@@ -166,6 +166,14 @@ impl Client {
         }
     }
 
+    /// Set the host for the client to something other than the default: `https://api.kittycad.io`.
+    pub fn set_host<H>(&mut self, host: H)
+    where
+        H: Into<String> + std::fmt::Display,
+    {
+        self.host = host.to_string();
+    }
+
     /// Create a new Client struct from the environment variable: KITTYCAD_API_TOKEN.
     pub fn new_from_env() -> Self {
         let token = env::var("KITTYCAD_API_TOKEN").expect("must set KITTYCAD_API_TOKEN");
