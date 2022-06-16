@@ -3654,7 +3654,7 @@
           "created_at": {
             "description": "The time and date the address was created.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "id": {
             "description": "The unique identifier of the address.",
@@ -3679,7 +3679,7 @@
           "updated_at": {
             "description": "The time and date the address was last updated.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "user_id": {
             "description": "The user ID that this address belongs to.",
@@ -3733,12 +3733,12 @@
             "nullable": true,
             "description": "The date and time the API call completed billing.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "created_at": {
             "description": "The date and time the API call was created.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "duration": {
             "nullable": true,
@@ -3808,7 +3808,7 @@
             "nullable": true,
             "description": "The date and time the API call started billing.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "status_code": {
             "nullable": true,
@@ -3834,7 +3834,7 @@
           "updated_at": {
             "description": "The date and time the API call was last updated.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "user_agent": {
             "description": "The user agent of the request.",
@@ -3882,7 +3882,7 @@
           "created_at": {
             "description": "The date and time the API token was created.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "id": {
             "description": "The unique identifier for the API token.",
@@ -3903,7 +3903,7 @@
           "updated_at": {
             "description": "The date and time the API token was last updated.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "user_id": {
             "description": "The ID of the user that owns the API token.",
@@ -3956,12 +3956,12 @@
             "nullable": true,
             "description": "The time and date the async API call was completed.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "created_at": {
             "description": "The time and date the async API call was created.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "error": {
             "nullable": true,
@@ -3987,7 +3987,7 @@
             "nullable": true,
             "description": "The time and date the async API call was started.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "status": {
             "description": "The status of the async API call.",
@@ -4008,7 +4008,7 @@
           "updated_at": {
             "description": "The time and date the async API call was last updated.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "user_id": {
             "description": "The user ID of the user who created the async API call.",
@@ -4038,12 +4038,12 @@
                 "nullable": true,
                 "description": "The time and date the file conversion was completed.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "created_at": {
                 "description": "The time and date the file conversion was created.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "error": {
                 "nullable": true,
@@ -4083,7 +4083,7 @@
                 "nullable": true,
                 "description": "The time and date the file conversion was started.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "status": {
                 "description": "The status of the file conversion.",
@@ -4102,7 +4102,7 @@
               "updated_at": {
                 "description": "The time and date the file conversion was last updated.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "user_id": {
                 "description": "The user ID of the user who created the file conversion.",
@@ -4127,12 +4127,12 @@
                 "nullable": true,
                 "description": "The time and date the mass was completed.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "created_at": {
                 "description": "The time and date the mass was created.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "error": {
                 "nullable": true,
@@ -4171,7 +4171,7 @@
                 "nullable": true,
                 "description": "The time and date the mass was started.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "status": {
                 "description": "The status of the mass.",
@@ -4190,7 +4190,7 @@
               "updated_at": {
                 "description": "The time and date the mass was last updated.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "user_id": {
                 "description": "The user ID of the user who created the mass.",
@@ -4214,12 +4214,12 @@
                 "nullable": true,
                 "description": "The time and date the volume was completed.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "created_at": {
                 "description": "The time and date the volume was created.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "error": {
                 "nullable": true,
@@ -4246,7 +4246,7 @@
                 "nullable": true,
                 "description": "The time and date the volume was started.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "status": {
                 "description": "The status of the volume.",
@@ -4265,7 +4265,7 @@
               "updated_at": {
                 "description": "The time and date the volume was last updated.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "user_id": {
                 "description": "The user ID of the user who created the volume.",
@@ -4295,12 +4295,12 @@
                 "nullable": true,
                 "description": "The time and date the density was completed.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "created_at": {
                 "description": "The time and date the density was created.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "density": {
                 "nullable": true,
@@ -4339,7 +4339,7 @@
                 "nullable": true,
                 "description": "The time and date the density was started.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "status": {
                 "description": "The status of the density.",
@@ -4358,7 +4358,7 @@
               "updated_at": {
                 "description": "The time and date the density was last updated.",
                 "type": "string",
-                "format": "date-time"
+                "format": "partial-date-time"
               },
               "user_id": {
                 "description": "The user ID of the user who created the density.",
@@ -5235,7 +5235,7 @@
           "created_at": {
             "description": "The date and time the user was created.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "discord": {
             "description": "The user's Discord handle.",
@@ -5250,7 +5250,7 @@
             "nullable": true,
             "description": "The date and time the email address was verified.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "first_name": {
             "description": "The user's first name.",
@@ -5298,7 +5298,7 @@
           "updated_at": {
             "description": "The date and time the user was last updated.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "zendesk_id": {
             "nullable": true,
@@ -5340,12 +5340,12 @@
             "nullable": true,
             "description": "The time and date the file conversion was completed.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "created_at": {
             "description": "The time and date the file conversion was created.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "error": {
             "nullable": true,
@@ -5385,7 +5385,7 @@
             "nullable": true,
             "description": "The time and date the file conversion was started.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "status": {
             "description": "The status of the file conversion.",
@@ -5398,7 +5398,7 @@
           "updated_at": {
             "description": "The time and date the file conversion was last updated.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "user_id": {
             "description": "The user ID of the user who created the file conversion.",
@@ -5422,12 +5422,12 @@
             "nullable": true,
             "description": "The time and date the density was completed.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "created_at": {
             "description": "The time and date the density was created.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "density": {
             "nullable": true,
@@ -5466,7 +5466,7 @@
             "nullable": true,
             "description": "The time and date the density was started.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "status": {
             "description": "The status of the density.",
@@ -5479,7 +5479,7 @@
           "updated_at": {
             "description": "The time and date the density was last updated.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "user_id": {
             "description": "The user ID of the user who created the density.",
@@ -5502,12 +5502,12 @@
             "nullable": true,
             "description": "The time and date the mass was completed.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "created_at": {
             "description": "The time and date the mass was created.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "error": {
             "nullable": true,
@@ -5546,7 +5546,7 @@
             "nullable": true,
             "description": "The time and date the mass was started.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "status": {
             "description": "The status of the mass.",
@@ -5559,7 +5559,7 @@
           "updated_at": {
             "description": "The time and date the mass was last updated.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "user_id": {
             "description": "The user ID of the user who created the mass.",
@@ -5618,12 +5618,12 @@
             "nullable": true,
             "description": "The time and date the volume was completed.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "created_at": {
             "description": "The time and date the volume was created.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "error": {
             "nullable": true,
@@ -5650,7 +5650,7 @@
             "nullable": true,
             "description": "The time and date the volume was started.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "status": {
             "description": "The status of the volume.",
@@ -5663,7 +5663,7 @@
           "updated_at": {
             "description": "The time and date the volume was last updated.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "user_id": {
             "description": "The user ID of the user who created the volume.",
@@ -6308,7 +6308,8 @@
       },
       "PhoneNumber": {
         "title": "String",
-        "type": "string"
+        "type": "string",
+        "format": "phone"
       },
       "Pong": {
         "description": "The response from the `/ping` endpoint.",
@@ -6330,12 +6331,12 @@
           "created_at": {
             "description": "The date and time the session was created.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "expires": {
             "description": "The date and time the session expires.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "id": {
             "description": "The unique identifier for the session.",
@@ -6352,7 +6353,7 @@
           "updated_at": {
             "description": "The date and time the session was last updated.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "user_id": {
             "description": "The user ID of the user that the session belongs to.",
@@ -6417,7 +6418,7 @@
           "created_at": {
             "description": "The date and time the user was created.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "discord": {
             "description": "The user's Discord handle.",
@@ -6432,7 +6433,7 @@
             "nullable": true,
             "description": "The date and time the email address was verified.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           },
           "first_name": {
             "description": "The user's first name.",
@@ -6470,7 +6471,7 @@
           "updated_at": {
             "description": "The date and time the user was last updated.",
             "type": "string",
-            "format": "date-time"
+            "format": "partial-date-time"
           }
         },
         "required": [

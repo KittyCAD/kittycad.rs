@@ -262,7 +262,11 @@ impl ParameterDataExt for openapiv3::ParameterData {
                                         "int64" => "i64".to_string(),
                                         "uint64" => "u64".to_string(),
                                         "google-fieldmask" => "&str".to_string(),
+                                        "phone" => "&str".to_string(),
                                         "google-datetime" => {
+                                            "chrono::DateTime<chrono::Utc>".to_string()
+                                        }
+                                        "partial-date-time" => {
                                             "chrono::DateTime<chrono::Utc>".to_string()
                                         }
                                         "ISO 8601 date-time" => {
@@ -1741,7 +1745,18 @@ impl TypeSpace {
                                 Some(uid.to_string()),
                                 TypeDetails::Basic("String".to_string(), s.schema_data.clone()),
                             )),
+                            "phone" => Ok((
+                                Some(uid.to_string()),
+                                TypeDetails::Basic("String".to_string(), s.schema_data.clone()),
+                            )),
                             "google-datetime" => Ok((
+                                Some(uid.to_string()),
+                                TypeDetails::Basic(
+                                    "crate::utils::DisplayOptionDateTime".to_string(),
+                                    s.schema_data.clone(),
+                                ),
+                            )),
+                            "partial-date-time" => Ok((
                                 Some(uid.to_string()),
                                 TypeDetails::Basic(
                                     "crate::utils::DisplayOptionDateTime".to_string(),
@@ -2597,13 +2612,6 @@ pub fn clean_fn_name(oid: &str, tag: &str) -> String {
         .replace("s_uuid", "")
         .replace("_id_or_uuid", "")
         .replace("_uuid", "")
-        .replace("organization_", "")
-        .replace("project_", "")
-        .replace("vpc_firewall_rules_", "firewall_rules_")
-        .replace("vpc_routers_", "routers_")
-        .replace("vpc_subnets_", "subnets_")
-        .replace("vpc_routes_", "routes_")
-        .replace("routers_routes_", "routes_")
         .replace("hardware_", "")
         .trim_start_matches('_')
         .trim_start_matches("in_")

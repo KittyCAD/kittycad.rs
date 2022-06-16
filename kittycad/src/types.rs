@@ -4323,7 +4323,6 @@ pub struct Invoice {
         skip_serializing_if = "Vec::is_empty",
         deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
     )]
-    #[header(hidden = true)]
     pub lines: Vec<InvoiceLineItem>,
 
     /**
@@ -4614,7 +4613,7 @@ pub struct LoginParams {
 ///
 /// This is mostly used for internal purposes and debugging.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
-pub struct MetadataType {
+pub struct Metadata {
     /**
     * Metadata about our cache.
     *  

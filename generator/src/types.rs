@@ -37,6 +37,10 @@ pub fn generate_types(api: &openapiv3::OpenAPI, ts: &mut TypeSpace) -> Result<St
 
             seen.insert(sn.clone(), true);
 
+            if sn == "MetadataType" {
+                sn = "Metadata".to_string();
+            }
+
             if sn == "Error" {
                 a(crate::types_templates::ERROR);
                 sn = "ErrorResponse".to_string();
@@ -88,7 +92,7 @@ pub fn generate_types(api: &openapiv3::OpenAPI, ts: &mut TypeSpace) -> Result<St
                     a("#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema,");
                     a("Default,");
                     if sn != "PaymentMethod"
-                        && sn != "MetadataType"
+                        && sn != "Metadata"
                         && sn != "EngineMetadata"
                         && sn != "JetstreamStats"
                         && sn != "Jetstream"
@@ -333,7 +337,7 @@ fn render_property(
         }
 
         // Hide things from the table that don't implement display.
-        if rt.starts_with("Vec<") {
+        if rt.starts_with("Vec<") && rt != "Vec<InvoiceLineItem>" {
             a(r#"#[header(hidden = true)]"#);
         }
 
