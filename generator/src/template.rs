@@ -294,7 +294,7 @@ mod test {
         let out = t.compile(Default::default());
         let want = "let url =
 format!(\"/measure/{}\",
-crate::progenitor_support::encode_path(number),);\n";
+crate::progenitor_support::encode_path(&number.to_string()),);\n";
         assert_eq!(want, &out);
         Ok(())
     }
