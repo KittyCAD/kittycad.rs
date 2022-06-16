@@ -3175,7 +3175,6 @@ rustdoc-args = ["--cfg", "docsrs"]
             /*
              * Create the Rust source files for each of the tags functions:
              */
-            
 
             match functions::generate_files(&api, &mut ts, &parameters) {
                 Ok((files, mut new_api)) => {
@@ -3189,7 +3188,7 @@ rustdoc-args = ["--cfg", "docsrs"]
                         r#"use kittycad::Client;
 
 // Authenticate via an API token.
-let client = Client::new("$KITTYCAD_API_TOKEN");
+let client = Client::new("$TOKEN");
 
 // - OR -
 
