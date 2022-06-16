@@ -41,7 +41,7 @@ jobs:
         with:
           repository: 'kittycad/kittycad.py'
           path: 'kittycad.py'
-          token: ${{secrets.PAT_GITHUB}}
+          token: ${{secrets.GLOBAL_PAT}}
       - name: move spec to docs
         shell: bash
         run: |
@@ -66,6 +66,6 @@ jobs:
               --head "$NEW_BRANCH" \
               --base main || true
         env:
-          GITHUB_TOKEN: ${{secrets.PAT_GITHUB}}
+          GITHUB_TOKEN: ${{secrets.GLOBAL_PAT}}
 
 
