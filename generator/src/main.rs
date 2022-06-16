@@ -2468,7 +2468,7 @@ fn gen(api: &OpenAPI, tags: Vec<String>) -> Result<String> {
         }
         if let Some(e) = &tag.external_docs {
             if !e.url.is_empty() {
-                docs = format!("{}\n\nFROM: {}", docs, e.url);
+                docs = format!("{}\n\nFROM: <{}>", docs, e.url);
             }
         }
 
@@ -2477,7 +2477,7 @@ fn gen(api: &OpenAPI, tags: Vec<String>) -> Result<String> {
                pub fn {}(&self) -> {}::{} {{
                     {}::{}::new(self.clone())
                }}"#,
-            docs.replace('\n', "\n///"),
+            docs.replace('\n', "\n/// "),
             to_snake_case(&clean_name(&tag.name)),
             to_snake_case(&clean_name(&tag.name)),
             struct_name(&tag.name),
