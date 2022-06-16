@@ -40,9 +40,7 @@
 //! ```
 //! use kittycad::Client;
 //!
-//! let kittycad = Client::new(
-//!     String::from("api-key"),
-//! );
+//! let kittycad = Client::new(String::from("api-key"));
 //! ```
 //!
 //! Alternatively, the library can search for most of the variables required for
@@ -57,7 +55,6 @@
 //!
 //! let kittycad = Client::new_from_env();
 //! ```
-//!
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::nonstandard_macro_braces)]
 #![allow(clippy::large_enum_variant)]

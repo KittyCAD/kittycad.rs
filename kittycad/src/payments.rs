@@ -13,26 +13,26 @@ impl Payments {
     }
 
     /**
-    * Get payment info about your user.
-    *
-    * This function performs a `GET` to the `/user/payment` endpoint.
-    *
-    * This includes billing address, phone, and name.
-    * This endpoint requires authentication by any KittyCAD user. It gets the payment information for the authenticated user.
-    */
+     * Get payment info about your user.
+     *
+     * This function performs a `GET` to the `/user/payment` endpoint.
+     *
+     * This includes billing address, phone, and name.
+     * This endpoint requires authentication by any KittyCAD user. It gets the payment information for the authenticated user.
+     */
     pub async fn get_information_for_user(&self) -> Result<crate::types::Customer> {
         let url = "/user/payment".to_string();
         self.client.get(&url, None).await
     }
 
     /**
-    * Update payment info for your user.
-    *
-    * This function performs a `PUT` to the `/user/payment` endpoint.
-    *
-    * This includes billing address, phone, and name.
-    * This endpoint requires authentication by any KittyCAD user. It updates the payment information for the authenticated user.
-    */
+     * Update payment info for your user.
+     *
+     * This function performs a `PUT` to the `/user/payment` endpoint.
+     *
+     * This includes billing address, phone, and name.
+     * This endpoint requires authentication by any KittyCAD user. It updates the payment information for the authenticated user.
+     */
     pub async fn update_information_for_user(
         &self,
         body: &crate::types::BillingInfo,
@@ -44,13 +44,13 @@ impl Payments {
     }
 
     /**
-    * Create payment info for your user.
-    *
-    * This function performs a `POST` to the `/user/payment` endpoint.
-    *
-    * This includes billing address, phone, and name.
-    * This endpoint requires authentication by any KittyCAD user. It creates the payment information for the authenticated user.
-    */
+     * Create payment info for your user.
+     *
+     * This function performs a `POST` to the `/user/payment` endpoint.
+     *
+     * This includes billing address, phone, and name.
+     * This endpoint requires authentication by any KittyCAD user. It creates the payment information for the authenticated user.
+     */
     pub async fn create_information_for_user(
         &self,
         body: &crate::types::BillingInfo,
@@ -62,65 +62,65 @@ impl Payments {
     }
 
     /**
-    * Delete payment info for your user.
-    *
-    * This function performs a `DELETE` to the `/user/payment` endpoint.
-    *
-    * This includes billing address, phone, and name.
-    * This endpoint requires authentication by any KittyCAD user. It deletes the payment information for the authenticated user.
-    */
+     * Delete payment info for your user.
+     *
+     * This function performs a `DELETE` to the `/user/payment` endpoint.
+     *
+     * This includes billing address, phone, and name.
+     * This endpoint requires authentication by any KittyCAD user. It deletes the payment information for the authenticated user.
+     */
     pub async fn delete_information_for_user(&self) -> Result<()> {
         let url = "/user/payment".to_string();
         self.client.delete(&url, None).await
     }
 
     /**
-    * Create a payment intent for your user.
-    *
-    * This function performs a `POST` to the `/user/payment/intent` endpoint.
-    *
-    * This endpoint requires authentication by any KittyCAD user. It creates a new payment intent for the authenticated user.
-    */
+     * Create a payment intent for your user.
+     *
+     * This function performs a `POST` to the `/user/payment/intent` endpoint.
+     *
+     * This endpoint requires authentication by any KittyCAD user. It creates a new payment intent for the authenticated user.
+     */
     pub async fn create_intent_for_user(&self) -> Result<crate::types::PaymentIntent> {
         let url = "/user/payment/intent".to_string();
         self.client.post(&url, None).await
     }
 
     /**
-    * List invoices for your user.
-    *
-    * This function performs a `GET` to the `/user/payment/invoices` endpoint.
-    *
-    * This endpoint requires authentication by any KittyCAD user. It lists invoices for the authenticated user.
-    */
+     * List invoices for your user.
+     *
+     * This function performs a `GET` to the `/user/payment/invoices` endpoint.
+     *
+     * This endpoint requires authentication by any KittyCAD user. It lists invoices for the authenticated user.
+     */
     pub async fn list_invoices_for_user(&self) -> Result<Vec<crate::types::Invoice>> {
         let url = "/user/payment/invoices".to_string();
         self.client.get(&url, None).await
     }
 
     /**
-    * List payment methods for your user.
-    *
-    * This function performs a `GET` to the `/user/payment/methods` endpoint.
-    *
-    * This endpoint requires authentication by any KittyCAD user. It lists payment methods for the authenticated user.
-    */
+     * List payment methods for your user.
+     *
+     * This function performs a `GET` to the `/user/payment/methods` endpoint.
+     *
+     * This endpoint requires authentication by any KittyCAD user. It lists payment methods for the authenticated user.
+     */
     pub async fn list_methods_for_user(&self) -> Result<Vec<crate::types::PaymentMethod>> {
         let url = "/user/payment/methods".to_string();
         self.client.get(&url, None).await
     }
 
     /**
-    * Delete a payment method for your user.
-    *
-    * This function performs a `DELETE` to the `/user/payment/methods/{id}` endpoint.
-    *
-    * This endpoint requires authentication by any KittyCAD user. It deletes the specified payment method for the authenticated user.
-    *
-    * **Parameters:**
-    *
-    * * `id: &str` -- The ID of the payment method.
-    */
+     * Delete a payment method for your user.
+     *
+     * This function performs a `DELETE` to the `/user/payment/methods/{id}` endpoint.
+     *
+     * This endpoint requires authentication by any KittyCAD user. It deletes the specified payment method for the authenticated user.
+     *
+     * **Parameters:**
+     *
+     * * `id: &str` -- The ID of the payment method.
+     */
     pub async fn delete_method_for_user(&self, id: &str) -> Result<()> {
         let url = format!(
             "/user/payment/methods/{}",
