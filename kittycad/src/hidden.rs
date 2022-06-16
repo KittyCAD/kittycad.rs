@@ -13,10 +13,10 @@ impl Hidden {
     }
 
     /**
-     * This endpoint sets a session cookie for a user.
-     *
-     * This function performs a `POST` to the `/login` endpoint.
-     */
+    * This endpoint sets a session cookie for a user.
+    *
+    * This function performs a `POST` to the `/login` endpoint.
+    */
     pub async fn login(&self, body: &crate::types::LoginParams) -> Result<()> {
         let url = "/login".to_string();
         self.client

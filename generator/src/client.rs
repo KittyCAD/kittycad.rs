@@ -9,6 +9,12 @@ pub fn generate_client() -> String {
 const CLIENT_FUNCTIONS: &str = r#"
 use std::env;
 
+static APP_USER_AGENT: &str = concat!(
+    env!("CARGO_PKG_NAME"),
+    "/",
+    env!("CARGO_PKG_VERSION"),
+);
+
 /// Entrypoint for interacting with the API client.
 #[derive(Clone)]
 pub struct Client {
@@ -28,7 +34,10 @@ impl Client {
     where
         T: ToString,
     {
-        let client = reqwest::Client::builder().build();
+        let client = reqwest::Client::builder()
+            .user_agent(APP_USER_AGENT)
+            .build();
+
         match client {
             Ok(c) => {
                 Client {

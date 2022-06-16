@@ -40,7 +40,9 @@
 //! ```
 //! use kittycad::Client;
 //!
-//! let kittycad = Client::new(String::from("api-key"));
+//! let kittycad = Client::new(
+//!     String::from("api-key"),
+//! );
 //! ```
 //!
 //! Alternatively, the library can search for most of the variables required for
@@ -55,6 +57,7 @@
 //!
 //! let kittycad = Client::new_from_env();
 //! ```
+//!
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::nonstandard_macro_braces)]
 #![allow(clippy::large_enum_variant)]
@@ -92,6 +95,7 @@ pub mod payments;
 pub mod sessions;
 #[cfg(test)]
 mod tests;
+pub mod traits;
 pub mod types;
 /// A user is someone who uses the KittyCAD API. Here, we can create, delete, and list users. We can also get information about a user. Operations will only be authorized if the user is requesting information about themselves.
 ///
@@ -124,6 +128,8 @@ mod progenitor_support {
 
 use std::env;
 
+static APP_USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"),);
+
 /// Entrypoint for interacting with the API client.
 #[derive(Clone)]
 pub struct Client {
@@ -141,7 +147,10 @@ impl Client {
     where
         T: ToString,
     {
-        let client = reqwest::Client::builder().build();
+        let client = reqwest::Client::builder()
+            .user_agent(APP_USER_AGENT)
+            .build();
+
         match client {
             Ok(c) => Client {
                 token: token.to_string(),

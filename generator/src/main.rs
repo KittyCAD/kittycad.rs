@@ -2358,6 +2358,7 @@ fn gen(api: &OpenAPI, tags: Vec<String>) -> Result<String> {
     a("#[cfg(test)]");
     a("mod tests;");
     // Hopefully there is never a "tag" named after these reserved libs.
+    a("pub mod traits;");
     a("pub mod types;");
     a("#[doc(hidden)]");
     a("pub mod utils;");
@@ -3082,19 +3083,20 @@ license = "MIT"
 
 [dependencies]
 anyhow = "1"
+async-trait = "^0.1.53"
 bytes = {{ version = "1", features = ["serde"] }}
 chrono = {{ version = "0.4", features = ["serde"] }}
 chrono-humanize = "^0.2.1"
+data-encoding = "^2.3.2"
 dirs = {{ version = "^4.0.0", optional = true }}
-http = "^0.2.4"
+http = "^0.2.8"
 hyperx = "1"
-ipnetwork = "^0.18"
 log = {{ version = "^0.4", features = ["serde"] }}
 mime = "0.3"
 parse-display = "^0.5"
 percent-encoding = "2.1"
 reqwest = {{ version = "0.11", default-features = false, features = ["json", "multipart", "rustls-tls"] }}
-schemars = {{ version = "0.8", features = ["bytes", "chrono", "url", "uuid"] }}
+schemars = {{ version = "0.8", features = ["bytes", "chrono", "url", "uuid1"] }}
 serde = {{ version = "1", features = ["derive"] }}
 serde_json = "1"
 serde_with = "1"
@@ -3102,13 +3104,9 @@ serde_urlencoded = "^0.7"
 tabled = {{ version = "0.5.0", features = ["color"] }}
 thiserror = "^1"
 url = {{ version = "2", features = ["serde"] }}
-uuid = {{ version = "^0.8", features = ["serde", "v4"] }}
+uuid = {{ version = "1", features = ["serde", "v4"] }}
 
 [dev-dependencies]
-base64 = "^0.13"
-dirs = "^4.0.0"
-Inflector = "^0.11.4"
-nom_pem = "4"
 pretty_assertions = "1"
 tokio = {{ version = "1.8.0", features = ["full"] }}
 

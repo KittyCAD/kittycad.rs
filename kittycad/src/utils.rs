@@ -1,9 +1,7 @@
 use std::{fmt, str::FromStr};
 
-use serde::{
-    de::{self, Visitor},
-    Deserialize, Serialize,
-};
+use serde::de::{self, Visitor};
+use serde::{Deserialize, Serialize};
 
 pub fn next_link(l: &hyperx::header::Link) -> Option<String> {
     l.values().iter().find_map(|value| {
