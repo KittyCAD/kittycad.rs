@@ -13,19 +13,19 @@ impl File {
     }
 
     /**
-    * Convert CAD file.
-    *
-    * This function performs a `POST` to the `/file/conversion/{src_format}/{output_format}` endpoint.
-    *
-    * Convert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.
-    * If the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.
-    * If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.
-    *
-    * **Parameters:**
-    *
-    * * `output_format: crate::types::FileOutputFormat` -- The format the file should be converted to.
-    * * `src_format: crate::types::FileSourceFormat` -- The valid types of source file formats.
-    */
+     * Convert CAD file.
+     *
+     * This function performs a `POST` to the `/file/conversion/{src_format}/{output_format}` endpoint.
+     *
+     * Convert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.
+     * If the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.
+     * If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.
+     *
+     * **Parameters:**
+     *
+     * * `output_format: crate::types::FileOutputFormat` -- The format the file should be converted to.
+     * * `src_format: crate::types::FileSourceFormat` -- The valid types of source file formats.
+     */
     pub async fn create_conversion<B: Into<reqwest::Body>>(
         &self,
         output_format: crate::types::FileOutputFormat,
@@ -42,19 +42,19 @@ impl File {
     }
 
     /**
-    * Get a file conversion.
-    *
-    * This function performs a `GET` to the `/file/conversions/{id}` endpoint.
-    *
-    * Get the status and output of an async file conversion.
-    * This endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.
-    * If the user is not authenticated to view the specified file conversion, then it is not returned.
-    * Only KittyCAD employees with the proper access can view file conversions for other users.
-    *
-    * **Parameters:**
-    *
-    * * `id: &str` -- The ID of the async operation.
-    */
+     * Get a file conversion.
+     *
+     * This function performs a `GET` to the `/file/conversions/{id}` endpoint.
+     *
+     * Get the status and output of an async file conversion.
+     * This endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.
+     * If the user is not authenticated to view the specified file conversion, then it is not returned.
+     * Only KittyCAD employees with the proper access can view file conversions for other users.
+     *
+     * **Parameters:**
+     *
+     * * `id: &str` -- The ID of the async operation.
+     */
     pub async fn get_conversion(&self, id: &str) -> Result<crate::types::AsyncApiCallOutput> {
         let url = format!(
             "/file/conversions/{}",
@@ -65,18 +65,18 @@ impl File {
     }
 
     /**
-    * Get CAD file density.
-    *
-    * This function performs a `POST` to the `/file/density` endpoint.
-    *
-    * Get the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.
-    * If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.
-    *
-    * **Parameters:**
-    *
-    * * `material_mass: f64` -- The material mass.
-    * * `src_format: crate::types::FileSourceFormat` -- The valid types of source file formats.
-    */
+     * Get CAD file density.
+     *
+     * This function performs a `POST` to the `/file/density` endpoint.
+     *
+     * Get the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.
+     * If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.
+     *
+     * **Parameters:**
+     *
+     * * `material_mass: f64` -- The material mass.
+     * * `src_format: crate::types::FileSourceFormat` -- The valid types of source file formats.
+     */
     pub async fn create_density<B: Into<reqwest::Body>>(
         &self,
         material_mass: f64,
@@ -97,15 +97,15 @@ impl File {
     }
 
     /**
-    * Execute a KittyCAD program in a specific language.
-    *
-    * This function performs a `POST` to the `/file/execute/{lang}` endpoint.
-    *
-    * **Parameters:**
-    *
-    * * `lang: crate::types::CodeLanguage` -- The language code is written in.
-    * * `output: &str` -- The output file we want to get the contents for (the paths are relative to where in litterbox it is being run). You can denote more than one file with a comma separated list of string paths.
-    */
+     * Execute a KittyCAD program in a specific language.
+     *
+     * This function performs a `POST` to the `/file/execute/{lang}` endpoint.
+     *
+     * **Parameters:**
+     *
+     * * `lang: crate::types::CodeLanguage` -- The language code is written in.
+     * * `output: &str` -- The output file we want to get the contents for (the paths are relative to where in litterbox it is being run). You can denote more than one file with a comma separated list of string paths.
+     */
     pub async fn create_execution<B: Into<reqwest::Body>>(
         &self,
         lang: crate::types::CodeLanguage,
@@ -127,18 +127,18 @@ impl File {
     }
 
     /**
-    * Get CAD file mass.
-    *
-    * This function performs a `POST` to the `/file/mass` endpoint.
-    *
-    * Get the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.
-    * If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.
-    *
-    * **Parameters:**
-    *
-    * * `material_density: f64` -- The material density.
-    * * `src_format: crate::types::FileSourceFormat` -- The valid types of source file formats.
-    */
+     * Get CAD file mass.
+     *
+     * This function performs a `POST` to the `/file/mass` endpoint.
+     *
+     * Get the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.
+     * If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.
+     *
+     * **Parameters:**
+     *
+     * * `material_density: f64` -- The material density.
+     * * `src_format: crate::types::FileSourceFormat` -- The valid types of source file formats.
+     */
     pub async fn create_mass<B: Into<reqwest::Body>>(
         &self,
         material_density: f64,
@@ -159,17 +159,17 @@ impl File {
     }
 
     /**
-    * Get CAD file volume.
-    *
-    * This function performs a `POST` to the `/file/volume` endpoint.
-    *
-    * Get the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.
-    * If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.
-    *
-    * **Parameters:**
-    *
-    * * `src_format: crate::types::FileSourceFormat` -- The valid types of source file formats.
-    */
+     * Get CAD file volume.
+     *
+     * This function performs a `POST` to the `/file/volume` endpoint.
+     *
+     * Get the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.
+     * If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.
+     *
+     * **Parameters:**
+     *
+     * * `src_format: crate::types::FileSourceFormat` -- The valid types of source file formats.
+     */
     pub async fn create_volume<B: Into<reqwest::Body>>(
         &self,
         src_format: crate::types::FileSourceFormat,
@@ -186,17 +186,17 @@ impl File {
     }
 
     /**
-    * Get a file conversion for your user.
-    *
-    * This function performs a `GET` to the `/user/file/conversions/{id}` endpoint.
-    *
-    * Get the status and output of an async file conversion. If completed, the contents of the converted file (`output`) will be returned as a base64 encoded string.
-    * This endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.
-    *
-    * **Parameters:**
-    *
-    * * `id: &str` -- The ID of the async operation.
-    */
+     * Get a file conversion for your user.
+     *
+     * This function performs a `GET` to the `/user/file/conversions/{id}` endpoint.
+     *
+     * Get the status and output of an async file conversion. If completed, the contents of the converted file (`output`) will be returned as a base64 encoded string.
+     * This endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.
+     *
+     * **Parameters:**
+     *
+     * * `id: &str` -- The ID of the async operation.
+     */
     pub async fn get_conversion_for_user(
         &self,
         id: &str,

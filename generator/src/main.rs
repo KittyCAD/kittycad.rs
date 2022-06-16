@@ -3172,7 +3172,9 @@ rustdoc-args = ["--cfg", "docsrs"]
             /*
              * Create the Rust source files for each of the tags functions:
              */
-            let fail = match functions::generate_files(&api, &mut ts, &parameters) {
+            
+
+            match functions::generate_files(&api, &mut ts, &parameters) {
                 Ok((files, mut new_api)) => {
                     let mut extension: HashMap<String, String> = HashMap::new();
                     extension.insert(
@@ -3242,9 +3244,7 @@ impl {} {{
                     println!("generate_files fail: {:?}", e);
                     true
                 }
-            };
-
-            fail
+            }
         }
         Err(e) => {
             println!("gen fail: {:?}", e);

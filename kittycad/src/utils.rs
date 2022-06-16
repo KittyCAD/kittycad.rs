@@ -1,7 +1,9 @@
 use std::{fmt, str::FromStr};
 
-use serde::de::{self, Visitor};
-use serde::{Deserialize, Serialize};
+use serde::{
+    de::{self, Visitor},
+    Deserialize, Serialize,
+};
 
 pub fn next_link(l: &hyperx::header::Link) -> Option<String> {
     l.values().iter().find_map(|value| {
@@ -640,7 +642,7 @@ pub mod deserialize_null_vector {
     }
 }
 
-#[derive(Debug, Clone, Default, Deserialize, Serialize, schemars::JsonSchema, PartialEq)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize, schemars::JsonSchema, PartialEq, Eq)]
 pub struct DisplayOptionDateTime(pub Option<chrono::DateTime<chrono::Utc>>);
 
 impl std::fmt::Display for DisplayOptionDateTime {

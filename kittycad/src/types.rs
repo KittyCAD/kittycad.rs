@@ -1,14 +1,15 @@
 //! The data types sent to and returned from the API client.
+use std::fmt;
+
 use parse_display::{Display, FromStr};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use std::fmt;
 use tabled::Tabled;
 
 /**
-* The status of an async API call.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+ * The status of an async API call.
+ */
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Tabled)]
 pub enum ApiCallStatus {
     #[serde(rename = "Completed")]
     Completed,
@@ -28,7 +29,7 @@ pub enum ApiCallStatus {
 
 impl std::fmt::Display for ApiCallStatus {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
+        match self {
             ApiCallStatus::Completed => "Completed",
             ApiCallStatus::Failed => "Failed",
             ApiCallStatus::InProgress => "In Progress",
@@ -74,13 +75,13 @@ impl ApiCallStatus {
 }
 
 /// An address.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct Address {
     /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
+     * A uuid.
+     *  
+     *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -89,8 +90,8 @@ pub struct Address {
     pub id: String,
 
     /**
-    * An address.
-    */
+     * An address.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -99,8 +100,8 @@ pub struct Address {
     pub city: String,
 
     /**
-    * An address.
-    */
+     * An address.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -109,14 +110,14 @@ pub struct Address {
     pub country: String,
 
     /**
-    * The time and date the address was created.
-    */
+     * The time and date the address was created.
+     */
     #[serde()]
     pub created_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * An address.
-    */
+     * An address.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -125,8 +126,8 @@ pub struct Address {
     pub state: String,
 
     /**
-    * An address.
-    */
+     * An address.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -136,8 +137,8 @@ pub struct Address {
     pub street_1: String,
 
     /**
-    * An address.
-    */
+     * An address.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -147,14 +148,14 @@ pub struct Address {
     pub street_2: String,
 
     /**
-    * The time and date the address was last updated.
-    */
+     * The time and date the address was last updated.
+     */
     #[serde()]
     pub updated_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * An address.
-    */
+     * An address.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -163,8 +164,8 @@ pub struct Address {
     pub user_id: String,
 
     /**
-    * An address.
-    */
+     * An address.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -174,7 +175,7 @@ pub struct Address {
 }
 
 /// A response for a query on the API call table that is grouped by something.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct ApiCallQueryGroup {
     #[serde(
         default,
@@ -192,9 +193,9 @@ pub struct ApiCallQueryGroup {
 }
 
 /**
-* The field of an API call to group by.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+ * The field of an API call to group by.
+ */
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Tabled)]
 pub enum ApiCallQueryGroupBy {
     #[serde(rename = "email")]
     Email,
@@ -216,7 +217,7 @@ pub enum ApiCallQueryGroupBy {
 
 impl std::fmt::Display for ApiCallQueryGroupBy {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
+        match self {
             ApiCallQueryGroupBy::Email => "email",
             ApiCallQueryGroupBy::Endpoint => "endpoint",
             ApiCallQueryGroupBy::IpAddress => "ip_address",
@@ -266,13 +267,13 @@ impl ApiCallQueryGroupBy {
 }
 
 /**
-* The Request Method (VERB)
-*   
-*   This type also contains constants for a number of common HTTP methods such as GET, POST, etc.
-*   
-*   Currently includes 8 variants representing the 8 methods defined in [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH, and an Extension variant for all extensions.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+ * The Request Method (VERB)
+ *   
+ *   This type also contains constants for a number of common HTTP methods such as GET, POST, etc.
+ *   
+ *   Currently includes 8 variants representing the 8 methods defined in [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH, and an Extension variant for all extensions.
+ */
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Tabled)]
 pub enum Method {
     #[serde(rename = "CONNECT")]
     Connect,
@@ -302,7 +303,7 @@ pub enum Method {
 
 impl std::fmt::Display for Method {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
+        match self {
             Method::Connect => "CONNECT",
             Method::Delete => "DELETE",
             Method::Extension => "EXTENSION",
@@ -373,10 +374,10 @@ impl Method {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct ApiCallWithPrice {
     /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
+     * A uuid.
+     *  
+     *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -385,20 +386,20 @@ pub struct ApiCallWithPrice {
     pub id: String,
 
     /**
-    * The date and time the API call completed billing.
-    */
+     * The date and time the API call completed billing.
+     */
     #[serde()]
     pub completed_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The date and time the API call was created.
-    */
+     * The date and time the API call was created.
+     */
     #[serde()]
     pub created_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The duration of the API call.
-    */
+     * The duration of the API call.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -407,10 +408,10 @@ pub struct ApiCallWithPrice {
     pub duration: i64,
 
     /**
-    * An API call with the price.
-    *  
-    *  This is a join of the `APICall` and `APICallPrice` tables.
-    */
+     * An API call with the price.
+     *  
+     *  This is a join of the `APICall` and `APICallPrice` tables.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -419,10 +420,10 @@ pub struct ApiCallWithPrice {
     pub email: String,
 
     /**
-    * An API call with the price.
-    *  
-    *  This is a join of the `APICall` and `APICallPrice` tables.
-    */
+     * An API call with the price.
+     *  
+     *  This is a join of the `APICall` and `APICallPrice` tables.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -431,10 +432,10 @@ pub struct ApiCallWithPrice {
     pub endpoint: String,
 
     /**
-    * An API call with the price.
-    *  
-    *  This is a join of the `APICall` and `APICallPrice` tables.
-    */
+     * An API call with the price.
+     *  
+     *  This is a join of the `APICall` and `APICallPrice` tables.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -443,18 +444,18 @@ pub struct ApiCallWithPrice {
     pub ip_address: String,
 
     /**
-    * The Request Method (VERB)
-    *  
-    *  This type also contains constants for a number of common HTTP methods such as GET, POST, etc.
-    *  
-    *  Currently includes 8 variants representing the 8 methods defined in [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH, and an Extension variant for all extensions.
-    */
+     * The Request Method (VERB)
+     *  
+     *  This type also contains constants for a number of common HTTP methods such as GET, POST, etc.
+     *  
+     *  Currently includes 8 variants representing the 8 methods defined in [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH, and an Extension variant for all extensions.
+     */
     #[serde(default, skip_serializing_if = "Method::is_noop")]
     pub method: Method,
 
     /**
-    * The number of minutes the API call was billed for.
-    */
+     * The number of minutes the API call was billed for.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i32",
@@ -463,10 +464,10 @@ pub struct ApiCallWithPrice {
     pub minutes: i32,
 
     /**
-    * An API call with the price.
-    *  
-    *  This is a join of the `APICall` and `APICallPrice` tables.
-    */
+     * An API call with the price.
+     *  
+     *  This is a join of the `APICall` and `APICallPrice` tables.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -475,8 +476,8 @@ pub struct ApiCallWithPrice {
     pub origin: String,
 
     /**
-    * The price of the API call.
-    */
+     * The price of the API call.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_f64",
@@ -485,8 +486,8 @@ pub struct ApiCallWithPrice {
     pub price: f64,
 
     /**
-    * The request body sent by the API call.
-    */
+     * The request body sent by the API call.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -495,10 +496,10 @@ pub struct ApiCallWithPrice {
     pub request_body: String,
 
     /**
-    * An API call with the price.
-    *  
-    *  This is a join of the `APICall` and `APICallPrice` tables.
-    */
+     * An API call with the price.
+     *  
+     *  This is a join of the `APICall` and `APICallPrice` tables.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -507,8 +508,8 @@ pub struct ApiCallWithPrice {
     pub request_query_params: String,
 
     /**
-    * The response body returned by the API call. We do not store this information if it is above a certain size.
-    */
+     * The response body returned by the API call. We do not store this information if it is above a certain size.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -517,14 +518,14 @@ pub struct ApiCallWithPrice {
     pub response_body: String,
 
     /**
-    * The date and time the API call started billing.
-    */
+     * The date and time the API call started billing.
+     */
     #[serde()]
     pub started_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The status code returned by the API call.
-    */
+     * The status code returned by the API call.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i32",
@@ -533,10 +534,10 @@ pub struct ApiCallWithPrice {
     pub status_code: i32,
 
     /**
-    * An API call with the price.
-    *  
-    *  This is a join of the `APICall` and `APICallPrice` tables.
-    */
+     * An API call with the price.
+     *  
+     *  This is a join of the `APICall` and `APICallPrice` tables.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -545,10 +546,10 @@ pub struct ApiCallWithPrice {
     pub stripe_invoice_item_id: String,
 
     /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
+     * A uuid.
+     *  
+     *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -557,14 +558,14 @@ pub struct ApiCallWithPrice {
     pub token: String,
 
     /**
-    * The date and time the API call was last updated.
-    */
+     * The date and time the API call was last updated.
+     */
     #[serde()]
     pub updated_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The user agent of the request.
-    */
+     * The user agent of the request.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -573,10 +574,10 @@ pub struct ApiCallWithPrice {
     pub user_agent: String,
 
     /**
-    * An API call with the price.
-    *  
-    *  This is a join of the `APICall` and `APICallPrice` tables.
-    */
+     * An API call with the price.
+     *  
+     *  This is a join of the `APICall` and `APICallPrice` tables.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -589,8 +590,8 @@ pub struct ApiCallWithPrice {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct ApiCallWithPriceResultsPage {
     /**
-    * list of items on this page of results
-    */
+     * list of items on this page of results
+     */
     #[serde(
         default,
         skip_serializing_if = "Vec::is_empty",
@@ -600,8 +601,8 @@ pub struct ApiCallWithPriceResultsPage {
     pub items: Vec<ApiCallWithPrice>,
 
     /**
-    * token used to fetch the next page of results (if any)
-    */
+     * token used to fetch the next page of results (if any)
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -613,13 +614,13 @@ pub struct ApiCallWithPriceResultsPage {
 /// An API token.
 ///
 /// These are used to authenticate users with Bearer authentication.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct ApiToken {
     /**
-    * An API token.
-    *  
-    *  These are used to authenticate users with Bearer authentication.
-    */
+     * An API token.
+     *  
+     *  These are used to authenticate users with Bearer authentication.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -628,14 +629,14 @@ pub struct ApiToken {
     pub id: String,
 
     /**
-    * The date and time the API token was created.
-    */
+     * The date and time the API token was created.
+     */
     #[serde()]
     pub created_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * If the token is valid. We never delete API tokens, but we can mark them as invalid. We save them for ever to preserve the history of the API token.
-    */
+     * If the token is valid. We never delete API tokens, but we can mark them as invalid. We save them for ever to preserve the history of the API token.
+     */
     #[serde(
         default,
         deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
@@ -643,10 +644,10 @@ pub struct ApiToken {
     pub is_valid: bool,
 
     /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
+     * A uuid.
+     *  
+     *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -655,16 +656,16 @@ pub struct ApiToken {
     pub token: String,
 
     /**
-    * The date and time the API token was last updated.
-    */
+     * The date and time the API token was last updated.
+     */
     #[serde()]
     pub updated_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * An API token.
-    *  
-    *  These are used to authenticate users with Bearer authentication.
-    */
+     * An API token.
+     *  
+     *  These are used to authenticate users with Bearer authentication.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -677,8 +678,8 @@ pub struct ApiToken {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct ApiTokenResultsPage {
     /**
-    * list of items on this page of results
-    */
+     * list of items on this page of results
+     */
     #[serde(
         default,
         skip_serializing_if = "Vec::is_empty",
@@ -688,8 +689,8 @@ pub struct ApiTokenResultsPage {
     pub items: Vec<ApiToken>,
 
     /**
-    * token used to fetch the next page of results (if any)
-    */
+     * token used to fetch the next page of results (if any)
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -699,9 +700,9 @@ pub struct ApiTokenResultsPage {
 }
 
 /**
-* The type of async API call.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+ * The type of async API call.
+ */
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Tabled)]
 pub enum AsyncApiCallType {
     #[serde(rename = "FileConversion")]
     FileConversion,
@@ -719,7 +720,7 @@ pub enum AsyncApiCallType {
 
 impl std::fmt::Display for AsyncApiCallType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
+        match self {
             AsyncApiCallType::FileConversion => "FileConversion",
             AsyncApiCallType::FileDensity => "FileDensity",
             AsyncApiCallType::FileMass => "FileMass",
@@ -761,13 +762,13 @@ impl AsyncApiCallType {
 }
 
 /// An async API call.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default)]
 pub struct AsyncApiCall {
     /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
+     * A uuid.
+     *  
+     *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -776,20 +777,20 @@ pub struct AsyncApiCall {
     pub id: String,
 
     /**
-    * The time and date the async API call was completed.
-    */
+     * The time and date the async API call was completed.
+     */
     #[serde()]
     pub completed_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The time and date the async API call was created.
-    */
+     * The time and date the async API call was created.
+     */
     #[serde()]
     pub created_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The error the function returned, if any.
-    */
+     * The error the function returned, if any.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -798,32 +799,32 @@ pub struct AsyncApiCall {
     pub error: String,
 
     /**
-    * An async API call.
-    */
+     * An async API call.
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub input: Option<serde_json::Value>,
 
     /**
-    * The JSON output for the API call. These are determined by the endpoint that is run.
-    */
+     * The JSON output for the API call. These are determined by the endpoint that is run.
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub output: Option<serde_json::Value>,
 
     /**
-    * The time and date the async API call was started.
-    */
+     * The time and date the async API call was started.
+     */
     #[serde()]
     pub started_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The status of an async API call.
-    */
+     * The status of an async API call.
+     */
     #[serde(default, skip_serializing_if = "ApiCallStatus::is_noop")]
     pub status: ApiCallStatus,
 
     /**
-    * The type of async API call.
-    */
+     * The type of async API call.
+     */
     #[serde(
         default,
         skip_serializing_if = "AsyncApiCallType::is_noop",
@@ -832,14 +833,14 @@ pub struct AsyncApiCall {
     pub type_: AsyncApiCallType,
 
     /**
-    * The time and date the async API call was last updated.
-    */
+     * The time and date the async API call was last updated.
+     */
     #[serde()]
     pub updated_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * An async API call.
-    */
+     * An async API call.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -848,8 +849,8 @@ pub struct AsyncApiCall {
     pub user_id: String,
 
     /**
-    * An async API call.
-    */
+     * An async API call.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -938,9 +939,9 @@ impl AsyncApiCallOutput {
     }
 }
 /**
-* The types for AsyncApiCallOutput.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+ * The types for AsyncApiCallOutput.
+ */
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Tabled)]
 pub enum AsyncApiCallOutputType {
     #[serde(rename = "FileConversion")]
     FileConversion,
@@ -954,7 +955,7 @@ pub enum AsyncApiCallOutputType {
 
 impl std::fmt::Display for AsyncApiCallOutputType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
+        match self {
             AsyncApiCallOutputType::FileConversion => "FileConversion",
             AsyncApiCallOutputType::FileDensity => "FileDensity",
             AsyncApiCallOutputType::FileMass => "FileMass",
@@ -992,8 +993,8 @@ impl std::str::FromStr for AsyncApiCallOutputType {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct AsyncApiCallResultsPage {
     /**
-    * list of items on this page of results
-    */
+     * list of items on this page of results
+     */
     #[serde(
         default,
         skip_serializing_if = "Vec::is_empty",
@@ -1003,8 +1004,8 @@ pub struct AsyncApiCallResultsPage {
     pub items: Vec<AsyncApiCall>,
 
     /**
-    * token used to fetch the next page of results (if any)
-    */
+     * token used to fetch the next page of results (if any)
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1017,8 +1018,8 @@ pub struct AsyncApiCallResultsPage {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
 pub struct BillingInfo {
     /**
-    * The billing information for payments.
-    */
+     * The billing information for payments.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1027,14 +1028,14 @@ pub struct BillingInfo {
     pub name: String,
 
     /**
-    * The address of the customer.
-    */
+     * The address of the customer.
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub address: Option<Address>,
 
     /**
-    * The billing information for payments.
-    */
+     * The billing information for payments.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1046,11 +1047,11 @@ pub struct BillingInfo {
 /// Metadata about our cache.
 ///
 /// This is mostly used for internal purposes and debugging.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct CacheMetadata {
     /**
-    * If the cache returned an ok response from ping.
-    */
+     * If the cache returned an ok response from ping.
+     */
     #[serde(
         default,
         deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
@@ -1059,11 +1060,11 @@ pub struct CacheMetadata {
 }
 
 /// Card checks.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct PaymentMethodCardChecks {
     /**
-    * Card checks.
-    */
+     * Card checks.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1073,8 +1074,8 @@ pub struct PaymentMethodCardChecks {
     pub address_line_1_check: String,
 
     /**
-    * Card checks.
-    */
+     * Card checks.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1083,8 +1084,8 @@ pub struct PaymentMethodCardChecks {
     pub address_postal_code_check: String,
 
     /**
-    * Card checks.
-    */
+     * Card checks.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1094,11 +1095,11 @@ pub struct PaymentMethodCardChecks {
 }
 
 /// The card details of a payment method.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default)]
 pub struct CardDetails {
     /**
-    * The card details of a payment method.
-    */
+     * The card details of a payment method.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1107,14 +1108,14 @@ pub struct CardDetails {
     pub brand: String,
 
     /**
-    * The card details of a payment method.
-    */
+     * The card details of a payment method.
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub checks: Option<PaymentMethodCardChecks>,
 
     /**
-    * The card details of a payment method.
-    */
+     * The card details of a payment method.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1123,8 +1124,8 @@ pub struct CardDetails {
     pub country: String,
 
     /**
-    * The card details of a payment method.
-    */
+     * The card details of a payment method.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1133,8 +1134,8 @@ pub struct CardDetails {
     pub exp_month: i64,
 
     /**
-    * The card details of a payment method.
-    */
+     * The card details of a payment method.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1143,8 +1144,8 @@ pub struct CardDetails {
     pub exp_year: i64,
 
     /**
-    * The card details of a payment method.
-    */
+     * The card details of a payment method.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1153,8 +1154,8 @@ pub struct CardDetails {
     pub fingerprint: String,
 
     /**
-    * The card details of a payment method.
-    */
+     * The card details of a payment method.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1163,8 +1164,8 @@ pub struct CardDetails {
     pub funding: String,
 
     /**
-    * The card details of a payment method.
-    */
+     * The card details of a payment method.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1175,11 +1176,11 @@ pub struct CardDetails {
 }
 
 /// Cluster information.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct Cluster {
     /**
-    * Cluster information.
-    */
+     * Cluster information.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1188,8 +1189,8 @@ pub struct Cluster {
     pub name: String,
 
     /**
-    * The IP address of the cluster.
-    */
+     * The IP address of the cluster.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1198,8 +1199,8 @@ pub struct Cluster {
     pub addr: String,
 
     /**
-    * Cluster information.
-    */
+     * Cluster information.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1208,8 +1209,8 @@ pub struct Cluster {
     pub auth_timeout: i64,
 
     /**
-    * Cluster information.
-    */
+     * Cluster information.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1218,8 +1219,8 @@ pub struct Cluster {
     pub cluster_port: i64,
 
     /**
-    * Cluster information.
-    */
+     * Cluster information.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1228,8 +1229,8 @@ pub struct Cluster {
     pub tls_timeout: i64,
 
     /**
-    * Cluster information.
-    */
+     * Cluster information.
+     */
     #[serde(
         default,
         skip_serializing_if = "Vec::is_empty",
@@ -1240,9 +1241,9 @@ pub struct Cluster {
 }
 
 /**
-* The language code is written in.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+ * The language code is written in.
+ */
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Tabled)]
 pub enum CodeLanguage {
     #[serde(rename = "go")]
     Go,
@@ -1260,7 +1261,7 @@ pub enum CodeLanguage {
 
 impl std::fmt::Display for CodeLanguage {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
+        match self {
             CodeLanguage::Go => "go",
             CodeLanguage::Node => "node",
             CodeLanguage::Python => "python",
@@ -1302,11 +1303,11 @@ impl CodeLanguage {
 }
 
 /// Output file contents.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct OutputFile {
     /**
-    * Output file contents.
-    */
+     * Output file contents.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1315,8 +1316,8 @@ pub struct OutputFile {
     pub name: String,
 
     /**
-    * Output file contents.
-    */
+     * Output file contents.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1326,11 +1327,11 @@ pub struct OutputFile {
 }
 
 /// Output of the code being executed.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct CodeOutput {
     /**
-    * Output of the code being executed.
-    */
+     * Output of the code being executed.
+     */
     #[serde(
         default,
         skip_serializing_if = "Vec::is_empty",
@@ -1340,8 +1341,8 @@ pub struct CodeOutput {
     pub output_files: Vec<OutputFile>,
 
     /**
-    * Output of the code being executed.
-    */
+     * Output of the code being executed.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1350,8 +1351,8 @@ pub struct CodeOutput {
     pub stderr: String,
 
     /**
-    * Output of the code being executed.
-    */
+     * Output of the code being executed.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1361,11 +1362,11 @@ pub struct CodeOutput {
 }
 
 /// Gateway information.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct Gateway {
     /**
-    * Gateway information.
-    */
+     * Gateway information.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1374,8 +1375,8 @@ pub struct Gateway {
     pub name: String,
 
     /**
-    * Gateway information.
-    */
+     * Gateway information.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1384,8 +1385,8 @@ pub struct Gateway {
     pub auth_timeout: i64,
 
     /**
-    * Gateway information.
-    */
+     * Gateway information.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1394,8 +1395,8 @@ pub struct Gateway {
     pub host: String,
 
     /**
-    * Gateway information.
-    */
+     * Gateway information.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1404,8 +1405,8 @@ pub struct Gateway {
     pub port: i64,
 
     /**
-    * Gateway information.
-    */
+     * Gateway information.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1418,30 +1419,30 @@ pub struct Gateway {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
 pub struct Jetstream {
     /**
-    * Jetstream information.
-    */
+     * Jetstream information.
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub config: Option<JetstreamConfig>,
 
     /**
-    * Jetstream information.
-    */
+     * Jetstream information.
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<MetaClusterInfo>,
 
     /**
-    * Jetstream information.
-    */
+     * Jetstream information.
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stats: Option<JetstreamStats>,
 }
 
 /// Leaf node information.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct LeafNode {
     /**
-    * Leaf node information.
-    */
+     * Leaf node information.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1450,8 +1451,8 @@ pub struct LeafNode {
     pub auth_timeout: i64,
 
     /**
-    * Leaf node information.
-    */
+     * Leaf node information.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1460,8 +1461,8 @@ pub struct LeafNode {
     pub host: String,
 
     /**
-    * Leaf node information.
-    */
+     * Leaf node information.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1470,8 +1471,8 @@ pub struct LeafNode {
     pub port: i64,
 
     /**
-    * Leaf node information.
-    */
+     * Leaf node information.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1486,16 +1487,16 @@ pub struct LeafNode {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
 pub struct Connection {
     /**
-    * The ID as known by the most recently connected server.
-    */
+     * The ID as known by the most recently connected server.
+     */
     #[serde(default)]
     pub id: u64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1504,24 +1505,24 @@ pub struct Connection {
     pub auth_timeout: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cluster: Option<Cluster>,
 
     /**
-    * The time the configuration was loaded.
-    */
+     * The time the configuration was loaded.
+     */
     #[serde()]
     pub config_load_time: crate::utils::DisplayOptionDateTime,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1530,10 +1531,10 @@ pub struct Connection {
     pub connections: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1549,18 +1550,18 @@ pub struct Connection {
     pub cpu: f64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub gateway: Option<Gateway>,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1569,10 +1570,10 @@ pub struct Connection {
     pub git_commit: String,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1581,10 +1582,10 @@ pub struct Connection {
     pub go: String,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1593,8 +1594,8 @@ pub struct Connection {
     pub gomaxprocs: i64,
 
     /**
-    * The host of the server.
-    */
+     * The host of the server.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1603,10 +1604,10 @@ pub struct Connection {
     pub host: String,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1615,10 +1616,10 @@ pub struct Connection {
     pub http_base_path: String,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1627,10 +1628,10 @@ pub struct Connection {
     pub http_host: String,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1646,10 +1647,10 @@ pub struct Connection {
     pub http_req_stats: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1658,10 +1659,10 @@ pub struct Connection {
     pub https_port: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1670,10 +1671,10 @@ pub struct Connection {
     pub in_bytes: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1682,8 +1683,8 @@ pub struct Connection {
     pub in_msgs: i64,
 
     /**
-    * The client IP as known by the most recently connected server.
-    */
+     * The client IP as known by the most recently connected server.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1692,26 +1693,26 @@ pub struct Connection {
     pub ip: String,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub jetstream: Option<Jetstream>,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub leaf: Option<LeafNode>,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1720,10 +1721,10 @@ pub struct Connection {
     pub leafnodes: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1732,10 +1733,10 @@ pub struct Connection {
     pub max_connections: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1744,10 +1745,10 @@ pub struct Connection {
     pub max_control_line: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1756,10 +1757,10 @@ pub struct Connection {
     pub max_payload: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1768,10 +1769,10 @@ pub struct Connection {
     pub max_pending: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1780,16 +1781,16 @@ pub struct Connection {
     pub mem: i64,
 
     /**
-    * The time now.
-    */
+     * The time now.
+     */
     #[serde()]
     pub now: crate::utils::DisplayOptionDateTime,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1798,10 +1799,10 @@ pub struct Connection {
     pub out_bytes: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1810,10 +1811,10 @@ pub struct Connection {
     pub out_msgs: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1822,10 +1823,10 @@ pub struct Connection {
     pub ping_interval: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1834,10 +1835,10 @@ pub struct Connection {
     pub ping_max: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1846,10 +1847,10 @@ pub struct Connection {
     pub port: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1858,10 +1859,10 @@ pub struct Connection {
     pub proto: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1870,10 +1871,10 @@ pub struct Connection {
     pub remotes: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1889,10 +1890,10 @@ pub struct Connection {
     pub rtt: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1901,10 +1902,10 @@ pub struct Connection {
     pub server_id: String,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1913,10 +1914,10 @@ pub struct Connection {
     pub server_name: String,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1925,16 +1926,16 @@ pub struct Connection {
     pub slow_consumers: i64,
 
     /**
-    * When the server was started.
-    */
+     * When the server was started.
+     */
     #[serde()]
     pub start: crate::utils::DisplayOptionDateTime,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1943,10 +1944,10 @@ pub struct Connection {
     pub subscriptions: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1955,10 +1956,10 @@ pub struct Connection {
     pub system_account: String,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1967,10 +1968,10 @@ pub struct Connection {
     pub tls_timeout: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -1979,10 +1980,10 @@ pub struct Connection {
     pub total_connections: i64,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -1991,10 +1992,10 @@ pub struct Connection {
     pub uptime: String,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -2003,10 +2004,10 @@ pub struct Connection {
     pub version: String,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -2016,11 +2017,11 @@ pub struct Connection {
 }
 
 /**
-* Supported set of sort modes for scanning by created_at only.
-*   
-*   Currently, we only support scanning in ascending order.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+ * Supported set of sort modes for scanning by created_at only.
+ *   
+ *   Currently, we only support scanning in ascending order.
+ */
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Tabled)]
 pub enum CreatedAtSortMode {
     #[serde(rename = "created-at-ascending")]
     CreatedAtAscending,
@@ -2034,7 +2035,7 @@ pub enum CreatedAtSortMode {
 
 impl std::fmt::Display for CreatedAtSortMode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
+        match self {
             CreatedAtSortMode::CreatedAtAscending => "created-at-ascending",
             CreatedAtSortMode::CreatedAtDescending => "created-at-descending",
             CreatedAtSortMode::Noop => "",
@@ -2068,11 +2069,11 @@ impl CreatedAtSortMode {
 }
 
 /**
-* Currency is the list of supported currencies.
-*   
-*   For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+ * Currency is the list of supported currencies.
+ *   
+ *   For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.
+ */
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Tabled)]
 pub enum Currency {
     #[serde(rename = "aed")]
     Aed,
@@ -2360,7 +2361,7 @@ pub enum Currency {
 
 impl std::fmt::Display for Currency {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
+        match self {
             Currency::Aed => "aed",
             Currency::Afn => "afn",
             Currency::All => "all",
@@ -2945,8 +2946,8 @@ impl Currency {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
 pub struct Customer {
     /**
-    * The resource representing a payment "Customer".
-    */
+     * The resource representing a payment "Customer".
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -2955,8 +2956,8 @@ pub struct Customer {
     pub id: String,
 
     /**
-    * The resource representing a payment "Customer".
-    */
+     * The resource representing a payment "Customer".
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -2965,14 +2966,14 @@ pub struct Customer {
     pub name: String,
 
     /**
-    * The customer's address.
-    */
+     * The customer's address.
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub address: Option<Address>,
 
     /**
-    * The resource representing a payment "Customer".
-    */
+     * The resource representing a payment "Customer".
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -2981,22 +2982,22 @@ pub struct Customer {
     pub balance: i64,
 
     /**
-    * Time at which the object was created.
-    */
+     * Time at which the object was created.
+     */
     #[serde()]
     pub created_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * Currency is the list of supported currencies.
-    *  
-    *  For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.
-    */
+     * Currency is the list of supported currencies.
+     *  
+     *  For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.
+     */
     #[serde(default, skip_serializing_if = "Currency::is_noop")]
     pub currency: Currency,
 
     /**
-    * The resource representing a payment "Customer".
-    */
+     * The resource representing a payment "Customer".
+     */
     #[serde(
         default,
         deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
@@ -3004,8 +3005,8 @@ pub struct Customer {
     pub delinquent: bool,
 
     /**
-    * The resource representing a payment "Customer".
-    */
+     * The resource representing a payment "Customer".
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3014,8 +3015,8 @@ pub struct Customer {
     pub email: String,
 
     /**
-    * The resource representing a payment "Customer".
-    */
+     * The resource representing a payment "Customer".
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3024,8 +3025,8 @@ pub struct Customer {
     pub metadata: String,
 
     /**
-    * The resource representing a payment "Customer".
-    */
+     * The resource representing a payment "Customer".
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3035,9 +3036,9 @@ pub struct Customer {
 }
 
 /**
-* The environment the server is running in.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+ * The environment the server is running in.
+ */
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Tabled)]
 pub enum Environment {
     #[serde(rename = "DEVELOPMENT")]
     Development,
@@ -3053,7 +3054,7 @@ pub enum Environment {
 
 impl std::fmt::Display for Environment {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
+        match self {
             Environment::Development => "DEVELOPMENT",
             Environment::Preview => "PREVIEW",
             Environment::Production => "PRODUCTION",
@@ -3093,11 +3094,11 @@ impl Environment {
 /// Metadata about our file system.
 ///
 /// This is mostly used for internal purposes and debugging.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct FileSystemMetadata {
     /**
-    * If the file system passed a sanity check.
-    */
+     * If the file system passed a sanity check.
+     */
     #[serde(
         default,
         deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
@@ -3111,8 +3112,8 @@ pub struct FileSystemMetadata {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
 pub struct EngineMetadata {
     /**
-    * If any async job is currently running.
-    */
+     * If any async job is currently running.
+     */
     #[serde(
         default,
         deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
@@ -3120,30 +3121,30 @@ pub struct EngineMetadata {
     pub async_jobs_running: bool,
 
     /**
-    * Metadata about our cache.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about our cache.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde()]
     pub cache: CacheMetadata,
 
     /**
-    * The environment the server is running in.
-    */
+     * The environment the server is running in.
+     */
     #[serde(default, skip_serializing_if = "Environment::is_noop")]
     pub environment: Environment,
 
     /**
-    * Metadata about our file system.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about our file system.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde()]
     pub fs: FileSystemMetadata,
 
     /**
-    * The git hash of the server.
-    */
+     * The git hash of the server.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3152,15 +3153,15 @@ pub struct EngineMetadata {
     pub git_hash: String,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde()]
     pub pubsub: Connection,
 }
 
-#[derive(Debug, Deserialize, thiserror::Error, PartialEq, Serialize)]
+#[derive(Debug, Deserialize, thiserror::Error, PartialEq, Eq, Serialize)]
 pub enum Error {
     /// An object needed as part of this operation was not found.
     #[error("Object not found: {message}")]
@@ -3345,11 +3346,11 @@ pub enum ResourceType {
 }
 
 /// Error information from a response.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct ErrorResponse {
     /**
-    * Error information from a response.
-    */
+     * Error information from a response.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3375,13 +3376,13 @@ pub struct ErrorResponse {
 /// Extended user information.
 ///
 /// This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct ExtendedUser {
     /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
+     * Extended user information.
+     *  
+     *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3390,10 +3391,10 @@ pub struct ExtendedUser {
     pub id: String,
 
     /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
+     * Extended user information.
+     *  
+     *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3402,10 +3403,10 @@ pub struct ExtendedUser {
     pub name: String,
 
     /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
+     * Extended user information.
+     *  
+     *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3414,16 +3415,16 @@ pub struct ExtendedUser {
     pub company: String,
 
     /**
-    * The date and time the user was created.
-    */
+     * The date and time the user was created.
+     */
     #[serde()]
     pub created_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
+     * Extended user information.
+     *  
+     *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3432,10 +3433,10 @@ pub struct ExtendedUser {
     pub discord: String,
 
     /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
+     * Extended user information.
+     *  
+     *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3444,16 +3445,16 @@ pub struct ExtendedUser {
     pub email: String,
 
     /**
-    * The date and time the email address was verified.
-    */
+     * The date and time the email address was verified.
+     */
     #[serde()]
     pub email_verified: crate::utils::DisplayOptionDateTime,
 
     /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
+     * Extended user information.
+     *  
+     *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3462,10 +3463,10 @@ pub struct ExtendedUser {
     pub first_name: String,
 
     /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
+     * Extended user information.
+     *  
+     *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3474,10 +3475,10 @@ pub struct ExtendedUser {
     pub github: String,
 
     /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
+     * Extended user information.
+     *  
+     *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3486,10 +3487,10 @@ pub struct ExtendedUser {
     pub image: String,
 
     /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
+     * Extended user information.
+     *  
+     *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3498,8 +3499,8 @@ pub struct ExtendedUser {
     pub last_name: String,
 
     /**
-    * The user's MailChimp ID. This is mostly used for internal mapping.
-    */
+     * The user's MailChimp ID. This is mostly used for internal mapping.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3508,10 +3509,10 @@ pub struct ExtendedUser {
     pub mailchimp_id: String,
 
     /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
+     * Extended user information.
+     *  
+     *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3520,8 +3521,8 @@ pub struct ExtendedUser {
     pub phone: String,
 
     /**
-    * The user's Stripe ID. This is mostly used for internal mapping.
-    */
+     * The user's Stripe ID. This is mostly used for internal mapping.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3530,14 +3531,14 @@ pub struct ExtendedUser {
     pub stripe_id: String,
 
     /**
-    * The date and time the user was last updated.
-    */
+     * The date and time the user was last updated.
+     */
     #[serde()]
     pub updated_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The user's Zendesk ID. This is mostly used for internal mapping.
-    */
+     * The user's Zendesk ID. This is mostly used for internal mapping.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3550,8 +3551,8 @@ pub struct ExtendedUser {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct ExtendedUserResultsPage {
     /**
-    * list of items on this page of results
-    */
+     * list of items on this page of results
+     */
     #[serde(
         default,
         skip_serializing_if = "Vec::is_empty",
@@ -3561,8 +3562,8 @@ pub struct ExtendedUserResultsPage {
     pub items: Vec<ExtendedUser>,
 
     /**
-    * token used to fetch the next page of results (if any)
-    */
+     * token used to fetch the next page of results (if any)
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3572,9 +3573,9 @@ pub struct ExtendedUserResultsPage {
 }
 
 /**
-* The valid types of output file formats.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+ * The valid types of output file formats.
+ */
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Tabled)]
 pub enum FileOutputFormat {
     #[serde(rename = "dae")]
     Dae,
@@ -3596,7 +3597,7 @@ pub enum FileOutputFormat {
 
 impl std::fmt::Display for FileOutputFormat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
+        match self {
             FileOutputFormat::Dae => "dae",
             FileOutputFormat::Fbx => "fbx",
             FileOutputFormat::Fbxb => "fbxb",
@@ -3646,9 +3647,9 @@ impl FileOutputFormat {
 }
 
 /**
-* The valid types of source file formats.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+ * The valid types of source file formats.
+ */
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Tabled)]
 pub enum FileSourceFormat {
     #[serde(rename = "dae")]
     Dae,
@@ -3668,7 +3669,7 @@ pub enum FileSourceFormat {
 
 impl std::fmt::Display for FileSourceFormat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
+        match self {
             FileSourceFormat::Dae => "dae",
             FileSourceFormat::Fbx => "fbx",
             FileSourceFormat::Obj => "obj",
@@ -3714,13 +3715,13 @@ impl FileSourceFormat {
 }
 
 /// A file conversion.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct FileConversion {
     /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
+     * A uuid.
+     *  
+     *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3729,20 +3730,20 @@ pub struct FileConversion {
     pub id: String,
 
     /**
-    * The time and date the file conversion was completed.
-    */
+     * The time and date the file conversion was completed.
+     */
     #[serde()]
     pub completed_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The time and date the file conversion was created.
-    */
+     * The time and date the file conversion was created.
+     */
     #[serde()]
     pub created_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The error the function returned, if any.
-    */
+     * The error the function returned, if any.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3751,8 +3752,8 @@ pub struct FileConversion {
     pub error: String,
 
     /**
-    * The converted file, if completed, base64 encoded.
-    */
+     * The converted file, if completed, base64 encoded.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3761,38 +3762,38 @@ pub struct FileConversion {
     pub output: String,
 
     /**
-    * The valid types of output file formats.
-    */
+     * The valid types of output file formats.
+     */
     #[serde(default, skip_serializing_if = "FileOutputFormat::is_noop")]
     pub output_format: FileOutputFormat,
 
     /**
-    * The valid types of source file formats.
-    */
+     * The valid types of source file formats.
+     */
     #[serde(default, skip_serializing_if = "FileSourceFormat::is_noop")]
     pub src_format: FileSourceFormat,
 
     /**
-    * The time and date the file conversion was started.
-    */
+     * The time and date the file conversion was started.
+     */
     #[serde()]
     pub started_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The status of an async API call.
-    */
+     * The status of an async API call.
+     */
     #[serde(default, skip_serializing_if = "ApiCallStatus::is_noop")]
     pub status: ApiCallStatus,
 
     /**
-    * The time and date the file conversion was last updated.
-    */
+     * The time and date the file conversion was last updated.
+     */
     #[serde()]
     pub updated_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * A file conversion.
-    */
+     * A file conversion.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3805,10 +3806,10 @@ pub struct FileConversion {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct FileDensity {
     /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
+     * A uuid.
+     *  
+     *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3817,20 +3818,20 @@ pub struct FileDensity {
     pub id: String,
 
     /**
-    * The time and date the density was completed.
-    */
+     * The time and date the density was completed.
+     */
     #[serde()]
     pub completed_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The time and date the density was created.
-    */
+     * The time and date the density was created.
+     */
     #[serde()]
     pub created_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The resulting density.
-    */
+     * The resulting density.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_f64",
@@ -3839,8 +3840,8 @@ pub struct FileDensity {
     pub density: f64,
 
     /**
-    * The error the function returned, if any.
-    */
+     * The error the function returned, if any.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3849,8 +3850,8 @@ pub struct FileDensity {
     pub error: String,
 
     /**
-    * A file density result.
-    */
+     * A file density result.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_f64",
@@ -3859,32 +3860,32 @@ pub struct FileDensity {
     pub material_mass: f64,
 
     /**
-    * The valid types of source file formats.
-    */
+     * The valid types of source file formats.
+     */
     #[serde(default, skip_serializing_if = "FileSourceFormat::is_noop")]
     pub src_format: FileSourceFormat,
 
     /**
-    * The time and date the density was started.
-    */
+     * The time and date the density was started.
+     */
     #[serde()]
     pub started_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The status of an async API call.
-    */
+     * The status of an async API call.
+     */
     #[serde(default, skip_serializing_if = "ApiCallStatus::is_noop")]
     pub status: ApiCallStatus,
 
     /**
-    * The time and date the density was last updated.
-    */
+     * The time and date the density was last updated.
+     */
     #[serde()]
     pub updated_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * A file density result.
-    */
+     * A file density result.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3897,10 +3898,10 @@ pub struct FileDensity {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct FileMass {
     /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
+     * A uuid.
+     *  
+     *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3909,20 +3910,20 @@ pub struct FileMass {
     pub id: String,
 
     /**
-    * The time and date the mass was completed.
-    */
+     * The time and date the mass was completed.
+     */
     #[serde()]
     pub completed_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The time and date the mass was created.
-    */
+     * The time and date the mass was created.
+     */
     #[serde()]
     pub created_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The error the function returned, if any.
-    */
+     * The error the function returned, if any.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3931,8 +3932,8 @@ pub struct FileMass {
     pub error: String,
 
     /**
-    * The resulting mass.
-    */
+     * The resulting mass.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_f64",
@@ -3941,8 +3942,8 @@ pub struct FileMass {
     pub mass: f64,
 
     /**
-    * A file mass result.
-    */
+     * A file mass result.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_f64",
@@ -3951,32 +3952,32 @@ pub struct FileMass {
     pub material_density: f64,
 
     /**
-    * The valid types of source file formats.
-    */
+     * The valid types of source file formats.
+     */
     #[serde(default, skip_serializing_if = "FileSourceFormat::is_noop")]
     pub src_format: FileSourceFormat,
 
     /**
-    * The time and date the mass was started.
-    */
+     * The time and date the mass was started.
+     */
     #[serde()]
     pub started_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The status of an async API call.
-    */
+     * The status of an async API call.
+     */
     #[serde(default, skip_serializing_if = "ApiCallStatus::is_noop")]
     pub status: ApiCallStatus,
 
     /**
-    * The time and date the mass was last updated.
-    */
+     * The time and date the mass was last updated.
+     */
     #[serde()]
     pub updated_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * A file mass result.
-    */
+     * A file mass result.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -3989,10 +3990,10 @@ pub struct FileMass {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct FileVolume {
     /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
+     * A uuid.
+     *  
+     *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4001,20 +4002,20 @@ pub struct FileVolume {
     pub id: String,
 
     /**
-    * The time and date the volume was completed.
-    */
+     * The time and date the volume was completed.
+     */
     #[serde()]
     pub completed_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The time and date the volume was created.
-    */
+     * The time and date the volume was created.
+     */
     #[serde()]
     pub created_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The error the function returned, if any.
-    */
+     * The error the function returned, if any.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4023,32 +4024,32 @@ pub struct FileVolume {
     pub error: String,
 
     /**
-    * The valid types of source file formats.
-    */
+     * The valid types of source file formats.
+     */
     #[serde(default, skip_serializing_if = "FileSourceFormat::is_noop")]
     pub src_format: FileSourceFormat,
 
     /**
-    * The time and date the volume was started.
-    */
+     * The time and date the volume was started.
+     */
     #[serde()]
     pub started_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The status of an async API call.
-    */
+     * The status of an async API call.
+     */
     #[serde(default, skip_serializing_if = "ApiCallStatus::is_noop")]
     pub status: ApiCallStatus,
 
     /**
-    * The time and date the volume was last updated.
-    */
+     * The time and date the volume was last updated.
+     */
     #[serde()]
     pub updated_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * A file volume result.
-    */
+     * A file volume result.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4057,8 +4058,8 @@ pub struct FileVolume {
     pub user_id: String,
 
     /**
-    * The resulting volume.
-    */
+     * The resulting volume.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_f64",
@@ -4068,11 +4069,11 @@ pub struct FileVolume {
 }
 
 /// An invoice line item.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct InvoiceLineItem {
     /**
-    * An invoice line item.
-    */
+     * An invoice line item.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4081,8 +4082,8 @@ pub struct InvoiceLineItem {
     pub id: String,
 
     /**
-    * An invoice line item.
-    */
+     * An invoice line item.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4091,8 +4092,8 @@ pub struct InvoiceLineItem {
     pub description: String,
 
     /**
-    * An invoice line item.
-    */
+     * An invoice line item.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4101,16 +4102,16 @@ pub struct InvoiceLineItem {
     pub amount: i64,
 
     /**
-    * Currency is the list of supported currencies.
-    *  
-    *  For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.
-    */
+     * Currency is the list of supported currencies.
+     *  
+     *  For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.
+     */
     #[serde(default, skip_serializing_if = "Currency::is_noop")]
     pub currency: Currency,
 
     /**
-    * An invoice line item.
-    */
+     * An invoice line item.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4119,8 +4120,8 @@ pub struct InvoiceLineItem {
     pub invoice_item: String,
 
     /**
-    * An invoice line item.
-    */
+     * An invoice line item.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4130,9 +4131,9 @@ pub struct InvoiceLineItem {
 }
 
 /**
-* An enum representing the possible values of an `Invoice`'s `status` field.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+ * An enum representing the possible values of an `Invoice`'s `status` field.
+ */
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Tabled)]
 pub enum InvoiceStatus {
     #[serde(rename = "deleted")]
     Deleted,
@@ -4154,7 +4155,7 @@ pub enum InvoiceStatus {
 
 impl std::fmt::Display for InvoiceStatus {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
+        match self {
             InvoiceStatus::Deleted => "deleted",
             InvoiceStatus::Draft => "draft",
             InvoiceStatus::Open => "open",
@@ -4207,8 +4208,8 @@ impl InvoiceStatus {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
 pub struct Invoice {
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4217,8 +4218,8 @@ pub struct Invoice {
     pub id: String,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4227,8 +4228,8 @@ pub struct Invoice {
     pub description: String,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4237,8 +4238,8 @@ pub struct Invoice {
     pub amount_due: i64,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4247,8 +4248,8 @@ pub struct Invoice {
     pub amount_paid: i64,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4257,14 +4258,14 @@ pub struct Invoice {
     pub amount_remaining: i64,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub attempt_count: Option<u64>,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
@@ -4272,22 +4273,22 @@ pub struct Invoice {
     pub attempted: bool,
 
     /**
-    * Time at which the object was created.
-    */
+     * Time at which the object was created.
+     */
     #[serde()]
     pub created_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * Currency is the list of supported currencies.
-    *  
-    *  For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.
-    */
+     * Currency is the list of supported currencies.
+     *  
+     *  For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.
+     */
     #[serde(default, skip_serializing_if = "Currency::is_noop")]
     pub currency: Currency,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4296,8 +4297,8 @@ pub struct Invoice {
     pub invoice_pdf: String,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4306,8 +4307,8 @@ pub struct Invoice {
     pub invoice_url: String,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         skip_serializing_if = "Vec::is_empty",
@@ -4316,8 +4317,8 @@ pub struct Invoice {
     pub lines: Vec<InvoiceLineItem>,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4326,8 +4327,8 @@ pub struct Invoice {
     pub metadata: String,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4336,8 +4337,8 @@ pub struct Invoice {
     pub number: String,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
@@ -4345,8 +4346,8 @@ pub struct Invoice {
     pub paid: bool,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4355,8 +4356,8 @@ pub struct Invoice {
     pub receipt_number: String,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4365,16 +4366,16 @@ pub struct Invoice {
     pub statement_descriptor: String,
 
     /**
-    * The status of the invoice, one of `draft`, `open`, `paid`, `uncollectible`, or `void`.
-    *  
-    *  [Learn more](https://stripe.com/docs/billing/invoices/workflow#workflow-overview).
-    */
+     * The status of the invoice, one of `draft`, `open`, `paid`, `uncollectible`, or `void`.
+     *  
+     *  [Learn more](https://stripe.com/docs/billing/invoices/workflow#workflow-overview).
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status: Option<InvoiceStatus>,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4383,8 +4384,8 @@ pub struct Invoice {
     pub subtotal: i64,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4393,8 +4394,8 @@ pub struct Invoice {
     pub tax: i64,
 
     /**
-    * An invoice.
-    */
+     * An invoice.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4404,11 +4405,11 @@ pub struct Invoice {
 }
 
 /// Jetstream configuration.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct JetstreamConfig {
     /**
-    * Jetstream configuration.
-    */
+     * Jetstream configuration.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4417,8 +4418,8 @@ pub struct JetstreamConfig {
     pub domain: String,
 
     /**
-    * Jetstream configuration.
-    */
+     * Jetstream configuration.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4427,8 +4428,8 @@ pub struct JetstreamConfig {
     pub max_memory: i64,
 
     /**
-    * Jetstream configuration.
-    */
+     * Jetstream configuration.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4437,8 +4438,8 @@ pub struct JetstreamConfig {
     pub max_storage: i64,
 
     /**
-    * Jetstream configuration.
-    */
+     * Jetstream configuration.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4448,11 +4449,11 @@ pub struct JetstreamConfig {
 }
 
 /// Jetstream statistics.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct MetaClusterInfo {
     /**
-    * Jetstream statistics.
-    */
+     * Jetstream statistics.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4461,8 +4462,8 @@ pub struct MetaClusterInfo {
     pub name: String,
 
     /**
-    * Jetstream statistics.
-    */
+     * Jetstream statistics.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4471,8 +4472,8 @@ pub struct MetaClusterInfo {
     pub cluster_size: i64,
 
     /**
-    * Jetstream statistics.
-    */
+     * Jetstream statistics.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4482,11 +4483,11 @@ pub struct MetaClusterInfo {
 }
 
 /// Jetstream statistics.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default)]
 pub struct JetstreamStats {
     /**
-    * Jetstream statistics.
-    */
+     * Jetstream statistics.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4495,14 +4496,14 @@ pub struct JetstreamStats {
     pub accounts: i64,
 
     /**
-    * Jetstream statistics.
-    */
+     * Jetstream statistics.
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub api: Option<JetstreamApiStats>,
 
     /**
-    * Jetstream statistics.
-    */
+     * Jetstream statistics.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4511,8 +4512,8 @@ pub struct JetstreamStats {
     pub ha_assets: i64,
 
     /**
-    * Jetstream statistics.
-    */
+     * Jetstream statistics.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4521,8 +4522,8 @@ pub struct JetstreamStats {
     pub memory: i64,
 
     /**
-    * Jetstream statistics.
-    */
+     * Jetstream statistics.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4531,8 +4532,8 @@ pub struct JetstreamStats {
     pub reserved_memory: i64,
 
     /**
-    * Jetstream statistics.
-    */
+     * Jetstream statistics.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4541,8 +4542,8 @@ pub struct JetstreamStats {
     pub reserved_store: i64,
 
     /**
-    * Jetstream statistics.
-    */
+     * Jetstream statistics.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4552,11 +4553,11 @@ pub struct JetstreamStats {
 }
 
 /// Jetstream API statistics.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct JetstreamApiStats {
     /**
-    * Jetstream API statistics.
-    */
+     * Jetstream API statistics.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4565,8 +4566,8 @@ pub struct JetstreamApiStats {
     pub errors: i64,
 
     /**
-    * Jetstream API statistics.
-    */
+     * Jetstream API statistics.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4575,8 +4576,8 @@ pub struct JetstreamApiStats {
     pub inflight: i64,
 
     /**
-    * Jetstream API statistics.
-    */
+     * Jetstream API statistics.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_i64",
@@ -4586,11 +4587,11 @@ pub struct JetstreamApiStats {
 }
 
 /// The parameters passed to login.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct LoginParams {
     /**
-    * The session token we should set as a cookie.
-    */
+     * The session token we should set as a cookie.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4605,38 +4606,38 @@ pub struct LoginParams {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
 pub struct Metadata {
     /**
-    * Metadata about our cache.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about our cache.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde()]
     pub cache: CacheMetadata,
 
     /**
-    * Metadata about our currently running server.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about our currently running server.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde()]
     pub engine: EngineMetadata,
 
     /**
-    * The environment the server is running in.
-    */
+     * The environment the server is running in.
+     */
     #[serde(default, skip_serializing_if = "Environment::is_noop")]
     pub environment: Environment,
 
     /**
-    * Metadata about our file system.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about our file system.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde()]
     pub fs: FileSystemMetadata,
 
     /**
-    * The git hash of the server.
-    */
+     * The git hash of the server.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4645,20 +4646,20 @@ pub struct Metadata {
     pub git_hash: String,
 
     /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+     * Metadata about a pub-sub connection.
+     *  
+     *  This is mostly used for internal purposes and debugging.
+     */
     #[serde()]
     pub pubsub: Connection,
 }
 
 /// A payment intent response.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct PaymentIntent {
     /**
-    * The client secret is used for client-side retrieval using a publishable key. The client secret can be used to complete payment setup from your frontend. It should not be stored, logged, or exposed to anyone other than the customer. Make sure that you have TLS enabled on any page that includes the client secret.
-    */
+     * The client secret is used for client-side retrieval using a publishable key. The client secret can be used to complete payment setup from your frontend. It should not be stored, logged, or exposed to anyone other than the customer. Make sure that you have TLS enabled on any page that includes the client secret.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4668,9 +4669,9 @@ pub struct PaymentIntent {
 }
 
 /**
-* An enum representing the possible values of an `PaymentMethod`'s `type` field.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+ * An enum representing the possible values of an `PaymentMethod`'s `type` field.
+ */
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Tabled)]
 pub enum PaymentMethodType {
     #[serde(rename = "card")]
     Card,
@@ -4682,7 +4683,7 @@ pub enum PaymentMethodType {
 
 impl std::fmt::Display for PaymentMethodType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
+        match self {
             PaymentMethodType::Card => "card",
             PaymentMethodType::Noop => "",
             PaymentMethodType::FallthroughString => "*",
@@ -4715,8 +4716,8 @@ impl PaymentMethodType {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
 pub struct PaymentMethod {
     /**
-    * A payment method.
-    */
+     * A payment method.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4725,26 +4726,26 @@ pub struct PaymentMethod {
     pub id: String,
 
     /**
-    * The billing information for payments.
-    */
+     * The billing information for payments.
+     */
     #[serde()]
     pub billing_info: BillingInfo,
 
     /**
-    * The card, if it is one. For our purposes, this is the only type of payment method that we support.
-    */
+     * The card, if it is one. For our purposes, this is the only type of payment method that we support.
+     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub card: Option<CardDetails>,
 
     /**
-    * Time at which the object was created.
-    */
+     * Time at which the object was created.
+     */
     #[serde()]
     pub created_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * A payment method.
-    */
+     * A payment method.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4753,8 +4754,8 @@ pub struct PaymentMethod {
     pub metadata: String,
 
     /**
-    * An enum representing the possible values of an `PaymentMethod`'s `type` field.
-    */
+     * An enum representing the possible values of an `PaymentMethod`'s `type` field.
+     */
     #[serde(
         default,
         skip_serializing_if = "PaymentMethodType::is_noop",
@@ -4764,9 +4765,9 @@ pub struct PaymentMethod {
 }
 
 /**
-* An enum representing the possible values of an `PaymentMethod`'s `type` field.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+ * An enum representing the possible values of an `PaymentMethod`'s `type` field.
+ */
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Tabled)]
 pub enum PaymentMethodTypeCard {
     #[serde(rename = "card")]
     Card,
@@ -4778,7 +4779,7 @@ pub enum PaymentMethodTypeCard {
 
 impl std::fmt::Display for PaymentMethodTypeCard {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
+        match self {
             PaymentMethodTypeCard::Card => "card",
             PaymentMethodTypeCard::Noop => "",
             PaymentMethodTypeCard::FallthroughString => "*",
@@ -4808,11 +4809,11 @@ impl PaymentMethodTypeCard {
 }
 
 /// The response from the `/ping` endpoint.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct Pong {
     /**
-    * The pong response.
-    */
+     * The pong response.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4824,13 +4825,13 @@ pub struct Pong {
 /// An authentication session.
 ///
 /// For our UIs, these are automatically created by Next.js.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct Session {
     /**
-    * An authentication session.
-    *  
-    *  For our UIs, these are automatically created by Next.js.
-    */
+     * An authentication session.
+     *  
+     *  For our UIs, these are automatically created by Next.js.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4839,22 +4840,22 @@ pub struct Session {
     pub id: String,
 
     /**
-    * The date and time the session was created.
-    */
+     * The date and time the session was created.
+     */
     #[serde()]
     pub created_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The date and time the session expires.
-    */
+     * The date and time the session expires.
+     */
     #[serde()]
     pub expires: crate::utils::DisplayOptionDateTime,
 
     /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
+     * A uuid.
+     *  
+     *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4863,16 +4864,16 @@ pub struct Session {
     pub session_token: String,
 
     /**
-    * The date and time the session was last updated.
-    */
+     * The date and time the session was last updated.
+     */
     #[serde()]
     pub updated_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * An authentication session.
-    *  
-    *  For our UIs, these are automatically created by Next.js.
-    */
+     * An authentication session.
+     *  
+     *  For our UIs, these are automatically created by Next.js.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -4882,9 +4883,9 @@ pub struct Session {
 }
 
 /**
-* The valid types of metric unit formats.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+ * The valid types of metric unit formats.
+ */
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Tabled)]
 pub enum UnitMetricFormat {
     #[serde(rename = "atto")]
     Atto,
@@ -4928,7 +4929,7 @@ pub enum UnitMetricFormat {
 
 impl std::fmt::Display for UnitMetricFormat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
+        match self {
             UnitMetricFormat::Atto => "atto",
             UnitMetricFormat::Centi => "centi",
             UnitMetricFormat::Deca => "deca",
@@ -5025,10 +5026,10 @@ impl UnitMetricFormat {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct UnitConversion {
     /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
+     * A uuid.
+     *  
+     *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5037,20 +5038,20 @@ pub struct UnitConversion {
     pub id: String,
 
     /**
-    * The time and date the unit conversion was completed.
-    */
+     * The time and date the unit conversion was completed.
+     */
     #[serde()]
     pub completed_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The time and date the unit conversion was created.
-    */
+     * The time and date the unit conversion was created.
+     */
     #[serde()]
     pub created_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The error the function returned, if any.
-    */
+     * The error the function returned, if any.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5059,8 +5060,8 @@ pub struct UnitConversion {
     pub error: String,
 
     /**
-    * A unit conversion.
-    */
+     * A unit conversion.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_f64",
@@ -5069,8 +5070,8 @@ pub struct UnitConversion {
     pub input: f64,
 
     /**
-    * The resulting value.
-    */
+     * The resulting value.
+     */
     #[serde(
         default,
         skip_serializing_if = "crate::utils::zero_f64",
@@ -5079,38 +5080,38 @@ pub struct UnitConversion {
     pub output: f64,
 
     /**
-    * The valid types of metric unit formats.
-    */
+     * The valid types of metric unit formats.
+     */
     #[serde(default, skip_serializing_if = "UnitMetricFormat::is_noop")]
     pub output_format: UnitMetricFormat,
 
     /**
-    * The valid types of metric unit formats.
-    */
+     * The valid types of metric unit formats.
+     */
     #[serde(default, skip_serializing_if = "UnitMetricFormat::is_noop")]
     pub src_format: UnitMetricFormat,
 
     /**
-    * The time and date the unit conversion was started.
-    */
+     * The time and date the unit conversion was started.
+     */
     #[serde()]
     pub started_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * The status of an async API call.
-    */
+     * The status of an async API call.
+     */
     #[serde(default, skip_serializing_if = "ApiCallStatus::is_noop")]
     pub status: ApiCallStatus,
 
     /**
-    * The time and date the unit conversion was last updated.
-    */
+     * The time and date the unit conversion was last updated.
+     */
     #[serde()]
     pub updated_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * A unit conversion.
-    */
+     * A unit conversion.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5120,11 +5121,11 @@ pub struct UnitConversion {
 }
 
 /// The user-modifiable parts of a User.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct UpdateUser {
     /**
-    * The user-modifiable parts of a User.
-    */
+     * The user-modifiable parts of a User.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5133,8 +5134,8 @@ pub struct UpdateUser {
     pub company: String,
 
     /**
-    * The user-modifiable parts of a User.
-    */
+     * The user-modifiable parts of a User.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5143,8 +5144,8 @@ pub struct UpdateUser {
     pub discord: String,
 
     /**
-    * The user-modifiable parts of a User.
-    */
+     * The user-modifiable parts of a User.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5153,8 +5154,8 @@ pub struct UpdateUser {
     pub first_name: String,
 
     /**
-    * The user-modifiable parts of a User.
-    */
+     * The user-modifiable parts of a User.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5163,8 +5164,8 @@ pub struct UpdateUser {
     pub github: String,
 
     /**
-    * The user-modifiable parts of a User.
-    */
+     * The user-modifiable parts of a User.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5173,8 +5174,8 @@ pub struct UpdateUser {
     pub last_name: String,
 
     /**
-    * The user-modifiable parts of a User.
-    */
+     * The user-modifiable parts of a User.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5184,11 +5185,11 @@ pub struct UpdateUser {
 }
 
 /// A user.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct User {
     /**
-    * A user.
-    */
+     * A user.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5197,8 +5198,8 @@ pub struct User {
     pub id: String,
 
     /**
-    * A user.
-    */
+     * A user.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5207,8 +5208,8 @@ pub struct User {
     pub name: String,
 
     /**
-    * A user.
-    */
+     * A user.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5217,14 +5218,14 @@ pub struct User {
     pub company: String,
 
     /**
-    * The date and time the user was created.
-    */
+     * The date and time the user was created.
+     */
     #[serde()]
     pub created_at: crate::utils::DisplayOptionDateTime,
 
     /**
-    * A user.
-    */
+     * A user.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5233,8 +5234,8 @@ pub struct User {
     pub discord: String,
 
     /**
-    * A user.
-    */
+     * A user.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5243,14 +5244,14 @@ pub struct User {
     pub email: String,
 
     /**
-    * The date and time the email address was verified.
-    */
+     * The date and time the email address was verified.
+     */
     #[serde()]
     pub email_verified: crate::utils::DisplayOptionDateTime,
 
     /**
-    * A user.
-    */
+     * A user.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5259,8 +5260,8 @@ pub struct User {
     pub first_name: String,
 
     /**
-    * A user.
-    */
+     * A user.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5269,8 +5270,8 @@ pub struct User {
     pub github: String,
 
     /**
-    * A user.
-    */
+     * A user.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5279,8 +5280,8 @@ pub struct User {
     pub image: String,
 
     /**
-    * A user.
-    */
+     * A user.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5289,8 +5290,8 @@ pub struct User {
     pub last_name: String,
 
     /**
-    * A user.
-    */
+     * A user.
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
@@ -5299,8 +5300,8 @@ pub struct User {
     pub phone: String,
 
     /**
-    * The date and time the user was last updated.
-    */
+     * The date and time the user was last updated.
+     */
     #[serde()]
     pub updated_at: crate::utils::DisplayOptionDateTime,
 }
@@ -5309,8 +5310,8 @@ pub struct User {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct UserResultsPage {
     /**
-    * list of items on this page of results
-    */
+     * list of items on this page of results
+     */
     #[serde(
         default,
         skip_serializing_if = "Vec::is_empty",
@@ -5320,8 +5321,8 @@ pub struct UserResultsPage {
     pub items: Vec<User>,
 
     /**
-    * token used to fetch the next page of results (if any)
-    */
+     * token used to fetch the next page of results (if any)
+     */
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
