@@ -26,7 +26,7 @@ impl Sessions {
     pub async fn get_for_user(&self, token: &str) -> Result<crate::types::Session> {
         let url = format!(
             "/user/session/{}",
-            crate::progenitor_support::encode_path(&token.to_string()),
+            crate::progenitor_support::encode_path(token),
         );
 
         self.client.get(&url, None).await

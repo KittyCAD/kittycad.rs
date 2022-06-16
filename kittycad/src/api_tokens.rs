@@ -132,7 +132,7 @@ impl ApiTokens {
     pub async fn get_token_for_user(&self, token: &str) -> Result<crate::types::ApiToken> {
         let url = format!(
             "/user/api-tokens/{}",
-            crate::progenitor_support::encode_path(&token.to_string()),
+            crate::progenitor_support::encode_path(token),
         );
 
         self.client.get(&url, None).await
@@ -153,7 +153,7 @@ impl ApiTokens {
     pub async fn delete_token_for_user(&self, token: &str) -> Result<()> {
         let url = format!(
             "/user/api-tokens/{}",
-            crate::progenitor_support::encode_path(&token.to_string()),
+            crate::progenitor_support::encode_path(token),
         );
 
         self.client.delete(&url, None).await
