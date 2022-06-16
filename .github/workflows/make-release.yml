@@ -1,0 +1,64 @@
+on:
+  push:
+    tags:
+      - v*
+name: make-release
+jobs:
+  makerelease:
+    name: make release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install latest nightly
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            override: true
+            components: rustfmt, clippy
+      - name: Cache cargo registry
+        uses: actions/cache@v3.0.2
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo index
+        uses: actions/cache@v3.0.2
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo build
+        uses: actions/cache@v3.0.2
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+      - name: Run make generate
+        run: |
+          make generate
+        shell: bash
+      # Ensure no files changed.
+      - name: Ensure no files changed
+        shell: bash
+        run: |
+          if [[ `git status --porcelain` ]]; then
+            echo "Files changed, exiting";
+            exit 1;
+          else
+            # No changes
+            echo "No files changed, proceeding";
+          fi
+      - name: Get if prerelease
+        shell: bash
+        id: extract_prerelease
+        run: |
+          if cat VERSION.txt | grep -q "rc"; then
+            echo "##[set-output name=prerelease;]$(echo true)"
+          else
+            echo "##[set-output name=prerelease;]$(echo false)"
+          fi
+      - name: Publish release
+        shell: bash
+        run: |
+          cargo publish --token ${{secrets.CARGO_TOKEN}}
+      - name: Create a Release
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: ${{steps.extract_prerelease.outputs.prerelease}}

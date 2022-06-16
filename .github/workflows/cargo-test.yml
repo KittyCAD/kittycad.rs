@@ -1,0 +1,46 @@
+on:
+  push:
+    paths:
+      - '**.rs'
+      - Cargo.toml
+      - Cargo.lock
+      - .github/workflows/cargo-test.yml
+name: cargo test
+jobs:
+  cargotest:
+    name: cargo test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Install latest rust
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            override: true
+            components: rustfmt, clippy
+      - name: Cache github etags
+        uses: actions/cache@v3.0.2
+        with:
+          path: ${{ github.workspace }}/.cache
+          key: github-cache
+      - name: Cache cargo registry
+        uses: actions/cache@v3.0.2
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo index
+        uses: actions/cache@v3.0.2
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo build
+        uses: actions/cache@v3.0.2
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+      - name: Run cargo test
+        run: |
+          cargo test
+        shell: bash
+        env:
+          KITTYCAD_API_TOKEN: ${{secrets.KITTYCAD_API_TOKEN}}

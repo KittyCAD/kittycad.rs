@@ -1,0 +1,31 @@
+name: validate-openapi-spec
+on:
+  push:
+    paths:
+      - .github/workflows/validate-openapi-spec.yml
+      - spec.json
+    branches:
+      - main
+  pull_request:
+    paths:
+      - .github/workflows/validate-openapi-spec.yml
+      - spec.json
+  workflow_dispatch:
+    inputs:
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+      - name: Install our tools
+        shell: bash
+        run: |
+          npm install -g @apidevtools/swagger-cli
+
+      - name: Run validation
+        shell: bash
+        run: |
+          swagger-cli validate spec.json

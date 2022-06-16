@@ -1,0 +1,59 @@
+on:
+  pull_request:
+    paths:
+      - spec.json
+      - .github/workflows/make-generate.yml
+name: make-generate
+permissions:
+  packages: read
+  contents: write
+jobs:
+  makegenerate:
+    # Check if the PR is not from a fork
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    name: make generate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Install latest nightly
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: nightly
+            override: true
+            components: rustfmt, clippy
+      - name: Cache cargo registry
+        uses: actions/cache@v3.0.2
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo index
+        uses: actions/cache@v3.0.2
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo build
+        uses: actions/cache@v3.0.2
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+      - name: Run make generate
+        run: |
+          make generate
+        shell: bash
+      - name: Check for modified files
+        id: git-check
+        run: echo ::set-output name=modified::$(if git diff-index --ignore-submodules --quiet HEAD --; then echo "false"; else echo "true"; fi)
+
+      - name: Commit changes, if any
+        if: steps.git-check.outputs.modified == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git add .
+          git commit -am "I have generated the library!"
+          git fetch origin
+          git rebase origin/${{github.event.pull_request.head.ref }} || true
+          git push origin ${{github.event.pull_request.head.ref }}
