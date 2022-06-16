@@ -1333,16 +1333,6 @@ pub struct CodeOutput {
     */
     #[serde(
         default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub output: String,
-
-    /**
-    * Output of the code being executed.
-    */
-    #[serde(
-        default,
         skip_serializing_if = "Vec::is_empty",
         deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
     )]
@@ -4882,6 +4872,244 @@ pub struct Session {
     * An authentication session.
     *  
     *  For our UIs, these are automatically created by Next.js.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub user_id: String,
+}
+
+/**
+* The valid types of metric unit formats.
+*/
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+pub enum UnitMetricFormat {
+    #[serde(rename = "atto")]
+    Atto,
+    #[serde(rename = "centi")]
+    Centi,
+    #[serde(rename = "deca")]
+    Deca,
+    #[serde(rename = "deci")]
+    Deci,
+    #[serde(rename = "exa")]
+    Exa,
+    #[serde(rename = "femto")]
+    Femto,
+    #[serde(rename = "giga")]
+    Giga,
+    #[serde(rename = "hecto")]
+    Hecto,
+    #[serde(rename = "kilo")]
+    Kilo,
+    #[serde(rename = "mega")]
+    Mega,
+    #[serde(rename = "metric_unit")]
+    MetricUnit,
+    #[serde(rename = "micro")]
+    Micro,
+    #[serde(rename = "milli")]
+    Milli,
+    #[serde(rename = "nano")]
+    Nano,
+    #[serde(rename = "peta")]
+    Peta,
+    #[serde(rename = "pico")]
+    Pico,
+    #[serde(rename = "tera")]
+    Tera,
+    #[serde(rename = "")]
+    Noop,
+    #[serde(other)]
+    FallthroughString,
+}
+
+impl std::fmt::Display for UnitMetricFormat {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &*self {
+            UnitMetricFormat::Atto => "atto",
+            UnitMetricFormat::Centi => "centi",
+            UnitMetricFormat::Deca => "deca",
+            UnitMetricFormat::Deci => "deci",
+            UnitMetricFormat::Exa => "exa",
+            UnitMetricFormat::Femto => "femto",
+            UnitMetricFormat::Giga => "giga",
+            UnitMetricFormat::Hecto => "hecto",
+            UnitMetricFormat::Kilo => "kilo",
+            UnitMetricFormat::Mega => "mega",
+            UnitMetricFormat::MetricUnit => "metric_unit",
+            UnitMetricFormat::Micro => "micro",
+            UnitMetricFormat::Milli => "milli",
+            UnitMetricFormat::Nano => "nano",
+            UnitMetricFormat::Peta => "peta",
+            UnitMetricFormat::Pico => "pico",
+            UnitMetricFormat::Tera => "tera",
+            UnitMetricFormat::Noop => "",
+            UnitMetricFormat::FallthroughString => "*",
+        }
+        .fmt(f)
+    }
+}
+
+impl Default for UnitMetricFormat {
+    fn default() -> UnitMetricFormat {
+        UnitMetricFormat::Atto
+    }
+}
+impl std::str::FromStr for UnitMetricFormat {
+    type Err = anyhow::Error;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s == "atto" {
+            return Ok(UnitMetricFormat::Atto);
+        }
+        if s == "centi" {
+            return Ok(UnitMetricFormat::Centi);
+        }
+        if s == "deca" {
+            return Ok(UnitMetricFormat::Deca);
+        }
+        if s == "deci" {
+            return Ok(UnitMetricFormat::Deci);
+        }
+        if s == "exa" {
+            return Ok(UnitMetricFormat::Exa);
+        }
+        if s == "femto" {
+            return Ok(UnitMetricFormat::Femto);
+        }
+        if s == "giga" {
+            return Ok(UnitMetricFormat::Giga);
+        }
+        if s == "hecto" {
+            return Ok(UnitMetricFormat::Hecto);
+        }
+        if s == "kilo" {
+            return Ok(UnitMetricFormat::Kilo);
+        }
+        if s == "mega" {
+            return Ok(UnitMetricFormat::Mega);
+        }
+        if s == "metric_unit" {
+            return Ok(UnitMetricFormat::MetricUnit);
+        }
+        if s == "micro" {
+            return Ok(UnitMetricFormat::Micro);
+        }
+        if s == "milli" {
+            return Ok(UnitMetricFormat::Milli);
+        }
+        if s == "nano" {
+            return Ok(UnitMetricFormat::Nano);
+        }
+        if s == "peta" {
+            return Ok(UnitMetricFormat::Peta);
+        }
+        if s == "pico" {
+            return Ok(UnitMetricFormat::Pico);
+        }
+        if s == "tera" {
+            return Ok(UnitMetricFormat::Tera);
+        }
+        anyhow::bail!("invalid string: {}", s);
+    }
+}
+impl UnitMetricFormat {
+    pub fn is_noop(&self) -> bool {
+        matches!(self, UnitMetricFormat::Noop)
+    }
+}
+
+/// A unit conversion.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+pub struct UnitConversion {
+    /**
+    * A uuid.
+    *  
+    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub id: String,
+
+    /**
+    * The time and date the unit conversion was completed.
+    */
+    #[serde()]
+    pub completed_at: crate::utils::DisplayOptionDateTime,
+
+    /**
+    * The time and date the unit conversion was created.
+    */
+    #[serde()]
+    pub created_at: crate::utils::DisplayOptionDateTime,
+
+    /**
+    * The error the function returned, if any.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub error: String,
+
+    /**
+    * A unit conversion.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "crate::utils::zero_f64",
+        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
+    )]
+    pub input: f64,
+
+    /**
+    * The resulting value.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "crate::utils::zero_f64",
+        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
+    )]
+    pub output: f64,
+
+    /**
+    * The valid types of metric unit formats.
+    */
+    #[serde(default, skip_serializing_if = "UnitMetricFormat::is_noop")]
+    pub output_format: UnitMetricFormat,
+
+    /**
+    * The valid types of metric unit formats.
+    */
+    #[serde(default, skip_serializing_if = "UnitMetricFormat::is_noop")]
+    pub src_format: UnitMetricFormat,
+
+    /**
+    * The time and date the unit conversion was started.
+    */
+    #[serde()]
+    pub started_at: crate::utils::DisplayOptionDateTime,
+
+    /**
+    * The status of an async API call.
+    */
+    #[serde(default, skip_serializing_if = "ApiCallStatus::is_noop")]
+    pub status: ApiCallStatus,
+
+    /**
+    * The time and date the unit conversion was last updated.
+    */
+    #[serde()]
+    pub updated_at: crate::utils::DisplayOptionDateTime,
+
+    /**
+    * A unit conversion.
     */
     #[serde(
         default,

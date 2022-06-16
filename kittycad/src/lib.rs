@@ -97,6 +97,10 @@ pub mod sessions;
 mod tests;
 pub mod traits;
 pub mod types;
+/// Unit conversion operations.
+///
+/// FROM: <https://docs.kittycad.io/api/file>
+pub mod unit;
 /// A user is someone who uses the KittyCAD API. Here, we can create, delete, and list users. We can also get information about a user. Operations will only be authorized if the user is requesting information about themselves.
 ///
 /// FROM: <https://docs.kittycad.io/api/users>
@@ -385,6 +389,13 @@ impl Client {
     /// FROM: <https://docs.kittycad.io/api/sessions>
     pub fn sessions(&self) -> sessions::Sessions {
         sessions::Sessions::new(self.clone())
+    }
+
+    /// Unit conversion operations.
+    ///
+    /// FROM: <https://docs.kittycad.io/api/file>
+    pub fn unit(&self) -> unit::Unit {
+        unit::Unit::new(self.clone())
     }
 
     /// A user is someone who uses the KittyCAD API. Here, we can create, delete, and list users. We can also get information about a user. Operations will only be authorized if the user is requesting information about themselves.
