@@ -67,38 +67,38 @@
 
 /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
 ///
-///FROM: https://docs.kittycad.io/api/api-calls
+/// FROM: <https://docs.kittycad.io/api/api-calls>
 pub mod api_calls;
 /// API tokens allow users to call the API outside of their session token that is used as a cookie in the user interface. Users can create, delete, and list their API tokens. But, of course, you need an API token to do this, so first be sure to generate one in the account UI.
 ///
-///FROM: https://docs.kittycad.io/api/api-tokens
+/// FROM: <https://docs.kittycad.io/api/api-tokens>
 pub mod api_tokens;
 /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
 ///
-///FROM: https://docs.kittycad.io/api/file
+/// FROM: <https://docs.kittycad.io/api/file>
 pub mod file;
 /// Hidden API endpoints that should not show up in the docs.
 ///
-///FROM: https://docs.kittycad.io/api/hidden
+/// FROM: <https://docs.kittycad.io/api/hidden>
 pub mod hidden;
 /// Meta information about the API.
 ///
-///FROM: https://docs.kittycad.io/api/meta
+/// FROM: <https://docs.kittycad.io/api/meta>
 pub mod meta;
 /// Operations around payments and billing.
 ///
-///FROM: https://docs.kittycad.io/api/payments
+/// FROM: <https://docs.kittycad.io/api/payments>
 pub mod payments;
 /// Sessions allow users to call the API from their session cookie in the browser.
 ///
-///FROM: https://docs.kittycad.io/api/sessions
+/// FROM: <https://docs.kittycad.io/api/sessions>
 pub mod sessions;
 #[cfg(test)]
 mod tests;
 pub mod types;
 /// A user is someone who uses the KittyCAD API. Here, we can create, delete, and list users. We can also get information about a user. Operations will only be authorized if the user is requesting information about themselves.
 ///
-///FROM: https://docs.kittycad.io/api/users
+/// FROM: <https://docs.kittycad.io/api/users>
 pub mod users;
 #[doc(hidden)]
 pub mod utils;

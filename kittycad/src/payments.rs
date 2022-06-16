@@ -124,7 +124,7 @@ impl Payments {
     pub async fn delete_method_for_user(&self, id: &str) -> Result<()> {
         let url = format!(
             "/user/payment/methods/{}",
-            crate::progenitor_support::encode_path(id),
+            crate::progenitor_support::encode_path(&id.to_string()),
         );
 
         self.client.delete(&url, None).await

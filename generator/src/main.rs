@@ -2379,13 +2379,13 @@ fn gen(api: &OpenAPI, tags: Vec<String>) -> Result<String> {
         }
         if let Some(e) = &tag.external_docs {
             if !e.url.is_empty() {
-                docs = format!("{}\n\nFROM: {}", docs, e.url);
+                docs = format!("{}\n\nFROM: <{}>", docs, e.url);
             }
         }
         docs = docs.trim().to_string();
 
         if !docs.is_empty() {
-            a(&format!("/// {}", docs.replace('\n', "\n///"),));
+            a(&format!("/// {}", docs.replace('\n', "\n/// "),));
         }
         a(&format!(
             "pub mod {};",

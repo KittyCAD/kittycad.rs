@@ -252,7 +252,7 @@ impl Users {
     pub async fn get_extended(&self, id: &str) -> Result<crate::types::ExtendedUser> {
         let url = format!(
             "/users-extended/{}",
-            crate::progenitor_support::encode_path(id),
+            crate::progenitor_support::encode_path(&id.to_string()),
         );
 
         self.client.get(&url, None).await
@@ -274,7 +274,7 @@ impl Users {
     pub async fn get(&self, id: &str) -> Result<crate::types::User> {
         let url = format!(
             "/users/{}",
-            crate::progenitor_support::encode_path(id),
+            crate::progenitor_support::encode_path(&id.to_string()),
         );
 
         self.client.get(&url, None).await
