@@ -53,14 +53,14 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add .
-          git commit -am "YOYO NEW GO SPEC DOCS ${VERSION}!" || exit 0
+          git commit -am "YOYO NEW RUST SPEC DOCS ${VERSION}!" || exit 0
           git fetch origin
           git rebase origin/main || exit 0
           export NEW_BRANCH="update-spec-${VERSION}"
           git checkout -b "$NEW_BRANCH"
           git push -f origin "$NEW_BRANCH"
-          gh pr create --title "Update go lang spec docs for ${VERSION}" \
-              --body "Updating the generated docs for go lang" \
+          gh pr create --title "Update rust lang spec docs for ${VERSION}" \
+              --body "Updating the generated docs for rust" \
               --head "$NEW_BRANCH" \
               --base main || true
         env:
