@@ -1,7 +1,8 @@
 use std::{fmt, str::FromStr};
 
+use chrono::TimeZone;
 use serde::de::{self, Visitor};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 pub fn next_link(l: &hyperx::header::Link) -> Option<String> {
     l.values().iter().find_map(|value| {
@@ -640,7 +641,7 @@ pub mod deserialize_null_vector {
     }
 }
 
-#[derive(Debug, Clone, Default, Deserialize, Serialize, schemars::JsonSchema, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, schemars::JsonSchema, PartialEq)]
 pub struct DisplayOptionDateTime(pub Option<chrono::DateTime<chrono::Utc>>);
 
 impl std::fmt::Display for DisplayOptionDateTime {
@@ -653,5 +654,23 @@ impl std::fmt::Display for DisplayOptionDateTime {
             ),
             None => write!(f, ""),
         }
+    }
+}
+
+impl<'de> serde::de::Deserialize<'de> for DisplayOptionDateTime {
+    fn deserialize<D>(deserializer: D) -> Result<DisplayOptionDateTime, D::Error>
+    where
+        D: serde::de::Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer).unwrap_or_default();
+        if s.is_empty() {
+            return Ok(DisplayOptionDateTime(None));
+        }
+
+        Ok(DisplayOptionDateTime(Some(
+            chrono::Utc
+                .datetime_from_str(&s, "%+")
+                .map_err(serde::de::Error::custom)?,
+        )))
     }
 }
