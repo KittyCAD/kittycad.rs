@@ -58,7 +58,7 @@ impl File {
     pub async fn get_conversion(&self, id: &str) -> Result<crate::types::AsyncApiCallOutput> {
         let url = format!(
             "/file/conversions/{}",
-            crate::progenitor_support::encode_path(&id.to_string()),
+            crate::progenitor_support::encode_path(id),
         );
 
         self.client.get(&url, None).await
@@ -203,7 +203,7 @@ impl File {
     ) -> Result<crate::types::AsyncApiCallOutput> {
         let url = format!(
             "/user/file/conversions/{}",
-            crate::progenitor_support::encode_path(&id.to_string()),
+            crate::progenitor_support::encode_path(id),
         );
 
         self.client.get(&url, None).await

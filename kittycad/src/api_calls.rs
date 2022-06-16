@@ -146,7 +146,7 @@ impl ApiCalls {
     pub async fn get_call(&self, id: &str) -> Result<crate::types::ApiCallWithPrice> {
         let url = format!(
             "/api-calls/{}",
-            crate::progenitor_support::encode_path(&id.to_string()),
+            crate::progenitor_support::encode_path(id),
         );
 
         self.client.get(&url, None).await
@@ -272,7 +272,7 @@ impl ApiCalls {
     pub async fn get_async_operation(&self, id: &str) -> Result<crate::types::AsyncApiCallOutput> {
         let url = format!(
             "/async/operations/{}",
-            crate::progenitor_support::encode_path(&id.to_string()),
+            crate::progenitor_support::encode_path(id),
         );
 
         self.client.get(&url, None).await
@@ -387,7 +387,7 @@ impl ApiCalls {
     pub async fn get_call_for_user(&self, id: &str) -> Result<crate::types::ApiCallWithPrice> {
         let url = format!(
             "/user/api-calls/{}",
-            crate::progenitor_support::encode_path(&id.to_string()),
+            crate::progenitor_support::encode_path(id),
         );
 
         self.client.get(&url, None).await
@@ -432,7 +432,7 @@ impl ApiCalls {
         let query_ = serde_urlencoded::to_string(&query_args).unwrap();
         let url = format!(
             "/users/{}/api-calls?{}",
-            crate::progenitor_support::encode_path(&id.to_string()),
+            crate::progenitor_support::encode_path(id),
             query_
         );
 
@@ -466,7 +466,7 @@ impl ApiCalls {
         let query_ = serde_urlencoded::to_string(&query_args).unwrap();
         let url = format!(
             "/users/{}/api-calls?{}",
-            crate::progenitor_support::encode_path(&id.to_string()),
+            crate::progenitor_support::encode_path(id),
             query_
         );
 
