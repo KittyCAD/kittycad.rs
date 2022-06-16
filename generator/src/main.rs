@@ -1448,6 +1448,9 @@ impl TypeSpace {
         let uid = uuid::Uuid::new_v4();
 
         match &s.schema_kind {
+            openapiv3::SchemaKind::Not { not } => {
+                anyhow::bail!("found a not: {:?}", not);
+            }
             openapiv3::SchemaKind::Type(t) => match t {
                 openapiv3::Type::Array(at) => {
                     if let Some(items) = &at.items {

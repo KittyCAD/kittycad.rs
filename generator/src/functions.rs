@@ -450,6 +450,7 @@ pub fn generate_files(
             }
             new_api
                 .paths
+                .paths
                 .insert(pn.to_string(), openapiv3::ReferenceOr::Item(new_op.clone()));
 
             // Add this to our map of functions based on the tag name.
