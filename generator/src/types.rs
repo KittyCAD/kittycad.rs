@@ -402,7 +402,7 @@ fn do_one_of_type(
         }
     }
 
-    a("#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema)]");
+    a("#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]");
     if !tag.is_empty() {
         a("#[serde(rename_all = \"snake_case\")]");
         a(&format!("#[serde(tag = \"{}\"", tag));

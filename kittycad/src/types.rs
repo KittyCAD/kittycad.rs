@@ -860,7 +860,7 @@ pub struct AsyncApiCall {
     pub worker: String,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
