@@ -65,3 +65,14 @@ async fn test_create_file_volume() {
     assert_eq!(result.src_format, crate::types::FileSourceFormat::Obj);
     assert_eq!(result.status, crate::types::ApiCallStatus::Completed);
 }
+
+#[tokio::test]
+async fn test_get_status_of_async_operation() {
+    let client = test_client();
+
+    let _result = client
+        .api_calls()
+        .get_async_operation("23a9759f-ee9b-47de-9a55-deb1ed035793")
+        .await
+        .unwrap();
+}

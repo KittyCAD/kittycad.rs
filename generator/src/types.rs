@@ -1,7 +1,7 @@
 use std::{cmp::Ordering, collections::BTreeMap};
 
 use anyhow::{bail, Result};
-use inflector::cases::{snakecase::to_snake_case};
+use inflector::cases::snakecase::to_snake_case;
 
 use crate::{render_param, struct_name, TypeDetails, TypeId, TypeSpace};
 
@@ -456,12 +456,16 @@ fn do_one_of_type(
                     }
                 }
 
+                let mut t = ts.render_type(prop, true).unwrap();
+                if let TypeDetails::Optional(_, data) = &pet.details {
+                    if data.nullable && !t.starts_with("Option<") {
+                        t = format!("Option<{}>", t)
+                    }
+                }
                 if o.len() <= 2 {
-                    let t = ts.render_type(prop, true).unwrap();
                     prop_types.push((name.to_string(), t.to_string()));
                     a(&format!("{},", t));
                 } else {
-                    let t = ts.render_type(prop, true).unwrap();
                     prop_types.push((name.to_string(), t.to_string()));
                     a(&format!("{}: {},", n, t));
                 }
