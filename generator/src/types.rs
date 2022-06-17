@@ -101,7 +101,6 @@ pub fn generate_types(api: &openapiv3::OpenAPI, ts: &mut TypeSpace) -> Result<St
                         && sn != "Customer"
                         && sn != "Connection"
                         && sn != "CardDetails"
-                        && sn != "AsyncApiCall"
                     {
                         a("Tabled,");
                     }
@@ -337,7 +336,9 @@ fn render_property(
         }
 
         // Hide things from the table that don't implement display.
-        if rt.starts_with("Vec<") && rt != "Vec<InvoiceLineItem>" {
+        if (rt.starts_with("Vec<") && rt != "Vec<InvoiceLineItem>")
+            || rt.contains("serde_json::Value")
+        {
             a(r#"#[tabled(skip)]"#);
         }
 

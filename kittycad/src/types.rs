@@ -761,7 +761,7 @@ impl AsyncApiCallType {
 }
 
 /// An async API call.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct AsyncApiCall {
     /**
     * A uuid.
@@ -801,12 +801,14 @@ pub struct AsyncApiCall {
     * An async API call.
     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[tabled(skip)]
     pub input: Option<serde_json::Value>,
 
     /**
     * The JSON output for the API call. These are determined by the endpoint that is run.
     */
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[tabled(skip)]
     pub output: Option<serde_json::Value>,
 
     /**
