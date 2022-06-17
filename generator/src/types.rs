@@ -1,7 +1,7 @@
 use std::{cmp::Ordering, collections::BTreeMap};
 
 use anyhow::{bail, Result};
-use inflector::cases::{kebabcase::to_kebab_case, snakecase::to_snake_case};
+use inflector::cases::{snakecase::to_snake_case};
 
 use crate::{render_param, struct_name, TypeDetails, TypeId, TypeSpace};
 
@@ -404,7 +404,6 @@ fn do_one_of_type(
 
     a("#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]");
     if !tag.is_empty() {
-        a("#[serde(rename_all = \"kebab-case\")]");
         a(&format!("#[serde(tag = \"{}\"", tag));
         if !content.is_empty() {
             a(&format!(", content = \"{}\"", content));
@@ -546,8 +545,7 @@ fn do_one_of_type(
         a("    let content = parts[1].to_string();");
         a("    let mut j = String::new();");
         for (name, p) in prop_types.iter() {
-            let k = to_kebab_case(name);
-            a(&format!("if tag == \"{}\" {{", k));
+            a(&format!("if tag == \"{}\" {{", name));
             a("j = format!(r#\"{{");
             a(&format!("\"{}\": \"{}\",", tag, to_snake_case(name)));
             if p == "String" || p.starts_with("Vec<") {
@@ -591,8 +589,7 @@ fn do_one_of_type(
         a("pub fn variants() -> Vec<String> {");
         a("    vec![");
         for (name, _) in types_strings.iter() {
-            let k = to_kebab_case(name);
-            a(&format!("        \"{}\".to_string(),", k));
+            a(&format!("        \"{}\".to_string(),", name));
             values.push(name.to_string());
         }
         a("    ]");
