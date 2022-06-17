@@ -338,7 +338,7 @@ fn render_property(
 
         // Hide things from the table that don't implement display.
         if rt.starts_with("Vec<") && rt != "Vec<InvoiceLineItem>" {
-            a(r#"#[header(hidden = true)]"#);
+            a(r#"#[tabled(skip)]"#);
         }
 
         if prop == "type" {

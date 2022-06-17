@@ -596,7 +596,7 @@ pub struct ApiCallWithPriceResultsPage {
         skip_serializing_if = "Vec::is_empty",
         deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
     )]
-    #[header(hidden = true)]
+    #[tabled(skip)]
     pub items: Vec<ApiCallWithPrice>,
 
     /**
@@ -684,7 +684,7 @@ pub struct ApiTokenResultsPage {
         skip_serializing_if = "Vec::is_empty",
         deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
     )]
-    #[header(hidden = true)]
+    #[tabled(skip)]
     pub items: Vec<ApiToken>,
 
     /**
@@ -999,7 +999,7 @@ pub struct AsyncApiCallResultsPage {
         skip_serializing_if = "Vec::is_empty",
         deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
     )]
-    #[header(hidden = true)]
+    #[tabled(skip)]
     pub items: Vec<AsyncApiCall>,
 
     /**
@@ -1235,7 +1235,7 @@ pub struct Cluster {
         skip_serializing_if = "Vec::is_empty",
         deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
     )]
-    #[header(hidden = true)]
+    #[tabled(skip)]
     pub urls: Vec<String>,
 }
 
@@ -1336,7 +1336,7 @@ pub struct CodeOutput {
         skip_serializing_if = "Vec::is_empty",
         deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
     )]
-    #[header(hidden = true)]
+    #[tabled(skip)]
     pub output_files: Vec<OutputFile>,
 
     /**
@@ -3557,7 +3557,7 @@ pub struct ExtendedUserResultsPage {
         skip_serializing_if = "Vec::is_empty",
         deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
     )]
-    #[header(hidden = true)]
+    #[tabled(skip)]
     pub items: Vec<ExtendedUser>,
 
     /**
@@ -5316,7 +5316,7 @@ pub struct UserResultsPage {
         skip_serializing_if = "Vec::is_empty",
         deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
     )]
-    #[header(hidden = true)]
+    #[tabled(skip)]
     pub items: Vec<User>,
 
     /**
