@@ -56,7 +56,7 @@ impl Client {
     where
         H: Into<String> + std::fmt::Display,
     {
-        self.host = host.to_string();
+        self.host = host.to_string().trim_end_matches('/').to_string();
     }
 
     /// Create a new Client struct from the environment variable: KITTYCAD_API_TOKEN.
