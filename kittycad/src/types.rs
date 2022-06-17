@@ -861,7 +861,7 @@ pub struct AsyncApiCall {
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "kebab-case")]
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
     FileConversion {
@@ -932,10 +932,10 @@ impl std::str::FromStr for AsyncApiCallOutput {
 impl AsyncApiCallOutput {
     pub fn variants() -> Vec<String> {
         vec![
-            "file_conversion".to_string(),
-            "file_density".to_string(),
-            "file_mass".to_string(),
-            "file_volume".to_string(),
+            "file-conversion".to_string(),
+            "file-density".to_string(),
+            "file-mass".to_string(),
+            "file-volume".to_string(),
         ]
     }
 }
