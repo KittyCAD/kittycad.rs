@@ -1879,8 +1879,8 @@
           "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#HiddenService.ListenOauth2ProviderCallback"
         },
         "x-rust": {
-          "example": "/**\n* Listen for callbacks for the OAuth 2.0 provider.\n*\n* This function performs a `GET` to the `/oauth2/provider/{provider}/callback` endpoint.\n*\n* **Parameters:**\n*\n* * `provider: crate::types::AccountProvider` -- An account provider.\n* * `code: &str` -- The authorization code.\n* * `state: &str` -- The state that we had passed in through the user consent URL.\n*/\nlet string = client.hidden().listen_oauth_2_provider_callback(code, provider, state).await?;",
-          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.listen_oauth_2_provider_callback"
+          "example": "/**\n* Listen for callbacks for the OAuth 2.0 provider.\n*\n* This function performs a `GET` to the `/oauth2/provider/{provider}/callback` endpoint.\n*\n* **Parameters:**\n*\n* * `provider: crate::types::AccountProvider` -- An account provider.\n* * `code: &str` -- The authorization code.\n* * `state: &str` -- The state that we had passed in through the user consent URL.\n*/\nlet string = client.hidden().listen_oauth2_provider_callback(code, provider, state).await?;",
+          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.listen_oauth2_provider_callback"
         }
       }
     },
@@ -1970,8 +1970,8 @@
           "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#HiddenService.ListenOauth2ProviderConsent"
         },
         "x-rust": {
-          "example": "/**\n* Get the consent URL and other information for the OAuth 2.0 provider.\n*\n* This function performs a `GET` to the `/oauth2/provider/{provider}/consent` endpoint.\n*\n* **Parameters:**\n*\n* * `provider: crate::types::AccountProvider` -- An account provider.\n* * `callback_url: &str` -- The URL to redirect back to after we have authenticated.\n*/\nlet o_auth_2_client_info = client.hidden().listen_oauth_2_provider_consent(callback_url, provider).await?;",
-          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.listen_oauth_2_provider_consent"
+          "example": "/**\n* Get the consent URL and other information for the OAuth 2.0 provider.\n*\n* This function performs a `GET` to the `/oauth2/provider/{provider}/consent` endpoint.\n*\n* **Parameters:**\n*\n* * `provider: crate::types::AccountProvider` -- An account provider.\n* * `callback_url: &str` -- The URL to redirect back to after we have authenticated.\n*/\nlet o_auth_2_client_info = client.hidden().listen_oauth2_provider_consent(callback_url, provider).await?;",
+          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.listen_oauth2_provider_consent"
         }
       }
     },

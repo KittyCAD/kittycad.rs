@@ -2594,6 +2594,10 @@ fn clean_name(t: &str) -> String {
         st = "ids".to_string();
     }
 
+    if st == "oauth 2" {
+        st = "oauth2".to_string()
+    }
+
     let mut words: Vec<String> = Default::default();
     // Only get a string with unique words.
     let split = st.split(' ');
@@ -2640,6 +2644,7 @@ pub fn clean_fn_name(oid: &str, tag: &str) -> String {
         .replace("_id_or_uuid", "")
         .replace("_uuid", "")
         .replace("hardware_", "")
+        .replace("oauth_2", "oauth2")
         .trim_start_matches('_')
         .trim_start_matches("in_")
         .trim_start_matches("by_")

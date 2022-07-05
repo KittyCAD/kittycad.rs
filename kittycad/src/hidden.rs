@@ -83,7 +83,7 @@ impl Hidden {
     * * `code: &str` -- The authorization code.
     * * `state: &str` -- The state that we had passed in through the user consent URL.
     */
-    pub async fn listen_oauth_2_provider_callback(
+    pub async fn listen_oauth2_provider_callback(
         &self,
         code: &str,
         provider: crate::types::AccountProvider,
@@ -116,7 +116,7 @@ impl Hidden {
     * * `provider: crate::types::AccountProvider` -- An account provider.
     * * `callback_url: &str` -- The URL to redirect back to after we have authenticated.
     */
-    pub async fn listen_oauth_2_provider_consent(
+    pub async fn listen_oauth2_provider_consent(
         &self,
         callback_url: &str,
         provider: crate::types::AccountProvider,
