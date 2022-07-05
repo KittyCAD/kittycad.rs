@@ -475,7 +475,7 @@
             "name": "status",
             "description": "The status to filter by.",
             "schema": {
-              "$ref": "#/components/schemas/APICallStatus"
+              "$ref": "#/components/schemas/ApiCallStatus"
             },
             "style": "form"
           }
@@ -622,6 +622,253 @@
         "x-rust": {
           "example": "/**\n* Get an async operation.\n*\n* This function performs a `GET` to the `/async/operations/{id}` endpoint.\n*\n* Get the status and output of an async operation.\n* This endpoint requires authentication by any KittyCAD user. It returns details of the requested async operation for the user.\n* If the user is not authenticated to view the specified async operation, then it is not returned.\n* Only KittyCAD employees with the proper access can view async operations for other users.\n*\n* **Parameters:**\n*\n* * `id: &str` -- The ID of the async operation.\n*/\nlet async_api_call_output = client.api_calls().get_async_operation(id).await?;",
           "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.get_async_operation"
+        }
+      }
+    },
+    "/auth/email": {
+      "post": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "Create an email verification request for a user.",
+        "operationId": "listen_auth_email",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailAuthenticationForm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-go": {
+          "example": "// ListenAuthEmail: Create an email verification request for a user.\nif err := client.Hidden.ListenAuthEmail(body); err != nil {\n\tpanic(err)\n}",
+          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#HiddenService.ListenAuthEmail"
+        },
+        "x-rust": {
+          "example": "/**\n* Create an email verification request for a user.\n*\n* This function performs a `POST` to the `/auth/email` endpoint.\n*/\nclient.hidden().listen_auth_email(body).await?;",
+          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.listen_auth_email"
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint for email authentication.",
+        "description": "This is necessary for some preflight requests, specifically DELETE, PUT, and POST since it has a request body.",
+        "operationId": "options_auth_email",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Null",
+                  "type": "string",
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/auth/email/callback": {
+      "get": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "Listen for callbacks for email verification for users.",
+        "operationId": "listen_auth_email_callback",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "callback_url",
+            "description": "The URL to redirect back to after we have authenticated.",
+            "schema": {
+              "nullable": true,
+              "type": "string",
+              "format": "uri"
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "email",
+            "description": "The user's email.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "token",
+            "description": "The verification token.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Temporary Redirect",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Empty"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-go": {
+          "example": "// ListenAuthEmailCallback: Listen for callbacks for email verification for users.\n//\n// Parameters:\n//\t- `callbackUrl`: The URL to redirect back to after we have authenticated.\n//\t- `email`: The user's email.\n//\t- `token`: The verification token.\nif err := client.Hidden.ListenAuthEmailCallback(callbackUrl, email, token); err != nil {\n\tpanic(err)\n}",
+          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#HiddenService.ListenAuthEmailCallback"
+        },
+        "x-rust": {
+          "example": "/**\n* Listen for callbacks for email verification for users.\n*\n* This function performs a `GET` to the `/auth/email/callback` endpoint.\n*\n* **Parameters:**\n*\n* * `callback_url: &url::Url` -- The URL to redirect back to after we have authenticated.\n* * `email: &str` -- The user's email.\n* * `token: &str` -- The verification token.\n*/\nlet string = client.hidden().listen_auth_email_callback(callback_url, email, token).await?;",
+          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.listen_auth_email_callback"
         }
       }
     },
@@ -1217,23 +1464,14 @@
         }
       }
     },
-    "/login": {
+    "/logout": {
       "post": {
         "tags": [
           "hidden"
         ],
-        "summary": "This endpoint sets a session cookie for a user.",
-        "operationId": "login",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginParams"
-              }
-            }
-          },
-          "required": true
-        },
+        "summary": "This endpoint removes the session cookie for a user.",
+        "description": "This is used in logout scenarios.",
+        "operationId": "logout",
         "responses": {
           "204": {
             "description": "resource updated",
@@ -1288,12 +1526,452 @@
           }
         },
         "x-go": {
-          "example": "// Login: This endpoint sets a session cookie for a user.\nif err := client.Hidden.Login(body); err != nil {\n\tpanic(err)\n}",
-          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#HiddenService.Login"
+          "example": "// Logout: This endpoint removes the session cookie for a user.\n//\n// This is used in logout scenarios.\nif err := client.Hidden.Logout(); err != nil {\n\tpanic(err)\n}",
+          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#HiddenService.Logout"
         },
         "x-rust": {
-          "example": "/**\n* This endpoint sets a session cookie for a user.\n*\n* This function performs a `POST` to the `/login` endpoint.\n*/\nclient.hidden().login(body).await?;",
-          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.login"
+          "example": "/**\n* This endpoint removes the session cookie for a user.\n*\n* This function performs a `POST` to the `/logout` endpoint.\n*\n* This is used in logout scenarios.\n*/\nclient.hidden().logout().await?;",
+          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.logout"
+        }
+      }
+    },
+    "/oauth2/device/auth": {
+      "post": {
+        "tags": [
+          "oauth2"
+        ],
+        "summary": "Start an OAuth 2.0 Device Authorization Grant.",
+        "description": "This endpoint is designed to be accessed from an *unauthenticated* API client. It generates and records a `device_code` and `user_code` which must be verified and confirmed prior to a token being granted.",
+        "operationId": "device_auth_request",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceAuthRequestForm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "*/*": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "x-go": {
+          "example": "// DeviceAuthRequest: Start an OAuth 2.0 Device Authorization Grant.\n//\n// This endpoint is designed to be accessed from an *unauthenticated* API client. It generates and records a `device_code` and `user_code` which must be verified and confirmed prior to a token being granted.\nresponseDeviceAuthRequest, err := client.Oauth2.DeviceAuthRequest(body)",
+          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#Oauth2Service.DeviceAuthRequest"
+        },
+        "x-rust": {
+          "example": "/**\n* Start an OAuth 2.0 Device Authorization Grant.\n*\n* This function performs a `POST` to the `/oauth2/device/auth` endpoint.\n*\n* This endpoint is designed to be accessed from an *unauthenticated* API client. It generates and records a `device_code` and `user_code` which must be verified and confirmed prior to a token being granted.\n*/\nclient.oauth_2().device_auth_request().await?;",
+          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth_2/struct.Oauth2.html#method.device_auth_request"
+        }
+      }
+    },
+    "/oauth2/device/confirm": {
+      "post": {
+        "tags": [
+          "oauth2"
+        ],
+        "summary": "Confirm an OAuth 2.0 Device Authorization Grant.",
+        "description": "This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/device/token`.",
+        "operationId": "device_auth_confirm",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceAuthVerifyParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Null",
+                  "type": "string",
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-go": {
+          "example": "// DeviceAuthConfirm: Confirm an OAuth 2.0 Device Authorization Grant.\n//\n// This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/device/token`.\nif err := client.Oauth2.DeviceAuthConfirm(body); err != nil {\n\tpanic(err)\n}",
+          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#Oauth2Service.DeviceAuthConfirm"
+        },
+        "x-rust": {
+          "example": "/**\n* Confirm an OAuth 2.0 Device Authorization Grant.\n*\n* This function performs a `POST` to the `/oauth2/device/confirm` endpoint.\n*\n* This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/device/token`.\n*/\nlet string = client.oauth_2().device_auth_confirm(body).await?;",
+          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth_2/struct.Oauth2.html#method.device_auth_confirm"
+        }
+      }
+    },
+    "/oauth2/device/token": {
+      "post": {
+        "tags": [
+          "oauth2"
+        ],
+        "summary": "Request a device access token.",
+        "description": "This endpoint should be polled by the client until the user code is verified and the grant is confirmed.",
+        "operationId": "device_access_token",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceAccessTokenRequestForm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "*/*": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "x-go": {
+          "example": "// DeviceAccessToken: Request a device access token.\n//\n// This endpoint should be polled by the client until the user code is verified and the grant is confirmed.\nresponseDeviceAccessToken, err := client.Oauth2.DeviceAccessToken(body)",
+          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#Oauth2Service.DeviceAccessToken"
+        },
+        "x-rust": {
+          "example": "/**\n* Request a device access token.\n*\n* This function performs a `POST` to the `/oauth2/device/token` endpoint.\n*\n* This endpoint should be polled by the client until the user code is verified and the grant is confirmed.\n*/\nclient.oauth_2().device_access_token().await?;",
+          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth_2/struct.Oauth2.html#method.device_access_token"
+        }
+      }
+    },
+    "/oauth2/device/verify": {
+      "get": {
+        "tags": [
+          "oauth2"
+        ],
+        "summary": "Verify an OAuth 2.0 Device Authorization Grant.",
+        "description": "This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `state` parameter to get them back here on completion. If they are logged in, serve up the console verification page so they can verify the user code.",
+        "operationId": "device_auth_verify",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "user_code",
+            "description": "The user code.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Temporary Redirect",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Empty"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-go": {
+          "example": "// DeviceAuthVerify: Verify an OAuth 2.0 Device Authorization Grant.\n//\n// This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `state` parameter to get them back here on completion. If they are logged in, serve up the console verification page so they can verify the user code.\n//\n// Parameters:\n//\t- `userCode`: The user code.\nif err := client.Oauth2.DeviceAuthVerify(userCode); err != nil {\n\tpanic(err)\n}",
+          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#Oauth2Service.DeviceAuthVerify"
+        },
+        "x-rust": {
+          "example": "/**\n* Verify an OAuth 2.0 Device Authorization Grant.\n*\n* This function performs a `GET` to the `/oauth2/device/verify` endpoint.\n*\n* This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `state` parameter to get them back here on completion. If they are logged in, serve up the console verification page so they can verify the user code.\n*\n* **Parameters:**\n*\n* * `user_code: &str` -- The user code.\n*/\nlet string = client.oauth_2().device_auth_verify(user_code).await?;",
+          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth_2/struct.Oauth2.html#method.device_auth_verify"
+        }
+      }
+    },
+    "/oauth2/provider/{provider}/callback": {
+      "get": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "Listen for callbacks for the OAuth 2.0 provider.",
+        "operationId": "listen_oauth2_provider_callback",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider",
+            "description": "The provider.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AccountProvider"
+            },
+            "style": "simple"
+          },
+          {
+            "in": "query",
+            "name": "code",
+            "description": "The authorization code.",
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "description": "The state that we had passed in through the user consent URL.",
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Temporary Redirect",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Empty"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-go": {
+          "example": "// ListenOauth2ProviderCallback: Listen for callbacks for the OAuth 2.0 provider.\n//\n// Parameters:\n//\t- `code`: The authorization code.\n//\t- `provider`: The provider.\n//\t- `state`: The state that we had passed in through the user consent URL.\nif err := client.Hidden.ListenOauth2ProviderCallback(provider, code, state); err != nil {\n\tpanic(err)\n}",
+          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#HiddenService.ListenOauth2ProviderCallback"
+        },
+        "x-rust": {
+          "example": "/**\n* Listen for callbacks for the OAuth 2.0 provider.\n*\n* This function performs a `GET` to the `/oauth2/provider/{provider}/callback` endpoint.\n*\n* **Parameters:**\n*\n* * `provider: crate::types::AccountProvider` -- An account provider.\n* * `code: &str` -- The authorization code.\n* * `state: &str` -- The state that we had passed in through the user consent URL.\n*/\nlet string = client.hidden().listen_oauth2_provider_callback(code, provider, state).await?;",
+          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.listen_oauth2_provider_callback"
+        }
+      }
+    },
+    "/oauth2/provider/{provider}/consent": {
+      "get": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "Get the consent URL and other information for the OAuth 2.0 provider.",
+        "operationId": "listen_oauth2_provider_consent",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider",
+            "description": "The provider.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AccountProvider"
+            },
+            "style": "simple"
+          },
+          {
+            "in": "query",
+            "name": "callback_url",
+            "description": "The URL to redirect back to after we have authenticated.",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2ClientInfo"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-go": {
+          "example": "// ListenOauth2ProviderConsent: Get the consent URL and other information for the OAuth 2.0 provider.\n//\n// Parameters:\n//\t- `callbackUrl`: The URL to redirect back to after we have authenticated.\n//\t- `provider`: The provider.\noAuth2ClientInfo, err := client.Hidden.ListenOauth2ProviderConsent(provider, callbackUrl)",
+          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#HiddenService.ListenOauth2ProviderConsent"
+        },
+        "x-rust": {
+          "example": "/**\n* Get the consent URL and other information for the OAuth 2.0 provider.\n*\n* This function performs a `GET` to the `/oauth2/provider/{provider}/consent` endpoint.\n*\n* **Parameters:**\n*\n* * `provider: crate::types::AccountProvider` -- An account provider.\n* * `callback_url: &str` -- The URL to redirect back to after we have authenticated.\n*/\nlet o_auth_2_client_info = client.hidden().listen_oauth2_provider_consent(callback_url, provider).await?;",
+          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.listen_oauth2_provider_consent"
         }
       }
     },
@@ -1369,7 +2047,8 @@
     "/unit/conversion/{src_format}/{output_format}": {
       "post": {
         "tags": [
-          "unit"
+          "unit",
+          "beta"
         ],
         "summary": "Convert units.",
         "description": "Convert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
@@ -2277,7 +2956,7 @@
           "users"
         ],
         "summary": "Get extended information about your user.",
-        "description": "Get the user information for the authenticated user.\nAlternatively, you can also use the `/users/me` endpoint.",
+        "description": "Get the user information for the authenticated user.\nAlternatively, you can also use the `/users-extended/me` endpoint.",
         "operationId": "get_user_self_extended",
         "responses": {
           "200": {
@@ -2332,11 +3011,11 @@
           }
         },
         "x-go": {
-          "example": "// GetSelfExtended: Get extended information about your user.\n//\n// Get the user information for the authenticated user.\n// Alternatively, you can also use the `/users/me` endpoint.\nextendedUser, err := client.User.GetSelfExtended()",
+          "example": "// GetSelfExtended: Get extended information about your user.\n//\n// Get the user information for the authenticated user.\n// Alternatively, you can also use the `/users-extended/me` endpoint.\nextendedUser, err := client.User.GetSelfExtended()",
           "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#UserService.GetSelfExtended"
         },
         "x-rust": {
-          "example": "/**\n* Get extended information about your user.\n*\n* This function performs a `GET` to the `/user/extended` endpoint.\n*\n* Get the user information for the authenticated user.\n* Alternatively, you can also use the `/users/me` endpoint.\n*/\nlet extended_user = client.users().get_self_extended().await?;",
+          "example": "/**\n* Get extended information about your user.\n*\n* This function performs a `GET` to the `/user/extended` endpoint.\n*\n* Get the user information for the authenticated user.\n* Alternatively, you can also use the `/users-extended/me` endpoint.\n*/\nlet extended_user = client.users().get_self_extended().await?;",
           "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_self_extended"
         }
       }
@@ -3731,15 +4410,12 @@
       }
     },
     "schemas": {
-      "APICallStatus": {
-        "description": "The status of an async API call.",
+      "AccountProvider": {
+        "description": "An account provider.",
         "type": "string",
         "enum": [
-          "Queued",
-          "Uploaded",
-          "In Progress",
-          "Completed",
-          "Failed"
+          "google",
+          "github"
         ]
       },
       "Address": {
@@ -3828,8 +4504,19 @@
           "ip_address"
         ]
       },
+      "ApiCallStatus": {
+        "description": "The status of an async API call.",
+        "type": "string",
+        "enum": [
+          "Queued",
+          "Uploaded",
+          "In Progress",
+          "Completed",
+          "Failed"
+        ]
+      },
       "ApiCallWithPrice": {
-        "description": "An API call with the price.\n\nThis is a join of the `APICall` and `APICallPrice` tables.",
+        "description": "An API call with the price.\n\nThis is a join of the `ApiCall` and `ApiCallPrice` tables.",
         "type": "object",
         "properties": {
           "completed_at": {
@@ -3846,8 +4533,11 @@
           "duration": {
             "nullable": true,
             "description": "The duration of the API call.",
-            "type": "integer",
-            "format": "int64"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Duration"
+              }
+            ]
           },
           "email": {
             "description": "The user's email address.",
@@ -3868,7 +4558,12 @@
           },
           "ip_address": {
             "description": "The ip address of the origin.",
-            "type": "string"
+            "default": "",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IpAddr"
+              }
+            ]
           },
           "method": {
             "description": "The HTTP method requsted by the API call.",
@@ -4041,16 +4736,6 @@
           "items"
         ]
       },
-      "AsyncAPICallType": {
-        "description": "The type of async API call.",
-        "type": "string",
-        "enum": [
-          "FileConversion",
-          "FileVolume",
-          "FileMass",
-          "FileDensity"
-        ]
-      },
       "AsyncApiCall": {
         "description": "An async API call.",
         "type": "object",
@@ -4096,7 +4781,7 @@
             "description": "The status of the async API call.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/APICallStatus"
+                "$ref": "#/components/schemas/ApiCallStatus"
               }
             ]
           },
@@ -4104,7 +4789,7 @@
             "description": "The type of async API call.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/AsyncAPICallType"
+                "$ref": "#/components/schemas/AsyncApiCallType"
               }
             ]
           },
@@ -4164,7 +4849,11 @@
               "output": {
                 "nullable": true,
                 "description": "The converted file, if completed, base64 encoded.",
-                "type": "string"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Base64Data"
+                  }
+                ]
               },
               "output_format": {
                 "description": "The output format of the file conversion.",
@@ -4192,7 +4881,7 @@
                 "description": "The status of the file conversion.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/APICallStatus"
+                    "$ref": "#/components/schemas/ApiCallStatus"
                   }
                 ]
               },
@@ -4280,7 +4969,7 @@
                 "description": "The status of the mass.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/APICallStatus"
+                    "$ref": "#/components/schemas/ApiCallStatus"
                   }
                 ]
               },
@@ -4355,7 +5044,7 @@
                 "description": "The status of the volume.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/APICallStatus"
+                    "$ref": "#/components/schemas/ApiCallStatus"
                   }
                 ]
               },
@@ -4448,7 +5137,7 @@
                 "description": "The status of the density.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/APICallStatus"
+                    "$ref": "#/components/schemas/ApiCallStatus"
                   }
                 ]
               },
@@ -4499,6 +5188,21 @@
         "required": [
           "items"
         ]
+      },
+      "AsyncApiCallType": {
+        "description": "The type of async API call.",
+        "type": "string",
+        "enum": [
+          "FileConversion",
+          "FileVolume",
+          "FileMass",
+          "FileDensity"
+        ]
+      },
+      "Base64Data": {
+        "title": "String",
+        "type": "string",
+        "format": "byte"
       },
       "BillingInfo": {
         "description": "The billing information for payments.",
@@ -4634,7 +5338,6 @@
         "type": "string",
         "enum": [
           "go",
-          "rust",
           "python",
           "node"
         ]
@@ -4658,6 +5361,22 @@
           "stdout": {
             "description": "The stdout of the code.",
             "default": "",
+            "type": "string"
+          }
+        }
+      },
+      "Commit": {
+        "description": "Commit holds the Git-commit (SHA1) that a binary was built from, as reported in the version-string of external tools, such as `containerd`, or `runC`.",
+        "type": "object",
+        "properties": {
+          "expected": {
+            "nullable": true,
+            "description": "Commit ID of external tool expected by dockerd as set at build time.",
+            "type": "string"
+          },
+          "id": {
+            "nullable": true,
+            "description": "Actual commit ID of external tool.",
             "type": "string"
           }
         }
@@ -4772,12 +5491,6 @@
             "type": "integer",
             "format": "int64"
           },
-          "id": {
-            "description": "The ID as known by the most recently connected server.",
-            "type": "integer",
-            "format": "uint64",
-            "minimum": 0
-          },
           "in_bytes": {
             "description": "The count of inbound bytes for the server.",
             "default": 0,
@@ -4789,10 +5502,6 @@
             "default": 0,
             "type": "integer",
             "format": "int64"
-          },
-          "ip": {
-            "description": "The client IP as known by the most recently connected server.",
-            "type": "string"
           },
           "jetstream": {
             "description": "Jetstream information.",
@@ -4931,14 +5640,6 @@
             "type": "integer",
             "format": "int64"
           },
-          "rtt": {
-            "description": "The round trip time between this client and the server.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Duration"
-              }
-            ]
-          },
           "server_id": {
             "description": "The server ID.",
             "default": "",
@@ -5004,10 +5705,7 @@
           "config_load_time",
           "host",
           "http_req_stats",
-          "id",
-          "ip",
           "now",
-          "rtt",
           "start"
         ]
       },
@@ -5203,7 +5901,8 @@
           },
           "email": {
             "description": "The customer's email address.",
-            "type": "string"
+            "type": "string",
+            "format": "email"
           },
           "id": {
             "description": "Unique identifier for the object.",
@@ -5236,9 +5935,449 @@
           "currency"
         ]
       },
+      "DeviceAccessTokenRequestForm": {
+        "description": "The form for a device access token request.",
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "description": "The client ID.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "device_code": {
+            "description": "The device code.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "grant_type": {
+            "description": "The grant type.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OAuth2GrantType"
+              }
+            ]
+          }
+        },
+        "required": [
+          "client_id",
+          "device_code",
+          "grant_type"
+        ]
+      },
+      "DeviceAuthRequestForm": {
+        "description": "The request parameters for the OAuth 2.0 Device Authorization Grant flow.",
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "description": "The client ID.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "client_id"
+        ]
+      },
+      "DeviceAuthVerifyParams": {
+        "description": "The request parameters to verify the `user_code` for the OAuth 2.0 Device Authorization Grant.",
+        "type": "object",
+        "properties": {
+          "user_code": {
+            "description": "The user code.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_code"
+        ]
+      },
+      "DockerSystemInfo": {
+        "description": "Docker system info.",
+        "type": "object",
+        "properties": {
+          "architecture": {
+            "nullable": true,
+            "description": "Hardware architecture of the host, as returned by the Go runtime (`GOARCH`).  A full list of possible values can be found in the [Go documentation](https://golang.org/doc/install/source#environment).",
+            "type": "string"
+          },
+          "bridge_nf_ip6tables": {
+            "nullable": true,
+            "description": "Indicates if `bridge-nf-call-ip6tables` is available on the host.",
+            "type": "boolean"
+          },
+          "bridge_nf_iptables": {
+            "nullable": true,
+            "description": "Indicates if `bridge-nf-call-iptables` is available on the host.",
+            "type": "boolean"
+          },
+          "cgroup_driver": {
+            "nullable": true,
+            "description": "The driver to use for managing cgroups.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SystemInfoCgroupDriverEnum"
+              }
+            ]
+          },
+          "cgroup_version": {
+            "nullable": true,
+            "description": "The version of the cgroup.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SystemInfoCgroupVersionEnum"
+              }
+            ]
+          },
+          "cluster_advertise": {
+            "nullable": true,
+            "description": "The network endpoint that the Engine advertises for the purpose of node discovery. ClusterAdvertise is a `host:port` combination on which the daemon is reachable by other hosts.\n\n**Deprecated**: This field is only propagated when using standalone Swarm mode, and overlay networking using an external k/v store. Overlay networks with Swarm mode enabled use the built-in raft store, and this field will be empty.",
+            "type": "string"
+          },
+          "cluster_store": {
+            "nullable": true,
+            "description": "URL of the distributed storage backend.   The storage backend is used for multihost networking (to store network and endpoint information) and by the node discovery mechanism.\n\n**Deprecated**: This field is only propagated when using standalone Swarm mode, and overlay networking using an external k/v store. Overlay networks with Swarm mode enabled use the built-in raft store, and this field will be empty.",
+            "type": "string"
+          },
+          "containerd_commit": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Commit"
+              }
+            ]
+          },
+          "containers": {
+            "nullable": true,
+            "description": "Total number of containers on the host.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "containers_paused": {
+            "nullable": true,
+            "description": "Number of containers with status `\\\"paused\\\"`.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "containers_running": {
+            "nullable": true,
+            "description": "Number of containers with status `\\\"running\\\"`.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "containers_stopped": {
+            "nullable": true,
+            "description": "Number of containers with status `\\\"stopped\\\"`.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "cpu_cfs_period": {
+            "nullable": true,
+            "description": "Indicates if CPU CFS(Completely Fair Scheduler) period is supported by the host.",
+            "type": "boolean"
+          },
+          "cpu_cfs_quota": {
+            "nullable": true,
+            "description": "Indicates if CPU CFS(Completely Fair Scheduler) quota is supported by the host.",
+            "type": "boolean"
+          },
+          "cpu_set": {
+            "nullable": true,
+            "description": "Indicates if CPUsets (cpuset.cpus, cpuset.mems) are supported by the host.  See [cpuset(7)](https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt)",
+            "type": "boolean"
+          },
+          "cpu_shares": {
+            "nullable": true,
+            "description": "Indicates if CPU Shares limiting is supported by the host.",
+            "type": "boolean"
+          },
+          "debug": {
+            "nullable": true,
+            "description": "Indicates if the daemon is running in debug-mode / with debug-level logging enabled.",
+            "type": "boolean"
+          },
+          "default_address_pools": {
+            "description": "List of custom default address pools for local networks, which can be specified in the daemon.json file or dockerd option.  Example: a Base \\\"10.10.0.0/16\\\" with Size 24 will define the set of 256 10.10.[0-255].0/24 address pools.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SystemInfoDefaultAddressPools"
+            }
+          },
+          "default_runtime": {
+            "nullable": true,
+            "description": "Name of the default OCI runtime that is used when starting containers.  The default can be overridden per-container at create time.",
+            "type": "string"
+          },
+          "docker_root_dir": {
+            "nullable": true,
+            "description": "Root directory of persistent Docker state.  Defaults to `/var/lib/docker` on Linux, and `C:\\\\ProgramData\\\\docker` on Windows.",
+            "type": "string"
+          },
+          "driver": {
+            "nullable": true,
+            "description": "Name of the storage driver in use.",
+            "type": "string"
+          },
+          "driver_status": {
+            "description": "Information specific to the storage driver, provided as \\\"label\\\" / \\\"value\\\" pairs.  This information is provided by the storage driver, and formatted in a way consistent with the output of `docker info` on the command line.\n\n**Note**: The information returned in this field, including the formatting of values and labels, should not be considered stable, and may change without notice.",
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "experimental_build": {
+            "nullable": true,
+            "description": "Indicates if experimental features are enabled on the daemon.",
+            "type": "boolean"
+          },
+          "http_proxy": {
+            "nullable": true,
+            "description": "HTTP-proxy configured for the daemon. This value is obtained from the [`HTTP_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable. Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL are masked in the API response.  Containers do not automatically inherit this configuration.",
+            "type": "string"
+          },
+          "https_proxy": {
+            "nullable": true,
+            "description": "HTTPS-proxy configured for the daemon. This value is obtained from the [`HTTPS_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable. Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL are masked in the API response.  Containers do not automatically inherit this configuration.",
+            "type": "string"
+          },
+          "id": {
+            "nullable": true,
+            "description": "Unique identifier of the daemon.\n\n**Note**: The format of the ID itself is not part of the API, and should not be considered stable.",
+            "type": "string"
+          },
+          "images": {
+            "nullable": true,
+            "description": "Total number of images on the host. Both _tagged_ and _untagged_ (dangling) images are counted.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "index_server_address": {
+            "nullable": true,
+            "description": "Address / URL of the index server that is used for image search, and as a default for user authentication for Docker Hub and Docker Cloud.",
+            "type": "string"
+          },
+          "init_binary": {
+            "nullable": true,
+            "description": "Name and, optional, path of the `docker-init` binary.  If the path is omitted, the daemon searches the host's `$PATH` for the binary and uses the first result.",
+            "type": "string"
+          },
+          "init_commit": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Commit"
+              }
+            ]
+          },
+          "ipv4_forwarding": {
+            "nullable": true,
+            "description": "Indicates IPv4 forwarding is enabled.",
+            "type": "boolean"
+          },
+          "isolation": {
+            "nullable": true,
+            "description": "Represents the isolation technology to use as a default for containers. The supported values are platform-specific.  If no isolation value is specified on daemon start, on Windows client, the default is `hyperv`, and on Windows server, the default is `process`.  This option is currently not used on other platforms.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SystemInfoIsolationEnum"
+              }
+            ]
+          },
+          "kernel_memory": {
+            "nullable": true,
+            "description": "Indicates if the host has kernel memory limit support enabled.\n\n**Deprecated**: This field is deprecated as the kernel 5.4 deprecated `kmem.limit_in_bytes`.",
+            "type": "boolean"
+          },
+          "kernel_memory_tcp": {
+            "nullable": true,
+            "description": "Indicates if the host has kernel memory TCP limit support enabled.  Kernel memory TCP limits are not supported when using cgroups v2, which does not support the corresponding `memory.kmem.tcp.limit_in_bytes` cgroup.",
+            "type": "boolean"
+          },
+          "kernel_version": {
+            "nullable": true,
+            "description": "Kernel version of the host.  On Linux, this information obtained from `uname`. On Windows this information is queried from the <kbd>HKEY_LOCAL_MACHINE\\\\\\\\SOFTWARE\\\\\\\\Microsoft\\\\\\\\Windows NT\\\\\\\\CurrentVersion\\\\\\\\</kbd> registry value, for example _\\\"10.0 14393 (14393.1198.amd64fre.rs1_release_sec.170427-1353)\\\"_.",
+            "type": "string"
+          },
+          "labels": {
+            "description": "User-defined labels (key/value metadata) as set on the daemon.\n\n**Note**: When part of a Swarm, nodes can both have _daemon_ labels, set through the daemon configuration, and _node_ labels, set from a manager node in the Swarm. Node labels are not included in this field. Node labels can be retrieved using the `/nodes/(id)` endpoint on a manager node in the Swarm.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "live_restore_enabled": {
+            "nullable": true,
+            "description": "Indicates if live restore is enabled.  If enabled, containers are kept running when the daemon is shutdown or upon daemon start if running containers are detected.",
+            "type": "boolean"
+          },
+          "logging_driver": {
+            "nullable": true,
+            "description": "The logging driver to use as a default for new containers.",
+            "type": "string"
+          },
+          "mem_total": {
+            "nullable": true,
+            "description": "Total amount of physical memory available on the host, in bytes.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "memory_limit": {
+            "nullable": true,
+            "description": "Indicates if the host has memory limit support enabled.",
+            "type": "boolean"
+          },
+          "n_events_listener": {
+            "nullable": true,
+            "description": "Number of event listeners subscribed.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "n_fd": {
+            "nullable": true,
+            "description": "The total number of file Descriptors in use by the daemon process.  This information is only returned if debug-mode is enabled.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "nullable": true,
+            "description": "Hostname of the host.",
+            "type": "string"
+          },
+          "ncpu": {
+            "nullable": true,
+            "description": "The number of logical CPUs usable by the daemon.  The number of available CPUs is checked by querying the operating system when the daemon starts. Changes to operating system CPU allocation after the daemon is started are not reflected.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "no_proxy": {
+            "nullable": true,
+            "description": "Comma-separated list of domain extensions for which no proxy should be used. This value is obtained from the [`NO_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable.  Containers do not automatically inherit this configuration.",
+            "type": "string"
+          },
+          "oom_kill_disable": {
+            "nullable": true,
+            "description": "Indicates if OOM killer disable is supported on the host.",
+            "type": "boolean"
+          },
+          "operating_system": {
+            "nullable": true,
+            "description": "Name of the host's operating system, for example: \\\"Ubuntu 16.04.2 LTS\\\" or \\\"Windows Server 2016 Datacenter\\\"",
+            "type": "string"
+          },
+          "os_type": {
+            "nullable": true,
+            "description": "Generic type of the operating system of the host, as returned by the Go runtime (`GOOS`).  Currently returned values are \\\"linux\\\" and \\\"windows\\\". A full list of possible values can be found in the [Go documentation](https://golang.org/doc/install/source#environment).",
+            "type": "string"
+          },
+          "os_version": {
+            "nullable": true,
+            "description": "Version of the host's operating system\n\n**Note**: The information returned in this field, including its very existence, and the formatting of values, should not be considered stable, and may change without notice.",
+            "type": "string"
+          },
+          "pids_limit": {
+            "nullable": true,
+            "description": "Indicates if the host kernel has PID limit support enabled.",
+            "type": "boolean"
+          },
+          "plugins": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PluginsInfo"
+              }
+            ]
+          },
+          "product_license": {
+            "nullable": true,
+            "description": "Reports a summary of the product license on the daemon.  If a commercial license has been applied to the daemon, information such as number of nodes, and expiration are included.",
+            "type": "string"
+          },
+          "registry_config": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RegistryServiceConfig"
+              }
+            ]
+          },
+          "runc_commit": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Commit"
+              }
+            ]
+          },
+          "runtimes": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Runtime"
+            }
+          },
+          "security_options": {
+            "description": "List of security features that are enabled on the daemon, such as apparmor, seccomp, SELinux, user-namespaces (userns), and rootless.  Additional configuration options for each security feature may be present, and are included as a comma-separated list of key/value pairs.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "server_version": {
+            "nullable": true,
+            "description": "Version string of the daemon. **Note**: the [standalone Swarm API](https://docs.docker.com/swarm/swarm-api/) returns the Swarm version instead of the daemon  version, for example `swarm/1.2.8`.",
+            "type": "string"
+          },
+          "swap_limit": {
+            "nullable": true,
+            "description": "Indicates if the host has memory swap limit support enabled.",
+            "type": "boolean"
+          },
+          "system_time": {
+            "nullable": true,
+            "description": "The  number of goroutines that currently exist.  This information is only returned if debug-mode is enabled.",
+            "type": "string"
+          },
+          "warnings": {
+            "description": "List of warnings / informational messages about missing features, or issues related to the daemon configuration.  These messages can be printed by the client as information to the user.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "Duration": {
+        "title": "int64",
         "type": "integer",
-        "format": "int64"
+        "format": "duration"
+      },
+      "EmailAuthenticationForm": {
+        "description": "The body of the form for email authentication.",
+        "type": "object",
+        "properties": {
+          "callback_url": {
+            "nullable": true,
+            "description": "The URL to redirect back to after we have authenticated.",
+            "type": "string",
+            "format": "uri"
+          },
+          "email": {
+            "description": "The user's email.",
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "Empty": {
+        "description": "An \"empty\" type used to represent responses that have no associated data payload. This isn't intended for general use, but must be pub since it's used as the Body type for certain responses.",
+        "type": "string",
+        "enum": [
+          null
+        ]
       },
       "EngineMetadata": {
         "description": "Metadata about our currently running server.\n\nThis is mostly used for internal purposes and debugging.",
@@ -5320,6 +6459,37 @@
         "required": [
           "message",
           "request_id"
+        ]
+      },
+      "ExecutorMetadata": {
+        "description": "Metadata about our currently running server.\n\nThis is mostly used for internal purposes and debugging.",
+        "type": "object",
+        "properties": {
+          "docker_info": {
+            "description": "Information about the docker daemon.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DockerSystemInfo"
+              }
+            ]
+          },
+          "environment": {
+            "description": "The environment we are running in.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Environment"
+              }
+            ]
+          },
+          "git_hash": {
+            "description": "The git hash of the server.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "docker_info",
+          "environment",
+          "git_hash"
         ]
       },
       "ExtendedUser": {
@@ -5461,7 +6631,11 @@
           "output": {
             "nullable": true,
             "description": "The converted file, if completed, base64 encoded.",
-            "type": "string"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Base64Data"
+              }
+            ]
           },
           "output_format": {
             "description": "The output format of the file conversion.",
@@ -5489,7 +6663,7 @@
             "description": "The status of the file conversion.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/APICallStatus"
+                "$ref": "#/components/schemas/ApiCallStatus"
               }
             ]
           },
@@ -5570,7 +6744,7 @@
             "description": "The status of the density.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/APICallStatus"
+                "$ref": "#/components/schemas/ApiCallStatus"
               }
             ]
           },
@@ -5650,7 +6824,7 @@
             "description": "The status of the mass.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/APICallStatus"
+                "$ref": "#/components/schemas/ApiCallStatus"
               }
             ]
           },
@@ -5754,7 +6928,7 @@
             "description": "The status of the volume.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/APICallStatus"
+                "$ref": "#/components/schemas/ApiCallStatus"
               }
             ]
           },
@@ -5816,6 +6990,34 @@
           }
         }
       },
+      "IndexInfo": {
+        "description": "IndexInfo contains information about a registry.",
+        "type": "object",
+        "properties": {
+          "mirrors": {
+            "description": "List of mirrors, expressed as URIs.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "nullable": true,
+            "description": "Name of the registry, such as \\\"docker.io\\\".",
+            "type": "string"
+          },
+          "official": {
+            "nullable": true,
+            "description": "Indicates whether this is an official registry (i.e., Docker Hub / docker.io)",
+            "type": "boolean"
+          },
+          "secure": {
+            "nullable": true,
+            "description": "Indicates if the registry is part of the list of insecure registries.  If `false`, the registry is insecure. Insecure registries accept un-encrypted (HTTP) and/or untrusted (HTTPS with certificates from unknown CAs) communication.\n\n**Warning**: Insecure registries can be useful when running a local registry. However, because its use creates security vulnerabilities it should ONLY be enabled for testing purposes. For increased security, users should add their CA to their system's list of trusted CAs instead of enabling this option.",
+            "type": "boolean"
+          }
+        }
+      },
       "Invoice": {
         "description": "An invoice.",
         "type": "object",
@@ -5863,20 +7065,25 @@
               }
             ]
           },
+          "customer_email": {
+            "description": "The email address for the customer. Until the invoice is finalized, this field will equal customer.email. Once the invoice is finalized, this field will no longer be updated.",
+            "type": "string",
+            "format": "email"
+          },
+          "customer_id": {
+            "description": "Customer ID. The unique identifier for the customer this invoice belongs to. This is the customer ID in the payments service, not our database customer ID.",
+            "type": "string"
+          },
+          "default_payment_method": {
+            "description": "Default payment method.",
+            "type": "string"
+          },
           "description": {
             "description": "Description of the invoice.",
             "type": "string"
           },
           "id": {
             "description": "Unique identifier for the object.",
-            "type": "string"
-          },
-          "invoice_pdf": {
-            "description": "The link to download the PDF for the invoice.",
-            "type": "string"
-          },
-          "invoice_url": {
-            "description": "The URL for the hosted invoice page, which allows customers to view and pay an invoice.",
             "type": "string"
           },
           "lines": {
@@ -5902,6 +7109,12 @@
             "description": "Whether payment was successfully collected for this invoice.\n\nAn invoice can be paid (most commonly) with a charge or with credit from the customer's account balance.",
             "default": false,
             "type": "boolean"
+          },
+          "pdf": {
+            "nullable": true,
+            "description": "The link to download the PDF for the invoice.",
+            "type": "string",
+            "format": "uri"
           },
           "receipt_number": {
             "description": "This is the transaction number that appears on email receipts sent for this invoice.",
@@ -5937,6 +7150,12 @@
             "default": 0,
             "type": "integer",
             "format": "int64"
+          },
+          "url": {
+            "nullable": true,
+            "description": "The URL for the hosted invoice page, which allows customers to view and pay an invoice.",
+            "type": "string",
+            "format": "uri"
           }
         },
         "required": [
@@ -5998,6 +7217,11 @@
           "uncollectible",
           "void"
         ]
+      },
+      "IpAddr": {
+        "title": "String",
+        "type": "string",
+        "format": "ip"
       },
       "Jetstream": {
         "description": "Jetstream information.",
@@ -6189,19 +7413,6 @@
           }
         }
       },
-      "LoginParams": {
-        "description": "The parameters passed to login.",
-        "type": "object",
-        "properties": {
-          "session": {
-            "description": "The session token we should set as a cookie.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "session"
-        ]
-      },
       "MetaClusterInfo": {
         "description": "Jetstream statistics.",
         "type": "object",
@@ -6252,6 +7463,14 @@
               }
             ]
           },
+          "executor": {
+            "description": "Metadata about our executor API connection.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExecutorMetadata"
+              }
+            ]
+          },
           "fs": {
             "description": "Metadata about our file system.",
             "allOf": [
@@ -6277,6 +7496,7 @@
           "cache",
           "engine",
           "environment",
+          "executor",
           "fs",
           "git_hash",
           "pubsub"
@@ -6298,11 +7518,38 @@
           "EXTENSION"
         ]
       },
+      "OAuth2ClientInfo": {
+        "description": "Information about an OAuth 2.0 client.",
+        "type": "object",
+        "properties": {
+          "csrf_token": {
+            "description": "Value used for [CSRF](https://tools.ietf.org/html/rfc6749#section-10.12) protection via the `state` parameter.",
+            "type": "string"
+          },
+          "pkce_code_verifier": {
+            "nullable": true,
+            "description": "Code Verifier used for [PKCE]((https://tools.ietf.org/html/rfc7636)) protection via the `code_verifier` parameter. The value must have a minimum length of 43 characters and a maximum length of 128 characters.  Each character must be ASCII alphanumeric or one of the characters \"-\" / \".\" / \"_\" / \"~\".",
+            "type": "string"
+          },
+          "url": {
+            "description": "The URL for consent.",
+            "type": "string"
+          }
+        }
+      },
+      "OAuth2GrantType": {
+        "description": "An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>.",
+        "type": "string",
+        "enum": [
+          "urn:ietf:params:oauth:grant-type:device_code"
+        ]
+      },
       "OutputFile": {
         "description": "Output file contents.",
         "type": "object",
         "properties": {
           "contents": {
+            "nullable": true,
             "description": "The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for JSON.",
             "type": "string"
           },
@@ -6409,6 +7656,40 @@
         "type": "string",
         "format": "phone"
       },
+      "PluginsInfo": {
+        "description": "Available plugins per type.\n\n**Note**: Only unmanaged (V1) plugins are included in this list. V1 plugins are \\\"lazily\\\" loaded, and are not returned in this list if there is no resource using the plugin.",
+        "type": "object",
+        "properties": {
+          "authorization": {
+            "description": "Names of available authorization plugins.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "log": {
+            "description": "Names of available logging-drivers, and logging-driver plugins.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "network": {
+            "description": "Names of available network-drivers, and network-driver plugins.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "volume": {
+            "description": "Names of available volume-drivers, and network-driver plugins.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "Pong": {
         "description": "The response from the `/ping` endpoint.",
         "type": "object",
@@ -6421,6 +7702,64 @@
         "required": [
           "message"
         ]
+      },
+      "RegistryServiceConfig": {
+        "description": "RegistryServiceConfig stores daemon registry services configuration.",
+        "type": "object",
+        "properties": {
+          "allow_nondistributable_artifacts_cid_rs": {
+            "description": "List of IP ranges to which nondistributable artifacts can be pushed, using the CIDR syntax [RFC 4632](https://tools.ietf.org/html/4632).  Some images (for example, Windows base images) contain artifacts whose distribution is restricted by license. When these images are pushed to a registry, restricted artifacts are not included.  This configuration override this behavior, and enables the daemon to push nondistributable artifacts to all registries whose resolved IP address is within the subnet described by the CIDR syntax.  This option is useful when pushing images containing nondistributable artifacts to a registry on an air-gapped network so hosts on that network can pull the images without connecting to another server.\n\n**Warning**: Nondistributable artifacts typically have restrictions on how and where they can be distributed and shared. Only use this feature to push artifacts to private registries and ensure that you are in compliance with any terms that cover redistributing nondistributable artifacts.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "allow_nondistributable_artifacts_hostnames": {
+            "description": "List of registry hostnames to which nondistributable artifacts can be pushed, using the format `<hostname>[:<port>]` or `<IP address>[:<port>]`.  Some images (for example, Windows base images) contain artifacts whose distribution is restricted by license. When these images are pushed to a registry, restricted artifacts are not included.  This configuration override this behavior for the specified registries.  This option is useful when pushing images containing nondistributable artifacts to a registry on an air-gapped network so hosts on that network can pull the images without connecting to another server.\n\n**Warning**: Nondistributable artifacts typically have restrictions on how and where they can be distributed and shared. Only use this feature to push artifacts to private registries and ensure that you are in compliance with any terms that cover redistributing nondistributable artifacts.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "index_configs": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/IndexInfo"
+            }
+          },
+          "insecure_registry_cid_rs": {
+            "description": "List of IP ranges of insecure registries, using the CIDR syntax ([RFC 4632](https://tools.ietf.org/html/4632)). Insecure registries accept un-encrypted (HTTP) and/or untrusted (HTTPS with certificates from unknown CAs) communication.  By default, local registries (`127.0.0.0/8`) are configured as insecure. All other registries are secure. Communicating with an insecure registry is not possible if the daemon assumes that registry is secure.  This configuration override this behavior, insecure communication with registries whose resolved IP address is within the subnet described by the CIDR syntax.  Registries can also be marked insecure by hostname. Those registries are listed under `IndexConfigs` and have their `Secure` field set to `false`.\n\n**Warning**: Using this option can be useful when running a local  registry, but introduces security vulnerabilities. This option should therefore ONLY be used for testing purposes. For increased security, users should add their CA to their system's list of trusted CAs instead of enabling this option.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mirrors": {
+            "description": "List of registry URLs that act as a mirror for the official (`docker.io`) registry.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Runtime": {
+        "description": "Runtime describes an [OCI compliant](https://github.com/opencontainers/runtime-spec) runtime.  The runtime is invoked by the daemon via the `containerd` daemon. OCI runtimes act as an interface to the Linux kernel namespaces, cgroups, and SELinux.",
+        "type": "object",
+        "properties": {
+          "path": {
+            "nullable": true,
+            "description": "Name and, optional, path, of the OCI executable binary.  If the path is omitted, the daemon searches the host's `$PATH` for the binary and uses the first result.",
+            "type": "string"
+          },
+          "runtime_args": {
+            "description": "List of command-line arguments to pass to the runtime when invoked.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
       },
       "Session": {
         "description": "An authentication session.\n\nFor our UIs, these are automatically created by Next.js.",
@@ -6469,6 +7808,48 @@
         "title": "int32",
         "type": "integer",
         "format": "int32"
+      },
+      "SystemInfoCgroupDriverEnum": {
+        "type": "string",
+        "enum": [
+          "",
+          "cgroupfs",
+          "systemd",
+          "none"
+        ]
+      },
+      "SystemInfoCgroupVersionEnum": {
+        "type": "string",
+        "enum": [
+          "",
+          "1",
+          "2"
+        ]
+      },
+      "SystemInfoDefaultAddressPools": {
+        "type": "object",
+        "properties": {
+          "base": {
+            "nullable": true,
+            "description": "The network address in CIDR format",
+            "type": "string"
+          },
+          "size": {
+            "nullable": true,
+            "description": "The network pool size",
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "SystemInfoIsolationEnum": {
+        "type": "string",
+        "enum": [
+          "",
+          "default",
+          "hyperv",
+          "process"
+        ]
       },
       "UnitConversion": {
         "description": "A unit conversion.",
@@ -6536,7 +7917,7 @@
             "description": "The status of the unit conversion.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/APICallStatus"
+                "$ref": "#/components/schemas/ApiCallStatus"
               }
             ]
           },
@@ -6758,6 +8139,13 @@
       "description": "Meta information about the API.",
       "externalDocs": {
         "url": "https://docs.kittycad.io/api/meta"
+      }
+    },
+    {
+      "name": "oauth2",
+      "description": "Endpoints that implement OAuth 2.0 grant flows.",
+      "externalDocs": {
+        "url": "https://docs.kittycad.io/api/oauth2"
       }
     },
     {

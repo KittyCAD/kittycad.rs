@@ -45,7 +45,7 @@ impl Users {
     * This function performs a `GET` to the `/user/extended` endpoint.
     *
     * Get the user information for the authenticated user.
-    * Alternatively, you can also use the `/users/me` endpoint.
+    * Alternatively, you can also use the `/users-extended/me` endpoint.
     */
     pub async fn get_self_extended(&self) -> Result<crate::types::ExtendedUser> {
         let url = "/user/extended".to_string();
