@@ -6539,8 +6539,6 @@ pub struct UserResultsPage {
 }
 
 pub type Duration = i64;
-/// An "empty" type used to represent responses that have no associated data payload. This isn't intended for general use, but must be pub since it's used as the Body type for certain responses.
-pub type Empty = String;
 pub type IpAddr = String;
 pub type PhoneNumber = String;
 pub type StatusCode = i32;
