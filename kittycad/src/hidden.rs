@@ -43,7 +43,7 @@ impl Hidden {
         callback_url: &url::Url,
         email: &str,
         token: &str,
-    ) -> Result<String> {
+    ) -> Result<()> {
         let mut query_args: Vec<(String, String)> = Default::default();
         if !callback_url.to_string().is_empty() {
             query_args.push(("callback_url".to_string(), callback_url.to_string()));

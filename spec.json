@@ -846,13 +846,6 @@
                   "type": "string"
                 }
               }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Empty"
-                }
-              }
             }
           },
           "4XX": {
@@ -867,7 +860,7 @@
           "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#HiddenService.ListenAuthEmailCallback"
         },
         "x-rust": {
-          "example": "/**\n* Listen for callbacks for email verification for users.\n*\n* This function performs a `GET` to the `/auth/email/callback` endpoint.\n*\n* **Parameters:**\n*\n* * `callback_url: &url::Url` -- The URL to redirect back to after we have authenticated.\n* * `email: &str` -- The user's email.\n* * `token: &str` -- The verification token.\n*/\nlet string = client.hidden().listen_auth_email_callback(callback_url, email, token).await?;",
+          "example": "/**\n* Listen for callbacks for email verification for users.\n*\n* This function performs a `GET` to the `/auth/email/callback` endpoint.\n*\n* **Parameters:**\n*\n* * `callback_url: &url::Url` -- The URL to redirect back to after we have authenticated.\n* * `email: &str` -- The user's email.\n* * `token: &str` -- The verification token.\n*/\nclient.hidden().listen_auth_email_callback(callback_url, email, token).await?;",
           "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.listen_auth_email_callback"
         }
       }
@@ -1590,6 +1583,63 @@
           "required": true
         },
         "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-rust": {
+          "example": "/**\n* Confirm an OAuth 2.0 Device Authorization Grant.\n*\n* This function performs a `POST` to the `/oauth2/device/confirm` endpoint.\n*\n* This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/oauth2/device/token`.\n*/\nclient.oauth_2().device_auth_confirm(body).await?;",
+          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth_2/struct.Oauth2.html#method.device_auth_confirm"
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint `/oauth2/device/confirm`.",
+        "description": "This is necessary for some preflight requests, specifically DELETE, PUT, and POST since it has a request body.",
+        "operationId": "options_device_auth_confirm",
+        "responses": {
           "200": {
             "description": "successful operation",
             "headers": {
@@ -1644,10 +1694,6 @@
           "5XX": {
             "$ref": "#/components/responses/Error"
           }
-        },
-        "x-rust": {
-          "example": "/**\n* Confirm an OAuth 2.0 Device Authorization Grant.\n*\n* This function performs a `POST` to the `/oauth2/device/confirm` endpoint.\n*\n* This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/oauth2/device/token`.\n*/\nlet string = client.oauth_2().device_auth_confirm(body).await?;",
-          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth_2/struct.Oauth2.html#method.device_auth_confirm"
         }
       }
     },
@@ -1693,7 +1739,7 @@
           "hidden"
         ],
         "summary": "Verify an OAuth 2.0 Device Authorization Grant.",
-        "description": "This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `state` parameter to get them back here on completion. If they are logged in, serve up the console verification page so they can verify the user code.",
+        "description": "This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website.",
         "operationId": "device_auth_verify",
         "parameters": [
           {
@@ -1743,13 +1789,6 @@
                   "type": "string"
                 }
               }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Empty"
-                }
-              }
             }
           },
           "4XX": {
@@ -1760,7 +1799,7 @@
           }
         },
         "x-rust": {
-          "example": "/**\n* Verify an OAuth 2.0 Device Authorization Grant.\n*\n* This function performs a `GET` to the `/oauth2/device/verify` endpoint.\n*\n* This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `state` parameter to get them back here on completion. If they are logged in, serve up the console verification page so they can verify the user code.\n*\n* **Parameters:**\n*\n* * `user_code: &str` -- The user code.\n*/\nlet string = client.oauth_2().device_auth_verify(user_code).await?;",
+          "example": "/**\n* Verify an OAuth 2.0 Device Authorization Grant.\n*\n* This function performs a `GET` to the `/oauth2/device/verify` endpoint.\n*\n* This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website.\n*\n* **Parameters:**\n*\n* * `user_code: &str` -- The user code.\n*/\nclient.oauth_2().device_auth_verify(user_code).await?;",
           "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth_2/struct.Oauth2.html#method.device_auth_verify"
         }
       }
@@ -1847,13 +1886,6 @@
                   "type": "string"
                 }
               }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Empty"
-                }
-              }
             }
           },
           "4XX": {
@@ -1864,7 +1896,7 @@
           }
         },
         "x-rust": {
-          "example": "/**\n* Listen for callbacks for the OAuth 2.0 provider.\n*\n* This function performs a `GET` to the `/oauth2/provider/{provider}/callback` endpoint.\n*\n* **Parameters:**\n*\n* * `provider: crate::types::AccountProvider` -- An account provider.\n* * `code: &str` -- The authorization code.\n* * `state: &str` -- The state that we had passed in through the user consent URL.\n*/\nlet string = client.oauth_2().listen_oauth2_provider_callback(code, provider, state).await?;",
+          "example": "/**\n* Listen for callbacks for the OAuth 2.0 provider.\n*\n* This function performs a `GET` to the `/oauth2/provider/{provider}/callback` endpoint.\n*\n* **Parameters:**\n*\n* * `provider: crate::types::AccountProvider` -- An account provider.\n* * `code: &str` -- The authorization code.\n* * `state: &str` -- The state that we had passed in through the user consent URL.\n*/\nclient.oauth_2().listen_oauth2_provider_callback(code, provider, state).await?;",
           "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth_2/struct.Oauth2.html#method.listen_oauth2_provider_callback"
         }
       }
@@ -6352,13 +6384,6 @@
         },
         "required": [
           "email"
-        ]
-      },
-      "Empty": {
-        "description": "An \"empty\" type used to represent responses that have no associated data payload. This isn't intended for general use, but must be pub since it's used as the Body type for certain responses.",
-        "type": "string",
-        "enum": [
-          null
         ]
       },
       "EngineMetadata": {

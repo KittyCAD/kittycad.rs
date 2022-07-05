@@ -34,7 +34,7 @@ impl Oauth2 {
     pub async fn device_auth_confirm(
         &self,
         body: &crate::types::DeviceAuthVerifyParams,
-    ) -> Result<String> {
+    ) -> Result<()> {
         let url = "/oauth2/device/confirm".to_string();
         self.client
             .post(&url, Some(reqwest::Body::from(serde_json::to_vec(body)?)))
@@ -58,13 +58,13 @@ impl Oauth2 {
     *
     * This function performs a `GET` to the `/oauth2/device/verify` endpoint.
     *
-    * This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `state` parameter to get them back here on completion. If they are logged in, serve up the console verification page so they can verify the user code.
+    * This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website.
     *
     * **Parameters:**
     *
     * * `user_code: &str` -- The user code.
     */
-    pub async fn device_auth_verify(&self, user_code: &str) -> Result<String> {
+    pub async fn device_auth_verify(&self, user_code: &str) -> Result<()> {
         let mut query_args: Vec<(String, String)> = Default::default();
         if !user_code.is_empty() {
             query_args.push(("user_code".to_string(), user_code.to_string()));
@@ -91,7 +91,7 @@ impl Oauth2 {
         code: &str,
         provider: crate::types::AccountProvider,
         state: &str,
-    ) -> Result<String> {
+    ) -> Result<()> {
         let mut query_args: Vec<(String, String)> = Default::default();
         if !code.is_empty() {
             query_args.push(("code".to_string(), code.to_string()));
