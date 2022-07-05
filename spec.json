@@ -1538,7 +1538,8 @@
     "/oauth2/device/auth": {
       "post": {
         "tags": [
-          "oauth2"
+          "oauth2",
+          "hidden"
         ],
         "summary": "Start an OAuth 2.0 Device Authorization Grant.",
         "description": "This endpoint is designed to be accessed from an *unauthenticated* API client. It generates and records a `device_code` and `user_code` which must be verified and confirmed prior to a token being granted.",
@@ -1563,10 +1564,6 @@
             }
           }
         },
-        "x-go": {
-          "example": "// DeviceAuthRequest: Start an OAuth 2.0 Device Authorization Grant.\n//\n// This endpoint is designed to be accessed from an *unauthenticated* API client. It generates and records a `device_code` and `user_code` which must be verified and confirmed prior to a token being granted.\nresponseDeviceAuthRequest, err := client.Oauth2.DeviceAuthRequest(body)",
-          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#Oauth2Service.DeviceAuthRequest"
-        },
         "x-rust": {
           "example": "/**\n* Start an OAuth 2.0 Device Authorization Grant.\n*\n* This function performs a `POST` to the `/oauth2/device/auth` endpoint.\n*\n* This endpoint is designed to be accessed from an *unauthenticated* API client. It generates and records a `device_code` and `user_code` which must be verified and confirmed prior to a token being granted.\n*/\nclient.oauth_2().device_auth_request().await?;",
           "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth_2/struct.Oauth2.html#method.device_auth_request"
@@ -1576,10 +1573,11 @@
     "/oauth2/device/confirm": {
       "post": {
         "tags": [
-          "oauth2"
+          "oauth2",
+          "hidden"
         ],
         "summary": "Confirm an OAuth 2.0 Device Authorization Grant.",
-        "description": "This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/device/token`.",
+        "description": "This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/oauth2/device/token`.",
         "operationId": "device_auth_confirm",
         "requestBody": {
           "content": {
@@ -1647,12 +1645,8 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-go": {
-          "example": "// DeviceAuthConfirm: Confirm an OAuth 2.0 Device Authorization Grant.\n//\n// This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/device/token`.\nif err := client.Oauth2.DeviceAuthConfirm(body); err != nil {\n\tpanic(err)\n}",
-          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#Oauth2Service.DeviceAuthConfirm"
-        },
         "x-rust": {
-          "example": "/**\n* Confirm an OAuth 2.0 Device Authorization Grant.\n*\n* This function performs a `POST` to the `/oauth2/device/confirm` endpoint.\n*\n* This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/device/token`.\n*/\nlet string = client.oauth_2().device_auth_confirm(body).await?;",
+          "example": "/**\n* Confirm an OAuth 2.0 Device Authorization Grant.\n*\n* This function performs a `POST` to the `/oauth2/device/confirm` endpoint.\n*\n* This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/oauth2/device/token`.\n*/\nlet string = client.oauth_2().device_auth_confirm(body).await?;",
           "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth_2/struct.Oauth2.html#method.device_auth_confirm"
         }
       }
@@ -1660,7 +1654,8 @@
     "/oauth2/device/token": {
       "post": {
         "tags": [
-          "oauth2"
+          "oauth2",
+          "hidden"
         ],
         "summary": "Request a device access token.",
         "description": "This endpoint should be polled by the client until the user code is verified and the grant is confirmed.",
@@ -1685,10 +1680,6 @@
             }
           }
         },
-        "x-go": {
-          "example": "// DeviceAccessToken: Request a device access token.\n//\n// This endpoint should be polled by the client until the user code is verified and the grant is confirmed.\nresponseDeviceAccessToken, err := client.Oauth2.DeviceAccessToken(body)",
-          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#Oauth2Service.DeviceAccessToken"
-        },
         "x-rust": {
           "example": "/**\n* Request a device access token.\n*\n* This function performs a `POST` to the `/oauth2/device/token` endpoint.\n*\n* This endpoint should be polled by the client until the user code is verified and the grant is confirmed.\n*/\nclient.oauth_2().device_access_token().await?;",
           "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth_2/struct.Oauth2.html#method.device_access_token"
@@ -1698,7 +1689,8 @@
     "/oauth2/device/verify": {
       "get": {
         "tags": [
-          "oauth2"
+          "oauth2",
+          "hidden"
         ],
         "summary": "Verify an OAuth 2.0 Device Authorization Grant.",
         "description": "This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `state` parameter to get them back here on completion. If they are logged in, serve up the console verification page so they can verify the user code.",
@@ -1767,10 +1759,6 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-go": {
-          "example": "// DeviceAuthVerify: Verify an OAuth 2.0 Device Authorization Grant.\n//\n// This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `state` parameter to get them back here on completion. If they are logged in, serve up the console verification page so they can verify the user code.\n//\n// Parameters:\n//\t- `userCode`: The user code.\nif err := client.Oauth2.DeviceAuthVerify(userCode); err != nil {\n\tpanic(err)\n}",
-          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#Oauth2Service.DeviceAuthVerify"
-        },
         "x-rust": {
           "example": "/**\n* Verify an OAuth 2.0 Device Authorization Grant.\n*\n* This function performs a `GET` to the `/oauth2/device/verify` endpoint.\n*\n* This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `state` parameter to get them back here on completion. If they are logged in, serve up the console verification page so they can verify the user code.\n*\n* **Parameters:**\n*\n* * `user_code: &str` -- The user code.\n*/\nlet string = client.oauth_2().device_auth_verify(user_code).await?;",
           "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth_2/struct.Oauth2.html#method.device_auth_verify"
@@ -1780,6 +1768,7 @@
     "/oauth2/provider/{provider}/callback": {
       "get": {
         "tags": [
+          "oauth2",
           "hidden"
         ],
         "summary": "Listen for callbacks for the OAuth 2.0 provider.",
@@ -1874,19 +1863,16 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-go": {
-          "example": "// ListenOauth2ProviderCallback: Listen for callbacks for the OAuth 2.0 provider.\n//\n// Parameters:\n//\t- `code`: The authorization code.\n//\t- `provider`: The provider.\n//\t- `state`: The state that we had passed in through the user consent URL.\nif err := client.Hidden.ListenOauth2ProviderCallback(provider, code, state); err != nil {\n\tpanic(err)\n}",
-          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#HiddenService.ListenOauth2ProviderCallback"
-        },
         "x-rust": {
-          "example": "/**\n* Listen for callbacks for the OAuth 2.0 provider.\n*\n* This function performs a `GET` to the `/oauth2/provider/{provider}/callback` endpoint.\n*\n* **Parameters:**\n*\n* * `provider: crate::types::AccountProvider` -- An account provider.\n* * `code: &str` -- The authorization code.\n* * `state: &str` -- The state that we had passed in through the user consent URL.\n*/\nlet string = client.hidden().listen_oauth2_provider_callback(code, provider, state).await?;",
-          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.listen_oauth2_provider_callback"
+          "example": "/**\n* Listen for callbacks for the OAuth 2.0 provider.\n*\n* This function performs a `GET` to the `/oauth2/provider/{provider}/callback` endpoint.\n*\n* **Parameters:**\n*\n* * `provider: crate::types::AccountProvider` -- An account provider.\n* * `code: &str` -- The authorization code.\n* * `state: &str` -- The state that we had passed in through the user consent URL.\n*/\nlet string = client.oauth_2().listen_oauth2_provider_callback(code, provider, state).await?;",
+          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth_2/struct.Oauth2.html#method.listen_oauth2_provider_callback"
         }
       }
     },
     "/oauth2/provider/{provider}/consent": {
       "get": {
         "tags": [
+          "oauth2",
           "hidden"
         ],
         "summary": "Get the consent URL and other information for the OAuth 2.0 provider.",
@@ -1965,13 +1951,9 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-go": {
-          "example": "// ListenOauth2ProviderConsent: Get the consent URL and other information for the OAuth 2.0 provider.\n//\n// Parameters:\n//\t- `callbackUrl`: The URL to redirect back to after we have authenticated.\n//\t- `provider`: The provider.\noAuth2ClientInfo, err := client.Hidden.ListenOauth2ProviderConsent(provider, callbackUrl)",
-          "libDocsLink": "https://pkg.go.dev/github.com/kittycad/kittycad.go/#HiddenService.ListenOauth2ProviderConsent"
-        },
         "x-rust": {
-          "example": "/**\n* Get the consent URL and other information for the OAuth 2.0 provider.\n*\n* This function performs a `GET` to the `/oauth2/provider/{provider}/consent` endpoint.\n*\n* **Parameters:**\n*\n* * `provider: crate::types::AccountProvider` -- An account provider.\n* * `callback_url: &str` -- The URL to redirect back to after we have authenticated.\n*/\nlet o_auth_2_client_info = client.hidden().listen_oauth2_provider_consent(callback_url, provider).await?;",
-          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.listen_oauth2_provider_consent"
+          "example": "/**\n* Get the consent URL and other information for the OAuth 2.0 provider.\n*\n* This function performs a `GET` to the `/oauth2/provider/{provider}/consent` endpoint.\n*\n* **Parameters:**\n*\n* * `provider: crate::types::AccountProvider` -- An account provider.\n* * `callback_url: &str` -- The URL to redirect back to after we have authenticated.\n*/\nlet o_auth_2_client_info = client.oauth_2().listen_oauth2_provider_consent(callback_url, provider).await?;",
+          "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth_2/struct.Oauth2.html#method.listen_oauth2_provider_consent"
         }
       }
     },

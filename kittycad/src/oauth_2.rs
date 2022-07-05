@@ -29,7 +29,7 @@ impl Oauth2 {
     *
     * This function performs a `POST` to the `/oauth2/device/confirm` endpoint.
     *
-    * This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/device/token`.
+    * This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/oauth2/device/token`.
     */
     pub async fn device_auth_confirm(
         &self,
@@ -71,6 +71,69 @@ impl Oauth2 {
         }
         let query_ = serde_urlencoded::to_string(&query_args).unwrap();
         let url = format!("/oauth2/device/verify?{}", query_);
+
+        self.client.get(&url, None).await
+    }
+
+    /**
+    * Listen for callbacks for the OAuth 2.0 provider.
+    *
+    * This function performs a `GET` to the `/oauth2/provider/{provider}/callback` endpoint.
+    *
+    * **Parameters:**
+    *
+    * * `provider: crate::types::AccountProvider` -- An account provider.
+    * * `code: &str` -- The authorization code.
+    * * `state: &str` -- The state that we had passed in through the user consent URL.
+    */
+    pub async fn listen_oauth2_provider_callback(
+        &self,
+        code: &str,
+        provider: crate::types::AccountProvider,
+        state: &str,
+    ) -> Result<String> {
+        let mut query_args: Vec<(String, String)> = Default::default();
+        if !code.is_empty() {
+            query_args.push(("code".to_string(), code.to_string()));
+        }
+        if !state.is_empty() {
+            query_args.push(("state".to_string(), state.to_string()));
+        }
+        let query_ = serde_urlencoded::to_string(&query_args).unwrap();
+        let url = format!(
+            "/oauth2/provider/{}/callback?{}",
+            crate::progenitor_support::encode_path(&provider.to_string()),
+            query_
+        );
+
+        self.client.get(&url, None).await
+    }
+
+    /**
+    * Get the consent URL and other information for the OAuth 2.0 provider.
+    *
+    * This function performs a `GET` to the `/oauth2/provider/{provider}/consent` endpoint.
+    *
+    * **Parameters:**
+    *
+    * * `provider: crate::types::AccountProvider` -- An account provider.
+    * * `callback_url: &str` -- The URL to redirect back to after we have authenticated.
+    */
+    pub async fn listen_oauth2_provider_consent(
+        &self,
+        callback_url: &str,
+        provider: crate::types::AccountProvider,
+    ) -> Result<crate::types::OAuth2ClientInfo> {
+        let mut query_args: Vec<(String, String)> = Default::default();
+        if !callback_url.is_empty() {
+            query_args.push(("callback_url".to_string(), callback_url.to_string()));
+        }
+        let query_ = serde_urlencoded::to_string(&query_args).unwrap();
+        let url = format!(
+            "/oauth2/provider/{}/consent?{}",
+            crate::progenitor_support::encode_path(&provider.to_string()),
+            query_
+        );
 
         self.client.get(&url, None).await
     }
