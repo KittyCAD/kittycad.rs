@@ -6,70 +6,52 @@ use std::fmt;
 use tabled::Tabled;
 
 /**
-* The status of an async API call.
+* An account provider.
 */
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
-pub enum ApiCallStatus {
-    #[serde(rename = "Completed")]
-    Completed,
-    #[serde(rename = "Failed")]
-    Failed,
-    #[serde(rename = "In Progress")]
-    InProgress,
-    #[serde(rename = "Queued")]
-    Queued,
-    #[serde(rename = "Uploaded")]
-    Uploaded,
+pub enum AccountProvider {
+    #[serde(rename = "github")]
+    Github,
+    #[serde(rename = "google")]
+    Google,
     #[serde(rename = "")]
     Noop,
     #[serde(other)]
     FallthroughString,
 }
 
-impl std::fmt::Display for ApiCallStatus {
+impl std::fmt::Display for AccountProvider {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &*self {
-            ApiCallStatus::Completed => "Completed",
-            ApiCallStatus::Failed => "Failed",
-            ApiCallStatus::InProgress => "In Progress",
-            ApiCallStatus::Queued => "Queued",
-            ApiCallStatus::Uploaded => "Uploaded",
-            ApiCallStatus::Noop => "",
-            ApiCallStatus::FallthroughString => "*",
+            AccountProvider::Github => "github",
+            AccountProvider::Google => "google",
+            AccountProvider::Noop => "",
+            AccountProvider::FallthroughString => "*",
         }
         .fmt(f)
     }
 }
 
-impl Default for ApiCallStatus {
-    fn default() -> ApiCallStatus {
-        ApiCallStatus::Completed
+impl Default for AccountProvider {
+    fn default() -> AccountProvider {
+        AccountProvider::Github
     }
 }
-impl std::str::FromStr for ApiCallStatus {
+impl std::str::FromStr for AccountProvider {
     type Err = anyhow::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "Completed" {
-            return Ok(ApiCallStatus::Completed);
+        if s == "github" {
+            return Ok(AccountProvider::Github);
         }
-        if s == "Failed" {
-            return Ok(ApiCallStatus::Failed);
-        }
-        if s == "In Progress" {
-            return Ok(ApiCallStatus::InProgress);
-        }
-        if s == "Queued" {
-            return Ok(ApiCallStatus::Queued);
-        }
-        if s == "Uploaded" {
-            return Ok(ApiCallStatus::Uploaded);
+        if s == "google" {
+            return Ok(AccountProvider::Google);
         }
         anyhow::bail!("invalid string: {}", s);
     }
 }
-impl ApiCallStatus {
+impl AccountProvider {
     pub fn is_noop(&self) -> bool {
-        matches!(self, ApiCallStatus::Noop)
+        matches!(self, AccountProvider::Noop)
     }
 }
 
@@ -266,6 +248,74 @@ impl ApiCallQueryGroupBy {
 }
 
 /**
+* The status of an async API call.
+*/
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+pub enum ApiCallStatus {
+    #[serde(rename = "Completed")]
+    Completed,
+    #[serde(rename = "Failed")]
+    Failed,
+    #[serde(rename = "In Progress")]
+    InProgress,
+    #[serde(rename = "Queued")]
+    Queued,
+    #[serde(rename = "Uploaded")]
+    Uploaded,
+    #[serde(rename = "")]
+    Noop,
+    #[serde(other)]
+    FallthroughString,
+}
+
+impl std::fmt::Display for ApiCallStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &*self {
+            ApiCallStatus::Completed => "Completed",
+            ApiCallStatus::Failed => "Failed",
+            ApiCallStatus::InProgress => "In Progress",
+            ApiCallStatus::Queued => "Queued",
+            ApiCallStatus::Uploaded => "Uploaded",
+            ApiCallStatus::Noop => "",
+            ApiCallStatus::FallthroughString => "*",
+        }
+        .fmt(f)
+    }
+}
+
+impl Default for ApiCallStatus {
+    fn default() -> ApiCallStatus {
+        ApiCallStatus::Completed
+    }
+}
+impl std::str::FromStr for ApiCallStatus {
+    type Err = anyhow::Error;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s == "Completed" {
+            return Ok(ApiCallStatus::Completed);
+        }
+        if s == "Failed" {
+            return Ok(ApiCallStatus::Failed);
+        }
+        if s == "In Progress" {
+            return Ok(ApiCallStatus::InProgress);
+        }
+        if s == "Queued" {
+            return Ok(ApiCallStatus::Queued);
+        }
+        if s == "Uploaded" {
+            return Ok(ApiCallStatus::Uploaded);
+        }
+        anyhow::bail!("invalid string: {}", s);
+    }
+}
+impl ApiCallStatus {
+    pub fn is_noop(&self) -> bool {
+        matches!(self, ApiCallStatus::Noop)
+    }
+}
+
+/**
 * The Request Method (VERB)
 *   
 *   This type also contains constants for a number of common HTTP methods such as GET, POST, etc.
@@ -369,7 +419,7 @@ impl Method {
 
 /// An API call with the price.
 ///
-/// This is a join of the `APICall` and `APICallPrice` tables.
+/// This is a join of the `ApiCall` and `ApiCallPrice` tables.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct ApiCallWithPrice {
     /**
@@ -409,7 +459,7 @@ pub struct ApiCallWithPrice {
     /**
     * An API call with the price.
     *  
-    *  This is a join of the `APICall` and `APICallPrice` tables.
+    *  This is a join of the `ApiCall` and `ApiCallPrice` tables.
     */
     #[serde(
         default,
@@ -421,7 +471,7 @@ pub struct ApiCallWithPrice {
     /**
     * An API call with the price.
     *  
-    *  This is a join of the `APICall` and `APICallPrice` tables.
+    *  This is a join of the `ApiCall` and `ApiCallPrice` tables.
     */
     #[serde(
         default,
@@ -433,7 +483,7 @@ pub struct ApiCallWithPrice {
     /**
     * An API call with the price.
     *  
-    *  This is a join of the `APICall` and `APICallPrice` tables.
+    *  This is a join of the `ApiCall` and `ApiCallPrice` tables.
     */
     #[serde(
         default,
@@ -465,7 +515,7 @@ pub struct ApiCallWithPrice {
     /**
     * An API call with the price.
     *  
-    *  This is a join of the `APICall` and `APICallPrice` tables.
+    *  This is a join of the `ApiCall` and `ApiCallPrice` tables.
     */
     #[serde(
         default,
@@ -497,7 +547,7 @@ pub struct ApiCallWithPrice {
     /**
     * An API call with the price.
     *  
-    *  This is a join of the `APICall` and `APICallPrice` tables.
+    *  This is a join of the `ApiCall` and `ApiCallPrice` tables.
     */
     #[serde(
         default,
@@ -535,7 +585,7 @@ pub struct ApiCallWithPrice {
     /**
     * An API call with the price.
     *  
-    *  This is a join of the `APICall` and `APICallPrice` tables.
+    *  This is a join of the `ApiCall` and `ApiCallPrice` tables.
     */
     #[serde(
         default,
@@ -575,7 +625,7 @@ pub struct ApiCallWithPrice {
     /**
     * An API call with the price.
     *  
-    *  This is a join of the `APICall` and `APICallPrice` tables.
+    *  This is a join of the `ApiCall` and `ApiCallPrice` tables.
     */
     #[serde(
         default,
@@ -868,7 +918,7 @@ pub enum AsyncApiCallOutput {
         created_at: crate::utils::DisplayOptionDateTime,
         error: Option<String>,
         id: String,
-        output: Option<String>,
+        output: Option<bytes::Bytes>,
         output_format: FileOutputFormat,
         src_format: FileSourceFormat,
         started_at: Option<crate::utils::DisplayOptionDateTime>,
@@ -1251,8 +1301,6 @@ pub enum CodeLanguage {
     Node,
     #[serde(rename = "python")]
     Python,
-    #[serde(rename = "rust")]
-    Rust,
     #[serde(rename = "")]
     Noop,
     #[serde(other)]
@@ -1265,7 +1313,6 @@ impl std::fmt::Display for CodeLanguage {
             CodeLanguage::Go => "go",
             CodeLanguage::Node => "node",
             CodeLanguage::Python => "python",
-            CodeLanguage::Rust => "rust",
             CodeLanguage::Noop => "",
             CodeLanguage::FallthroughString => "*",
         }
@@ -1290,9 +1337,6 @@ impl std::str::FromStr for CodeLanguage {
         if s == "python" {
             return Ok(CodeLanguage::Python);
         }
-        if s == "rust" {
-            return Ok(CodeLanguage::Rust);
-        }
         anyhow::bail!("invalid string: {}", s);
     }
 }
@@ -1316,7 +1360,7 @@ pub struct OutputFile {
     pub name: String,
 
     /**
-    * Output file contents.
+    * The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for JSON.
     */
     #[serde(
         default,
@@ -1359,6 +1403,30 @@ pub struct CodeOutput {
         deserialize_with = "crate::utils::deserialize_null_string::deserialize"
     )]
     pub stdout: String,
+}
+
+/// Commit holds the Git-commit (SHA1) that a binary was built from, as reported in the version-string of external tools, such as `containerd`, or `runC`.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+pub struct Commit {
+    /**
+    * Actual commit ID of external tool.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub id: String,
+
+    /**
+    * Commit ID of external tool expected by dockerd as set at build time.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub expected: String,
 }
 
 /// Gateway information.
@@ -1486,12 +1554,6 @@ pub struct LeafNode {
 /// This is mostly used for internal purposes and debugging.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
 pub struct Connection {
-    /**
-    * The ID as known by the most recently connected server.
-    */
-    #[serde(default)]
-    pub id: u64,
-
     /**
     * Metadata about a pub-sub connection.
     *  
@@ -1683,16 +1745,6 @@ pub struct Connection {
     pub in_msgs: i64,
 
     /**
-    * The client IP as known by the most recently connected server.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub ip: String,
-
-    /**
     * Metadata about a pub-sub connection.
     *  
     *  This is mostly used for internal purposes and debugging.
@@ -1881,13 +1933,6 @@ pub struct Connection {
         deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
     )]
     pub routes: i64,
-
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub rtt: i64,
 
     /**
     * Metadata about a pub-sub connection.
@@ -3036,6 +3081,992 @@ pub struct Customer {
 }
 
 /**
+* An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>.
+*/
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+pub enum OAuth2GrantType {
+    #[serde(rename = "urn:ietf:params:oauth:grant-type:device_code")]
+    UrnIetfParamsOauthGrantTypeDeviceCode,
+    #[serde(rename = "")]
+    Noop,
+    #[serde(other)]
+    FallthroughString,
+}
+
+impl std::fmt::Display for OAuth2GrantType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &*self {
+            OAuth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode => {
+                "urn:ietf:params:oauth:grant-type:device_code"
+            }
+            OAuth2GrantType::Noop => "",
+            OAuth2GrantType::FallthroughString => "*",
+        }
+        .fmt(f)
+    }
+}
+
+impl Default for OAuth2GrantType {
+    fn default() -> OAuth2GrantType {
+        OAuth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode
+    }
+}
+impl std::str::FromStr for OAuth2GrantType {
+    type Err = anyhow::Error;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s == "urn:ietf:params:oauth:grant-type:device_code" {
+            return Ok(OAuth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode);
+        }
+        anyhow::bail!("invalid string: {}", s);
+    }
+}
+impl OAuth2GrantType {
+    pub fn is_noop(&self) -> bool {
+        matches!(self, OAuth2GrantType::Noop)
+    }
+}
+
+/// The form for a device access token request.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+pub struct DeviceAccessTokenRequestForm {
+    /**
+    * The client ID.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub client_id: String,
+
+    /**
+    * The device code.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub device_code: String,
+
+    /**
+    * An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>.
+    */
+    #[serde(default, skip_serializing_if = "OAuth2GrantType::is_noop")]
+    pub grant_type: OAuth2GrantType,
+}
+
+/// The request parameters for the OAuth 2.0 Device Authorization Grant flow.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+pub struct DeviceAuthRequestForm {
+    /**
+    * The client ID.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub client_id: String,
+}
+
+/// The request parameters to verify the `user_code` for the OAuth 2.0 Device Authorization Grant.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+pub struct DeviceAuthVerifyParams {
+    /**
+    * The user code.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub user_code: String,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+pub enum SystemInfoCgroupDriverEnum {
+    #[serde(rename = "cgroupfs")]
+    Cgroupfs,
+    #[serde(rename = "none")]
+    None,
+    #[serde(rename = "systemd")]
+    Systemd,
+    #[serde(rename = "")]
+    Noop,
+    #[serde(other)]
+    FallthroughString,
+}
+
+impl std::fmt::Display for SystemInfoCgroupDriverEnum {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &*self {
+            SystemInfoCgroupDriverEnum::Cgroupfs => "cgroupfs",
+            SystemInfoCgroupDriverEnum::None => "none",
+            SystemInfoCgroupDriverEnum::Systemd => "systemd",
+            SystemInfoCgroupDriverEnum::Noop => "",
+            SystemInfoCgroupDriverEnum::FallthroughString => "*",
+        }
+        .fmt(f)
+    }
+}
+
+impl Default for SystemInfoCgroupDriverEnum {
+    fn default() -> SystemInfoCgroupDriverEnum {
+        SystemInfoCgroupDriverEnum::Noop
+    }
+}
+impl std::str::FromStr for SystemInfoCgroupDriverEnum {
+    type Err = anyhow::Error;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s == "cgroupfs" {
+            return Ok(SystemInfoCgroupDriverEnum::Cgroupfs);
+        }
+        if s == "none" {
+            return Ok(SystemInfoCgroupDriverEnum::None);
+        }
+        if s == "systemd" {
+            return Ok(SystemInfoCgroupDriverEnum::Systemd);
+        }
+        anyhow::bail!("invalid string: {}", s);
+    }
+}
+impl SystemInfoCgroupDriverEnum {
+    pub fn is_noop(&self) -> bool {
+        matches!(self, SystemInfoCgroupDriverEnum::Noop)
+    }
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+pub enum SystemInfoCgroupVersionEnum {
+    #[serde(rename = "1")]
+    One,
+    #[serde(rename = "2")]
+    Two,
+    #[serde(rename = "")]
+    Noop,
+    #[serde(other)]
+    FallthroughString,
+}
+
+impl std::fmt::Display for SystemInfoCgroupVersionEnum {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &*self {
+            SystemInfoCgroupVersionEnum::One => "1",
+            SystemInfoCgroupVersionEnum::Two => "2",
+            SystemInfoCgroupVersionEnum::Noop => "",
+            SystemInfoCgroupVersionEnum::FallthroughString => "*",
+        }
+        .fmt(f)
+    }
+}
+
+impl Default for SystemInfoCgroupVersionEnum {
+    fn default() -> SystemInfoCgroupVersionEnum {
+        SystemInfoCgroupVersionEnum::Noop
+    }
+}
+impl std::str::FromStr for SystemInfoCgroupVersionEnum {
+    type Err = anyhow::Error;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s == "1" {
+            return Ok(SystemInfoCgroupVersionEnum::One);
+        }
+        if s == "2" {
+            return Ok(SystemInfoCgroupVersionEnum::Two);
+        }
+        anyhow::bail!("invalid string: {}", s);
+    }
+}
+impl SystemInfoCgroupVersionEnum {
+    pub fn is_noop(&self) -> bool {
+        matches!(self, SystemInfoCgroupVersionEnum::Noop)
+    }
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+pub struct SystemInfoDefaultAddressPools {
+    /**
+    * The network address in CIDR format
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub base: String,
+
+    /**
+    * The network pool size
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "crate::utils::zero_i64",
+        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+    )]
+    pub size: i64,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+pub enum SystemInfoIsolationEnum {
+    #[serde(rename = "default")]
+    Default,
+    #[serde(rename = "hyperv")]
+    Hyperv,
+    #[serde(rename = "process")]
+    Process,
+    #[serde(rename = "")]
+    Noop,
+    #[serde(other)]
+    FallthroughString,
+}
+
+impl std::fmt::Display for SystemInfoIsolationEnum {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &*self {
+            SystemInfoIsolationEnum::Default => "default",
+            SystemInfoIsolationEnum::Hyperv => "hyperv",
+            SystemInfoIsolationEnum::Process => "process",
+            SystemInfoIsolationEnum::Noop => "",
+            SystemInfoIsolationEnum::FallthroughString => "*",
+        }
+        .fmt(f)
+    }
+}
+
+impl Default for SystemInfoIsolationEnum {
+    fn default() -> SystemInfoIsolationEnum {
+        SystemInfoIsolationEnum::Noop
+    }
+}
+impl std::str::FromStr for SystemInfoIsolationEnum {
+    type Err = anyhow::Error;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s == "default" {
+            return Ok(SystemInfoIsolationEnum::Default);
+        }
+        if s == "hyperv" {
+            return Ok(SystemInfoIsolationEnum::Hyperv);
+        }
+        if s == "process" {
+            return Ok(SystemInfoIsolationEnum::Process);
+        }
+        anyhow::bail!("invalid string: {}", s);
+    }
+}
+impl SystemInfoIsolationEnum {
+    pub fn is_noop(&self) -> bool {
+        matches!(self, SystemInfoIsolationEnum::Noop)
+    }
+}
+
+/// Available plugins per type.
+///
+/// **Note**: Only unmanaged (V1) plugins are included in this list. V1 plugins are \"lazily\" loaded, and are not returned in this list if there is no resource using the plugin.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+pub struct PluginsInfo {
+    /**
+    * Available plugins per type.
+    *  
+    *  \*\*Note\*\*: Only unmanaged (V1) plugins are included in this list. V1 plugins are \"lazily\" loaded, and are not returned in this list if there is no resource using the plugin.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+    )]
+    #[tabled(skip)]
+    pub authorization: Vec<String>,
+
+    /**
+    * Available plugins per type.
+    *  
+    *  \*\*Note\*\*: Only unmanaged (V1) plugins are included in this list. V1 plugins are \"lazily\" loaded, and are not returned in this list if there is no resource using the plugin.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+    )]
+    #[tabled(skip)]
+    pub log: Vec<String>,
+
+    /**
+    * Available plugins per type.
+    *  
+    *  \*\*Note\*\*: Only unmanaged (V1) plugins are included in this list. V1 plugins are \"lazily\" loaded, and are not returned in this list if there is no resource using the plugin.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+    )]
+    #[tabled(skip)]
+    pub network: Vec<String>,
+
+    /**
+    * Available plugins per type.
+    *  
+    *  \*\*Note\*\*: Only unmanaged (V1) plugins are included in this list. V1 plugins are \"lazily\" loaded, and are not returned in this list if there is no resource using the plugin.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+    )]
+    #[tabled(skip)]
+    pub volume: Vec<String>,
+}
+
+/// RegistryServiceConfig stores daemon registry services configuration.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+pub struct RegistryServiceConfig {
+    /**
+    * RegistryServiceConfig stores daemon registry services configuration.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+    )]
+    pub allow_nondistributable_artifacts_cid_rs: Vec<String>,
+
+    /**
+    * RegistryServiceConfig stores daemon registry services configuration.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+    )]
+    pub allow_nondistributable_artifacts_hostnames: Vec<String>,
+
+    /**
+    * RegistryServiceConfig stores daemon registry services configuration.
+    */
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index_configs: Option<IndexInfo>,
+
+    /**
+    * RegistryServiceConfig stores daemon registry services configuration.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+    )]
+    pub insecure_registry_cid_rs: Vec<String>,
+
+    /**
+    * RegistryServiceConfig stores daemon registry services configuration.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+    )]
+    pub mirrors: Vec<String>,
+}
+
+/// Runtime describes an [OCI compliant](https://github.com/opencontainers/runtime-spec) runtime.  The runtime is invoked by the daemon via the `containerd` daemon. OCI runtimes act as an interface to the Linux kernel namespaces, cgroups, and SELinux.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+pub struct Runtime {
+    /**
+    * Name and, optional, path, of the OCI executable binary.  If the path is omitted, the daemon searches the host's `$PATH` for the binary and uses the first result.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub path: String,
+
+    /**
+    * Runtime describes an [OCI compliant](https://github.com/opencontainers/runtime-spec) runtime.  The runtime is invoked by the daemon via the `containerd` daemon. OCI runtimes act as an interface to the Linux kernel namespaces, cgroups, and SELinux.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+    )]
+    #[tabled(skip)]
+    pub runtime_args: Vec<String>,
+}
+
+/// Docker system info.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+pub struct DockerSystemInfo {
+    /**
+    * Unique identifier of the daemon.
+    *  
+    *  \*\*Note\*\*: The format of the ID itself is not part of the API, and should not be considered stable.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub id: String,
+
+    /**
+    * Hostname of the host.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub name: String,
+
+    /**
+    * Hardware architecture of the host, as returned by the Go runtime (`GOARCH`).  A full list of possible values can be found in the [Go documentation](https://golang.org/doc/install/source#environment).
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub architecture: String,
+
+    /**
+    * Indicates if `bridge-nf-call-ip6tables` is available on the host.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize",
+        rename = "bridge_nf_ip6tables"
+    )]
+    pub bridge_nf_ip_6tables: bool,
+
+    /**
+    * Indicates if `bridge-nf-call-iptables` is available on the host.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub bridge_nf_iptables: bool,
+
+    /**
+    * The driver to use for managing cgroups.
+    */
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cgroup_driver: Option<SystemInfoCgroupDriverEnum>,
+
+    /**
+    * The version of the cgroup.
+    */
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cgroup_version: Option<SystemInfoCgroupVersionEnum>,
+
+    /**
+    * The network endpoint that the Engine advertises for the purpose of node discovery. ClusterAdvertise is a `host:port` combination on which the daemon is reachable by other hosts.
+    *  
+    *  \*\*Deprecated\*\*: This field is only propagated when using standalone Swarm mode, and overlay networking using an external k/v store. Overlay networks with Swarm mode enabled use the built-in raft store, and this field will be empty.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub cluster_advertise: String,
+
+    /**
+    * URL of the distributed storage backend.   The storage backend is used for multihost networking (to store network and endpoint information) and by the node discovery mechanism.
+    *  
+    *  \*\*Deprecated\*\*: This field is only propagated when using standalone Swarm mode, and overlay networking using an external k/v store. Overlay networks with Swarm mode enabled use the built-in raft store, and this field will be empty.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub cluster_store: String,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub containerd_commit: Option<Commit>,
+
+    /**
+    * Total number of containers on the host.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "crate::utils::zero_i64",
+        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+    )]
+    pub containers: i64,
+
+    /**
+    * Number of containers with status `\"paused\"`.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "crate::utils::zero_i64",
+        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+    )]
+    pub containers_paused: i64,
+
+    /**
+    * Number of containers with status `\"running\"`.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "crate::utils::zero_i64",
+        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+    )]
+    pub containers_running: i64,
+
+    /**
+    * Number of containers with status `\"stopped\"`.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "crate::utils::zero_i64",
+        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+    )]
+    pub containers_stopped: i64,
+
+    /**
+    * Indicates if CPU CFS(Completely Fair Scheduler) period is supported by the host.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub cpu_cfs_period: bool,
+
+    /**
+    * Indicates if CPU CFS(Completely Fair Scheduler) quota is supported by the host.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub cpu_cfs_quota: bool,
+
+    /**
+    * Indicates if CPUsets (cpuset.cpus, cpuset.mems) are supported by the host.  See [cpuset(7)](https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt)
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub cpu_set: bool,
+
+    /**
+    * Indicates if CPU Shares limiting is supported by the host.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub cpu_shares: bool,
+
+    /**
+    * Indicates if the daemon is running in debug-mode / with debug-level logging enabled.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub debug: bool,
+
+    /**
+    * Docker system info.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+    )]
+    pub default_address_pools: Vec<SystemInfoDefaultAddressPools>,
+
+    /**
+    * Name of the default OCI runtime that is used when starting containers.  The default can be overridden per-container at create time.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub default_runtime: String,
+
+    /**
+    * Root directory of persistent Docker state.  Defaults to `/var/lib/docker` on Linux, and `C:\\ProgramData\\docker` on Windows.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub docker_root_dir: String,
+
+    /**
+    * Name of the storage driver in use.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub driver: String,
+
+    /**
+    * Docker system info.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+    )]
+    pub driver_status: Vec<Vec<String>>,
+
+    /**
+    * Indicates if experimental features are enabled on the daemon.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub experimental_build: bool,
+
+    /**
+    * HTTP-proxy configured for the daemon. This value is obtained from the [`HTTP_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable. Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL are masked in the API response.  Containers do not automatically inherit this configuration.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub http_proxy: String,
+
+    /**
+    * HTTPS-proxy configured for the daemon. This value is obtained from the [`HTTPS_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable. Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL are masked in the API response.  Containers do not automatically inherit this configuration.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub https_proxy: String,
+
+    /**
+    * Total number of images on the host. Both _tagged_ and _untagged_ (dangling) images are counted.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "crate::utils::zero_i64",
+        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+    )]
+    pub images: i64,
+
+    /**
+    * Address / URL of the index server that is used for image search, and as a default for user authentication for Docker Hub and Docker Cloud.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub index_server_address: String,
+
+    /**
+    * Name and, optional, path of the `docker-init` binary.  If the path is omitted, the daemon searches the host's `$PATH` for the binary and uses the first result.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub init_binary: String,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub init_commit: Option<Commit>,
+
+    /**
+    * Indicates IPv4 forwarding is enabled.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize",
+        rename = "ipv4_forwarding"
+    )]
+    pub ipv_4_forwarding: bool,
+
+    /**
+    * Represents the isolation technology to use as a default for containers. The supported values are platform-specific.  If no isolation value is specified on daemon start, on Windows client, the default is `hyperv`, and on Windows server, the default is `process`.  This option is currently not used on other platforms.
+    */
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub isolation: Option<SystemInfoIsolationEnum>,
+
+    /**
+    * Indicates if the host has kernel memory limit support enabled.
+    *  
+    *  \*\*Deprecated\*\*: This field is deprecated as the kernel 5.4 deprecated `kmem.limit_in_bytes`.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub kernel_memory: bool,
+
+    /**
+    * Indicates if the host has kernel memory TCP limit support enabled.  Kernel memory TCP limits are not supported when using cgroups v2, which does not support the corresponding `memory.kmem.tcp.limit_in_bytes` cgroup.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub kernel_memory_tcp: bool,
+
+    /**
+    * Kernel version of the host.  On Linux, this information obtained from `uname`. On Windows this information is queried from the <kbd>HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\</kbd> registry value, for example _\"10.0 14393 (14393.1198.amd64fre.rs1_release_sec.170427-1353)\"_.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub kernel_version: String,
+
+    /**
+    * Docker system info.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+    )]
+    pub labels: Vec<String>,
+
+    /**
+    * Indicates if live restore is enabled.  If enabled, containers are kept running when the daemon is shutdown or upon daemon start if running containers are detected.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub live_restore_enabled: bool,
+
+    /**
+    * The logging driver to use as a default for new containers.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub logging_driver: String,
+
+    /**
+    * Total amount of physical memory available on the host, in bytes.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "crate::utils::zero_i64",
+        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+    )]
+    pub mem_total: i64,
+
+    /**
+    * Indicates if the host has memory limit support enabled.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub memory_limit: bool,
+
+    /**
+    * Number of event listeners subscribed.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "crate::utils::zero_i64",
+        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+    )]
+    pub n_events_listener: i64,
+
+    /**
+    * The total number of file Descriptors in use by the daemon process.  This information is only returned if debug-mode is enabled.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "crate::utils::zero_i64",
+        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+    )]
+    pub n_fd: i64,
+
+    /**
+    * The number of logical CPUs usable by the daemon.  The number of available CPUs is checked by querying the operating system when the daemon starts. Changes to operating system CPU allocation after the daemon is started are not reflected.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "crate::utils::zero_i64",
+        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+    )]
+    pub ncpu: i64,
+
+    /**
+    * Comma-separated list of domain extensions for which no proxy should be used. This value is obtained from the [`NO_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable.  Containers do not automatically inherit this configuration.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub no_proxy: String,
+
+    /**
+    * Indicates if OOM killer disable is supported on the host.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub oom_kill_disable: bool,
+
+    /**
+    * Name of the host's operating system, for example: \"Ubuntu 16.04.2 LTS\" or \"Windows Server 2016 Datacenter\"
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub operating_system: String,
+
+    /**
+    * Generic type of the operating system of the host, as returned by the Go runtime (`GOOS`).  Currently returned values are \"linux\" and \"windows\". A full list of possible values can be found in the [Go documentation](https://golang.org/doc/install/source#environment).
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub os_type: String,
+
+    /**
+    * Version of the host's operating system
+    *  
+    *  \*\*Note\*\*: The information returned in this field, including its very existence, and the formatting of values, should not be considered stable, and may change without notice.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub os_version: String,
+
+    /**
+    * Indicates if the host kernel has PID limit support enabled.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub pids_limit: bool,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub plugins: Option<PluginsInfo>,
+
+    /**
+    * Reports a summary of the product license on the daemon.  If a commercial license has been applied to the daemon, information such as number of nodes, and expiration are included.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub product_license: String,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub registry_config: Option<RegistryServiceConfig>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub runc_commit: Option<Commit>,
+
+    /**
+    * Docker system info.
+    */
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub runtimes: Option<Runtime>,
+
+    /**
+    * Docker system info.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+    )]
+    pub security_options: Vec<String>,
+
+    /**
+    * Version string of the daemon. \*\*Note\*\*: the [standalone Swarm API](https://docs.docker.com/swarm/swarm-api/) returns the Swarm version instead of the daemon  version, for example `swarm/1.2.8`.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub server_version: String,
+
+    /**
+    * Indicates if the host has memory swap limit support enabled.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub swap_limit: bool,
+
+    /**
+    * The  number of goroutines that currently exist.  This information is only returned if debug-mode is enabled.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub system_time: String,
+
+    /**
+    * Docker system info.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+    )]
+    pub warnings: Vec<String>,
+}
+
+/// The body of the form for email authentication.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+pub struct EmailAuthenticationForm {
+    /**
+    * The URL to redirect back to after we have authenticated.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::utils::deserialize_empty_url::deserialize"
+    )]
+    pub callback_url: Option<url::Url>,
+
+    /**
+    * The user's email.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub email: String,
+}
+
+/**
 * The environment the server is running in.
 */
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
@@ -3371,6 +4402,34 @@ pub struct ErrorResponse {
         deserialize_with = "crate::utils::deserialize_null_string::deserialize"
     )]
     pub request_id: String,
+}
+
+/// Metadata about our currently running server.
+///
+/// This is mostly used for internal purposes and debugging.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+pub struct ExecutorMetadata {
+    /**
+    * Docker system info.
+    */
+    #[serde()]
+    pub docker_info: DockerSystemInfo,
+
+    /**
+    * The environment the server is running in.
+    */
+    #[serde(default, skip_serializing_if = "Environment::is_noop")]
+    pub environment: Environment,
+
+    /**
+    * The git hash of the server.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub git_hash: String,
 }
 
 /// Extended user information.
@@ -3754,12 +4813,9 @@ pub struct FileConversion {
     /**
     * The converted file, if completed, base64 encoded.
     */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub output: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[tabled(skip)]
+    pub output: Option<bytes::Bytes>,
 
     /**
     * The valid types of output file formats.
@@ -4068,6 +5124,51 @@ pub struct FileVolume {
     pub volume: f64,
 }
 
+/// IndexInfo contains information about a registry.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+pub struct IndexInfo {
+    /**
+    * Name of the registry, such as \"docker.io\".
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub name: String,
+
+    /**
+    * IndexInfo contains information about a registry.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Vec::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+    )]
+    #[tabled(skip)]
+    pub mirrors: Vec<String>,
+
+    /**
+    * Indicates whether this is an official registry (i.e., Docker Hub / docker.io)
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub official: bool,
+
+    /**
+    * Indicates if the registry is part of the list of insecure registries.  If `false`, the registry is insecure. Insecure registries accept un-encrypted (HTTP) and/or untrusted (HTTPS with certificates from unknown CAs) communication.
+    *  
+    *  \*\*Warning\*\*: Insecure registries can be useful when running a local registry. However, because its use creates security vulnerabilities it should ONLY be enabled for testing purposes. For increased security, users should add their CA to their system's list of trusted CAs instead of enabling this option.
+    */
+    #[serde(
+        default,
+        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
+    )]
+    pub secure: bool,
+}
+
 /// An invoice line item.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
 pub struct InvoiceLineItem {
@@ -4294,7 +5395,7 @@ pub struct Invoice {
         skip_serializing_if = "String::is_empty",
         deserialize_with = "crate::utils::deserialize_null_string::deserialize"
     )]
-    pub invoice_pdf: String,
+    pub customer_email: String,
 
     /**
     * An invoice.
@@ -4304,7 +5405,17 @@ pub struct Invoice {
         skip_serializing_if = "String::is_empty",
         deserialize_with = "crate::utils::deserialize_null_string::deserialize"
     )]
-    pub invoice_url: String,
+    pub customer_id: String,
+
+    /**
+    * An invoice.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub default_payment_method: String,
 
     /**
     * An invoice.
@@ -4344,6 +5455,16 @@ pub struct Invoice {
         deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
     )]
     pub paid: bool,
+
+    /**
+    * The link to download the PDF for the invoice.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::utils::deserialize_empty_url::deserialize"
+    )]
+    pub pdf: Option<url::Url>,
 
     /**
     * An invoice.
@@ -4402,6 +5523,16 @@ pub struct Invoice {
         deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
     )]
     pub total: i64,
+
+    /**
+    * The URL for the hosted invoice page, which allows customers to view and pay an invoice.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::utils::deserialize_empty_url::deserialize"
+    )]
+    pub url: Option<url::Url>,
 }
 
 /// Jetstream configuration.
@@ -4586,20 +5717,6 @@ pub struct JetstreamApiStats {
     pub total: i64,
 }
 
-/// The parameters passed to login.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct LoginParams {
-    /**
-    * The session token we should set as a cookie.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub session: String,
-}
-
 /// Metadata about our currently running server.
 ///
 /// This is mostly used for internal purposes and debugging.
@@ -4628,6 +5745,14 @@ pub struct Metadata {
     pub environment: Environment,
 
     /**
+    * Metadata about our currently running server.
+    *  
+    *  This is mostly used for internal purposes and debugging.
+    */
+    #[serde()]
+    pub executor: ExecutorMetadata,
+
+    /**
     * Metadata about our file system.
     *  
     *  This is mostly used for internal purposes and debugging.
@@ -4652,6 +5777,88 @@ pub struct Metadata {
     */
     #[serde()]
     pub pubsub: Connection,
+}
+
+/// Information about an OAuth 2.0 client.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+pub struct OAuth2ClientInfo {
+    /**
+    * Information about an OAuth 2.0 client.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub csrf_token: String,
+
+    /**
+    * Code Verifier used for [PKCE]((https://tools.ietf.org/html/rfc7636)) protection via the `code_verifier` parameter. The value must have a minimum length of 43 characters and a maximum length of 128 characters.  Each character must be ASCII alphanumeric or one of the characters "-" / "." / "_" / "~".
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub pkce_code_verifier: String,
+
+    /**
+    * Information about an OAuth 2.0 client.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub url: String,
+}
+
+/**
+* An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>.
+*/
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+pub enum OAuth2GrantTypeUrnIetfParamsOauthDeviceCode {
+    #[serde(rename = "urn:ietf:params:oauth:grant-type:device_code")]
+    UrnIetfParamsOauthGrantTypeDeviceCode,
+    #[serde(rename = "")]
+    Noop,
+    #[serde(other)]
+    FallthroughString,
+}
+
+impl std::fmt::Display for OAuth2GrantTypeUrnIetfParamsOauthDeviceCode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &*self {
+            OAuth2GrantTypeUrnIetfParamsOauthDeviceCode::UrnIetfParamsOauthGrantTypeDeviceCode => {
+                "urn:ietf:params:oauth:grant-type:device_code"
+            }
+            OAuth2GrantTypeUrnIetfParamsOauthDeviceCode::Noop => "",
+            OAuth2GrantTypeUrnIetfParamsOauthDeviceCode::FallthroughString => "*",
+        }
+        .fmt(f)
+    }
+}
+
+impl Default for OAuth2GrantTypeUrnIetfParamsOauthDeviceCode {
+    fn default() -> OAuth2GrantTypeUrnIetfParamsOauthDeviceCode {
+        OAuth2GrantTypeUrnIetfParamsOauthDeviceCode::UrnIetfParamsOauthGrantTypeDeviceCode
+    }
+}
+impl std::str::FromStr for OAuth2GrantTypeUrnIetfParamsOauthDeviceCode {
+    type Err = anyhow::Error;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s == "urn:ietf:params:oauth:grant-type:device_code" {
+            return Ok(
+                OAuth2GrantTypeUrnIetfParamsOauthDeviceCode::UrnIetfParamsOauthGrantTypeDeviceCode,
+            );
+        }
+        anyhow::bail!("invalid string: {}", s);
+    }
+}
+impl OAuth2GrantTypeUrnIetfParamsOauthDeviceCode {
+    pub fn is_noop(&self) -> bool {
+        matches!(self, OAuth2GrantTypeUrnIetfParamsOauthDeviceCode::Noop)
+    }
 }
 
 /// A payment intent response.
@@ -5332,6 +6539,9 @@ pub struct UserResultsPage {
 }
 
 pub type Duration = i64;
+/// An "empty" type used to represent responses that have no associated data payload. This isn't intended for general use, but must be pub since it's used as the Body type for certain responses.
+pub type Empty = String;
+pub type IpAddr = String;
 pub type PhoneNumber = String;
 pub type StatusCode = i32;
 /// A uuid.

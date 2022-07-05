@@ -91,6 +91,7 @@ pub fn generate_types(api: &openapiv3::OpenAPI, ts: &mut TypeSpace) -> Result<St
                     // this is gated by the oneof types cooperating.
                     a("#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema,");
                     a("Default,");
+                    let mut use_tabled = false;
                     if sn != "PaymentMethod"
                         && sn != "Metadata"
                         && sn != "EngineMetadata"
@@ -101,8 +102,13 @@ pub fn generate_types(api: &openapiv3::OpenAPI, ts: &mut TypeSpace) -> Result<St
                         && sn != "Customer"
                         && sn != "Connection"
                         && sn != "CardDetails"
+                        && sn != "DockerSystemInfo"
+                        && sn != "ExecutorMetadata"
+                        && sn != "RegistryServiceConfig"
+                        && sn != "EmailAuthenticationForm"
                     {
                         a("Tabled,");
+                        use_tabled = true;
                     }
                     a(r#")]"#);
 
@@ -114,13 +120,13 @@ pub fn generate_types(api: &openapiv3::OpenAPI, ts: &mut TypeSpace) -> Result<St
                     let try_first = vec!["id", "name", "description"];
                     for f in try_first.iter() {
                         if let Some(tid) = omap.get(&f.to_string()) {
-                            a(&render_property(ts, tid, f, &desc, &sn)?);
+                            a(&render_property(ts, tid, f, &desc, &sn, use_tabled)?);
                             omap.remove(&f.to_string());
                         }
                     }
 
                     for (name, tid) in omap.iter() {
-                        a(&render_property(ts, tid, name, &desc, &sn)?);
+                        a(&render_property(ts, tid, name, &desc, &sn, use_tabled)?);
                     }
                     a("}");
                     a("");
@@ -181,6 +187,7 @@ fn render_property(
     name: &str,
     desc: &str,
     sn: &str,
+    use_tabled: bool,
 ) -> Result<String> {
     let mut out = String::new();
 
@@ -336,8 +343,9 @@ fn render_property(
         }
 
         // Hide things from the table that don't implement display.
-        if (rt.starts_with("Vec<") && rt != "Vec<InvoiceLineItem>")
+        if (rt.starts_with("Vec<") && use_tabled)
             || rt.contains("serde_json::Value")
+            || rt.contains("bytes::Bytes")
         {
             a(r#"#[tabled(skip)]"#);
         }

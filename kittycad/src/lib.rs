@@ -85,6 +85,10 @@ pub mod hidden;
 ///
 /// FROM: <https://docs.kittycad.io/api/meta>
 pub mod meta;
+/// Endpoints that implement OAuth 2.0 grant flows.
+///
+/// FROM: <https://docs.kittycad.io/api/oauth2>
+pub mod oauth_2;
 /// Operations around payments and billing.
 ///
 /// FROM: <https://docs.kittycad.io/api/payments>
@@ -383,6 +387,13 @@ impl Client {
     /// FROM: <https://docs.kittycad.io/api/meta>
     pub fn meta(&self) -> meta::Meta {
         meta::Meta::new(self.clone())
+    }
+
+    /// Endpoints that implement OAuth 2.0 grant flows.
+    ///
+    /// FROM: <https://docs.kittycad.io/api/oauth2>
+    pub fn oauth_2(&self) -> oauth_2::Oauth2 {
+        oauth_2::Oauth2::new(self.clone())
     }
 
     /// Operations around payments and billing.

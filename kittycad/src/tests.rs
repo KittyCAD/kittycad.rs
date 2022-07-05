@@ -21,7 +21,7 @@ async fn test_create_file_conversion() {
         .await
         .unwrap();
 
-    assert!(!conversion.output.is_empty());
+    assert!(conversion.output.is_some());
 
     assert_eq!(conversion.src_format, crate::types::FileSourceFormat::Obj);
     assert_eq!(conversion.status, crate::types::ApiCallStatus::Completed);
@@ -42,7 +42,7 @@ async fn test_create_file_conversion_with_base64_helper() {
         .await
         .unwrap();
 
-    assert!(!conversion.output.is_empty());
+    assert!(conversion.output.is_some());
     assert!(!output.is_empty());
 
     assert_eq!(conversion.src_format, crate::types::FileSourceFormat::Obj);

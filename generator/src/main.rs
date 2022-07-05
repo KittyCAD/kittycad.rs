@@ -329,6 +329,10 @@ impl ParameterDataExt for openapiv3::ParameterData {
                                                 uint = false;
                                                 width = 16;
                                             }
+                                            "duration" => {
+                                                uint = false;
+                                                width = 64;
+                                            }
                                             /* int32 and int64 are build it and parse as the integer type */
                                             f => anyhow::bail!("unknown integer format {}", f),
                                         }
@@ -1884,6 +1888,10 @@ impl TypeSpace {
                                     uint = false;
                                     width = 16;
                                 }
+                                "duration" => {
+                                    uint = false;
+                                    width = 64;
+                                }
                                 /* int32 and int64 are build it and parse as the integer type */
                                 f => anyhow::bail!("unknown integer format {}", f),
                             }
@@ -2248,7 +2256,7 @@ pub fn render_param(
 
     a(&format!("pub enum {} {{", sn));
     for e in &enums {
-        if struct_name(e).is_empty() {
+        if struct_name(e).is_empty() || e.trim().is_empty() {
             // TODO: do something for empty(?)
             continue;
         }
@@ -2273,6 +2281,10 @@ pub fn render_param(
     a(r#"fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {"#);
     a(r#"match &*self {"#);
     for e in &enums {
+        if struct_name(e).is_empty() || e.trim().is_empty() {
+            // TODO: do something for empty(?)
+            continue;
+        }
         a(&format!(r#"{}::{} => "{}","#, sn, struct_name(e), e));
     }
     if !required && default.is_none() && do_fallthrough_etc {
@@ -2295,14 +2307,20 @@ pub fn render_param(
         a(&format!("impl Default for {} {{", sn));
         a(&format!("fn default() -> {} {{", sn));
         if let Some(d) = default {
-            // Use the default that can be passed to the OpenAPI,
-            a(&format!(
-                "{}::{}",
-                sn,
-                struct_name(&d.to_string().replace('"', ""))
-            ));
+            // If it is empty use the Noop.
+            let clean_name = d.to_string().replace('"', "");
+            if struct_name(&clean_name).is_empty() || clean_name.trim().is_empty() {
+                a(&format!("{}::Noop", sn));
+            } else {
+                // Use the default that can be passed to the OpenAPI,
+                a(&format!("{}::{}", sn, struct_name(&clean_name)));
+            }
         } else {
-            a(&format!("{}::{}", sn, struct_name(&enums[0])));
+            let mut clean_name = enums[0].to_string();
+            if clean_name.is_empty() {
+                clean_name = "Noop".to_string();
+            }
+            a(&format!("{}::{}", sn, struct_name(&clean_name)));
         }
         a("}");
         a("}");
@@ -2313,6 +2331,10 @@ pub fn render_param(
     a("type Err = anyhow::Error;");
     a("fn from_str(s: &str) -> Result<Self, Self::Err> {");
     for e in &enums {
+        if struct_name(e).is_empty() || e.trim().is_empty() {
+            // TODO: do something for empty(?)
+            continue;
+        }
         a(&format!(
             r#"if s == "{}" {{ return Ok({}::{}); }}"#,
             e,
@@ -2558,6 +2580,7 @@ fn clean_name(t: &str) -> String {
     .replace("v_1_", "")
     .replace("_v_2_", "_")
     .replace("_v_3_", "_")
+    .replace("oauth_2", "oauth2")
     .replace("s_uuid", "")
     .replace("_id_or_uuid", "")
     .replace("_uuid", "")

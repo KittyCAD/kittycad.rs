@@ -24,7 +24,11 @@ impl Base64Ops for crate::file::File {
             .await?;
 
         // Decode the output.
-        let output = data_encoding::BASE64.decode(conversion.output.as_bytes())?;
+        let output = if let Some(o) = &conversion.output {
+            data_encoding::BASE64.decode(o)?
+        } else {
+            vec![]
+        };
 
         Ok((conversion, output))
     }
