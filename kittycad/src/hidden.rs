@@ -20,7 +20,7 @@ impl Hidden {
     pub async fn listen_auth_email(
         &self,
         body: &crate::types::EmailAuthenticationForm,
-    ) -> Result<()> {
+    ) -> Result<crate::types::VerificationToken> {
         let url = "/auth/email".to_string();
         self.client
             .post(&url, Some(reqwest::Body::from(serde_json::to_vec(body)?)))

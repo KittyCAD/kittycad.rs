@@ -3021,10 +3021,10 @@ pub struct Customer {
     */
     #[serde(
         default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+        skip_serializing_if = "crate::utils::zero_f64",
+        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
     )]
-    pub balance: i64,
+    pub balance: f64,
 
     /**
     * Time at which the object was created.
@@ -4534,16 +4534,15 @@ pub struct ExtendedUser {
     pub github: String,
 
     /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
+    * The image avatar for the user. This is a URL.
     */
     #[serde(
         default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::utils::deserialize_empty_url::deserialize"
     )]
-    pub image: String,
+    #[tabled(skip)]
+    pub image: Option<url::Url>,
 
     /**
     * Extended user information.
@@ -5197,10 +5196,10 @@ pub struct InvoiceLineItem {
     */
     #[serde(
         default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+        skip_serializing_if = "crate::utils::zero_f64",
+        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
     )]
-    pub amount: i64,
+    pub amount: f64,
 
     /**
     * Currency is the list of supported currencies.
@@ -5333,30 +5332,30 @@ pub struct Invoice {
     */
     #[serde(
         default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+        skip_serializing_if = "crate::utils::zero_f64",
+        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
     )]
-    pub amount_due: i64,
+    pub amount_due: f64,
 
     /**
     * An invoice.
     */
     #[serde(
         default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+        skip_serializing_if = "crate::utils::zero_f64",
+        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
     )]
-    pub amount_paid: i64,
+    pub amount_paid: f64,
 
     /**
     * An invoice.
     */
     #[serde(
         default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+        skip_serializing_if = "crate::utils::zero_f64",
+        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
     )]
-    pub amount_remaining: i64,
+    pub amount_remaining: f64,
 
     /**
     * An invoice.
@@ -5499,30 +5498,30 @@ pub struct Invoice {
     */
     #[serde(
         default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+        skip_serializing_if = "crate::utils::zero_f64",
+        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
     )]
-    pub subtotal: i64,
+    pub subtotal: f64,
 
     /**
     * An invoice.
     */
     #[serde(
         default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+        skip_serializing_if = "crate::utils::zero_f64",
+        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
     )]
-    pub tax: i64,
+    pub tax: f64,
 
     /**
     * An invoice.
     */
     #[serde(
         default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
+        skip_serializing_if = "crate::utils::zero_f64",
+        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
     )]
-    pub total: i64,
+    pub total: f64,
 
     /**
     * The URL for the hosted invoice page, which allows customers to view and pay an invoice.
@@ -6477,14 +6476,15 @@ pub struct User {
     pub github: String,
 
     /**
-    * A user.
+    * The image avatar for the user. This is a URL.
     */
     #[serde(
         default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::utils::deserialize_empty_url::deserialize"
     )]
-    pub image: String,
+    #[tabled(skip)]
+    pub image: Option<url::Url>,
 
     /**
     * A user.
@@ -6538,10 +6538,54 @@ pub struct UserResultsPage {
     pub next_page: String,
 }
 
-pub type Duration = i64;
-pub type IpAddr = String;
-pub type PhoneNumber = String;
-pub type StatusCode = i32;
+/// A verification token for a user.
+///
+/// This is typically used to verify a user's email address.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+pub struct VerificationToken {
+    /**
+    * A verification token for a user.
+    *  
+    *  This is typically used to verify a user's email address.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub id: String,
+
+    /**
+    * The date and time the verification token was created.
+    */
+    #[serde()]
+    pub created_at: crate::utils::DisplayOptionDateTime,
+
+    /**
+    * The date and time the verification token expires.
+    */
+    #[serde()]
+    pub expires: crate::utils::DisplayOptionDateTime,
+
+    /**
+    * A verification token for a user.
+    *  
+    *  This is typically used to verify a user's email address.
+    */
+    #[serde(
+        default,
+        skip_serializing_if = "String::is_empty",
+        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
+    )]
+    pub identifier: String,
+
+    /**
+    * The date and time the verification token was last updated.
+    */
+    #[serde()]
+    pub updated_at: crate::utils::DisplayOptionDateTime,
+}
+
 /// A uuid.
 ///
 /// A Version 4 UUID is a universally unique identifier that is generated using random numbers.

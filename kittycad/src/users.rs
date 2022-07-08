@@ -40,6 +40,19 @@ impl Users {
     }
 
     /**
+    * Delete your user.
+    *
+    * This function performs a `DELETE` to the `/user` endpoint.
+    *
+    * This endpoint requires authentication by any KittyCAD user. It deletes the authenticated user from KittyCAD's database.
+    * This call will only succeed if all invoices associated with the user have been paid in full and there is no outstanding balance.
+    */
+    pub async fn delete_self(&self) -> Result<()> {
+        let url = "/user".to_string();
+        self.client.delete(&url, None).await
+    }
+
+    /**
     * Get extended information about your user.
     *
     * This function performs a `GET` to the `/user/extended` endpoint.

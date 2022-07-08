@@ -343,9 +343,11 @@ fn render_property(
         }
 
         // Hide things from the table that don't implement display.
-        if (rt.starts_with("Vec<") && use_tabled)
+        if (rt.starts_with("Vec<")
             || rt.contains("serde_json::Value")
             || rt.contains("bytes::Bytes")
+            || rt.contains("Option<url::Url>"))
+            && use_tabled
         {
             a(r#"#[tabled(skip)]"#);
         }
