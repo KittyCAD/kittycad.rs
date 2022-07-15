@@ -2252,7 +2252,7 @@ pub fn render_param(
         a("*/");
     }
 
-    a("#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]");
+    a("#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]");
 
     a(&format!("pub enum {} {{", sn));
     for e in &enums {
@@ -3116,6 +3116,7 @@ license = "MIT"
 anyhow = "1"
 async-trait = "^0.1.53"
 bytes = {{ version = "1", features = ["serde"] }}
+clap = {{ version = "^3.2.12", features = ["cargo", "derive", "env", "unicode"] }}
 chrono = {{ version = "0.4", features = ["serde"] }}
 chrono-humanize = "^0.2.1"
 data-encoding = "^2.3.2"

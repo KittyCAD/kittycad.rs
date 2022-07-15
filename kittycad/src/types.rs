@@ -8,7 +8,7 @@ use tabled::Tabled;
 /**
 * An account provider.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum AccountProvider {
     #[serde(rename = "github")]
     Github,
@@ -176,7 +176,7 @@ pub struct ApiCallQueryGroup {
 /**
 * The field of an API call to group by.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum ApiCallQueryGroupBy {
     #[serde(rename = "email")]
     Email,
@@ -250,7 +250,7 @@ impl ApiCallQueryGroupBy {
 /**
 * The status of an async API call.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum ApiCallStatus {
     #[serde(rename = "Completed")]
     Completed,
@@ -322,7 +322,7 @@ impl ApiCallStatus {
 *   
 *   Currently includes 8 variants representing the 8 methods defined in [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH, and an Extension variant for all extensions.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum Method {
     #[serde(rename = "CONNECT")]
     Connect,
@@ -751,7 +751,7 @@ pub struct ApiTokenResultsPage {
 /**
 * The type of async API call.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum AsyncApiCallType {
     #[serde(rename = "FileConversion")]
     FileConversion,
@@ -991,7 +991,7 @@ impl AsyncApiCallOutput {
 /**
 * The types for AsyncApiCallOutput.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum AsyncApiCallOutputType {
     #[serde(rename = "FileConversion")]
     FileConversion,
@@ -1293,7 +1293,7 @@ pub struct Cluster {
 /**
 * The language code is written in.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum CodeLanguage {
     #[serde(rename = "go")]
     Go,
@@ -2066,7 +2066,7 @@ pub struct Connection {
 *   
 *   Currently, we only support scanning in ascending order.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum CreatedAtSortMode {
     #[serde(rename = "created-at-ascending")]
     CreatedAtAscending,
@@ -2118,7 +2118,7 @@ impl CreatedAtSortMode {
 *   
 *   For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum Currency {
     #[serde(rename = "aed")]
     Aed,
@@ -3083,7 +3083,7 @@ pub struct Customer {
 /**
 * An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum OAuth2GrantType {
     #[serde(rename = "urn:ietf:params:oauth:grant-type:device_code")]
     UrnIetfParamsOauthGrantTypeDeviceCode,
@@ -3184,7 +3184,7 @@ pub struct DeviceAuthVerifyParams {
     pub user_code: String,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum SystemInfoCgroupDriverEnum {
     #[serde(rename = "cgroupfs")]
     Cgroupfs,
@@ -3237,7 +3237,7 @@ impl SystemInfoCgroupDriverEnum {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum SystemInfoCgroupVersionEnum {
     #[serde(rename = "1")]
     One,
@@ -3307,7 +3307,7 @@ pub struct SystemInfoDefaultAddressPools {
     pub size: i64,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum SystemInfoIsolationEnum {
     #[serde(rename = "default")]
     Default,
@@ -4069,7 +4069,7 @@ pub struct EmailAuthenticationForm {
 /**
 * The environment the server is running in.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum Environment {
     #[serde(rename = "DEVELOPMENT")]
     Development,
@@ -4633,7 +4633,7 @@ pub struct ExtendedUserResultsPage {
 /**
 * The valid types of output file formats.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum FileOutputFormat {
     #[serde(rename = "dae")]
     Dae,
@@ -4707,7 +4707,7 @@ impl FileOutputFormat {
 /**
 * The valid types of source file formats.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum FileSourceFormat {
     #[serde(rename = "dae")]
     Dae,
@@ -5233,7 +5233,7 @@ pub struct InvoiceLineItem {
 /**
 * An enum representing the possible values of an `Invoice`'s `status` field.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum InvoiceStatus {
     #[serde(rename = "deleted")]
     Deleted,
@@ -5815,7 +5815,7 @@ pub struct OAuth2ClientInfo {
 /**
 * An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum OAuth2GrantTypeUrnIetfParamsOauthDeviceCode {
     #[serde(rename = "urn:ietf:params:oauth:grant-type:device_code")]
     UrnIetfParamsOauthGrantTypeDeviceCode,
@@ -5877,7 +5877,7 @@ pub struct PaymentIntent {
 /**
 * An enum representing the possible values of an `PaymentMethod`'s `type` field.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum PaymentMethodType {
     #[serde(rename = "card")]
     Card,
@@ -5973,7 +5973,7 @@ pub struct PaymentMethod {
 /**
 * An enum representing the possible values of an `PaymentMethod`'s `type` field.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum PaymentMethodTypeCard {
     #[serde(rename = "card")]
     Card,
@@ -6091,7 +6091,7 @@ pub struct Session {
 /**
 * The valid types of metric unit formats.
 */
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
 pub enum UnitMetricFormat {
     #[serde(rename = "atto")]
     Atto,
