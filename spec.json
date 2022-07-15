@@ -14,7 +14,7 @@
     },
     "x-rust": {
       "client": "use kittycad::Client;\n\n// Authenticate via an API token.\nlet client = Client::new(\"$TOKEN\");\n\n// - OR -\n\n// Authenticate with your token and host parsed from the environment variables:\n// KITTYCAD_API_TOKEN.\nlet client = Client::new_from_env();",
-      "install": "[dependencies]\nkittycad = \"0.1.5\""
+      "install": "[dependencies]\nkittycad = \"0.1.6\""
     }
   },
   "paths": {
