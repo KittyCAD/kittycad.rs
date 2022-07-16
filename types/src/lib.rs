@@ -677,15 +677,22 @@ fn render_object(
         }
         let prop_ident = format_ident!("{}", prop);
 
-        let mut prop_value = quote!(
+        let prop_value = quote!(
             #prop_ident: #type_name,
         );
 
-        let mut serde_props = Vec<proc_macro2::TokenStream>::new();
+        let type_name_text = get_text(&type_name)?;
+
+        let mut serde_props = Vec::<proc_macro2::TokenStream>::new();
+
         if &prop != k {
             serde_props.push(quote!(
                 rename = #k
             ));
+        }
+
+        if type_name_text.starts_with("Option<") {
+            serde_props.push(quote!(skip_serializing_if = "Option::is_none"));
         }
 
         values = quote!(
