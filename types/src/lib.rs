@@ -811,16 +811,11 @@ fn render_enum(
     let mut values = quote!();
     for e in &s.enumeration {
         if e.is_none() {
-            // TODO: do something for empty(?)
+            // TODO: do something for None
             continue;
         }
 
         let e = e.as_ref().unwrap().to_string();
-
-        if proper_name(&e).is_empty() || e.trim().is_empty() {
-            // TODO: do something for empty(?)
-            continue;
-        }
 
         let e_name = format_ident!("{}", proper_name(&e));
         let mut e_value = quote!(
@@ -882,6 +877,10 @@ fn render_enum(
 /// Return a proper rust name for a string.
 /// For example, this gets used as the enum and struct name.
 fn proper_name(s: &str) -> String {
+    if s.is_empty() {
+        return "Empty".to_string();
+    }
+
     // Check if s is a number like 1 or 2, etc.
     // If it is a number we want to convert it to a string as follows:
     // 1 => One

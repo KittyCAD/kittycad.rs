@@ -2548,6 +2548,9 @@ pub struct Session {
     parse_display :: Display,
 )]
 pub enum SystemInfoCgroupDriverEnum {
+    #[serde(rename = "")]
+    #[display("")]
+    Empty,
     #[serde(rename = "cgroupfs")]
     #[display("cgroupfs")]
     Cgroupfs,
@@ -2574,6 +2577,9 @@ pub enum SystemInfoCgroupDriverEnum {
     parse_display :: Display,
 )]
 pub enum SystemInfoCgroupVersionEnum {
+    #[serde(rename = "")]
+    #[display("")]
+    Empty,
     #[serde(rename = "1")]
     #[display("1")]
     One,
@@ -2615,6 +2621,9 @@ pub struct SystemInfoDefaultAddressPools {
     parse_display :: Display,
 )]
 pub enum SystemInfoIsolationEnum {
+    #[serde(rename = "")]
+    #[display("")]
+    Empty,
     #[serde(rename = "default")]
     #[display("default")]
     Default,
