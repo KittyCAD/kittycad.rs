@@ -40,7 +40,7 @@ pub fn list_async_operations(&self) -> Result<crate::types::AsyncApiCallResultsP
 
 
 #[doc = "Get an async operation.\n\nGet the status and output of an async operation.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested async operation for the user.\nIf the user is not authenticated to view the specified async operation, then it is not returned.\nOnly KittyCAD employees with the proper access can view async operations for other users."]
-pub fn get_async_operation(&self) -> Result<AsyncApiCallOutput> {
+pub fn get_async_operation(&self) -> Result<crate::types::AsyncApiCallOutput> {
     todo!()
 }
 

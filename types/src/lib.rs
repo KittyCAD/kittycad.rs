@@ -146,7 +146,12 @@ pub fn get_type_name_for_schema(
                     );
                 } else {
                     let ident = format_ident!("{}", proper_name(name));
-                    return Ok(quote!(#ident));
+                    let t = if in_crate {
+                        quote!(#ident)
+                    } else {
+                        quote!(crate::types::#ident)
+                    };
+                    return Ok(t);
                 }
             }
 

@@ -18,7 +18,7 @@ impl File {
     }
 
     #[doc = "Get a file conversion.\n\nGet the status and output of an async file conversion.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\nIf the user is not authenticated to view the specified file conversion, then it is not returned.\nOnly KittyCAD employees with the proper access can view file conversions for other users."]
-    pub fn get_conversion(&self) -> Result<AsyncApiCallOutput> {
+    pub fn get_conversion(&self) -> Result<crate::types::AsyncApiCallOutput> {
         todo!()
     }
 
@@ -43,7 +43,7 @@ impl File {
     }
 
     #[doc = "Get a file conversion for your user.\n\nGet the status and output of an async file conversion. If completed, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user."]
-    pub fn get_conversion_for_user(&self) -> Result<AsyncApiCallOutput> {
+    pub fn get_conversion_for_user(&self) -> Result<crate::types::AsyncApiCallOutput> {
         todo!()
     }
 }
