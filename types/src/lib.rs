@@ -119,11 +119,8 @@ pub fn get_type_name_for_schema(
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Number(n)) => get_type_name_for_number(n),
         openapiv3::SchemaKind::Type(openapiv3::Type::Integer(i)) => get_type_name_for_integer(i),
-        openapiv3::SchemaKind::Type(openapiv3::Type::Object(_o)) => {
-            // We have an object type.
-            // Get the name for the object.
-            let ident = get_type_name(name, &schema.schema_data)?;
-            Ok(quote!(#ident))
+        openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
+            get_type_name_for_object(name, o, &schema.schema_data, spec)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Array(a)) => {
             get_type_name_for_array(name, a, spec)
@@ -332,6 +329,46 @@ fn get_type_name_for_integer(i: &openapiv3::IntegerType) -> Result<proc_macro2::
     };
 
     Ok(t)
+}
+
+/// Get the type name for an object type.
+fn get_type_name_for_object(
+    name: &str,
+    o: &openapiv3::ObjectType,
+    data: &openapiv3::SchemaData,
+    spec: &openapiv3::OpenAPI,
+) -> Result<proc_macro2::TokenStream> {
+    // If the object has no properties, but has additional_properties, just use that
+    // for the type.
+    if o.properties.is_empty() {
+        if let Some(additional_properties) = &o.additional_properties {
+            match additional_properties {
+                openapiv3::AdditionalProperties::Any(any) => {
+                    anyhow::bail!(
+                        "additional_properties is not supported for any type: {:?}",
+                        any
+                    );
+                }
+                openapiv3::AdditionalProperties::Schema(schema) => {
+                    let t = if let Ok(reference) = schema.reference() {
+                        let ident = format_ident!("{}", proper_name(&reference));
+                        quote!(#ident)
+                    } else {
+                        get_type_name_for_schema(name, schema.item()?, spec)?
+                    };
+
+                    // The additional properties is a HashMap of the key to the value.
+                    // Where the key is a string.
+                    return Ok(quote!(std::collections::HashMap<String, #t>));
+                }
+            }
+        }
+    }
+
+    // We have an object type.
+    // Get the name for the object.
+    let ident = get_type_name(name, data)?;
+    Ok(quote!(#ident))
 }
 
 /// Get the type name for an array type.
@@ -556,7 +593,6 @@ fn render_object(
     data: &openapiv3::SchemaData,
     spec: &openapiv3::OpenAPI,
 ) -> Result<proc_macro2::TokenStream> {
-    // TODO: additional properties
     // TODO: min/max properties
 
     let description = if let Some(d) = &data.description {
@@ -567,6 +603,25 @@ fn render_object(
 
     // Get the proper name version of the name of the object.
     let struct_name = get_type_name(name, data)?;
+
+    // If the object has no properties, but has additional_properties, just use that
+    // for the type.
+    if o.properties.is_empty() {
+        if let Some(additional_properties) = &o.additional_properties {
+            match additional_properties {
+                openapiv3::AdditionalProperties::Any(any) => {
+                    anyhow::bail!(
+                        "additional_properties is not supported for any type: {:?}",
+                        any
+                    );
+                }
+                openapiv3::AdditionalProperties::Schema(schema) => {
+                    let rendered = render_schema(name, schema.item()?, spec)?;
+                    return Ok(rendered);
+                }
+            }
+        }
+    }
 
     let mut values = quote!();
     for (k, v) in &o.properties {

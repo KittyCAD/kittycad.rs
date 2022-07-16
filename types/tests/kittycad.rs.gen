@@ -718,7 +718,7 @@ pub struct Connection {
     http_host: String,
     #[doc = "The http port of the server."]
     http_port: i64,
-    http_req_stats: HttpReqStats,
+    http_req_stats: std::collections::HashMap<String, i64>,
     #[doc = "The https port of the server."]
     https_port: i64,
     #[doc = "The count of inbound bytes for the server."]
@@ -1270,7 +1270,7 @@ pub struct Customer {
     #[doc = "Unique identifier for the object."]
     id: String,
     #[doc = "Set of key-value pairs."]
-    metadata: Metadata,
+    metadata: std::collections::HashMap<String, String>,
     #[doc = "The customer's full name or business name."]
     name: String,
     #[doc = "The customer's phone number."]
@@ -1450,7 +1450,7 @@ pub struct DockerSystemInfo {
     product_license: String,
     registry_config: RegistryConfig,
     runc_commit: RuncCommit,
-    runtimes: Runtimes,
+    runtimes: std::collections::HashMap<String, Runtime>,
     #[doc = "List of security features that are enabled on the daemon, such as apparmor, seccomp, SELinux, user-namespaces (userns), and rootless.  Additional configuration options for each security feature may be present, and are included as a comma-separated list of key/value pairs."]
     security_options: Vec<String>,
     #[doc = "Version string of the daemon. **Note**: the [standalone Swarm API](https://docs.docker.com/swarm/swarm-api/) returns the Swarm version instead of the daemon  version, for example `swarm/1.2.8`."]
@@ -1961,7 +1961,7 @@ pub struct Invoice {
     #[doc = "The individual line items that make up the invoice.\n\n`lines` is sorted as follows: invoice items in reverse chronological order, followed by the subscription, if any."]
     lines: Vec<InvoiceLineItem>,
     #[doc = "Set of key-value pairs."]
-    metadata: Metadata,
+    metadata: std::collections::HashMap<String, String>,
     #[doc = "A unique, identifying string that appears on emails sent to the customer for this invoice."]
     number: String,
     #[doc = "Whether payment was successfully collected for this invoice.\n\nAn invoice can be paid (most commonly) with a charge or with credit from the customer's account balance."]
@@ -2008,7 +2008,7 @@ pub struct InvoiceLineItem {
     #[doc = "The ID of the invoice item associated with this line item if any."]
     invoice_item: String,
     #[doc = "Set of [key-value pairs](https://stripe.com/docs/api/metadata) that you can attach to an object.\n\nSet of key-value pairs."]
-    metadata: Metadata,
+    metadata: std::collections::HashMap<String, String>,
 }
 
 #[doc = "An enum representing the possible values of an `Invoice`'s `status` field."]
@@ -2368,7 +2368,7 @@ pub struct PaymentMethod {
     #[doc = "Unique identifier for the object."]
     id: String,
     #[doc = "Set of key-value pairs."]
-    metadata: Metadata,
+    metadata: std::collections::HashMap<String, String>,
     #[doc = "The type of payment method."]
     #[serde(rename = "type")]
     type_: Type,
@@ -2480,7 +2480,7 @@ pub struct RegistryServiceConfig {
     allow_nondistributable_artifacts_cid_rs: Vec<String>,
     #[doc = "List of registry hostnames to which nondistributable artifacts can be pushed, using the format `<hostname>[:<port>]` or `<IP address>[:<port>]`.  Some images (for example, Windows base images) contain artifacts whose distribution is restricted by license. When these images are pushed to a registry, restricted artifacts are not included.  This configuration override this behavior for the specified registries.  This option is useful when pushing images containing nondistributable artifacts to a registry on an air-gapped network so hosts on that network can pull the images without connecting to another server.\n\n**Warning**: Nondistributable artifacts typically have restrictions on how and where they can be distributed and shared. Only use this feature to push artifacts to private registries and ensure that you are in compliance with any terms that cover redistributing nondistributable artifacts."]
     allow_nondistributable_artifacts_hostnames: Vec<String>,
-    index_configs: IndexConfigs,
+    index_configs: std::collections::HashMap<String, IndexInfo>,
     #[doc = "List of IP ranges of insecure registries, using the CIDR syntax ([RFC 4632](https://tools.ietf.org/html/4632)). Insecure registries accept un-encrypted (HTTP) and/or untrusted (HTTPS with certificates from unknown CAs) communication.  By default, local registries (`127.0.0.0/8`) are configured as insecure. All other registries are secure. Communicating with an insecure registry is not possible if the daemon assumes that registry is secure.  This configuration override this behavior, insecure communication with registries whose resolved IP address is within the subnet described by the CIDR syntax.  Registries can also be marked insecure by hostname. Those registries are listed under `IndexConfigs` and have their `Secure` field set to `false`.\n\n**Warning**: Using this option can be useful when running a local  registry, but introduces security vulnerabilities. This option should therefore ONLY be used for testing purposes. For increased security, users should add their CA to their system's list of trusted CAs instead of enabling this option."]
     insecure_registry_cid_rs: Vec<String>,
     #[doc = "List of registry URLs that act as a mirror for the official (`docker.io`) registry."]
