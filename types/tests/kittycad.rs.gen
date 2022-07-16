@@ -176,7 +176,7 @@ pub struct Address {
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The unique identifier of the address."]
     #[serde()]
-    id: Id,
+    id: uuid::Uuid,
     #[doc = "The state component."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     state: Option<String>,
@@ -307,7 +307,7 @@ pub struct ApiCallWithPrice {
     endpoint: Option<String>,
     #[doc = "The unique identifier for the API call."]
     #[serde()]
-    id: Id,
+    id: uuid::Uuid,
     #[doc = "The ip address of the origin."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     ip_address: Option<std::net::Ipv4Addr>,
@@ -343,7 +343,7 @@ pub struct ApiCallWithPrice {
     stripe_invoice_item_id: Option<String>,
     #[doc = "The API token that made the API call."]
     #[serde()]
-    token: Token,
+    token: uuid::Uuid,
     #[doc = "The date and time the API call was last updated."]
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
@@ -400,7 +400,7 @@ pub struct ApiToken {
     is_valid: bool,
     #[doc = "The API token itself."]
     #[serde()]
-    token: Token,
+    token: uuid::Uuid,
     #[doc = "The date and time the API token was last updated."]
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
@@ -454,7 +454,7 @@ pub struct AsyncApiCall {
     error: Option<String>,
     #[doc = "The unique identifier of the async API call.\n\nThis is the same as the API call ID."]
     #[serde()]
-    id: Id,
+    id: uuid::Uuid,
     #[doc = "The JSON input for the API call. These are determined by the endpoint that is run."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     input: Option<serde_json::Value>,
@@ -505,7 +505,7 @@ pub struct FileConversion {
     error: Option<String>,
     #[doc = "The unique identifier of the file conversion.\n\nThis is the same as the API call ID."]
     #[serde()]
-    id: Id,
+    id: uuid::Uuid,
     #[doc = "The converted file, if completed, base64 encoded."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     output: Option<base64::Base64Data>,
@@ -555,7 +555,7 @@ pub struct FileMass {
     error: Option<String>,
     #[doc = "The unique identifier of the mass request.\n\nThis is the same as the API call ID."]
     #[serde()]
-    id: Id,
+    id: uuid::Uuid,
     #[doc = "The resulting mass."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     mass: Option<f64>,
@@ -605,7 +605,7 @@ pub struct FileVolume {
     error: Option<String>,
     #[doc = "The unique identifier of the volume request.\n\nThis is the same as the API call ID."]
     #[serde()]
-    id: Id,
+    id: uuid::Uuid,
     #[doc = "The source format of the file."]
     #[serde()]
     src_format: SrcFormat,
@@ -655,7 +655,7 @@ pub struct FileDensity {
     error: Option<String>,
     #[doc = "The unique identifier of the density request.\n\nThis is the same as the API call ID."]
     #[serde()]
-    id: Id,
+    id: uuid::Uuid,
     #[doc = "The material mass as denoted by the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     material_mass: Option<f64>,
@@ -2073,7 +2073,7 @@ pub struct FileConversion {
     error: Option<String>,
     #[doc = "The unique identifier of the file conversion.\n\nThis is the same as the API call ID."]
     #[serde()]
-    id: Id,
+    id: uuid::Uuid,
     #[doc = "The converted file, if completed, base64 encoded."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     output: Option<base64::Base64Data>,
@@ -2124,7 +2124,7 @@ pub struct FileDensity {
     error: Option<String>,
     #[doc = "The unique identifier of the density request.\n\nThis is the same as the API call ID."]
     #[serde()]
-    id: Id,
+    id: uuid::Uuid,
     #[doc = "The material mass as denoted by the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     material_mass: Option<f64>,
@@ -2169,7 +2169,7 @@ pub struct FileMass {
     error: Option<String>,
     #[doc = "The unique identifier of the mass request.\n\nThis is the same as the API call ID."]
     #[serde()]
-    id: Id,
+    id: uuid::Uuid,
     #[doc = "The resulting mass."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     mass: Option<f64>,
@@ -2304,7 +2304,7 @@ pub struct FileVolume {
     error: Option<String>,
     #[doc = "The unique identifier of the volume request.\n\nThis is the same as the API call ID."]
     #[serde()]
-    id: Id,
+    id: uuid::Uuid,
     #[doc = "The source format of the file."]
     #[serde()]
     src_format: SrcFormat,
@@ -3081,7 +3081,7 @@ pub struct Session {
     id: Option<String>,
     #[doc = "The session token."]
     #[serde()]
-    session_token: SessionToken,
+    session_token: uuid::Uuid,
     #[doc = "The date and time the session was last updated."]
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
@@ -3218,7 +3218,7 @@ pub struct UnitConversion {
     error: Option<String>,
     #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
     #[serde()]
-    id: Id,
+    id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     input: Option<f64>,
