@@ -1,6 +1,6 @@
 #![doc = r" This module contains the generated types for the library."]
 use tabled::Tabled;
-mod base64 {
+pub mod base64 {
     #![doc = " Base64 data that encodes to url safe base64, but can decode from multiple"]
     #![doc = " base64 implementations to account for various clients and libraries. Compatible"]
     #![doc = " with serde and JsonSchema."]
@@ -129,7 +129,7 @@ mod base64 {
     }
 }
 
-mod paginate {
+pub mod paginate {
     #![doc = " Utility functions used for pagination."]
     use anyhow::Result;
     #[doc = " A trait for types that allow pagination."]
