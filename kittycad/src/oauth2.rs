@@ -28,17 +28,26 @@ impl Oauth2 {
     }
 
     #[doc = "Verify an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website."]
-    pub fn device_auth_verify(&self) -> Result<()> {
+    pub fn device_auth_verify(&self, _user_code: String) -> Result<()> {
         todo!()
     }
 
     #[doc = "Listen for callbacks for the OAuth 2.0 provider."]
-    pub fn listen_provider_callback(&self) -> Result<()> {
+    pub fn listen_provider_callback(
+        &self,
+        _provider: crate::types::AccountProvider,
+        _code: Option<String>,
+        _state: Option<String>,
+    ) -> Result<()> {
         todo!()
     }
 
     #[doc = "Get the consent URL and other information for the OAuth 2.0 provider."]
-    pub fn listen_provider_consent(&self) -> Result<crate::types::Oauth2ClientInfo> {
+    pub fn listen_provider_consent(
+        &self,
+        _provider: crate::types::AccountProvider,
+        _callback_url: Option<String>,
+    ) -> Result<crate::types::Oauth2ClientInfo> {
         todo!()
     }
 }

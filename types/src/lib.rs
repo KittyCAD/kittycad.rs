@@ -1017,7 +1017,8 @@ fn clean_text(s: &str) -> String {
     }
 }
 
-fn get_text(output: &proc_macro2::TokenStream) -> Result<String> {
+/// Get the type name as a string.
+pub fn get_text(output: &proc_macro2::TokenStream) -> Result<String> {
     let content = output.to_string();
 
     Ok(clean_text(&content).replace(' ', ""))

@@ -48,7 +48,7 @@ impl Payments {
     }
 
     #[doc = "Delete a payment method for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the specified payment method for the authenticated user."]
-    pub fn delete_payment_method_for_user(&self) -> Result<()> {
+    pub fn delete_payment_method_for_user(&self, _id: String) -> Result<()> {
         todo!()
     }
 }

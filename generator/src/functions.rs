@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use anyhow::Result;
-use types::exts::ReferenceOrExt;
+use types::exts::{ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt};
 
 /*
  * Generate a function for each Operation.
@@ -36,15 +36,12 @@ pub fn generate_files(spec: &openapiv3::OpenAPI) -> Result<BTreeMap<String, Stri
             // Get the response for the function.
             let response_type = get_response_type(op, spec)?;
 
-            /* let function = quote! {
-                #docs
-                pub fn #name(#(#(#args),*),*) -> #return_type {
-                    #body
-                }
-            };*/
+            // Get the function args.
+            let args = get_args(op, spec)?;
+
             let function = quote! {
                 #[doc = #docs]
-                pub fn #fn_name_ident(&self) -> Result<#response_type> {
+                pub fn #fn_name_ident(&self, #(#args),*) -> Result<#response_type> {
                     todo!()
                 }
             };
@@ -195,4 +192,56 @@ impl StatusCodeExt for openapiv3::StatusCode {
             openapiv3::StatusCode::Range(r) => r.to_string().starts_with("2"),
         }
     }
+}
+
+/// Return the function arguments for the operation.
+fn get_args(
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<Vec<proc_macro2::TokenStream>> {
+    let mut args = vec![];
+
+    // Let's get the arguments for the function.
+    for parameter in &op.parameters {
+        // Get the parameter.
+        let parameter = match parameter {
+            openapiv3::ReferenceOr::Reference { reference } => {
+                anyhow::bail!(
+                    "parameter `{}` is a reference and not supported yet",
+                    reference
+                )
+            }
+            openapiv3::ReferenceOr::Item(r) => r,
+        };
+
+        // Get the data for the parameter.
+        let data = parameter.data()?;
+
+        let name = types::clean_property_name(&data.name);
+        let name_ident = format_ident!("{}", name);
+        // Get the schema for the parameter.
+        let schema = data.format.schema()?;
+
+        // Get the type for the parameter.
+        let mut t = match schema {
+            openapiv3::ReferenceOr::Reference { .. } => {
+                types::get_type_name_from_reference(&schema.reference()?, spec, false)?
+            }
+            openapiv3::ReferenceOr::Item(s) => {
+                types::get_type_name_for_schema("", &s, spec, false)?
+            }
+        };
+
+        // Make it an option if it's optional.
+        if !data.required && !types::get_text(&t)?.starts_with("Option<") {
+            t = quote!(Option<#t>);
+        }
+
+        // Add the argument to the list.
+        args.push(quote! {
+            #name_ident: #t
+        });
+    }
+
+    Ok(args)
 }

@@ -18,7 +18,12 @@ impl Hidden {
     }
 
     #[doc = "Listen for callbacks for email verification for users."]
-    pub fn listen_auth_email_callback(&self) -> Result<()> {
+    pub fn listen_auth_email_callback(
+        &self,
+        _callback_url: Option<url::Url>,
+        _email: String,
+        _token: String,
+    ) -> Result<()> {
         todo!()
     }
 
