@@ -713,9 +713,10 @@ fn render_object(
 
     // TODO: defaults
 
+    // TODO: tabled
     let rendered = quote! {
         #description
-        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Hash, Debug, Clone, schemars::JsonSchema, tabled::Tabled)]
+        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone, schemars::JsonSchema)]
         pub struct #struct_name {
             #values
         }
