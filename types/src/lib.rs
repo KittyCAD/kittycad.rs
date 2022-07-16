@@ -21,22 +21,13 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
             // Let's get the schema from the reference.
             let schema = schema.get_schema_from_reference(spec, true)?;
             // Let's handle all the kinds of schemas.
-            // TODO: handle the error
-            if let Ok(t) = render_schema(name, &schema, spec) {
-                // Add it to our rendered types.
-                rendered = quote! {
-                    #rendered
-
-                    #t
-                };
-            }
-            /*let t = render_schema(name, &schema, spec)?;
+            let t = render_schema(name, &schema, spec)?;
             // Add it to our rendered types.
             rendered = quote! {
                 #rendered
 
                 #t
-            };*/
+            };
         }
     }
 
@@ -73,14 +64,10 @@ pub fn render_schema(
             // We don't render booleans yet, since it is a primitive type.
             Ok(quote!())
         }
-        openapiv3::SchemaKind::OneOf { one_of: _ } => {
-            println!("{} => OneOf", name);
-            anyhow::bail!("XXX one of not supported yet");
+        openapiv3::SchemaKind::OneOf { one_of } => {
+            render_one_of(name, one_of, &schema.schema_data, spec)
         }
-        openapiv3::SchemaKind::AllOf { all_of: _ } => {
-            println!("{} => AllOf", name);
-            anyhow::bail!("XXX all of not supported yet");
-        }
+        openapiv3::SchemaKind::AllOf { all_of } => render_all_of(name, all_of, &schema.schema_data),
         openapiv3::SchemaKind::AnyOf { any_of: _ } => {
             println!("{} => AnyOf", name);
             anyhow::bail!("XXX any of not supported yet");
@@ -89,9 +76,9 @@ pub fn render_schema(
             println!("{} => Not", name);
             anyhow::bail!("XXX not not supported yet");
         }
-        openapiv3::SchemaKind::Any(_any) => {
+        openapiv3::SchemaKind::Any(any) => {
             println!("{} => Any", name);
-            anyhow::bail!("XXX any not supported yet");
+            anyhow::bail!("XXX any not supported yet: {:?}", any);
         }
     }
 }
@@ -100,6 +87,7 @@ pub fn render_schema(
 pub fn get_type_name_for_schema(
     name: &str,
     schema: &openapiv3::Schema,
+    spec: &openapiv3::OpenAPI,
 ) -> Result<proc_macro2::TokenStream> {
     match &schema.schema_kind {
         openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
@@ -118,16 +106,26 @@ pub fn get_type_name_for_schema(
             Ok(quote!(#ident))
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Array(a)) => {
-            get_type_name_for_array(name, a, &schema.schema_data)
+            get_type_name_for_array(name, a, &schema.schema_data, spec)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => Ok(quote!(bool)),
-        openapiv3::SchemaKind::OneOf { one_of: _ } => {
-            println!("{} => OneOf", name);
-            anyhow::bail!("XXX one of not supported yet");
+        openapiv3::SchemaKind::OneOf { one_of } => {
+            if one_of.len() != 1 {
+                anyhow::bail!("XXX one of with more than one value not supported yet");
+            }
+
+            let internal_schema = &one_of[0].get_schema_from_reference(spec, true)?;
+            let ident = get_type_name(name, &internal_schema.schema_data)?;
+            Ok(quote!(#ident))
         }
-        openapiv3::SchemaKind::AllOf { all_of: _ } => {
-            println!("{} => AllOf", name);
-            anyhow::bail!("XXX all of not supported yet");
+        openapiv3::SchemaKind::AllOf { all_of } => {
+            if all_of.len() != 1 {
+                anyhow::bail!("XXX all of with more than one value not supported yet");
+            }
+
+            let internal_schema = &all_of[0].get_schema_from_reference(spec, true)?;
+            let ident = get_type_name(name, &internal_schema.schema_data)?;
+            Ok(quote!(#ident))
         }
         openapiv3::SchemaKind::AnyOf { any_of: _ } => {
             println!("{} => AnyOf", name);
@@ -137,10 +135,7 @@ pub fn get_type_name_for_schema(
             println!("{} => Not", name);
             anyhow::bail!("XXX not not supported yet");
         }
-        openapiv3::SchemaKind::Any(_any) => {
-            println!("{} => Any", name);
-            anyhow::bail!("XXX any not supported yet");
-        }
+        openapiv3::SchemaKind::Any(_any) => Ok(quote!(serde_json::Value)),
     }
 }
 
@@ -245,7 +240,19 @@ fn get_type_name_for_number(
         }
         openapiv3::VariantOrUnknownOrEmpty::Empty => quote!(f64),
         openapiv3::VariantOrUnknownOrEmpty::Unknown(f) => {
-            anyhow::bail!("XXX unknown number format {}", f)
+            let width = match f.as_str() {
+                "f32" => 32,
+                "f64" => 64,
+                "money-usd" => 64,
+                /* int32 and int64 are build it and parse as the integer type */
+                f => anyhow::bail!("unknown number format {}", f),
+            };
+
+            match width {
+                32 => quote!(f32),
+                64 => quote!(f64),
+                _ => anyhow::bail!("unknown number width {}", width),
+            }
         }
     };
 
@@ -298,6 +305,10 @@ fn get_type_name_for_integer(
                     uint = false;
                     width = 16;
                 }
+                "duration" => {
+                    uint = false;
+                    width = 64;
+                }
                 /* int32 and int64 are build it and parse as the integer type */
                 f => anyhow::bail!("unknown integer format {}", f),
             }
@@ -330,6 +341,7 @@ fn get_type_name_for_array(
     name: &str,
     a: &openapiv3::ArrayType,
     data: &openapiv3::SchemaData,
+    spec: &openapiv3::OpenAPI,
 ) -> Result<proc_macro2::TokenStream> {
     println!("{} => Array", name);
     println!("{} => {:?}", name, a);
@@ -337,12 +349,228 @@ fn get_type_name_for_array(
 
     // Make sure we have a reference for our type.
     if let Some(ref s) = a.items {
-        let reference = format_ident!("{}", s.reference()?);
-        return Ok(quote!(#reference));
+        if let Ok(r) = s.reference() {
+            let reference = format_ident!("{}", r);
+            return Ok(quote!(Vec<#reference>));
+        } else {
+            // We have an item.
+            let item = s.item()?;
+            // Get the type name for the item.
+            let t = get_type_name_for_schema(name, item, spec)?;
+            return Ok(quote!(Vec<#t>));
+        }
     }
 
     // This should never happen, but who knows.
     anyhow::bail!("no items in array, cannot get type name")
+}
+
+/// Render the full type for an all of.
+fn render_all_of(
+    name: &str,
+    all_of: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
+    data: &openapiv3::SchemaData,
+) -> Result<proc_macro2::TokenStream> {
+    println!("{} => AllOf", name);
+    println!("{} => {:?}", name, all_of);
+    println!("{} => {:?}", name, data);
+
+    anyhow::bail!("XXX all of not implemented")
+}
+
+/// Render the full type for a one of.
+fn render_one_of(
+    name: &str,
+    one_of: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
+    data: &openapiv3::SchemaData,
+    spec: &openapiv3::OpenAPI,
+) -> Result<proc_macro2::TokenStream> {
+    println!("{} => OneOf", name);
+    println!("{} => {:?}", name, one_of);
+    println!("{} => {:?}", name, data);
+
+    let description = if let Some(d) = &data.description {
+        quote!(#[doc = #d])
+    } else {
+        quote!()
+    };
+
+    // Get the proper name version of the type.
+    let one_of_name = get_type_name(name, data)?;
+
+    // Any additional types we might need for rendering this type.
+    let mut additional_types = quote!();
+
+    let mut tag = "".to_string();
+    // TODO: should we set the content?, like if its a object w only 2 properties, the one that is
+    // not the tag should be the content.
+
+    for o in one_of {
+        // Get the schema for this OneOf.
+        let schema = o.get_schema_from_reference(spec, true)?;
+        // Determine if we can do anything fancy with the resulting enum and flatten it.
+        if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = schema.schema_kind {
+            // If the object contains a property that is an enum of 1, then that is the tag.
+            for (k, v) in &o.properties {
+                // Get the schema for the property.
+                let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
+                    let s = &**i;
+                    s.clone()
+                } else {
+                    v.get_schema_from_reference(spec, true)?
+                };
+
+                if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
+                    inner_schema.schema_kind
+                {
+                    if s.enumeration.len() == 1 {
+                        tag = k.to_string();
+                    }
+                }
+            }
+        }
+    }
+
+    let serde_options = if !tag.is_empty() {
+        quote!(#[serde(tag = #tag)])
+    } else {
+        quote!()
+    };
+
+    let mut values = quote!();
+    for o in one_of {
+        // Get the schema for this OneOf.
+        let schema = o.get_schema_from_reference(spec, true)?;
+
+        // If we have a tag use the value of that property for the enum.
+        let tag_name = if !tag.is_empty() {
+            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
+                // Get the value of this tag.
+                let v = match o.properties.get(&tag) {
+                    Some(v) => v,
+                    None => {
+                        anyhow::bail!(
+                            "no property `{}` in object, even through we thought we had a tag",
+                            tag
+                        );
+                    }
+                };
+
+                // Get the single value from the enum.
+                let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
+                    let s = &**i;
+                    s.clone()
+                } else {
+                    v.get_schema_from_reference(spec, true)?
+                };
+
+                if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
+                    inner_schema.schema_kind
+                {
+                    if s.enumeration.len() == 1 {
+                        s.enumeration[0]
+                            .as_ref()
+                            .map(|s| s.to_string())
+                            .unwrap_or_default()
+                    } else {
+                        anyhow::bail!("enumeration for tag `{}` is not a single value", tag);
+                    }
+                } else {
+                    anyhow::bail!("enumeration for tag `{}` is not a string", tag);
+                }
+            } else {
+                anyhow::bail!("one of schema `{:?}` is not an object", schema);
+            }
+        } else {
+            "".to_string()
+        };
+
+        let o_type = if let openapiv3::ReferenceOr::Reference { .. } = o {
+            // If the one of is a reference just use the reference.
+            let reference = o.reference()?;
+            let reference_name = format_ident!("{}", proper_name(&reference));
+
+            if !tag_name.is_empty() {
+                let p = proper_name(&tag_name);
+                let n = format_ident!("{}", proper_name(&tag_name));
+                if p != tag_name {
+                    // Rename serde to the correct tag name.
+                    quote!(
+                        #[serde(rename = #tag_name)]
+                        #n(#reference_name),
+                    )
+                } else {
+                    quote!(
+                        #n(#reference_name),
+                    )
+                }
+            } else {
+                quote!(
+                    #reference_name(#reference_name),
+                )
+            }
+        } else {
+            // We don't have a reference, we have an item.
+            // We need to expand the item.
+            let rendered_type = match &schema.schema_kind {
+                openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
+                    if tag_name.is_empty() {
+                        anyhow::bail!("no tag name for one of `{:?}`", schema);
+                    }
+
+                    // Ensure we have a type for this type.
+                    let obj = render_object(&tag_name, o, &schema.schema_data, spec)?;
+                    additional_types = quote!(
+                        #additional_types
+
+                        #obj
+                    );
+
+                    // Return the type name.
+                    let ident = format_ident!("{}", proper_name(&tag_name));
+                    quote!(#ident)
+                }
+                _ => get_type_name_for_schema("", &schema, spec)?,
+            };
+
+            if !tag_name.is_empty() {
+                let p = proper_name(&tag_name);
+                let n = format_ident!("{}", proper_name(&tag_name));
+                if p != tag_name {
+                    // Rename serde to the correct tag name.
+                    quote!(
+                        #[serde(rename = #tag_name)]
+                        #n(#rendered_type),
+                    )
+                } else {
+                    quote!(
+                        #n(#rendered_type),
+                    )
+                }
+            } else {
+                anyhow::bail!("no tag name for one of `{:?}`", schema);
+            }
+        };
+
+        values = quote!(
+            #values
+
+            #o_type
+        );
+    }
+
+    let rendered = quote! {
+        #additional_types
+
+        #description
+        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Hash, Debug, Clone, schemars::JsonSchema, tabled::Tabled)]
+        #serde_options
+        pub enum #one_of_name {
+            #values
+        }
+    };
+
+    Ok(rendered)
 }
 
 /// Render the full type for an object.
@@ -356,13 +584,16 @@ fn render_object(
     println!("{} => {:?}", name, o);
     println!("{} => {:?}", name, data);
 
+    // TODO: additional properties
+    // TODO: min/max properties
+
     let description = if let Some(d) = &data.description {
         quote!(#[doc = #d])
     } else {
         quote!()
     };
 
-    // Get the proper name version of the name of the enum.
+    // Get the proper name version of the name of the object.
     let struct_name = get_type_name(name, data)?;
 
     let mut values = quote!();
@@ -370,22 +601,21 @@ fn render_object(
         let prop = clean_property_name(k);
 
         // Get the schema for the property.
-        let schema = if let openapiv3::ReferenceOr::Item(i) = v {
+        let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
             let s = &**i;
             s.clone()
         } else {
             v.get_schema_from_reference(spec, true)?
         };
-        println!("OBJ {} => {:?}", prop, schema);
 
-        let prop_desc = if let Some(d) = &schema.schema_data.description {
+        let prop_desc = if let Some(d) = &inner_schema.schema_data.description {
             quote!(#[doc = #d])
         } else {
             quote!()
         };
 
         // Get the type name for the schema.
-        let mut type_name = get_type_name_for_schema(&prop, &schema)?;
+        let mut type_name = get_type_name_for_schema(&prop, &inner_schema, spec)?;
         // Check if this type is required.
         if !o.required.contains(k) && get_text(&type_name)?.starts_with("Option<") {
             // Make the type optional.
