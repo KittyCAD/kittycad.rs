@@ -680,17 +680,19 @@ fn render_object(
         let mut prop_value = quote!(
             #prop_ident: #type_name,
         );
+
+        let mut serde_props = Vec<proc_macro2::TokenStream>::new();
         if &prop != k {
-            prop_value = quote!(
-                #[serde(rename = #k)]
-                #prop_value
-            );
+            serde_props.push(quote!(
+                rename = #k
+            ));
         }
 
         values = quote!(
             #values
 
             #prop_desc
+            #[serde(#(#serde_props),*)]
             #prop_value
         );
     }
