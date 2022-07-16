@@ -1,9 +1,10 @@
+//! A library for generating rust client sdks from OpenAPI specs.
 #![deny(missing_docs)]
 
-mod client;
-mod functions;
-mod template;
-mod types;
+pub mod client;
+pub mod functions;
+pub mod template;
+pub mod types;
 
 #[macro_use]
 extern crate quote;
@@ -20,6 +21,9 @@ use inflector::cases::snakecase::to_snake_case;
 use openapiv3::OpenAPI;
 use serde::Deserialize;
 
+use crate::types::exts::ReferenceOrExt;
+
+/// Save a file.
 fn save<P>(p: P, data: &str) -> Result<()>
 where
     P: AsRef<Path>,
@@ -35,6 +39,7 @@ where
     Ok(())
 }
 
+/// Load a file.
 fn load<P, T>(p: P) -> Result<T>
 where
     P: AsRef<Path>,
@@ -50,6 +55,7 @@ where
     Ok(serde_json::from_reader(f)?)
 }
 
+/// Load an OpenAPI spec.
 fn load_api<P>(p: P) -> Result<OpenAPI>
 where
     P: AsRef<Path>,
@@ -57,175 +63,8 @@ where
     load(p)
 }
 
-trait ExtractJsonMediaType {
-    fn is_binary(&self) -> Result<bool>;
-    fn content_json(&self) -> Result<openapiv3::MediaType>;
-}
-
-impl ExtractJsonMediaType for openapiv3::Response {
-    fn content_json(&self) -> Result<openapiv3::MediaType> {
-        // We do not need to check the length of the content because there might be
-        // more than one. For example, if xml or some other format is also defined.
-        if let Some(mt) = self.content.get("application/json") {
-            Ok(mt.clone())
-        } else {
-            bail!(
-                "could not find application/json, only found {}",
-                self.content.keys().next().unwrap()
-            );
-        }
-    }
-
-    fn is_binary(&self) -> Result<bool> {
-        if self.content.is_empty() {
-            /*
-             * XXX If there are no content types, I guess it is not binary?
-             */
-            return Ok(false);
-        }
-
-        // We do not need to check the length of the content because there might be
-        // more than one. For example, if xml or some other format is also defined.
-        if let Some(mt) = self.content.get("application/octet-stream") {
-            if !mt.encoding.is_empty() {
-                bail!("XXX encoding");
-            }
-
-            if let Some(s) = &mt.schema {
-                use openapiv3::{SchemaKind, StringFormat, Type, VariantOrUnknownOrEmpty::Item};
-
-                if let Ok(s) = s.item() {
-                    if s.schema_data.nullable {
-                        bail!("XXX nullable binary?");
-                    }
-                    if s.schema_data.default.is_some() {
-                        bail!("XXX default binary?");
-                    }
-                    if s.schema_data.discriminator.is_some() {
-                        bail!("XXX binary discriminator?");
-                    }
-                    match &s.schema_kind {
-                        SchemaKind::Type(Type::String(st)) => {
-                            if st.min_length.is_some() || st.max_length.is_some() {
-                                bail!("binary min/max length");
-                            }
-                            if !matches!(st.format, Item(StringFormat::Binary)) {
-                                bail!("expected binary format string, got {:?}", st.format);
-                            }
-                            if st.pattern.is_some() {
-                                bail!("XXX pattern");
-                            }
-                            if !st.enumeration.is_empty() {
-                                bail!("XXX binary enumeration {:?}", st);
-                            }
-                            return Ok(true);
-                        }
-                        x => {
-                            bail!("XXX schemakind type {:?}", x);
-                        }
-                    }
-                } else {
-                    return Ok(false);
-                }
-            } else {
-                bail!("binary thing had no schema?");
-            }
-        }
-
-        Ok(false)
-    }
-}
-
-impl ExtractJsonMediaType for openapiv3::RequestBody {
-    fn content_json(&self) -> Result<openapiv3::MediaType> {
-        // We do not need to check the length of the content because there might be
-        // more than one. For example, if xml or some other format is also defined.
-        if let Some(mt) = self.content.get("application/json") {
-            Ok(mt.clone())
-        } else {
-            bail!(
-                "could not find application/json, only found {}",
-                self.content.keys().next().unwrap()
-            );
-        }
-    }
-
-    fn is_binary(&self) -> Result<bool> {
-        if self.content.is_empty() {
-            /*
-             * XXX If there are no content types, I guess it is not binary?
-             */
-            return Ok(false);
-        }
-
-        // We do not need to check the length of the content because there might be
-        // more than one. For example, if xml or some other format is also defined.
-        if let Some(mt) = self.content.get("application/octet-stream") {
-            if !mt.encoding.is_empty() {
-                bail!("XXX encoding");
-            }
-
-            if let Some(s) = &mt.schema {
-                use openapiv3::{SchemaKind, StringFormat, Type, VariantOrUnknownOrEmpty::Item};
-
-                if let Ok(s) = s.item() {
-                    if s.schema_data.nullable {
-                        bail!("XXX nullable binary?");
-                    }
-                    if s.schema_data.default.is_some() {
-                        bail!("XXX default binary?");
-                    }
-                    if s.schema_data.discriminator.is_some() {
-                        bail!("XXX binary discriminator?");
-                    }
-                    match &s.schema_kind {
-                        SchemaKind::Type(Type::String(st)) => {
-                            if st.min_length.is_some() || st.max_length.is_some() {
-                                bail!("binary min/max length");
-                            }
-                            if !matches!(st.format, Item(StringFormat::Binary)) {
-                                bail!("expected binary format string, got {:?}", st.format);
-                            }
-                            if st.pattern.is_some() {
-                                bail!("XXX pattern");
-                            }
-                            if !st.enumeration.is_empty() {
-                                bail!("XXX enumeration");
-                            }
-                            return Ok(true);
-                        }
-                        x => {
-                            bail!("XXX schemakind type {:?}", x);
-                        }
-                    }
-                } else {
-                    return Ok(false);
-                }
-            } else {
-                bail!("binary thing had no schema?");
-            }
-        }
-
-        Ok(false)
-    }
-}
-
-trait ReferenceOrExt<T> {
-    fn item(&self) -> Result<&T>;
-}
-
-impl<T> ReferenceOrExt<T> for openapiv3::ReferenceOr<T> {
-    fn item(&self) -> Result<&T> {
-        match self {
-            openapiv3::ReferenceOr::Item(i) => Ok(i),
-            openapiv3::ReferenceOr::Reference { reference } => {
-                bail!("reference not supported here: {}", reference);
-            }
-        }
-    }
-}
-
-fn gen(api: &OpenAPI) -> Result<String> {
+/// Generate a client library.
+pub fn generate(api: &OpenAPI) -> Result<String> {
     let mut out = String::new();
 
     let mut a = |s: &str| {

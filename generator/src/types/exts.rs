@@ -302,3 +302,18 @@ impl ParameterExt for &openapiv3::Parameter {
         }
     }
 }
+
+/// A trait for utility functions on status codes.
+pub trait StatusCodeExt {
+    /// Returns `true` if the HTTP status code was successful.
+    fn is_success(&self) -> bool;
+}
+
+impl StatusCodeExt for openapiv3::StatusCode {
+    fn is_success(&self) -> bool {
+        match self {
+            openapiv3::StatusCode::Code(c) => (&200..&300).contains(&c),
+            openapiv3::StatusCode::Range(r) => r.to_string().starts_with('2'),
+        }
+    }
+}

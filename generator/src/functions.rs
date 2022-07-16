@@ -1,11 +1,14 @@
+//! Utilities for generating rust functions from an OpenAPI spec.
+
 use std::{collections::BTreeMap, fmt::Write as _};
 
-use crate::types::exts::{ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt};
 use anyhow::Result;
 
-/*
- * Generate a function for each Operation.
- */
+use crate::types::exts::{
+    ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt, StatusCodeExt,
+};
+
+/// Generate functions for each path operation.
 pub fn generate_files(spec: &openapiv3::OpenAPI) -> Result<BTreeMap<String, String>> {
     let mut tag_files: BTreeMap<String, String> = Default::default();
 
@@ -201,19 +204,6 @@ fn get_response_type(
 
     // We couldn't find a type for the response.
     Ok(None)
-}
-
-pub trait StatusCodeExt {
-    fn is_success(&self) -> bool;
-}
-
-impl StatusCodeExt for openapiv3::StatusCode {
-    fn is_success(&self) -> bool {
-        match self {
-            openapiv3::StatusCode::Code(c) => (&200..&300).contains(&c),
-            openapiv3::StatusCode::Range(r) => r.to_string().starts_with('2'),
-        }
-    }
 }
 
 /// Return the function arguments for the operation.

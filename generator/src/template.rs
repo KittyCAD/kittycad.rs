@@ -1,3 +1,5 @@
+//! Templates for our generated client libraries.
+
 use std::fmt::Write as _;
 
 use anyhow::Result;
@@ -133,6 +135,7 @@ fn generate_docs_openapi_info(
     ))
 }
 
+/// Generate the main docs for our client library.
 pub fn generate_docs(
     api: &openapiv3::OpenAPI,
     name: &str,

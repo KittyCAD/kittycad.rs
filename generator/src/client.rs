@@ -1,7 +1,6 @@
-/*
- * Declare the client object:
- */
+//! Client templates for our generated library.
 
+/// Generate the base of the API client.
 pub fn generate_client() -> String {
     CLIENT_FUNCTIONS.to_string()
 }
