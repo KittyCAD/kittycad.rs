@@ -57,7 +57,6 @@ pub fn render_schema(
             render_object(name, o, &schema.schema_data, spec)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Array(_a)) => {
-            println!("{} => Array", name);
             anyhow::bail!("XXX array not supported yet");
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => {
@@ -67,17 +66,16 @@ pub fn render_schema(
         openapiv3::SchemaKind::OneOf { one_of } => {
             render_one_of(name, one_of, &schema.schema_data, spec)
         }
-        openapiv3::SchemaKind::AllOf { all_of } => render_all_of(name, all_of, &schema.schema_data),
+        openapiv3::SchemaKind::AllOf { all_of: _ } => {
+            anyhow::bail!("XXX all of not supported yet");
+        }
         openapiv3::SchemaKind::AnyOf { any_of: _ } => {
-            println!("{} => AnyOf", name);
             anyhow::bail!("XXX any of not supported yet");
         }
         openapiv3::SchemaKind::Not { not: _ } => {
-            println!("{} => Not", name);
             anyhow::bail!("XXX not not supported yet");
         }
         openapiv3::SchemaKind::Any(any) => {
-            println!("{} => Any", name);
             anyhow::bail!("XXX any not supported yet: {:?}", any);
         }
     }
@@ -93,12 +91,8 @@ pub fn get_type_name_for_schema(
         openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
             get_type_name_for_string(name, s, &schema.schema_data)
         }
-        openapiv3::SchemaKind::Type(openapiv3::Type::Number(n)) => {
-            get_type_name_for_number(name, n, &schema.schema_data)
-        }
-        openapiv3::SchemaKind::Type(openapiv3::Type::Integer(i)) => {
-            get_type_name_for_integer(name, i, &schema.schema_data)
-        }
+        openapiv3::SchemaKind::Type(openapiv3::Type::Number(n)) => get_type_name_for_number(n),
+        openapiv3::SchemaKind::Type(openapiv3::Type::Integer(i)) => get_type_name_for_integer(i),
         openapiv3::SchemaKind::Type(openapiv3::Type::Object(_o)) => {
             // We have an object type.
             // Get the name for the object.
@@ -106,7 +100,7 @@ pub fn get_type_name_for_schema(
             Ok(quote!(#ident))
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Array(a)) => {
-            get_type_name_for_array(name, a, &schema.schema_data, spec)
+            get_type_name_for_array(name, a, spec)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => Ok(quote!(bool)),
         openapiv3::SchemaKind::OneOf { one_of } => {
@@ -128,11 +122,9 @@ pub fn get_type_name_for_schema(
             Ok(quote!(#ident))
         }
         openapiv3::SchemaKind::AnyOf { any_of: _ } => {
-            println!("{} => AnyOf", name);
             anyhow::bail!("XXX any of not supported yet");
         }
         openapiv3::SchemaKind::Not { not: _ } => {
-            println!("{} => Not", name);
             anyhow::bail!("XXX not not supported yet");
         }
         openapiv3::SchemaKind::Any(_any) => Ok(quote!(serde_json::Value)),
@@ -145,10 +137,6 @@ fn render_string_type(
     s: &openapiv3::StringType,
     data: &openapiv3::SchemaData,
 ) -> Result<proc_macro2::TokenStream> {
-    println!("{} => String", name);
-    println!("{} => {:?}", name, s);
-    println!("{} => {:?}", name, data);
-
     if !s.enumeration.is_empty() {
         return render_enum(name, s, data);
     }
@@ -222,15 +210,7 @@ fn get_type_name_for_string(
 }
 
 /// Get the type name for a number type.
-fn get_type_name_for_number(
-    name: &str,
-    n: &openapiv3::NumberType,
-    data: &openapiv3::SchemaData,
-) -> Result<proc_macro2::TokenStream> {
-    println!("{} => Number", name);
-    println!("{} => {:?}", name, n);
-    println!("{} => {:?}", name, data);
-
+fn get_type_name_for_number(n: &openapiv3::NumberType) -> Result<proc_macro2::TokenStream> {
     let t = match &n.format {
         openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::NumberFormat::Float) => {
             quote!(f64)
@@ -260,15 +240,7 @@ fn get_type_name_for_number(
 }
 
 /// Get the type name for an integer type.
-fn get_type_name_for_integer(
-    name: &str,
-    i: &openapiv3::IntegerType,
-    data: &openapiv3::SchemaData,
-) -> Result<proc_macro2::TokenStream> {
-    println!("{} => Integer", name);
-    println!("{} => {:?}", name, i);
-    println!("{} => {:?}", name, data);
-
+fn get_type_name_for_integer(i: &openapiv3::IntegerType) -> Result<proc_macro2::TokenStream> {
     let t = match &i.format {
         openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::IntegerFormat::Int32) => {
             quote!(i32)
@@ -340,13 +312,8 @@ fn get_type_name_for_integer(
 fn get_type_name_for_array(
     name: &str,
     a: &openapiv3::ArrayType,
-    data: &openapiv3::SchemaData,
     spec: &openapiv3::OpenAPI,
 ) -> Result<proc_macro2::TokenStream> {
-    println!("{} => Array", name);
-    println!("{} => {:?}", name, a);
-    println!("{} => {:?}", name, data);
-
     // Make sure we have a reference for our type.
     if let Some(ref s) = a.items {
         if let Ok(r) = s.reference() {
@@ -365,19 +332,6 @@ fn get_type_name_for_array(
     anyhow::bail!("no items in array, cannot get type name")
 }
 
-/// Render the full type for an all of.
-fn render_all_of(
-    name: &str,
-    all_of: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
-    data: &openapiv3::SchemaData,
-) -> Result<proc_macro2::TokenStream> {
-    println!("{} => AllOf", name);
-    println!("{} => {:?}", name, all_of);
-    println!("{} => {:?}", name, data);
-
-    anyhow::bail!("XXX all of not implemented")
-}
-
 /// Render the full type for a one of.
 fn render_one_of(
     name: &str,
@@ -385,10 +339,6 @@ fn render_one_of(
     data: &openapiv3::SchemaData,
     spec: &openapiv3::OpenAPI,
 ) -> Result<proc_macro2::TokenStream> {
-    println!("{} => OneOf", name);
-    println!("{} => {:?}", name, one_of);
-    println!("{} => {:?}", name, data);
-
     let description = if let Some(d) = &data.description {
         quote!(#[doc = #d])
     } else {
@@ -580,10 +530,6 @@ fn render_object(
     data: &openapiv3::SchemaData,
     spec: &openapiv3::OpenAPI,
 ) -> Result<proc_macro2::TokenStream> {
-    println!("{} => Object", name);
-    println!("{} => {:?}", name, o);
-    println!("{} => {:?}", name, data);
-
     // TODO: additional properties
     // TODO: min/max properties
 
