@@ -335,6 +335,32 @@ fn get_function_body(
         quote!()
     };
 
+    // Get the response if there is one.
+    let response = if let Some(response) = get_response(op, spec)? {
+        quote! {
+            // Get the response.
+            let response = rb.send()?;
+            // Get the status code.
+            let status_code = response.status();
+            // Get the body.
+            let body = response.text()?;
+            // Get the type.
+            let type_ = types::get_type_name_for_schema("", &response.headers(), spec, false)?;
+            // Get the result.
+            let result = match status_code {
+                // If the status code is a success, then we return the body.
+                200..=299 => Ok(body),
+                // Otherwise we return the error.
+                _ => Err(anyhow::anyhow!("{} {}", status_code, body)),
+            };
+            // Return the result.
+            result
+        }
+    } else {
+        // Do nothing.
+        quote!()
+    };
+
     Ok(quote! {
         let mut rb = self.client.client.request(
             http::Method::#method_ident,
@@ -351,8 +377,5 @@ fn get_function_body(
 
         // Send the request.
         let resp = self.client.client.execute(req).await?;
-
-        // Get the response.
-        resp.json()?
     })
 }
