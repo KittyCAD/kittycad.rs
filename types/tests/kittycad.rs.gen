@@ -166,10 +166,10 @@ pub enum AccountProvider {
 )]
 pub struct Address {
     #[doc = "The city component."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     city: Option<String>,
     #[doc = "The country component."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     country: Option<String>,
     #[doc = "The time and date the address was created."]
     #[serde()]
@@ -178,22 +178,22 @@ pub struct Address {
     #[serde()]
     id: Id,
     #[doc = "The state component."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     state: Option<String>,
     #[doc = "The first street component."]
-    #[serde(rename = "street1", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "street1", default, skip_serializing_if = "Option::is_none")]
     street_1: Option<String>,
     #[doc = "The second street component."]
-    #[serde(rename = "street2", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "street2", default, skip_serializing_if = "Option::is_none")]
     street_2: Option<String>,
     #[doc = "The time and date the address was last updated."]
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID that this address belongs to."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     user_id: Option<String>,
     #[doc = "The zip component."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     zip: Option<String>,
 }
 
@@ -291,55 +291,55 @@ pub enum ApiCallStatus {
 )]
 pub struct ApiCallWithPrice {
     #[doc = "The date and time the API call completed billing."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The date and time the API call was created."]
     #[serde()]
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The duration of the API call."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     duration: Option<i64>,
     #[doc = "The user's email address."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     email: Option<String>,
     #[doc = "The endpoint requested by the API call."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     endpoint: Option<String>,
     #[doc = "The unique identifier for the API call."]
     #[serde()]
     id: Id,
     #[doc = "The ip address of the origin."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     ip_address: Option<std::net::Ipv4Addr>,
     #[doc = "The HTTP method requsted by the API call."]
     #[serde()]
     method: Method,
     #[doc = "The number of minutes the API call was billed for."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     minutes: Option<i32>,
     #[doc = "The origin of the API call."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     origin: Option<String>,
     #[doc = "The price of the API call."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     price: Option<f64>,
     #[doc = "The request body sent by the API call."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     request_body: Option<String>,
     #[doc = "The request query params sent by the API call."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     request_query_params: Option<String>,
     #[doc = "The response body returned by the API call. We do not store this information if it is above a certain size."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     response_body: Option<String>,
     #[doc = "The date and time the API call started billing."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status code returned by the API call."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     status_code: Option<i32>,
     #[doc = "The Stripe invoice item ID of the API call if it is billable."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     stripe_invoice_item_id: Option<String>,
     #[doc = "The API token that made the API call."]
     #[serde()]
@@ -351,7 +351,7 @@ pub struct ApiCallWithPrice {
     #[serde()]
     user_agent: String,
     #[doc = "The ID of the user that made the API call."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     user_id: Option<String>,
 }
 
@@ -372,7 +372,7 @@ pub struct ApiCallWithPriceResultsPage {
     #[serde()]
     items: Vec<ApiCallWithPrice>,
     #[doc = "token used to fetch the next page of results (if any)"]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     next_page: Option<String>,
 }
 
@@ -393,7 +393,7 @@ pub struct ApiToken {
     #[serde()]
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The unique identifier for the API token."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     id: Option<String>,
     #[doc = "If the token is valid. We never delete API tokens, but we can mark them as invalid. We save them for ever to preserve the history of the API token."]
     #[serde()]
@@ -405,7 +405,7 @@ pub struct ApiToken {
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The ID of the user that owns the API token."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     user_id: Option<String>,
 }
 
@@ -426,7 +426,7 @@ pub struct ApiTokenResultsPage {
     #[serde()]
     items: Vec<ApiToken>,
     #[doc = "token used to fetch the next page of results (if any)"]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     next_page: Option<String>,
 }
 
@@ -444,25 +444,25 @@ pub struct ApiTokenResultsPage {
 )]
 pub struct AsyncApiCall {
     #[doc = "The time and date the async API call was completed."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the async API call was created."]
     #[serde()]
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     error: Option<String>,
     #[doc = "The unique identifier of the async API call.\n\nThis is the same as the API call ID."]
     #[serde()]
     id: Id,
     #[doc = "The JSON input for the API call. These are determined by the endpoint that is run."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     input: Option<serde_json::Value>,
     #[doc = "The JSON output for the API call. These are determined by the endpoint that is run."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     output: Option<serde_json::Value>,
     #[doc = "The time and date the async API call was started."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the async API call."]
     #[serde()]
@@ -474,10 +474,10 @@ pub struct AsyncApiCall {
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the async API call."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     user_id: Option<String>,
     #[doc = "The worker node that is performing or performed the async API call."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     worker: Option<String>,
 }
 
@@ -495,19 +495,19 @@ pub struct AsyncApiCall {
 )]
 pub struct FileConversion {
     #[doc = "The time and date the file conversion was completed."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the file conversion was created."]
     #[serde()]
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     error: Option<String>,
     #[doc = "The unique identifier of the file conversion.\n\nThis is the same as the API call ID."]
     #[serde()]
     id: Id,
     #[doc = "The converted file, if completed, base64 encoded."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     output: Option<base64::Base64Data>,
     #[doc = "The output format of the file conversion."]
     #[serde()]
@@ -516,7 +516,7 @@ pub struct FileConversion {
     #[serde()]
     src_format: SrcFormat,
     #[doc = "The time and date the file conversion was started."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the file conversion."]
     #[serde()]
@@ -527,7 +527,7 @@ pub struct FileConversion {
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the file conversion."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     user_id: Option<String>,
 }
 
@@ -545,28 +545,28 @@ pub struct FileConversion {
 )]
 pub struct FileMass {
     #[doc = "The time and date the mass was completed."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the mass was created."]
     #[serde()]
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     error: Option<String>,
     #[doc = "The unique identifier of the mass request.\n\nThis is the same as the API call ID."]
     #[serde()]
     id: Id,
     #[doc = "The resulting mass."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     mass: Option<f64>,
     #[doc = "The material density as denoted by the user."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     material_density: Option<f64>,
     #[doc = "The source format of the file."]
     #[serde()]
     src_format: SrcFormat,
     #[doc = "The time and date the mass was started."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the mass."]
     #[serde()]
@@ -577,7 +577,7 @@ pub struct FileMass {
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the mass."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     user_id: Option<String>,
 }
 
@@ -595,13 +595,13 @@ pub struct FileMass {
 )]
 pub struct FileVolume {
     #[doc = "The time and date the volume was completed."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the volume was created."]
     #[serde()]
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     error: Option<String>,
     #[doc = "The unique identifier of the volume request.\n\nThis is the same as the API call ID."]
     #[serde()]
@@ -610,7 +610,7 @@ pub struct FileVolume {
     #[serde()]
     src_format: SrcFormat,
     #[doc = "The time and date the volume was started."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the volume."]
     #[serde()]
@@ -621,10 +621,10 @@ pub struct FileVolume {
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the volume."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     user_id: Option<String>,
     #[doc = "The resulting volume."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     volume: Option<f64>,
 }
 
@@ -642,28 +642,28 @@ pub struct FileVolume {
 )]
 pub struct FileDensity {
     #[doc = "The time and date the density was completed."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the density was created."]
     #[serde()]
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The resulting density."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     density: Option<f64>,
     #[doc = "The error the function returned, if any."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     error: Option<String>,
     #[doc = "The unique identifier of the density request.\n\nThis is the same as the API call ID."]
     #[serde()]
     id: Id,
     #[doc = "The material mass as denoted by the user."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     material_mass: Option<f64>,
     #[doc = "The source format of the file."]
     #[serde()]
     src_format: SrcFormat,
     #[doc = "The time and date the density was started."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the density."]
     #[serde()]
@@ -674,7 +674,7 @@ pub struct FileDensity {
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the density."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     user_id: Option<String>,
 }
 
@@ -715,7 +715,7 @@ pub struct AsyncApiCallResultsPage {
     #[serde()]
     items: Vec<AsyncApiCall>,
     #[doc = "token used to fetch the next page of results (if any)"]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     next_page: Option<String>,
 }
 
@@ -755,13 +755,13 @@ pub enum AsyncApiCallType {
 )]
 pub struct BillingInfo {
     #[doc = "The address of the customer."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     address: Option<Address>,
     #[doc = "The name of the customer."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[doc = "The phone for the customer."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     phone: Option<String>,
 }
 
@@ -797,28 +797,28 @@ pub struct CacheMetadata {
 )]
 pub struct CardDetails {
     #[doc = "Card brand.\n\nCan be `amex`, `diners`, `discover`, `jcb`, `mastercard`, `unionpay`, `visa`, or `unknown`."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     brand: Option<String>,
     #[doc = "Checks on Card address and CVC if provided."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     checks: Option<Checks>,
     #[doc = "Two-letter ISO code representing the country of the card."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     country: Option<String>,
     #[doc = "Two-digit number representing the card's expiration month."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     exp_month: Option<i64>,
     #[doc = "Four-digit number representing the card's expiration year."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     exp_year: Option<i64>,
     #[doc = "Uniquely identifies this particular card number."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     fingerprint: Option<String>,
     #[doc = "Card funding type.\n\nCan be `credit`, `debit`, `prepaid`, or `unknown`."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     funding: Option<String>,
     #[doc = "The last four digits of the card."]
-    #[serde(rename = "last4", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "last4", default, skip_serializing_if = "Option::is_none")]
     last_4: Option<String>,
 }
 
@@ -836,22 +836,22 @@ pub struct CardDetails {
 )]
 pub struct Cluster {
     #[doc = "The IP address of the cluster."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     addr: Option<std::net::Ipv4Addr>,
     #[doc = "The auth timeout of the cluster."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     auth_timeout: Option<i64>,
     #[doc = "The port of the cluster."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     cluster_port: Option<i64>,
     #[doc = "The name of the cluster."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[doc = "The TLS timeout for the cluster."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     tls_timeout: Option<i64>,
     #[doc = "The urls of the cluster."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     urls: Option<Vec<String>>,
 }
 
@@ -896,13 +896,13 @@ pub enum CodeLanguage {
 )]
 pub struct CodeOutput {
     #[doc = "The contents of the files requested if they were passed."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     output_files: Option<Vec<OutputFile>>,
     #[doc = "The stderr of the code."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     stderr: Option<String>,
     #[doc = "The stdout of the code."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     stdout: Option<String>,
 }
 
@@ -920,10 +920,10 @@ pub struct CodeOutput {
 )]
 pub struct Commit {
     #[doc = "Commit ID of external tool expected by dockerd as set at build time."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     expected: Option<String>,
     #[doc = "Actual commit ID of external tool."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     id: Option<String>,
 }
 
@@ -941,140 +941,140 @@ pub struct Commit {
 )]
 pub struct Connection {
     #[doc = "The auth timeout of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     auth_timeout: Option<i64>,
     #[doc = "Information about the cluster."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     cluster: Option<Cluster>,
     #[doc = "The time the configuration was loaded."]
     #[serde()]
     config_load_time: chrono::DateTime<chrono::Utc>,
     #[doc = "The number of connections to the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     connections: Option<i64>,
     #[doc = "The CPU core usage of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     cores: Option<i64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     cpu: Option<f64>,
     #[doc = "Information about the gateway."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     gateway: Option<Gateway>,
     #[doc = "The git commit."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     git_commit: Option<String>,
     #[doc = "The go version."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     go: Option<String>,
     #[doc = "`GOMAXPROCS` of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     gomaxprocs: Option<i64>,
     #[doc = "The host of the server."]
     #[serde()]
     host: std::net::Ipv4Addr,
     #[doc = "The http base path of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     http_base_path: Option<String>,
     #[doc = "The http host of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     http_host: Option<String>,
     #[doc = "The http port of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     http_port: Option<i64>,
     #[serde()]
     http_req_stats: std::collections::HashMap<String, i64>,
     #[doc = "The https port of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     https_port: Option<i64>,
     #[doc = "The count of inbound bytes for the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     in_bytes: Option<i64>,
     #[doc = "The number of inbound messages for the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     in_msgs: Option<i64>,
     #[doc = "Jetstream information."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     jetstream: Option<Jetstream>,
     #[doc = "Information about leaf nodes."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     leaf: Option<Leaf>,
     #[doc = "The number of leaf nodes for the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     leafnodes: Option<i64>,
     #[doc = "The max connections of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     max_connections: Option<i64>,
     #[doc = "The max control line of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     max_control_line: Option<i64>,
     #[doc = "The max payload of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     max_payload: Option<i64>,
     #[doc = "The max pending of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     max_pending: Option<i64>,
     #[doc = "The memory usage of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     mem: Option<i64>,
     #[doc = "The time now."]
     #[serde()]
     now: chrono::DateTime<chrono::Utc>,
     #[doc = "The count of outbound bytes for the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     out_bytes: Option<i64>,
     #[doc = "The number of outbound messages for the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     out_msgs: Option<i64>,
     #[doc = "The ping interval of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     ping_interval: Option<i64>,
     #[doc = "The ping max of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     ping_max: Option<i64>,
     #[doc = "The port of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     port: Option<i64>,
     #[doc = "The protocol version."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     proto: Option<i64>,
     #[doc = "The number of remotes for the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     remotes: Option<i64>,
     #[doc = "The number of routes for the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     routes: Option<i64>,
     #[doc = "The server ID."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     server_id: Option<String>,
     #[doc = "The server name."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     server_name: Option<String>,
     #[doc = "The number of slow consumers for the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     slow_consumers: Option<i64>,
     #[doc = "When the server was started."]
     #[serde()]
     start: chrono::DateTime<chrono::Utc>,
     #[doc = "The number of subscriptions for the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     subscriptions: Option<i64>,
     #[doc = "The system account."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     system_account: Option<String>,
     #[doc = "The TLS timeout of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     tls_timeout: Option<i64>,
     #[doc = "The total number of connections to the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     total_connections: Option<i64>,
     #[doc = "The uptime of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     uptime: Option<String>,
     #[doc = "The version of the service."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     version: Option<String>,
     #[doc = "The write deadline of the server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     write_deadline: Option<i64>,
 }
 
@@ -1551,10 +1551,10 @@ pub enum Currency {
 )]
 pub struct Customer {
     #[doc = "The customer's address."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     address: Option<Address>,
     #[doc = "Current balance, if any, being stored on the customer.\n\nIf negative, the customer has credit to apply to their next invoice. If positive, the customer has an amount owed that will be added to their next invoice. The balance does not refer to any unpaid invoices; it solely takes into account amounts that have yet to be successfully applied to any invoice. This balance is only taken into account as invoices are finalized."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     balance: Option<f64>,
     #[doc = "Time at which the object was created."]
     #[serde()]
@@ -1563,22 +1563,22 @@ pub struct Customer {
     #[serde()]
     currency: Currency,
     #[doc = "When the customer's latest invoice is billed by charging automatically, `delinquent` is `true` if the invoice's latest charge failed.\n\nWhen the customer's latest invoice is billed by sending an invoice, `delinquent` is `true` if the invoice isn't paid by its due date.  If an invoice is marked uncollectible by dunning, `delinquent` doesn't get reset to `false`."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     delinquent: Option<bool>,
     #[doc = "The customer's email address."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     email: Option<String>,
     #[doc = "Unique identifier for the object."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     id: Option<String>,
     #[doc = "Set of key-value pairs."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     metadata: Option<std::collections::HashMap<String, String>>,
     #[doc = "The customer's full name or business name."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[doc = "The customer's phone number."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     phone: Option<String>,
 }
 
@@ -1656,181 +1656,186 @@ pub struct DeviceAuthVerifyParams {
 )]
 pub struct DockerSystemInfo {
     #[doc = "Hardware architecture of the host, as returned by the Go runtime (`GOARCH`).  A full list of possible values can be found in the [Go documentation](https://golang.org/doc/install/source#environment)."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     architecture: Option<String>,
     #[doc = "Indicates if `bridge-nf-call-ip6tables` is available on the host."]
     #[serde(
         rename = "bridge_nf_ip6tables",
+        default,
         skip_serializing_if = "Option::is_none"
     )]
     bridge_nf_ip_6tables: Option<bool>,
     #[doc = "Indicates if `bridge-nf-call-iptables` is available on the host."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     bridge_nf_iptables: Option<bool>,
     #[doc = "The driver to use for managing cgroups."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     cgroup_driver: Option<CgroupDriver>,
     #[doc = "The version of the cgroup."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     cgroup_version: Option<CgroupVersion>,
     #[doc = "The network endpoint that the Engine advertises for the purpose of node discovery. ClusterAdvertise is a `host:port` combination on which the daemon is reachable by other hosts.\n\n**Deprecated**: This field is only propagated when using standalone Swarm mode, and overlay networking using an external k/v store. Overlay networks with Swarm mode enabled use the built-in raft store, and this field will be empty."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     cluster_advertise: Option<String>,
     #[doc = "URL of the distributed storage backend.   The storage backend is used for multihost networking (to store network and endpoint information) and by the node discovery mechanism.\n\n**Deprecated**: This field is only propagated when using standalone Swarm mode, and overlay networking using an external k/v store. Overlay networks with Swarm mode enabled use the built-in raft store, and this field will be empty."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     cluster_store: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     containerd_commit: Option<ContainerdCommit>,
     #[doc = "Total number of containers on the host."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     containers: Option<i64>,
     #[doc = "Number of containers with status `\\\"paused\\\"`."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     containers_paused: Option<i64>,
     #[doc = "Number of containers with status `\\\"running\\\"`."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     containers_running: Option<i64>,
     #[doc = "Number of containers with status `\\\"stopped\\\"`."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     containers_stopped: Option<i64>,
     #[doc = "Indicates if CPU CFS(Completely Fair Scheduler) period is supported by the host."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     cpu_cfs_period: Option<bool>,
     #[doc = "Indicates if CPU CFS(Completely Fair Scheduler) quota is supported by the host."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     cpu_cfs_quota: Option<bool>,
     #[doc = "Indicates if CPUsets (cpuset.cpus, cpuset.mems) are supported by the host.  See [cpuset(7)](https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt)"]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     cpu_set: Option<bool>,
     #[doc = "Indicates if CPU Shares limiting is supported by the host."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     cpu_shares: Option<bool>,
     #[doc = "Indicates if the daemon is running in debug-mode / with debug-level logging enabled."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     debug: Option<bool>,
     #[doc = "List of custom default address pools for local networks, which can be specified in the daemon.json file or dockerd option.  Example: a Base \\\"10.10.0.0/16\\\" with Size 24 will define the set of 256 10.10.[0-255].0/24 address pools."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     default_address_pools: Option<Vec<SystemInfoDefaultAddressPools>>,
     #[doc = "Name of the default OCI runtime that is used when starting containers.  The default can be overridden per-container at create time."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     default_runtime: Option<String>,
     #[doc = "Root directory of persistent Docker state.  Defaults to `/var/lib/docker` on Linux, and `C:\\\\ProgramData\\\\docker` on Windows."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     docker_root_dir: Option<String>,
     #[doc = "Name of the storage driver in use."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     driver: Option<String>,
     #[doc = "Information specific to the storage driver, provided as \\\"label\\\" / \\\"value\\\" pairs.  This information is provided by the storage driver, and formatted in a way consistent with the output of `docker info` on the command line.\n\n**Note**: The information returned in this field, including the formatting of values and labels, should not be considered stable, and may change without notice."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     driver_status: Option<Vec<Vec<String>>>,
     #[doc = "Indicates if experimental features are enabled on the daemon."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     experimental_build: Option<bool>,
     #[doc = "HTTP-proxy configured for the daemon. This value is obtained from the [`HTTP_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable. Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL are masked in the API response.  Containers do not automatically inherit this configuration."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     http_proxy: Option<String>,
     #[doc = "HTTPS-proxy configured for the daemon. This value is obtained from the [`HTTPS_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable. Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL are masked in the API response.  Containers do not automatically inherit this configuration."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     https_proxy: Option<String>,
     #[doc = "Unique identifier of the daemon.\n\n**Note**: The format of the ID itself is not part of the API, and should not be considered stable."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     id: Option<String>,
     #[doc = "Total number of images on the host. Both _tagged_ and _untagged_ (dangling) images are counted."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     images: Option<i64>,
     #[doc = "Address / URL of the index server that is used for image search, and as a default for user authentication for Docker Hub and Docker Cloud."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     index_server_address: Option<String>,
     #[doc = "Name and, optional, path of the `docker-init` binary.  If the path is omitted, the daemon searches the host's `$PATH` for the binary and uses the first result."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     init_binary: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     init_commit: Option<InitCommit>,
     #[doc = "Indicates IPv4 forwarding is enabled."]
-    #[serde(rename = "ipv4_forwarding", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "ipv4_forwarding",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     ipv_4_forwarding: Option<bool>,
     #[doc = "Represents the isolation technology to use as a default for containers. The supported values are platform-specific.  If no isolation value is specified on daemon start, on Windows client, the default is `hyperv`, and on Windows server, the default is `process`.  This option is currently not used on other platforms."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     isolation: Option<Isolation>,
     #[doc = "Indicates if the host has kernel memory limit support enabled.\n\n**Deprecated**: This field is deprecated as the kernel 5.4 deprecated `kmem.limit_in_bytes`."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     kernel_memory: Option<bool>,
     #[doc = "Indicates if the host has kernel memory TCP limit support enabled.  Kernel memory TCP limits are not supported when using cgroups v2, which does not support the corresponding `memory.kmem.tcp.limit_in_bytes` cgroup."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     kernel_memory_tcp: Option<bool>,
     #[doc = "Kernel version of the host.  On Linux, this information obtained from `uname`. On Windows this information is queried from the <kbd>HKEY_LOCAL_MACHINE\\\\\\\\SOFTWARE\\\\\\\\Microsoft\\\\\\\\Windows NT\\\\\\\\CurrentVersion\\\\\\\\</kbd> registry value, for example _\\\"10.0 14393 (14393.1198.amd64fre.rs1_release_sec.170427-1353)\\\"_."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     kernel_version: Option<String>,
     #[doc = "User-defined labels (key/value metadata) as set on the daemon.\n\n**Note**: When part of a Swarm, nodes can both have _daemon_ labels, set through the daemon configuration, and _node_ labels, set from a manager node in the Swarm. Node labels are not included in this field. Node labels can be retrieved using the `/nodes/(id)` endpoint on a manager node in the Swarm."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     labels: Option<Vec<String>>,
     #[doc = "Indicates if live restore is enabled.  If enabled, containers are kept running when the daemon is shutdown or upon daemon start if running containers are detected."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     live_restore_enabled: Option<bool>,
     #[doc = "The logging driver to use as a default for new containers."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     logging_driver: Option<String>,
     #[doc = "Total amount of physical memory available on the host, in bytes."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     mem_total: Option<i64>,
     #[doc = "Indicates if the host has memory limit support enabled."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     memory_limit: Option<bool>,
     #[doc = "Number of event listeners subscribed."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     n_events_listener: Option<i64>,
     #[doc = "The total number of file Descriptors in use by the daemon process.  This information is only returned if debug-mode is enabled."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     n_fd: Option<i64>,
     #[doc = "Hostname of the host."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[doc = "The number of logical CPUs usable by the daemon.  The number of available CPUs is checked by querying the operating system when the daemon starts. Changes to operating system CPU allocation after the daemon is started are not reflected."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     ncpu: Option<i64>,
     #[doc = "Comma-separated list of domain extensions for which no proxy should be used. This value is obtained from the [`NO_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable.  Containers do not automatically inherit this configuration."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     no_proxy: Option<String>,
     #[doc = "Indicates if OOM killer disable is supported on the host."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     oom_kill_disable: Option<bool>,
     #[doc = "Name of the host's operating system, for example: \\\"Ubuntu 16.04.2 LTS\\\" or \\\"Windows Server 2016 Datacenter\\\""]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     operating_system: Option<String>,
     #[doc = "Generic type of the operating system of the host, as returned by the Go runtime (`GOOS`).  Currently returned values are \\\"linux\\\" and \\\"windows\\\". A full list of possible values can be found in the [Go documentation](https://golang.org/doc/install/source#environment)."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     os_type: Option<String>,
     #[doc = "Version of the host's operating system\n\n**Note**: The information returned in this field, including its very existence, and the formatting of values, should not be considered stable, and may change without notice."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     os_version: Option<String>,
     #[doc = "Indicates if the host kernel has PID limit support enabled."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pids_limit: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     plugins: Option<Plugins>,
     #[doc = "Reports a summary of the product license on the daemon.  If a commercial license has been applied to the daemon, information such as number of nodes, and expiration are included."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     product_license: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     registry_config: Option<RegistryConfig>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     runc_commit: Option<RuncCommit>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     runtimes: Option<std::collections::HashMap<String, Runtime>>,
     #[doc = "List of security features that are enabled on the daemon, such as apparmor, seccomp, SELinux, user-namespaces (userns), and rootless.  Additional configuration options for each security feature may be present, and are included as a comma-separated list of key/value pairs."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     security_options: Option<Vec<String>>,
     #[doc = "Version string of the daemon. **Note**: the [standalone Swarm API](https://docs.docker.com/swarm/swarm-api/) returns the Swarm version instead of the daemon  version, for example `swarm/1.2.8`."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     server_version: Option<String>,
     #[doc = "Indicates if the host has memory swap limit support enabled."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     swap_limit: Option<bool>,
     #[doc = "The  number of goroutines that currently exist.  This information is only returned if debug-mode is enabled."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     system_time: Option<String>,
     #[doc = "List of warnings / informational messages about missing features, or issues related to the daemon configuration.  These messages can be printed by the client as information to the user."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     warnings: Option<Vec<String>>,
 }
 
@@ -1848,7 +1853,7 @@ pub struct DockerSystemInfo {
 )]
 pub struct EmailAuthenticationForm {
     #[doc = "The URL to redirect back to after we have authenticated."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     callback_url: Option<url::Url>,
     #[doc = "The user's email."]
     #[serde()]
@@ -1928,7 +1933,7 @@ pub enum Environment {
     tabled :: Tabled,
 )]
 pub struct Error {
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     error_code: Option<String>,
     #[serde()]
     message: String,
@@ -1974,52 +1979,52 @@ pub struct ExecutorMetadata {
 )]
 pub struct ExtendedUser {
     #[doc = "The user's company."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     company: Option<String>,
     #[doc = "The date and time the user was created."]
     #[serde()]
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user's Discord handle."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     discord: Option<String>,
     #[doc = "The email address of the user."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     email: Option<String>,
     #[doc = "The date and time the email address was verified."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     email_verified: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The user's first name."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     first_name: Option<String>,
     #[doc = "The user's GitHub handle."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     github: Option<String>,
     #[doc = "The unique identifier for the user."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     id: Option<String>,
     #[doc = "The image avatar for the user. This is a URL."]
     #[serde()]
     image: url::Url,
     #[doc = "The user's last name."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     last_name: Option<String>,
     #[doc = "The user's MailChimp ID. This is mostly used for internal mapping."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     mailchimp_id: Option<String>,
     #[doc = "The name of the user. This is auto populated at first from the authentication provider (if there was a name). It can be updated by the user by updating their `first_name` and `last_name` fields."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[doc = "The user's phone number."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     phone: Option<String>,
     #[doc = "The user's Stripe ID. This is mostly used for internal mapping."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     stripe_id: Option<String>,
     #[doc = "The date and time the user was last updated."]
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user's Zendesk ID. This is mostly used for internal mapping."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     zendesk_id: Option<String>,
 }
 
@@ -2040,7 +2045,7 @@ pub struct ExtendedUserResultsPage {
     #[serde()]
     items: Vec<ExtendedUser>,
     #[doc = "token used to fetch the next page of results (if any)"]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     next_page: Option<String>,
 }
 
@@ -2058,19 +2063,19 @@ pub struct ExtendedUserResultsPage {
 )]
 pub struct FileConversion {
     #[doc = "The time and date the file conversion was completed."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the file conversion was created."]
     #[serde()]
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     error: Option<String>,
     #[doc = "The unique identifier of the file conversion.\n\nThis is the same as the API call ID."]
     #[serde()]
     id: Id,
     #[doc = "The converted file, if completed, base64 encoded."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     output: Option<base64::Base64Data>,
     #[doc = "The output format of the file conversion."]
     #[serde()]
@@ -2079,7 +2084,7 @@ pub struct FileConversion {
     #[serde()]
     src_format: SrcFormat,
     #[doc = "The time and date the file conversion was started."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the file conversion."]
     #[serde()]
@@ -2088,7 +2093,7 @@ pub struct FileConversion {
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the file conversion."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     user_id: Option<String>,
 }
 
@@ -2106,28 +2111,28 @@ pub struct FileConversion {
 )]
 pub struct FileDensity {
     #[doc = "The time and date the density was completed."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the density was created."]
     #[serde()]
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The resulting density."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     density: Option<f64>,
     #[doc = "The error the function returned, if any."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     error: Option<String>,
     #[doc = "The unique identifier of the density request.\n\nThis is the same as the API call ID."]
     #[serde()]
     id: Id,
     #[doc = "The material mass as denoted by the user."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     material_mass: Option<f64>,
     #[doc = "The source format of the file."]
     #[serde()]
     src_format: SrcFormat,
     #[doc = "The time and date the density was started."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the density."]
     #[serde()]
@@ -2136,7 +2141,7 @@ pub struct FileDensity {
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the density."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     user_id: Option<String>,
 }
 
@@ -2154,28 +2159,28 @@ pub struct FileDensity {
 )]
 pub struct FileMass {
     #[doc = "The time and date the mass was completed."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the mass was created."]
     #[serde()]
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     error: Option<String>,
     #[doc = "The unique identifier of the mass request.\n\nThis is the same as the API call ID."]
     #[serde()]
     id: Id,
     #[doc = "The resulting mass."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     mass: Option<f64>,
     #[doc = "The material density as denoted by the user."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     material_density: Option<f64>,
     #[doc = "The source format of the file."]
     #[serde()]
     src_format: SrcFormat,
     #[doc = "The time and date the mass was started."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the mass."]
     #[serde()]
@@ -2184,7 +2189,7 @@ pub struct FileMass {
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the mass."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     user_id: Option<String>,
 }
 
@@ -2289,13 +2294,13 @@ pub struct FileSystemMetadata {
 )]
 pub struct FileVolume {
     #[doc = "The time and date the volume was completed."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the volume was created."]
     #[serde()]
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     error: Option<String>,
     #[doc = "The unique identifier of the volume request.\n\nThis is the same as the API call ID."]
     #[serde()]
@@ -2304,7 +2309,7 @@ pub struct FileVolume {
     #[serde()]
     src_format: SrcFormat,
     #[doc = "The time and date the volume was started."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the volume."]
     #[serde()]
@@ -2313,10 +2318,10 @@ pub struct FileVolume {
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the volume."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     user_id: Option<String>,
     #[doc = "The resulting volume."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     volume: Option<f64>,
 }
 
@@ -2334,19 +2339,19 @@ pub struct FileVolume {
 )]
 pub struct Gateway {
     #[doc = "The auth timeout of the gateway."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     auth_timeout: Option<i64>,
     #[doc = "The host of the gateway."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     host: Option<String>,
     #[doc = "The name of the gateway."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[doc = "The port of the gateway."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     port: Option<i64>,
     #[doc = "The TLS timeout for the gateway."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     tls_timeout: Option<i64>,
 }
 
@@ -2364,16 +2369,16 @@ pub struct Gateway {
 )]
 pub struct IndexInfo {
     #[doc = "List of mirrors, expressed as URIs."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     mirrors: Option<Vec<String>>,
     #[doc = "Name of the registry, such as \\\"docker.io\\\"."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[doc = "Indicates whether this is an official registry (i.e., Docker Hub / docker.io)"]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     official: Option<bool>,
     #[doc = "Indicates if the registry is part of the list of insecure registries.  If `false`, the registry is insecure. Insecure registries accept un-encrypted (HTTP) and/or untrusted (HTTPS with certificates from unknown CAs) communication.\n\n**Warning**: Insecure registries can be useful when running a local registry. However, because its use creates security vulnerabilities it should ONLY be enabled for testing purposes. For increased security, users should add their CA to their system's list of trusted CAs instead of enabling this option."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     secure: Option<bool>,
 }
 
@@ -2391,19 +2396,19 @@ pub struct IndexInfo {
 )]
 pub struct Invoice {
     #[doc = "Final amount due at this time for this invoice.\n\nIf the invoice's total is smaller than the minimum charge amount, for example, or if there is account credit that can be applied to the invoice, the `amount_due` may be 0. If there is a positive `starting_balance` for the invoice (the customer owes money), the `amount_due` will also take that into account. The charge that gets generated for the invoice will be for the amount specified in `amount_due`."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     amount_due: Option<f64>,
     #[doc = "The amount, in USD, that was paid."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     amount_paid: Option<f64>,
     #[doc = "The amount remaining, in USD, that is due."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     amount_remaining: Option<f64>,
     #[doc = "Number of payment attempts made for this invoice, from the perspective of the payment retry schedule.\n\nAny payment attempt counts as the first attempt, and subsequently only automatic retries increment the attempt count. In other words, manual payment attempts after the first attempt do not affect the retry schedule."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     attempt_count: Option<u64>,
     #[doc = "Whether an attempt has been made to pay the invoice.\n\nAn invoice is not attempted until 1 hour after the `invoice.created` webhook, for example, so you might not want to display that invoice as unpaid to your users."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     attempted: Option<bool>,
     #[doc = "Time at which the object was created."]
     #[serde()]
@@ -2412,55 +2417,55 @@ pub struct Invoice {
     #[serde()]
     currency: Currency,
     #[doc = "The email address for the customer. Until the invoice is finalized, this field will equal customer.email. Once the invoice is finalized, this field will no longer be updated."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     customer_email: Option<String>,
     #[doc = "Customer ID. The unique identifier for the customer this invoice belongs to. This is the customer ID in the payments service, not our database customer ID."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     customer_id: Option<String>,
     #[doc = "Default payment method."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     default_payment_method: Option<String>,
     #[doc = "Description of the invoice."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     description: Option<String>,
     #[doc = "Unique identifier for the object."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     id: Option<String>,
     #[doc = "The individual line items that make up the invoice.\n\n`lines` is sorted as follows: invoice items in reverse chronological order, followed by the subscription, if any."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     lines: Option<Vec<InvoiceLineItem>>,
     #[doc = "Set of key-value pairs."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     metadata: Option<std::collections::HashMap<String, String>>,
     #[doc = "A unique, identifying string that appears on emails sent to the customer for this invoice."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     number: Option<String>,
     #[doc = "Whether payment was successfully collected for this invoice.\n\nAn invoice can be paid (most commonly) with a charge or with credit from the customer's account balance."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     paid: Option<bool>,
     #[doc = "The link to download the PDF for the invoice."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pdf: Option<url::Url>,
     #[doc = "This is the transaction number that appears on email receipts sent for this invoice."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     receipt_number: Option<String>,
     #[doc = "Extra information about an invoice for the customer's credit card statement."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     statement_descriptor: Option<String>,
     #[doc = "The status of the invoice, one of `draft`, `open`, `paid`, `uncollectible`, or `void`.\n\n[Learn more](https://stripe.com/docs/billing/invoices/workflow#workflow-overview)."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     status: Option<Status>,
     #[doc = "Total of all subscriptions, invoice items, and prorations on the invoice before any invoice level discount or tax is applied.\n\nItem discounts are already incorporated."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     subtotal: Option<f64>,
     #[doc = "The amount of tax on this invoice.\n\nThis is the sum of all the tax amounts on this invoice."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     tax: Option<f64>,
     #[doc = "Total after discounts and taxes."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     total: Option<f64>,
     #[doc = "The URL for the hosted invoice page, which allows customers to view and pay an invoice."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     url: Option<url::Url>,
 }
 
@@ -2478,22 +2483,22 @@ pub struct Invoice {
 )]
 pub struct InvoiceLineItem {
     #[doc = "The amount, in USD."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     amount: Option<f64>,
     #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase."]
     #[serde()]
     currency: Currency,
     #[doc = "The description."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     description: Option<String>,
     #[doc = "Unique identifier for the object."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     id: Option<String>,
     #[doc = "The ID of the invoice item associated with this line item if any."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     invoice_item: Option<String>,
     #[doc = "Set of [key-value pairs](https://stripe.com/docs/api/metadata) that you can attach to an object.\n\nSet of key-value pairs."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     metadata: Option<std::collections::HashMap<String, String>>,
 }
 
@@ -2547,13 +2552,13 @@ pub enum InvoiceStatus {
 )]
 pub struct Jetstream {
     #[doc = "The Jetstream config."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     config: Option<Config>,
     #[doc = "Meta information about the cluster."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     meta: Option<Meta>,
     #[doc = "Jetstream statistics."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     stats: Option<Stats>,
 }
 
@@ -2571,13 +2576,13 @@ pub struct Jetstream {
 )]
 pub struct JetstreamApiStats {
     #[doc = "The number of errors."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     errors: Option<i64>,
     #[doc = "The number of inflight requests."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     inflight: Option<i64>,
     #[doc = "The number of requests."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     total: Option<i64>,
 }
 
@@ -2595,16 +2600,16 @@ pub struct JetstreamApiStats {
 )]
 pub struct JetstreamConfig {
     #[doc = "The domain."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     domain: Option<String>,
     #[doc = "The max memory."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     max_memory: Option<i64>,
     #[doc = "The max storage."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     max_storage: Option<i64>,
     #[doc = "The store directory."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     store_dir: Option<String>,
 }
 
@@ -2622,25 +2627,25 @@ pub struct JetstreamConfig {
 )]
 pub struct JetstreamStats {
     #[doc = "The number of accounts."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     accounts: Option<i64>,
     #[doc = "API stats."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     api: Option<Api>,
     #[doc = "The number of HA assets."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     ha_assets: Option<i64>,
     #[doc = "The memory used by the Jetstream server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     memory: Option<i64>,
     #[doc = "The reserved memory for the Jetstream server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     reserved_memory: Option<i64>,
     #[doc = "The reserved storage for the Jetstream server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     reserved_store: Option<i64>,
     #[doc = "The storage used by the Jetstream server."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     store: Option<i64>,
 }
 
@@ -2658,16 +2663,16 @@ pub struct JetstreamStats {
 )]
 pub struct LeafNode {
     #[doc = "The auth timeout of the leaf node."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     auth_timeout: Option<i64>,
     #[doc = "The host of the leaf node."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     host: Option<String>,
     #[doc = "The port of the leaf node."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     port: Option<i64>,
     #[doc = "The TLS timeout for the leaf node."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     tls_timeout: Option<i64>,
 }
 
@@ -2685,13 +2690,13 @@ pub struct LeafNode {
 )]
 pub struct MetaClusterInfo {
     #[doc = "The size of the cluster."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     cluster_size: Option<i64>,
     #[doc = "The leader of the cluster."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     leader: Option<String>,
     #[doc = "The name of the cluster."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     name: Option<String>,
 }
 
@@ -2793,13 +2798,13 @@ pub enum Method {
 )]
 pub struct Oauth2ClientInfo {
     #[doc = "Value used for [CSRF](https://tools.ietf.org/html/rfc6749#section-10.12) protection via the `state` parameter."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     csrf_token: Option<String>,
     #[doc = "Code Verifier used for [PKCE]((https://tools.ietf.org/html/rfc7636)) protection via the `code_verifier` parameter. The value must have a minimum length of 43 characters and a maximum length of 128 characters.  Each character must be ASCII alphanumeric or one of the characters \"-\" / \".\" / \"_\" / \"~\"."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pkce_code_verifier: Option<String>,
     #[doc = "The URL for consent."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     url: Option<String>,
 }
 
@@ -2844,10 +2849,10 @@ impl Default for Oauth2GrantType {
 )]
 pub struct OutputFile {
     #[doc = "The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for JSON."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     contents: Option<String>,
     #[doc = "The name of the file."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     name: Option<String>,
 }
 
@@ -2886,16 +2891,16 @@ pub struct PaymentMethod {
     #[serde()]
     billing_info: BillingInfo,
     #[doc = "The card, if it is one. For our purposes, this is the only type of payment method that we support."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     card: Option<Card>,
     #[doc = "Time at which the object was created."]
     #[serde()]
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "Unique identifier for the object."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     id: Option<String>,
     #[doc = "Set of key-value pairs."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     metadata: Option<std::collections::HashMap<String, String>>,
     #[doc = "The type of payment method."]
     #[serde(rename = "type")]
@@ -2918,14 +2923,15 @@ pub struct PaymentMethodCardChecks {
     #[doc = "If a address line1 was provided, results of the check, one of `pass`, `fail`, `unavailable`, or `unchecked`."]
     #[serde(
         rename = "address_line1_check",
+        default,
         skip_serializing_if = "Option::is_none"
     )]
     address_line_1_check: Option<String>,
     #[doc = "If a address postal code was provided, results of the check, one of `pass`, `fail`, `unavailable`, or `unchecked`."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     address_postal_code_check: Option<String>,
     #[doc = "If a CVC was provided, results of the check, one of `pass`, `fail`, `unavailable`, or `unchecked`."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     cvc_check: Option<String>,
 }
 
@@ -2970,16 +2976,16 @@ impl Default for PaymentMethodType {
 )]
 pub struct PluginsInfo {
     #[doc = "Names of available authorization plugins."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     authorization: Option<Vec<String>>,
     #[doc = "Names of available logging-drivers, and logging-driver plugins."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     log: Option<Vec<String>>,
     #[doc = "Names of available network-drivers, and network-driver plugins."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     network: Option<Vec<String>>,
     #[doc = "Names of available volume-drivers, and network-driver plugins."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     volume: Option<Vec<String>>,
 }
 
@@ -3015,18 +3021,18 @@ pub struct Pong {
 )]
 pub struct RegistryServiceConfig {
     #[doc = "List of IP ranges to which nondistributable artifacts can be pushed, using the CIDR syntax [RFC 4632](https://tools.ietf.org/html/4632).  Some images (for example, Windows base images) contain artifacts whose distribution is restricted by license. When these images are pushed to a registry, restricted artifacts are not included.  This configuration override this behavior, and enables the daemon to push nondistributable artifacts to all registries whose resolved IP address is within the subnet described by the CIDR syntax.  This option is useful when pushing images containing nondistributable artifacts to a registry on an air-gapped network so hosts on that network can pull the images without connecting to another server.\n\n**Warning**: Nondistributable artifacts typically have restrictions on how and where they can be distributed and shared. Only use this feature to push artifacts to private registries and ensure that you are in compliance with any terms that cover redistributing nondistributable artifacts."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     allow_nondistributable_artifacts_cid_rs: Option<Vec<String>>,
     #[doc = "List of registry hostnames to which nondistributable artifacts can be pushed, using the format `<hostname>[:<port>]` or `<IP address>[:<port>]`.  Some images (for example, Windows base images) contain artifacts whose distribution is restricted by license. When these images are pushed to a registry, restricted artifacts are not included.  This configuration override this behavior for the specified registries.  This option is useful when pushing images containing nondistributable artifacts to a registry on an air-gapped network so hosts on that network can pull the images without connecting to another server.\n\n**Warning**: Nondistributable artifacts typically have restrictions on how and where they can be distributed and shared. Only use this feature to push artifacts to private registries and ensure that you are in compliance with any terms that cover redistributing nondistributable artifacts."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     allow_nondistributable_artifacts_hostnames: Option<Vec<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     index_configs: Option<std::collections::HashMap<String, IndexInfo>>,
     #[doc = "List of IP ranges of insecure registries, using the CIDR syntax ([RFC 4632](https://tools.ietf.org/html/4632)). Insecure registries accept un-encrypted (HTTP) and/or untrusted (HTTPS with certificates from unknown CAs) communication.  By default, local registries (`127.0.0.0/8`) are configured as insecure. All other registries are secure. Communicating with an insecure registry is not possible if the daemon assumes that registry is secure.  This configuration override this behavior, insecure communication with registries whose resolved IP address is within the subnet described by the CIDR syntax.  Registries can also be marked insecure by hostname. Those registries are listed under `IndexConfigs` and have their `Secure` field set to `false`.\n\n**Warning**: Using this option can be useful when running a local  registry, but introduces security vulnerabilities. This option should therefore ONLY be used for testing purposes. For increased security, users should add their CA to their system's list of trusted CAs instead of enabling this option."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     insecure_registry_cid_rs: Option<Vec<String>>,
     #[doc = "List of registry URLs that act as a mirror for the official (`docker.io`) registry."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     mirrors: Option<Vec<String>>,
 }
 
@@ -3044,10 +3050,10 @@ pub struct RegistryServiceConfig {
 )]
 pub struct Runtime {
     #[doc = "Name and, optional, path, of the OCI executable binary.  If the path is omitted, the daemon searches the host's `$PATH` for the binary and uses the first result."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     path: Option<String>,
     #[doc = "List of command-line arguments to pass to the runtime when invoked."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     runtime_args: Option<Vec<String>>,
 }
 
@@ -3071,7 +3077,7 @@ pub struct Session {
     #[serde()]
     expires: chrono::DateTime<chrono::Utc>,
     #[doc = "The unique identifier for the session."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     id: Option<String>,
     #[doc = "The session token."]
     #[serde()]
@@ -3080,7 +3086,7 @@ pub struct Session {
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user that the session belongs to."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     user_id: Option<String>,
 }
 
@@ -3152,10 +3158,10 @@ pub enum SystemInfoCgroupVersionEnum {
 )]
 pub struct SystemInfoDefaultAddressPools {
     #[doc = "The network address in CIDR format"]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     base: Option<String>,
     #[doc = "The network pool size"]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     size: Option<i64>,
 }
 
@@ -3202,22 +3208,22 @@ pub enum SystemInfoIsolationEnum {
 )]
 pub struct UnitConversion {
     #[doc = "The time and date the unit conversion was completed."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the unit conversion was created."]
     #[serde()]
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     error: Option<String>,
     #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
     #[serde()]
     id: Id,
     #[doc = "The input value."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     input: Option<f64>,
     #[doc = "The resulting value."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     output: Option<f64>,
     #[doc = "The output format of the unit conversion."]
     #[serde()]
@@ -3226,7 +3232,7 @@ pub struct UnitConversion {
     #[serde()]
     src_format: SrcFormat,
     #[doc = "The time and date the unit conversion was started."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the unit conversion."]
     #[serde()]
@@ -3235,7 +3241,7 @@ pub struct UnitConversion {
     #[serde()]
     updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the unit conversion."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     user_id: Option<String>,
 }
 
@@ -3322,22 +3328,22 @@ pub enum UnitMetricFormat {
 )]
 pub struct UpdateUser {
     #[doc = "The user's company."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     company: Option<String>,
     #[doc = "The user's Discord handle."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     discord: Option<String>,
     #[doc = "The user's first name."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     first_name: Option<String>,
     #[doc = "The user's GitHub handle."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     github: Option<String>,
     #[doc = "The user's last name."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     last_name: Option<String>,
     #[doc = "The user's phone number."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     phone: Option<String>,
 }
 
@@ -3355,40 +3361,40 @@ pub struct UpdateUser {
 )]
 pub struct User {
     #[doc = "The user's company."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     company: Option<String>,
     #[doc = "The date and time the user was created."]
     #[serde()]
     created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user's Discord handle."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     discord: Option<String>,
     #[doc = "The email address of the user."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     email: Option<String>,
     #[doc = "The date and time the email address was verified."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     email_verified: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The user's first name."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     first_name: Option<String>,
     #[doc = "The user's GitHub handle."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     github: Option<String>,
     #[doc = "The unique identifier for the user."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     id: Option<String>,
     #[doc = "The image avatar for the user. This is a URL."]
     #[serde()]
     image: url::Url,
     #[doc = "The user's last name."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     last_name: Option<String>,
     #[doc = "The name of the user. This is auto populated at first from the authentication provider (if there was a name). It can be updated by the user by updating their `first_name` and `last_name` fields."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[doc = "The user's phone number."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     phone: Option<String>,
     #[doc = "The date and time the user was last updated."]
     #[serde()]
@@ -3412,7 +3418,7 @@ pub struct UserResultsPage {
     #[serde()]
     items: Vec<User>,
     #[doc = "token used to fetch the next page of results (if any)"]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     next_page: Option<String>,
 }
 
@@ -3436,10 +3442,10 @@ pub struct VerificationToken {
     #[serde()]
     expires: chrono::DateTime<chrono::Utc>,
     #[doc = "The token used for verification. This is used as the id for the table since it is unique per record."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     id: Option<String>,
     #[doc = "The identifier for the user. This is typically the user's email address since that is what we are verifying."]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     identifier: Option<String>,
     #[doc = "The date and time the verification token was last updated."]
     #[serde()]

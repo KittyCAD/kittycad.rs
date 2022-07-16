@@ -692,6 +692,7 @@ fn render_object(
         }
 
         if type_name_text.starts_with("Option<") {
+            serde_props.push(quote!(default));
             serde_props.push(quote!(skip_serializing_if = "Option::is_none"));
         }
 
