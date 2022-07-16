@@ -20,19 +20,19 @@ fn main() -> Result<()> {
         Ok(args) => {
             if !args.free.is_empty() {
                 eprintln!("{}", opts.usage("progenitor"));
-                bail!("unexpected positional arguments");
+                anyhow::bail!("unexpected positional arguments");
             }
             args
         }
         Err(e) => {
             eprintln!("{}", opts.usage("progenitor"));
-            bail!(e);
+            anyhow::bail!(e);
         }
     };
 
     let input_spec = args.opt_str("i").unwrap();
 
-    let api = load_api(&input_spec)?;
+    let api = generator::load_api(&input_spec)?;
 
     let debug = |s: &str| {
         if args.opt_present("debug") {
@@ -47,14 +47,14 @@ fn main() -> Result<()> {
     let output_dir = args.opt_str("o").unwrap();
     let spec_link = args.opt_str("spec-link").unwrap();
 
-    let fail = match gen(&api) {
+    let fail = match generator::generate(&api) {
         Ok(out) => {
             let description = args.opt_str("d").unwrap();
 
             /*
              * Create the top-level crate directory:
              */
-            let root = PathBuf::from(&output_dir);
+            let root = std::path::PathBuf::from(&output_dir);
             std::fs::create_dir_all(&root)?;
 
             /*
@@ -114,15 +114,20 @@ rustdoc-args = ["--cfg", "docsrs"]
 "#,
                 name, description, version, name, output_dir,
             );
-            save(&toml, tomlout.as_str())?;
+            generator::save(&toml, tomlout.as_str())?;
 
             /*
              * Generate our documentation for the library.
              */
-            let docs = template::generate_docs(&api, &to_snake_case(&name), &version, &spec_link)?;
+            let docs = generator::template::generate_docs(
+                &api,
+                &inflector::cases::snakecase::to_snake_case(&name),
+                &version,
+                &spec_link,
+            )?;
             let mut readme = root.clone();
             readme.push("README.md");
-            save(
+            generator::save(
                 readme,
                 // Add a title to the README.md so it looks nicer in GitHub.
                 &format!(
@@ -145,26 +150,26 @@ rustdoc-args = ["--cfg", "docsrs"]
             let lib = format!("{}\n{}", docs, out);
             let mut librs = src.clone();
             librs.push("lib.rs");
-            save(librs, lib.as_str())?;
+            generator::save(librs, lib.as_str())?;
 
             /*
              * Create the Rust source types file containing the generated types:
              */
-            let types = types::generate_types(&api)?;
+            let types = generator::types::generate_types(&api)?;
             let mut typesrs = src.clone();
             typesrs.push("types.rs");
-            save(typesrs, types.as_str())?;
+            generator::save(typesrs, types.as_str())?;
 
             /*
              * Create the Rust source files for each of the tags functions:
              */
 
-            match functions::generate_files(&api) {
+            match generator::functions::generate_files(&api) {
                 Ok(files) => {
                     // We have a map of our files, let's write to them.
                     for (f, content) in files {
                         let mut tagrs = src.clone();
-                        tagrs.push(format!("{}.rs", clean_tag_name(&f)));
+                        tagrs.push(format!("{}.rs", generator::clean_tag_name(&f)));
 
                         let output = format!(
                             r#"use anyhow::Result;
@@ -186,12 +191,12 @@ rustdoc-args = ["--cfg", "docsrs"]
 
                 {}
             }}"#,
-                            types::proper_name(&f),
-                            types::proper_name(&f),
-                            types::proper_name(&f),
+                            generator::types::proper_name(&f),
+                            generator::types::proper_name(&f),
+                            generator::types::proper_name(&f),
                             content,
                         );
-                        save(tagrs, output.as_str())?;
+                        generator::save(tagrs, output.as_str())?;
                     }
 
                     false
@@ -209,7 +214,7 @@ rustdoc-args = ["--cfg", "docsrs"]
     };
 
     if fail {
-        bail!("generation experienced errors");
+        anyhow::bail!("generation experienced errors");
     }
 
     Ok(())

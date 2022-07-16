@@ -9,27 +9,19 @@ pub mod types;
 #[macro_use]
 extern crate quote;
 
-use std::{
-    ffi::OsStr,
-    fs::{File, OpenOptions},
-    io::Write,
-    path::{Path, PathBuf},
-};
+use std::{fs, io::Write};
 
-use anyhow::{bail, Result};
-use inflector::cases::snakecase::to_snake_case;
-use openapiv3::OpenAPI;
-use serde::Deserialize;
+use anyhow::Result;
 
 use crate::types::exts::ReferenceOrExt;
 
 /// Save a file.
-fn save<P>(p: P, data: &str) -> Result<()>
+pub fn save<P>(p: P, data: &str) -> Result<()>
 where
-    P: AsRef<Path>,
+    P: AsRef<std::path::Path>,
 {
     let p = p.as_ref();
-    let mut f = OpenOptions::new()
+    let mut f = std::fs::OpenOptions::new()
         .create(true)
         .truncate(true)
         .write(true)
@@ -42,13 +34,13 @@ where
 /// Load a file.
 fn load<P, T>(p: P) -> Result<T>
 where
-    P: AsRef<Path>,
-    for<'de> T: Deserialize<'de>,
+    P: AsRef<std::path::Path>,
+    for<'de> T: serde::Deserialize<'de>,
 {
     let p = p.as_ref();
-    let f = File::open(p)?;
+    let f = fs::File::open(p)?;
     if let Some(ext) = p.extension() {
-        if ext == OsStr::new("yaml") || ext == OsStr::new("yml") {
+        if ext == std::ffi::OsStr::new("yaml") || ext == std::ffi::OsStr::new("yml") {
             return Ok(serde_yaml::from_reader(f)?);
         }
     }
@@ -56,15 +48,15 @@ where
 }
 
 /// Load an OpenAPI spec.
-fn load_api<P>(p: P) -> Result<OpenAPI>
+pub fn load_api<P>(p: P) -> Result<openapiv3::OpenAPI>
 where
-    P: AsRef<Path>,
+    P: AsRef<std::path::Path>,
 {
     load(p)
 }
 
 /// Generate a client library.
-pub fn generate(api: &OpenAPI) -> Result<String> {
+pub fn generate(api: &openapiv3::OpenAPI) -> Result<String> {
     let mut out = String::new();
 
     let mut a = |s: &str| {
@@ -197,7 +189,8 @@ pub fn generate(api: &OpenAPI) -> Result<String> {
     Ok(out)
 }
 
-fn clean_tag_name(s: &str) -> String {
+/// Clean a tag name.
+pub fn clean_tag_name(s: &str) -> String {
     let result = inflector::cases::snakecase::to_snake_case(s);
 
     if result == "oauth_2" {

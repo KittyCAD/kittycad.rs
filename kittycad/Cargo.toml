@@ -1,6 +1,6 @@
 [package]
 name = "kittycad"
-description = "A fully generated & opinionated API client for the kittycad API."
+description = "A fully generated & opinionated API client for the KittyCAD API."
 version = "0.1.8"
 documentation = "https://docs.rs/kittycad/"
 repository = "https://github.com/Kittycad/kittycad.rs/tree/main/kittycad"
