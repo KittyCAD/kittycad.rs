@@ -119,7 +119,7 @@ mod base64 {
 
     #[cfg(test)]
     mod tests {
-        use crate::base64::Base64Data;
+        use super::Base64Data;
         use std::convert::TryFrom;
         #[test]
         fn test_base64_try_from() {
