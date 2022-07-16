@@ -1,3 +1,5 @@
+// TODO: #![deny(missing_docs)]
+
 pub mod exts;
 
 #[macro_use]
@@ -18,21 +20,23 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
         for (name, schema) in &components.schemas {
             // Let's get the schema from the reference.
             let schema = schema.get_schema_from_reference(spec, true)?;
-            println!("{} => {:?}", name, schema.schema_kind);
             // Let's handle all the kinds of schemas.
-            match render_schema(name, &schema) {
-                Ok(t) => {
-                    rendered = quote! {
-                        #rendered
+            // TODO: handle the error
+            if let Ok(t) = render_schema(name, &schema, spec) {
+                // Add it to our rendered types.
+                rendered = quote! {
+                    #rendered
 
-                        #t
-                    };
-                }
-                Err(err) => {
-                    // TODO: actually handle the error, but for now we are just testing.
-                    println!("ERROR: {}", err);
-                }
+                    #t
+                };
             }
+            /*let t = render_schema(name, &schema, spec)?;
+            // Add it to our rendered types.
+            rendered = quote! {
+                #rendered
+
+                #t
+            };*/
         }
     }
 
@@ -41,7 +45,11 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
 
 /// Render a schema into a Rust type.
 /// This generates the Rust type.
-pub fn render_schema(name: &str, schema: &openapiv3::Schema) -> Result<proc_macro2::TokenStream> {
+pub fn render_schema(
+    name: &str,
+    schema: &openapiv3::Schema,
+    spec: &openapiv3::OpenAPI,
+) -> Result<proc_macro2::TokenStream> {
     match &schema.schema_kind {
         openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
             render_string_type(name, s, &schema.schema_data)
@@ -55,7 +63,7 @@ pub fn render_schema(name: &str, schema: &openapiv3::Schema) -> Result<proc_macr
             Ok(quote!())
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
-            render_object(name, o, &schema.schema_data)
+            render_object(name, o, &schema.schema_data, spec)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Array(_a)) => {
             println!("{} => Array", name);
@@ -109,9 +117,8 @@ pub fn get_type_name_for_schema(
             let ident = get_type_name(name, &schema.schema_data)?;
             Ok(quote!(#ident))
         }
-        openapiv3::SchemaKind::Type(openapiv3::Type::Array(_a)) => {
-            println!("{} => Array", name);
-            anyhow::bail!("XXX array not supported yet");
+        openapiv3::SchemaKind::Type(openapiv3::Type::Array(a)) => {
+            get_type_name_for_array(name, a, &schema.schema_data)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => Ok(quote!(bool)),
         openapiv3::SchemaKind::OneOf { one_of: _ } => {
@@ -208,6 +215,8 @@ fn get_type_name_for_string(
             "uuid" => quote!(uuid::Uuid),
             "hostname" => quote!(String),
             "time" => quote!(chrono::NaiveTime),
+            "date-time" => quote!(chrono::DateTime<chrono::Utc>),
+            "partial-date-time" => quote!(chrono::DateTime<chrono::Utc>),
             f => {
                 anyhow::bail!("XXX unknown string format {}", f)
             }
@@ -316,17 +325,163 @@ fn get_type_name_for_integer(
     Ok(t)
 }
 
+/// Get the type name for an array type.
+fn get_type_name_for_array(
+    name: &str,
+    a: &openapiv3::ArrayType,
+    data: &openapiv3::SchemaData,
+) -> Result<proc_macro2::TokenStream> {
+    println!("{} => Array", name);
+    println!("{} => {:?}", name, a);
+    println!("{} => {:?}", name, data);
+
+    // Make sure we have a reference for our type.
+    if let Some(ref s) = a.items {
+        let reference = format_ident!("{}", s.reference()?);
+        return Ok(quote!(#reference));
+    }
+
+    // This should never happen, but who knows.
+    anyhow::bail!("no items in array, cannot get type name")
+}
+
 /// Render the full type for an object.
 fn render_object(
     name: &str,
     o: &openapiv3::ObjectType,
     data: &openapiv3::SchemaData,
+    spec: &openapiv3::OpenAPI,
 ) -> Result<proc_macro2::TokenStream> {
     println!("{} => Object", name);
     println!("{} => {:?}", name, o);
     println!("{} => {:?}", name, data);
 
-    anyhow::bail!("XXX object not supported yet");
+    let description = if let Some(d) = &data.description {
+        quote!(#[doc = #d])
+    } else {
+        quote!()
+    };
+
+    // Get the proper name version of the name of the enum.
+    let struct_name = get_type_name(name, data)?;
+
+    let mut values = quote!();
+    for (k, v) in &o.properties {
+        let prop = clean_property_name(k);
+
+        // Get the schema for the property.
+        let schema = if let openapiv3::ReferenceOr::Item(i) = v {
+            let s = &**i;
+            s.clone()
+        } else {
+            v.get_schema_from_reference(spec, true)?
+        };
+        println!("OBJ {} => {:?}", prop, schema);
+
+        let prop_desc = if let Some(d) = &schema.schema_data.description {
+            quote!(#[doc = #d])
+        } else {
+            quote!()
+        };
+
+        // Get the type name for the schema.
+        let mut type_name = get_type_name_for_schema(&prop, &schema)?;
+        // Check if this type is required.
+        if !o.required.contains(k) && get_text(&type_name)?.starts_with("Option<") {
+            // Make the type optional.
+            type_name = quote!(Option<#type_name>);
+        }
+        let prop_ident = format_ident!("{}", prop);
+
+        let mut prop_value = quote!(
+            #prop_ident: #type_name,
+        );
+        if &prop != k {
+            prop_value = quote!(
+                #[serde(rename = #k)]
+                #prop_value
+            );
+        }
+
+        values = quote!(
+            #values
+
+            #prop_desc
+            #prop_value
+        );
+    }
+
+    // TODO: defaults
+    /*// If the data for the enum has a default value, implement default for the enum.
+    let default = if let Some(default) = &data.default {
+        let default = default.to_string();
+        let default = format_ident!("{}", proper_name(&default));
+        quote!(
+            impl Default for #enum_name {
+                fn default() -> Self {
+                    #default
+                }
+            }
+        )
+    } else if s.enumeration.len() == 1 {
+        let default = s.enumeration[0].as_ref().unwrap().to_string();
+        let default = format_ident!("{}", proper_name(&default));
+        quote!(
+            impl Default for #enum_name {
+                fn default() -> Self {
+                    #enum_name::#default
+                }
+            }
+        )
+    } else {
+        quote!()
+    };*/
+
+    let rendered = quote! {
+        #description
+        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Hash, Debug, Clone, schemars::JsonSchema, tabled::Tabled)]
+        pub struct #struct_name {
+            #values
+        }
+    };
+
+    Ok(rendered)
+}
+
+/// Clean a property name for an object so we can use it in rust.
+fn clean_property_name(s: &str) -> String {
+    let mut prop = inflector::cases::snakecase::to_snake_case(s.trim());
+
+    // Account for reserved keywords in rust.
+    if prop == "ref"
+        || prop == "type"
+        || prop == "self"
+        || prop == "box"
+        || prop == "match"
+        || prop == "foo"
+        || prop == "enum"
+        || prop == "const"
+        || prop == "use"
+    {
+        prop = format!("{}_", prop);
+    } else if prop == "$ref" || prop == "$type" {
+        // Account for any weird types.
+        prop = format!("{}_", prop.replace('$', ""));
+    } else if prop == "+1" {
+        // Account for any weird types.
+        prop = "plus_one".to_string()
+    } else if prop == "-1" {
+        // Account for any weird types.
+        prop = "minus_one".to_string()
+    } else if prop.starts_with('@') {
+        // Account for any weird types.
+        prop = prop.trim_start_matches('@').to_string();
+    } else if prop.starts_with('_') {
+        // Account for any weird types.
+        prop = prop.trim_start_matches('_').to_string();
+    }
+
+    prop
 }
 
 /// Render the full type for an enum.
@@ -345,7 +500,7 @@ fn render_enum(
         quote!()
     };
 
-    // Get the struct name version of the name of the enum.
+    // Get the proper name version of the name of the enum.
     let enum_name = get_type_name(name, data)?;
 
     let mut values = quote!();
@@ -464,7 +619,13 @@ fn clean_text(s: &str) -> String {
     }
 }
 
-pub fn get_text_fmt(output: &proc_macro2::TokenStream) -> Result<String> {
+fn get_text(output: &proc_macro2::TokenStream) -> Result<String> {
+    let content = output.to_string();
+
+    Ok(clean_text(&content).replace(' ', ""))
+}
+
+fn get_text_fmt(output: &proc_macro2::TokenStream) -> Result<String> {
     // Format the file with rustfmt.
     let content = rustfmt_wrapper::rustfmt(output).unwrap();
 

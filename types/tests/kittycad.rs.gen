@@ -22,6 +22,23 @@ pub enum AccountProvider {
     Github,
 }
 
+#[doc = "A response for a query on the API call table that is grouped by something."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct ApiCallQueryGroup {
+    count: i64,
+    query: String,
+}
+
 #[doc = "The field of an API call to group by."]
 #[derive(
     serde :: Serialize,
@@ -83,6 +100,63 @@ pub enum ApiCallStatus {
     Failed,
 }
 
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct ApiCallWithPriceResultsPage {
+    #[doc = "list of items on this page of results"]
+    items: ApiCallWithPrice,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    next_page: String,
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct ApiTokenResultsPage {
+    #[doc = "list of items on this page of results"]
+    items: ApiToken,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    next_page: String,
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct AsyncApiCallResultsPage {
+    #[doc = "list of items on this page of results"]
+    items: AsyncApiCall,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    next_page: String,
+}
+
 #[doc = "The type of async API call."]
 #[derive(
     serde :: Serialize,
@@ -103,6 +177,23 @@ pub enum AsyncApiCallType {
     FileVolume,
     FileMass,
     FileDensity,
+}
+
+#[doc = "Metadata about our cache.\n\nThis is mostly used for internal purposes and debugging."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct CacheMetadata {
+    #[doc = "If the cache returned an ok response from ping."]
+    ok: bool,
 }
 
 #[doc = "The language code is written in."]
@@ -130,6 +221,46 @@ pub enum CodeLanguage {
     #[serde(rename = "node")]
     #[display("node")]
     Node,
+}
+
+#[doc = "Output of the code being executed."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct CodeOutput {
+    #[doc = "The contents of the files requested if they were passed."]
+    output_files: OutputFile,
+    #[doc = "The stderr of the code."]
+    stderr: String,
+    #[doc = "The stdout of the code."]
+    stdout: String,
+}
+
+#[doc = "Commit holds the Git-commit (SHA1) that a binary was built from, as reported in the version-string of external tools, such as `containerd`, or `runC`."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct Commit {
+    #[doc = "Commit ID of external tool expected by dockerd as set at build time."]
+    expected: String,
+    #[doc = "Actual commit ID of external tool."]
+    id: String,
 }
 
 #[doc = "Supported set of sort modes for scanning by created_at only.\n\nCurrently, we only support scanning in ascending order."]
@@ -591,6 +722,59 @@ pub enum Currency {
     Zmw,
 }
 
+#[doc = "The request parameters for the OAuth 2.0 Device Authorization Grant flow."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct DeviceAuthRequestForm {
+    #[doc = "The client ID."]
+    client_id: uuid::Uuid,
+}
+
+#[doc = "The request parameters to verify the `user_code` for the OAuth 2.0 Device Authorization Grant."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct DeviceAuthVerifyParams {
+    #[doc = "The user code."]
+    user_code: String,
+}
+
+#[doc = "The body of the form for email authentication."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct EmailAuthenticationForm {
+    #[doc = "The URL to redirect back to after we have authenticated."]
+    callback_url: url::Url,
+    #[doc = "The user's email."]
+    email: String,
+}
+
 #[doc = "The environment the server is running in."]
 #[derive(
     serde :: Serialize,
@@ -616,6 +800,90 @@ pub enum Environment {
     #[serde(rename = "PRODUCTION")]
     #[display("PRODUCTION")]
     Production,
+}
+
+#[doc = "Error information from a response."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct Error {
+    error_code: String,
+    message: String,
+    request_id: String,
+}
+
+#[doc = "Extended user information.\n\nThis is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct ExtendedUser {
+    #[doc = "The user's company."]
+    company: String,
+    #[doc = "The date and time the user was created."]
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user's Discord handle."]
+    discord: String,
+    #[doc = "The email address of the user."]
+    email: String,
+    #[doc = "The date and time the email address was verified."]
+    email_verified: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user's first name."]
+    first_name: String,
+    #[doc = "The user's GitHub handle."]
+    github: String,
+    #[doc = "The unique identifier for the user."]
+    id: String,
+    #[doc = "The image avatar for the user. This is a URL."]
+    image: url::Url,
+    #[doc = "The user's last name."]
+    last_name: String,
+    #[doc = "The user's MailChimp ID. This is mostly used for internal mapping."]
+    mailchimp_id: String,
+    #[doc = "The name of the user. This is auto populated at first from the authentication provider (if there was a name). It can be updated by the user by updating their `first_name` and `last_name` fields."]
+    name: String,
+    #[doc = "The user's phone number."]
+    phone: String,
+    #[doc = "The user's Stripe ID. This is mostly used for internal mapping."]
+    stripe_id: String,
+    #[doc = "The date and time the user was last updated."]
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user's Zendesk ID. This is mostly used for internal mapping."]
+    zendesk_id: String,
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct ExtendedUserResultsPage {
+    #[doc = "list of items on this page of results"]
+    items: ExtendedUser,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    next_page: String,
 }
 
 #[doc = "The valid types of output file formats."]
@@ -687,6 +955,48 @@ pub enum FileSourceFormat {
     Fbx,
 }
 
+#[doc = "Metadata about our file system.\n\nThis is mostly used for internal purposes and debugging."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct FileSystemMetadata {
+    #[doc = "If the file system passed a sanity check."]
+    ok: bool,
+}
+
+#[doc = "Gateway information."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct Gateway {
+    #[doc = "The auth timeout of the gateway."]
+    auth_timeout: i64,
+    #[doc = "The host of the gateway."]
+    host: String,
+    #[doc = "The name of the gateway."]
+    name: String,
+    #[doc = "The port of the gateway."]
+    port: i64,
+    #[doc = "The TLS timeout for the gateway."]
+    tls_timeout: i64,
+}
+
 #[doc = "An enum representing the possible values of an `Invoice`'s `status` field."]
 #[derive(
     serde :: Serialize,
@@ -721,6 +1031,94 @@ pub enum InvoiceStatus {
     #[serde(rename = "void")]
     #[display("void")]
     Void,
+}
+
+#[doc = "Jetstream API statistics."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct JetstreamApiStats {
+    #[doc = "The number of errors."]
+    errors: i64,
+    #[doc = "The number of inflight requests."]
+    inflight: i64,
+    #[doc = "The number of requests."]
+    total: i64,
+}
+
+#[doc = "Jetstream configuration."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct JetstreamConfig {
+    #[doc = "The domain."]
+    domain: String,
+    #[doc = "The max memory."]
+    max_memory: i64,
+    #[doc = "The max storage."]
+    max_storage: i64,
+    #[doc = "The store directory."]
+    store_dir: String,
+}
+
+#[doc = "Leaf node information."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct LeafNode {
+    #[doc = "The auth timeout of the leaf node."]
+    auth_timeout: i64,
+    #[doc = "The host of the leaf node."]
+    host: String,
+    #[doc = "The port of the leaf node."]
+    port: i64,
+    #[doc = "The TLS timeout for the leaf node."]
+    tls_timeout: i64,
+}
+
+#[doc = "Jetstream statistics."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct MetaClusterInfo {
+    #[doc = "The size of the cluster."]
+    cluster_size: i64,
+    #[doc = "The leader of the cluster."]
+    leader: String,
+    #[doc = "The name of the cluster."]
+    name: String,
 }
 
 #[doc = "The Request Method (VERB)\n\nThis type also contains constants for a number of common HTTP methods such as GET, POST, etc.\n\nCurrently includes 8 variants representing the 8 methods defined in [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH, and an Extension variant for all extensions."]
@@ -771,6 +1169,27 @@ pub enum Method {
     Extension,
 }
 
+#[doc = "Information about an OAuth 2.0 client."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct Oauth2ClientInfo {
+    #[doc = "Value used for [CSRF](https://tools.ietf.org/html/rfc6749#section-10.12) protection via the `state` parameter."]
+    csrf_token: String,
+    #[doc = "Code Verifier used for [PKCE]((https://tools.ietf.org/html/rfc7636)) protection via the `code_verifier` parameter. The value must have a minimum length of 43 characters and a maximum length of 128 characters.  Each character must be ASCII alphanumeric or one of the characters \"-\" / \".\" / \"_\" / \"~\"."]
+    pkce_code_verifier: String,
+    #[doc = "The URL for consent."]
+    url: String,
+}
+
 #[doc = "An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>."]
 #[derive(
     serde :: Serialize,
@@ -798,6 +1217,64 @@ impl Default for Oauth2GrantType {
     }
 }
 
+#[doc = "Output file contents."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct OutputFile {
+    #[doc = "The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for JSON."]
+    contents: String,
+    #[doc = "The name of the file."]
+    name: String,
+}
+
+#[doc = "A payment intent response."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct PaymentIntent {
+    #[doc = "The client secret is used for client-side retrieval using a publishable key. The client secret can be used to complete payment setup from your frontend. It should not be stored, logged, or exposed to anyone other than the customer. Make sure that you have TLS enabled on any page that includes the client secret."]
+    client_secret: String,
+}
+
+#[doc = "Card checks."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct PaymentMethodCardChecks {
+    #[doc = "If a address line1 was provided, results of the check, one of `pass`, `fail`, `unavailable`, or `unchecked`."]
+    #[serde(rename = "address_line1_check")]
+    address_line_1_check: String,
+    #[doc = "If a address postal code was provided, results of the check, one of `pass`, `fail`, `unavailable`, or `unchecked`."]
+    address_postal_code_check: String,
+    #[doc = "If a CVC was provided, results of the check, one of `pass`, `fail`, `unavailable`, or `unchecked`."]
+    cvc_check: String,
+}
+
 #[doc = "An enum representing the possible values of an `PaymentMethod`'s `type` field."]
 #[derive(
     serde :: Serialize,
@@ -823,6 +1300,23 @@ impl Default for PaymentMethodType {
     fn default() -> Self {
         PaymentMethodType::Card
     }
+}
+
+#[doc = "The response from the `/ping` endpoint."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct Pong {
+    #[doc = "The pong response."]
+    message: String,
 }
 
 #[derive(
@@ -872,6 +1366,24 @@ pub enum SystemInfoCgroupVersionEnum {
     #[serde(rename = "2")]
     #[display("2")]
     Two,
+}
+
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct SystemInfoDefaultAddressPools {
+    #[doc = "The network address in CIDR format"]
+    base: String,
+    #[doc = "The network pool size"]
+    size: i64,
 }
 
 #[derive(
@@ -967,4 +1479,116 @@ pub enum UnitMetricFormat {
     #[serde(rename = "exa")]
     #[display("exa")]
     Exa,
+}
+
+#[doc = "The user-modifiable parts of a User."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct UpdateUser {
+    #[doc = "The user's company."]
+    company: String,
+    #[doc = "The user's Discord handle."]
+    discord: String,
+    #[doc = "The user's first name."]
+    first_name: String,
+    #[doc = "The user's GitHub handle."]
+    github: String,
+    #[doc = "The user's last name."]
+    last_name: String,
+    #[doc = "The user's phone number."]
+    phone: String,
+}
+
+#[doc = "A user."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct User {
+    #[doc = "The user's company."]
+    company: String,
+    #[doc = "The date and time the user was created."]
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user's Discord handle."]
+    discord: String,
+    #[doc = "The email address of the user."]
+    email: String,
+    #[doc = "The date and time the email address was verified."]
+    email_verified: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user's first name."]
+    first_name: String,
+    #[doc = "The user's GitHub handle."]
+    github: String,
+    #[doc = "The unique identifier for the user."]
+    id: String,
+    #[doc = "The image avatar for the user. This is a URL."]
+    image: url::Url,
+    #[doc = "The user's last name."]
+    last_name: String,
+    #[doc = "The name of the user. This is auto populated at first from the authentication provider (if there was a name). It can be updated by the user by updating their `first_name` and `last_name` fields."]
+    name: String,
+    #[doc = "The user's phone number."]
+    phone: String,
+    #[doc = "The date and time the user was last updated."]
+    updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct UserResultsPage {
+    #[doc = "list of items on this page of results"]
+    items: User,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    next_page: String,
+}
+
+#[doc = "A verification token for a user.\n\nThis is typically used to verify a user's email address."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct VerificationToken {
+    #[doc = "The date and time the verification token was created."]
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The date and time the verification token expires."]
+    expires: chrono::DateTime<chrono::Utc>,
+    #[doc = "The token used for verification. This is used as the id for the table since it is unique per record."]
+    id: String,
+    #[doc = "The identifier for the user. This is typically the user's email address since that is what we are verifying."]
+    identifier: String,
+    #[doc = "The date and time the verification token was last updated."]
+    updated_at: chrono::DateTime<chrono::Utc>,
 }
