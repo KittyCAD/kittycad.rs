@@ -40,19 +40,14 @@ impl SchemaExt for openapiv3::PathItem {
 
 impl SchemaExt for openapiv3::RequestBody {
     fn recurse(&self, spec: &openapiv3::OpenAPI) -> Result<openapiv3::Schema> {
-        // Get the content type.
-        let content = self.content.get("application/json").ok_or_else(|| {
-            anyhow::anyhow!("RequestBody does not have a content type of `application/json`")
-        })?;
-
-        if content.schema.is_none() {
-            anyhow::bail!("RequestBody does not have a schema")
+        // Iterate over all the media types and return the first request.
+        for (_name, content) in &self.content {
+            if let Some(s) = &content.schema {
+                return s.recurse(spec);
+            }
         }
 
-        let schema = content.schema.as_ref().unwrap();
-
-        // Recurse the schema.
-        schema.recurse(spec)
+        anyhow::bail!("RequestBody does not have a schema: {:?}", self)
     }
 }
 
