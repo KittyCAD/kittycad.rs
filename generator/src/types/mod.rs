@@ -3,6 +3,7 @@
 pub mod base64;
 pub mod exts;
 pub mod paginate;
+pub mod phone_number;
 
 use std::str::FromStr;
 
@@ -21,6 +22,9 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
     // Include the paginate data type for pagination.
     let paginate_mod = get_paginate_mod()?;
 
+    // Include the phone number data type for phone numbers.
+    let phone_number_mod = get_phone_number_mod()?;
+
     // Let's start with the components if there are any.
     let mut rendered = quote!(
         //! This module contains the generated types for the library.
@@ -30,6 +34,8 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
         #base64_mod
 
         #paginate_mod
+
+        #phone_number_mod
     );
 
     if let Some(components) = &spec.components {
@@ -274,7 +280,13 @@ fn get_type_name_for_string(
             "uri-template" => quote!(String),
             "url" => quote!(url::Url),
             "email" => quote!(String),
-            "phone" => quote!(phonenumber::PhoneNumber),
+            "phone" => {
+                if in_crate {
+                    quote!(phone_number::PhoneNumber)
+                } else {
+                    quote!(crate::types::phone_number::PhoneNumber)
+                }
+            }
             "uuid" => quote!(uuid::Uuid),
             "hostname" => quote!(String),
             "time" => quote!(chrono::NaiveTime),
@@ -1098,6 +1110,16 @@ fn get_paginate_mod() -> Result<proc_macro2::TokenStream> {
     let stream = proc_macro2::TokenStream::from_str(file).map_err(|e| anyhow::anyhow!("{}", e))?;
     Ok(quote!(
         pub mod paginate {
+            #stream
+        }
+    ))
+}
+
+fn get_phone_number_mod() -> Result<proc_macro2::TokenStream> {
+    let file = include_str!("phone_number.rs");
+    let stream = proc_macro2::TokenStream::from_str(file).map_err(|e| anyhow::anyhow!("{}", e))?;
+    Ok(quote!(
+        pub mod phone_number {
             #stream
         }
     ))

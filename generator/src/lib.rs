@@ -402,10 +402,15 @@ fn persistent_modules() -> Vec<String> {
 
 fn generate_cargo_toml(opts: &Opts) -> String {
     let repo_info = if let Some(repo) = &opts.repo_name {
+        let output = if opts.output.display().to_string() == "." {
+            "".to_string()
+        } else {
+            opts.output.display().to_string()
+        };
+
         format!(
             r#"repository = "https://github.com/{}/tree/main/{}""#,
-            repo,
-            opts.output.display()
+            repo, output
         )
     } else {
         "".to_string()

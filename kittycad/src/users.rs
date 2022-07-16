@@ -151,7 +151,7 @@ impl Users {
     ) -> Result<Vec<crate::types::User>> {
         use crate::types::paginate::Pagination;
         let mut result = self
-            .list(limit.clone(), page_token.clone(), sort_by.clone())
+            .list(limit, page_token.clone(), sort_by.clone())
             .await?;
         let mut items = result.items();
         if result.has_more_pages()? {
@@ -234,7 +234,7 @@ impl Users {
     ) -> Result<Vec<crate::types::ExtendedUser>> {
         use crate::types::paginate::Pagination;
         let mut result = self
-            .list_extended(limit.clone(), page_token.clone(), sort_by.clone())
+            .list_extended(limit, page_token.clone(), sort_by.clone())
             .await?;
         let mut items = result.items();
         if result.has_more_pages()? {
