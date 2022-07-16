@@ -594,7 +594,6 @@ fn render_object(
     spec: &openapiv3::OpenAPI,
 ) -> Result<proc_macro2::TokenStream> {
     // TODO: min/max properties
-    // TODO: additionalProperties
 
     let description = if let Some(d) = &data.description {
         quote!(#[doc = #d])
@@ -604,6 +603,25 @@ fn render_object(
 
     // Get the proper name version of the name of the object.
     let struct_name = get_type_name(name, data)?;
+
+    // If the object has no properties, but has additional_properties, just use that
+    // for the type.
+    if o.properties.is_empty() {
+        if let Some(additional_properties) = &o.additional_properties {
+            match additional_properties {
+                openapiv3::AdditionalProperties::Any(any) => {
+                    anyhow::bail!(
+                        "additional_properties is not supported for any type: {:?}",
+                        any
+                    );
+                }
+                openapiv3::AdditionalProperties::Schema(schema) => {
+                    let rendered = render_schema(name, schema.item()?, spec)?;
+                    return Ok(rendered);
+                }
+            }
+        }
+    }
 
     let mut values = quote!();
     for (k, v) in &o.properties {
