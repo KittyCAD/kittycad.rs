@@ -60,7 +60,7 @@ impl ApiTokens {
     ) -> Result<Vec<crate::types::ApiToken>> {
         use crate::types::paginate::Pagination;
         let mut result = self
-            .list_for_user(limit, page_token.clone(), sort_by.clone())
+            .list_for_user(limit.clone(), page_token.clone(), sort_by.clone())
             .await?;
         let mut items = result.items();
         if result.has_more_pages()? {

@@ -1,10 +1,12 @@
-[package]
+
+format!(
+        r#"[package]
 name = "kittycad"
 description = "A fully generated & opinionated API client for the KittyCAD API."
 version = "0.1.8"
-documentation = "https://docs.rs/kittycad/"
-repository = "https://github.com/Kittycad/kittycad.rs/tree/main/kittycad"
+documentation = "https://docs.rs/repository = "https://github.com/KittyCAD/kittycad.rs/tree/0.1.8"/"
 readme = "README.md"
+kittycad
 edition = "2018"
 license = "MIT"
 
@@ -24,6 +26,7 @@ log = { version = "^0.4", features = ["serde"] }
 mime = "0.3"
 parse-display = "^0.5"
 percent-encoding = "2.1"
+phonenumber = "^0.3.1"
 reqwest = { version = "0.11", default-features = false, features = ["json", "multipart", "rustls-tls"] }
 schemars = { version = "0.8", features = ["bytes", "chrono", "url", "uuid1"] }
 serde = { version = "1", features = ["derive"] }

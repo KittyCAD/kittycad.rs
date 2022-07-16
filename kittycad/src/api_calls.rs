@@ -88,7 +88,7 @@ impl ApiCalls {
     ) -> Result<Vec<crate::types::ApiCallWithPrice>> {
         use crate::types::paginate::Pagination;
         let mut result = self
-            .list(limit, page_token.clone(), sort_by.clone())
+            .list(limit.clone(), page_token.clone(), sort_by.clone())
             .await?;
         let mut items = result.items();
         if result.has_more_pages()? {
@@ -204,7 +204,7 @@ impl ApiCalls {
         use crate::types::paginate::Pagination;
         let mut result = self
             .list_async_operations(
-                limit,
+                limit.clone(),
                 page_token.clone(),
                 sort_by.clone(),
                 status.clone(),
@@ -320,7 +320,7 @@ impl ApiCalls {
     ) -> Result<Vec<crate::types::ApiCallWithPrice>> {
         use crate::types::paginate::Pagination;
         let mut result = self
-            .user_list(limit, page_token.clone(), sort_by.clone())
+            .user_list(limit.clone(), page_token.clone(), sort_by.clone())
             .await?;
         let mut items = result.items();
         if result.has_more_pages()? {
@@ -440,7 +440,7 @@ impl ApiCalls {
         let mut result = self
             .list_for_user(
                 id.clone(),
-                limit,
+                limit.clone(),
                 page_token.clone(),
                 sort_by.clone(),
             )

@@ -745,7 +745,7 @@ pub struct BillingInfo {
     #[doc = "The phone for the customer."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
-    pub phone: Option<String>,
+    pub phone: Option<phonenumber::PhoneNumber>,
 }
 
 impl std::fmt::Display for BillingInfo {
@@ -1687,7 +1687,7 @@ pub struct Customer {
     #[doc = "The customer's phone number."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
-    pub phone: Option<String>,
+    pub phone: Option<phonenumber::PhoneNumber>,
 }
 
 impl std::fmt::Display for Customer {
@@ -2269,7 +2269,7 @@ pub struct ExtendedUser {
     #[doc = "The user's phone number."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
-    pub phone: Option<String>,
+    pub phone: Option<phonenumber::PhoneNumber>,
     #[doc = "The user's Stripe ID. This is mostly used for internal mapping."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
@@ -3982,7 +3982,7 @@ pub struct UpdateUser {
     #[doc = "The user's phone number."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
-    pub phone: Option<String>,
+    pub phone: Option<phonenumber::PhoneNumber>,
 }
 
 impl std::fmt::Display for UpdateUser {
@@ -4051,7 +4051,7 @@ pub struct User {
     #[doc = "The user's phone number."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
-    pub phone: Option<String>,
+    pub phone: Option<phonenumber::PhoneNumber>,
     #[doc = "The date and time the user was last updated."]
     #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,

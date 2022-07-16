@@ -216,63 +216,7 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     // Write the Cargo.toml file:
     let mut toml = opts.output.clone();
     toml.push("Cargo.toml");
-    let tomlout = format!(
-        r#"[package]
-name = "{}"
-description = "{}"
-version = "{}"
-documentation = "https://docs.rs/{}/"
-repository = "https://github.com/Kittycad/kittycad.rs/tree/main/{}"
-readme = "README.md"
-edition = "2018"
-license = "MIT"
-
-[dependencies]
-anyhow = "1"
-async-trait = "^0.1.53"
-bytes = {{ version = "1", features = ["serde"] }}
-clap = {{ version = "^3.2.12", features = ["cargo", "derive", "env", "unicode"] }}
-chrono = {{ version = "0.4", features = ["serde"] }}
-chrono-humanize = "^0.2.1"
-data-encoding = "^2.3.2"
-dirs = {{ version = "^4.0.0", optional = true }}
-format_serde_error = "^0.3.0"
-http = "^0.2.8"
-hyperx = "1"
-log = {{ version = "^0.4", features = ["serde"] }}
-mime = "0.3"
-parse-display = "^0.5"
-percent-encoding = "2.1"
-reqwest = {{ version = "0.11", default-features = false, features = ["json", "multipart", "rustls-tls"] }}
-schemars = {{ version = "0.8", features = ["bytes", "chrono", "url", "uuid1"] }}
-serde = {{ version = "1", features = ["derive"] }}
-serde_json = "1"
-serde_with = "1"
-serde_urlencoded = "^0.7"
-tabled = {{ version = "0.7.0", features = ["color"] }}
-thiserror = "^1"
-url = {{ version = "2", features = ["serde"] }}
-uuid = {{ version = "1", features = ["serde", "v4"] }}
-
-[dev-dependencies]
-expectorate = "1"
-pretty_assertions = "1"
-tokio = {{ version = "1.20.0", features = ["full"] }}
-
-[features]
-# enable etag-based http_cache functionality
-httpcache = ["dirs"]
-
-[package.metadata.docs.rs]
-all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
-"#,
-        opts.name,
-        opts.description,
-        opts.version,
-        opts.name,
-        opts.output.display(),
-    );
+    let tomlout = generate_cargo_toml(opts);
     crate::save(&toml, tomlout.as_str())?;
 
     /*
@@ -414,6 +358,10 @@ pub struct Opts {
     /// The link to a hosted version of the spec.
     #[clap(short, long)]
     pub spec_url: Option<String>,
+
+    /// The repo name, formatted like `{owner}/{name}`, if hosted on GitHub.
+    #[clap(short, long)]
+    pub repo_name: Option<String>,
 }
 
 impl Opts {
@@ -450,4 +398,74 @@ impl Opts {
 /// These are modules we do not nuke at generation time.
 fn persistent_modules() -> Vec<String> {
     vec!["tests".to_string()]
+}
+
+fn generate_cargo_toml(opts: &Opts) -> String {
+    let repo_info = if let Some(repo) = &opts.repo_name {
+        format!(
+            r#"repository = "https://github.com/{}/tree/{}""#,
+            repo, opts.version
+        )
+    } else {
+        "".to_string()
+    };
+
+    format!(
+        r#"[package]
+name = "{}"
+description = "{}"
+version = "{}"
+documentation = "https://docs.rs/{}/"
+readme = "README.md"
+{}
+edition = "2018"
+license = "MIT"
+
+[dependencies]
+anyhow = "1"
+async-trait = "^0.1.53"
+bytes = {{ version = "1", features = ["serde"] }}
+clap = {{ version = "^3.2.12", features = ["cargo", "derive", "env", "unicode"] }}
+chrono = {{ version = "0.4", features = ["serde"] }}
+chrono-humanize = "^0.2.1"
+data-encoding = "^2.3.2"
+dirs = {{ version = "^4.0.0", optional = true }}
+format_serde_error = "^0.3.0"
+http = "^0.2.8"
+hyperx = "1"
+log = {{ version = "^0.4", features = ["serde"] }}
+mime = "0.3"
+parse-display = "^0.5"
+percent-encoding = "2.1"
+phonenumber = "^0.3.1"
+reqwest = {{ version = "0.11", default-features = false, features = ["json", "multipart", "rustls-tls"] }}
+schemars = {{ version = "0.8", features = ["bytes", "chrono", "url", "uuid1"] }}
+serde = {{ version = "1", features = ["derive"] }}
+serde_json = "1"
+serde_with = "1"
+serde_urlencoded = "^0.7"
+tabled = {{ version = "0.7.0", features = ["color"] }}
+thiserror = "^1"
+url = {{ version = "2", features = ["serde"] }}
+uuid = {{ version = "1", features = ["serde", "v4"] }}
+
+[dev-dependencies]
+expectorate = "1"
+pretty_assertions = "1"
+tokio = {{ version = "1.20.0", features = ["full"] }}
+
+[features]
+# enable etag-based http_cache functionality
+httpcache = ["dirs"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+"#,
+        opts.name,
+        opts.description,
+        opts.version,
+        repo_info,
+        opts.output.display(),
+    )
 }

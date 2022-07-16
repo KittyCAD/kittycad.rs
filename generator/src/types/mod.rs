@@ -274,7 +274,7 @@ fn get_type_name_for_string(
             "uri-template" => quote!(String),
             "url" => quote!(url::Url),
             "email" => quote!(String),
-            "phone" => quote!(String),
+            "phone" => quote!(phonenumber::PhoneNumber),
             "uuid" => quote!(uuid::Uuid),
             "hostname" => quote!(String),
             "time" => quote!(chrono::NaiveTime),
