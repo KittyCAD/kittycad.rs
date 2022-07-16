@@ -72,7 +72,7 @@ async fn test_get_status_of_async_operation() {
 
     let _result = client
         .api_calls()
-        .get_async_operation("23a9759f-ee9b-47de-9a55-deb1ed035793")
+        .get_async_operation("23a9759f-ee9b-47de-9a55-deb1ed035793".to_string())
         .await
         .unwrap();
 }

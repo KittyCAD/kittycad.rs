@@ -62,6 +62,14 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 #[doc(hidden)]
+/// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
+///
+/// FROM: <https://docs.kittycad.io/api/api-calls>
+pub mod api_calls;
+/// API tokens allow users to call the API outside of their session token that is used as a cookie in the user interface. Users can create, delete, and list their API tokens. But, of course, you need an API token to do this, so first be sure to generate one in the account UI.
+///
+/// FROM: <https://docs.kittycad.io/api/api-tokens>
+pub mod api_tokens;
 /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
 ///
 /// FROM: <https://docs.kittycad.io/api/file>
@@ -167,6 +175,20 @@ impl Client {
         let token = env::var("KITTYCAD_API_TOKEN").expect("must set KITTYCAD_API_TOKEN");
 
         Client::new(token)
+    }
+
+    /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
+    ///
+    /// FROM: <https://docs.kittycad.io/api/api-calls>
+    pub fn api_calls(&self) -> api_calls::ApiCalls {
+        api_calls::ApiCalls::new(self.clone())
+    }
+
+    /// API tokens allow users to call the API outside of their session token that is used as a cookie in the user interface. Users can create, delete, and list their API tokens. But, of course, you need an API token to do this, so first be sure to generate one in the account UI.
+    ///
+    /// FROM: <https://docs.kittycad.io/api/api-tokens>
+    pub fn api_tokens(&self) -> api_tokens::ApiTokens {
+        api_tokens::ApiTokens::new(self.clone())
     }
 
     /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.

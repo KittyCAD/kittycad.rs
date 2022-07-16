@@ -257,16 +257,16 @@ fn gen(api: &OpenAPI) -> Result<String> {
                     return Ok(());
                 };
 
-                let tag = crate::clean_tag_name(op.tags.first().ok_or(anyhow::anyhow!(
+                let tag = op.tags.first().ok_or(anyhow::anyhow!(
                     "operation `{}` `{}` has no tags",
                     name,
                     method
-                ))?);
+                ))?;
 
                 // Add our tag to our vector.
                 // TODO: there is some repeated code above w functions.rs we could probably
                 // clean up.
-                tags_with_paths.push(tag);
+                tags_with_paths.push(tag.to_string());
 
                 Ok(())
             };
