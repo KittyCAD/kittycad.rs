@@ -122,19 +122,19 @@ pub fn get_type_name_for_schema(
     schema: &openapiv3::Schema,
     spec: &openapiv3::OpenAPI,
 ) -> Result<proc_macro2::TokenStream> {
-    match &schema.schema_kind {
+    let t = match &schema.schema_kind {
         openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
-            get_type_name_for_string(name, s, &schema.schema_data)
+            get_type_name_for_string(name, s, &schema.schema_data)?
         }
-        openapiv3::SchemaKind::Type(openapiv3::Type::Number(n)) => get_type_name_for_number(n),
-        openapiv3::SchemaKind::Type(openapiv3::Type::Integer(i)) => get_type_name_for_integer(i),
+        openapiv3::SchemaKind::Type(openapiv3::Type::Number(n)) => get_type_name_for_number(n)?,
+        openapiv3::SchemaKind::Type(openapiv3::Type::Integer(i)) => get_type_name_for_integer(i)?,
         openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
-            get_type_name_for_object(name, o, &schema.schema_data, spec)
+            get_type_name_for_object(name, o, &schema.schema_data, spec)?
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Array(a)) => {
-            get_type_name_for_array(name, a, spec)
+            get_type_name_for_array(name, a, spec)?
         }
-        openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => Ok(quote!(bool)),
+        openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => quote!(bool),
         openapiv3::SchemaKind::OneOf { one_of } => {
             if one_of.len() != 1 {
                 anyhow::bail!("XXX one of with more than one value not supported yet");
@@ -142,7 +142,7 @@ pub fn get_type_name_for_schema(
 
             let internal_schema = &one_of[0].get_schema_from_reference(spec, true)?;
             let ident = get_type_name(name, &internal_schema.schema_data)?;
-            Ok(quote!(#ident))
+            quote!(#ident)
         }
         openapiv3::SchemaKind::AllOf { all_of } => {
             if all_of.len() != 1 {
@@ -151,7 +151,7 @@ pub fn get_type_name_for_schema(
 
             let internal_schema = &all_of[0].get_schema_from_reference(spec, true)?;
             let ident = get_type_name(name, &internal_schema.schema_data)?;
-            Ok(quote!(#ident))
+            quote!(#ident)
         }
         openapiv3::SchemaKind::AnyOf { any_of: _ } => {
             anyhow::bail!("XXX any of not supported yet");
@@ -159,7 +159,13 @@ pub fn get_type_name_for_schema(
         openapiv3::SchemaKind::Not { not: _ } => {
             anyhow::bail!("XXX not not supported yet");
         }
-        openapiv3::SchemaKind::Any(_any) => Ok(quote!(serde_json::Value)),
+        openapiv3::SchemaKind::Any(_any) => quote!(serde_json::Value),
+    };
+
+    if schema.schema_data.nullable {
+        Ok(quote!(Option<#t>))
+    } else {
+        Ok(t)
     }
 }
 
@@ -602,7 +608,19 @@ fn render_object(
     data: &openapiv3::SchemaData,
     spec: &openapiv3::OpenAPI,
 ) -> Result<proc_macro2::TokenStream> {
-    // TODO: min/max properties
+    if let Some(min_properties) = o.min_properties {
+        anyhow::bail!(
+            "min properties not supported for objects: {:?}",
+            min_properties
+        );
+    }
+
+    if let Some(max_properties) = o.max_properties {
+        anyhow::bail!(
+            "max properties not supported for objects: {:?}",
+            max_properties
+        );
+    }
 
     let description = if let Some(d) = &data.description {
         quote!(#[doc = #d])
@@ -653,7 +671,7 @@ fn render_object(
         // Get the type name for the schema.
         let mut type_name = get_type_name_for_schema(&prop, &inner_schema, spec)?;
         // Check if this type is required.
-        if !o.required.contains(k) && get_text(&type_name)?.starts_with("Option<") {
+        if !o.required.contains(k) && !get_text(&type_name)?.starts_with("Option<") {
             // Make the type optional.
             type_name = quote!(Option<#type_name>);
         }
@@ -678,30 +696,6 @@ fn render_object(
     }
 
     // TODO: defaults
-    /*// If the data for the enum has a default value, implement default for the enum.
-    let default = if let Some(default) = &data.default {
-        let default = default.to_string();
-        let default = format_ident!("{}", proper_name(&default));
-        quote!(
-            impl Default for #enum_name {
-                fn default() -> Self {
-                    #default
-                }
-            }
-        )
-    } else if s.enumeration.len() == 1 {
-        let default = s.enumeration[0].as_ref().unwrap().to_string();
-        let default = format_ident!("{}", proper_name(&default));
-        quote!(
-            impl Default for #enum_name {
-                fn default() -> Self {
-                    #enum_name::#default
-                }
-            }
-        )
-    } else {
-        quote!()
-    };*/
 
     let rendered = quote! {
         #description
@@ -820,8 +814,7 @@ fn render_enum(
     let mut values = quote!();
     for e in &s.enumeration {
         if e.is_none() {
-            // TODO: do something for None
-            continue;
+            anyhow::bail!("Cannot render None string enumeration");
         }
 
         let e = e.as_ref().unwrap().to_string();
