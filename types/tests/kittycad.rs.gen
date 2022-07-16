@@ -1,0 +1,958 @@
+#[doc = "An account provider."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum AccountProvider {
+    #[serde(rename = "google")]
+    #[display("google")]
+    Google,
+    #[serde(rename = "github")]
+    #[display("github")]
+    Github,
+}
+
+#[doc = "The field of an API call to group by."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum ApiCallQueryGroupBy {
+    #[serde(rename = "email")]
+    #[display("email")]
+    Email,
+    #[serde(rename = "method")]
+    #[display("method")]
+    Method,
+    #[serde(rename = "endpoint")]
+    #[display("endpoint")]
+    Endpoint,
+    #[serde(rename = "user_id")]
+    #[display("user_id")]
+    UserId,
+    #[serde(rename = "origin")]
+    #[display("origin")]
+    Origin,
+    #[serde(rename = "ip_address")]
+    #[display("ip_address")]
+    IpAddress,
+}
+
+#[doc = "The status of an async API call."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum ApiCallStatus {
+    Queued,
+    Uploaded,
+    #[serde(rename = "In Progress")]
+    #[display("In Progress")]
+    InProgress,
+    Completed,
+    Failed,
+}
+
+#[doc = "The type of async API call."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum AsyncApiCallType {
+    FileConversion,
+    FileVolume,
+    FileMass,
+    FileDensity,
+}
+
+#[doc = "The language code is written in."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum CodeLanguage {
+    #[serde(rename = "go")]
+    #[display("go")]
+    Go,
+    #[serde(rename = "python")]
+    #[display("python")]
+    Python,
+    #[serde(rename = "node")]
+    #[display("node")]
+    Node,
+}
+
+#[doc = "Supported set of sort modes for scanning by created_at only.\n\nCurrently, we only support scanning in ascending order."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum CreatedAtSortMode {
+    #[serde(rename = "created-at-ascending")]
+    #[display("created-at-ascending")]
+    CreatedAtAscending,
+    #[serde(rename = "created-at-descending")]
+    #[display("created-at-descending")]
+    CreatedAtDescending,
+}
+
+#[doc = "Currency is the list of supported currencies.\n\nFor more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum Currency {
+    #[serde(rename = "aed")]
+    #[display("aed")]
+    Aed,
+    #[serde(rename = "afn")]
+    #[display("afn")]
+    Afn,
+    #[serde(rename = "all")]
+    #[display("all")]
+    All,
+    #[serde(rename = "amd")]
+    #[display("amd")]
+    Amd,
+    #[serde(rename = "ang")]
+    #[display("ang")]
+    Ang,
+    #[serde(rename = "aoa")]
+    #[display("aoa")]
+    Aoa,
+    #[serde(rename = "ars")]
+    #[display("ars")]
+    Ars,
+    #[serde(rename = "aud")]
+    #[display("aud")]
+    Aud,
+    #[serde(rename = "awg")]
+    #[display("awg")]
+    Awg,
+    #[serde(rename = "azn")]
+    #[display("azn")]
+    Azn,
+    #[serde(rename = "bam")]
+    #[display("bam")]
+    Bam,
+    #[serde(rename = "bbd")]
+    #[display("bbd")]
+    Bbd,
+    #[serde(rename = "bdt")]
+    #[display("bdt")]
+    Bdt,
+    #[serde(rename = "bgn")]
+    #[display("bgn")]
+    Bgn,
+    #[serde(rename = "bif")]
+    #[display("bif")]
+    Bif,
+    #[serde(rename = "bmd")]
+    #[display("bmd")]
+    Bmd,
+    #[serde(rename = "bnd")]
+    #[display("bnd")]
+    Bnd,
+    #[serde(rename = "bob")]
+    #[display("bob")]
+    Bob,
+    #[serde(rename = "brl")]
+    #[display("brl")]
+    Brl,
+    #[serde(rename = "bsd")]
+    #[display("bsd")]
+    Bsd,
+    #[serde(rename = "bwp")]
+    #[display("bwp")]
+    Bwp,
+    #[serde(rename = "bzd")]
+    #[display("bzd")]
+    Bzd,
+    #[serde(rename = "cad")]
+    #[display("cad")]
+    Cad,
+    #[serde(rename = "cdf")]
+    #[display("cdf")]
+    Cdf,
+    #[serde(rename = "chf")]
+    #[display("chf")]
+    Chf,
+    #[serde(rename = "clp")]
+    #[display("clp")]
+    Clp,
+    #[serde(rename = "cny")]
+    #[display("cny")]
+    Cny,
+    #[serde(rename = "cop")]
+    #[display("cop")]
+    Cop,
+    #[serde(rename = "crc")]
+    #[display("crc")]
+    Crc,
+    #[serde(rename = "cve")]
+    #[display("cve")]
+    Cve,
+    #[serde(rename = "czk")]
+    #[display("czk")]
+    Czk,
+    #[serde(rename = "djf")]
+    #[display("djf")]
+    Djf,
+    #[serde(rename = "dkk")]
+    #[display("dkk")]
+    Dkk,
+    #[serde(rename = "dop")]
+    #[display("dop")]
+    Dop,
+    #[serde(rename = "dzd")]
+    #[display("dzd")]
+    Dzd,
+    #[serde(rename = "eek")]
+    #[display("eek")]
+    Eek,
+    #[serde(rename = "egp")]
+    #[display("egp")]
+    Egp,
+    #[serde(rename = "etb")]
+    #[display("etb")]
+    Etb,
+    #[serde(rename = "eur")]
+    #[display("eur")]
+    Eur,
+    #[serde(rename = "fjd")]
+    #[display("fjd")]
+    Fjd,
+    #[serde(rename = "fkp")]
+    #[display("fkp")]
+    Fkp,
+    #[serde(rename = "gbp")]
+    #[display("gbp")]
+    Gbp,
+    #[serde(rename = "gel")]
+    #[display("gel")]
+    Gel,
+    #[serde(rename = "gip")]
+    #[display("gip")]
+    Gip,
+    #[serde(rename = "gmd")]
+    #[display("gmd")]
+    Gmd,
+    #[serde(rename = "gnf")]
+    #[display("gnf")]
+    Gnf,
+    #[serde(rename = "gtq")]
+    #[display("gtq")]
+    Gtq,
+    #[serde(rename = "gyd")]
+    #[display("gyd")]
+    Gyd,
+    #[serde(rename = "hkd")]
+    #[display("hkd")]
+    Hkd,
+    #[serde(rename = "hnl")]
+    #[display("hnl")]
+    Hnl,
+    #[serde(rename = "hrk")]
+    #[display("hrk")]
+    Hrk,
+    #[serde(rename = "htg")]
+    #[display("htg")]
+    Htg,
+    #[serde(rename = "huf")]
+    #[display("huf")]
+    Huf,
+    #[serde(rename = "idr")]
+    #[display("idr")]
+    Idr,
+    #[serde(rename = "ils")]
+    #[display("ils")]
+    Ils,
+    #[serde(rename = "inr")]
+    #[display("inr")]
+    Inr,
+    #[serde(rename = "isk")]
+    #[display("isk")]
+    Isk,
+    #[serde(rename = "jmd")]
+    #[display("jmd")]
+    Jmd,
+    #[serde(rename = "jpy")]
+    #[display("jpy")]
+    Jpy,
+    #[serde(rename = "kes")]
+    #[display("kes")]
+    Kes,
+    #[serde(rename = "kgs")]
+    #[display("kgs")]
+    Kgs,
+    #[serde(rename = "khr")]
+    #[display("khr")]
+    Khr,
+    #[serde(rename = "kmf")]
+    #[display("kmf")]
+    Kmf,
+    #[serde(rename = "krw")]
+    #[display("krw")]
+    Krw,
+    #[serde(rename = "kyd")]
+    #[display("kyd")]
+    Kyd,
+    #[serde(rename = "kzt")]
+    #[display("kzt")]
+    Kzt,
+    #[serde(rename = "lak")]
+    #[display("lak")]
+    Lak,
+    #[serde(rename = "lbp")]
+    #[display("lbp")]
+    Lbp,
+    #[serde(rename = "lkr")]
+    #[display("lkr")]
+    Lkr,
+    #[serde(rename = "lrd")]
+    #[display("lrd")]
+    Lrd,
+    #[serde(rename = "lsl")]
+    #[display("lsl")]
+    Lsl,
+    #[serde(rename = "ltl")]
+    #[display("ltl")]
+    Ltl,
+    #[serde(rename = "lvl")]
+    #[display("lvl")]
+    Lvl,
+    #[serde(rename = "mad")]
+    #[display("mad")]
+    Mad,
+    #[serde(rename = "mdl")]
+    #[display("mdl")]
+    Mdl,
+    #[serde(rename = "mga")]
+    #[display("mga")]
+    Mga,
+    #[serde(rename = "mkd")]
+    #[display("mkd")]
+    Mkd,
+    #[serde(rename = "mnt")]
+    #[display("mnt")]
+    Mnt,
+    #[serde(rename = "mop")]
+    #[display("mop")]
+    Mop,
+    #[serde(rename = "mro")]
+    #[display("mro")]
+    Mro,
+    #[serde(rename = "mur")]
+    #[display("mur")]
+    Mur,
+    #[serde(rename = "mvr")]
+    #[display("mvr")]
+    Mvr,
+    #[serde(rename = "mwk")]
+    #[display("mwk")]
+    Mwk,
+    #[serde(rename = "mxn")]
+    #[display("mxn")]
+    Mxn,
+    #[serde(rename = "myr")]
+    #[display("myr")]
+    Myr,
+    #[serde(rename = "mzn")]
+    #[display("mzn")]
+    Mzn,
+    #[serde(rename = "nad")]
+    #[display("nad")]
+    Nad,
+    #[serde(rename = "ngn")]
+    #[display("ngn")]
+    Ngn,
+    #[serde(rename = "nio")]
+    #[display("nio")]
+    Nio,
+    #[serde(rename = "nok")]
+    #[display("nok")]
+    Nok,
+    #[serde(rename = "npr")]
+    #[display("npr")]
+    Npr,
+    #[serde(rename = "nzd")]
+    #[display("nzd")]
+    Nzd,
+    #[serde(rename = "pab")]
+    #[display("pab")]
+    Pab,
+    #[serde(rename = "pen")]
+    #[display("pen")]
+    Pen,
+    #[serde(rename = "pgk")]
+    #[display("pgk")]
+    Pgk,
+    #[serde(rename = "php")]
+    #[display("php")]
+    Php,
+    #[serde(rename = "pkr")]
+    #[display("pkr")]
+    Pkr,
+    #[serde(rename = "pln")]
+    #[display("pln")]
+    Pln,
+    #[serde(rename = "pyg")]
+    #[display("pyg")]
+    Pyg,
+    #[serde(rename = "qar")]
+    #[display("qar")]
+    Qar,
+    #[serde(rename = "ron")]
+    #[display("ron")]
+    Ron,
+    #[serde(rename = "rsd")]
+    #[display("rsd")]
+    Rsd,
+    #[serde(rename = "rub")]
+    #[display("rub")]
+    Rub,
+    #[serde(rename = "rwf")]
+    #[display("rwf")]
+    Rwf,
+    #[serde(rename = "sar")]
+    #[display("sar")]
+    Sar,
+    #[serde(rename = "sbd")]
+    #[display("sbd")]
+    Sbd,
+    #[serde(rename = "scr")]
+    #[display("scr")]
+    Scr,
+    #[serde(rename = "sek")]
+    #[display("sek")]
+    Sek,
+    #[serde(rename = "sgd")]
+    #[display("sgd")]
+    Sgd,
+    #[serde(rename = "shp")]
+    #[display("shp")]
+    Shp,
+    #[serde(rename = "sll")]
+    #[display("sll")]
+    Sll,
+    #[serde(rename = "sos")]
+    #[display("sos")]
+    Sos,
+    #[serde(rename = "srd")]
+    #[display("srd")]
+    Srd,
+    #[serde(rename = "std")]
+    #[display("std")]
+    Std,
+    #[serde(rename = "svc")]
+    #[display("svc")]
+    Svc,
+    #[serde(rename = "szl")]
+    #[display("szl")]
+    Szl,
+    #[serde(rename = "thb")]
+    #[display("thb")]
+    Thb,
+    #[serde(rename = "tjs")]
+    #[display("tjs")]
+    Tjs,
+    #[serde(rename = "top")]
+    #[display("top")]
+    Top,
+    #[serde(rename = "try")]
+    #[display("try")]
+    Try,
+    #[serde(rename = "ttd")]
+    #[display("ttd")]
+    Ttd,
+    #[serde(rename = "twd")]
+    #[display("twd")]
+    Twd,
+    #[serde(rename = "tzs")]
+    #[display("tzs")]
+    Tzs,
+    #[serde(rename = "uah")]
+    #[display("uah")]
+    Uah,
+    #[serde(rename = "ugx")]
+    #[display("ugx")]
+    Ugx,
+    #[serde(rename = "usd")]
+    #[display("usd")]
+    Usd,
+    #[serde(rename = "uyu")]
+    #[display("uyu")]
+    Uyu,
+    #[serde(rename = "uzs")]
+    #[display("uzs")]
+    Uzs,
+    #[serde(rename = "vef")]
+    #[display("vef")]
+    Vef,
+    #[serde(rename = "vnd")]
+    #[display("vnd")]
+    Vnd,
+    #[serde(rename = "vuv")]
+    #[display("vuv")]
+    Vuv,
+    #[serde(rename = "wst")]
+    #[display("wst")]
+    Wst,
+    #[serde(rename = "xaf")]
+    #[display("xaf")]
+    Xaf,
+    #[serde(rename = "xcd")]
+    #[display("xcd")]
+    Xcd,
+    #[serde(rename = "xof")]
+    #[display("xof")]
+    Xof,
+    #[serde(rename = "xpf")]
+    #[display("xpf")]
+    Xpf,
+    #[serde(rename = "yer")]
+    #[display("yer")]
+    Yer,
+    #[serde(rename = "zar")]
+    #[display("zar")]
+    Zar,
+    #[serde(rename = "zmw")]
+    #[display("zmw")]
+    Zmw,
+}
+
+#[doc = "The environment the server is running in."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum Environment {
+    #[serde(rename = "DEVELOPMENT")]
+    #[display("DEVELOPMENT")]
+    Development,
+    #[serde(rename = "PREVIEW")]
+    #[display("PREVIEW")]
+    Preview,
+    #[serde(rename = "PRODUCTION")]
+    #[display("PRODUCTION")]
+    Production,
+}
+
+#[doc = "The valid types of output file formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum FileOutputFormat {
+    #[serde(rename = "stl")]
+    #[display("stl")]
+    Stl,
+    #[serde(rename = "obj")]
+    #[display("obj")]
+    Obj,
+    #[serde(rename = "dae")]
+    #[display("dae")]
+    Dae,
+    #[serde(rename = "step")]
+    #[display("step")]
+    Step,
+    #[serde(rename = "fbx")]
+    #[display("fbx")]
+    Fbx,
+    #[serde(rename = "fbxb")]
+    #[display("fbxb")]
+    Fbxb,
+}
+
+#[doc = "The valid types of source file formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum FileSourceFormat {
+    #[serde(rename = "stl")]
+    #[display("stl")]
+    Stl,
+    #[serde(rename = "obj")]
+    #[display("obj")]
+    Obj,
+    #[serde(rename = "dae")]
+    #[display("dae")]
+    Dae,
+    #[serde(rename = "step")]
+    #[display("step")]
+    Step,
+    #[serde(rename = "fbx")]
+    #[display("fbx")]
+    Fbx,
+}
+
+#[doc = "An enum representing the possible values of an `Invoice`'s `status` field."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum InvoiceStatus {
+    #[serde(rename = "deleted")]
+    #[display("deleted")]
+    Deleted,
+    #[serde(rename = "draft")]
+    #[display("draft")]
+    Draft,
+    #[serde(rename = "open")]
+    #[display("open")]
+    Open,
+    #[serde(rename = "paid")]
+    #[display("paid")]
+    Paid,
+    #[serde(rename = "uncollectible")]
+    #[display("uncollectible")]
+    Uncollectible,
+    #[serde(rename = "void")]
+    #[display("void")]
+    Void,
+}
+
+#[doc = "The Request Method (VERB)\n\nThis type also contains constants for a number of common HTTP methods such as GET, POST, etc.\n\nCurrently includes 8 variants representing the 8 methods defined in [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH, and an Extension variant for all extensions."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum Method {
+    #[serde(rename = "OPTIONS")]
+    #[display("OPTIONS")]
+    Options,
+    #[serde(rename = "GET")]
+    #[display("GET")]
+    Get,
+    #[serde(rename = "POST")]
+    #[display("POST")]
+    Post,
+    #[serde(rename = "PUT")]
+    #[display("PUT")]
+    Put,
+    #[serde(rename = "DELETE")]
+    #[display("DELETE")]
+    Delete,
+    #[serde(rename = "HEAD")]
+    #[display("HEAD")]
+    Head,
+    #[serde(rename = "TRACE")]
+    #[display("TRACE")]
+    Trace,
+    #[serde(rename = "CONNECT")]
+    #[display("CONNECT")]
+    Connect,
+    #[serde(rename = "PATCH")]
+    #[display("PATCH")]
+    Patch,
+    #[serde(rename = "EXTENSION")]
+    #[display("EXTENSION")]
+    Extension,
+}
+
+#[doc = "An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum Oauth2GrantType {
+    #[serde(rename = "urn:ietf:params:oauth:grant-type:device_code")]
+    #[display("urn:ietf:params:oauth:grant-type:device_code")]
+    UrnIetfParamsOauthGrantTypeDeviceCode,
+}
+
+#[doc = "An enum representing the possible values of an `PaymentMethod`'s `type` field."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum PaymentMethodType {
+    #[serde(rename = "card")]
+    #[display("card")]
+    Card,
+}
+
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum SystemInfoCgroupDriverEnum {
+    #[serde(rename = "cgroupfs")]
+    #[display("cgroupfs")]
+    Cgroupfs,
+    #[serde(rename = "systemd")]
+    #[display("systemd")]
+    Systemd,
+    #[serde(rename = "none")]
+    #[display("none")]
+    None,
+}
+
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum SystemInfoCgroupVersionEnum {
+    #[serde(rename = "1")]
+    #[display("1")]
+    One,
+    #[serde(rename = "2")]
+    #[display("2")]
+    Two,
+}
+
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum SystemInfoIsolationEnum {
+    #[serde(rename = "default")]
+    #[display("default")]
+    Default,
+    #[serde(rename = "hyperv")]
+    #[display("hyperv")]
+    Hyperv,
+    #[serde(rename = "process")]
+    #[display("process")]
+    Process,
+}
+
+#[doc = "The valid types of metric unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitMetricFormat {
+    #[serde(rename = "atto")]
+    #[display("atto")]
+    Atto,
+    #[serde(rename = "femto")]
+    #[display("femto")]
+    Femto,
+    #[serde(rename = "pico")]
+    #[display("pico")]
+    Pico,
+    #[serde(rename = "nano")]
+    #[display("nano")]
+    Nano,
+    #[serde(rename = "micro")]
+    #[display("micro")]
+    Micro,
+    #[serde(rename = "milli")]
+    #[display("milli")]
+    Milli,
+    #[serde(rename = "centi")]
+    #[display("centi")]
+    Centi,
+    #[serde(rename = "deci")]
+    #[display("deci")]
+    Deci,
+    #[serde(rename = "metric_unit")]
+    #[display("metric_unit")]
+    MetricUnit,
+    #[serde(rename = "deca")]
+    #[display("deca")]
+    Deca,
+    #[serde(rename = "hecto")]
+    #[display("hecto")]
+    Hecto,
+    #[serde(rename = "kilo")]
+    #[display("kilo")]
+    Kilo,
+    #[serde(rename = "mega")]
+    #[display("mega")]
+    Mega,
+    #[serde(rename = "giga")]
+    #[display("giga")]
+    Giga,
+    #[serde(rename = "tera")]
+    #[display("tera")]
+    Tera,
+    #[serde(rename = "peta")]
+    #[display("peta")]
+    Peta,
+    #[serde(rename = "exa")]
+    #[display("exa")]
+    Exa,
+}

@@ -1,6 +1,6 @@
 [workspace]
 members = [
 	"generator",
-	"kittycad"
+	"kittycad",
+	"types",
 ]
-
