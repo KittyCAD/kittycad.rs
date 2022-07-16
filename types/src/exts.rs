@@ -156,11 +156,11 @@ impl ParameterSchemaOrContentExt for openapiv3::ParameterSchemaOrContent {
     }
 }
 
-trait ParameterExt {
+pub trait ParameterExt {
     fn data(&self) -> Option<openapiv3::ParameterData>;
 }
 
-impl ParameterExt for openapiv3::Parameter {
+impl ParameterExt for &openapiv3::Parameter {
     fn data(&self) -> Option<openapiv3::ParameterData> {
         match self {
             openapiv3::Parameter::Path {

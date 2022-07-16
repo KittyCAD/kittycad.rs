@@ -8,7 +8,7 @@ extern crate quote;
 use anyhow::Result;
 use numeral::Cardinal;
 
-use crate::exts::ReferenceOrExt;
+use crate::exts::{ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt};
 
 /// Generate Rust types from an OpenAPI v3 spec.
 pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
@@ -18,6 +18,20 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
     if let Some(components) = &spec.components {
         // Parse the schemas.
         for (name, schema) in &components.schemas {
+            // Let's get the schema from the reference.
+            let schema = schema.get_schema_from_reference(spec, true)?;
+            // Let's handle all the kinds of schemas.
+            let t = render_schema(name, &schema, spec)?;
+            // Add it to our rendered types.
+            rendered = quote! {
+                #rendered
+
+                #t
+            };
+        }
+        // Parse the parameters.
+        for (name, parameter) in &components.parameters {
+            let schema = parameter.item()?.data().unwrap().format.schema()?;
             // Let's get the schema from the reference.
             let schema = schema.get_schema_from_reference(spec, true)?;
             // Let's handle all the kinds of schemas.
