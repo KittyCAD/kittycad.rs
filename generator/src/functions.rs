@@ -9,8 +9,10 @@ use crate::types::exts::{
 };
 
 /// Generate functions for each path operation.
-pub fn generate_files(spec: &openapiv3::OpenAPI) -> Result<BTreeMap<String, String>> {
-    let mut tag_files: BTreeMap<String, String> = Default::default();
+pub fn generate_files(
+    spec: &openapiv3::OpenAPI,
+) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
+    let mut tag_files: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
 
     for (name, path) in spec.paths.iter() {
         let op = path.item()?;
@@ -76,22 +78,22 @@ pub fn generate_files(spec: &openapiv3::OpenAPI) -> Result<BTreeMap<String, Stri
                 }
             };
 
-            let mut fn_str = crate::types::get_text_fmt(&function)?;
-
-            // Add our function to our existing tag file, or create a new one.
-            if let std::collections::btree_map::Entry::Vacant(e) = tag_files.entry(tag.to_string())
-            {
-                e.insert(fn_str);
-            } else {
-                // Add some new lines.
-                fn_str = format!("\n\n{}", fn_str);
-
-                tag_files.get_mut(&tag).unwrap().push_str(&fn_str);
-            }
+            add_fn_to_tag(&mut tag_files, &tag, &function)?;
 
             // Let's check if this function can be paginated.
             let pagination_properties = get_pagination_properties(name, method, op, spec)?;
-            if pagination_properties.can_paginate() {}
+            if pagination_properties.can_paginate() {
+                // If we can paginate we should generate a paginated stream function.
+                let stream_fn_name_ident = format_ident!("{}_stream", fn_name);
+                let function = quote! {
+                    #[doc = #docs]
+                    pub async fn #stream_fn_name_ident(&self #args #request_body) -> Result<#response_type> {
+                        #function_body
+                    }
+                };
+
+                add_fn_to_tag(&mut tag_files, &tag, &function)?;
+            }
 
             Ok(())
         };
@@ -544,4 +546,30 @@ fn get_pagination_properties(
     spec: &openapiv3::OpenAPI,
 ) -> Result<crate::types::PaginationProperties> {
     crate::types::PaginationProperties::from_operation(name, method, op, spec)
+}
+
+/// Add a function to our list of tagged functions.
+fn add_fn_to_tag(
+    tag_files: &mut BTreeMap<String, proc_macro2::TokenStream>,
+    tag: &str,
+    function: &proc_macro2::TokenStream,
+) -> Result<()> {
+    // Add our function to our existing tag file, or create a new one.
+    if let std::collections::btree_map::Entry::Vacant(e) = tag_files.entry(tag.to_string()) {
+        e.insert(function.clone());
+    } else {
+        let current = tag_files
+            .get(tag)
+            .ok_or_else(|| anyhow::anyhow!("failed to find tag file for tag `{}`", tag))?;
+        tag_files.insert(
+            tag.to_string(),
+            quote! {
+                #current
+
+                #function
+            },
+        );
+    }
+
+    Ok(())
 }

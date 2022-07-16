@@ -33,7 +33,6 @@ impl Meta {
             ))
         }
     }
-
     #[doc = "Get the metadata about our currently running server.\n\nThis includes information on any of our other distributed systems it is connected to.\nYou must be a KittyCAD employee to perform this request."]
     pub async fn get_metadata(&self) -> Result<crate::types::Metadata> {
         let mut req = self.client.client.request(
@@ -55,7 +54,6 @@ impl Meta {
             ))
         }
     }
-
     #[doc = "Return pong."]
     pub async fn ping(&self) -> Result<crate::types::Pong> {
         let mut req = self.client.client.request(

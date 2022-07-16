@@ -37,7 +37,6 @@ impl Hidden {
             ))
         }
     }
-
     #[doc = "Listen for callbacks for email verification for users."]
     pub async fn listen_auth_email_callback(
         &self,
@@ -54,7 +53,6 @@ impl Hidden {
         if let Some(p) = callback_url {
             query_params.push(("callback_url", format!("{}", p)));
         }
-
         query_params.push(("email", email));
         query_params.push(("token", token));
         req = req.query(&query_params);
@@ -71,7 +69,6 @@ impl Hidden {
             ))
         }
     }
-
     #[doc = "This endpoint removes the session cookie for a user.\n\nThis is used in logout scenarios."]
     pub async fn logout(&self) -> Result<()> {
         let mut req = self.client.client.request(

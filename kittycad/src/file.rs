@@ -45,7 +45,6 @@ impl File {
             ))
         }
     }
-
     #[doc = "Get a file conversion.\n\nGet the status and output of an async file conversion.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\nIf the user is not authenticated to view the specified file conversion, then it is not returned.\nOnly KittyCAD employees with the proper access can view file conversions for other users."]
     pub async fn get_conversion(&self, id: String) -> Result<crate::types::AsyncApiCallOutput> {
         let mut req = self.client.client.request(
@@ -71,7 +70,6 @@ impl File {
             ))
         }
     }
-
     #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint."]
     pub async fn create_density(
         &self,
@@ -103,7 +101,6 @@ impl File {
             ))
         }
     }
-
     #[doc = "Execute a KittyCAD program in a specific language."]
     pub async fn create_execution(
         &self,
@@ -124,7 +121,6 @@ impl File {
         if let Some(p) = output {
             query_params.push(("output", p));
         }
-
         req = req.query(&query_params);
         req = req.body(body.clone());
         let resp = req.send().await?;
@@ -141,7 +137,6 @@ impl File {
             ))
         }
     }
-
     #[doc = "Get CAD file mass.\n\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint."]
     pub async fn create_mass(
         &self,
@@ -173,7 +168,6 @@ impl File {
             ))
         }
     }
-
     #[doc = "Get CAD file volume.\n\nGet the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint."]
     pub async fn create_volume(
         &self,
@@ -203,7 +197,6 @@ impl File {
             ))
         }
     }
-
     #[doc = "Get a file conversion for your user.\n\nGet the status and output of an async file conversion. If completed, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user."]
     pub async fn get_conversion_for_user(
         &self,
