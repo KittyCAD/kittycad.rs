@@ -123,31 +123,41 @@ pub fn get_type_name_for_schema(
     name: &str,
     schema: &openapiv3::Schema,
     spec: &openapiv3::OpenAPI,
+    in_crate: bool,
 ) -> Result<proc_macro2::TokenStream> {
     let t = match &schema.schema_kind {
         openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
-            get_type_name_for_string(name, s, &schema.schema_data)?
+            get_type_name_for_string(name, s, &schema.schema_data, in_crate)?
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Number(n)) => get_type_name_for_number(n)?,
         openapiv3::SchemaKind::Type(openapiv3::Type::Integer(i)) => get_type_name_for_integer(i)?,
         openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
-            get_type_name_for_object(name, o, &schema.schema_data, spec)?
+            get_type_name_for_object(name, o, &schema.schema_data, spec, in_crate)?
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Array(a)) => {
-            get_type_name_for_array(name, a, spec)?
+            get_type_name_for_array(name, a, spec, in_crate)?
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => quote!(bool),
         openapiv3::SchemaKind::OneOf { one_of } => {
             if one_of.len() != 1 {
-                anyhow::bail!("XXX one of with more than one value not supported yet");
+                if name.is_empty() {
+                    anyhow::bail!(
+                        "XXX one of with more than one value not supported yet when name is empty"
+                    );
+                } else {
+                    let ident = format_ident!("{}", proper_name(name));
+                    return Ok(quote!(#ident));
+                }
             }
 
             let internal_schema = &one_of[0];
             match internal_schema {
                 openapiv3::ReferenceOr::Reference { .. } => {
-                    get_type_name_from_reference(&internal_schema.reference()?, spec)?
+                    get_type_name_from_reference(&internal_schema.reference()?, spec, in_crate)?
                 }
-                openapiv3::ReferenceOr::Item(s) => get_type_name_for_schema(name, s, spec)?,
+                openapiv3::ReferenceOr::Item(s) => {
+                    get_type_name_for_schema(name, s, spec, in_crate)?
+                }
             }
         }
         openapiv3::SchemaKind::AllOf { all_of } => {
@@ -158,9 +168,11 @@ pub fn get_type_name_for_schema(
             let internal_schema = &all_of[0];
             match internal_schema {
                 openapiv3::ReferenceOr::Reference { .. } => {
-                    get_type_name_from_reference(&internal_schema.reference()?, spec)?
+                    get_type_name_from_reference(&internal_schema.reference()?, spec, in_crate)?
                 }
-                openapiv3::ReferenceOr::Item(s) => get_type_name_for_schema(name, s, spec)?,
+                openapiv3::ReferenceOr::Item(s) => {
+                    get_type_name_for_schema(name, s, spec, in_crate)?
+                }
             }
         }
         openapiv3::SchemaKind::AnyOf { any_of: _ } => {
@@ -206,12 +218,19 @@ fn get_type_name_for_string(
     name: &str,
     s: &openapiv3::StringType,
     data: &openapiv3::SchemaData,
+    in_crate: bool,
 ) -> Result<proc_macro2::TokenStream> {
     if !s.enumeration.is_empty() {
         // We have an enum type.
         // Get the name for the enum.
         let ident = get_type_name(name, data)?;
-        return Ok(quote!(#ident));
+        let t = if in_crate {
+            quote!(#ident)
+        } else {
+            quote!(crate::types::#ident)
+        };
+
+        return Ok(t);
     }
 
     let t = match &s.format {
@@ -226,7 +245,11 @@ fn get_type_name_for_string(
         }
         openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Byte) => {
             // Use our custom base64 data type.
-            quote!(base64::Base64Data)
+            if in_crate {
+                quote!(base64::Base64Data)
+            } else {
+                quote!(crate::types::base64::Base64Data)
+            }
         }
         openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Binary) => {
             quote!(bytes::Bytes)
@@ -258,9 +281,10 @@ fn get_type_name_for_string(
 }
 
 /// Get the type name for a reference.
-fn get_type_name_from_reference(
+pub fn get_type_name_from_reference(
     name: &str,
     spec: &openapiv3::OpenAPI,
+    in_crate: bool,
 ) -> Result<proc_macro2::TokenStream> {
     // Get the spec for the reference.
     let schema = if let Some(components) = &spec.components {
@@ -273,7 +297,7 @@ fn get_type_name_from_reference(
         anyhow::bail!("no components in spec, cannot get reference");
     };
 
-    get_type_name_for_schema(name, schema, spec)
+    get_type_name_for_schema(name, schema, spec, in_crate)
 }
 
 /// Get the type name for a number type.
@@ -381,6 +405,7 @@ fn get_type_name_for_object(
     o: &openapiv3::ObjectType,
     data: &openapiv3::SchemaData,
     spec: &openapiv3::OpenAPI,
+    in_crate: bool,
 ) -> Result<proc_macro2::TokenStream> {
     // If the object has no properties, but has additional_properties, just use that
     // for the type.
@@ -396,9 +421,13 @@ fn get_type_name_for_object(
                 openapiv3::AdditionalProperties::Schema(schema) => {
                     let t = if let Ok(reference) = schema.reference() {
                         let ident = format_ident!("{}", proper_name(&reference));
-                        quote!(#ident)
+                        if in_crate {
+                            quote!(#ident)
+                        } else {
+                            quote!(crate::types::#ident)
+                        }
                     } else {
-                        get_type_name_for_schema(name, schema.item()?, spec)?
+                        get_type_name_for_schema(name, schema.item()?, spec, in_crate)?
                     };
 
                     // The additional properties is a HashMap of the key to the value.
@@ -420,23 +449,29 @@ fn get_type_name_for_array(
     name: &str,
     a: &openapiv3::ArrayType,
     spec: &openapiv3::OpenAPI,
+    in_crate: bool,
 ) -> Result<proc_macro2::TokenStream> {
     // Make sure we have a reference for our type.
-    if let Some(ref s) = a.items {
+    let t = if let Some(ref s) = a.items {
         if let Ok(r) = s.reference() {
             let reference = format_ident!("{}", r);
-            return Ok(quote!(Vec<#reference>));
+            if in_crate {
+                quote!(#reference)
+            } else {
+                quote!(crate::types::#reference)
+            }
         } else {
             // We have an item.
             let item = s.item()?;
             // Get the type name for the item.
-            let t = get_type_name_for_schema(name, item, spec)?;
-            return Ok(quote!(Vec<#t>));
+            get_type_name_for_schema(name, item, spec, in_crate)?
         }
-    }
+    } else {
+        // We have no items.
+        anyhow::bail!("no items in array, cannot get type name")
+    };
 
-    // This should never happen, but who knows.
-    anyhow::bail!("no items in array, cannot get type name")
+    Ok(quote!(Vec<#t>))
 }
 
 /// Render the full type for a one of.
@@ -593,7 +628,7 @@ fn render_one_of(
                     let ident = format_ident!("{}", proper_name(&tag_name));
                     quote!(#ident)
                 }
-                _ => get_type_name_for_schema("", &schema, spec)?,
+                _ => get_type_name_for_schema("", &schema, spec, true)?,
             };
 
             if !tag_name.is_empty() {
@@ -705,7 +740,7 @@ fn render_object(
         };
 
         // Get the type name for the schema.
-        let mut type_name = get_type_name_for_schema(&prop, &inner_schema, spec)?;
+        let mut type_name = get_type_name_for_schema(&prop, &inner_schema, spec, true)?;
         // Check if this type is required.
         if !o.required.contains(k) && !get_text(&type_name)?.starts_with("Option<") {
             // Make the type optional.

@@ -439,6 +439,7 @@ dependencies = [
  "getopts",
  "http",
  "openapiv3",
+ "proc-macro2",
  "quote",
  "serde",
  "serde_json",

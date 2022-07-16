@@ -13,17 +13,17 @@ impl Hidden {
     }
 
     #[doc = "Create an email verification request for a user."]
-    pub fn listen_auth_email(&self) -> Result<()> {
-        Ok(())
+    pub fn listen_auth_email(&self) -> Result<VerificationToken> {
+        todo!()
     }
 
     #[doc = "Listen for callbacks for email verification for users."]
     pub fn listen_auth_email_callback(&self) -> Result<()> {
-        Ok(())
+        todo!()
     }
 
     #[doc = "This endpoint removes the session cookie for a user.\n\nThis is used in logout scenarios."]
     pub fn logout(&self) -> Result<()> {
-        Ok(())
+        todo!()
     }
 }

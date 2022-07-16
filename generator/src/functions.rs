@@ -6,10 +6,10 @@ use types::exts::ReferenceOrExt;
 /*
  * Generate a function for each Operation.
  */
-pub fn generate_files(api: &openapiv3::OpenAPI) -> Result<BTreeMap<String, String>> {
+pub fn generate_files(spec: &openapiv3::OpenAPI) -> Result<BTreeMap<String, String>> {
     let mut tag_files: BTreeMap<String, String> = Default::default();
 
-    for (name, path) in api.paths.iter() {
+    for (name, path) in spec.paths.iter() {
         let op = path.item()?;
 
         let mut gen = |name: &str, method: &str, op: Option<&openapiv3::Operation>| -> Result<()> {
@@ -26,10 +26,15 @@ pub fn generate_files(api: &openapiv3::OpenAPI) -> Result<BTreeMap<String, Strin
                 method
             ))?);
 
+            // Get the docs.
             let docs = generate_docs(name, method, op)?;
 
+            // Get the function name.
             let fn_name = get_fn_name(name, method, &tag, op)?;
             let fn_name_ident = format_ident!("{}", fn_name);
+
+            // Get the response for the function.
+            let response_type = get_response_type(op, spec)?;
 
             /* let function = quote! {
                 #docs
@@ -39,8 +44,8 @@ pub fn generate_files(api: &openapiv3::OpenAPI) -> Result<BTreeMap<String, Strin
             };*/
             let function = quote! {
                 #[doc = #docs]
-                pub fn #fn_name_ident(&self) -> Result<()> {
-                    Ok(())
+                pub fn #fn_name_ident(&self) -> Result<#response_type> {
+                    todo!()
                 }
             };
 
@@ -133,4 +138,61 @@ fn get_fn_name(name: &str, method: &str, tag: &str, op: &openapiv3::Operation) -
     }
 
     Ok(name)
+}
+
+/// Return the response type for the operation.
+fn get_response_type(
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<proc_macro2::TokenStream> {
+    for (status_code, response) in &op.responses.responses {
+        // We only care if the response is a success since this is for the function
+        // to return upon success.
+        if status_code.is_success() {
+            // Then let's get the type for the response.
+            let response = match response {
+                openapiv3::ReferenceOr::Reference { reference } => {
+                    anyhow::bail!(
+                        "response `{}` is a reference and not supported yet",
+                        reference
+                    )
+                }
+                openapiv3::ReferenceOr::Item(r) => r.clone(),
+            };
+
+            // Iterate over all the media types and return the first response.
+            for (_name, content) in &response.content {
+                if let Some(s) = &content.schema {
+                    let t = match s {
+                        openapiv3::ReferenceOr::Reference { .. } => {
+                            types::get_type_name_from_reference(&s.reference()?, spec, false)?
+                        }
+                        openapiv3::ReferenceOr::Item(s) => {
+                            types::get_type_name_for_schema("", s, spec, false)?
+                        }
+                    };
+
+                    // Return early since we found the type.
+                    return Ok(t);
+                }
+            }
+        }
+    }
+
+    // We couldn't find a type for the response.
+    // So we'll return `()`.
+    Ok(quote!(()))
+}
+
+pub trait StatusCodeExt {
+    fn is_success(&self) -> bool;
+}
+
+impl StatusCodeExt for openapiv3::StatusCode {
+    fn is_success(&self) -> bool {
+        match self {
+            openapiv3::StatusCode::Code(c) => c >= &200 && c < &300,
+            openapiv3::StatusCode::Range(r) => r.to_string().starts_with("2"),
+        }
+    }
 }
