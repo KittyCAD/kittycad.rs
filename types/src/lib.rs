@@ -1,4 +1,6 @@
-// TODO: #![deny(missing_docs)]
+//! A library for converting OpenAPI schemas to Rust types.
+
+#![deny(missing_docs)]
 
 pub mod exts;
 

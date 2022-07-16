@@ -1,6 +1,10 @@
+//! Extension traits for OpenAPI types that are nice to have.
+
 use anyhow::Result;
 
-trait SchemaExt {
+/// A trait for types that house a `Schema`.
+pub trait SchemaExt {
+    /// Returns the schema for the type.
     fn recurse(&self, spec: &openapiv3::OpenAPI) -> Result<openapiv3::Schema>;
 }
 
@@ -77,10 +81,18 @@ impl SchemaExt for openapiv3::Response {
     }
 }
 
+/// A trait for types that have a `Schema`.
 pub trait ReferenceOrExt<T> {
+    /// Get the item for the ReferenceOr.
+    /// This returns an error if the ReferenceOr is a Reference.
     fn item(&self) -> Result<&T>;
+    /// Recurse the schemas.
     fn recurse(&self, spec: &openapiv3::OpenAPI) -> Result<openapiv3::Schema>;
+    /// Get the reference for the ReferenceOr.
+    /// This returns an error if the ReferenceOr is an item.
     fn reference(&self) -> Result<String>;
+    /// Get the schema from the ReferenceOr.
+    /// This will recurse any references and get the underlying schemas for those.
     fn get_schema_from_reference(
         &self,
         spec: &openapiv3::OpenAPI,
@@ -149,7 +161,9 @@ impl<T: SchemaExt> ReferenceOrExt<T> for openapiv3::ReferenceOr<T> {
     }
 }
 
+/// A trait for types that can be converted to a `ReferenceOr<Schema>`.
 pub trait ParameterSchemaOrContentExt {
+    /// Return the `ReferenceOr<Schema>` for the type.
     fn schema(&self) -> Result<openapiv3::ReferenceOr<openapiv3::Schema>>;
 }
 
@@ -164,7 +178,9 @@ impl ParameterSchemaOrContentExt for openapiv3::ParameterSchemaOrContent {
     }
 }
 
+/// A trait for types that have `ParameterData`.
 pub trait ParameterExt {
+    /// Return the `ParameterData` for the type.
     fn data(&self) -> Option<openapiv3::ParameterData>;
 }
 
