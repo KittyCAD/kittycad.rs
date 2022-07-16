@@ -15,10 +15,20 @@ impl Unit {
     #[doc = "Convert units.\n\nConvert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions."]
     pub async fn create_conversion(
         &self,
-        _output_format: crate::types::UnitMetricFormat,
-        _src_format: crate::types::UnitMetricFormat,
-        _value: f64,
+        output_format: crate::types::UnitMetricFormat,
+        src_format: crate::types::UnitMetricFormat,
+        value: f64,
     ) -> Result<crate::types::UnitConversion> {
-        todo!()
+        let mut rb = self.client.client.request(
+            http::Method::POST,
+            &format!(
+                "{}/{}",
+                self.client.base_url, "unit/conversion/{src_format}/{output_format}"
+            ),
+        );
+        rb = rb.bearer_auth(self.client.token);
+        let req = rb.build()?;
+        let resp = self.client.client.execute(req).await?;
+        resp.json()?
     }
 }

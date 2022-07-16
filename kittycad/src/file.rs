@@ -15,62 +15,119 @@ impl File {
     #[doc = "Convert CAD file.\n\nConvert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\nIf the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint."]
     pub async fn create_conversion(
         &self,
-        _output_format: crate::types::FileOutputFormat,
-        _src_format: crate::types::FileSourceFormat,
-        _body: &bytes::Bytes,
+        output_format: crate::types::FileOutputFormat,
+        src_format: crate::types::FileSourceFormat,
+        body: &bytes::Bytes,
     ) -> Result<crate::types::FileConversion> {
-        todo!()
+        let mut rb = self.client.client.request(
+            http::Method::POST,
+            &format!(
+                "{}/{}",
+                self.client.base_url, "file/conversion/{src_format}/{output_format}"
+            ),
+        );
+        rb = rb.bearer_auth(self.client.token);
+        rb = rb.body(body.clone());
+        let req = rb.build()?;
+        let resp = self.client.client.execute(req).await?;
+        resp.json()?
     }
 
     #[doc = "Get a file conversion.\n\nGet the status and output of an async file conversion.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\nIf the user is not authenticated to view the specified file conversion, then it is not returned.\nOnly KittyCAD employees with the proper access can view file conversions for other users."]
-    pub async fn get_conversion(&self, _id: String) -> Result<crate::types::AsyncApiCallOutput> {
-        todo!()
+    pub async fn get_conversion(&self, id: String) -> Result<crate::types::AsyncApiCallOutput> {
+        let mut rb = self.client.client.request(
+            http::Method::GET,
+            &format!("{}/{}", self.client.base_url, "file/conversions/{id}"),
+        );
+        rb = rb.bearer_auth(self.client.token);
+        let req = rb.build()?;
+        let resp = self.client.client.execute(req).await?;
+        resp.json()?
     }
 
     #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint."]
     pub async fn create_density(
         &self,
-        _material_mass: f64,
-        _src_format: crate::types::FileSourceFormat,
-        _body: &bytes::Bytes,
+        material_mass: f64,
+        src_format: crate::types::FileSourceFormat,
+        body: &bytes::Bytes,
     ) -> Result<crate::types::FileDensity> {
-        todo!()
+        let mut rb = self.client.client.request(
+            http::Method::POST,
+            &format!("{}/{}", self.client.base_url, "file/density"),
+        );
+        rb = rb.bearer_auth(self.client.token);
+        rb = rb.body(body.clone());
+        let req = rb.build()?;
+        let resp = self.client.client.execute(req).await?;
+        resp.json()?
     }
 
     #[doc = "Execute a KittyCAD program in a specific language."]
     pub async fn create_execution(
         &self,
-        _lang: crate::types::CodeLanguage,
-        _output: Option<String>,
-        _body: &bytes::Bytes,
+        lang: crate::types::CodeLanguage,
+        output: Option<String>,
+        body: &bytes::Bytes,
     ) -> Result<crate::types::CodeOutput> {
-        todo!()
+        let mut rb = self.client.client.request(
+            http::Method::POST,
+            &format!("{}/{}", self.client.base_url, "file/execute/{lang}"),
+        );
+        rb = rb.bearer_auth(self.client.token);
+        rb = rb.body(body.clone());
+        let req = rb.build()?;
+        let resp = self.client.client.execute(req).await?;
+        resp.json()?
     }
 
     #[doc = "Get CAD file mass.\n\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint."]
     pub async fn create_mass(
         &self,
-        _material_density: f64,
-        _src_format: crate::types::FileSourceFormat,
-        _body: &bytes::Bytes,
+        material_density: f64,
+        src_format: crate::types::FileSourceFormat,
+        body: &bytes::Bytes,
     ) -> Result<crate::types::FileMass> {
-        todo!()
+        let mut rb = self.client.client.request(
+            http::Method::POST,
+            &format!("{}/{}", self.client.base_url, "file/mass"),
+        );
+        rb = rb.bearer_auth(self.client.token);
+        rb = rb.body(body.clone());
+        let req = rb.build()?;
+        let resp = self.client.client.execute(req).await?;
+        resp.json()?
     }
 
     #[doc = "Get CAD file volume.\n\nGet the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint."]
     pub async fn create_volume(
         &self,
-        _src_format: crate::types::FileSourceFormat,
-        _body: &bytes::Bytes,
+        src_format: crate::types::FileSourceFormat,
+        body: &bytes::Bytes,
     ) -> Result<crate::types::FileVolume> {
-        todo!()
+        let mut rb = self.client.client.request(
+            http::Method::POST,
+            &format!("{}/{}", self.client.base_url, "file/volume"),
+        );
+        rb = rb.bearer_auth(self.client.token);
+        rb = rb.body(body.clone());
+        let req = rb.build()?;
+        let resp = self.client.client.execute(req).await?;
+        resp.json()?
     }
 
     #[doc = "Get a file conversion for your user.\n\nGet the status and output of an async file conversion. If completed, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user."]
     pub async fn get_conversion_for_user(
         &self,
-        _id: String,
+        id: String,
     ) -> Result<crate::types::AsyncApiCallOutput> {
-        todo!()
+        let mut rb = self.client.client.request(
+            http::Method::GET,
+            &format!("{}/{}", self.client.base_url, "user/file/conversions/{id}"),
+        );
+        rb = rb.bearer_auth(self.client.token);
+        let req = rb.build()?;
+        let resp = self.client.client.execute(req).await?;
+        resp.json()?
     }
 }

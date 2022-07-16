@@ -134,7 +134,7 @@ static APP_USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), ".rs/", env!("CARG
 #[derive(Clone)]
 pub struct Client {
     token: String,
-    host: String,
+    base_url: String,
 
     client: reqwest::Client,
 }
@@ -154,7 +154,7 @@ impl Client {
         match client {
             Ok(c) => Client {
                 token: token.to_string(),
-                host: "https://api.kittycad.io".to_string(),
+                base_url: "https://api.kittycad.io".to_string(),
 
                 client: c,
             },
@@ -162,12 +162,12 @@ impl Client {
         }
     }
 
-    /// Set the host for the client to something other than the default: `https://api.kittycad.io`.
-    pub fn set_host<H>(&mut self, host: H)
+    /// Set the base URL for the client to something other than the default: `https://api.kittycad.io`.
+    pub fn set_base_url<H>(&mut self, base_url: H)
     where
         H: Into<String> + std::fmt::Display,
     {
-        self.host = host.to_string().trim_end_matches('/').to_string();
+        self.base_url = base_url.to_string().trim_end_matches('/').to_string();
     }
 
     /// Create a new Client struct from the environment variable: KITTYCAD_API_TOKEN.

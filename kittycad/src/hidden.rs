@@ -15,23 +15,45 @@ impl Hidden {
     #[doc = "Create an email verification request for a user."]
     pub async fn listen_auth_email(
         &self,
-        _body: &crate::types::EmailAuthenticationForm,
+        body: &crate::types::EmailAuthenticationForm,
     ) -> Result<crate::types::VerificationToken> {
-        todo!()
+        let mut rb = self.client.client.request(
+            http::Method::POST,
+            &format!("{}/{}", self.client.base_url, "auth/email"),
+        );
+        rb = rb.bearer_auth(self.client.token);
+        rb = rb.json(body);
+        let req = rb.build()?;
+        let resp = self.client.client.execute(req).await?;
+        resp.json()?
     }
 
     #[doc = "Listen for callbacks for email verification for users."]
     pub async fn listen_auth_email_callback(
         &self,
-        _callback_url: Option<url::Url>,
-        _email: String,
-        _token: String,
+        callback_url: Option<url::Url>,
+        email: String,
+        token: String,
     ) -> Result<()> {
-        todo!()
+        let mut rb = self.client.client.request(
+            http::Method::GET,
+            &format!("{}/{}", self.client.base_url, "auth/email/callback"),
+        );
+        rb = rb.bearer_auth(self.client.token);
+        let req = rb.build()?;
+        let resp = self.client.client.execute(req).await?;
+        resp.json()?
     }
 
     #[doc = "This endpoint removes the session cookie for a user.\n\nThis is used in logout scenarios."]
     pub async fn logout(&self) -> Result<()> {
-        todo!()
+        let mut rb = self.client.client.request(
+            http::Method::POST,
+            &format!("{}/{}", self.client.base_url, "logout"),
+        );
+        rb = rb.bearer_auth(self.client.token);
+        let req = rb.build()?;
+        let resp = self.client.client.execute(req).await?;
+        resp.json()?
     }
 }

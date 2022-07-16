@@ -33,7 +33,13 @@ pub fn generate_files(spec: &openapiv3::OpenAPI) -> Result<BTreeMap<String, Stri
             let fn_name_ident = format_ident!("{}", fn_name);
 
             // Get the response for the function.
-            let response_type = get_response_type(op, spec)?;
+            let response_type = if let Some(response) = get_response_type(op, spec)? {
+                let t = response.type_name;
+                quote!(#t)
+            } else {
+                // We don't have a response, so we'll return `()`.
+                quote!(())
+            };
 
             // Get the function args.
             let args = get_args(op, spec)?;
@@ -45,12 +51,22 @@ pub fn generate_files(spec: &openapiv3::OpenAPI) -> Result<BTreeMap<String, Stri
             };
 
             // Get the request body for the function if there is one.
-            let request_body = get_request_body(op, spec)?;
+            let request_body = if let Some(rb) = get_request_body(op, spec)? {
+                let t = rb.type_name;
+                // We add the comma at the front, so it works.
+                quote!(, body: &#t)
+            } else {
+                // We don't have a request body, so we'll return nothing.
+                quote!()
+            };
+
+            // Get the function body.
+            let function_body = get_function_body(name, method, op, spec)?;
 
             let function = quote! {
                 #[doc = #docs]
                 pub async fn #fn_name_ident(&self #args #request_body) -> Result<#response_type> {
-                    todo!()
+                    #function_body
                 }
             };
 
@@ -140,11 +156,16 @@ fn get_fn_name(name: &str, method: &str, tag: &str, op: &openapiv3::Operation) -
     Ok(name)
 }
 
+struct RequestOrResponse {
+    media_type: String,
+    type_name: proc_macro2::TokenStream,
+}
+
 /// Return the response type for the operation.
 fn get_response_type(
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
-) -> Result<proc_macro2::TokenStream> {
+) -> Result<Option<RequestOrResponse>> {
     for (status_code, response) in &op.responses.responses {
         // We only care if the response is a success since this is for the function
         // to return upon success.
@@ -153,7 +174,7 @@ fn get_response_type(
             let response = response.expand(spec)?;
 
             // Iterate over all the media types and return the first response.
-            for (_name, content) in &response.content {
+            for (name, content) in &response.content {
                 if let Some(s) = &content.schema {
                     let t = match s {
                         openapiv3::ReferenceOr::Reference { .. } => {
@@ -165,15 +186,17 @@ fn get_response_type(
                     };
 
                     // Return early since we found the type.
-                    return Ok(t);
+                    return Ok(Some(RequestOrResponse {
+                        media_type: name.to_string(),
+                        type_name: t,
+                    }));
                 }
             }
         }
     }
 
     // We couldn't find a type for the response.
-    // So we'll return `()`.
-    Ok(quote!(()))
+    Ok(None)
 }
 
 pub trait StatusCodeExt {
@@ -237,13 +260,13 @@ fn get_args(
 fn get_request_body(
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
-) -> Result<proc_macro2::TokenStream> {
+) -> Result<Option<RequestOrResponse>> {
     if let Some(request_body) = &op.request_body {
         // Then let's get the type for the response.
         let request_body = request_body.expand(spec)?;
 
         // Iterate over all the media types and return the first request.
-        for (_name, content) in &request_body.content {
+        for (name, content) in &request_body.content {
             if let Some(s) = &content.schema {
                 let t = match s {
                     openapiv3::ReferenceOr::Reference { .. } => {
@@ -256,12 +279,80 @@ fn get_request_body(
 
                 // Return early since we found the type.
                 // We start with a comma here so it's not weird.
-                return Ok(quote!(, body: &#t));
+                return Ok(Some(RequestOrResponse {
+                    media_type: name.to_string(),
+                    type_name: t,
+                }));
             }
         }
     }
 
     // We don't have a request body.
     // So we return nothing.
-    Ok(quote!())
+    Ok(None)
+}
+
+/// Return the function body for the operation.
+fn get_function_body(
+    name: &str,
+    method: &str,
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<proc_macro2::TokenStream> {
+    let path = name.trim_start_matches('/');
+    let method_ident = format_ident!("{}", method);
+
+    // Get if there is a request body.
+    let request_body = if let Some(request_body) = get_request_body(op, spec)? {
+        match request_body.media_type.as_str() {
+            "application/json" => {
+                quote! {
+                    // Add the json body.
+                    rb = rb.json(body);
+                }
+            }
+            "application/x-www-form-urlencoded" => {
+                quote! {
+                    // Add the form body.
+                    rb = rb.form(body);
+                }
+            }
+            "application/octet-stream" => {
+                quote! {
+                    // Add the raw body.
+                    rb = rb.body(body.clone());
+                }
+            }
+            _ => {
+                anyhow::bail!(
+                    "unsupported media type for request body: {}",
+                    request_body.media_type
+                );
+            }
+        }
+    } else {
+        // Do nothing.
+        quote!()
+    };
+
+    Ok(quote! {
+        let mut rb = self.client.client.request(
+            http::Method::#method_ident,
+            &format!("{}/{}", self.client.base_url, #path),
+        );
+
+        // Add in our authentication.
+        rb = rb.bearer_auth(self.client.token);
+
+        #request_body
+
+        // Build the request.
+        let req = rb.build()?;
+
+        // Send the request.
+        let resp = self.client.client.execute(req).await?;
+
+        // Get the response.
+        resp.json()?
+    })
 }
