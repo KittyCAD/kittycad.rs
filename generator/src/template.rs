@@ -6,22 +6,22 @@ use anyhow::Result;
 use inflector::cases::kebabcase::to_kebab_case;
 
 fn generate_docs_openapi_info(
-    api: &openapiv3::OpenAPI,
-    spec_link: &str,
+    spec: &openapiv3::OpenAPI,
+    spec_link: &Option<String>,
     package_name: &str,
 ) -> Result<String> {
     let mut description = String::new();
-    if let Some(d) = &api.info.description {
+    if let Some(d) = &spec.info.description {
         description = d.replace('\n', "\n//! ");
     }
 
     let mut tos = String::new();
-    if let Some(t) = &api.info.terms_of_service {
+    if let Some(t) = &spec.info.terms_of_service {
         tos = format!("[API Terms of Service]({})", t);
     }
 
     let mut contact = String::new();
-    if let Some(c) = &api.info.contact {
+    if let Some(c) = &spec.info.contact {
         let mut num = 1;
         let mut name = String::new();
         if let Some(n) = &c.name {
@@ -71,7 +71,7 @@ fn generate_docs_openapi_info(
     }
 
     let mut license = String::new();
-    if let Some(l) = &api.info.license {
+    if let Some(l) = &spec.info.license {
         license.push_str("| name ");
 
         let mut url = String::new();
@@ -101,7 +101,13 @@ fn generate_docs_openapi_info(
         license = format!("### License\n//!\n//! \n{}", license);
     }
 
-    let api_version = format!("based on API spec version `{}`", api.info.version);
+    let api_version = format!("based on API spec version `{}`", spec.info.version);
+
+    let spec_link_blurb = if let Some(link) = spec_link {
+        format!("This client is generated from the [OpenAPI specs]({}) {}. This way it will remain up to date as features are added.", link, api_version)
+    } else {
+        "".to_string()
+    };
 
     Ok(format!(
         r#"//! A fully generated, opinionated API client library for KittyCAD.
@@ -119,9 +125,9 @@ fn generate_docs_openapi_info(
 //!
 //! ## Client Details
 //!
-//! This client is generated from the [KittyCAD OpenAPI
-//! specs]({}) {}. This way it will remain
-//! up to date as features are added. The documentation for the crate is generated
+//! {}
+//!
+//! The documentation for the crate is generated
 //! along with the code to make this library easy to use.
 //! "#,
         to_kebab_case(package_name),
@@ -130,19 +136,18 @@ fn generate_docs_openapi_info(
         tos,
         contact,
         license,
-        spec_link,
-        api_version,
+        spec_link_blurb,
     ))
 }
 
 /// Generate the main docs for our client library.
 pub fn generate_docs(
-    api: &openapiv3::OpenAPI,
+    spec: &openapiv3::OpenAPI,
     name: &str,
     version: &str,
-    spec_link: &str,
+    spec_link: &Option<String>,
 ) -> Result<String> {
-    let info = generate_docs_openapi_info(api, spec_link, name)?;
+    let info = generate_docs_openapi_info(spec, spec_link, name)?;
     Ok(format!(
         r#"{}
 //!

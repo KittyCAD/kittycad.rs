@@ -21,9 +21,9 @@ API server for KittyCAD
 
 ## Client Details
 
-This client is generated from the [KittyCAD OpenAPI
-specs](https://github.com/) based on API spec version `0.1.0`. This way it will remain
-up to date as features are added. The documentation for the crate is generated
+This client is generated from the [OpenAPI specs](https://github.com/) based on API spec version `0.1.0`. This way it will remain up to date as features are added.
+
+The documentation for the crate is generated
 along with the code to make this library easy to use.
 
 

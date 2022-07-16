@@ -1,69 +1,101 @@
+use std::fs;
+
 use anyhow::Result;
+use clap::Parser;
+use slog::Drain;
+
+/// The options for our generator.
+#[derive(Parser, Debug, Clone)]
+#[clap(version = clap::crate_version!(), author = clap::crate_authors!("\n"))]
+pub struct Opts {
+    /// Print debug info.
+    #[clap(short = 'D', long)]
+    pub debug: bool,
+
+    /// Print logs as json.
+    #[clap(short, long)]
+    pub json: bool,
+
+    /// The input OpenAPI definition document (JSON | YAML).
+    #[clap(short, long, parse(from_os_str), required = true)]
+    pub input: std::path::PathBuf,
+
+    /// The output directory for our generated client.
+    #[clap(short, long, parse(from_os_str), default_value = ".", required = true)]
+    pub output: std::path::PathBuf,
+
+    /// The crate name for our generated client.
+    #[clap(short, long, required = true)]
+    pub name: String,
+
+    /// The crate version for our generated client.
+    #[clap(short, long, required = true)]
+    pub version: String,
+
+    /// The crate description for our generated client.
+    #[clap(short, long, required = true)]
+    pub description: String,
+
+    /// The link to a hosted version of the spec.
+    #[clap(short, long)]
+    pub spec_url: Option<String>,
+}
+
+impl Opts {
+    /// Setup our logger.
+    pub fn create_logger(&self) -> slog::Logger {
+        if self.json {
+            let drain = slog_json::Json::default(std::io::stderr()).fuse();
+            self.async_root_logger(drain)
+        } else {
+            let decorator = slog_term::TermDecorator::new().build();
+            let drain = slog_term::FullFormat::new(decorator).build().fuse();
+            self.async_root_logger(drain)
+        }
+    }
+
+    fn async_root_logger<T>(&self, drain: T) -> slog::Logger
+    where
+        T: slog::Drain + Send + 'static,
+        <T as slog::Drain>::Err: std::fmt::Debug,
+    {
+        let level = if self.debug {
+            slog::Level::Debug
+        } else {
+            slog::Level::Info
+        };
+
+        let level_drain = slog::LevelFilter(drain, level).fuse();
+        let async_drain = slog_async::Async::new(level_drain).build().fuse();
+        slog::Logger::root(async_drain, slog::o!())
+    }
+}
 
 fn main() -> Result<()> {
-    let mut opts = getopts::Options::new();
-    opts.parsing_style(getopts::ParsingStyle::StopAtFirstFree);
-    opts.reqopt(
-        "i",
-        "",
-        "OpenAPI definition document (JSON | YAML)",
-        "INPUT",
-    );
-    opts.reqopt("o", "", "Generated Rust crate directory", "OUTPUT");
-    opts.reqopt("n", "", "Target Rust crate name", "CRATE");
-    opts.reqopt("v", "", "Target Rust crate version", "VERSION");
-    opts.reqopt("d", "", "Target Rust crate description", "DESCRIPTION");
-    opts.reqopt("", "spec-link", "Link to the spec", "SPEC_LINK");
-    opts.optflag("", "debug", "Print debug output");
+    // Parse the command line arguments.
+    let opts: Opts = Opts::parse();
 
-    let args = match opts.parse(std::env::args().skip(1)) {
-        Ok(args) => {
-            if !args.free.is_empty() {
-                eprintln!("{}", opts.usage("progenitor"));
-                anyhow::bail!("unexpected positional arguments");
-            }
-            args
-        }
-        Err(e) => {
-            eprintln!("{}", opts.usage("progenitor"));
-            anyhow::bail!(e);
-        }
-    };
+    // Setup our logger.
+    let drain = opts.create_logger();
+    let logger = slog::Logger::root(drain, slog::o!());
 
-    let input_spec = args.opt_str("i").unwrap();
+    let _scope_guard = slog_scope::set_global_logger(logger);
+    slog_stdlog::init()?;
 
-    let api = generator::load_api(&input_spec)?;
+    // Let's read the spec from the file.
+    let spec = generator::load_api(&opts.input)?;
 
-    let debug = |s: &str| {
-        if args.opt_present("debug") {
-            println!("{}", s);
-        }
-    };
+    // Generate the client.
+    let out = generator::generate(&spec)?;
 
-    debug("");
+    // Create the top-level crate directory:
+    fs::create_dir_all(&opts.output)?;
 
-    let name = args.opt_str("n").unwrap();
-    let version = args.opt_str("v").unwrap();
-    let output_dir = args.opt_str("o").unwrap();
-    let spec_link = args.opt_str("spec-link").unwrap();
-
-    let fail = match generator::generate(&api) {
-        Ok(out) => {
-            let description = args.opt_str("d").unwrap();
-
-            /*
-             * Create the top-level crate directory:
-             */
-            let root = std::path::PathBuf::from(&output_dir);
-            std::fs::create_dir_all(&root)?;
-
-            /*
-             * Write the Cargo.toml file:
-             */
-            let mut toml = root.clone();
-            toml.push("Cargo.toml");
-            let tomlout = format!(
-                r#"[package]
+    // Write the Cargo.toml file:
+    let mut toml = opts.output.clone();
+    toml.push("Cargo.toml");
+    let tomlout = format!(
+        r#"[package]
 name = "{}"
 description = "{}"
 version = "{}"
@@ -112,67 +144,64 @@ httpcache = ["dirs"]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 "#,
-                name, description, version, name, output_dir,
-            );
-            generator::save(&toml, tomlout.as_str())?;
+        opts.name,
+        opts.description,
+        opts.version,
+        opts.name,
+        opts.output.display(),
+    );
+    generator::save(&toml, tomlout.as_str())?;
 
-            /*
-             * Generate our documentation for the library.
-             */
-            let docs = generator::template::generate_docs(
-                &api,
-                &inflector::cases::snakecase::to_snake_case(&name),
-                &version,
-                &spec_link,
-            )?;
-            let mut readme = root.clone();
-            readme.push("README.md");
-            generator::save(
-                readme,
-                // Add a title to the README.md so it looks nicer in GitHub.
-                &format!(
-                    "# `{}`\n\n{}",
-                    name,
-                    docs.replace("//! ", "").replace("//!", "").as_str()
-                ),
-            )?;
+    /*
+     * Generate our documentation for the library.
+     */
+    let docs = generator::template::generate_docs(
+        &spec,
+        &inflector::cases::snakecase::to_snake_case(&opts.name),
+        &opts.version,
+        &opts.spec_url,
+    )?;
+    let mut readme = opts.output.clone();
+    readme.push("README.md");
+    generator::save(
+        readme,
+        // Add a title to the README.md so it looks nicer in GitHub.
+        &format!(
+            "# `{}`\n\n{}",
+            opts.name,
+            docs.replace("//! ", "").replace("//!", "").as_str()
+        ),
+    )?;
 
-            /*
-             * Create the src/ directory:
-             */
-            let mut src = root;
-            src.push("src");
-            std::fs::create_dir_all(&src)?;
+    // Create the src/ directory.
+    let mut src = opts.output.clone();
+    src.push("src");
+    fs::create_dir_all(&src)?;
 
-            /*
-             * Create the Rust source file containing the generated client:
-             */
-            let lib = format!("{}\n{}", docs, out);
-            let mut librs = src.clone();
-            librs.push("lib.rs");
-            generator::save(librs, lib.as_str())?;
+    // Create the Rust source file containing the generated client.
+    let lib = format!("{}\n{}", docs, out);
+    let mut librs = src.clone();
+    librs.push("lib.rs");
+    generator::save(librs, lib.as_str())?;
 
-            /*
-             * Create the Rust source types file containing the generated types:
-             */
-            let types = generator::types::generate_types(&api)?;
-            let mut typesrs = src.clone();
-            typesrs.push("types.rs");
-            generator::save(typesrs, types.as_str())?;
+    // Create the Rust source types file containing the generated types.
+    let types = generator::types::generate_types(&spec)?;
+    let mut typesrs = src.clone();
+    typesrs.push("types.rs");
+    generator::save(typesrs, types.as_str())?;
 
-            /*
-             * Create the Rust source files for each of the tags functions:
-             */
+    // TODO: cleanup old tag files.
 
-            match generator::functions::generate_files(&api) {
-                Ok(files) => {
-                    // We have a map of our files, let's write to them.
-                    for (f, content) in files {
-                        let mut tagrs = src.clone();
-                        tagrs.push(format!("{}.rs", generator::clean_tag_name(&f)));
+    // Create the Rust source files for each of the tags functions.
+    match generator::functions::generate_files(&spec) {
+        Ok(files) => {
+            // We have a map of our files, let's write to them.
+            for (f, content) in files {
+                let mut tagrs = src.clone();
+                tagrs.push(format!("{}.rs", generator::clean_tag_name(&f)));
 
-                        let output = format!(
-                            r#"use anyhow::Result;
+                let output = format!(
+                    r#"use anyhow::Result;
 
             use crate::Client;
 
@@ -191,30 +220,17 @@ rustdoc-args = ["--cfg", "docsrs"]
 
                 {}
             }}"#,
-                            generator::types::proper_name(&f),
-                            generator::types::proper_name(&f),
-                            generator::types::proper_name(&f),
-                            content,
-                        );
-                        generator::save(tagrs, output.as_str())?;
-                    }
-
-                    false
-                }
-                Err(e) => {
-                    println!("generate_files fail: {:?}", e);
-                    true
-                }
+                    generator::types::proper_name(&f),
+                    generator::types::proper_name(&f),
+                    generator::types::proper_name(&f),
+                    content,
+                );
+                generator::save(tagrs, output.as_str())?;
             }
         }
         Err(e) => {
-            println!("gen fail: {:?}", e);
-            true
+            println!("generate_files fail: {:?}", e);
         }
-    };
-
-    if fail {
-        anyhow::bail!("generation experienced errors");
     }
 
     Ok(())
