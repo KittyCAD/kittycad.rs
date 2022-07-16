@@ -356,12 +356,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "english-numbers"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e4f5d6e192964d498b45abee72ca445e91909094bc8e8791259e82c2a0d1aa6"
-
-[[package]]
 name = "expectorate"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -442,15 +436,14 @@ version = "0.0.0"
 dependencies = [
  "Inflector",
  "anyhow",
- "english-numbers",
  "getopts",
  "http",
  "openapiv3",
+ "quote",
  "serde",
  "serde_json",
  "serde_yaml",
  "types",
- "uuid",
 ]
 
 [[package]]

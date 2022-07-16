@@ -978,7 +978,8 @@ fn get_text(output: &proc_macro2::TokenStream) -> Result<String> {
     Ok(clean_text(&content).replace(' ', ""))
 }
 
-fn get_text_fmt(output: &proc_macro2::TokenStream) -> Result<String> {
+/// Format a TokenStream as a string and run `rustfmt` on the result.
+pub fn get_text_fmt(output: &proc_macro2::TokenStream) -> Result<String> {
     // Format the file with rustfmt.
     let content = rustfmt_wrapper::rustfmt(output).unwrap();
 

@@ -98,8 +98,6 @@ pub mod unit;
 /// FROM: <https://docs.kittycad.io/api/users>
 pub mod users;
 
-
-
 mod progenitor_support {
     use percent_encoding::{utf8_percent_encode, AsciiSet, CONTROLS};
 

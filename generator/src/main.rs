@@ -2,8 +2,10 @@ mod client;
 mod functions;
 mod template;
 
+#[macro_use]
+extern crate quote;
+
 use std::{
-    collections::HashSet,
     ffi::OsStr,
     fs::{File, OpenOptions},
     io::Write,
@@ -49,117 +51,7 @@ fn load_api<P>(p: P) -> Result<OpenAPI>
 where
     P: AsRef<Path>,
 {
-    let api: OpenAPI = load(p)?;
-
-    if api.openapi != "3.0.3" {
-        /*
-         * XXX During development we are being very strict, but this should
-         * probably be relaxed.
-         */
-        println!("unexpected version {}", api.openapi);
-    }
-
-    if !api.servers.is_empty() {
-        println!("servers not presently supported");
-    }
-
-    if api.security.is_some() {
-        println!("security not presently supported");
-    }
-
-    if let Some(components) = api.components.as_ref() {
-        if !components.security_schemes.is_empty() {
-            println!("component security schemes not supported");
-        }
-
-        if !components.responses.is_empty() {
-            println!("component responses not supported");
-        }
-
-        if !components.parameters.is_empty() {
-            println!("component parameters not supported");
-        }
-
-        if !components.request_bodies.is_empty() {
-            println!("component request bodies not supported");
-        }
-
-        if !components.headers.is_empty() {
-            println!("component headers not supported");
-        }
-
-        if !components.links.is_empty() {
-            println!("component links not supported");
-        }
-
-        if !components.callbacks.is_empty() {
-            println!("component callbacks not supported");
-        }
-
-        /*
-         * XXX Ignoring "examples" and "extensions" for now.
-         */
-    }
-
-    // TODO: add external docs etc to the README/Cargo generation.
-
-    /*
-     * XXX Ignoring "extensions" for now, as they seem not
-     * to immediately affect our code generation.
-     */
-
-    let mut opids = HashSet::new();
-    for p in api.paths.iter() {
-        match p.1 {
-            openapiv3::ReferenceOr::Reference { reference: _ } => {
-                bail!("path {} uses reference, unsupported", p.0);
-            }
-            openapiv3::ReferenceOr::Item(item) => {
-                /*
-                 * Make sure every operation has an operation ID, and that each
-                 * operation ID is only used once in the document.
-                 */
-                let mut id = |o: Option<&openapiv3::Operation>| -> Result<()> {
-                    if let Some(o) = o {
-                        if let Some(oid) = o.operation_id.as_ref() {
-                            if !opids.insert(oid.to_string()) {
-                                bail!("duplicate operation ID: {}", oid);
-                            }
-
-                            if !o.servers.is_empty() {
-                                println!("op {}: servers, unsupported", oid);
-                            }
-
-                            if o.security.is_some() {
-                                //println!("op {}: security, unsupported", oid);
-                            }
-
-                            if o.responses.default.is_some() {
-                                println!("op {}: has response default", oid);
-                            }
-                        }
-                    }
-
-                    Ok(())
-                };
-
-                id(item.get.as_ref())?;
-                id(item.put.as_ref())?;
-                id(item.post.as_ref())?;
-                id(item.delete.as_ref())?;
-                id(item.options.as_ref())?;
-                id(item.head.as_ref())?;
-                id(item.patch.as_ref())?;
-                id(item.trace.as_ref())?;
-
-                if !item.servers.is_empty() {
-                    bail!("path {} has servers; unsupported", p.0);
-                }
-            }
-        }
-    }
-
-    Ok(api)
+    load(p)
 }
 
 trait ExtractJsonMediaType {
@@ -415,9 +307,6 @@ fn gen(api: &OpenAPI) -> Result<String> {
         a(&format!("pub mod {};", clean_tag_name(&tag.name)));
     }
 
-    a("");
-
-    a("use anyhow::{anyhow, Error, Result};");
     a("");
 
     a("mod progenitor_support {");
