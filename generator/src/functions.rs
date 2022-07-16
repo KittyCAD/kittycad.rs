@@ -156,15 +156,7 @@ fn get_response_type(
         // to return upon success.
         if status_code.is_success() {
             // Then let's get the type for the response.
-            let response = match response {
-                openapiv3::ReferenceOr::Reference { reference } => {
-                    anyhow::bail!(
-                        "response `{}` is a reference and not supported yet",
-                        reference
-                    )
-                }
-                openapiv3::ReferenceOr::Item(r) => r.clone(),
-            };
+            let response = response.expand(spec)?;
 
             // Iterate over all the media types and return the first response.
             for (_name, content) in &response.content {
@@ -213,18 +205,10 @@ fn get_args(
     // Let's get the arguments for the function.
     for parameter in &op.parameters {
         // Get the parameter.
-        let parameter = match parameter {
-            openapiv3::ReferenceOr::Reference { reference } => {
-                anyhow::bail!(
-                    "parameter `{}` is a reference and not supported yet",
-                    reference
-                )
-            }
-            openapiv3::ReferenceOr::Item(r) => r,
-        };
+        let parameter = parameter.expand(spec)?;
 
         // Get the data for the parameter.
-        let data = parameter.data()?;
+        let data = (&parameter).data()?;
 
         let name = types::clean_property_name(&data.name);
         let name_ident = format_ident!("{}", name);
@@ -262,15 +246,7 @@ fn get_request_body(
 ) -> Result<proc_macro2::TokenStream> {
     if let Some(request_body) = &op.request_body {
         // Then let's get the type for the response.
-        let request_body = match request_body {
-            openapiv3::ReferenceOr::Reference { reference } => {
-                anyhow::bail!(
-                    "request body `{}` is a reference and not supported yet",
-                    reference
-                )
-            }
-            openapiv3::ReferenceOr::Item(r) => r.clone(),
-        };
+        let request_body = request_body.expand(spec)?;
 
         // Iterate over all the media types and return the first request.
         for (_name, content) in &request_body.content {

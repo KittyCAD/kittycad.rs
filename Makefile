@@ -5,8 +5,8 @@ SPEC = $(CURDIR)/spec.json
 VERSION = $(shell cat VERSION.txt)
 
 generate: kittycad
-	cargo test --all -- --nocapture
 	cargo clippy --all
+	cargo test --all -- --nocapture
 
 target/debug/generator: generator/src/*.rs generator/Cargo.toml types/src/*.rs spec.json
 	cargo build -p types

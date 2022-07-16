@@ -44,7 +44,10 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
         }
         // Parse the parameters.
         for (name, parameter) in &components.parameters {
-            let schema = parameter.item()?.data()?.format.schema()?;
+            let schema = (&parameter.expand(spec)?)
+                .data()?
+                .format
+                .schema()?;
             // Let's get the schema from the reference.
             let schema = schema.get_schema_from_reference(spec, true)?;
             // Let's handle all the kinds of schemas.
@@ -59,12 +62,12 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
 
         // Parse the responses.
         for (name, response) in &components.responses {
-            render_response(name, response.item()?, spec)?;
+            render_response(name, &response.expand(spec)?, spec)?;
         }
 
         // Parse the request bodies.
         for (name, request_body) in &components.request_bodies {
-            render_request_body(name, request_body.item()?, spec)?;
+            render_request_body(name, &request_body.expand(spec)?, spec)?;
         }
     }
 
