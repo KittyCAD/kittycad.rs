@@ -403,8 +403,9 @@ fn persistent_modules() -> Vec<String> {
 fn generate_cargo_toml(opts: &Opts) -> String {
     let repo_info = if let Some(repo) = &opts.repo_name {
         format!(
-            r#"repository = "https://github.com/{}/tree/{}""#,
-            repo, opts.version
+            r#"repository = "https://github.com/{}/tree/main/{}""#,
+            repo,
+            opts.output.display()
         )
     } else {
         "".to_string()
@@ -415,7 +416,7 @@ fn generate_cargo_toml(opts: &Opts) -> String {
 name = "{}"
 description = "{}"
 version = "{}"
-documentation = "https://docs.rs/{}/"
+documentation = "https://docs.rs/{}"
 readme = "README.md"
 {}
 edition = "2018"
@@ -462,10 +463,6 @@ httpcache = ["dirs"]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 "#,
-        opts.name,
-        opts.description,
-        opts.version,
-        repo_info,
-        opts.output.display(),
+        opts.name, opts.description, opts.version, opts.name, repo_info,
     )
 }

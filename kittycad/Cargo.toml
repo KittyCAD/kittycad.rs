@@ -1,12 +1,10 @@
-
-format!(
-        r#"[package]
+[package]
 name = "kittycad"
 description = "A fully generated & opinionated API client for the KittyCAD API."
 version = "0.1.8"
-documentation = "https://docs.rs/repository = "https://github.com/KittyCAD/kittycad.rs/tree/0.1.8"/"
+documentation = "https://docs.rs/kittycad"
 readme = "README.md"
-kittycad
+repository = "https://github.com/KittyCAD/kittycad.rs/tree/main/kittycad"
 edition = "2018"
 license = "MIT"
 
