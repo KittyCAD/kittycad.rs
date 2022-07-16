@@ -106,26 +106,6 @@ pub mod unit;
 /// FROM: <https://docs.kittycad.io/api/users>
 pub mod users;
 
-mod progenitor_support {
-    use percent_encoding::{utf8_percent_encode, AsciiSet, CONTROLS};
-
-    const PATH_SET: &AsciiSet = &CONTROLS
-        .add(b' ')
-        .add(b'"')
-        .add(b'#')
-        .add(b'<')
-        .add(b'>')
-        .add(b'?')
-        .add(b'`')
-        .add(b'{')
-        .add(b'}');
-
-    #[allow(dead_code)]
-    pub(crate) fn encode_path(pc: &str) -> String {
-        utf8_percent_encode(pc, PATH_SET).to_string()
-    }
-}
-
 use std::env;
 
 static APP_USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), ".rs/", env!("CARGO_PKG_VERSION"),);
