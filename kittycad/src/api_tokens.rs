@@ -57,11 +57,12 @@ impl ApiTokens {
         limit: Option<u32>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::ApiTokenResultsPage> {
+    ) -> Result<Vec<crate::types::ApiToken>> {
         use crate::types::paginate::Pagination;
         let mut result = self
             .list_for_user(limit, page_token.clone(), sort_by.clone())
             .await?;
+        let mut items = result.items();
         if result.has_more_pages()? {
             result = {
                 let mut req = self.client.client.request(
@@ -69,7 +70,9 @@ impl ApiTokens {
                     &format!("{}/{}", self.client.base_url, "user/api-tokens"),
                 );
                 req = req.bearer_auth(&self.client.token);
-                let resp = req.send().await?;
+                let mut request = req.build()?;
+                request = result.next_page(request)?;
+                let resp = self.client.client.execute(request).await?;
                 let status = resp.status();
                 let text = resp.text().await.unwrap_or_default();
                 if status.is_success() {
@@ -84,9 +87,10 @@ impl ApiTokens {
                     ))
                 }
             }?;
+            items.extend(result.items());
         }
 
-        Ok(result)
+        Ok(items)
     }
 
     #[doc = "Create a new API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It creates a new API token for the authenticated user."]

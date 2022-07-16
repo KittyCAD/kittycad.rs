@@ -108,3 +108,17 @@ async fn tabled_one_of() {
         &tabled::Table::new(vec![result]).to_string(),
     );
 }
+
+#[tokio::test]
+async fn test_stream() {
+    let client = test_client();
+
+    let limit = 2;
+    let stream = client
+        .api_calls()
+        .list_stream(Some(limit), None, None)
+        .await
+        .unwrap();
+
+    assert!(stream.len() > limit as usize);
+}

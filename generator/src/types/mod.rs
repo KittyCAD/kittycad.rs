@@ -804,7 +804,7 @@ fn render_object(
     let mut pagination = quote!();
     let pagination_properties = PaginationProperties::from_object(o, spec)?;
     if pagination_properties.can_paginate() {
-        let page_item = pagination_properties.item_type()?;
+        let page_item = pagination_properties.item_type(true)?;
         let item_ident = pagination_properties.item_ident()?;
         let next_page_str = pagination_properties.next_page_str()?;
         let next_page_ident = format_ident!("{}", next_page_str);
@@ -1217,9 +1217,13 @@ impl PaginationProperties {
     }
 
     /// Get the item type for this object.
-    pub fn item_type(&self) -> Result<proc_macro2::TokenStream> {
+    pub fn item_type(&self, in_crate: bool) -> Result<proc_macro2::TokenStream> {
         if let Some((_k, v)) = &self.items {
-            return Ok(v.clone());
+            if in_crate {
+                return Ok(v.clone());
+            } else {
+                return Ok(quote!(crate::types::#v));
+            }
         }
 
         anyhow::bail!("No item type found")

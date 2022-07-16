@@ -148,11 +148,12 @@ impl Users {
         limit: Option<u32>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::UserResultsPage> {
+    ) -> Result<Vec<crate::types::User>> {
         use crate::types::paginate::Pagination;
         let mut result = self
             .list(limit, page_token.clone(), sort_by.clone())
             .await?;
+        let mut items = result.items();
         if result.has_more_pages()? {
             result = {
                 let mut req = self.client.client.request(
@@ -160,7 +161,9 @@ impl Users {
                     &format!("{}/{}", self.client.base_url, "users"),
                 );
                 req = req.bearer_auth(&self.client.token);
-                let resp = req.send().await?;
+                let mut request = req.build()?;
+                request = result.next_page(request)?;
+                let resp = self.client.client.execute(request).await?;
                 let status = resp.status();
                 let text = resp.text().await.unwrap_or_default();
                 if status.is_success() {
@@ -175,9 +178,10 @@ impl Users {
                     ))
                 }
             }?;
+            items.extend(result.items());
         }
 
-        Ok(result)
+        Ok(items)
     }
 
     #[doc = "List users with extended information.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first."]
@@ -227,11 +231,12 @@ impl Users {
         limit: Option<u32>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::ExtendedUserResultsPage> {
+    ) -> Result<Vec<crate::types::ExtendedUser>> {
         use crate::types::paginate::Pagination;
         let mut result = self
             .list_extended(limit, page_token.clone(), sort_by.clone())
             .await?;
+        let mut items = result.items();
         if result.has_more_pages()? {
             result = {
                 let mut req = self.client.client.request(
@@ -239,7 +244,9 @@ impl Users {
                     &format!("{}/{}", self.client.base_url, "users-extended"),
                 );
                 req = req.bearer_auth(&self.client.token);
-                let resp = req.send().await?;
+                let mut request = req.build()?;
+                request = result.next_page(request)?;
+                let resp = self.client.client.execute(request).await?;
                 let status = resp.status();
                 let text = resp.text().await.unwrap_or_default();
                 if status.is_success() {
@@ -254,9 +261,10 @@ impl Users {
                     ))
                 }
             }?;
+            items.extend(result.items());
         }
 
-        Ok(result)
+        Ok(items)
     }
 
     #[doc = "Get extended information about a user.\n\nTo get information about yourself, use `/users-extended/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user/extended` endpoint.\nTo get information about any KittyCAD user, you must be a KittyCAD employee."]

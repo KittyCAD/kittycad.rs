@@ -108,9 +108,11 @@ pub fn generate_files(
 
                 let paginated_function_body = get_function_body(name, method, op, spec, true)?;
 
+                let item_type = pagination_properties.item_type(false)?;
+
                 let function = quote! {
                     #[doc = #docs]
-                    pub async fn #stream_fn_name_ident(&self #args #request_body) -> Result<#response_type> {
+                    pub async fn #stream_fn_name_ident(&self #args #request_body) -> Result<Vec<#item_type>> {
                         use crate::types::paginate::Pagination;
 
                         // Get the result from our other function.
@@ -125,7 +127,7 @@ pub fn generate_files(
                             items.extend(result.items());
                         }
 
-                        Ok(result)
+                        Ok(items)
                     }
                 };
 
@@ -535,6 +537,23 @@ fn get_function_body(
         quote!(Ok(()))
     };
 
+    let send_request = if paginated {
+        quote!(
+            // Build the request.
+            let mut request = req.build()?;
+            // Now we will modify the request to add the pagination.
+            request = result.next_page(request)?;
+            // Now we will execute the request.
+            let resp = self.client.client.execute(request).await?;
+        )
+    } else {
+        // Do nothing.
+        quote!(
+            // Send the request.
+            let resp = req.send().await?;
+        )
+    };
+
     Ok(quote! {
         let mut req = self.client.client.request(
             http::Method::#method_ident,
@@ -548,8 +567,7 @@ fn get_function_body(
 
         #request_body
 
-        // Send the request.
-        let resp = req.send().await?;
+        #send_request
 
         // Get the response status.
         let status = resp.status();

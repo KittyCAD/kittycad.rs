@@ -85,11 +85,12 @@ impl ApiCalls {
         limit: Option<u32>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::ApiCallWithPriceResultsPage> {
+    ) -> Result<Vec<crate::types::ApiCallWithPrice>> {
         use crate::types::paginate::Pagination;
         let mut result = self
             .list(limit, page_token.clone(), sort_by.clone())
             .await?;
+        let mut items = result.items();
         if result.has_more_pages()? {
             result = {
                 let mut req = self.client.client.request(
@@ -97,7 +98,9 @@ impl ApiCalls {
                     &format!("{}/{}", self.client.base_url, "api-calls"),
                 );
                 req = req.bearer_auth(&self.client.token);
-                let resp = req.send().await?;
+                let mut request = req.build()?;
+                request = result.next_page(request)?;
+                let resp = self.client.client.execute(request).await?;
                 let status = resp.status();
                 let text = resp.text().await.unwrap_or_default();
                 if status.is_success() {
@@ -112,9 +115,10 @@ impl ApiCalls {
                     ))
                 }
             }?;
+            items.extend(result.items());
         }
 
-        Ok(result)
+        Ok(items)
     }
 
     #[doc = "Get details of an API call.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\nIf the user is not authenticated to view the specified API call, then it is not returned.\nOnly KittyCAD employees can view API calls for other users."]
@@ -196,7 +200,7 @@ impl ApiCalls {
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
         status: Option<crate::types::ApiCallStatus>,
-    ) -> Result<crate::types::AsyncApiCallResultsPage> {
+    ) -> Result<Vec<crate::types::AsyncApiCall>> {
         use crate::types::paginate::Pagination;
         let mut result = self
             .list_async_operations(
@@ -206,6 +210,7 @@ impl ApiCalls {
                 status.clone(),
             )
             .await?;
+        let mut items = result.items();
         if result.has_more_pages()? {
             result = {
                 let mut req = self.client.client.request(
@@ -213,7 +218,9 @@ impl ApiCalls {
                     &format!("{}/{}", self.client.base_url, "async/operations"),
                 );
                 req = req.bearer_auth(&self.client.token);
-                let resp = req.send().await?;
+                let mut request = req.build()?;
+                request = result.next_page(request)?;
+                let resp = self.client.client.execute(request).await?;
                 let status = resp.status();
                 let text = resp.text().await.unwrap_or_default();
                 if status.is_success() {
@@ -228,9 +235,10 @@ impl ApiCalls {
                     ))
                 }
             }?;
+            items.extend(result.items());
         }
 
-        Ok(result)
+        Ok(items)
     }
 
     #[doc = "Get an async operation.\n\nGet the status and output of an async operation.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested async operation for the user.\nIf the user is not authenticated to view the specified async operation, then it is not returned.\nOnly KittyCAD employees with the proper access can view async operations for other users."]
@@ -309,11 +317,12 @@ impl ApiCalls {
         limit: Option<u32>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::ApiCallWithPriceResultsPage> {
+    ) -> Result<Vec<crate::types::ApiCallWithPrice>> {
         use crate::types::paginate::Pagination;
         let mut result = self
             .user_list(limit, page_token.clone(), sort_by.clone())
             .await?;
+        let mut items = result.items();
         if result.has_more_pages()? {
             result = {
                 let mut req = self.client.client.request(
@@ -321,7 +330,9 @@ impl ApiCalls {
                     &format!("{}/{}", self.client.base_url, "user/api-calls"),
                 );
                 req = req.bearer_auth(&self.client.token);
-                let resp = req.send().await?;
+                let mut request = req.build()?;
+                request = result.next_page(request)?;
+                let resp = self.client.client.execute(request).await?;
                 let status = resp.status();
                 let text = resp.text().await.unwrap_or_default();
                 if status.is_success() {
@@ -336,9 +347,10 @@ impl ApiCalls {
                     ))
                 }
             }?;
+            items.extend(result.items());
         }
 
-        Ok(result)
+        Ok(items)
     }
 
     #[doc = "Get an API call for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user."]
@@ -423,7 +435,7 @@ impl ApiCalls {
         limit: Option<u32>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::ApiCallWithPriceResultsPage> {
+    ) -> Result<Vec<crate::types::ApiCallWithPrice>> {
         use crate::types::paginate::Pagination;
         let mut result = self
             .list_for_user(
@@ -433,6 +445,7 @@ impl ApiCalls {
                 sort_by.clone(),
             )
             .await?;
+        let mut items = result.items();
         if result.has_more_pages()? {
             result = {
                 let mut req = self.client.client.request(
@@ -444,7 +457,9 @@ impl ApiCalls {
                     ),
                 );
                 req = req.bearer_auth(&self.client.token);
-                let resp = req.send().await?;
+                let mut request = req.build()?;
+                request = result.next_page(request)?;
+                let resp = self.client.client.execute(request).await?;
                 let status = resp.status();
                 let text = resp.text().await.unwrap_or_default();
                 if status.is_success() {
@@ -459,8 +474,9 @@ impl ApiCalls {
                     ))
                 }
             }?;
+            items.extend(result.items());
         }
 
-        Ok(result)
+        Ok(items)
     }
 }
