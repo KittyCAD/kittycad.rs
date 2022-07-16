@@ -2,13 +2,13 @@ use anyhow::Result;
 
 use crate::Client;
 
-pub struct File {
+pub struct Oauth2 {
     pub client: Client,
 }
 
-impl File {
+impl Oauth2 {
     #[doc(hidden)]
     pub fn new(client: Client) -> Self {
-        File { client }
+        Oauth2 { client }
     }
 }

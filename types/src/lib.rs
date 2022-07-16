@@ -44,7 +44,7 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
         }
         // Parse the parameters.
         for (name, parameter) in &components.parameters {
-            let schema = parameter.item()?.data().unwrap().format.schema()?;
+            let schema = parameter.item()?.data()?.format.schema()?;
             // Let's get the schema from the reference.
             let schema = schema.get_schema_from_reference(spec, true)?;
             // Let's handle all the kinds of schemas.
@@ -804,7 +804,7 @@ fn render_request_body(
 }
 
 /// Clean a property name for an object so we can use it in rust.
-fn clean_property_name(s: &str) -> String {
+pub fn clean_property_name(s: &str) -> String {
     let mut prop = inflector::cases::snakecase::to_snake_case(s.trim());
 
     // Account for reserved keywords in rust.
@@ -925,7 +925,7 @@ fn render_enum(
 
 /// Return a proper rust name for a string.
 /// For example, this gets used as the enum and struct name.
-fn proper_name(s: &str) -> String {
+pub fn proper_name(s: &str) -> String {
     if s.is_empty() {
         return "Empty".to_string();
     }

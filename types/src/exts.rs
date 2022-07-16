@@ -58,9 +58,7 @@ impl SchemaExt for openapiv3::RequestBody {
 impl SchemaExt for openapiv3::Parameter {
     fn recurse(&self, spec: &openapiv3::OpenAPI) -> Result<openapiv3::Schema> {
         // Get the parameter data.
-        let data = self
-            .data()
-            .ok_or_else(|| anyhow::anyhow!("Parameter does not have data"))?;
+        let data = self.data()?;
         // Get the parameter schema.
         let schema = data.format.schema()?;
         // Recurse the schema.
@@ -181,30 +179,30 @@ impl ParameterSchemaOrContentExt for openapiv3::ParameterSchemaOrContent {
 /// A trait for types that have `ParameterData`.
 pub trait ParameterExt {
     /// Return the `ParameterData` for the type.
-    fn data(&self) -> Option<openapiv3::ParameterData>;
+    fn data(&self) -> Result<openapiv3::ParameterData>;
 }
 
 impl ParameterExt for &openapiv3::Parameter {
-    fn data(&self) -> Option<openapiv3::ParameterData> {
+    fn data(&self) -> Result<openapiv3::ParameterData> {
         match self {
             openapiv3::Parameter::Path {
                 parameter_data,
                 style: _,
-            } => Some(parameter_data.clone()),
+            } => Ok(parameter_data.clone()),
             openapiv3::Parameter::Header {
                 parameter_data,
                 style: openapiv3::HeaderStyle::Simple,
-            } => Some(parameter_data.clone()),
+            } => Ok(parameter_data.clone()),
             openapiv3::Parameter::Cookie {
                 parameter_data,
                 style: openapiv3::CookieStyle::Form,
-            } => Some(parameter_data.clone()),
+            } => Ok(parameter_data.clone()),
             openapiv3::Parameter::Query {
                 parameter_data,
                 allow_reserved: _,
                 style: _,
                 allow_empty_value: _,
-            } => Some(parameter_data.clone()),
+            } => Ok(parameter_data.clone()),
         }
     }
 }
