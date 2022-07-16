@@ -8,7 +8,7 @@ generate: kittycad
 	cargo test --all -- --nocapture
 	cargo clippy --all
 
-target/debug/generator: generator/src/*.rs generator/Cargo.toml
+target/debug/generator: generator/src/*.rs generator/Cargo.toml types/src/*.rs spec.json
 	cargo build -p types
 	cargo build --bin generator
 

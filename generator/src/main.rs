@@ -2380,7 +2380,6 @@ fn gen(api: &OpenAPI, tags: Vec<String>) -> Result<String> {
     a("#[cfg(test)]");
     a("mod tests;");
     // Hopefully there is never a "tag" named after these reserved libs.
-    a("pub mod traits;");
     a("pub mod types;");
     a("#[doc(hidden)]");
 

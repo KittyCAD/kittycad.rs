@@ -127,7 +127,7 @@ impl schemars::JsonSchema for Base64Data {
 
 #[cfg(test)]
 mod tests {
-    use crate::base64::Base64Data;
+    use super::Base64Data;
     use std::convert::TryFrom;
 
     #[test]

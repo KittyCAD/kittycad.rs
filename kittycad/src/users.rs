@@ -131,25 +131,25 @@ impl Users {
         let mut page = resp.next_page;
 
         // Paginate if we should.
-        while !page.is_empty() {
+        while let Some(ref p) = page {
             if !url.contains('?') {
                 resp = self
                     .client
-                    .get(&format!("{}?page={}", url, page), None)
+                    .get(&format!("{}?page={}", url, p), None)
                     .await?;
             } else {
                 resp = self
                     .client
-                    .get(&format!("{}&page={}", url, page), None)
+                    .get(&format!("{}&page={}", url, p), None)
                     .await?;
             }
 
             items.append(&mut resp.items);
 
-            if !resp.next_page.is_empty() && resp.next_page != page {
-                page = resp.next_page.to_string();
+            if page == resp.next_page {
+                page = None;
             } else {
-                page = "".to_string();
+                page = resp.next_page.clone();
             }
         }
 
@@ -223,25 +223,25 @@ impl Users {
         let mut page = resp.next_page;
 
         // Paginate if we should.
-        while !page.is_empty() {
+        while let Some(ref p) = page {
             if !url.contains('?') {
                 resp = self
                     .client
-                    .get(&format!("{}?page={}", url, page), None)
+                    .get(&format!("{}?page={}", url, p), None)
                     .await?;
             } else {
                 resp = self
                     .client
-                    .get(&format!("{}&page={}", url, page), None)
+                    .get(&format!("{}&page={}", url, p), None)
                     .await?;
             }
 
             items.append(&mut resp.items);
 
-            if !resp.next_page.is_empty() && resp.next_page != page {
-                page = resp.next_page.to_string();
+            if page == resp.next_page {
+                page = None;
             } else {
-                page = "".to_string();
+                page = resp.next_page.clone();
             }
         }
 

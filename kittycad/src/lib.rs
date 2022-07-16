@@ -100,7 +100,6 @@ pub mod payments;
 pub mod sessions;
 #[cfg(test)]
 mod tests;
-pub mod traits;
 pub mod types;
 /// Unit conversion operations.
 ///

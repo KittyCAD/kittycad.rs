@@ -792,20 +792,20 @@ fn get_fn_inner(
             let mut page = resp.next_page;
 
             // Paginate if we should.
-            while !page.is_empty() {{
+            while let Some(ref p) = page {{
                 if !url.contains('?') {{
-                    resp = self.client.{}(&format!("{{}}?page={{}}", url, page), {}).await?;
+                    resp = self.client.{}(&format!("{{}}?page={{}}", url, p), {}).await?;
                 }} else {{
-                    resp = self.client.{}(&format!("{{}}&page={{}}", url, page), {}).await?;
+                    resp = self.client.{}(&format!("{{}}&page={{}}", url, p), {}).await?;
                 }}
 
 
                 {}.append(&mut resp.{});
 
-                if !resp.next_page.is_empty() && resp.next_page != page {{
-                    page = resp.next_page.to_string();
+                if page == resp.next_page {{
+                    page = None;
                 }} else {{
-                    page = "".to_string();
+                    page = resp.next_page.clone();
                 }}
             }}
 
