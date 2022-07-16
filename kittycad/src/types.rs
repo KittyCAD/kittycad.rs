@@ -1,6592 +1,3453 @@
-//! The data types sent to and returned from the API client.
-use parse_display::{Display, FromStr};
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
-use std::fmt;
-use tabled::Tabled;
+#![doc = r" This module contains the generated types for the library."]
+mod base64 {
+    #![doc = " Base64 data that encodes to url safe base64, but can decode from multiple"]
+    #![doc = " base64 implementations to account for various clients and libraries. Compatible"]
+    #![doc = " with serde and JsonSchema."]
+    use serde::de::{Error, Unexpected, Visitor};
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+    use std::convert::TryFrom;
+    use std::fmt;
+    static ALLOWED_DECODING_FORMATS: &[data_encoding::Encoding] = &[
+        data_encoding::BASE64,
+        data_encoding::BASE64URL,
+        data_encoding::BASE64URL_NOPAD,
+        data_encoding::BASE64_MIME,
+        data_encoding::BASE64_NOPAD,
+    ];
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    #[doc = " A container for binary that should be base64 encoded in serialisation. In reverse"]
+    #[doc = " when deserializing, will decode from many different types of base64 possible."]
+    pub struct Base64Data(pub Vec<u8>);
+    impl Base64Data {
+        #[doc = " Return is the data is empty."]
+        pub fn is_empty(&self) -> bool {
+            self.0.is_empty()
+        }
+    }
 
-/**
-* An account provider.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
+    impl fmt::Display for Base64Data {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "{}", data_encoding::BASE64URL_NOPAD.encode(&self.0))
+        }
+    }
+
+    impl From<Base64Data> for Vec<u8> {
+        fn from(data: Base64Data) -> Vec<u8> {
+            data.0
+        }
+    }
+
+    impl From<Vec<u8>> for Base64Data {
+        fn from(data: Vec<u8>) -> Base64Data {
+            Base64Data(data)
+        }
+    }
+
+    impl AsRef<[u8]> for Base64Data {
+        fn as_ref(&self) -> &[u8] {
+            &self.0
+        }
+    }
+
+    impl TryFrom<&str> for Base64Data {
+        type Error = anyhow::Error;
+        fn try_from(v: &str) -> Result<Self, Self::Error> {
+            for config in ALLOWED_DECODING_FORMATS {
+                if let Ok(data) = config.decode(v.as_bytes()) {
+                    return Ok(Base64Data(data));
+                }
+            }
+            anyhow::bail!("Could not decode base64 data: {}", v);
+        }
+    }
+
+    struct Base64DataVisitor;
+    impl<'de> Visitor<'de> for Base64DataVisitor {
+        type Value = Base64Data;
+        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+            write!(formatter, "a base64 encoded string")
+        }
+
+        fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+        where
+            E: Error,
+        {
+            for config in ALLOWED_DECODING_FORMATS {
+                if let Ok(data) = config.decode(v.as_bytes()) {
+                    return Ok(Base64Data(data));
+                }
+            }
+            Err(serde::de::Error::invalid_value(Unexpected::Str(v), &self))
+        }
+    }
+
+    impl<'de> Deserialize<'de> for Base64Data {
+        fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error>
+        where
+            D: Deserializer<'de>,
+        {
+            deserializer.deserialize_str(Base64DataVisitor)
+        }
+    }
+
+    impl Serialize for Base64Data {
+        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: Serializer,
+        {
+            let encoded = data_encoding::BASE64URL_NOPAD.encode(&self.0);
+            serializer.serialize_str(&encoded)
+        }
+    }
+
+    impl schemars::JsonSchema for Base64Data {
+        fn schema_name() -> String {
+            "Base64Data".to_string()
+        }
+
+        fn json_schema(gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
+            let mut obj = gen.root_schema_for::<String>().schema;
+            obj.format = Some("byte".to_string());
+            schemars::schema::Schema::Object(obj)
+        }
+
+        fn is_referenceable() -> bool {
+            false
+        }
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use crate::base64::Base64Data;
+        use std::convert::TryFrom;
+        #[test]
+        fn test_base64_try_from() {
+            assert!(Base64Data::try_from("aGVsbG8=").is_ok());
+            assert!(Base64Data::try_from("abcdefghij").is_err());
+        }
+    }
+}
+
+#[doc = "An account provider."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
 pub enum AccountProvider {
-    #[serde(rename = "github")]
-    Github,
     #[serde(rename = "google")]
+    #[display("google")]
     Google,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
+    #[serde(rename = "github")]
+    #[display("github")]
+    Github,
 }
 
-impl std::fmt::Display for AccountProvider {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            AccountProvider::Github => "github",
-            AccountProvider::Google => "google",
-            AccountProvider::Noop => "",
-            AccountProvider::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for AccountProvider {
-    fn default() -> AccountProvider {
-        AccountProvider::Github
-    }
-}
-impl std::str::FromStr for AccountProvider {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "github" {
-            return Ok(AccountProvider::Github);
-        }
-        if s == "google" {
-            return Ok(AccountProvider::Google);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl AccountProvider {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, AccountProvider::Noop)
-    }
-}
-
-/// An address.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "An address."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct Address {
-    /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * An address.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub city: String,
-
-    /**
-    * An address.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub country: String,
-
-    /**
-    * The time and date the address was created.
-    */
+    #[doc = "The city component."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    city: Option<String>,
+    #[doc = "The country component."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    country: Option<String>,
+    #[doc = "The time and date the address was created."]
     #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * An address.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub state: String,
-
-    /**
-    * An address.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize",
-        rename = "street1"
-    )]
-    pub street_1: String,
-
-    /**
-    * An address.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize",
-        rename = "street2"
-    )]
-    pub street_2: String,
-
-    /**
-    * The time and date the address was last updated.
-    */
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The unique identifier of the address."]
     #[serde()]
-    pub updated_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * An address.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub user_id: String,
-
-    /**
-    * An address.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub zip: String,
+    id: uuid::Uuid,
+    #[doc = "The state component."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    state: Option<String>,
+    #[doc = "The first street component."]
+    #[serde(rename = "street1", default, skip_serializing_if = "Option::is_none")]
+    street_1: Option<String>,
+    #[doc = "The second street component."]
+    #[serde(rename = "street2", default, skip_serializing_if = "Option::is_none")]
+    street_2: Option<String>,
+    #[doc = "The time and date the address was last updated."]
+    #[serde()]
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID that this address belongs to."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    user_id: Option<String>,
+    #[doc = "The zip component."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    zip: Option<String>,
 }
 
-/// A response for a query on the API call table that is grouped by something.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "A response for a query on the API call table that is grouped by something."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct ApiCallQueryGroup {
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub count: i64,
-
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub query: String,
+    #[serde()]
+    count: i64,
+    #[serde()]
+    query: String,
 }
 
-/**
-* The field of an API call to group by.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
+#[doc = "The field of an API call to group by."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
 pub enum ApiCallQueryGroupBy {
     #[serde(rename = "email")]
+    #[display("email")]
     Email,
-    #[serde(rename = "endpoint")]
-    Endpoint,
-    #[serde(rename = "ip_address")]
-    IpAddress,
     #[serde(rename = "method")]
+    #[display("method")]
     Method,
-    #[serde(rename = "origin")]
-    Origin,
+    #[serde(rename = "endpoint")]
+    #[display("endpoint")]
+    Endpoint,
     #[serde(rename = "user_id")]
+    #[display("user_id")]
     UserId,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
+    #[serde(rename = "origin")]
+    #[display("origin")]
+    Origin,
+    #[serde(rename = "ip_address")]
+    #[display("ip_address")]
+    IpAddress,
 }
 
-impl std::fmt::Display for ApiCallQueryGroupBy {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            ApiCallQueryGroupBy::Email => "email",
-            ApiCallQueryGroupBy::Endpoint => "endpoint",
-            ApiCallQueryGroupBy::IpAddress => "ip_address",
-            ApiCallQueryGroupBy::Method => "method",
-            ApiCallQueryGroupBy::Origin => "origin",
-            ApiCallQueryGroupBy::UserId => "user_id",
-            ApiCallQueryGroupBy::Noop => "",
-            ApiCallQueryGroupBy::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for ApiCallQueryGroupBy {
-    fn default() -> ApiCallQueryGroupBy {
-        ApiCallQueryGroupBy::Email
-    }
-}
-impl std::str::FromStr for ApiCallQueryGroupBy {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "email" {
-            return Ok(ApiCallQueryGroupBy::Email);
-        }
-        if s == "endpoint" {
-            return Ok(ApiCallQueryGroupBy::Endpoint);
-        }
-        if s == "ip_address" {
-            return Ok(ApiCallQueryGroupBy::IpAddress);
-        }
-        if s == "method" {
-            return Ok(ApiCallQueryGroupBy::Method);
-        }
-        if s == "origin" {
-            return Ok(ApiCallQueryGroupBy::Origin);
-        }
-        if s == "user_id" {
-            return Ok(ApiCallQueryGroupBy::UserId);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl ApiCallQueryGroupBy {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, ApiCallQueryGroupBy::Noop)
-    }
-}
-
-/**
-* The status of an async API call.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
+#[doc = "The status of an async API call."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
 pub enum ApiCallStatus {
-    #[serde(rename = "Completed")]
-    Completed,
-    #[serde(rename = "Failed")]
-    Failed,
-    #[serde(rename = "In Progress")]
-    InProgress,
-    #[serde(rename = "Queued")]
     Queued,
-    #[serde(rename = "Uploaded")]
     Uploaded,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
+    #[serde(rename = "In Progress")]
+    #[display("In Progress")]
+    InProgress,
+    Completed,
+    Failed,
 }
 
-impl std::fmt::Display for ApiCallStatus {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            ApiCallStatus::Completed => "Completed",
-            ApiCallStatus::Failed => "Failed",
-            ApiCallStatus::InProgress => "In Progress",
-            ApiCallStatus::Queued => "Queued",
-            ApiCallStatus::Uploaded => "Uploaded",
-            ApiCallStatus::Noop => "",
-            ApiCallStatus::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for ApiCallStatus {
-    fn default() -> ApiCallStatus {
-        ApiCallStatus::Completed
-    }
-}
-impl std::str::FromStr for ApiCallStatus {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "Completed" {
-            return Ok(ApiCallStatus::Completed);
-        }
-        if s == "Failed" {
-            return Ok(ApiCallStatus::Failed);
-        }
-        if s == "In Progress" {
-            return Ok(ApiCallStatus::InProgress);
-        }
-        if s == "Queued" {
-            return Ok(ApiCallStatus::Queued);
-        }
-        if s == "Uploaded" {
-            return Ok(ApiCallStatus::Uploaded);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl ApiCallStatus {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, ApiCallStatus::Noop)
-    }
-}
-
-/**
-* The Request Method (VERB)
-*   
-*   This type also contains constants for a number of common HTTP methods such as GET, POST, etc.
-*   
-*   Currently includes 8 variants representing the 8 methods defined in [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH, and an Extension variant for all extensions.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
-pub enum Method {
-    #[serde(rename = "CONNECT")]
-    Connect,
-    #[serde(rename = "DELETE")]
-    Delete,
-    #[serde(rename = "EXTENSION")]
-    Extension,
-    #[serde(rename = "GET")]
-    Get,
-    #[serde(rename = "HEAD")]
-    Head,
-    #[serde(rename = "OPTIONS")]
-    Options,
-    #[serde(rename = "PATCH")]
-    Patch,
-    #[serde(rename = "POST")]
-    Post,
-    #[serde(rename = "PUT")]
-    Put,
-    #[serde(rename = "TRACE")]
-    Trace,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
-}
-
-impl std::fmt::Display for Method {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            Method::Connect => "CONNECT",
-            Method::Delete => "DELETE",
-            Method::Extension => "EXTENSION",
-            Method::Get => "GET",
-            Method::Head => "HEAD",
-            Method::Options => "OPTIONS",
-            Method::Patch => "PATCH",
-            Method::Post => "POST",
-            Method::Put => "PUT",
-            Method::Trace => "TRACE",
-            Method::Noop => "",
-            Method::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for Method {
-    fn default() -> Method {
-        Method::Connect
-    }
-}
-impl std::str::FromStr for Method {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "CONNECT" {
-            return Ok(Method::Connect);
-        }
-        if s == "DELETE" {
-            return Ok(Method::Delete);
-        }
-        if s == "EXTENSION" {
-            return Ok(Method::Extension);
-        }
-        if s == "GET" {
-            return Ok(Method::Get);
-        }
-        if s == "HEAD" {
-            return Ok(Method::Head);
-        }
-        if s == "OPTIONS" {
-            return Ok(Method::Options);
-        }
-        if s == "PATCH" {
-            return Ok(Method::Patch);
-        }
-        if s == "POST" {
-            return Ok(Method::Post);
-        }
-        if s == "PUT" {
-            return Ok(Method::Put);
-        }
-        if s == "TRACE" {
-            return Ok(Method::Trace);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl Method {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, Method::Noop)
-    }
-}
-
-/// An API call with the price.
-///
-/// This is a join of the `ApiCall` and `ApiCallPrice` tables.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "An API call with the price.\n\nThis is a join of the `ApiCall` and `ApiCallPrice` tables."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct ApiCallWithPrice {
-    /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * The date and time the API call completed billing.
-    */
+    #[doc = "The date and time the API call completed billing."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The date and time the API call was created."]
     #[serde()]
-    pub completed_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The date and time the API call was created.
-    */
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The duration of the API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    duration: Option<i64>,
+    #[doc = "The user's email address."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    email: Option<String>,
+    #[doc = "The endpoint requested by the API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    endpoint: Option<String>,
+    #[doc = "The unique identifier for the API call."]
     #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The duration of the API call.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub duration: i64,
-
-    /**
-    * An API call with the price.
-    *  
-    *  This is a join of the `ApiCall` and `ApiCallPrice` tables.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub email: String,
-
-    /**
-    * An API call with the price.
-    *  
-    *  This is a join of the `ApiCall` and `ApiCallPrice` tables.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub endpoint: String,
-
-    /**
-    * An API call with the price.
-    *  
-    *  This is a join of the `ApiCall` and `ApiCallPrice` tables.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub ip_address: String,
-
-    /**
-    * The Request Method (VERB)
-    *  
-    *  This type also contains constants for a number of common HTTP methods such as GET, POST, etc.
-    *  
-    *  Currently includes 8 variants representing the 8 methods defined in [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH, and an Extension variant for all extensions.
-    */
-    #[serde(default, skip_serializing_if = "Method::is_noop")]
-    pub method: Method,
-
-    /**
-    * The number of minutes the API call was billed for.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i32",
-        deserialize_with = "crate::utils::deserialize_null_i32::deserialize"
-    )]
-    pub minutes: i32,
-
-    /**
-    * An API call with the price.
-    *  
-    *  This is a join of the `ApiCall` and `ApiCallPrice` tables.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub origin: String,
-
-    /**
-    * The price of the API call.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub price: f64,
-
-    /**
-    * The request body sent by the API call.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub request_body: String,
-
-    /**
-    * An API call with the price.
-    *  
-    *  This is a join of the `ApiCall` and `ApiCallPrice` tables.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub request_query_params: String,
-
-    /**
-    * The response body returned by the API call. We do not store this information if it is above a certain size.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub response_body: String,
-
-    /**
-    * The date and time the API call started billing.
-    */
+    id: uuid::Uuid,
+    #[doc = "The ip address of the origin."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    ip_address: Option<std::net::Ipv4Addr>,
+    #[doc = "The HTTP method requsted by the API call."]
     #[serde()]
-    pub started_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The status code returned by the API call.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i32",
-        deserialize_with = "crate::utils::deserialize_null_i32::deserialize"
-    )]
-    pub status_code: i32,
-
-    /**
-    * An API call with the price.
-    *  
-    *  This is a join of the `ApiCall` and `ApiCallPrice` tables.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub stripe_invoice_item_id: String,
-
-    /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub token: String,
-
-    /**
-    * The date and time the API call was last updated.
-    */
+    method: Method,
+    #[doc = "The number of minutes the API call was billed for."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    minutes: Option<i32>,
+    #[doc = "The origin of the API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    origin: Option<String>,
+    #[doc = "The price of the API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    price: Option<f64>,
+    #[doc = "The request body sent by the API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    request_body: Option<String>,
+    #[doc = "The request query params sent by the API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    request_query_params: Option<String>,
+    #[doc = "The response body returned by the API call. We do not store this information if it is above a certain size."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    response_body: Option<String>,
+    #[doc = "The date and time the API call started billing."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status code returned by the API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    status_code: Option<i32>,
+    #[doc = "The Stripe invoice item ID of the API call if it is billable."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    stripe_invoice_item_id: Option<String>,
+    #[doc = "The API token that made the API call."]
     #[serde()]
-    pub updated_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The user agent of the request.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub user_agent: String,
-
-    /**
-    * An API call with the price.
-    *  
-    *  This is a join of the `ApiCall` and `ApiCallPrice` tables.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub user_id: String,
+    token: uuid::Uuid,
+    #[doc = "The date and time the API call was last updated."]
+    #[serde()]
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user agent of the request."]
+    #[serde()]
+    user_agent: String,
+    #[doc = "The ID of the user that made the API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    user_id: Option<String>,
 }
 
-/// A single page of results
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct ApiCallWithPriceResultsPage {
-    /**
-    * list of items on this page of results
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    #[tabled(skip)]
-    pub items: Vec<ApiCallWithPrice>,
-
-    /**
-    * token used to fetch the next page of results (if any)
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub next_page: String,
+    #[doc = "list of items on this page of results"]
+    #[serde()]
+    items: Vec<ApiCallWithPrice>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    next_page: Option<String>,
 }
 
-/// An API token.
-///
-/// These are used to authenticate users with Bearer authentication.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "An API token.\n\nThese are used to authenticate users with Bearer authentication."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct ApiToken {
-    /**
-    * An API token.
-    *  
-    *  These are used to authenticate users with Bearer authentication.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * The date and time the API token was created.
-    */
+    #[doc = "The date and time the API token was created."]
     #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * If the token is valid. We never delete API tokens, but we can mark them as invalid. We save them for ever to preserve the history of the API token.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub is_valid: bool,
-
-    /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub token: String,
-
-    /**
-    * The date and time the API token was last updated.
-    */
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The unique identifier for the API token."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    id: Option<String>,
+    #[doc = "If the token is valid. We never delete API tokens, but we can mark them as invalid. We save them for ever to preserve the history of the API token."]
     #[serde()]
-    pub updated_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * An API token.
-    *  
-    *  These are used to authenticate users with Bearer authentication.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub user_id: String,
+    is_valid: bool,
+    #[doc = "The API token itself."]
+    #[serde()]
+    token: uuid::Uuid,
+    #[doc = "The date and time the API token was last updated."]
+    #[serde()]
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The ID of the user that owns the API token."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    user_id: Option<String>,
 }
 
-/// A single page of results
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct ApiTokenResultsPage {
-    /**
-    * list of items on this page of results
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    #[tabled(skip)]
-    pub items: Vec<ApiToken>,
-
-    /**
-    * token used to fetch the next page of results (if any)
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub next_page: String,
+    #[doc = "list of items on this page of results"]
+    #[serde()]
+    items: Vec<ApiToken>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    next_page: Option<String>,
 }
 
-/**
-* The type of async API call.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
-pub enum AsyncApiCallType {
-    #[serde(rename = "FileConversion")]
-    FileConversion,
-    #[serde(rename = "FileDensity")]
-    FileDensity,
-    #[serde(rename = "FileMass")]
-    FileMass,
-    #[serde(rename = "FileVolume")]
-    FileVolume,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
-}
-
-impl std::fmt::Display for AsyncApiCallType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            AsyncApiCallType::FileConversion => "FileConversion",
-            AsyncApiCallType::FileDensity => "FileDensity",
-            AsyncApiCallType::FileMass => "FileMass",
-            AsyncApiCallType::FileVolume => "FileVolume",
-            AsyncApiCallType::Noop => "",
-            AsyncApiCallType::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for AsyncApiCallType {
-    fn default() -> AsyncApiCallType {
-        AsyncApiCallType::FileConversion
-    }
-}
-impl std::str::FromStr for AsyncApiCallType {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "FileConversion" {
-            return Ok(AsyncApiCallType::FileConversion);
-        }
-        if s == "FileDensity" {
-            return Ok(AsyncApiCallType::FileDensity);
-        }
-        if s == "FileMass" {
-            return Ok(AsyncApiCallType::FileMass);
-        }
-        if s == "FileVolume" {
-            return Ok(AsyncApiCallType::FileVolume);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl AsyncApiCallType {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, AsyncApiCallType::Noop)
-    }
-}
-
-/// An async API call.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "An async API call."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct AsyncApiCall {
-    /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * The time and date the async API call was completed.
-    */
-    #[serde()]
-    pub completed_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The time and date the async API call was created.
-    */
-    #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The error the function returned, if any.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub error: String,
-
-    /**
-    * An async API call.
-    */
+    #[doc = "The time and date the async API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[tabled(skip)]
-    pub input: Option<serde_json::Value>,
-
-    /**
-    * The JSON output for the API call. These are determined by the endpoint that is run.
-    */
+    completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the async API call was created."]
+    #[serde()]
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[tabled(skip)]
-    pub output: Option<serde_json::Value>,
-
-    /**
-    * The time and date the async API call was started.
-    */
+    error: Option<String>,
+    #[doc = "The unique identifier of the async API call.\n\nThis is the same as the API call ID."]
     #[serde()]
-    pub started_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The status of an async API call.
-    */
-    #[serde(default, skip_serializing_if = "ApiCallStatus::is_noop")]
-    pub status: ApiCallStatus,
-
-    /**
-    * The type of async API call.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "AsyncApiCallType::is_noop",
-        rename = "type"
-    )]
-    pub type_: AsyncApiCallType,
-
-    /**
-    * The time and date the async API call was last updated.
-    */
+    id: uuid::Uuid,
+    #[doc = "The JSON input for the API call. These are determined by the endpoint that is run."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    input: Option<serde_json::Value>,
+    #[doc = "The JSON output for the API call. These are determined by the endpoint that is run."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    output: Option<serde_json::Value>,
+    #[doc = "The time and date the async API call was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the async API call."]
     #[serde()]
-    pub updated_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * An async API call.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub user_id: String,
-
-    /**
-    * An async API call.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub worker: String,
+    status: Status,
+    #[doc = "The type of async API call."]
+    #[serde(rename = "type")]
+    type_: Type,
+    #[doc = "The time and date the async API call was last updated."]
+    #[serde()]
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the async API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    user_id: Option<String>,
+    #[doc = "The worker node that is performing or performed the async API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    worker: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled)]
+#[doc = "A file conversion."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct FileConversion {
+    #[doc = "The time and date the file conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the file conversion was created."]
+    #[serde()]
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    error: Option<String>,
+    #[doc = "The unique identifier of the file conversion.\n\nThis is the same as the API call ID."]
+    #[serde()]
+    id: uuid::Uuid,
+    #[doc = "The converted file, if completed, base64 encoded."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    output: Option<base64::Base64Data>,
+    #[doc = "The output format of the file conversion."]
+    #[serde()]
+    output_format: OutputFormat,
+    #[doc = "The source format of the file conversion."]
+    #[serde()]
+    src_format: SrcFormat,
+    #[doc = "The time and date the file conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the file conversion."]
+    #[serde()]
+    status: Status,
+    #[serde(rename = "type")]
+    type_: Type,
+    #[doc = "The time and date the file conversion was last updated."]
+    #[serde()]
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the file conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    user_id: Option<String>,
+}
+
+#[doc = "A file mass."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct FileMass {
+    #[doc = "The time and date the mass was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the mass was created."]
+    #[serde()]
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    error: Option<String>,
+    #[doc = "The unique identifier of the mass request.\n\nThis is the same as the API call ID."]
+    #[serde()]
+    id: uuid::Uuid,
+    #[doc = "The resulting mass."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    mass: Option<f64>,
+    #[doc = "The material density as denoted by the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    material_density: Option<f64>,
+    #[doc = "The source format of the file."]
+    #[serde()]
+    src_format: SrcFormat,
+    #[doc = "The time and date the mass was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the mass."]
+    #[serde()]
+    status: Status,
+    #[serde(rename = "type")]
+    type_: Type,
+    #[doc = "The time and date the mass was last updated."]
+    #[serde()]
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the mass."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    user_id: Option<String>,
+}
+
+#[doc = "A file volume."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct FileVolume {
+    #[doc = "The time and date the volume was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the volume was created."]
+    #[serde()]
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    error: Option<String>,
+    #[doc = "The unique identifier of the volume request.\n\nThis is the same as the API call ID."]
+    #[serde()]
+    id: uuid::Uuid,
+    #[doc = "The source format of the file."]
+    #[serde()]
+    src_format: SrcFormat,
+    #[doc = "The time and date the volume was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the volume."]
+    #[serde()]
+    status: Status,
+    #[serde(rename = "type")]
+    type_: Type,
+    #[doc = "The time and date the volume was last updated."]
+    #[serde()]
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the volume."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    user_id: Option<String>,
+    #[doc = "The resulting volume."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    volume: Option<f64>,
+}
+
+#[doc = "A file density."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct FileDensity {
+    #[doc = "The time and date the density was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the density was created."]
+    #[serde()]
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The resulting density."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    density: Option<f64>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    error: Option<String>,
+    #[doc = "The unique identifier of the density request.\n\nThis is the same as the API call ID."]
+    #[serde()]
+    id: uuid::Uuid,
+    #[doc = "The material mass as denoted by the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    material_mass: Option<f64>,
+    #[doc = "The source format of the file."]
+    #[serde()]
+    src_format: SrcFormat,
+    #[doc = "The time and date the density was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the density."]
+    #[serde()]
+    status: Status,
+    #[serde(rename = "type")]
+    type_: Type,
+    #[doc = "The time and date the density was last updated."]
+    #[serde()]
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the density."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    user_id: Option<String>,
+}
+
+#[doc = "The output from the async API call."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
-    FileConversion {
-        completed_at: Option<crate::utils::DisplayOptionDateTime>,
-        created_at: crate::utils::DisplayOptionDateTime,
-        error: Option<String>,
-        id: String,
-        output: Option<bytes::Bytes>,
-        output_format: FileOutputFormat,
-        src_format: FileSourceFormat,
-        started_at: Option<crate::utils::DisplayOptionDateTime>,
-        status: ApiCallStatus,
-        updated_at: crate::utils::DisplayOptionDateTime,
-        user_id: String,
-    },
-    FileMass {
-        completed_at: Option<crate::utils::DisplayOptionDateTime>,
-        created_at: crate::utils::DisplayOptionDateTime,
-        error: Option<String>,
-        id: String,
-        mass: Option<f64>,
-        material_density: f64,
-        src_format: FileSourceFormat,
-        started_at: Option<crate::utils::DisplayOptionDateTime>,
-        status: ApiCallStatus,
-        updated_at: crate::utils::DisplayOptionDateTime,
-        user_id: String,
-    },
-    FileVolume {
-        completed_at: Option<crate::utils::DisplayOptionDateTime>,
-        created_at: crate::utils::DisplayOptionDateTime,
-        error: Option<String>,
-        id: String,
-        src_format: FileSourceFormat,
-        started_at: Option<crate::utils::DisplayOptionDateTime>,
-        status: ApiCallStatus,
-        updated_at: crate::utils::DisplayOptionDateTime,
-        user_id: String,
-        volume: Option<f64>,
-    },
-    FileDensity {
-        completed_at: Option<crate::utils::DisplayOptionDateTime>,
-        created_at: crate::utils::DisplayOptionDateTime,
-        density: Option<f64>,
-        error: Option<String>,
-        id: String,
-        material_mass: f64,
-        src_format: FileSourceFormat,
-        started_at: Option<crate::utils::DisplayOptionDateTime>,
-        status: ApiCallStatus,
-        updated_at: crate::utils::DisplayOptionDateTime,
-        user_id: String,
-    },
+    FileConversion(FileConversion),
+    FileMass(FileMass),
+    FileVolume(FileVolume),
+    FileDensity(FileDensity),
 }
 
-impl fmt::Display for AsyncApiCallOutput {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", serde_json::json!(self))
-    }
-}
-
-impl std::str::FromStr for AsyncApiCallOutput {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(serde_json::from_str(s)?)
-    }
-}
-impl AsyncApiCallOutput {
-    pub fn variants() -> Vec<String> {
-        vec![
-            "FileConversion".to_string(),
-            "FileDensity".to_string(),
-            "FileMass".to_string(),
-            "FileVolume".to_string(),
-        ]
-    }
-}
-/**
-* The types for AsyncApiCallOutput.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
-pub enum AsyncApiCallOutputType {
-    #[serde(rename = "FileConversion")]
-    FileConversion,
-    #[serde(rename = "FileDensity")]
-    FileDensity,
-    #[serde(rename = "FileMass")]
-    FileMass,
-    #[serde(rename = "FileVolume")]
-    FileVolume,
-}
-
-impl std::fmt::Display for AsyncApiCallOutputType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            AsyncApiCallOutputType::FileConversion => "FileConversion",
-            AsyncApiCallOutputType::FileDensity => "FileDensity",
-            AsyncApiCallOutputType::FileMass => "FileMass",
-            AsyncApiCallOutputType::FileVolume => "FileVolume",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for AsyncApiCallOutputType {
-    fn default() -> AsyncApiCallOutputType {
-        AsyncApiCallOutputType::FileConversion
-    }
-}
-impl std::str::FromStr for AsyncApiCallOutputType {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "FileConversion" {
-            return Ok(AsyncApiCallOutputType::FileConversion);
-        }
-        if s == "FileDensity" {
-            return Ok(AsyncApiCallOutputType::FileDensity);
-        }
-        if s == "FileMass" {
-            return Ok(AsyncApiCallOutputType::FileMass);
-        }
-        if s == "FileVolume" {
-            return Ok(AsyncApiCallOutputType::FileVolume);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-
-/// A single page of results
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct AsyncApiCallResultsPage {
-    /**
-    * list of items on this page of results
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    #[tabled(skip)]
-    pub items: Vec<AsyncApiCall>,
-
-    /**
-    * token used to fetch the next page of results (if any)
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub next_page: String,
+    #[doc = "list of items on this page of results"]
+    #[serde()]
+    items: Vec<AsyncApiCall>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    next_page: Option<String>,
 }
 
-/// The billing information for payments.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+#[doc = "The type of async API call."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum AsyncApiCallType {
+    FileConversion,
+    FileVolume,
+    FileMass,
+    FileDensity,
+}
+
+#[doc = "The billing information for payments."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct BillingInfo {
-    /**
-    * The billing information for payments.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub name: String,
-
-    /**
-    * The address of the customer.
-    */
+    #[doc = "The address of the customer."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub address: Option<Address>,
-
-    /**
-    * The billing information for payments.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub phone: String,
+    address: Option<Address>,
+    #[doc = "The name of the customer."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[doc = "The phone for the customer."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    phone: Option<String>,
 }
 
-/// Metadata about our cache.
-///
-/// This is mostly used for internal purposes and debugging.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "Metadata about our cache.\n\nThis is mostly used for internal purposes and debugging."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct CacheMetadata {
-    /**
-    * If the cache returned an ok response from ping.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub ok: bool,
+    #[doc = "If the cache returned an ok response from ping."]
+    #[serde()]
+    ok: bool,
 }
 
-/// Card checks.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct PaymentMethodCardChecks {
-    /**
-    * Card checks.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize",
-        rename = "address_line1_check"
-    )]
-    pub address_line_1_check: String,
-
-    /**
-    * Card checks.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub address_postal_code_check: String,
-
-    /**
-    * Card checks.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub cvc_check: String,
-}
-
-/// The card details of a payment method.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+#[doc = "The card details of a payment method."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct CardDetails {
-    /**
-    * The card details of a payment method.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub brand: String,
-
-    /**
-    * The card details of a payment method.
-    */
+    #[doc = "Card brand.\n\nCan be `amex`, `diners`, `discover`, `jcb`, `mastercard`, `unionpay`, `visa`, or `unknown`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub checks: Option<PaymentMethodCardChecks>,
-
-    /**
-    * The card details of a payment method.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub country: String,
-
-    /**
-    * The card details of a payment method.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub exp_month: i64,
-
-    /**
-    * The card details of a payment method.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub exp_year: i64,
-
-    /**
-    * The card details of a payment method.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub fingerprint: String,
-
-    /**
-    * The card details of a payment method.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub funding: String,
-
-    /**
-    * The card details of a payment method.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize",
-        rename = "last4"
-    )]
-    pub last_4: String,
+    brand: Option<String>,
+    #[doc = "Checks on Card address and CVC if provided."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    checks: Option<Checks>,
+    #[doc = "Two-letter ISO code representing the country of the card."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    country: Option<String>,
+    #[doc = "Two-digit number representing the card's expiration month."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    exp_month: Option<i64>,
+    #[doc = "Four-digit number representing the card's expiration year."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    exp_year: Option<i64>,
+    #[doc = "Uniquely identifies this particular card number."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    fingerprint: Option<String>,
+    #[doc = "Card funding type.\n\nCan be `credit`, `debit`, `prepaid`, or `unknown`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    funding: Option<String>,
+    #[doc = "The last four digits of the card."]
+    #[serde(rename = "last4", default, skip_serializing_if = "Option::is_none")]
+    last_4: Option<String>,
 }
 
-/// Cluster information.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "Cluster information."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct Cluster {
-    /**
-    * Cluster information.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub name: String,
-
-    /**
-    * The IP address of the cluster.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub addr: String,
-
-    /**
-    * Cluster information.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub auth_timeout: i64,
-
-    /**
-    * Cluster information.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub cluster_port: i64,
-
-    /**
-    * Cluster information.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub tls_timeout: i64,
-
-    /**
-    * Cluster information.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    #[tabled(skip)]
-    pub urls: Vec<String>,
+    #[doc = "The IP address of the cluster."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    addr: Option<std::net::Ipv4Addr>,
+    #[doc = "The auth timeout of the cluster."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    auth_timeout: Option<i64>,
+    #[doc = "The port of the cluster."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    cluster_port: Option<i64>,
+    #[doc = "The name of the cluster."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[doc = "The TLS timeout for the cluster."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    tls_timeout: Option<i64>,
+    #[doc = "The urls of the cluster."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    urls: Option<Vec<String>>,
 }
 
-/**
-* The language code is written in.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
+#[doc = "The language code is written in."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
 pub enum CodeLanguage {
     #[serde(rename = "go")]
+    #[display("go")]
     Go,
-    #[serde(rename = "node")]
-    Node,
     #[serde(rename = "python")]
+    #[display("python")]
     Python,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
+    #[serde(rename = "node")]
+    #[display("node")]
+    Node,
 }
 
-impl std::fmt::Display for CodeLanguage {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            CodeLanguage::Go => "go",
-            CodeLanguage::Node => "node",
-            CodeLanguage::Python => "python",
-            CodeLanguage::Noop => "",
-            CodeLanguage::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for CodeLanguage {
-    fn default() -> CodeLanguage {
-        CodeLanguage::Go
-    }
-}
-impl std::str::FromStr for CodeLanguage {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "go" {
-            return Ok(CodeLanguage::Go);
-        }
-        if s == "node" {
-            return Ok(CodeLanguage::Node);
-        }
-        if s == "python" {
-            return Ok(CodeLanguage::Python);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl CodeLanguage {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, CodeLanguage::Noop)
-    }
-}
-
-/// Output file contents.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct OutputFile {
-    /**
-    * Output file contents.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub name: String,
-
-    /**
-    * The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for JSON.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub contents: String,
-}
-
-/// Output of the code being executed.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "Output of the code being executed."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct CodeOutput {
-    /**
-    * Output of the code being executed.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    #[tabled(skip)]
-    pub output_files: Vec<OutputFile>,
-
-    /**
-    * Output of the code being executed.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub stderr: String,
-
-    /**
-    * Output of the code being executed.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub stdout: String,
+    #[doc = "The contents of the files requested if they were passed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    output_files: Option<Vec<OutputFile>>,
+    #[doc = "The stderr of the code."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    stderr: Option<String>,
+    #[doc = "The stdout of the code."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    stdout: Option<String>,
 }
 
-/// Commit holds the Git-commit (SHA1) that a binary was built from, as reported in the version-string of external tools, such as `containerd`, or `runC`.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "Commit holds the Git-commit (SHA1) that a binary was built from, as reported in the version-string of external tools, such as `containerd`, or `runC`."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct Commit {
-    /**
-    * Actual commit ID of external tool.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * Commit ID of external tool expected by dockerd as set at build time.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub expected: String,
-}
-
-/// Gateway information.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct Gateway {
-    /**
-    * Gateway information.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub name: String,
-
-    /**
-    * Gateway information.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub auth_timeout: i64,
-
-    /**
-    * Gateway information.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub host: String,
-
-    /**
-    * Gateway information.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub port: i64,
-
-    /**
-    * Gateway information.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub tls_timeout: i64,
-}
-
-/// Jetstream information.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
-pub struct Jetstream {
-    /**
-    * Jetstream information.
-    */
+    #[doc = "Commit ID of external tool expected by dockerd as set at build time."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub config: Option<JetstreamConfig>,
-
-    /**
-    * Jetstream information.
-    */
+    expected: Option<String>,
+    #[doc = "Actual commit ID of external tool."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub meta: Option<MetaClusterInfo>,
-
-    /**
-    * Jetstream information.
-    */
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub stats: Option<JetstreamStats>,
+    id: Option<String>,
 }
 
-/// Leaf node information.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct LeafNode {
-    /**
-    * Leaf node information.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub auth_timeout: i64,
-
-    /**
-    * Leaf node information.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub host: String,
-
-    /**
-    * Leaf node information.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub port: i64,
-
-    /**
-    * Leaf node information.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub tls_timeout: i64,
-}
-
-/// Metadata about a pub-sub connection.
-///
-/// This is mostly used for internal purposes and debugging.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+#[doc = "Metadata about a pub-sub connection.\n\nThis is mostly used for internal purposes and debugging."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct Connection {
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub auth_timeout: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+    #[doc = "The auth timeout of the server."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cluster: Option<Cluster>,
-
-    /**
-    * The time the configuration was loaded.
-    */
+    auth_timeout: Option<i64>,
+    #[doc = "Information about the cluster."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    cluster: Option<Cluster>,
+    #[doc = "The time the configuration was loaded."]
     #[serde()]
-    pub config_load_time: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub connections: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub cores: i64,
-
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub cpu: f64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+    config_load_time: chrono::DateTime<chrono::Utc>,
+    #[doc = "The number of connections to the server."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub gateway: Option<Gateway>,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub git_commit: String,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub go: String,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub gomaxprocs: i64,
-
-    /**
-    * The host of the server.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub host: String,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub http_base_path: String,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub http_host: String,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub http_port: i64,
-
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub http_req_stats: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub https_port: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub in_bytes: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub in_msgs: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+    connections: Option<i64>,
+    #[doc = "The CPU core usage of the server."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub jetstream: Option<Jetstream>,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+    cores: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub leaf: Option<LeafNode>,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub leafnodes: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub max_connections: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub max_control_line: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub max_payload: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub max_pending: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub mem: i64,
-
-    /**
-    * The time now.
-    */
+    cpu: Option<f64>,
+    #[doc = "Information about the gateway."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    gateway: Option<Gateway>,
+    #[doc = "The git commit."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    git_commit: Option<String>,
+    #[doc = "The go version."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    go: Option<String>,
+    #[doc = "`GOMAXPROCS` of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    gomaxprocs: Option<i64>,
+    #[doc = "The host of the server."]
     #[serde()]
-    pub now: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub out_bytes: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub out_msgs: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub ping_interval: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub ping_max: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub port: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub proto: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub remotes: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub routes: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub server_id: String,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub server_name: String,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub slow_consumers: i64,
-
-    /**
-    * When the server was started.
-    */
+    host: std::net::Ipv4Addr,
+    #[doc = "The http base path of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    http_base_path: Option<String>,
+    #[doc = "The http host of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    http_host: Option<String>,
+    #[doc = "The http port of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    http_port: Option<i64>,
     #[serde()]
-    pub start: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub subscriptions: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub system_account: String,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub tls_timeout: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub total_connections: i64,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub uptime: String,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub version: String,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub write_deadline: i64,
+    http_req_stats: std::collections::HashMap<String, i64>,
+    #[doc = "The https port of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    https_port: Option<i64>,
+    #[doc = "The count of inbound bytes for the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    in_bytes: Option<i64>,
+    #[doc = "The number of inbound messages for the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    in_msgs: Option<i64>,
+    #[doc = "Jetstream information."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    jetstream: Option<Jetstream>,
+    #[doc = "Information about leaf nodes."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    leaf: Option<Leaf>,
+    #[doc = "The number of leaf nodes for the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    leafnodes: Option<i64>,
+    #[doc = "The max connections of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    max_connections: Option<i64>,
+    #[doc = "The max control line of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    max_control_line: Option<i64>,
+    #[doc = "The max payload of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    max_payload: Option<i64>,
+    #[doc = "The max pending of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    max_pending: Option<i64>,
+    #[doc = "The memory usage of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    mem: Option<i64>,
+    #[doc = "The time now."]
+    #[serde()]
+    now: chrono::DateTime<chrono::Utc>,
+    #[doc = "The count of outbound bytes for the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    out_bytes: Option<i64>,
+    #[doc = "The number of outbound messages for the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    out_msgs: Option<i64>,
+    #[doc = "The ping interval of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    ping_interval: Option<i64>,
+    #[doc = "The ping max of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    ping_max: Option<i64>,
+    #[doc = "The port of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    port: Option<i64>,
+    #[doc = "The protocol version."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    proto: Option<i64>,
+    #[doc = "The number of remotes for the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    remotes: Option<i64>,
+    #[doc = "The number of routes for the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    routes: Option<i64>,
+    #[doc = "The server ID."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    server_id: Option<String>,
+    #[doc = "The server name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    server_name: Option<String>,
+    #[doc = "The number of slow consumers for the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    slow_consumers: Option<i64>,
+    #[doc = "When the server was started."]
+    #[serde()]
+    start: chrono::DateTime<chrono::Utc>,
+    #[doc = "The number of subscriptions for the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    subscriptions: Option<i64>,
+    #[doc = "The system account."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    system_account: Option<String>,
+    #[doc = "The TLS timeout of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    tls_timeout: Option<i64>,
+    #[doc = "The total number of connections to the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    total_connections: Option<i64>,
+    #[doc = "The uptime of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    uptime: Option<String>,
+    #[doc = "The version of the service."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    version: Option<String>,
+    #[doc = "The write deadline of the server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    write_deadline: Option<i64>,
 }
 
-/**
-* Supported set of sort modes for scanning by created_at only.
-*   
-*   Currently, we only support scanning in ascending order.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
+#[doc = "Supported set of sort modes for scanning by created_at only.\n\nCurrently, we only support scanning in ascending order."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
 pub enum CreatedAtSortMode {
     #[serde(rename = "created-at-ascending")]
+    #[display("created-at-ascending")]
     CreatedAtAscending,
     #[serde(rename = "created-at-descending")]
+    #[display("created-at-descending")]
     CreatedAtDescending,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
 }
 
-impl std::fmt::Display for CreatedAtSortMode {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            CreatedAtSortMode::CreatedAtAscending => "created-at-ascending",
-            CreatedAtSortMode::CreatedAtDescending => "created-at-descending",
-            CreatedAtSortMode::Noop => "",
-            CreatedAtSortMode::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for CreatedAtSortMode {
-    fn default() -> CreatedAtSortMode {
-        CreatedAtSortMode::CreatedAtAscending
-    }
-}
-impl std::str::FromStr for CreatedAtSortMode {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "created-at-ascending" {
-            return Ok(CreatedAtSortMode::CreatedAtAscending);
-        }
-        if s == "created-at-descending" {
-            return Ok(CreatedAtSortMode::CreatedAtDescending);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl CreatedAtSortMode {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, CreatedAtSortMode::Noop)
-    }
-}
-
-/**
-* Currency is the list of supported currencies.
-*   
-*   For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
+#[doc = "Currency is the list of supported currencies.\n\nFor more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
 pub enum Currency {
     #[serde(rename = "aed")]
+    #[display("aed")]
     Aed,
     #[serde(rename = "afn")]
+    #[display("afn")]
     Afn,
     #[serde(rename = "all")]
+    #[display("all")]
     All,
     #[serde(rename = "amd")]
+    #[display("amd")]
     Amd,
     #[serde(rename = "ang")]
+    #[display("ang")]
     Ang,
     #[serde(rename = "aoa")]
+    #[display("aoa")]
     Aoa,
     #[serde(rename = "ars")]
+    #[display("ars")]
     Ars,
     #[serde(rename = "aud")]
+    #[display("aud")]
     Aud,
     #[serde(rename = "awg")]
+    #[display("awg")]
     Awg,
     #[serde(rename = "azn")]
+    #[display("azn")]
     Azn,
     #[serde(rename = "bam")]
+    #[display("bam")]
     Bam,
     #[serde(rename = "bbd")]
+    #[display("bbd")]
     Bbd,
     #[serde(rename = "bdt")]
+    #[display("bdt")]
     Bdt,
     #[serde(rename = "bgn")]
+    #[display("bgn")]
     Bgn,
     #[serde(rename = "bif")]
+    #[display("bif")]
     Bif,
     #[serde(rename = "bmd")]
+    #[display("bmd")]
     Bmd,
     #[serde(rename = "bnd")]
+    #[display("bnd")]
     Bnd,
     #[serde(rename = "bob")]
+    #[display("bob")]
     Bob,
     #[serde(rename = "brl")]
+    #[display("brl")]
     Brl,
     #[serde(rename = "bsd")]
+    #[display("bsd")]
     Bsd,
     #[serde(rename = "bwp")]
+    #[display("bwp")]
     Bwp,
     #[serde(rename = "bzd")]
+    #[display("bzd")]
     Bzd,
     #[serde(rename = "cad")]
+    #[display("cad")]
     Cad,
     #[serde(rename = "cdf")]
+    #[display("cdf")]
     Cdf,
     #[serde(rename = "chf")]
+    #[display("chf")]
     Chf,
     #[serde(rename = "clp")]
+    #[display("clp")]
     Clp,
     #[serde(rename = "cny")]
+    #[display("cny")]
     Cny,
     #[serde(rename = "cop")]
+    #[display("cop")]
     Cop,
     #[serde(rename = "crc")]
+    #[display("crc")]
     Crc,
     #[serde(rename = "cve")]
+    #[display("cve")]
     Cve,
     #[serde(rename = "czk")]
+    #[display("czk")]
     Czk,
     #[serde(rename = "djf")]
+    #[display("djf")]
     Djf,
     #[serde(rename = "dkk")]
+    #[display("dkk")]
     Dkk,
     #[serde(rename = "dop")]
+    #[display("dop")]
     Dop,
     #[serde(rename = "dzd")]
+    #[display("dzd")]
     Dzd,
     #[serde(rename = "eek")]
+    #[display("eek")]
     Eek,
     #[serde(rename = "egp")]
+    #[display("egp")]
     Egp,
     #[serde(rename = "etb")]
+    #[display("etb")]
     Etb,
     #[serde(rename = "eur")]
+    #[display("eur")]
     Eur,
     #[serde(rename = "fjd")]
+    #[display("fjd")]
     Fjd,
     #[serde(rename = "fkp")]
+    #[display("fkp")]
     Fkp,
     #[serde(rename = "gbp")]
+    #[display("gbp")]
     Gbp,
     #[serde(rename = "gel")]
+    #[display("gel")]
     Gel,
     #[serde(rename = "gip")]
+    #[display("gip")]
     Gip,
     #[serde(rename = "gmd")]
+    #[display("gmd")]
     Gmd,
     #[serde(rename = "gnf")]
+    #[display("gnf")]
     Gnf,
     #[serde(rename = "gtq")]
+    #[display("gtq")]
     Gtq,
     #[serde(rename = "gyd")]
+    #[display("gyd")]
     Gyd,
     #[serde(rename = "hkd")]
+    #[display("hkd")]
     Hkd,
     #[serde(rename = "hnl")]
+    #[display("hnl")]
     Hnl,
     #[serde(rename = "hrk")]
+    #[display("hrk")]
     Hrk,
     #[serde(rename = "htg")]
+    #[display("htg")]
     Htg,
     #[serde(rename = "huf")]
+    #[display("huf")]
     Huf,
     #[serde(rename = "idr")]
+    #[display("idr")]
     Idr,
     #[serde(rename = "ils")]
+    #[display("ils")]
     Ils,
     #[serde(rename = "inr")]
+    #[display("inr")]
     Inr,
     #[serde(rename = "isk")]
+    #[display("isk")]
     Isk,
     #[serde(rename = "jmd")]
+    #[display("jmd")]
     Jmd,
     #[serde(rename = "jpy")]
+    #[display("jpy")]
     Jpy,
     #[serde(rename = "kes")]
+    #[display("kes")]
     Kes,
     #[serde(rename = "kgs")]
+    #[display("kgs")]
     Kgs,
     #[serde(rename = "khr")]
+    #[display("khr")]
     Khr,
     #[serde(rename = "kmf")]
+    #[display("kmf")]
     Kmf,
     #[serde(rename = "krw")]
+    #[display("krw")]
     Krw,
     #[serde(rename = "kyd")]
+    #[display("kyd")]
     Kyd,
     #[serde(rename = "kzt")]
+    #[display("kzt")]
     Kzt,
     #[serde(rename = "lak")]
+    #[display("lak")]
     Lak,
     #[serde(rename = "lbp")]
+    #[display("lbp")]
     Lbp,
     #[serde(rename = "lkr")]
+    #[display("lkr")]
     Lkr,
     #[serde(rename = "lrd")]
+    #[display("lrd")]
     Lrd,
     #[serde(rename = "lsl")]
+    #[display("lsl")]
     Lsl,
     #[serde(rename = "ltl")]
+    #[display("ltl")]
     Ltl,
     #[serde(rename = "lvl")]
+    #[display("lvl")]
     Lvl,
     #[serde(rename = "mad")]
+    #[display("mad")]
     Mad,
     #[serde(rename = "mdl")]
+    #[display("mdl")]
     Mdl,
     #[serde(rename = "mga")]
+    #[display("mga")]
     Mga,
     #[serde(rename = "mkd")]
+    #[display("mkd")]
     Mkd,
     #[serde(rename = "mnt")]
+    #[display("mnt")]
     Mnt,
     #[serde(rename = "mop")]
+    #[display("mop")]
     Mop,
     #[serde(rename = "mro")]
+    #[display("mro")]
     Mro,
     #[serde(rename = "mur")]
+    #[display("mur")]
     Mur,
     #[serde(rename = "mvr")]
+    #[display("mvr")]
     Mvr,
     #[serde(rename = "mwk")]
+    #[display("mwk")]
     Mwk,
     #[serde(rename = "mxn")]
+    #[display("mxn")]
     Mxn,
     #[serde(rename = "myr")]
+    #[display("myr")]
     Myr,
     #[serde(rename = "mzn")]
+    #[display("mzn")]
     Mzn,
     #[serde(rename = "nad")]
+    #[display("nad")]
     Nad,
     #[serde(rename = "ngn")]
+    #[display("ngn")]
     Ngn,
     #[serde(rename = "nio")]
+    #[display("nio")]
     Nio,
     #[serde(rename = "nok")]
+    #[display("nok")]
     Nok,
     #[serde(rename = "npr")]
+    #[display("npr")]
     Npr,
     #[serde(rename = "nzd")]
+    #[display("nzd")]
     Nzd,
     #[serde(rename = "pab")]
+    #[display("pab")]
     Pab,
     #[serde(rename = "pen")]
+    #[display("pen")]
     Pen,
     #[serde(rename = "pgk")]
+    #[display("pgk")]
     Pgk,
     #[serde(rename = "php")]
+    #[display("php")]
     Php,
     #[serde(rename = "pkr")]
+    #[display("pkr")]
     Pkr,
     #[serde(rename = "pln")]
+    #[display("pln")]
     Pln,
     #[serde(rename = "pyg")]
+    #[display("pyg")]
     Pyg,
     #[serde(rename = "qar")]
+    #[display("qar")]
     Qar,
     #[serde(rename = "ron")]
+    #[display("ron")]
     Ron,
     #[serde(rename = "rsd")]
+    #[display("rsd")]
     Rsd,
     #[serde(rename = "rub")]
+    #[display("rub")]
     Rub,
     #[serde(rename = "rwf")]
+    #[display("rwf")]
     Rwf,
     #[serde(rename = "sar")]
+    #[display("sar")]
     Sar,
     #[serde(rename = "sbd")]
+    #[display("sbd")]
     Sbd,
     #[serde(rename = "scr")]
+    #[display("scr")]
     Scr,
     #[serde(rename = "sek")]
+    #[display("sek")]
     Sek,
     #[serde(rename = "sgd")]
+    #[display("sgd")]
     Sgd,
     #[serde(rename = "shp")]
+    #[display("shp")]
     Shp,
     #[serde(rename = "sll")]
+    #[display("sll")]
     Sll,
     #[serde(rename = "sos")]
+    #[display("sos")]
     Sos,
     #[serde(rename = "srd")]
+    #[display("srd")]
     Srd,
     #[serde(rename = "std")]
+    #[display("std")]
     Std,
     #[serde(rename = "svc")]
+    #[display("svc")]
     Svc,
     #[serde(rename = "szl")]
+    #[display("szl")]
     Szl,
     #[serde(rename = "thb")]
+    #[display("thb")]
     Thb,
     #[serde(rename = "tjs")]
+    #[display("tjs")]
     Tjs,
     #[serde(rename = "top")]
+    #[display("top")]
     Top,
     #[serde(rename = "try")]
+    #[display("try")]
     Try,
     #[serde(rename = "ttd")]
+    #[display("ttd")]
     Ttd,
     #[serde(rename = "twd")]
+    #[display("twd")]
     Twd,
     #[serde(rename = "tzs")]
+    #[display("tzs")]
     Tzs,
     #[serde(rename = "uah")]
+    #[display("uah")]
     Uah,
     #[serde(rename = "ugx")]
+    #[display("ugx")]
     Ugx,
     #[serde(rename = "usd")]
+    #[display("usd")]
     Usd,
     #[serde(rename = "uyu")]
+    #[display("uyu")]
     Uyu,
     #[serde(rename = "uzs")]
+    #[display("uzs")]
     Uzs,
     #[serde(rename = "vef")]
+    #[display("vef")]
     Vef,
     #[serde(rename = "vnd")]
+    #[display("vnd")]
     Vnd,
     #[serde(rename = "vuv")]
+    #[display("vuv")]
     Vuv,
     #[serde(rename = "wst")]
+    #[display("wst")]
     Wst,
     #[serde(rename = "xaf")]
+    #[display("xaf")]
     Xaf,
     #[serde(rename = "xcd")]
+    #[display("xcd")]
     Xcd,
     #[serde(rename = "xof")]
+    #[display("xof")]
     Xof,
     #[serde(rename = "xpf")]
+    #[display("xpf")]
     Xpf,
     #[serde(rename = "yer")]
+    #[display("yer")]
     Yer,
     #[serde(rename = "zar")]
+    #[display("zar")]
     Zar,
     #[serde(rename = "zmw")]
+    #[display("zmw")]
     Zmw,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
 }
 
-impl std::fmt::Display for Currency {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            Currency::Aed => "aed",
-            Currency::Afn => "afn",
-            Currency::All => "all",
-            Currency::Amd => "amd",
-            Currency::Ang => "ang",
-            Currency::Aoa => "aoa",
-            Currency::Ars => "ars",
-            Currency::Aud => "aud",
-            Currency::Awg => "awg",
-            Currency::Azn => "azn",
-            Currency::Bam => "bam",
-            Currency::Bbd => "bbd",
-            Currency::Bdt => "bdt",
-            Currency::Bgn => "bgn",
-            Currency::Bif => "bif",
-            Currency::Bmd => "bmd",
-            Currency::Bnd => "bnd",
-            Currency::Bob => "bob",
-            Currency::Brl => "brl",
-            Currency::Bsd => "bsd",
-            Currency::Bwp => "bwp",
-            Currency::Bzd => "bzd",
-            Currency::Cad => "cad",
-            Currency::Cdf => "cdf",
-            Currency::Chf => "chf",
-            Currency::Clp => "clp",
-            Currency::Cny => "cny",
-            Currency::Cop => "cop",
-            Currency::Crc => "crc",
-            Currency::Cve => "cve",
-            Currency::Czk => "czk",
-            Currency::Djf => "djf",
-            Currency::Dkk => "dkk",
-            Currency::Dop => "dop",
-            Currency::Dzd => "dzd",
-            Currency::Eek => "eek",
-            Currency::Egp => "egp",
-            Currency::Etb => "etb",
-            Currency::Eur => "eur",
-            Currency::Fjd => "fjd",
-            Currency::Fkp => "fkp",
-            Currency::Gbp => "gbp",
-            Currency::Gel => "gel",
-            Currency::Gip => "gip",
-            Currency::Gmd => "gmd",
-            Currency::Gnf => "gnf",
-            Currency::Gtq => "gtq",
-            Currency::Gyd => "gyd",
-            Currency::Hkd => "hkd",
-            Currency::Hnl => "hnl",
-            Currency::Hrk => "hrk",
-            Currency::Htg => "htg",
-            Currency::Huf => "huf",
-            Currency::Idr => "idr",
-            Currency::Ils => "ils",
-            Currency::Inr => "inr",
-            Currency::Isk => "isk",
-            Currency::Jmd => "jmd",
-            Currency::Jpy => "jpy",
-            Currency::Kes => "kes",
-            Currency::Kgs => "kgs",
-            Currency::Khr => "khr",
-            Currency::Kmf => "kmf",
-            Currency::Krw => "krw",
-            Currency::Kyd => "kyd",
-            Currency::Kzt => "kzt",
-            Currency::Lak => "lak",
-            Currency::Lbp => "lbp",
-            Currency::Lkr => "lkr",
-            Currency::Lrd => "lrd",
-            Currency::Lsl => "lsl",
-            Currency::Ltl => "ltl",
-            Currency::Lvl => "lvl",
-            Currency::Mad => "mad",
-            Currency::Mdl => "mdl",
-            Currency::Mga => "mga",
-            Currency::Mkd => "mkd",
-            Currency::Mnt => "mnt",
-            Currency::Mop => "mop",
-            Currency::Mro => "mro",
-            Currency::Mur => "mur",
-            Currency::Mvr => "mvr",
-            Currency::Mwk => "mwk",
-            Currency::Mxn => "mxn",
-            Currency::Myr => "myr",
-            Currency::Mzn => "mzn",
-            Currency::Nad => "nad",
-            Currency::Ngn => "ngn",
-            Currency::Nio => "nio",
-            Currency::Nok => "nok",
-            Currency::Npr => "npr",
-            Currency::Nzd => "nzd",
-            Currency::Pab => "pab",
-            Currency::Pen => "pen",
-            Currency::Pgk => "pgk",
-            Currency::Php => "php",
-            Currency::Pkr => "pkr",
-            Currency::Pln => "pln",
-            Currency::Pyg => "pyg",
-            Currency::Qar => "qar",
-            Currency::Ron => "ron",
-            Currency::Rsd => "rsd",
-            Currency::Rub => "rub",
-            Currency::Rwf => "rwf",
-            Currency::Sar => "sar",
-            Currency::Sbd => "sbd",
-            Currency::Scr => "scr",
-            Currency::Sek => "sek",
-            Currency::Sgd => "sgd",
-            Currency::Shp => "shp",
-            Currency::Sll => "sll",
-            Currency::Sos => "sos",
-            Currency::Srd => "srd",
-            Currency::Std => "std",
-            Currency::Svc => "svc",
-            Currency::Szl => "szl",
-            Currency::Thb => "thb",
-            Currency::Tjs => "tjs",
-            Currency::Top => "top",
-            Currency::Try => "try",
-            Currency::Ttd => "ttd",
-            Currency::Twd => "twd",
-            Currency::Tzs => "tzs",
-            Currency::Uah => "uah",
-            Currency::Ugx => "ugx",
-            Currency::Usd => "usd",
-            Currency::Uyu => "uyu",
-            Currency::Uzs => "uzs",
-            Currency::Vef => "vef",
-            Currency::Vnd => "vnd",
-            Currency::Vuv => "vuv",
-            Currency::Wst => "wst",
-            Currency::Xaf => "xaf",
-            Currency::Xcd => "xcd",
-            Currency::Xof => "xof",
-            Currency::Xpf => "xpf",
-            Currency::Yer => "yer",
-            Currency::Zar => "zar",
-            Currency::Zmw => "zmw",
-            Currency::Noop => "",
-            Currency::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for Currency {
-    fn default() -> Currency {
-        Currency::Aed
-    }
-}
-impl std::str::FromStr for Currency {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "aed" {
-            return Ok(Currency::Aed);
-        }
-        if s == "afn" {
-            return Ok(Currency::Afn);
-        }
-        if s == "all" {
-            return Ok(Currency::All);
-        }
-        if s == "amd" {
-            return Ok(Currency::Amd);
-        }
-        if s == "ang" {
-            return Ok(Currency::Ang);
-        }
-        if s == "aoa" {
-            return Ok(Currency::Aoa);
-        }
-        if s == "ars" {
-            return Ok(Currency::Ars);
-        }
-        if s == "aud" {
-            return Ok(Currency::Aud);
-        }
-        if s == "awg" {
-            return Ok(Currency::Awg);
-        }
-        if s == "azn" {
-            return Ok(Currency::Azn);
-        }
-        if s == "bam" {
-            return Ok(Currency::Bam);
-        }
-        if s == "bbd" {
-            return Ok(Currency::Bbd);
-        }
-        if s == "bdt" {
-            return Ok(Currency::Bdt);
-        }
-        if s == "bgn" {
-            return Ok(Currency::Bgn);
-        }
-        if s == "bif" {
-            return Ok(Currency::Bif);
-        }
-        if s == "bmd" {
-            return Ok(Currency::Bmd);
-        }
-        if s == "bnd" {
-            return Ok(Currency::Bnd);
-        }
-        if s == "bob" {
-            return Ok(Currency::Bob);
-        }
-        if s == "brl" {
-            return Ok(Currency::Brl);
-        }
-        if s == "bsd" {
-            return Ok(Currency::Bsd);
-        }
-        if s == "bwp" {
-            return Ok(Currency::Bwp);
-        }
-        if s == "bzd" {
-            return Ok(Currency::Bzd);
-        }
-        if s == "cad" {
-            return Ok(Currency::Cad);
-        }
-        if s == "cdf" {
-            return Ok(Currency::Cdf);
-        }
-        if s == "chf" {
-            return Ok(Currency::Chf);
-        }
-        if s == "clp" {
-            return Ok(Currency::Clp);
-        }
-        if s == "cny" {
-            return Ok(Currency::Cny);
-        }
-        if s == "cop" {
-            return Ok(Currency::Cop);
-        }
-        if s == "crc" {
-            return Ok(Currency::Crc);
-        }
-        if s == "cve" {
-            return Ok(Currency::Cve);
-        }
-        if s == "czk" {
-            return Ok(Currency::Czk);
-        }
-        if s == "djf" {
-            return Ok(Currency::Djf);
-        }
-        if s == "dkk" {
-            return Ok(Currency::Dkk);
-        }
-        if s == "dop" {
-            return Ok(Currency::Dop);
-        }
-        if s == "dzd" {
-            return Ok(Currency::Dzd);
-        }
-        if s == "eek" {
-            return Ok(Currency::Eek);
-        }
-        if s == "egp" {
-            return Ok(Currency::Egp);
-        }
-        if s == "etb" {
-            return Ok(Currency::Etb);
-        }
-        if s == "eur" {
-            return Ok(Currency::Eur);
-        }
-        if s == "fjd" {
-            return Ok(Currency::Fjd);
-        }
-        if s == "fkp" {
-            return Ok(Currency::Fkp);
-        }
-        if s == "gbp" {
-            return Ok(Currency::Gbp);
-        }
-        if s == "gel" {
-            return Ok(Currency::Gel);
-        }
-        if s == "gip" {
-            return Ok(Currency::Gip);
-        }
-        if s == "gmd" {
-            return Ok(Currency::Gmd);
-        }
-        if s == "gnf" {
-            return Ok(Currency::Gnf);
-        }
-        if s == "gtq" {
-            return Ok(Currency::Gtq);
-        }
-        if s == "gyd" {
-            return Ok(Currency::Gyd);
-        }
-        if s == "hkd" {
-            return Ok(Currency::Hkd);
-        }
-        if s == "hnl" {
-            return Ok(Currency::Hnl);
-        }
-        if s == "hrk" {
-            return Ok(Currency::Hrk);
-        }
-        if s == "htg" {
-            return Ok(Currency::Htg);
-        }
-        if s == "huf" {
-            return Ok(Currency::Huf);
-        }
-        if s == "idr" {
-            return Ok(Currency::Idr);
-        }
-        if s == "ils" {
-            return Ok(Currency::Ils);
-        }
-        if s == "inr" {
-            return Ok(Currency::Inr);
-        }
-        if s == "isk" {
-            return Ok(Currency::Isk);
-        }
-        if s == "jmd" {
-            return Ok(Currency::Jmd);
-        }
-        if s == "jpy" {
-            return Ok(Currency::Jpy);
-        }
-        if s == "kes" {
-            return Ok(Currency::Kes);
-        }
-        if s == "kgs" {
-            return Ok(Currency::Kgs);
-        }
-        if s == "khr" {
-            return Ok(Currency::Khr);
-        }
-        if s == "kmf" {
-            return Ok(Currency::Kmf);
-        }
-        if s == "krw" {
-            return Ok(Currency::Krw);
-        }
-        if s == "kyd" {
-            return Ok(Currency::Kyd);
-        }
-        if s == "kzt" {
-            return Ok(Currency::Kzt);
-        }
-        if s == "lak" {
-            return Ok(Currency::Lak);
-        }
-        if s == "lbp" {
-            return Ok(Currency::Lbp);
-        }
-        if s == "lkr" {
-            return Ok(Currency::Lkr);
-        }
-        if s == "lrd" {
-            return Ok(Currency::Lrd);
-        }
-        if s == "lsl" {
-            return Ok(Currency::Lsl);
-        }
-        if s == "ltl" {
-            return Ok(Currency::Ltl);
-        }
-        if s == "lvl" {
-            return Ok(Currency::Lvl);
-        }
-        if s == "mad" {
-            return Ok(Currency::Mad);
-        }
-        if s == "mdl" {
-            return Ok(Currency::Mdl);
-        }
-        if s == "mga" {
-            return Ok(Currency::Mga);
-        }
-        if s == "mkd" {
-            return Ok(Currency::Mkd);
-        }
-        if s == "mnt" {
-            return Ok(Currency::Mnt);
-        }
-        if s == "mop" {
-            return Ok(Currency::Mop);
-        }
-        if s == "mro" {
-            return Ok(Currency::Mro);
-        }
-        if s == "mur" {
-            return Ok(Currency::Mur);
-        }
-        if s == "mvr" {
-            return Ok(Currency::Mvr);
-        }
-        if s == "mwk" {
-            return Ok(Currency::Mwk);
-        }
-        if s == "mxn" {
-            return Ok(Currency::Mxn);
-        }
-        if s == "myr" {
-            return Ok(Currency::Myr);
-        }
-        if s == "mzn" {
-            return Ok(Currency::Mzn);
-        }
-        if s == "nad" {
-            return Ok(Currency::Nad);
-        }
-        if s == "ngn" {
-            return Ok(Currency::Ngn);
-        }
-        if s == "nio" {
-            return Ok(Currency::Nio);
-        }
-        if s == "nok" {
-            return Ok(Currency::Nok);
-        }
-        if s == "npr" {
-            return Ok(Currency::Npr);
-        }
-        if s == "nzd" {
-            return Ok(Currency::Nzd);
-        }
-        if s == "pab" {
-            return Ok(Currency::Pab);
-        }
-        if s == "pen" {
-            return Ok(Currency::Pen);
-        }
-        if s == "pgk" {
-            return Ok(Currency::Pgk);
-        }
-        if s == "php" {
-            return Ok(Currency::Php);
-        }
-        if s == "pkr" {
-            return Ok(Currency::Pkr);
-        }
-        if s == "pln" {
-            return Ok(Currency::Pln);
-        }
-        if s == "pyg" {
-            return Ok(Currency::Pyg);
-        }
-        if s == "qar" {
-            return Ok(Currency::Qar);
-        }
-        if s == "ron" {
-            return Ok(Currency::Ron);
-        }
-        if s == "rsd" {
-            return Ok(Currency::Rsd);
-        }
-        if s == "rub" {
-            return Ok(Currency::Rub);
-        }
-        if s == "rwf" {
-            return Ok(Currency::Rwf);
-        }
-        if s == "sar" {
-            return Ok(Currency::Sar);
-        }
-        if s == "sbd" {
-            return Ok(Currency::Sbd);
-        }
-        if s == "scr" {
-            return Ok(Currency::Scr);
-        }
-        if s == "sek" {
-            return Ok(Currency::Sek);
-        }
-        if s == "sgd" {
-            return Ok(Currency::Sgd);
-        }
-        if s == "shp" {
-            return Ok(Currency::Shp);
-        }
-        if s == "sll" {
-            return Ok(Currency::Sll);
-        }
-        if s == "sos" {
-            return Ok(Currency::Sos);
-        }
-        if s == "srd" {
-            return Ok(Currency::Srd);
-        }
-        if s == "std" {
-            return Ok(Currency::Std);
-        }
-        if s == "svc" {
-            return Ok(Currency::Svc);
-        }
-        if s == "szl" {
-            return Ok(Currency::Szl);
-        }
-        if s == "thb" {
-            return Ok(Currency::Thb);
-        }
-        if s == "tjs" {
-            return Ok(Currency::Tjs);
-        }
-        if s == "top" {
-            return Ok(Currency::Top);
-        }
-        if s == "try" {
-            return Ok(Currency::Try);
-        }
-        if s == "ttd" {
-            return Ok(Currency::Ttd);
-        }
-        if s == "twd" {
-            return Ok(Currency::Twd);
-        }
-        if s == "tzs" {
-            return Ok(Currency::Tzs);
-        }
-        if s == "uah" {
-            return Ok(Currency::Uah);
-        }
-        if s == "ugx" {
-            return Ok(Currency::Ugx);
-        }
-        if s == "usd" {
-            return Ok(Currency::Usd);
-        }
-        if s == "uyu" {
-            return Ok(Currency::Uyu);
-        }
-        if s == "uzs" {
-            return Ok(Currency::Uzs);
-        }
-        if s == "vef" {
-            return Ok(Currency::Vef);
-        }
-        if s == "vnd" {
-            return Ok(Currency::Vnd);
-        }
-        if s == "vuv" {
-            return Ok(Currency::Vuv);
-        }
-        if s == "wst" {
-            return Ok(Currency::Wst);
-        }
-        if s == "xaf" {
-            return Ok(Currency::Xaf);
-        }
-        if s == "xcd" {
-            return Ok(Currency::Xcd);
-        }
-        if s == "xof" {
-            return Ok(Currency::Xof);
-        }
-        if s == "xpf" {
-            return Ok(Currency::Xpf);
-        }
-        if s == "yer" {
-            return Ok(Currency::Yer);
-        }
-        if s == "zar" {
-            return Ok(Currency::Zar);
-        }
-        if s == "zmw" {
-            return Ok(Currency::Zmw);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl Currency {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, Currency::Noop)
-    }
-}
-
-/// The resource representing a payment "Customer".
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+#[doc = "The resource representing a payment \"Customer\"."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct Customer {
-    /**
-    * The resource representing a payment "Customer".
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * The resource representing a payment "Customer".
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub name: String,
-
-    /**
-    * The customer's address.
-    */
+    #[doc = "The customer's address."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub address: Option<Address>,
-
-    /**
-    * The resource representing a payment "Customer".
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub balance: f64,
-
-    /**
-    * Time at which the object was created.
-    */
+    address: Option<Address>,
+    #[doc = "Current balance, if any, being stored on the customer.\n\nIf negative, the customer has credit to apply to their next invoice. If positive, the customer has an amount owed that will be added to their next invoice. The balance does not refer to any unpaid invoices; it solely takes into account amounts that have yet to be successfully applied to any invoice. This balance is only taken into account as invoices are finalized."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    balance: Option<f64>,
+    #[doc = "Time at which the object was created."]
     #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * Currency is the list of supported currencies.
-    *  
-    *  For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.
-    */
-    #[serde(default, skip_serializing_if = "Currency::is_noop")]
-    pub currency: Currency,
-
-    /**
-    * The resource representing a payment "Customer".
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub delinquent: bool,
-
-    /**
-    * The resource representing a payment "Customer".
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub email: String,
-
-    /**
-    * The resource representing a payment "Customer".
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub metadata: String,
-
-    /**
-    * The resource representing a payment "Customer".
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub phone: String,
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Three-letter ISO code for the currency the customer can be charged in for recurring billing purposes."]
+    #[serde()]
+    currency: Currency,
+    #[doc = "When the customer's latest invoice is billed by charging automatically, `delinquent` is `true` if the invoice's latest charge failed.\n\nWhen the customer's latest invoice is billed by sending an invoice, `delinquent` is `true` if the invoice isn't paid by its due date.  If an invoice is marked uncollectible by dunning, `delinquent` doesn't get reset to `false`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    delinquent: Option<bool>,
+    #[doc = "The customer's email address."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    email: Option<String>,
+    #[doc = "Unique identifier for the object."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    id: Option<String>,
+    #[doc = "Set of key-value pairs."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    metadata: Option<std::collections::HashMap<String, String>>,
+    #[doc = "The customer's full name or business name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[doc = "The customer's phone number."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    phone: Option<String>,
 }
 
-/**
-* An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
-pub enum OAuth2GrantType {
-    #[serde(rename = "urn:ietf:params:oauth:grant-type:device_code")]
-    UrnIetfParamsOauthGrantTypeDeviceCode,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
-}
-
-impl std::fmt::Display for OAuth2GrantType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            OAuth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode => {
-                "urn:ietf:params:oauth:grant-type:device_code"
-            }
-            OAuth2GrantType::Noop => "",
-            OAuth2GrantType::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for OAuth2GrantType {
-    fn default() -> OAuth2GrantType {
-        OAuth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode
-    }
-}
-impl std::str::FromStr for OAuth2GrantType {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "urn:ietf:params:oauth:grant-type:device_code" {
-            return Ok(OAuth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl OAuth2GrantType {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, OAuth2GrantType::Noop)
-    }
-}
-
-/// The form for a device access token request.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "The form for a device access token request."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct DeviceAccessTokenRequestForm {
-    /**
-    * The client ID.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub client_id: String,
-
-    /**
-    * The device code.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub device_code: String,
-
-    /**
-    * An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>.
-    */
-    #[serde(default, skip_serializing_if = "OAuth2GrantType::is_noop")]
-    pub grant_type: OAuth2GrantType,
+    #[doc = "The client ID."]
+    #[serde()]
+    client_id: uuid::Uuid,
+    #[doc = "The device code."]
+    #[serde()]
+    device_code: uuid::Uuid,
+    #[doc = "The grant type."]
+    #[serde()]
+    grant_type: GrantType,
 }
 
-/// The request parameters for the OAuth 2.0 Device Authorization Grant flow.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "The request parameters for the OAuth 2.0 Device Authorization Grant flow."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct DeviceAuthRequestForm {
-    /**
-    * The client ID.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub client_id: String,
+    #[doc = "The client ID."]
+    #[serde()]
+    client_id: uuid::Uuid,
 }
 
-/// The request parameters to verify the `user_code` for the OAuth 2.0 Device Authorization Grant.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "The request parameters to verify the `user_code` for the OAuth 2.0 Device Authorization Grant."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct DeviceAuthVerifyParams {
-    /**
-    * The user code.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub user_code: String,
+    #[doc = "The user code."]
+    #[serde()]
+    user_code: String,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
-pub enum SystemInfoCgroupDriverEnum {
-    #[serde(rename = "cgroupfs")]
-    Cgroupfs,
-    #[serde(rename = "none")]
-    None,
-    #[serde(rename = "systemd")]
-    Systemd,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
-}
-
-impl std::fmt::Display for SystemInfoCgroupDriverEnum {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            SystemInfoCgroupDriverEnum::Cgroupfs => "cgroupfs",
-            SystemInfoCgroupDriverEnum::None => "none",
-            SystemInfoCgroupDriverEnum::Systemd => "systemd",
-            SystemInfoCgroupDriverEnum::Noop => "",
-            SystemInfoCgroupDriverEnum::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for SystemInfoCgroupDriverEnum {
-    fn default() -> SystemInfoCgroupDriverEnum {
-        SystemInfoCgroupDriverEnum::Noop
-    }
-}
-impl std::str::FromStr for SystemInfoCgroupDriverEnum {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "cgroupfs" {
-            return Ok(SystemInfoCgroupDriverEnum::Cgroupfs);
-        }
-        if s == "none" {
-            return Ok(SystemInfoCgroupDriverEnum::None);
-        }
-        if s == "systemd" {
-            return Ok(SystemInfoCgroupDriverEnum::Systemd);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl SystemInfoCgroupDriverEnum {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, SystemInfoCgroupDriverEnum::Noop)
-    }
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
-pub enum SystemInfoCgroupVersionEnum {
-    #[serde(rename = "1")]
-    One,
-    #[serde(rename = "2")]
-    Two,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
-}
-
-impl std::fmt::Display for SystemInfoCgroupVersionEnum {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            SystemInfoCgroupVersionEnum::One => "1",
-            SystemInfoCgroupVersionEnum::Two => "2",
-            SystemInfoCgroupVersionEnum::Noop => "",
-            SystemInfoCgroupVersionEnum::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for SystemInfoCgroupVersionEnum {
-    fn default() -> SystemInfoCgroupVersionEnum {
-        SystemInfoCgroupVersionEnum::Noop
-    }
-}
-impl std::str::FromStr for SystemInfoCgroupVersionEnum {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "1" {
-            return Ok(SystemInfoCgroupVersionEnum::One);
-        }
-        if s == "2" {
-            return Ok(SystemInfoCgroupVersionEnum::Two);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl SystemInfoCgroupVersionEnum {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, SystemInfoCgroupVersionEnum::Noop)
-    }
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct SystemInfoDefaultAddressPools {
-    /**
-    * The network address in CIDR format
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub base: String,
-
-    /**
-    * The network pool size
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub size: i64,
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
-pub enum SystemInfoIsolationEnum {
-    #[serde(rename = "default")]
-    Default,
-    #[serde(rename = "hyperv")]
-    Hyperv,
-    #[serde(rename = "process")]
-    Process,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
-}
-
-impl std::fmt::Display for SystemInfoIsolationEnum {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            SystemInfoIsolationEnum::Default => "default",
-            SystemInfoIsolationEnum::Hyperv => "hyperv",
-            SystemInfoIsolationEnum::Process => "process",
-            SystemInfoIsolationEnum::Noop => "",
-            SystemInfoIsolationEnum::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for SystemInfoIsolationEnum {
-    fn default() -> SystemInfoIsolationEnum {
-        SystemInfoIsolationEnum::Noop
-    }
-}
-impl std::str::FromStr for SystemInfoIsolationEnum {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "default" {
-            return Ok(SystemInfoIsolationEnum::Default);
-        }
-        if s == "hyperv" {
-            return Ok(SystemInfoIsolationEnum::Hyperv);
-        }
-        if s == "process" {
-            return Ok(SystemInfoIsolationEnum::Process);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl SystemInfoIsolationEnum {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, SystemInfoIsolationEnum::Noop)
-    }
-}
-
-/// Available plugins per type.
-///
-/// **Note**: Only unmanaged (V1) plugins are included in this list. V1 plugins are \"lazily\" loaded, and are not returned in this list if there is no resource using the plugin.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct PluginsInfo {
-    /**
-    * Available plugins per type.
-    *  
-    *  \*\*Note\*\*: Only unmanaged (V1) plugins are included in this list. V1 plugins are \"lazily\" loaded, and are not returned in this list if there is no resource using the plugin.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    #[tabled(skip)]
-    pub authorization: Vec<String>,
-
-    /**
-    * Available plugins per type.
-    *  
-    *  \*\*Note\*\*: Only unmanaged (V1) plugins are included in this list. V1 plugins are \"lazily\" loaded, and are not returned in this list if there is no resource using the plugin.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    #[tabled(skip)]
-    pub log: Vec<String>,
-
-    /**
-    * Available plugins per type.
-    *  
-    *  \*\*Note\*\*: Only unmanaged (V1) plugins are included in this list. V1 plugins are \"lazily\" loaded, and are not returned in this list if there is no resource using the plugin.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    #[tabled(skip)]
-    pub network: Vec<String>,
-
-    /**
-    * Available plugins per type.
-    *  
-    *  \*\*Note\*\*: Only unmanaged (V1) plugins are included in this list. V1 plugins are \"lazily\" loaded, and are not returned in this list if there is no resource using the plugin.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    #[tabled(skip)]
-    pub volume: Vec<String>,
-}
-
-/// RegistryServiceConfig stores daemon registry services configuration.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
-pub struct RegistryServiceConfig {
-    /**
-    * RegistryServiceConfig stores daemon registry services configuration.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    pub allow_nondistributable_artifacts_cid_rs: Vec<String>,
-
-    /**
-    * RegistryServiceConfig stores daemon registry services configuration.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    pub allow_nondistributable_artifacts_hostnames: Vec<String>,
-
-    /**
-    * RegistryServiceConfig stores daemon registry services configuration.
-    */
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub index_configs: Option<IndexInfo>,
-
-    /**
-    * RegistryServiceConfig stores daemon registry services configuration.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    pub insecure_registry_cid_rs: Vec<String>,
-
-    /**
-    * RegistryServiceConfig stores daemon registry services configuration.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    pub mirrors: Vec<String>,
-}
-
-/// Runtime describes an [OCI compliant](https://github.com/opencontainers/runtime-spec) runtime.  The runtime is invoked by the daemon via the `containerd` daemon. OCI runtimes act as an interface to the Linux kernel namespaces, cgroups, and SELinux.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct Runtime {
-    /**
-    * Name and, optional, path, of the OCI executable binary.  If the path is omitted, the daemon searches the host's `$PATH` for the binary and uses the first result.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub path: String,
-
-    /**
-    * Runtime describes an [OCI compliant](https://github.com/opencontainers/runtime-spec) runtime.  The runtime is invoked by the daemon via the `containerd` daemon. OCI runtimes act as an interface to the Linux kernel namespaces, cgroups, and SELinux.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    #[tabled(skip)]
-    pub runtime_args: Vec<String>,
-}
-
-/// Docker system info.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+#[doc = "Docker system info."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct DockerSystemInfo {
-    /**
-    * Unique identifier of the daemon.
-    *  
-    *  \*\*Note\*\*: The format of the ID itself is not part of the API, and should not be considered stable.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * Hostname of the host.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub name: String,
-
-    /**
-    * Hardware architecture of the host, as returned by the Go runtime (`GOARCH`).  A full list of possible values can be found in the [Go documentation](https://golang.org/doc/install/source#environment).
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub architecture: String,
-
-    /**
-    * Indicates if `bridge-nf-call-ip6tables` is available on the host.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize",
-        rename = "bridge_nf_ip6tables"
-    )]
-    pub bridge_nf_ip_6tables: bool,
-
-    /**
-    * Indicates if `bridge-nf-call-iptables` is available on the host.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub bridge_nf_iptables: bool,
-
-    /**
-    * The driver to use for managing cgroups.
-    */
+    #[doc = "Hardware architecture of the host, as returned by the Go runtime (`GOARCH`).  A full list of possible values can be found in the [Go documentation](https://golang.org/doc/install/source#environment)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cgroup_driver: Option<SystemInfoCgroupDriverEnum>,
-
-    /**
-    * The version of the cgroup.
-    */
+    architecture: Option<String>,
+    #[doc = "Indicates if `bridge-nf-call-ip6tables` is available on the host."]
+    #[serde(
+        rename = "bridge_nf_ip6tables",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
+    bridge_nf_ip_6tables: Option<bool>,
+    #[doc = "Indicates if `bridge-nf-call-iptables` is available on the host."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cgroup_version: Option<SystemInfoCgroupVersionEnum>,
-
-    /**
-    * The network endpoint that the Engine advertises for the purpose of node discovery. ClusterAdvertise is a `host:port` combination on which the daemon is reachable by other hosts.
-    *  
-    *  \*\*Deprecated\*\*: This field is only propagated when using standalone Swarm mode, and overlay networking using an external k/v store. Overlay networks with Swarm mode enabled use the built-in raft store, and this field will be empty.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub cluster_advertise: String,
-
-    /**
-    * URL of the distributed storage backend.   The storage backend is used for multihost networking (to store network and endpoint information) and by the node discovery mechanism.
-    *  
-    *  \*\*Deprecated\*\*: This field is only propagated when using standalone Swarm mode, and overlay networking using an external k/v store. Overlay networks with Swarm mode enabled use the built-in raft store, and this field will be empty.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub cluster_store: String,
-
+    bridge_nf_iptables: Option<bool>,
+    #[doc = "The driver to use for managing cgroups."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub containerd_commit: Option<Commit>,
-
-    /**
-    * Total number of containers on the host.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub containers: i64,
-
-    /**
-    * Number of containers with status `\"paused\"`.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub containers_paused: i64,
-
-    /**
-    * Number of containers with status `\"running\"`.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub containers_running: i64,
-
-    /**
-    * Number of containers with status `\"stopped\"`.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub containers_stopped: i64,
-
-    /**
-    * Indicates if CPU CFS(Completely Fair Scheduler) period is supported by the host.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub cpu_cfs_period: bool,
-
-    /**
-    * Indicates if CPU CFS(Completely Fair Scheduler) quota is supported by the host.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub cpu_cfs_quota: bool,
-
-    /**
-    * Indicates if CPUsets (cpuset.cpus, cpuset.mems) are supported by the host.  See [cpuset(7)](https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt)
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub cpu_set: bool,
-
-    /**
-    * Indicates if CPU Shares limiting is supported by the host.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub cpu_shares: bool,
-
-    /**
-    * Indicates if the daemon is running in debug-mode / with debug-level logging enabled.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub debug: bool,
-
-    /**
-    * Docker system info.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    pub default_address_pools: Vec<SystemInfoDefaultAddressPools>,
-
-    /**
-    * Name of the default OCI runtime that is used when starting containers.  The default can be overridden per-container at create time.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub default_runtime: String,
-
-    /**
-    * Root directory of persistent Docker state.  Defaults to `/var/lib/docker` on Linux, and `C:\\ProgramData\\docker` on Windows.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub docker_root_dir: String,
-
-    /**
-    * Name of the storage driver in use.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub driver: String,
-
-    /**
-    * Docker system info.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    pub driver_status: Vec<Vec<String>>,
-
-    /**
-    * Indicates if experimental features are enabled on the daemon.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub experimental_build: bool,
-
-    /**
-    * HTTP-proxy configured for the daemon. This value is obtained from the [`HTTP_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable. Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL are masked in the API response.  Containers do not automatically inherit this configuration.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub http_proxy: String,
-
-    /**
-    * HTTPS-proxy configured for the daemon. This value is obtained from the [`HTTPS_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable. Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL are masked in the API response.  Containers do not automatically inherit this configuration.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub https_proxy: String,
-
-    /**
-    * Total number of images on the host. Both _tagged_ and _untagged_ (dangling) images are counted.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub images: i64,
-
-    /**
-    * Address / URL of the index server that is used for image search, and as a default for user authentication for Docker Hub and Docker Cloud.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub index_server_address: String,
-
-    /**
-    * Name and, optional, path of the `docker-init` binary.  If the path is omitted, the daemon searches the host's `$PATH` for the binary and uses the first result.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub init_binary: String,
-
+    cgroup_driver: Option<CgroupDriver>,
+    #[doc = "The version of the cgroup."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub init_commit: Option<Commit>,
-
-    /**
-    * Indicates IPv4 forwarding is enabled.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize",
-        rename = "ipv4_forwarding"
-    )]
-    pub ipv_4_forwarding: bool,
-
-    /**
-    * Represents the isolation technology to use as a default for containers. The supported values are platform-specific.  If no isolation value is specified on daemon start, on Windows client, the default is `hyperv`, and on Windows server, the default is `process`.  This option is currently not used on other platforms.
-    */
+    cgroup_version: Option<CgroupVersion>,
+    #[doc = "The network endpoint that the Engine advertises for the purpose of node discovery. ClusterAdvertise is a `host:port` combination on which the daemon is reachable by other hosts.\n\n**Deprecated**: This field is only propagated when using standalone Swarm mode, and overlay networking using an external k/v store. Overlay networks with Swarm mode enabled use the built-in raft store, and this field will be empty."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub isolation: Option<SystemInfoIsolationEnum>,
-
-    /**
-    * Indicates if the host has kernel memory limit support enabled.
-    *  
-    *  \*\*Deprecated\*\*: This field is deprecated as the kernel 5.4 deprecated `kmem.limit_in_bytes`.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub kernel_memory: bool,
-
-    /**
-    * Indicates if the host has kernel memory TCP limit support enabled.  Kernel memory TCP limits are not supported when using cgroups v2, which does not support the corresponding `memory.kmem.tcp.limit_in_bytes` cgroup.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub kernel_memory_tcp: bool,
-
-    /**
-    * Kernel version of the host.  On Linux, this information obtained from `uname`. On Windows this information is queried from the <kbd>HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\</kbd> registry value, for example _\"10.0 14393 (14393.1198.amd64fre.rs1_release_sec.170427-1353)\"_.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub kernel_version: String,
-
-    /**
-    * Docker system info.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    pub labels: Vec<String>,
-
-    /**
-    * Indicates if live restore is enabled.  If enabled, containers are kept running when the daemon is shutdown or upon daemon start if running containers are detected.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub live_restore_enabled: bool,
-
-    /**
-    * The logging driver to use as a default for new containers.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub logging_driver: String,
-
-    /**
-    * Total amount of physical memory available on the host, in bytes.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub mem_total: i64,
-
-    /**
-    * Indicates if the host has memory limit support enabled.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub memory_limit: bool,
-
-    /**
-    * Number of event listeners subscribed.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub n_events_listener: i64,
-
-    /**
-    * The total number of file Descriptors in use by the daemon process.  This information is only returned if debug-mode is enabled.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub n_fd: i64,
-
-    /**
-    * The number of logical CPUs usable by the daemon.  The number of available CPUs is checked by querying the operating system when the daemon starts. Changes to operating system CPU allocation after the daemon is started are not reflected.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub ncpu: i64,
-
-    /**
-    * Comma-separated list of domain extensions for which no proxy should be used. This value is obtained from the [`NO_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable.  Containers do not automatically inherit this configuration.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub no_proxy: String,
-
-    /**
-    * Indicates if OOM killer disable is supported on the host.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub oom_kill_disable: bool,
-
-    /**
-    * Name of the host's operating system, for example: \"Ubuntu 16.04.2 LTS\" or \"Windows Server 2016 Datacenter\"
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub operating_system: String,
-
-    /**
-    * Generic type of the operating system of the host, as returned by the Go runtime (`GOOS`).  Currently returned values are \"linux\" and \"windows\". A full list of possible values can be found in the [Go documentation](https://golang.org/doc/install/source#environment).
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub os_type: String,
-
-    /**
-    * Version of the host's operating system
-    *  
-    *  \*\*Note\*\*: The information returned in this field, including its very existence, and the formatting of values, should not be considered stable, and may change without notice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub os_version: String,
-
-    /**
-    * Indicates if the host kernel has PID limit support enabled.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub pids_limit: bool,
-
+    cluster_advertise: Option<String>,
+    #[doc = "URL of the distributed storage backend.   The storage backend is used for multihost networking (to store network and endpoint information) and by the node discovery mechanism.\n\n**Deprecated**: This field is only propagated when using standalone Swarm mode, and overlay networking using an external k/v store. Overlay networks with Swarm mode enabled use the built-in raft store, and this field will be empty."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub plugins: Option<PluginsInfo>,
-
-    /**
-    * Reports a summary of the product license on the daemon.  If a commercial license has been applied to the daemon, information such as number of nodes, and expiration are included.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub product_license: String,
-
+    cluster_store: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub registry_config: Option<RegistryServiceConfig>,
-
+    containerd_commit: Option<ContainerdCommit>,
+    #[doc = "Total number of containers on the host."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub runc_commit: Option<Commit>,
-
-    /**
-    * Docker system info.
-    */
+    containers: Option<i64>,
+    #[doc = "Number of containers with status `\\\"paused\\\"`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub runtimes: Option<Runtime>,
-
-    /**
-    * Docker system info.
-    */
+    containers_paused: Option<i64>,
+    #[doc = "Number of containers with status `\\\"running\\\"`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    containers_running: Option<i64>,
+    #[doc = "Number of containers with status `\\\"stopped\\\"`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    containers_stopped: Option<i64>,
+    #[doc = "Indicates if CPU CFS(Completely Fair Scheduler) period is supported by the host."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    cpu_cfs_period: Option<bool>,
+    #[doc = "Indicates if CPU CFS(Completely Fair Scheduler) quota is supported by the host."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    cpu_cfs_quota: Option<bool>,
+    #[doc = "Indicates if CPUsets (cpuset.cpus, cpuset.mems) are supported by the host.  See [cpuset(7)](https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    cpu_set: Option<bool>,
+    #[doc = "Indicates if CPU Shares limiting is supported by the host."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    cpu_shares: Option<bool>,
+    #[doc = "Indicates if the daemon is running in debug-mode / with debug-level logging enabled."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    debug: Option<bool>,
+    #[doc = "List of custom default address pools for local networks, which can be specified in the daemon.json file or dockerd option.  Example: a Base \\\"10.10.0.0/16\\\" with Size 24 will define the set of 256 10.10.[0-255].0/24 address pools."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    default_address_pools: Option<Vec<SystemInfoDefaultAddressPools>>,
+    #[doc = "Name of the default OCI runtime that is used when starting containers.  The default can be overridden per-container at create time."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    default_runtime: Option<String>,
+    #[doc = "Root directory of persistent Docker state.  Defaults to `/var/lib/docker` on Linux, and `C:\\\\ProgramData\\\\docker` on Windows."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    docker_root_dir: Option<String>,
+    #[doc = "Name of the storage driver in use."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    driver: Option<String>,
+    #[doc = "Information specific to the storage driver, provided as \\\"label\\\" / \\\"value\\\" pairs.  This information is provided by the storage driver, and formatted in a way consistent with the output of `docker info` on the command line.\n\n**Note**: The information returned in this field, including the formatting of values and labels, should not be considered stable, and may change without notice."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    driver_status: Option<Vec<Vec<String>>>,
+    #[doc = "Indicates if experimental features are enabled on the daemon."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    experimental_build: Option<bool>,
+    #[doc = "HTTP-proxy configured for the daemon. This value is obtained from the [`HTTP_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable. Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL are masked in the API response.  Containers do not automatically inherit this configuration."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    http_proxy: Option<String>,
+    #[doc = "HTTPS-proxy configured for the daemon. This value is obtained from the [`HTTPS_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable. Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL are masked in the API response.  Containers do not automatically inherit this configuration."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    https_proxy: Option<String>,
+    #[doc = "Unique identifier of the daemon.\n\n**Note**: The format of the ID itself is not part of the API, and should not be considered stable."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    id: Option<String>,
+    #[doc = "Total number of images on the host. Both _tagged_ and _untagged_ (dangling) images are counted."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    images: Option<i64>,
+    #[doc = "Address / URL of the index server that is used for image search, and as a default for user authentication for Docker Hub and Docker Cloud."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    index_server_address: Option<String>,
+    #[doc = "Name and, optional, path of the `docker-init` binary.  If the path is omitted, the daemon searches the host's `$PATH` for the binary and uses the first result."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    init_binary: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    init_commit: Option<InitCommit>,
+    #[doc = "Indicates IPv4 forwarding is enabled."]
     #[serde(
+        rename = "ipv4_forwarding",
         default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
+        skip_serializing_if = "Option::is_none"
     )]
-    pub security_options: Vec<String>,
-
-    /**
-    * Version string of the daemon. \*\*Note\*\*: the [standalone Swarm API](https://docs.docker.com/swarm/swarm-api/) returns the Swarm version instead of the daemon  version, for example `swarm/1.2.8`.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub server_version: String,
-
-    /**
-    * Indicates if the host has memory swap limit support enabled.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub swap_limit: bool,
-
-    /**
-    * The  number of goroutines that currently exist.  This information is only returned if debug-mode is enabled.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub system_time: String,
-
-    /**
-    * Docker system info.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    pub warnings: Vec<String>,
+    ipv_4_forwarding: Option<bool>,
+    #[doc = "Represents the isolation technology to use as a default for containers. The supported values are platform-specific.  If no isolation value is specified on daemon start, on Windows client, the default is `hyperv`, and on Windows server, the default is `process`.  This option is currently not used on other platforms."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    isolation: Option<Isolation>,
+    #[doc = "Indicates if the host has kernel memory limit support enabled.\n\n**Deprecated**: This field is deprecated as the kernel 5.4 deprecated `kmem.limit_in_bytes`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    kernel_memory: Option<bool>,
+    #[doc = "Indicates if the host has kernel memory TCP limit support enabled.  Kernel memory TCP limits are not supported when using cgroups v2, which does not support the corresponding `memory.kmem.tcp.limit_in_bytes` cgroup."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    kernel_memory_tcp: Option<bool>,
+    #[doc = "Kernel version of the host.  On Linux, this information obtained from `uname`. On Windows this information is queried from the <kbd>HKEY_LOCAL_MACHINE\\\\\\\\SOFTWARE\\\\\\\\Microsoft\\\\\\\\Windows NT\\\\\\\\CurrentVersion\\\\\\\\</kbd> registry value, for example _\\\"10.0 14393 (14393.1198.amd64fre.rs1_release_sec.170427-1353)\\\"_."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    kernel_version: Option<String>,
+    #[doc = "User-defined labels (key/value metadata) as set on the daemon.\n\n**Note**: When part of a Swarm, nodes can both have _daemon_ labels, set through the daemon configuration, and _node_ labels, set from a manager node in the Swarm. Node labels are not included in this field. Node labels can be retrieved using the `/nodes/(id)` endpoint on a manager node in the Swarm."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    labels: Option<Vec<String>>,
+    #[doc = "Indicates if live restore is enabled.  If enabled, containers are kept running when the daemon is shutdown or upon daemon start if running containers are detected."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    live_restore_enabled: Option<bool>,
+    #[doc = "The logging driver to use as a default for new containers."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    logging_driver: Option<String>,
+    #[doc = "Total amount of physical memory available on the host, in bytes."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    mem_total: Option<i64>,
+    #[doc = "Indicates if the host has memory limit support enabled."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    memory_limit: Option<bool>,
+    #[doc = "Number of event listeners subscribed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    n_events_listener: Option<i64>,
+    #[doc = "The total number of file Descriptors in use by the daemon process.  This information is only returned if debug-mode is enabled."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    n_fd: Option<i64>,
+    #[doc = "Hostname of the host."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[doc = "The number of logical CPUs usable by the daemon.  The number of available CPUs is checked by querying the operating system when the daemon starts. Changes to operating system CPU allocation after the daemon is started are not reflected."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    ncpu: Option<i64>,
+    #[doc = "Comma-separated list of domain extensions for which no proxy should be used. This value is obtained from the [`NO_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable.  Containers do not automatically inherit this configuration."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    no_proxy: Option<String>,
+    #[doc = "Indicates if OOM killer disable is supported on the host."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    oom_kill_disable: Option<bool>,
+    #[doc = "Name of the host's operating system, for example: \\\"Ubuntu 16.04.2 LTS\\\" or \\\"Windows Server 2016 Datacenter\\\""]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    operating_system: Option<String>,
+    #[doc = "Generic type of the operating system of the host, as returned by the Go runtime (`GOOS`).  Currently returned values are \\\"linux\\\" and \\\"windows\\\". A full list of possible values can be found in the [Go documentation](https://golang.org/doc/install/source#environment)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    os_type: Option<String>,
+    #[doc = "Version of the host's operating system\n\n**Note**: The information returned in this field, including its very existence, and the formatting of values, should not be considered stable, and may change without notice."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    os_version: Option<String>,
+    #[doc = "Indicates if the host kernel has PID limit support enabled."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pids_limit: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    plugins: Option<Plugins>,
+    #[doc = "Reports a summary of the product license on the daemon.  If a commercial license has been applied to the daemon, information such as number of nodes, and expiration are included."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    product_license: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    registry_config: Option<RegistryConfig>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    runc_commit: Option<RuncCommit>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    runtimes: Option<std::collections::HashMap<String, Runtime>>,
+    #[doc = "List of security features that are enabled on the daemon, such as apparmor, seccomp, SELinux, user-namespaces (userns), and rootless.  Additional configuration options for each security feature may be present, and are included as a comma-separated list of key/value pairs."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    security_options: Option<Vec<String>>,
+    #[doc = "Version string of the daemon. **Note**: the [standalone Swarm API](https://docs.docker.com/swarm/swarm-api/) returns the Swarm version instead of the daemon  version, for example `swarm/1.2.8`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    server_version: Option<String>,
+    #[doc = "Indicates if the host has memory swap limit support enabled."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    swap_limit: Option<bool>,
+    #[doc = "The  number of goroutines that currently exist.  This information is only returned if debug-mode is enabled."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    system_time: Option<String>,
+    #[doc = "List of warnings / informational messages about missing features, or issues related to the daemon configuration.  These messages can be printed by the client as information to the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    warnings: Option<Vec<String>>,
 }
 
-/// The body of the form for email authentication.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+#[doc = "The body of the form for email authentication."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct EmailAuthenticationForm {
-    /**
-    * The URL to redirect back to after we have authenticated.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        deserialize_with = "crate::utils::deserialize_empty_url::deserialize"
-    )]
-    pub callback_url: Option<url::Url>,
-
-    /**
-    * The user's email.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub email: String,
+    #[doc = "The URL to redirect back to after we have authenticated."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    callback_url: Option<url::Url>,
+    #[doc = "The user's email."]
+    #[serde()]
+    email: String,
 }
 
-/**
-* The environment the server is running in.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
+#[doc = "Metadata about our currently running server.\n\nThis is mostly used for internal purposes and debugging."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct EngineMetadata {
+    #[doc = "If any async job is currently running."]
+    #[serde()]
+    async_jobs_running: bool,
+    #[doc = "Metadata about our cache."]
+    #[serde()]
+    cache: Cache,
+    #[doc = "The environment we are running in."]
+    #[serde()]
+    environment: Environment,
+    #[doc = "Metadata about our file system."]
+    #[serde()]
+    fs: Fs,
+    #[doc = "The git hash of the server."]
+    #[serde()]
+    git_hash: String,
+    #[doc = "Metadata about our pub-sub connection."]
+    #[serde()]
+    pubsub: Pubsub,
+}
+
+#[doc = "The environment the server is running in."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
 pub enum Environment {
     #[serde(rename = "DEVELOPMENT")]
+    #[display("DEVELOPMENT")]
     Development,
     #[serde(rename = "PREVIEW")]
+    #[display("PREVIEW")]
     Preview,
     #[serde(rename = "PRODUCTION")]
+    #[display("PRODUCTION")]
     Production,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
 }
 
-impl std::fmt::Display for Environment {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            Environment::Development => "DEVELOPMENT",
-            Environment::Preview => "PREVIEW",
-            Environment::Production => "PRODUCTION",
-            Environment::Noop => "",
-            Environment::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for Environment {
-    fn default() -> Environment {
-        Environment::Development
-    }
-}
-impl std::str::FromStr for Environment {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "DEVELOPMENT" {
-            return Ok(Environment::Development);
-        }
-        if s == "PREVIEW" {
-            return Ok(Environment::Preview);
-        }
-        if s == "PRODUCTION" {
-            return Ok(Environment::Production);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl Environment {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, Environment::Noop)
-    }
-}
-
-/// Metadata about our file system.
-///
-/// This is mostly used for internal purposes and debugging.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct FileSystemMetadata {
-    /**
-    * If the file system passed a sanity check.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub ok: bool,
-}
-
-/// Metadata about our currently running server.
-///
-/// This is mostly used for internal purposes and debugging.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
-pub struct EngineMetadata {
-    /**
-    * If any async job is currently running.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub async_jobs_running: bool,
-
-    /**
-    * Metadata about our cache.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde()]
-    pub cache: CacheMetadata,
-
-    /**
-    * The environment the server is running in.
-    */
-    #[serde(default, skip_serializing_if = "Environment::is_noop")]
-    pub environment: Environment,
-
-    /**
-    * Metadata about our file system.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde()]
-    pub fs: FileSystemMetadata,
-
-    /**
-    * The git hash of the server.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub git_hash: String,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
-    #[serde()]
-    pub pubsub: Connection,
-}
-
-#[derive(Debug, Deserialize, thiserror::Error, PartialEq, Serialize)]
-pub enum Error {
-    /// An object needed as part of this operation was not found.
-    #[error("Object not found: {message}")]
-    ObjectNotFound {
-        /// A message describing the problem.
-        message: String,
-    },
-    /// An object already exists with the specified name or identifier.
-    #[error("Object already exists: {message}")]
-    ObjectAlreadyExists {
-        /// A message describing the problem.
-        message: String,
-    },
-    /// The request was well-formed, but the operation cannot be completed given
-    /// the current state of the system.
-    #[error("Invalid Request: {message}")]
-    InvalidRequest {
-        /// A message describing the problem.
-        message: String,
-    },
-    /// Authentication credentials were required but either missing or invalid.
-    /// The HTTP status code is called "Unauthorized", but it's more accurate to
-    /// call it "Unauthenticated".
-    #[error("Missing or invalid credentials")]
-    Unauthenticated {
-        /// An internal message.
-        internal_message: String,
-    },
-    /// The specified input field is not valid.
-    #[error("Invalid Value: {message}")]
-    InvalidValue {
-        /// A message describing the problem.
-        message: String,
-    },
-    /// The request is not authorized to perform the requested operation.
-    #[error("Forbidden")]
-    Forbidden,
-
-    /// The system encountered an unhandled operational error.
-    #[error("Internal Error: {internal_message}")]
-    InternalError {
-        /// An internal message.
-        internal_message: String,
-    },
-    /// The system (or part of it) is unavailable.
-    #[error("Service Unavailable: {internal_message}")]
-    ServiceUnavailable {
-        /// An internal message.
-        internal_message: String,
-    },
-    /// Method Not Allowed
-    #[error("Method Not Allowed: {internal_message}")]
-    MethodNotAllowed {
-        /// An internal message.
-        internal_message: String,
-    },
-}
-
-impl Error {
-    /// Returns whether the error is likely transient and could reasonably be
-    /// retried
-    pub fn retryable(&self) -> bool {
-        match self {
-            Error::ServiceUnavailable { .. } => true,
-
-            Error::ObjectNotFound { .. }
-            | Error::ObjectAlreadyExists { .. }
-            | Error::Unauthenticated { .. }
-            | Error::InvalidRequest { .. }
-            | Error::InvalidValue { .. }
-            | Error::Forbidden
-            | Error::MethodNotAllowed { .. }
-            | Error::InternalError { .. } => false,
-        }
-    }
-}
-
-impl From<ErrorResponse> for Error {
-    /// Converts an `Error` error into an `HttpError`.  This defines how
-    /// errors that are represented internally using `Error` are ultimately
-    /// exposed to clients over HTTP.
-    fn from(error: ErrorResponse) -> Error {
-        if error.error_code == "ObjectNotFound" {
-            return Error::ObjectNotFound {
-                message: error.message,
-            };
-        }
-
-        if error.error_code == "ObjectAlreadyExists" {
-            return Error::ObjectAlreadyExists {
-                message: error.message,
-            };
-        }
-
-        if error.error_code == "Unauthorized" {
-            return Error::Unauthenticated {
-                internal_message: error.message,
-            };
-        }
-
-        if error.error_code == "InvalidRequest" {
-            return Error::InvalidRequest {
-                message: error.message,
-            };
-        }
-
-        if error.error_code == "InvalidValue" {
-            return Error::InvalidValue {
-                message: error.message,
-            };
-        }
-
-        if error.error_code == "Forbidden" {
-            return Error::Forbidden;
-        }
-
-        if error.error_code == "MethodNotAllowed" {
-            return Error::MethodNotAllowed {
-                internal_message: error.message,
-            };
-        }
-
-        if error.error_code == "ServiceUnavailable" {
-            return Error::ServiceUnavailable {
-                internal_message: error.message,
-            };
-        }
-
-        Error::InternalError {
-            internal_message: error.message,
-        }
-    }
-}
-
-/// Identifies a type of API resource
+#[doc = "Error information from a response."]
 #[derive(
-    Clone,
-    Copy,
-    Debug,
-    serde_with::DeserializeFromStr,
-    Display,
-    Eq,
-    FromStr,
-    Ord,
+    serde :: Serialize,
+    serde :: Deserialize,
     PartialEq,
-    PartialOrd,
-    serde_with::SerializeDisplay,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
 )]
-#[display(style = "kebab-case")]
-pub enum ResourceType {
-    /// An address.
-    Address,
-    /// An API call.
-    #[display("api-call")]
-    APICall,
-    /// An API call price.
-    #[display("api-call-price")]
-    APICallPrice,
-    /// An API call with price.
-    #[display("api-call-with-price")]
-    APICallWithPrice,
-    /// An API token.
-    #[display("api-token")]
-    APIToken,
-    /// An async API call.
-    #[display("async-api-call")]
-    AsyncAPICall,
-    /// An extended user.
-    ExtendedUser,
-    /// A file conversion.
-    FileConversion,
-    /// A MailChimp subscriber.
-    MailChimpSubscriber,
-    /// A session.
-    Session,
-    /// A Stripe customer.
-    StripeCustomer,
-    /// A user.
-    User,
-    /// A Zendesk contact.
-    ZendeskContact,
+pub struct Error {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    error_code: Option<String>,
+    #[serde()]
+    message: String,
+    #[serde()]
+    request_id: String,
 }
 
-/// Error information from a response.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct ErrorResponse {
-    /**
-    * Error information from a response.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub error_code: String,
-
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub message: String,
-
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub request_id: String,
-}
-
-/// Metadata about our currently running server.
-///
-/// This is mostly used for internal purposes and debugging.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+#[doc = "Metadata about our currently running server.\n\nThis is mostly used for internal purposes and debugging."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct ExecutorMetadata {
-    /**
-    * Docker system info.
-    */
+    #[doc = "Information about the docker daemon."]
     #[serde()]
-    pub docker_info: DockerSystemInfo,
-
-    /**
-    * The environment the server is running in.
-    */
-    #[serde(default, skip_serializing_if = "Environment::is_noop")]
-    pub environment: Environment,
-
-    /**
-    * The git hash of the server.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub git_hash: String,
+    docker_info: DockerInfo,
+    #[doc = "The environment we are running in."]
+    #[serde()]
+    environment: Environment,
+    #[doc = "The git hash of the server."]
+    #[serde()]
+    git_hash: String,
 }
 
-/// Extended user information.
-///
-/// This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "Extended user information.\n\nThis is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct ExtendedUser {
-    /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub name: String,
-
-    /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub company: String,
-
-    /**
-    * The date and time the user was created.
-    */
+    #[doc = "The user's company."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    company: Option<String>,
+    #[doc = "The date and time the user was created."]
     #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub discord: String,
-
-    /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub email: String,
-
-    /**
-    * The date and time the email address was verified.
-    */
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user's Discord handle."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    discord: Option<String>,
+    #[doc = "The email address of the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    email: Option<String>,
+    #[doc = "The date and time the email address was verified."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    email_verified: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The user's first name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    first_name: Option<String>,
+    #[doc = "The user's GitHub handle."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    github: Option<String>,
+    #[doc = "The unique identifier for the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    id: Option<String>,
+    #[doc = "The image avatar for the user. This is a URL."]
     #[serde()]
-    pub email_verified: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub first_name: String,
-
-    /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub github: String,
-
-    /**
-    * The image avatar for the user. This is a URL.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        deserialize_with = "crate::utils::deserialize_empty_url::deserialize"
-    )]
-    #[tabled(skip)]
-    pub image: Option<url::Url>,
-
-    /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub last_name: String,
-
-    /**
-    * The user's MailChimp ID. This is mostly used for internal mapping.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub mailchimp_id: String,
-
-    /**
-    * Extended user information.
-    *  
-    *  This is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub phone: String,
-
-    /**
-    * The user's Stripe ID. This is mostly used for internal mapping.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub stripe_id: String,
-
-    /**
-    * The date and time the user was last updated.
-    */
+    image: url::Url,
+    #[doc = "The user's last name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    last_name: Option<String>,
+    #[doc = "The user's MailChimp ID. This is mostly used for internal mapping."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    mailchimp_id: Option<String>,
+    #[doc = "The name of the user. This is auto populated at first from the authentication provider (if there was a name). It can be updated by the user by updating their `first_name` and `last_name` fields."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[doc = "The user's phone number."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    phone: Option<String>,
+    #[doc = "The user's Stripe ID. This is mostly used for internal mapping."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    stripe_id: Option<String>,
+    #[doc = "The date and time the user was last updated."]
     #[serde()]
-    pub updated_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The user's Zendesk ID. This is mostly used for internal mapping.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub zendesk_id: String,
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user's Zendesk ID. This is mostly used for internal mapping."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    zendesk_id: Option<String>,
 }
 
-/// A single page of results
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct ExtendedUserResultsPage {
-    /**
-    * list of items on this page of results
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    #[tabled(skip)]
-    pub items: Vec<ExtendedUser>,
-
-    /**
-    * token used to fetch the next page of results (if any)
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub next_page: String,
+    #[doc = "list of items on this page of results"]
+    #[serde()]
+    items: Vec<ExtendedUser>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    next_page: Option<String>,
 }
 
-/**
-* The valid types of output file formats.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
+#[doc = "A file conversion."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct FileConversion {
+    #[doc = "The time and date the file conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the file conversion was created."]
+    #[serde()]
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    error: Option<String>,
+    #[doc = "The unique identifier of the file conversion.\n\nThis is the same as the API call ID."]
+    #[serde()]
+    id: uuid::Uuid,
+    #[doc = "The converted file, if completed, base64 encoded."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    output: Option<base64::Base64Data>,
+    #[doc = "The output format of the file conversion."]
+    #[serde()]
+    output_format: OutputFormat,
+    #[doc = "The source format of the file conversion."]
+    #[serde()]
+    src_format: SrcFormat,
+    #[doc = "The time and date the file conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the file conversion."]
+    #[serde()]
+    status: Status,
+    #[doc = "The time and date the file conversion was last updated."]
+    #[serde()]
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the file conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    user_id: Option<String>,
+}
+
+#[doc = "A file density result."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct FileDensity {
+    #[doc = "The time and date the density was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the density was created."]
+    #[serde()]
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The resulting density."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    density: Option<f64>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    error: Option<String>,
+    #[doc = "The unique identifier of the density request.\n\nThis is the same as the API call ID."]
+    #[serde()]
+    id: uuid::Uuid,
+    #[doc = "The material mass as denoted by the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    material_mass: Option<f64>,
+    #[doc = "The source format of the file."]
+    #[serde()]
+    src_format: SrcFormat,
+    #[doc = "The time and date the density was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the density."]
+    #[serde()]
+    status: Status,
+    #[doc = "The time and date the density was last updated."]
+    #[serde()]
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the density."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    user_id: Option<String>,
+}
+
+#[doc = "A file mass result."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct FileMass {
+    #[doc = "The time and date the mass was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the mass was created."]
+    #[serde()]
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    error: Option<String>,
+    #[doc = "The unique identifier of the mass request.\n\nThis is the same as the API call ID."]
+    #[serde()]
+    id: uuid::Uuid,
+    #[doc = "The resulting mass."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    mass: Option<f64>,
+    #[doc = "The material density as denoted by the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    material_density: Option<f64>,
+    #[doc = "The source format of the file."]
+    #[serde()]
+    src_format: SrcFormat,
+    #[doc = "The time and date the mass was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the mass."]
+    #[serde()]
+    status: Status,
+    #[doc = "The time and date the mass was last updated."]
+    #[serde()]
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the mass."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    user_id: Option<String>,
+}
+
+#[doc = "The valid types of output file formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
 pub enum FileOutputFormat {
+    #[serde(rename = "stl")]
+    #[display("stl")]
+    Stl,
+    #[serde(rename = "obj")]
+    #[display("obj")]
+    Obj,
     #[serde(rename = "dae")]
+    #[display("dae")]
     Dae,
+    #[serde(rename = "step")]
+    #[display("step")]
+    Step,
     #[serde(rename = "fbx")]
+    #[display("fbx")]
     Fbx,
     #[serde(rename = "fbxb")]
+    #[display("fbxb")]
     Fbxb,
-    #[serde(rename = "obj")]
-    Obj,
-    #[serde(rename = "step")]
-    Step,
-    #[serde(rename = "stl")]
-    Stl,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
 }
 
-impl std::fmt::Display for FileOutputFormat {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            FileOutputFormat::Dae => "dae",
-            FileOutputFormat::Fbx => "fbx",
-            FileOutputFormat::Fbxb => "fbxb",
-            FileOutputFormat::Obj => "obj",
-            FileOutputFormat::Step => "step",
-            FileOutputFormat::Stl => "stl",
-            FileOutputFormat::Noop => "",
-            FileOutputFormat::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for FileOutputFormat {
-    fn default() -> FileOutputFormat {
-        FileOutputFormat::Dae
-    }
-}
-impl std::str::FromStr for FileOutputFormat {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "dae" {
-            return Ok(FileOutputFormat::Dae);
-        }
-        if s == "fbx" {
-            return Ok(FileOutputFormat::Fbx);
-        }
-        if s == "fbxb" {
-            return Ok(FileOutputFormat::Fbxb);
-        }
-        if s == "obj" {
-            return Ok(FileOutputFormat::Obj);
-        }
-        if s == "step" {
-            return Ok(FileOutputFormat::Step);
-        }
-        if s == "stl" {
-            return Ok(FileOutputFormat::Stl);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl FileOutputFormat {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, FileOutputFormat::Noop)
-    }
-}
-
-/**
-* The valid types of source file formats.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
+#[doc = "The valid types of source file formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
 pub enum FileSourceFormat {
-    #[serde(rename = "dae")]
-    Dae,
-    #[serde(rename = "fbx")]
-    Fbx,
-    #[serde(rename = "obj")]
-    Obj,
-    #[serde(rename = "step")]
-    Step,
     #[serde(rename = "stl")]
+    #[display("stl")]
     Stl,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
+    #[serde(rename = "obj")]
+    #[display("obj")]
+    Obj,
+    #[serde(rename = "dae")]
+    #[display("dae")]
+    Dae,
+    #[serde(rename = "step")]
+    #[display("step")]
+    Step,
+    #[serde(rename = "fbx")]
+    #[display("fbx")]
+    Fbx,
 }
 
-impl std::fmt::Display for FileSourceFormat {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            FileSourceFormat::Dae => "dae",
-            FileSourceFormat::Fbx => "fbx",
-            FileSourceFormat::Obj => "obj",
-            FileSourceFormat::Step => "step",
-            FileSourceFormat::Stl => "stl",
-            FileSourceFormat::Noop => "",
-            FileSourceFormat::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
+#[doc = "Metadata about our file system.\n\nThis is mostly used for internal purposes and debugging."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct FileSystemMetadata {
+    #[doc = "If the file system passed a sanity check."]
+    #[serde()]
+    ok: bool,
 }
 
-impl Default for FileSourceFormat {
-    fn default() -> FileSourceFormat {
-        FileSourceFormat::Dae
-    }
-}
-impl std::str::FromStr for FileSourceFormat {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "dae" {
-            return Ok(FileSourceFormat::Dae);
-        }
-        if s == "fbx" {
-            return Ok(FileSourceFormat::Fbx);
-        }
-        if s == "obj" {
-            return Ok(FileSourceFormat::Obj);
-        }
-        if s == "step" {
-            return Ok(FileSourceFormat::Step);
-        }
-        if s == "stl" {
-            return Ok(FileSourceFormat::Stl);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl FileSourceFormat {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, FileSourceFormat::Noop)
-    }
-}
-
-/// A file conversion.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct FileConversion {
-    /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * The time and date the file conversion was completed.
-    */
-    #[serde()]
-    pub completed_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The time and date the file conversion was created.
-    */
-    #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The error the function returned, if any.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub error: String,
-
-    /**
-    * The converted file, if completed, base64 encoded.
-    */
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[tabled(skip)]
-    pub output: Option<bytes::Bytes>,
-
-    /**
-    * The valid types of output file formats.
-    */
-    #[serde(default, skip_serializing_if = "FileOutputFormat::is_noop")]
-    pub output_format: FileOutputFormat,
-
-    /**
-    * The valid types of source file formats.
-    */
-    #[serde(default, skip_serializing_if = "FileSourceFormat::is_noop")]
-    pub src_format: FileSourceFormat,
-
-    /**
-    * The time and date the file conversion was started.
-    */
-    #[serde()]
-    pub started_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The status of an async API call.
-    */
-    #[serde(default, skip_serializing_if = "ApiCallStatus::is_noop")]
-    pub status: ApiCallStatus,
-
-    /**
-    * The time and date the file conversion was last updated.
-    */
-    #[serde()]
-    pub updated_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * A file conversion.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub user_id: String,
-}
-
-/// A file density result.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct FileDensity {
-    /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * The time and date the density was completed.
-    */
-    #[serde()]
-    pub completed_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The time and date the density was created.
-    */
-    #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The resulting density.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub density: f64,
-
-    /**
-    * The error the function returned, if any.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub error: String,
-
-    /**
-    * A file density result.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub material_mass: f64,
-
-    /**
-    * The valid types of source file formats.
-    */
-    #[serde(default, skip_serializing_if = "FileSourceFormat::is_noop")]
-    pub src_format: FileSourceFormat,
-
-    /**
-    * The time and date the density was started.
-    */
-    #[serde()]
-    pub started_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The status of an async API call.
-    */
-    #[serde(default, skip_serializing_if = "ApiCallStatus::is_noop")]
-    pub status: ApiCallStatus,
-
-    /**
-    * The time and date the density was last updated.
-    */
-    #[serde()]
-    pub updated_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * A file density result.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub user_id: String,
-}
-
-/// A file mass result.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct FileMass {
-    /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * The time and date the mass was completed.
-    */
-    #[serde()]
-    pub completed_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The time and date the mass was created.
-    */
-    #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The error the function returned, if any.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub error: String,
-
-    /**
-    * The resulting mass.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub mass: f64,
-
-    /**
-    * A file mass result.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub material_density: f64,
-
-    /**
-    * The valid types of source file formats.
-    */
-    #[serde(default, skip_serializing_if = "FileSourceFormat::is_noop")]
-    pub src_format: FileSourceFormat,
-
-    /**
-    * The time and date the mass was started.
-    */
-    #[serde()]
-    pub started_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The status of an async API call.
-    */
-    #[serde(default, skip_serializing_if = "ApiCallStatus::is_noop")]
-    pub status: ApiCallStatus,
-
-    /**
-    * The time and date the mass was last updated.
-    */
-    #[serde()]
-    pub updated_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * A file mass result.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub user_id: String,
-}
-
-/// A file volume result.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "A file volume result."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct FileVolume {
-    /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * The time and date the volume was completed.
-    */
+    #[doc = "The time and date the volume was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the volume was created."]
     #[serde()]
-    pub completed_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The time and date the volume was created.
-    */
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    error: Option<String>,
+    #[doc = "The unique identifier of the volume request.\n\nThis is the same as the API call ID."]
     #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The error the function returned, if any.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub error: String,
-
-    /**
-    * The valid types of source file formats.
-    */
-    #[serde(default, skip_serializing_if = "FileSourceFormat::is_noop")]
-    pub src_format: FileSourceFormat,
-
-    /**
-    * The time and date the volume was started.
-    */
+    id: uuid::Uuid,
+    #[doc = "The source format of the file."]
     #[serde()]
-    pub started_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The status of an async API call.
-    */
-    #[serde(default, skip_serializing_if = "ApiCallStatus::is_noop")]
-    pub status: ApiCallStatus,
-
-    /**
-    * The time and date the volume was last updated.
-    */
+    src_format: SrcFormat,
+    #[doc = "The time and date the volume was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the volume."]
     #[serde()]
-    pub updated_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * A file volume result.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub user_id: String,
-
-    /**
-    * The resulting volume.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub volume: f64,
+    status: Status,
+    #[doc = "The time and date the volume was last updated."]
+    #[serde()]
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the volume."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    user_id: Option<String>,
+    #[doc = "The resulting volume."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    volume: Option<f64>,
 }
 
-/// IndexInfo contains information about a registry.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "Gateway information."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct Gateway {
+    #[doc = "The auth timeout of the gateway."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    auth_timeout: Option<i64>,
+    #[doc = "The host of the gateway."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    host: Option<String>,
+    #[doc = "The name of the gateway."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[doc = "The port of the gateway."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    port: Option<i64>,
+    #[doc = "The TLS timeout for the gateway."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    tls_timeout: Option<i64>,
+}
+
+#[doc = "IndexInfo contains information about a registry."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct IndexInfo {
-    /**
-    * Name of the registry, such as \"docker.io\".
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub name: String,
-
-    /**
-    * IndexInfo contains information about a registry.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    #[tabled(skip)]
-    pub mirrors: Vec<String>,
-
-    /**
-    * Indicates whether this is an official registry (i.e., Docker Hub / docker.io)
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub official: bool,
-
-    /**
-    * Indicates if the registry is part of the list of insecure registries.  If `false`, the registry is insecure. Insecure registries accept un-encrypted (HTTP) and/or untrusted (HTTPS with certificates from unknown CAs) communication.
-    *  
-    *  \*\*Warning\*\*: Insecure registries can be useful when running a local registry. However, because its use creates security vulnerabilities it should ONLY be enabled for testing purposes. For increased security, users should add their CA to their system's list of trusted CAs instead of enabling this option.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub secure: bool,
+    #[doc = "List of mirrors, expressed as URIs."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    mirrors: Option<Vec<String>>,
+    #[doc = "Name of the registry, such as \\\"docker.io\\\"."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[doc = "Indicates whether this is an official registry (i.e., Docker Hub / docker.io)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    official: Option<bool>,
+    #[doc = "Indicates if the registry is part of the list of insecure registries.  If `false`, the registry is insecure. Insecure registries accept un-encrypted (HTTP) and/or untrusted (HTTPS with certificates from unknown CAs) communication.\n\n**Warning**: Insecure registries can be useful when running a local registry. However, because its use creates security vulnerabilities it should ONLY be enabled for testing purposes. For increased security, users should add their CA to their system's list of trusted CAs instead of enabling this option."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    secure: Option<bool>,
 }
 
-/// An invoice line item.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "An invoice."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct Invoice {
+    #[doc = "Final amount due at this time for this invoice.\n\nIf the invoice's total is smaller than the minimum charge amount, for example, or if there is account credit that can be applied to the invoice, the `amount_due` may be 0. If there is a positive `starting_balance` for the invoice (the customer owes money), the `amount_due` will also take that into account. The charge that gets generated for the invoice will be for the amount specified in `amount_due`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    amount_due: Option<f64>,
+    #[doc = "The amount, in USD, that was paid."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    amount_paid: Option<f64>,
+    #[doc = "The amount remaining, in USD, that is due."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    amount_remaining: Option<f64>,
+    #[doc = "Number of payment attempts made for this invoice, from the perspective of the payment retry schedule.\n\nAny payment attempt counts as the first attempt, and subsequently only automatic retries increment the attempt count. In other words, manual payment attempts after the first attempt do not affect the retry schedule."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    attempt_count: Option<u64>,
+    #[doc = "Whether an attempt has been made to pay the invoice.\n\nAn invoice is not attempted until 1 hour after the `invoice.created` webhook, for example, so you might not want to display that invoice as unpaid to your users."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    attempted: Option<bool>,
+    #[doc = "Time at which the object was created."]
+    #[serde()]
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase."]
+    #[serde()]
+    currency: Currency,
+    #[doc = "The email address for the customer. Until the invoice is finalized, this field will equal customer.email. Once the invoice is finalized, this field will no longer be updated."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    customer_email: Option<String>,
+    #[doc = "Customer ID. The unique identifier for the customer this invoice belongs to. This is the customer ID in the payments service, not our database customer ID."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    customer_id: Option<String>,
+    #[doc = "Default payment method."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    default_payment_method: Option<String>,
+    #[doc = "Description of the invoice."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
+    #[doc = "Unique identifier for the object."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    id: Option<String>,
+    #[doc = "The individual line items that make up the invoice.\n\n`lines` is sorted as follows: invoice items in reverse chronological order, followed by the subscription, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    lines: Option<Vec<InvoiceLineItem>>,
+    #[doc = "Set of key-value pairs."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    metadata: Option<std::collections::HashMap<String, String>>,
+    #[doc = "A unique, identifying string that appears on emails sent to the customer for this invoice."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    number: Option<String>,
+    #[doc = "Whether payment was successfully collected for this invoice.\n\nAn invoice can be paid (most commonly) with a charge or with credit from the customer's account balance."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    paid: Option<bool>,
+    #[doc = "The link to download the PDF for the invoice."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pdf: Option<url::Url>,
+    #[doc = "This is the transaction number that appears on email receipts sent for this invoice."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    receipt_number: Option<String>,
+    #[doc = "Extra information about an invoice for the customer's credit card statement."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    statement_descriptor: Option<String>,
+    #[doc = "The status of the invoice, one of `draft`, `open`, `paid`, `uncollectible`, or `void`.\n\n[Learn more](https://stripe.com/docs/billing/invoices/workflow#workflow-overview)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    status: Option<Status>,
+    #[doc = "Total of all subscriptions, invoice items, and prorations on the invoice before any invoice level discount or tax is applied.\n\nItem discounts are already incorporated."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    subtotal: Option<f64>,
+    #[doc = "The amount of tax on this invoice.\n\nThis is the sum of all the tax amounts on this invoice."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    tax: Option<f64>,
+    #[doc = "Total after discounts and taxes."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    total: Option<f64>,
+    #[doc = "The URL for the hosted invoice page, which allows customers to view and pay an invoice."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    url: Option<url::Url>,
+}
+
+#[doc = "An invoice line item."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct InvoiceLineItem {
-    /**
-    * An invoice line item.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * An invoice line item.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub description: String,
-
-    /**
-    * An invoice line item.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub amount: f64,
-
-    /**
-    * Currency is the list of supported currencies.
-    *  
-    *  For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.
-    */
-    #[serde(default, skip_serializing_if = "Currency::is_noop")]
-    pub currency: Currency,
-
-    /**
-    * An invoice line item.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub invoice_item: String,
-
-    /**
-    * An invoice line item.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub metadata: String,
+    #[doc = "The amount, in USD."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    amount: Option<f64>,
+    #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase."]
+    #[serde()]
+    currency: Currency,
+    #[doc = "The description."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
+    #[doc = "Unique identifier for the object."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    id: Option<String>,
+    #[doc = "The ID of the invoice item associated with this line item if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    invoice_item: Option<String>,
+    #[doc = "Set of [key-value pairs](https://stripe.com/docs/api/metadata) that you can attach to an object.\n\nSet of key-value pairs."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    metadata: Option<std::collections::HashMap<String, String>>,
 }
 
-/**
-* An enum representing the possible values of an `Invoice`'s `status` field.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
+#[doc = "An enum representing the possible values of an `Invoice`'s `status` field."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
 pub enum InvoiceStatus {
     #[serde(rename = "deleted")]
+    #[display("deleted")]
     Deleted,
     #[serde(rename = "draft")]
+    #[display("draft")]
     Draft,
     #[serde(rename = "open")]
+    #[display("open")]
     Open,
     #[serde(rename = "paid")]
+    #[display("paid")]
     Paid,
     #[serde(rename = "uncollectible")]
+    #[display("uncollectible")]
     Uncollectible,
     #[serde(rename = "void")]
+    #[display("void")]
     Void,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
 }
 
-impl std::fmt::Display for InvoiceStatus {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            InvoiceStatus::Deleted => "deleted",
-            InvoiceStatus::Draft => "draft",
-            InvoiceStatus::Open => "open",
-            InvoiceStatus::Paid => "paid",
-            InvoiceStatus::Uncollectible => "uncollectible",
-            InvoiceStatus::Void => "void",
-            InvoiceStatus::Noop => "",
-            InvoiceStatus::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for InvoiceStatus {
-    fn default() -> InvoiceStatus {
-        InvoiceStatus::Deleted
-    }
-}
-impl std::str::FromStr for InvoiceStatus {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "deleted" {
-            return Ok(InvoiceStatus::Deleted);
-        }
-        if s == "draft" {
-            return Ok(InvoiceStatus::Draft);
-        }
-        if s == "open" {
-            return Ok(InvoiceStatus::Open);
-        }
-        if s == "paid" {
-            return Ok(InvoiceStatus::Paid);
-        }
-        if s == "uncollectible" {
-            return Ok(InvoiceStatus::Uncollectible);
-        }
-        if s == "void" {
-            return Ok(InvoiceStatus::Void);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl InvoiceStatus {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, InvoiceStatus::Noop)
-    }
-}
-
-/// An invoice.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
-pub struct Invoice {
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub description: String,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub amount_due: f64,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub amount_paid: f64,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub amount_remaining: f64,
-
-    /**
-    * An invoice.
-    */
+#[doc = "Jetstream information."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct Jetstream {
+    #[doc = "The Jetstream config."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub attempt_count: Option<u64>,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub attempted: bool,
-
-    /**
-    * Time at which the object was created.
-    */
-    #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * Currency is the list of supported currencies.
-    *  
-    *  For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.
-    */
-    #[serde(default, skip_serializing_if = "Currency::is_noop")]
-    pub currency: Currency,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub customer_email: String,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub customer_id: String,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub default_payment_method: String,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    pub lines: Vec<InvoiceLineItem>,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub metadata: String,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub number: String,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        deserialize_with = "crate::utils::deserialize_null_boolean::deserialize"
-    )]
-    pub paid: bool,
-
-    /**
-    * The link to download the PDF for the invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        deserialize_with = "crate::utils::deserialize_empty_url::deserialize"
-    )]
-    pub pdf: Option<url::Url>,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub receipt_number: String,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub statement_descriptor: String,
-
-    /**
-    * The status of the invoice, one of `draft`, `open`, `paid`, `uncollectible`, or `void`.
-    *  
-    *  [Learn more](https://stripe.com/docs/billing/invoices/workflow#workflow-overview).
-    */
+    config: Option<Config>,
+    #[doc = "Meta information about the cluster."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub status: Option<InvoiceStatus>,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub subtotal: f64,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub tax: f64,
-
-    /**
-    * An invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub total: f64,
-
-    /**
-    * The URL for the hosted invoice page, which allows customers to view and pay an invoice.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        deserialize_with = "crate::utils::deserialize_empty_url::deserialize"
-    )]
-    pub url: Option<url::Url>,
-}
-
-/// Jetstream configuration.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct JetstreamConfig {
-    /**
-    * Jetstream configuration.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub domain: String,
-
-    /**
-    * Jetstream configuration.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub max_memory: i64,
-
-    /**
-    * Jetstream configuration.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub max_storage: i64,
-
-    /**
-    * Jetstream configuration.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub store_dir: String,
-}
-
-/// Jetstream statistics.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct MetaClusterInfo {
-    /**
-    * Jetstream statistics.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub name: String,
-
-    /**
-    * Jetstream statistics.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub cluster_size: i64,
-
-    /**
-    * Jetstream statistics.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub leader: String,
-}
-
-/// Jetstream statistics.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
-pub struct JetstreamStats {
-    /**
-    * Jetstream statistics.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub accounts: i64,
-
-    /**
-    * Jetstream statistics.
-    */
+    meta: Option<Meta>,
+    #[doc = "Jetstream statistics."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub api: Option<JetstreamApiStats>,
-
-    /**
-    * Jetstream statistics.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub ha_assets: i64,
-
-    /**
-    * Jetstream statistics.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub memory: i64,
-
-    /**
-    * Jetstream statistics.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub reserved_memory: i64,
-
-    /**
-    * Jetstream statistics.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub reserved_store: i64,
-
-    /**
-    * Jetstream statistics.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub store: i64,
+    stats: Option<Stats>,
 }
 
-/// Jetstream API statistics.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "Jetstream API statistics."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct JetstreamApiStats {
-    /**
-    * Jetstream API statistics.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub errors: i64,
-
-    /**
-    * Jetstream API statistics.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub inflight: i64,
-
-    /**
-    * Jetstream API statistics.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_i64",
-        deserialize_with = "crate::utils::deserialize_null_i64::deserialize"
-    )]
-    pub total: i64,
+    #[doc = "The number of errors."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    errors: Option<i64>,
+    #[doc = "The number of inflight requests."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    inflight: Option<i64>,
+    #[doc = "The number of requests."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    total: Option<i64>,
 }
 
-/// Metadata about our currently running server.
-///
-/// This is mostly used for internal purposes and debugging.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
+#[doc = "Jetstream configuration."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct JetstreamConfig {
+    #[doc = "The domain."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    domain: Option<String>,
+    #[doc = "The max memory."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    max_memory: Option<i64>,
+    #[doc = "The max storage."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    max_storage: Option<i64>,
+    #[doc = "The store directory."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    store_dir: Option<String>,
+}
+
+#[doc = "Jetstream statistics."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct JetstreamStats {
+    #[doc = "The number of accounts."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    accounts: Option<i64>,
+    #[doc = "API stats."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    api: Option<Api>,
+    #[doc = "The number of HA assets."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    ha_assets: Option<i64>,
+    #[doc = "The memory used by the Jetstream server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    memory: Option<i64>,
+    #[doc = "The reserved memory for the Jetstream server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    reserved_memory: Option<i64>,
+    #[doc = "The reserved storage for the Jetstream server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    reserved_store: Option<i64>,
+    #[doc = "The storage used by the Jetstream server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    store: Option<i64>,
+}
+
+#[doc = "Leaf node information."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct LeafNode {
+    #[doc = "The auth timeout of the leaf node."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    auth_timeout: Option<i64>,
+    #[doc = "The host of the leaf node."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    host: Option<String>,
+    #[doc = "The port of the leaf node."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    port: Option<i64>,
+    #[doc = "The TLS timeout for the leaf node."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    tls_timeout: Option<i64>,
+}
+
+#[doc = "Jetstream statistics."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct MetaClusterInfo {
+    #[doc = "The size of the cluster."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    cluster_size: Option<i64>,
+    #[doc = "The leader of the cluster."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    leader: Option<String>,
+    #[doc = "The name of the cluster."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+}
+
+#[doc = "Metadata about our currently running server.\n\nThis is mostly used for internal purposes and debugging."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct Metadata {
-    /**
-    * Metadata about our cache.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+    #[doc = "Metadata about our cache."]
     #[serde()]
-    pub cache: CacheMetadata,
-
-    /**
-    * Metadata about our currently running server.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+    cache: Cache,
+    #[doc = "Metadata about our engine API connection."]
     #[serde()]
-    pub engine: EngineMetadata,
-
-    /**
-    * The environment the server is running in.
-    */
-    #[serde(default, skip_serializing_if = "Environment::is_noop")]
-    pub environment: Environment,
-
-    /**
-    * Metadata about our currently running server.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+    engine: Engine,
+    #[doc = "The environment we are running in."]
     #[serde()]
-    pub executor: ExecutorMetadata,
-
-    /**
-    * Metadata about our file system.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+    environment: Environment,
+    #[doc = "Metadata about our executor API connection."]
     #[serde()]
-    pub fs: FileSystemMetadata,
-
-    /**
-    * The git hash of the server.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub git_hash: String,
-
-    /**
-    * Metadata about a pub-sub connection.
-    *  
-    *  This is mostly used for internal purposes and debugging.
-    */
+    executor: Executor,
+    #[doc = "Metadata about our file system."]
     #[serde()]
-    pub pubsub: Connection,
+    fs: Fs,
+    #[doc = "The git hash of the server."]
+    #[serde()]
+    git_hash: String,
+    #[doc = "Metadata about our pub-sub connection."]
+    #[serde()]
+    pubsub: Pubsub,
 }
 
-/// Information about an OAuth 2.0 client.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct OAuth2ClientInfo {
-    /**
-    * Information about an OAuth 2.0 client.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub csrf_token: String,
-
-    /**
-    * Code Verifier used for [PKCE]((https://tools.ietf.org/html/rfc7636)) protection via the `code_verifier` parameter. The value must have a minimum length of 43 characters and a maximum length of 128 characters.  Each character must be ASCII alphanumeric or one of the characters "-" / "." / "_" / "~".
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub pkce_code_verifier: String,
-
-    /**
-    * Information about an OAuth 2.0 client.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub url: String,
+#[doc = "The Request Method (VERB)\n\nThis type also contains constants for a number of common HTTP methods such as GET, POST, etc.\n\nCurrently includes 8 variants representing the 8 methods defined in [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH, and an Extension variant for all extensions."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum Method {
+    #[serde(rename = "OPTIONS")]
+    #[display("OPTIONS")]
+    Options,
+    #[serde(rename = "GET")]
+    #[display("GET")]
+    Get,
+    #[serde(rename = "POST")]
+    #[display("POST")]
+    Post,
+    #[serde(rename = "PUT")]
+    #[display("PUT")]
+    Put,
+    #[serde(rename = "DELETE")]
+    #[display("DELETE")]
+    Delete,
+    #[serde(rename = "HEAD")]
+    #[display("HEAD")]
+    Head,
+    #[serde(rename = "TRACE")]
+    #[display("TRACE")]
+    Trace,
+    #[serde(rename = "CONNECT")]
+    #[display("CONNECT")]
+    Connect,
+    #[serde(rename = "PATCH")]
+    #[display("PATCH")]
+    Patch,
+    #[serde(rename = "EXTENSION")]
+    #[display("EXTENSION")]
+    Extension,
 }
 
-/**
-* An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
-pub enum OAuth2GrantTypeUrnIetfParamsOauthDeviceCode {
+#[doc = "Information about an OAuth 2.0 client."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct Oauth2ClientInfo {
+    #[doc = "Value used for [CSRF](https://tools.ietf.org/html/rfc6749#section-10.12) protection via the `state` parameter."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    csrf_token: Option<String>,
+    #[doc = "Code Verifier used for [PKCE]((https://tools.ietf.org/html/rfc7636)) protection via the `code_verifier` parameter. The value must have a minimum length of 43 characters and a maximum length of 128 characters.  Each character must be ASCII alphanumeric or one of the characters \"-\" / \".\" / \"_\" / \"~\"."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pkce_code_verifier: Option<String>,
+    #[doc = "The URL for consent."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    url: Option<String>,
+}
+
+#[doc = "An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum Oauth2GrantType {
     #[serde(rename = "urn:ietf:params:oauth:grant-type:device_code")]
+    #[display("urn:ietf:params:oauth:grant-type:device_code")]
     UrnIetfParamsOauthGrantTypeDeviceCode,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
 }
 
-impl std::fmt::Display for OAuth2GrantTypeUrnIetfParamsOauthDeviceCode {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            OAuth2GrantTypeUrnIetfParamsOauthDeviceCode::UrnIetfParamsOauthGrantTypeDeviceCode => {
-                "urn:ietf:params:oauth:grant-type:device_code"
-            }
-            OAuth2GrantTypeUrnIetfParamsOauthDeviceCode::Noop => "",
-            OAuth2GrantTypeUrnIetfParamsOauthDeviceCode::FallthroughString => "*",
-        }
-        .fmt(f)
+impl Default for Oauth2GrantType {
+    fn default() -> Self {
+        Oauth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode
     }
 }
 
-impl Default for OAuth2GrantTypeUrnIetfParamsOauthDeviceCode {
-    fn default() -> OAuth2GrantTypeUrnIetfParamsOauthDeviceCode {
-        OAuth2GrantTypeUrnIetfParamsOauthDeviceCode::UrnIetfParamsOauthGrantTypeDeviceCode
-    }
-}
-impl std::str::FromStr for OAuth2GrantTypeUrnIetfParamsOauthDeviceCode {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "urn:ietf:params:oauth:grant-type:device_code" {
-            return Ok(
-                OAuth2GrantTypeUrnIetfParamsOauthDeviceCode::UrnIetfParamsOauthGrantTypeDeviceCode,
-            );
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl OAuth2GrantTypeUrnIetfParamsOauthDeviceCode {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, OAuth2GrantTypeUrnIetfParamsOauthDeviceCode::Noop)
-    }
+#[doc = "Output file contents."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct OutputFile {
+    #[doc = "The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for JSON."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    contents: Option<String>,
+    #[doc = "The name of the file."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
 }
 
-/// A payment intent response.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "A payment intent response."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct PaymentIntent {
-    /**
-    * The client secret is used for client-side retrieval using a publishable key. The client secret can be used to complete payment setup from your frontend. It should not be stored, logged, or exposed to anyone other than the customer. Make sure that you have TLS enabled on any page that includes the client secret.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub client_secret: String,
+    #[doc = "The client secret is used for client-side retrieval using a publishable key. The client secret can be used to complete payment setup from your frontend. It should not be stored, logged, or exposed to anyone other than the customer. Make sure that you have TLS enabled on any page that includes the client secret."]
+    #[serde()]
+    client_secret: String,
 }
 
-/**
-* An enum representing the possible values of an `PaymentMethod`'s `type` field.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
+#[doc = "A payment method."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct PaymentMethod {
+    #[doc = "The billing info for the payment method."]
+    #[serde()]
+    billing_info: BillingInfo,
+    #[doc = "The card, if it is one. For our purposes, this is the only type of payment method that we support."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    card: Option<Card>,
+    #[doc = "Time at which the object was created."]
+    #[serde()]
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Unique identifier for the object."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    id: Option<String>,
+    #[doc = "Set of key-value pairs."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    metadata: Option<std::collections::HashMap<String, String>>,
+    #[doc = "The type of payment method."]
+    #[serde(rename = "type")]
+    type_: Type,
+}
+
+#[doc = "Card checks."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct PaymentMethodCardChecks {
+    #[doc = "If a address line1 was provided, results of the check, one of `pass`, `fail`, `unavailable`, or `unchecked`."]
+    #[serde(
+        rename = "address_line1_check",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
+    address_line_1_check: Option<String>,
+    #[doc = "If a address postal code was provided, results of the check, one of `pass`, `fail`, `unavailable`, or `unchecked`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    address_postal_code_check: Option<String>,
+    #[doc = "If a CVC was provided, results of the check, one of `pass`, `fail`, `unavailable`, or `unchecked`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    cvc_check: Option<String>,
+}
+
+#[doc = "An enum representing the possible values of an `PaymentMethod`'s `type` field."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
 pub enum PaymentMethodType {
     #[serde(rename = "card")]
+    #[display("card")]
     Card,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
-}
-
-impl std::fmt::Display for PaymentMethodType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            PaymentMethodType::Card => "card",
-            PaymentMethodType::Noop => "",
-            PaymentMethodType::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
 }
 
 impl Default for PaymentMethodType {
-    fn default() -> PaymentMethodType {
+    fn default() -> Self {
         PaymentMethodType::Card
     }
 }
-impl std::str::FromStr for PaymentMethodType {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "card" {
-            return Ok(PaymentMethodType::Card);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl PaymentMethodType {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, PaymentMethodType::Noop)
-    }
-}
 
-/// A payment method.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default)]
-pub struct PaymentMethod {
-    /**
-    * A payment method.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * The billing information for payments.
-    */
-    #[serde()]
-    pub billing_info: BillingInfo,
-
-    /**
-    * The card, if it is one. For our purposes, this is the only type of payment method that we support.
-    */
+#[doc = "Available plugins per type.\n\n**Note**: Only unmanaged (V1) plugins are included in this list. V1 plugins are \\\"lazily\\\" loaded, and are not returned in this list if there is no resource using the plugin."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct PluginsInfo {
+    #[doc = "Names of available authorization plugins."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub card: Option<CardDetails>,
-
-    /**
-    * Time at which the object was created.
-    */
-    #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * A payment method.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub metadata: String,
-
-    /**
-    * An enum representing the possible values of an `PaymentMethod`'s `type` field.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "PaymentMethodType::is_noop",
-        rename = "type"
-    )]
-    pub type_: PaymentMethodType,
+    authorization: Option<Vec<String>>,
+    #[doc = "Names of available logging-drivers, and logging-driver plugins."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    log: Option<Vec<String>>,
+    #[doc = "Names of available network-drivers, and network-driver plugins."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    network: Option<Vec<String>>,
+    #[doc = "Names of available volume-drivers, and network-driver plugins."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    volume: Option<Vec<String>>,
 }
 
-/**
-* An enum representing the possible values of an `PaymentMethod`'s `type` field.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
-pub enum PaymentMethodTypeCard {
-    #[serde(rename = "card")]
-    Card,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
-}
-
-impl std::fmt::Display for PaymentMethodTypeCard {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            PaymentMethodTypeCard::Card => "card",
-            PaymentMethodTypeCard::Noop => "",
-            PaymentMethodTypeCard::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for PaymentMethodTypeCard {
-    fn default() -> PaymentMethodTypeCard {
-        PaymentMethodTypeCard::Card
-    }
-}
-impl std::str::FromStr for PaymentMethodTypeCard {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "card" {
-            return Ok(PaymentMethodTypeCard::Card);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl PaymentMethodTypeCard {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, PaymentMethodTypeCard::Noop)
-    }
-}
-
-/// The response from the `/ping` endpoint.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "The response from the `/ping` endpoint."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct Pong {
-    /**
-    * The pong response.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub message: String,
+    #[doc = "The pong response."]
+    #[serde()]
+    message: String,
 }
 
-/// An authentication session.
-///
-/// For our UIs, these are automatically created by Next.js.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "RegistryServiceConfig stores daemon registry services configuration."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct RegistryServiceConfig {
+    #[doc = "List of IP ranges to which nondistributable artifacts can be pushed, using the CIDR syntax [RFC 4632](https://tools.ietf.org/html/4632).  Some images (for example, Windows base images) contain artifacts whose distribution is restricted by license. When these images are pushed to a registry, restricted artifacts are not included.  This configuration override this behavior, and enables the daemon to push nondistributable artifacts to all registries whose resolved IP address is within the subnet described by the CIDR syntax.  This option is useful when pushing images containing nondistributable artifacts to a registry on an air-gapped network so hosts on that network can pull the images without connecting to another server.\n\n**Warning**: Nondistributable artifacts typically have restrictions on how and where they can be distributed and shared. Only use this feature to push artifacts to private registries and ensure that you are in compliance with any terms that cover redistributing nondistributable artifacts."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    allow_nondistributable_artifacts_cid_rs: Option<Vec<String>>,
+    #[doc = "List of registry hostnames to which nondistributable artifacts can be pushed, using the format `<hostname>[:<port>]` or `<IP address>[:<port>]`.  Some images (for example, Windows base images) contain artifacts whose distribution is restricted by license. When these images are pushed to a registry, restricted artifacts are not included.  This configuration override this behavior for the specified registries.  This option is useful when pushing images containing nondistributable artifacts to a registry on an air-gapped network so hosts on that network can pull the images without connecting to another server.\n\n**Warning**: Nondistributable artifacts typically have restrictions on how and where they can be distributed and shared. Only use this feature to push artifacts to private registries and ensure that you are in compliance with any terms that cover redistributing nondistributable artifacts."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    allow_nondistributable_artifacts_hostnames: Option<Vec<String>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    index_configs: Option<std::collections::HashMap<String, IndexInfo>>,
+    #[doc = "List of IP ranges of insecure registries, using the CIDR syntax ([RFC 4632](https://tools.ietf.org/html/4632)). Insecure registries accept un-encrypted (HTTP) and/or untrusted (HTTPS with certificates from unknown CAs) communication.  By default, local registries (`127.0.0.0/8`) are configured as insecure. All other registries are secure. Communicating with an insecure registry is not possible if the daemon assumes that registry is secure.  This configuration override this behavior, insecure communication with registries whose resolved IP address is within the subnet described by the CIDR syntax.  Registries can also be marked insecure by hostname. Those registries are listed under `IndexConfigs` and have their `Secure` field set to `false`.\n\n**Warning**: Using this option can be useful when running a local  registry, but introduces security vulnerabilities. This option should therefore ONLY be used for testing purposes. For increased security, users should add their CA to their system's list of trusted CAs instead of enabling this option."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    insecure_registry_cid_rs: Option<Vec<String>>,
+    #[doc = "List of registry URLs that act as a mirror for the official (`docker.io`) registry."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    mirrors: Option<Vec<String>>,
+}
+
+#[doc = "Runtime describes an [OCI compliant](https://github.com/opencontainers/runtime-spec) runtime.  The runtime is invoked by the daemon via the `containerd` daemon. OCI runtimes act as an interface to the Linux kernel namespaces, cgroups, and SELinux."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct Runtime {
+    #[doc = "Name and, optional, path, of the OCI executable binary.  If the path is omitted, the daemon searches the host's `$PATH` for the binary and uses the first result."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    path: Option<String>,
+    #[doc = "List of command-line arguments to pass to the runtime when invoked."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    runtime_args: Option<Vec<String>>,
+}
+
+#[doc = "An authentication session.\n\nFor our UIs, these are automatically created by Next.js."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct Session {
-    /**
-    * An authentication session.
-    *  
-    *  For our UIs, these are automatically created by Next.js.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * The date and time the session was created.
-    */
+    #[doc = "The date and time the session was created."]
     #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The date and time the session expires.
-    */
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The date and time the session expires."]
     #[serde()]
-    pub expires: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub session_token: String,
-
-    /**
-    * The date and time the session was last updated.
-    */
+    expires: chrono::DateTime<chrono::Utc>,
+    #[doc = "The unique identifier for the session."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    id: Option<String>,
+    #[doc = "The session token."]
     #[serde()]
-    pub updated_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * An authentication session.
-    *  
-    *  For our UIs, these are automatically created by Next.js.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub user_id: String,
+    session_token: uuid::Uuid,
+    #[doc = "The date and time the session was last updated."]
+    #[serde()]
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user that the session belongs to."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    user_id: Option<String>,
 }
 
-/**
-* The valid types of metric unit formats.
-*/
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Tabled, clap::ValueEnum)]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum SystemInfoCgroupDriverEnum {
+    #[serde(rename = "")]
+    #[display("")]
+    Empty,
+    #[serde(rename = "cgroupfs")]
+    #[display("cgroupfs")]
+    Cgroupfs,
+    #[serde(rename = "systemd")]
+    #[display("systemd")]
+    Systemd,
+    #[serde(rename = "none")]
+    #[display("none")]
+    None,
+}
+
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum SystemInfoCgroupVersionEnum {
+    #[serde(rename = "")]
+    #[display("")]
+    Empty,
+    #[serde(rename = "1")]
+    #[display("1")]
+    One,
+    #[serde(rename = "2")]
+    #[display("2")]
+    Two,
+}
+
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct SystemInfoDefaultAddressPools {
+    #[doc = "The network address in CIDR format"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    base: Option<String>,
+    #[doc = "The network pool size"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    size: Option<i64>,
+}
+
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum SystemInfoIsolationEnum {
+    #[serde(rename = "")]
+    #[display("")]
+    Empty,
+    #[serde(rename = "default")]
+    #[display("default")]
+    Default,
+    #[serde(rename = "hyperv")]
+    #[display("hyperv")]
+    Hyperv,
+    #[serde(rename = "process")]
+    #[display("process")]
+    Process,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct UnitConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    #[serde()]
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[serde()]
+    id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    #[serde()]
+    output_format: OutputFormat,
+    #[doc = "The source format of the unit conversion."]
+    #[serde()]
+    src_format: SrcFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    #[serde()]
+    status: Status,
+    #[doc = "The time and date the unit conversion was last updated."]
+    #[serde()]
+    updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    user_id: Option<String>,
+}
+
+#[doc = "The valid types of metric unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
 pub enum UnitMetricFormat {
     #[serde(rename = "atto")]
+    #[display("atto")]
     Atto,
-    #[serde(rename = "centi")]
-    Centi,
-    #[serde(rename = "deca")]
-    Deca,
-    #[serde(rename = "deci")]
-    Deci,
-    #[serde(rename = "exa")]
-    Exa,
     #[serde(rename = "femto")]
+    #[display("femto")]
     Femto,
-    #[serde(rename = "giga")]
-    Giga,
-    #[serde(rename = "hecto")]
-    Hecto,
-    #[serde(rename = "kilo")]
-    Kilo,
-    #[serde(rename = "mega")]
-    Mega,
-    #[serde(rename = "metric_unit")]
-    MetricUnit,
+    #[serde(rename = "pico")]
+    #[display("pico")]
+    Pico,
+    #[serde(rename = "nano")]
+    #[display("nano")]
+    Nano,
     #[serde(rename = "micro")]
+    #[display("micro")]
     Micro,
     #[serde(rename = "milli")]
+    #[display("milli")]
     Milli,
-    #[serde(rename = "nano")]
-    Nano,
-    #[serde(rename = "peta")]
-    Peta,
-    #[serde(rename = "pico")]
-    Pico,
+    #[serde(rename = "centi")]
+    #[display("centi")]
+    Centi,
+    #[serde(rename = "deci")]
+    #[display("deci")]
+    Deci,
+    #[serde(rename = "metric_unit")]
+    #[display("metric_unit")]
+    MetricUnit,
+    #[serde(rename = "deca")]
+    #[display("deca")]
+    Deca,
+    #[serde(rename = "hecto")]
+    #[display("hecto")]
+    Hecto,
+    #[serde(rename = "kilo")]
+    #[display("kilo")]
+    Kilo,
+    #[serde(rename = "mega")]
+    #[display("mega")]
+    Mega,
+    #[serde(rename = "giga")]
+    #[display("giga")]
+    Giga,
     #[serde(rename = "tera")]
+    #[display("tera")]
     Tera,
-    #[serde(rename = "")]
-    Noop,
-    #[serde(other)]
-    FallthroughString,
+    #[serde(rename = "peta")]
+    #[display("peta")]
+    Peta,
+    #[serde(rename = "exa")]
+    #[display("exa")]
+    Exa,
 }
 
-impl std::fmt::Display for UnitMetricFormat {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &*self {
-            UnitMetricFormat::Atto => "atto",
-            UnitMetricFormat::Centi => "centi",
-            UnitMetricFormat::Deca => "deca",
-            UnitMetricFormat::Deci => "deci",
-            UnitMetricFormat::Exa => "exa",
-            UnitMetricFormat::Femto => "femto",
-            UnitMetricFormat::Giga => "giga",
-            UnitMetricFormat::Hecto => "hecto",
-            UnitMetricFormat::Kilo => "kilo",
-            UnitMetricFormat::Mega => "mega",
-            UnitMetricFormat::MetricUnit => "metric_unit",
-            UnitMetricFormat::Micro => "micro",
-            UnitMetricFormat::Milli => "milli",
-            UnitMetricFormat::Nano => "nano",
-            UnitMetricFormat::Peta => "peta",
-            UnitMetricFormat::Pico => "pico",
-            UnitMetricFormat::Tera => "tera",
-            UnitMetricFormat::Noop => "",
-            UnitMetricFormat::FallthroughString => "*",
-        }
-        .fmt(f)
-    }
-}
-
-impl Default for UnitMetricFormat {
-    fn default() -> UnitMetricFormat {
-        UnitMetricFormat::Atto
-    }
-}
-impl std::str::FromStr for UnitMetricFormat {
-    type Err = anyhow::Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "atto" {
-            return Ok(UnitMetricFormat::Atto);
-        }
-        if s == "centi" {
-            return Ok(UnitMetricFormat::Centi);
-        }
-        if s == "deca" {
-            return Ok(UnitMetricFormat::Deca);
-        }
-        if s == "deci" {
-            return Ok(UnitMetricFormat::Deci);
-        }
-        if s == "exa" {
-            return Ok(UnitMetricFormat::Exa);
-        }
-        if s == "femto" {
-            return Ok(UnitMetricFormat::Femto);
-        }
-        if s == "giga" {
-            return Ok(UnitMetricFormat::Giga);
-        }
-        if s == "hecto" {
-            return Ok(UnitMetricFormat::Hecto);
-        }
-        if s == "kilo" {
-            return Ok(UnitMetricFormat::Kilo);
-        }
-        if s == "mega" {
-            return Ok(UnitMetricFormat::Mega);
-        }
-        if s == "metric_unit" {
-            return Ok(UnitMetricFormat::MetricUnit);
-        }
-        if s == "micro" {
-            return Ok(UnitMetricFormat::Micro);
-        }
-        if s == "milli" {
-            return Ok(UnitMetricFormat::Milli);
-        }
-        if s == "nano" {
-            return Ok(UnitMetricFormat::Nano);
-        }
-        if s == "peta" {
-            return Ok(UnitMetricFormat::Peta);
-        }
-        if s == "pico" {
-            return Ok(UnitMetricFormat::Pico);
-        }
-        if s == "tera" {
-            return Ok(UnitMetricFormat::Tera);
-        }
-        anyhow::bail!("invalid string: {}", s);
-    }
-}
-impl UnitMetricFormat {
-    pub fn is_noop(&self) -> bool {
-        matches!(self, UnitMetricFormat::Noop)
-    }
-}
-
-/// A unit conversion.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
-pub struct UnitConversion {
-    /**
-    * A uuid.
-    *  
-    *  A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * The time and date the unit conversion was completed.
-    */
-    #[serde()]
-    pub completed_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The time and date the unit conversion was created.
-    */
-    #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The error the function returned, if any.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub error: String,
-
-    /**
-    * A unit conversion.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub input: f64,
-
-    /**
-    * The resulting value.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "crate::utils::zero_f64",
-        deserialize_with = "crate::utils::deserialize_null_f64::deserialize"
-    )]
-    pub output: f64,
-
-    /**
-    * The valid types of metric unit formats.
-    */
-    #[serde(default, skip_serializing_if = "UnitMetricFormat::is_noop")]
-    pub output_format: UnitMetricFormat,
-
-    /**
-    * The valid types of metric unit formats.
-    */
-    #[serde(default, skip_serializing_if = "UnitMetricFormat::is_noop")]
-    pub src_format: UnitMetricFormat,
-
-    /**
-    * The time and date the unit conversion was started.
-    */
-    #[serde()]
-    pub started_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The status of an async API call.
-    */
-    #[serde(default, skip_serializing_if = "ApiCallStatus::is_noop")]
-    pub status: ApiCallStatus,
-
-    /**
-    * The time and date the unit conversion was last updated.
-    */
-    #[serde()]
-    pub updated_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * A unit conversion.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub user_id: String,
-}
-
-/// The user-modifiable parts of a User.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "The user-modifiable parts of a User."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct UpdateUser {
-    /**
-    * The user-modifiable parts of a User.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub company: String,
-
-    /**
-    * The user-modifiable parts of a User.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub discord: String,
-
-    /**
-    * The user-modifiable parts of a User.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub first_name: String,
-
-    /**
-    * The user-modifiable parts of a User.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub github: String,
-
-    /**
-    * The user-modifiable parts of a User.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub last_name: String,
-
-    /**
-    * The user-modifiable parts of a User.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub phone: String,
+    #[doc = "The user's company."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    company: Option<String>,
+    #[doc = "The user's Discord handle."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    discord: Option<String>,
+    #[doc = "The user's first name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    first_name: Option<String>,
+    #[doc = "The user's GitHub handle."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    github: Option<String>,
+    #[doc = "The user's last name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    last_name: Option<String>,
+    #[doc = "The user's phone number."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    phone: Option<String>,
 }
 
-/// A user.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "A user."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct User {
-    /**
-    * A user.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * A user.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub name: String,
-
-    /**
-    * A user.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub company: String,
-
-    /**
-    * The date and time the user was created.
-    */
+    #[doc = "The user's company."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    company: Option<String>,
+    #[doc = "The date and time the user was created."]
     #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * A user.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub discord: String,
-
-    /**
-    * A user.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub email: String,
-
-    /**
-    * The date and time the email address was verified.
-    */
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user's Discord handle."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    discord: Option<String>,
+    #[doc = "The email address of the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    email: Option<String>,
+    #[doc = "The date and time the email address was verified."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    email_verified: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The user's first name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    first_name: Option<String>,
+    #[doc = "The user's GitHub handle."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    github: Option<String>,
+    #[doc = "The unique identifier for the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    id: Option<String>,
+    #[doc = "The image avatar for the user. This is a URL."]
     #[serde()]
-    pub email_verified: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * A user.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub first_name: String,
-
-    /**
-    * A user.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub github: String,
-
-    /**
-    * The image avatar for the user. This is a URL.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        deserialize_with = "crate::utils::deserialize_empty_url::deserialize"
-    )]
-    #[tabled(skip)]
-    pub image: Option<url::Url>,
-
-    /**
-    * A user.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub last_name: String,
-
-    /**
-    * A user.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub phone: String,
-
-    /**
-    * The date and time the user was last updated.
-    */
+    image: url::Url,
+    #[doc = "The user's last name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    last_name: Option<String>,
+    #[doc = "The name of the user. This is auto populated at first from the authentication provider (if there was a name). It can be updated by the user by updating their `first_name` and `last_name` fields."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[doc = "The user's phone number."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    phone: Option<String>,
+    #[doc = "The date and time the user was last updated."]
     #[serde()]
-    pub updated_at: crate::utils::DisplayOptionDateTime,
+    updated_at: chrono::DateTime<chrono::Utc>,
 }
 
-/// A single page of results
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct UserResultsPage {
-    /**
-    * list of items on this page of results
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "Vec::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_vector::deserialize"
-    )]
-    #[tabled(skip)]
-    pub items: Vec<User>,
-
-    /**
-    * token used to fetch the next page of results (if any)
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub next_page: String,
+    #[doc = "list of items on this page of results"]
+    #[serde()]
+    items: Vec<User>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    next_page: Option<String>,
 }
 
-/// A verification token for a user.
-///
-/// This is typically used to verify a user's email address.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema, Default, Tabled)]
+#[doc = "A verification token for a user.\n\nThis is typically used to verify a user's email address."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
 pub struct VerificationToken {
-    /**
-    * A verification token for a user.
-    *  
-    *  This is typically used to verify a user's email address.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub id: String,
-
-    /**
-    * The date and time the verification token was created.
-    */
+    #[doc = "The date and time the verification token was created."]
     #[serde()]
-    pub created_at: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * The date and time the verification token expires.
-    */
+    created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The date and time the verification token expires."]
     #[serde()]
-    pub expires: crate::utils::DisplayOptionDateTime,
-
-    /**
-    * A verification token for a user.
-    *  
-    *  This is typically used to verify a user's email address.
-    */
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
-    )]
-    pub identifier: String,
-
-    /**
-    * The date and time the verification token was last updated.
-    */
+    expires: chrono::DateTime<chrono::Utc>,
+    #[doc = "The token used for verification. This is used as the id for the table since it is unique per record."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    id: Option<String>,
+    #[doc = "The identifier for the user. This is typically the user's email address since that is what we are verifying."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    identifier: Option<String>,
+    #[doc = "The date and time the verification token was last updated."]
     #[serde()]
-    pub updated_at: crate::utils::DisplayOptionDateTime,
+    updated_at: chrono::DateTime<chrono::Utc>,
 }
-
-/// A uuid.
-///
-/// A Version 4 UUID is a universally unique identifier that is generated using random numbers.
-pub type Uuid = String;

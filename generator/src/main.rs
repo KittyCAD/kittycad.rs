@@ -1,9 +1,6 @@
 mod client;
 mod functions;
 mod template;
-mod types;
-mod types_templates;
-mod utils;
 
 use std::{
     collections::{BTreeMap, HashMap, HashSet},
@@ -3186,17 +3183,9 @@ rustdoc-args = ["--cfg", "docsrs"]
             save(librs, lib.as_str())?;
 
             /*
-             * Create the Rust utils module:
-             */
-            let utils = utils::generate_utils();
-            let mut utilsrs = src.clone();
-            utilsrs.push("utils.rs");
-            save(utilsrs, utils.as_str())?;
-
-            /*
              * Create the Rust source types file containing the generated types:
              */
-            let types = types::generate_types(&api, &mut ts)?;
+            let types = types::generate_types(&api)?;
             let mut typesrs = src.clone();
             typesrs.push("types.rs");
             save(typesrs, types.as_str())?;

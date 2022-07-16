@@ -23,6 +23,8 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
     let mut rendered = quote!(
         //! This module contains the generated types for the library.
 
+        use tabled::Tabled;
+
         #base64_mod
     );
 
