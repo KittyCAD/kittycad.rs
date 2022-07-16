@@ -9,11 +9,12 @@ pub mod types;
 #[macro_use]
 extern crate quote;
 
-use std::{fs, io::Write};
+use std::io::Write;
 
 use anyhow::Result;
 use clap::Parser;
 use slog::Drain;
+use tokio::fs;
 
 use crate::types::exts::ReferenceOrExt;
 
@@ -33,28 +34,25 @@ where
     Ok(())
 }
 
-/// Load a file.
-fn load<P, T>(p: P) -> Result<T>
-where
-    P: AsRef<std::path::Path>,
-    for<'de> T: serde::Deserialize<'de>,
-{
-    let p = p.as_ref();
-    let f = fs::File::open(p)?;
-    if let Some(ext) = p.extension() {
-        if ext == std::ffi::OsStr::new("yaml") || ext == std::ffi::OsStr::new("yml") {
-            return Ok(serde_yaml::from_reader(f)?);
-        }
-    }
-    Ok(serde_json::from_reader(f)?)
+/// Parse an OpenAPI v3 spec JSON string as an OpenAPI struct.
+pub fn load_json_spec(s: &str) -> Result<openapiv3::OpenAPI> {
+    serde_json::from_str(s).map_err(|e| anyhow::anyhow!(e))
 }
 
-/// Load an OpenAPI spec.
-pub fn load_api<P>(p: P) -> Result<openapiv3::OpenAPI>
+/// Parse a file as an OpenAPI spec.
+pub async fn load_api<P>(p: P) -> Result<openapiv3::OpenAPI>
 where
     P: AsRef<std::path::Path>,
 {
-    load(p)
+    let p = p.as_ref();
+    // Read the file into a string.
+    let contents = fs::read_to_string(p).await?;
+    if let Some(ext) = p.extension() {
+        if ext == std::ffi::OsStr::new("yaml") || ext == std::ffi::OsStr::new("yml") {
+            return Ok(serde_yaml::from_str(&contents)?);
+        }
+    }
+    Ok(load_json_spec(&contents)?)
 }
 
 fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
@@ -71,8 +69,15 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
     a("#![allow(missing_docs)]"); // TODO: Make this a deny.
     a("#![cfg_attr(docsrs, feature(doc_cfg))]");
     a("");
-    a("#[cfg(test)]");
-    a("mod tests;");
+
+    // Write our persistent modules.
+    for module in persistent_modules() {
+        if module == "tests" {
+            a("#[cfg(test)]");
+        }
+        a(&format!("mod {};", module));
+    }
+
     // Hopefully there is never a "tag" named after these reserved libs.
     a("pub mod types;");
     a("#[doc(hidden)]");
@@ -97,8 +102,6 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
                 })?;
 
                 // Add our tag to our vector.
-                // TODO: there is some repeated code above w functions.rs we could probably
-                // clean up.
                 tags_with_paths.push(tag.to_string());
 
                 Ok(())
@@ -202,12 +205,12 @@ fn clean_tag_name(s: &str) -> String {
 }
 
 /// Generate the client library.
-pub fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
+pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     // Generate the client.
     let out = crate::internal_generate(spec, opts)?;
 
     // Create the top-level crate directory:
-    fs::create_dir_all(&opts.output)?;
+    fs::create_dir_all(&opts.output).await?;
 
     // Write the Cargo.toml file:
     let mut toml = opts.output.clone();
@@ -296,7 +299,34 @@ rustdoc-args = ["--cfg", "docsrs"]
     // Create the src/ directory.
     let mut src = opts.output.clone();
     src.push("src");
-    fs::create_dir_all(&src)?;
+    fs::create_dir_all(&src).await?;
+
+    // Clean up any old files we might have.
+    // Walk the src/ directory and delete any files that aren't a persistent module.
+    let mut src_list = fs::read_dir(&src).await?;
+    while let Some(file) = src_list.next_entry().await? {
+        // Return early if it is a directory.
+        if file.file_type().await?.is_dir() {
+            continue;
+        }
+        // Get the file name.
+        let file_name = file
+            .file_name()
+            .to_str()
+            .ok_or_else(|| {
+                anyhow::anyhow!("failed to get file name for {}", file.path().display())
+            })?
+            .trim_end_matches(".rs")
+            .to_string();
+
+        let persistent_modules = persistent_modules();
+        if persistent_modules.contains(&file_name) {
+            continue;
+        }
+
+        println!("Deleting {} {}", file.path().display(), file_name);
+        // Delete the file.
+    }
 
     // Create the Rust source file containing the generated client.
     let lib = format!("{}\n{}", docs, out);
@@ -310,47 +340,34 @@ rustdoc-args = ["--cfg", "docsrs"]
     typesrs.push("types.rs");
     crate::save(typesrs, types.as_str())?;
 
-    // TODO: cleanup old tag files.
-
     // Create the Rust source files for each of the tags functions.
-    match crate::functions::generate_files(spec) {
-        Ok(files) => {
-            // We have a map of our files, let's write to them.
-            for (f, content) in files {
-                let mut tagrs = src.clone();
-                tagrs.push(format!("{}.rs", crate::clean_tag_name(&f)));
+    let files = crate::functions::generate_files(spec)?;
+    // We have a map of our files, let's write to them.
+    for (f, content) in files {
+        let mut tagrs = src.clone();
+        tagrs.push(format!("{}.rs", f));
+        let proper_tag_name = crate::types::proper_name(&f);
+        let proper_tag_name_ident = format_ident!("{}", proper_tag_name);
 
-                let output = format!(
-                    r#"use anyhow::Result;
+        let output = quote! {
+            use anyhow::Result;
 
             use crate::Client;
 
-            pub struct {} {{
+            pub struct #proper_tag_name_ident {
                 pub client: Client,
-            }}
-
-            impl {} {{
-                #[doc(hidden)]
-                pub fn new(client: Client) -> Self
-                {{
-                    {} {{
-                        client,
-                    }}
-                }}
-
-                {}
-            }}"#,
-                    crate::types::proper_name(&f),
-                    crate::types::proper_name(&f),
-                    crate::types::proper_name(&f),
-                    content,
-                );
-                crate::save(tagrs, output.as_str())?;
             }
-        }
-        Err(e) => {
-            println!("generate_files fail: {:?}", e);
-        }
+
+            impl #proper_tag_name_ident {
+                #[doc(hidden)]
+                pub fn new(client: Client) -> Self {
+                    Self { client }
+                }
+
+                #content
+            }
+        };
+        crate::save(tagrs, &crate::types::get_text_fmt(&output)?)?;
     }
 
     Ok(())
@@ -426,4 +443,10 @@ impl Opts {
         let async_drain = slog_async::Async::new(level_drain).build().fuse();
         slog::Logger::root(async_drain, slog::o!())
     }
+}
+
+/// Return a list of the persistent modules.
+/// These are modules we do not nuke at generation time.
+fn persistent_modules() -> Vec<String> {
+    vec!["tests".to_string()]
 }

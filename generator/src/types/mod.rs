@@ -1078,11 +1078,6 @@ pub fn get_text_fmt(output: &proc_macro2::TokenStream) -> Result<String> {
     Ok(clean_text(&content))
 }
 
-/// Parse an OpenAPI v3 spec JSON string as an OpenAPI struct.
-pub fn load_spec(s: &str) -> Result<openapiv3::OpenAPI> {
-    serde_json::from_str(s).map_err(|e| anyhow::anyhow!(e))
-}
-
 fn get_base64_mod() -> Result<proc_macro2::TokenStream> {
     let file = include_str!("base64.rs");
     let stream = proc_macro2::TokenStream::from_str(file).map_err(|e| anyhow::anyhow!("{}", e))?;

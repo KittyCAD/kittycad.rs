@@ -1,7 +1,5 @@
-use anyhow::Result;
-
 use crate::Client;
-
+use anyhow::Result;
 pub struct Meta {
     pub client: Client,
 }
@@ -9,7 +7,7 @@ pub struct Meta {
 impl Meta {
     #[doc(hidden)]
     pub fn new(client: Client) -> Self {
-        Meta { client }
+        Self { client }
     }
 
     #[doc = "Get OpenAPI schema."]
@@ -33,6 +31,7 @@ impl Meta {
             ))
         }
     }
+
     #[doc = "Get the metadata about our currently running server.\n\nThis includes information on any of our other distributed systems it is connected to.\nYou must be a KittyCAD employee to perform this request."]
     pub async fn get_metadata(&self) -> Result<crate::types::Metadata> {
         let mut req = self.client.client.request(
@@ -54,6 +53,7 @@ impl Meta {
             ))
         }
     }
+
     #[doc = "Return pong."]
     pub async fn ping(&self) -> Result<crate::types::Pong> {
         let mut req = self.client.client.request(

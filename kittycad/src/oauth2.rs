@@ -1,7 +1,5 @@
-use anyhow::Result;
-
 use crate::Client;
-
+use anyhow::Result;
 pub struct Oauth2 {
     pub client: Client,
 }
@@ -9,7 +7,7 @@ pub struct Oauth2 {
 impl Oauth2 {
     #[doc(hidden)]
     pub fn new(client: Client) -> Self {
-        Oauth2 { client }
+        Self { client }
     }
 
     #[doc = "Start an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint is designed to be accessed from an *unauthenticated* API client. It generates and records a `device_code` and `user_code` which must be verified and confirmed prior to a token being granted."]
@@ -36,6 +34,7 @@ impl Oauth2 {
             ))
         }
     }
+
     #[doc = "Confirm an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/oauth2/device/token`."]
     pub async fn device_auth_confirm(
         &self,
@@ -60,6 +59,7 @@ impl Oauth2 {
             ))
         }
     }
+
     #[doc = "Request a device access token.\n\nThis endpoint should be polled by the client until the user code is verified and the grant is confirmed."]
     pub async fn device_access_token(
         &self,
@@ -84,6 +84,7 @@ impl Oauth2 {
             ))
         }
     }
+
     #[doc = "Verify an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website."]
     pub async fn device_auth_verify(&self, user_code: String) -> Result<()> {
         let mut req = self.client.client.request(
@@ -107,6 +108,7 @@ impl Oauth2 {
             ))
         }
     }
+
     #[doc = "Listen for callbacks for the OAuth 2.0 provider."]
     pub async fn listen_provider_callback(
         &self,
@@ -128,9 +130,11 @@ impl Oauth2 {
         if let Some(p) = code {
             query_params.push(("code", p));
         }
+
         if let Some(p) = state {
             query_params.push(("state", p));
         }
+
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -145,6 +149,7 @@ impl Oauth2 {
             ))
         }
     }
+
     #[doc = "Get the consent URL and other information for the OAuth 2.0 provider."]
     pub async fn listen_provider_consent(
         &self,
@@ -165,6 +170,7 @@ impl Oauth2 {
         if let Some(p) = callback_url {
             query_params.push(("callback_url", p));
         }
+
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();

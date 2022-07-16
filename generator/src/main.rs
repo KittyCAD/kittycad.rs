@@ -1,7 +1,8 @@
 use anyhow::Result;
 use clap::Parser;
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     // Parse the command line arguments.
     let opts = generator::Opts::parse();
 
@@ -13,10 +14,10 @@ fn main() -> Result<()> {
     slog_stdlog::init()?;
 
     // Let's read the spec from the file.
-    let spec = generator::load_api(&opts.input)?;
+    let spec = generator::load_api(&opts.input).await?;
 
     // Generate the library.
-    generator::generate(&spec, &opts)?;
+    generator::generate(&spec, &opts).await?;
 
     Ok(())
 }
