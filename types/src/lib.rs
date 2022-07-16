@@ -213,12 +213,39 @@ fn render_enum(
         );
     }
 
+    // If the data for the enum has a default value, implement default for the enum.
+    let default = if let Some(default) = &data.default {
+        let default = default.to_string();
+        let default = format_ident!("{}", struct_name(&default));
+        quote!(
+            impl Default for #enum_name {
+                fn default() -> Self {
+                    #default
+                }
+            }
+        )
+    } else if s.enumeration.len() == 1 {
+        let default = s.enumeration[0].as_ref().unwrap().to_string();
+        let default = format_ident!("{}", struct_name(&default));
+        quote!(
+            impl Default for #enum_name {
+                fn default() -> Self {
+                    #enum_name::#default
+                }
+            }
+        )
+    } else {
+        quote!()
+    };
+
     let rendered = quote! {
         #description
         #[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Hash, Debug, Clone, schemars::JsonSchema, tabled::Tabled, clap::ValueEnum, parse_display::FromStr, parse_display::Display)]
         pub enum #enum_name {
             #values
         }
+
+        #default
     };
 
     Ok(rendered)

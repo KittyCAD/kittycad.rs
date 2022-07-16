@@ -792,6 +792,12 @@ pub enum Oauth2GrantType {
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
 
+impl Default for Oauth2GrantType {
+    fn default() -> Self {
+        Oauth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode
+    }
+}
+
 #[doc = "An enum representing the possible values of an `PaymentMethod`'s `type` field."]
 #[derive(
     serde :: Serialize,
@@ -811,6 +817,12 @@ pub enum PaymentMethodType {
     #[serde(rename = "card")]
     #[display("card")]
     Card,
+}
+
+impl Default for PaymentMethodType {
+    fn default() -> Self {
+        PaymentMethodType::Card
+    }
 }
 
 #[derive(
