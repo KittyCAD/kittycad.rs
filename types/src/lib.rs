@@ -593,11 +593,12 @@ fn render_one_of(
         );
     }
 
+    // TODO: tabled
     let rendered = quote! {
         #additional_types
 
         #description
-        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Hash, Debug, Clone, schemars::JsonSchema, tabled::Tabled)]
+        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema)]
         #serde_options
         pub enum #one_of_name {
             #values
@@ -684,7 +685,7 @@ fn render_object(
         let prop_ident = format_ident!("{}", prop);
 
         let prop_value = quote!(
-            #prop_ident: #type_name,
+            pub #prop_ident: #type_name,
         );
 
         let type_name_text = get_text(&type_name)?;
@@ -716,7 +717,7 @@ fn render_object(
     // TODO: tabled
     let rendered = quote! {
         #description
-        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone, schemars::JsonSchema)]
+        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema)]
         pub struct #struct_name {
             #values
         }
