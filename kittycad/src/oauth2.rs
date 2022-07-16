@@ -38,7 +38,7 @@ impl Oauth2 {
     }
 
     #[doc = "Get the consent URL and other information for the OAuth 2.0 provider."]
-    pub fn listen_provider_consent(&self) -> Result<Oauth2ClientInfo> {
+    pub fn listen_provider_consent(&self) -> Result<crate::types::Oauth2ClientInfo> {
         todo!()
     }
 }

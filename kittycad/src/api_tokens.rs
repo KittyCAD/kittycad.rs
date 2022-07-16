@@ -16,19 +16,19 @@ use anyhow::Result;
                 }
 
                 #[doc = "List API tokens for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first."]
-pub fn list_for_user(&self) -> Result<ApiTokenResultsPage> {
+pub fn list_for_user(&self) -> Result<crate::types::ApiTokenResultsPage> {
     todo!()
 }
 
 
 #[doc = "Create a new API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It creates a new API token for the authenticated user."]
-pub fn create_api_token_for_user(&self) -> Result<ApiToken> {
+pub fn create_api_token_for_user(&self) -> Result<crate::types::ApiToken> {
     todo!()
 }
 
 
 #[doc = "Get an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user."]
-pub fn get_api_token_for_user(&self) -> Result<ApiToken> {
+pub fn get_api_token_for_user(&self) -> Result<crate::types::ApiToken> {
     todo!()
 }
 

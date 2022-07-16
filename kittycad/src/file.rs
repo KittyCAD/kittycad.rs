@@ -13,7 +13,7 @@ impl File {
     }
 
     #[doc = "Convert CAD file.\n\nConvert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\nIf the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint."]
-    pub fn create_conversion(&self) -> Result<FileConversion> {
+    pub fn create_conversion(&self) -> Result<crate::types::FileConversion> {
         todo!()
     }
 
@@ -23,22 +23,22 @@ impl File {
     }
 
     #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint."]
-    pub fn create_density(&self) -> Result<FileDensity> {
+    pub fn create_density(&self) -> Result<crate::types::FileDensity> {
         todo!()
     }
 
     #[doc = "Execute a KittyCAD program in a specific language."]
-    pub fn create_execution(&self) -> Result<CodeOutput> {
+    pub fn create_execution(&self) -> Result<crate::types::CodeOutput> {
         todo!()
     }
 
     #[doc = "Get CAD file mass.\n\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint."]
-    pub fn create_mass(&self) -> Result<FileMass> {
+    pub fn create_mass(&self) -> Result<crate::types::FileMass> {
         todo!()
     }
 
     #[doc = "Get CAD file volume.\n\nGet the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint."]
-    pub fn create_volume(&self) -> Result<FileVolume> {
+    pub fn create_volume(&self) -> Result<crate::types::FileVolume> {
         todo!()
     }
 

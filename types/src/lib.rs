@@ -441,7 +441,12 @@ fn get_type_name_for_object(
     // We have an object type.
     // Get the name for the object.
     let ident = get_type_name(name, data)?;
-    Ok(quote!(#ident))
+    let t = if in_crate {
+        quote!(#ident)
+    } else {
+        quote!(crate::types::#ident)
+    };
+    Ok(t)
 }
 
 /// Get the type name for an array type.

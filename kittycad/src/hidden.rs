@@ -13,7 +13,7 @@ impl Hidden {
     }
 
     #[doc = "Create an email verification request for a user."]
-    pub fn listen_auth_email(&self) -> Result<VerificationToken> {
+    pub fn listen_auth_email(&self) -> Result<crate::types::VerificationToken> {
         todo!()
     }
 

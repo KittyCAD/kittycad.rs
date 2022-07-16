@@ -18,12 +18,12 @@ impl Meta {
     }
 
     #[doc = "Get the metadata about our currently running server.\n\nThis includes information on any of our other distributed systems it is connected to.\nYou must be a KittyCAD employee to perform this request."]
-    pub fn get_metadata(&self) -> Result<Metadata> {
+    pub fn get_metadata(&self) -> Result<crate::types::Metadata> {
         todo!()
     }
 
     #[doc = "Return pong."]
-    pub fn ping(&self) -> Result<Pong> {
+    pub fn ping(&self) -> Result<crate::types::Pong> {
         todo!()
     }
 }
