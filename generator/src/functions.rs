@@ -71,7 +71,7 @@ pub fn generate_files(
             };
 
             // Get the function body.
-            let function_body = get_function_body(name, method, op, spec)?;
+            let function_body = get_function_body(name, method, op, spec, false)?;
 
             let function = quote! {
                 #[doc = #docs]
@@ -96,7 +96,7 @@ pub fn generate_files(
                         let n = format_ident!("{}", k);
                         quote!(#n)
                     });
-                    quote!(#(#a),*)
+                    quote!(#(#a.clone()),*)
                 };
 
                 // Check if we have a body as an arg.
@@ -106,6 +106,8 @@ pub fn generate_files(
                     quote!(,body)
                 };
 
+                let paginated_function_body = get_function_body(name, method, op, spec, true)?;
+
                 let function = quote! {
                     #[doc = #docs]
                     pub async fn #stream_fn_name_ident(&self #args #request_body) -> Result<#response_type> {
@@ -114,7 +116,9 @@ pub fn generate_files(
                         // Get the result from our other function.
                         let mut result = self.#fn_name_ident(#inner_args #body_arg).await?;
                         if result.has_more_pages()? {
-                            todo!()
+                            result = {
+                                #paginated_function_body
+                            }?;
                         }
 
                         Ok(result)
@@ -397,6 +401,7 @@ fn get_function_body(
     method: &http::Method,
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
+    paginated: bool,
 ) -> Result<proc_macro2::TokenStream> {
     let path = name.trim_start_matches('/');
     let method_ident = format_ident!("{}", method.to_string());
@@ -429,7 +434,7 @@ fn get_function_body(
 
     // Let's get the query parameters.
     let query_params = get_query_params(op, spec)?;
-    let query_params_code = if !query_params.is_empty() {
+    let query_params_code = if !query_params.is_empty() && !paginated {
         let mut array = Vec::new();
         for (name, t) in &query_params {
             let cleaned_name = crate::types::clean_property_name(name);

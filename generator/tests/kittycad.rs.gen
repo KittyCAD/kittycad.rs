@@ -140,6 +140,8 @@ pub mod paginate {
         fn has_more_pages(&self) -> Result<bool>;
         #[doc = " Modify a request to get the next page."]
         fn next_page(&self, rb: reqwest::Request) -> Result<reqwest::Request>;
+        #[doc = " Get the items from a page."]
+        fn items(&self) -> Vec<Self::Item>;
     }
 }
 
@@ -448,7 +450,7 @@ impl std::fmt::Display for ApiCallWithPriceResultsPage {
 }
 
 impl crate::types::paginate::Pagination for ApiCallWithPriceResultsPage {
-    type Item = Vec<ApiCallWithPrice>;
+    type Item = ApiCallWithPrice;
     fn has_more_pages(&self) -> anyhow::Result<bool> {
         Ok(self.next_page.is_some())
     }
@@ -461,6 +463,10 @@ impl crate::types::paginate::Pagination for ApiCallWithPriceResultsPage {
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
         Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
     }
 }
 
@@ -539,7 +545,7 @@ impl std::fmt::Display for ApiTokenResultsPage {
 }
 
 impl crate::types::paginate::Pagination for ApiTokenResultsPage {
-    type Item = Vec<ApiToken>;
+    type Item = ApiToken;
     fn has_more_pages(&self) -> anyhow::Result<bool> {
         Ok(self.next_page.is_some())
     }
@@ -552,6 +558,10 @@ impl crate::types::paginate::Pagination for ApiTokenResultsPage {
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
         Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
     }
 }
 
@@ -671,7 +681,7 @@ impl std::fmt::Display for AsyncApiCallResultsPage {
 }
 
 impl crate::types::paginate::Pagination for AsyncApiCallResultsPage {
-    type Item = Vec<AsyncApiCall>;
+    type Item = AsyncApiCall;
     fn has_more_pages(&self) -> anyhow::Result<bool> {
         Ok(self.next_page.is_some())
     }
@@ -684,6 +694,10 @@ impl crate::types::paginate::Pagination for AsyncApiCallResultsPage {
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
         Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
     }
 }
 
@@ -2311,7 +2325,7 @@ impl std::fmt::Display for ExtendedUserResultsPage {
 }
 
 impl crate::types::paginate::Pagination for ExtendedUserResultsPage {
-    type Item = Vec<ExtendedUser>;
+    type Item = ExtendedUser;
     fn has_more_pages(&self) -> anyhow::Result<bool> {
         Ok(self.next_page.is_some())
     }
@@ -2324,6 +2338,10 @@ impl crate::types::paginate::Pagination for ExtendedUserResultsPage {
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
         Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
     }
 }
 
@@ -4081,7 +4099,7 @@ impl std::fmt::Display for UserResultsPage {
 }
 
 impl crate::types::paginate::Pagination for UserResultsPage {
-    type Item = Vec<User>;
+    type Item = User;
     fn has_more_pages(&self) -> anyhow::Result<bool> {
         Ok(self.next_page.is_some())
     }
@@ -4094,6 +4112,10 @@ impl crate::types::paginate::Pagination for UserResultsPage {
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
         Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
     }
 }
 

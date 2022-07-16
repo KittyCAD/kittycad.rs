@@ -805,6 +805,7 @@ fn render_object(
     let pagination_properties = PaginationProperties::from_object(o, spec)?;
     if pagination_properties.can_paginate() {
         let page_item = pagination_properties.item_type()?;
+        let item_ident = pagination_properties.item_ident()?;
         let next_page_str = pagination_properties.next_page_str()?;
         let next_page_ident = format_ident!("{}", next_page_str);
 
@@ -822,6 +823,10 @@ fn render_object(
                         .append_pair(#next_page_str, self.#next_page_ident.as_deref().unwrap_or(""));
 
                     Ok(req)
+                }
+
+                fn items(&self) -> Vec<Self::Item> {
+                    self.#item_ident.clone()
                 }
             }
         );
@@ -1129,10 +1134,10 @@ impl PaginationProperties {
             // Get the type name for the schema.
             let mut type_name =
                 crate::types::get_type_name_for_schema(&prop, &inner_schema, spec, true)?;
+
+            let type_name_str = crate::types::get_text(&type_name)?;
             // Check if this type is required.
-            if !o.required.contains(k)
-                && !crate::types::get_text(&type_name)?.starts_with("Option<")
-            {
+            if !o.required.contains(k) && !type_name_str.starts_with("Option<") {
                 // Make the type optional.
                 type_name = quote!(Option<#type_name>);
             }
@@ -1140,7 +1145,13 @@ impl PaginationProperties {
             if is_pagination_property_next_page(&prop) {
                 properties.next_page = Some((prop, type_name));
             } else if is_pagination_property_items(&prop, &type_name)? {
-                properties.items = Some((prop, type_name));
+                let ident = format_ident!(
+                    "{}",
+                    type_name_str
+                        .trim_start_matches("Vec<")
+                        .trim_end_matches('>')
+                );
+                properties.items = Some((prop, quote!(#ident)));
             }
         }
 
@@ -1209,6 +1220,15 @@ impl PaginationProperties {
     pub fn item_type(&self) -> Result<proc_macro2::TokenStream> {
         if let Some((_k, v)) = &self.items {
             return Ok(v.clone());
+        }
+
+        anyhow::bail!("No item type found")
+    }
+
+    /// Get the item ident for this object.
+    pub fn item_ident(&self) -> Result<proc_macro2::Ident> {
+        if let Some((k, _v)) = &self.items {
+            return Ok(format_ident!("{}", k));
         }
 
         anyhow::bail!("No item type found")

@@ -59,9 +59,31 @@ impl ApiTokens {
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> Result<crate::types::ApiTokenResultsPage> {
         use crate::types::paginate::Pagination;
-        let result = self.list_for_user(limit, page_token, sort_by).await?;
+        let mut result = self
+            .list_for_user(limit, page_token.clone(), sort_by.clone())
+            .await?;
         if result.has_more_pages()? {
-            todo!()
+            result = {
+                let mut req = self.client.client.request(
+                    http::Method::GET,
+                    &format!("{}/{}", self.client.base_url, "user/api-tokens"),
+                );
+                req = req.bearer_auth(&self.client.token);
+                let resp = req.send().await?;
+                let status = resp.status();
+                let text = resp.text().await.unwrap_or_default();
+                if status.is_success() {
+                    serde_json::from_str(&text).map_err(|err| {
+                        format_serde_error::SerdeError::new(text.to_string(), err).into()
+                    })
+                } else {
+                    Err(anyhow::anyhow!(
+                        "response was not successful `{}` -> `{}`",
+                        status,
+                        text
+                    ))
+                }
+            }?;
         }
 
         Ok(result)
