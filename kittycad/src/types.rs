@@ -129,6 +129,20 @@ mod base64 {
     }
 }
 
+mod paginate {
+    #![doc = " Utility functions used for pagination."]
+    use anyhow::Result;
+    #[doc = " A trait for types that allow pagination."]
+    pub trait Pagination {
+        #[doc = " The item that is paginated."]
+        type Item: serde::de::DeserializeOwned;
+        #[doc = " Returns true if the response has more pages."]
+        fn has_more_pages(&self) -> Result<bool>;
+        #[doc = " Modify a request to get the next page."]
+        fn next_page(&self, rb: reqwest::Request) -> Result<reqwest::Request>;
+    }
+}
+
 #[doc = "An account provider."]
 #[derive(
     serde :: Serialize,
@@ -433,6 +447,23 @@ impl std::fmt::Display for ApiCallWithPriceResultsPage {
     }
 }
 
+impl crate::types::paginate::Pagination for ApiCallWithPriceResultsPage {
+    type Item = Vec<ApiCallWithPrice>;
+    fn has_more_pages(&self) -> anyhow::Result<bool> {
+        Ok(self.next_page.is_some())
+    }
+
+    fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request> {
+        let mut req = req
+            .try_clone()
+            .ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair("page_token", &self.next_page.unwrap().to_string());
+        Ok(req)
+    }
+}
+
 #[doc = "An API token.\n\nThese are used to authenticate users with Bearer authentication."]
 #[derive(
     serde :: Serialize,
@@ -504,6 +535,23 @@ impl std::fmt::Display for ApiTokenResultsPage {
             "{}",
             serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
         )
+    }
+}
+
+impl crate::types::paginate::Pagination for ApiTokenResultsPage {
+    type Item = Vec<ApiToken>;
+    fn has_more_pages(&self) -> anyhow::Result<bool> {
+        Ok(self.next_page.is_some())
+    }
+
+    fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request> {
+        let mut req = req
+            .try_clone()
+            .ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair("page_token", &self.next_page.unwrap().to_string());
+        Ok(req)
     }
 }
 
@@ -619,6 +667,23 @@ impl std::fmt::Display for AsyncApiCallResultsPage {
             "{}",
             serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
         )
+    }
+}
+
+impl crate::types::paginate::Pagination for AsyncApiCallResultsPage {
+    type Item = Vec<AsyncApiCall>;
+    fn has_more_pages(&self) -> anyhow::Result<bool> {
+        Ok(self.next_page.is_some())
+    }
+
+    fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request> {
+        let mut req = req
+            .try_clone()
+            .ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair("page_token", &self.next_page.unwrap().to_string());
+        Ok(req)
     }
 }
 
@@ -2242,6 +2307,23 @@ impl std::fmt::Display for ExtendedUserResultsPage {
             "{}",
             serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
         )
+    }
+}
+
+impl crate::types::paginate::Pagination for ExtendedUserResultsPage {
+    type Item = Vec<ExtendedUser>;
+    fn has_more_pages(&self) -> anyhow::Result<bool> {
+        Ok(self.next_page.is_some())
+    }
+
+    fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request> {
+        let mut req = req
+            .try_clone()
+            .ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair("page_token", &self.next_page.unwrap().to_string());
+        Ok(req)
     }
 }
 
@@ -3995,6 +4077,23 @@ impl std::fmt::Display for UserResultsPage {
             "{}",
             serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
         )
+    }
+}
+
+impl crate::types::paginate::Pagination for UserResultsPage {
+    type Item = Vec<User>;
+    fn has_more_pages(&self) -> anyhow::Result<bool> {
+        Ok(self.next_page.is_some())
+    }
+
+    fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request> {
+        let mut req = req
+            .try_clone()
+            .ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair("page_token", &self.next_page.unwrap().to_string());
+        Ok(req)
     }
 }
 

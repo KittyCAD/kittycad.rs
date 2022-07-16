@@ -523,3 +523,13 @@ fn get_function_body(
         }
     })
 }
+
+/// Check if a operation is paginated.
+fn pagination_properties(
+    name: &str,
+    method: &str,
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<crate::types::PaginationProperties> {
+    todo!()
+}
