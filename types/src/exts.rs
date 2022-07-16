@@ -69,6 +69,19 @@ impl SchemaExt for openapiv3::Parameter {
     }
 }
 
+impl SchemaExt for openapiv3::Response {
+    fn recurse(&self, spec: &openapiv3::OpenAPI) -> Result<openapiv3::Schema> {
+        // Iterate over all the media types and return the first response.
+        for (_name, content) in &self.content {
+            if let Some(s) = &content.schema {
+                return s.recurse(spec);
+            }
+        }
+
+        anyhow::bail!("Response does not have a schema: {:?}", self)
+    }
+}
+
 pub trait ReferenceOrExt<T> {
     fn item(&self) -> Result<&T>;
     fn recurse(&self, spec: &openapiv3::OpenAPI) -> Result<openapiv3::Schema>;

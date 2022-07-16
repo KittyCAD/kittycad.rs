@@ -43,6 +43,16 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
                 #t
             };
         }
+
+        // TODO: Parse the responses.
+        for (name, response) in &components.responses {
+            render_response(name, response.item()?, spec)?;
+        }
+
+        // TODO: Parse the request bodies.
+        if !components.request_bodies.is_empty() {
+            anyhow::bail!("request bodies not supported in components yet");
+        }
     }
 
     get_text_fmt(&rendered)
@@ -636,6 +646,30 @@ fn render_object(
     };
 
     Ok(rendered)
+}
+
+/// Render the full type for a response.
+fn render_response(
+    name: &str,
+    response: &openapiv3::Response,
+    spec: &openapiv3::OpenAPI,
+) -> Result<proc_macro2::TokenStream> {
+    let mut responses = quote!();
+
+    for (content_name, content) in &response.content {
+        if let Some(openapiv3::ReferenceOr::Item(i)) = &content.schema {
+            // If the schema is a reference we don't care, since we would have already rendered
+            // that reference.
+            let rendered = render_schema(&format!("{}_{}", name, content_name), i, spec)?;
+            responses = quote!(
+                #responses
+
+                #rendered
+            );
+        }
+    }
+
+    Ok(responses)
 }
 
 /// Clean a property name for an object so we can use it in rust.
