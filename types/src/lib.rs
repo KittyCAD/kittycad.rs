@@ -898,6 +898,17 @@ mod test {
     }
 
     #[test]
+    // TODO: also make these work but not a priority.
+    #[ignore]
+    fn test_generate_github_types() {
+        let result = super::generate_types(
+            &super::load_spec(include_str!("../tests/api.github.com.json")).unwrap(),
+        )
+        .unwrap();
+        expectorate::assert_contents("tests/github.rs.gen", &result);
+    }
+
+    #[test]
     fn test_proper_name_number() {
         assert_eq!(super::proper_name("1"), "One");
         assert_eq!(super::proper_name("2"), "Two");
