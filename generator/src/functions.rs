@@ -4,9 +4,7 @@ use std::{collections::BTreeMap, fmt::Write as _};
 
 use anyhow::Result;
 
-use crate::types::exts::{
-    ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt, StatusCodeExt,
-};
+use crate::types::exts::{ParameterSchemaOrContentExt, ReferenceOrExt, StatusCodeExt};
 
 /// Generate functions for each path operation.
 pub fn generate_files(
@@ -50,12 +48,16 @@ pub fn generate_files(
             };
 
             // Get the function args.
-            let args = get_args(op, spec)?;
+            let raw_args = get_args(op, spec)?;
             // Make sure if we have args, we start with a comma.
-            let args = if args.is_empty() {
+            let args = if raw_args.is_empty() {
                 quote!()
             } else {
-                quote!(,#(#args),*)
+                let a = raw_args.iter().map(|(k, v)| {
+                    let n = format_ident!("{}", k);
+                    quote!(#n: #v)
+                });
+                quote!(,#(#a),*)
             };
 
             // Get the request body for the function if there is one.
@@ -85,10 +87,37 @@ pub fn generate_files(
             if pagination_properties.can_paginate() {
                 // If we can paginate we should generate a paginated stream function.
                 let stream_fn_name_ident = format_ident!("{}_stream", fn_name);
+
+                // Get the inner args for the function.
+                let inner_args = if raw_args.is_empty() {
+                    quote!()
+                } else {
+                    let a = raw_args.iter().map(|(k, _v)| {
+                        let n = format_ident!("{}", k);
+                        quote!(#n)
+                    });
+                    quote!(#(#a),*)
+                };
+
+                // Check if we have a body as an arg.
+                let body_arg = if request_body.is_empty() {
+                    quote!()
+                } else {
+                    quote!(,body)
+                };
+
                 let function = quote! {
                     #[doc = #docs]
                     pub async fn #stream_fn_name_ident(&self #args #request_body) -> Result<#response_type> {
-                        #function_body
+                        use crate::types::paginate::Pagination;
+
+                        // Get the result from our other function.
+                        let mut result = self.#fn_name_ident(#inner_args #body_arg).await?;
+                        if result.has_more_pages()? {
+                            todo!()
+                        }
+
+                        Ok(result)
                     }
                 };
 
@@ -224,44 +253,14 @@ fn get_response_type(
 fn get_args(
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
-) -> Result<Vec<proc_macro2::TokenStream>> {
-    let mut args = vec![];
+) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
+    let query_params = get_query_params(op, spec)?;
+    let path_params = get_path_params(op, spec)?;
 
-    // Let's get the arguments for the function.
-    for parameter in &op.parameters {
-        // Get the parameter.
-        let parameter = parameter.expand(spec)?;
-
-        // Get the data for the parameter.
-        let data = (&parameter).data()?;
-
-        let name = crate::types::clean_property_name(&data.name);
-        let name_ident = format_ident!("{}", name);
-        // Get the schema for the parameter.
-        let schema = data.format.schema()?;
-
-        // Get the type for the parameter.
-        let mut t = match schema {
-            openapiv3::ReferenceOr::Reference { .. } => {
-                crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
-            }
-            openapiv3::ReferenceOr::Item(s) => {
-                crate::types::get_type_name_for_schema("", &s, spec, false)?
-            }
-        };
-
-        // Make it an option if it's optional.
-        if !data.required && !crate::types::get_text(&t)?.starts_with("Option<") {
-            t = quote!(Option<#t>);
-        }
-
-        // Add the argument to the list.
-        args.push(quote! {
-            #name_ident: #t
-        });
-    }
-
-    Ok(args)
+    Ok(query_params
+        .into_iter()
+        .chain(path_params.into_iter())
+        .collect())
 }
 
 /// Return the request body type for the operation.
@@ -300,16 +299,11 @@ fn get_request_body(
     Ok(None)
 }
 
-/// Return the function body for the operation.
-fn get_function_body(
-    name: &str,
-    method: &http::Method,
+/// Return the path params for the operation.
+fn get_path_params(
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
-) -> Result<proc_macro2::TokenStream> {
-    let path = name.trim_start_matches('/');
-    let method_ident = format_ident!("{}", method.to_string());
-
+) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
     // Let's get the path parameters.
     let mut path_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
     // Let's get the arguments for the function.
@@ -346,30 +340,15 @@ fn get_function_body(
             path_params.insert(parameter_data.name, t);
         }
     }
-    let clean_url = if !path_params.is_empty() {
-        let mut clean_string = quote!();
-        for (name, t) in &path_params {
-            let url_string = format!("{{{}}}", name);
-            let cleaned_name = crate::types::clean_property_name(name);
-            let name_ident = format_ident!("{}", cleaned_name);
 
-            let type_text = crate::types::get_text(t)?;
+    Ok(path_params)
+}
 
-            clean_string = if type_text == "String" {
-                quote! {
-                    #clean_string.replace(#url_string, &#name_ident)
-                }
-            } else {
-                quote! {
-                    #clean_string.replace(#url_string, &format!("{}", #name_ident))
-                }
-            };
-        }
-        clean_string
-    } else {
-        quote!()
-    };
-
+/// Return the query params for the operation.
+fn get_query_params(
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
     // Let's get the query parameters.
     let mut query_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
     // Let's get the arguments for the function.
@@ -408,6 +387,48 @@ fn get_function_body(
             query_params.insert(parameter_data.name, t);
         }
     }
+
+    Ok(query_params)
+}
+
+/// Return the function body for the operation.
+fn get_function_body(
+    name: &str,
+    method: &http::Method,
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<proc_macro2::TokenStream> {
+    let path = name.trim_start_matches('/');
+    let method_ident = format_ident!("{}", method.to_string());
+
+    // Let's get the path parameters.
+    let path_params = get_path_params(op, spec)?;
+    let clean_url = if !path_params.is_empty() {
+        let mut clean_string = quote!();
+        for (name, t) in &path_params {
+            let url_string = format!("{{{}}}", name);
+            let cleaned_name = crate::types::clean_property_name(name);
+            let name_ident = format_ident!("{}", cleaned_name);
+
+            let type_text = crate::types::get_text(t)?;
+
+            clean_string = if type_text == "String" {
+                quote! {
+                    #clean_string.replace(#url_string, &#name_ident)
+                }
+            } else {
+                quote! {
+                    #clean_string.replace(#url_string, &format!("{}", #name_ident))
+                }
+            };
+        }
+        clean_string
+    } else {
+        quote!()
+    };
+
+    // Let's get the query parameters.
+    let query_params = get_query_params(op, spec)?;
     let query_params_code = if !query_params.is_empty() {
         let mut array = Vec::new();
         for (name, t) in &query_params {

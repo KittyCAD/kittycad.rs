@@ -58,38 +58,13 @@ impl ApiTokens {
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> Result<crate::types::ApiTokenResultsPage> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user/api-tokens"),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let mut query_params = Vec::new();
-        if let Some(p) = limit {
-            query_params.push(("limit", format!("{}", p)));
+        use crate::types::paginate::Pagination;
+        let result = self.list_for_user(limit, page_token, sort_by).await?;
+        if result.has_more_pages()? {
+            todo!()
         }
 
-        if let Some(p) = page_token {
-            query_params.push(("page_token", p));
-        }
-
-        if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{}", p)));
-        }
-
-        req = req.query(&query_params);
-        let resp = req.send().await?;
-        let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
-        if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
-        } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
-        }
+        Ok(result)
     }
 
     #[doc = "Create a new API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It creates a new API token for the authenticated user."]

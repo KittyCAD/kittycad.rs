@@ -112,8 +112,8 @@ impl Oauth2 {
     #[doc = "Listen for callbacks for the OAuth 2.0 provider."]
     pub async fn listen_provider_callback(
         &self,
-        provider: crate::types::AccountProvider,
         code: Option<String>,
+        provider: crate::types::AccountProvider,
         state: Option<String>,
     ) -> Result<()> {
         let mut req = self.client.client.request(
@@ -153,8 +153,8 @@ impl Oauth2 {
     #[doc = "Get the consent URL and other information for the OAuth 2.0 provider."]
     pub async fn listen_provider_consent(
         &self,
-        provider: crate::types::AccountProvider,
         callback_url: Option<String>,
+        provider: crate::types::AccountProvider,
     ) -> Result<crate::types::Oauth2ClientInfo> {
         let mut req = self.client.client.request(
             http::Method::GET,

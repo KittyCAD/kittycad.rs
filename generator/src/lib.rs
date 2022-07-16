@@ -52,7 +52,8 @@ where
             return Ok(serde_yaml::from_str(&contents)?);
         }
     }
-    Ok(load_json_spec(&contents)?)
+
+    load_json_spec(&contents)
 }
 
 fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
@@ -324,8 +325,8 @@ rustdoc-args = ["--cfg", "docsrs"]
             continue;
         }
 
-        println!("Deleting {} {}", file.path().display(), file_name);
         // Delete the file.
+        fs::remove_file(file.path()).await?;
     }
 
     // Create the Rust source file containing the generated client.

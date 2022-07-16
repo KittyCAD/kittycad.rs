@@ -1082,7 +1082,7 @@ fn get_base64_mod() -> Result<proc_macro2::TokenStream> {
     let file = include_str!("base64.rs");
     let stream = proc_macro2::TokenStream::from_str(file).map_err(|e| anyhow::anyhow!("{}", e))?;
     Ok(quote!(
-        mod base64 {
+        pub mod base64 {
             #stream
         }
     ))
@@ -1092,7 +1092,7 @@ fn get_paginate_mod() -> Result<proc_macro2::TokenStream> {
     let file = include_str!("paginate.rs");
     let stream = proc_macro2::TokenStream::from_str(file).map_err(|e| anyhow::anyhow!("{}", e))?;
     Ok(quote!(
-        mod paginate {
+        pub mod paginate {
             #stream
         }
     ))
