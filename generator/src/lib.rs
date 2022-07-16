@@ -204,7 +204,7 @@ fn clean_tag_name(s: &str) -> String {
 /// Generate the client library.
 pub fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     // Generate the client.
-    let out = crate::internal_generate(&spec, opts)?;
+    let out = crate::internal_generate(spec, opts)?;
 
     // Create the top-level crate directory:
     fs::create_dir_all(&opts.output)?;
@@ -274,7 +274,7 @@ rustdoc-args = ["--cfg", "docsrs"]
      * Generate our documentation for the library.
      */
     let docs = crate::template::generate_docs(
-        &spec,
+        spec,
         &inflector::cases::snakecase::to_snake_case(&opts.name),
         &opts.description,
         &opts.version,
@@ -304,7 +304,7 @@ rustdoc-args = ["--cfg", "docsrs"]
     crate::save(librs, lib.as_str())?;
 
     // Create the Rust source types file containing the generated types.
-    let types = crate::types::generate_types(&spec)?;
+    let types = crate::types::generate_types(spec)?;
     let mut typesrs = src.clone();
     typesrs.push("types.rs");
     crate::save(typesrs, types.as_str())?;
@@ -312,7 +312,7 @@ rustdoc-args = ["--cfg", "docsrs"]
     // TODO: cleanup old tag files.
 
     // Create the Rust source files for each of the tags functions.
-    match crate::functions::generate_files(&spec) {
+    match crate::functions::generate_files(spec) {
         Ok(files) => {
             // We have a map of our files, let's write to them.
             for (f, content) in files {

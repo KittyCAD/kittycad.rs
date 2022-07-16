@@ -8,7 +8,6 @@ pub fn generate_client(name: &str, base_url: &url::Url) -> String {
             &crate::template::get_token_env_variable(name),
         )
         .replace("BASE_URL", base_url.to_string().trim_end_matches('/'))
-        .to_string()
 }
 
 const CLIENT_FUNCTIONS: &str = r#"
@@ -56,7 +55,7 @@ impl Client {
         }
     }
 
-    /// Set the base URL for the client to something other than the default: <BASEURL>.
+    /// Set the base URL for the client to something other than the default: <BASE_URL>.
     pub fn set_base_url<H>(&mut self, base_url: H)
     where
         H: Into<String> + std::fmt::Display,

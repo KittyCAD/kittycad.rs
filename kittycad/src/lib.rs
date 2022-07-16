@@ -142,7 +142,7 @@ impl Client {
         }
     }
 
-    /// Set the base URL for the client to something other than the default: <BASEURL>.
+    /// Set the base URL for the client to something other than the default: <https://api.kittycad.io>.
     pub fn set_base_url<H>(&mut self, base_url: H)
     where
         H: Into<String> + std::fmt::Display,
