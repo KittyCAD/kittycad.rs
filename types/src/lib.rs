@@ -546,13 +546,19 @@ fn render_one_of(
                         anyhow::bail!("no tag name for one of `{:?}`", schema);
                     }
 
-                    // Ensure we have a type for this type.
-                    let obj = render_object(&tag_name, o, &schema.schema_data, spec)?;
-                    additional_types = quote!(
-                        #additional_types
+                    // Check if we have a component schema already for this type.
+                    if let Some(components) = &spec.components {
+                        if !components.schemas.contains_key(&tag_name) {
+                            // Ensure we have a type for this type.
+                            let obj = render_object(&tag_name, o, &schema.schema_data, spec)?;
+                            additional_types = quote!(
+                                #additional_types
 
-                        #obj
-                    );
+                                #obj
+                            );
+                        }
+                        // TODO: ensure the types are equal with the exception of the tag.
+                    }
 
                     // Return the type name.
                     let ident = format_ident!("{}", proper_name(&tag_name));

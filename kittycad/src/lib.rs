@@ -65,6 +65,7 @@
 #![allow(missing_docs)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
+#[doc(hidden)]
 /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
 ///
 /// FROM: <https://docs.kittycad.io/api/api-calls>
@@ -109,8 +110,6 @@ pub mod unit;
 ///
 /// FROM: <https://docs.kittycad.io/api/users>
 pub mod users;
-#[doc(hidden)]
-pub mod utils;
 
 use anyhow::{anyhow, Error, Result};
 

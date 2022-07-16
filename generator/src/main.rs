@@ -2383,7 +2383,6 @@ fn gen(api: &OpenAPI, tags: Vec<String>) -> Result<String> {
     a("pub mod traits;");
     a("pub mod types;");
     a("#[doc(hidden)]");
-    a("pub mod utils;");
 
     /*
      * Import the module for each tag.
