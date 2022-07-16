@@ -142,16 +142,26 @@ pub fn get_type_name_for_schema(
                 anyhow::bail!("XXX one of with more than one value not supported yet");
             }
 
-            let internal_schema = &one_of[0].get_schema_from_reference(spec, true)?;
-            get_type_name_for_schema(name, internal_schema, spec)?
+            let internal_schema = &one_of[0];
+            match internal_schema {
+                openapiv3::ReferenceOr::Reference { .. } => {
+                    get_type_name_from_reference(&internal_schema.reference()?, spec)?
+                }
+                openapiv3::ReferenceOr::Item(s) => get_type_name_for_schema(name, s, spec)?,
+            }
         }
         openapiv3::SchemaKind::AllOf { all_of } => {
             if all_of.len() != 1 {
                 anyhow::bail!("XXX all of with more than one value not supported yet");
             }
 
-            let internal_schema = &all_of[0].get_schema_from_reference(spec, true)?;
-            get_type_name_for_schema(name, internal_schema, spec)?
+            let internal_schema = &all_of[0];
+            match internal_schema {
+                openapiv3::ReferenceOr::Reference { .. } => {
+                    get_type_name_from_reference(&internal_schema.reference()?, spec)?
+                }
+                openapiv3::ReferenceOr::Item(s) => get_type_name_for_schema(name, s, spec)?,
+            }
         }
         openapiv3::SchemaKind::AnyOf { any_of: _ } => {
             anyhow::bail!("XXX any of not supported yet");
@@ -245,6 +255,25 @@ fn get_type_name_for_string(
     };
 
     Ok(t)
+}
+
+/// Get the type name for a reference.
+fn get_type_name_from_reference(
+    name: &str,
+    spec: &openapiv3::OpenAPI,
+) -> Result<proc_macro2::TokenStream> {
+    // Get the spec for the reference.
+    let schema = if let Some(components) = &spec.components {
+        components
+            .schemas
+            .get(name)
+            .ok_or_else(|| anyhow::anyhow!("reference {} not found in components", name))?
+            .item()?
+    } else {
+        anyhow::bail!("no components in spec, cannot get reference");
+    };
+
+    get_type_name_for_schema(name, schema, spec)
 }
 
 /// Get the type name for a number type.

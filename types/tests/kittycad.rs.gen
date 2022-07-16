@@ -411,10 +411,10 @@ pub struct AsyncApiCall {
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the async API call."]
     #[serde()]
-    pub status: Status,
+    pub status: ApiCallStatus,
     #[doc = "The type of async API call."]
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: AsyncApiCallType,
     #[doc = "The time and date the async API call was last updated."]
     #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
@@ -509,7 +509,7 @@ pub struct CardDetails {
     pub brand: Option<String>,
     #[doc = "Checks on Card address and CVC if provided."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub checks: Option<Checks>,
+    pub checks: Option<PaymentMethodCardChecks>,
     #[doc = "Two-letter ISO code representing the country of the card."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub country: Option<String>,
@@ -673,7 +673,7 @@ pub struct Connection {
     pub jetstream: Option<Jetstream>,
     #[doc = "Information about leaf nodes."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub leaf: Option<Leaf>,
+    pub leaf: Option<LeafNode>,
     #[doc = "The number of leaf nodes for the server."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub leafnodes: Option<i64>,
@@ -1263,7 +1263,7 @@ pub struct DeviceAccessTokenRequestForm {
     pub device_code: uuid::Uuid,
     #[doc = "The grant type."]
     #[serde()]
-    pub grant_type: GrantType,
+    pub grant_type: Oauth2GrantType,
 }
 
 #[doc = "The request parameters for the OAuth 2.0 Device Authorization Grant flow."]
@@ -1306,10 +1306,10 @@ pub struct DockerSystemInfo {
     pub bridge_nf_iptables: Option<bool>,
     #[doc = "The driver to use for managing cgroups."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cgroup_driver: Option<CgroupDriver>,
+    pub cgroup_driver: Option<SystemInfoCgroupDriverEnum>,
     #[doc = "The version of the cgroup."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cgroup_version: Option<CgroupVersion>,
+    pub cgroup_version: Option<SystemInfoCgroupVersionEnum>,
     #[doc = "The network endpoint that the Engine advertises for the purpose of node discovery. ClusterAdvertise is a `host:port` combination on which the daemon is reachable by other hosts.\n\n**Deprecated**: This field is only propagated when using standalone Swarm mode, and overlay networking using an external k/v store. Overlay networks with Swarm mode enabled use the built-in raft store, and this field will be empty."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cluster_advertise: Option<String>,
@@ -1317,7 +1317,7 @@ pub struct DockerSystemInfo {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cluster_store: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub containerd_commit: Option<ContainerdCommit>,
+    pub containerd_commit: Option<Commit>,
     #[doc = "Total number of containers on the host."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub containers: Option<i64>,
@@ -1382,7 +1382,7 @@ pub struct DockerSystemInfo {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub init_binary: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub init_commit: Option<InitCommit>,
+    pub init_commit: Option<Commit>,
     #[doc = "Indicates IPv4 forwarding is enabled."]
     #[serde(
         rename = "ipv4_forwarding",
@@ -1392,7 +1392,7 @@ pub struct DockerSystemInfo {
     pub ipv_4_forwarding: Option<bool>,
     #[doc = "Represents the isolation technology to use as a default for containers. The supported values are platform-specific.  If no isolation value is specified on daemon start, on Windows client, the default is `hyperv`, and on Windows server, the default is `process`.  This option is currently not used on other platforms."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub isolation: Option<Isolation>,
+    pub isolation: Option<SystemInfoIsolationEnum>,
     #[doc = "Indicates if the host has kernel memory limit support enabled.\n\n**Deprecated**: This field is deprecated as the kernel 5.4 deprecated `kmem.limit_in_bytes`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kernel_memory: Option<bool>,
@@ -1448,14 +1448,14 @@ pub struct DockerSystemInfo {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pids_limit: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub plugins: Option<Plugins>,
+    pub plugins: Option<PluginsInfo>,
     #[doc = "Reports a summary of the product license on the daemon.  If a commercial license has been applied to the daemon, information such as number of nodes, and expiration are included."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub product_license: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub registry_config: Option<RegistryConfig>,
+    pub registry_config: Option<RegistryServiceConfig>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub runc_commit: Option<RuncCommit>,
+    pub runc_commit: Option<Commit>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub runtimes: Option<std::collections::HashMap<String, Runtime>>,
     #[doc = "List of security features that are enabled on the daemon, such as apparmor, seccomp, SELinux, user-namespaces (userns), and rootless.  Additional configuration options for each security feature may be present, and are included as a comma-separated list of key/value pairs."]
@@ -1498,19 +1498,19 @@ pub struct EngineMetadata {
     pub async_jobs_running: bool,
     #[doc = "Metadata about our cache."]
     #[serde()]
-    pub cache: Cache,
+    pub cache: CacheMetadata,
     #[doc = "The environment we are running in."]
     #[serde()]
     pub environment: Environment,
     #[doc = "Metadata about our file system."]
     #[serde()]
-    pub fs: Fs,
+    pub fs: FileSystemMetadata,
     #[doc = "The git hash of the server."]
     #[serde()]
     pub git_hash: String,
     #[doc = "Metadata about our pub-sub connection."]
     #[serde()]
-    pub pubsub: Pubsub,
+    pub pubsub: Connection,
 }
 
 #[doc = "The environment the server is running in."]
@@ -1560,7 +1560,7 @@ pub struct Error {
 pub struct ExecutorMetadata {
     #[doc = "Information about the docker daemon."]
     #[serde()]
-    pub docker_info: DockerInfo,
+    pub docker_info: DockerSystemInfo,
     #[doc = "The environment we are running in."]
     #[serde()]
     pub environment: Environment,
@@ -1659,16 +1659,16 @@ pub struct FileConversion {
     pub output: Option<base64::Base64Data>,
     #[doc = "The output format of the file conversion."]
     #[serde()]
-    pub output_format: OutputFormat,
+    pub output_format: FileOutputFormat,
     #[doc = "The source format of the file conversion."]
     #[serde()]
-    pub src_format: SrcFormat,
+    pub src_format: FileSourceFormat,
     #[doc = "The time and date the file conversion was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the file conversion."]
     #[serde()]
-    pub status: Status,
+    pub status: ApiCallStatus,
     #[doc = "The time and date the file conversion was last updated."]
     #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
@@ -1702,13 +1702,13 @@ pub struct FileDensity {
     pub material_mass: Option<f64>,
     #[doc = "The source format of the file."]
     #[serde()]
-    pub src_format: SrcFormat,
+    pub src_format: FileSourceFormat,
     #[doc = "The time and date the density was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the density."]
     #[serde()]
-    pub status: Status,
+    pub status: ApiCallStatus,
     #[doc = "The time and date the density was last updated."]
     #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
@@ -1742,13 +1742,13 @@ pub struct FileMass {
     pub material_density: Option<f64>,
     #[doc = "The source format of the file."]
     #[serde()]
-    pub src_format: SrcFormat,
+    pub src_format: FileSourceFormat,
     #[doc = "The time and date the mass was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the mass."]
     #[serde()]
-    pub status: Status,
+    pub status: ApiCallStatus,
     #[doc = "The time and date the mass was last updated."]
     #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
@@ -1855,13 +1855,13 @@ pub struct FileVolume {
     pub id: uuid::Uuid,
     #[doc = "The source format of the file."]
     #[serde()]
-    pub src_format: SrcFormat,
+    pub src_format: FileSourceFormat,
     #[doc = "The time and date the volume was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the volume."]
     #[serde()]
-    pub status: Status,
+    pub status: ApiCallStatus,
     #[doc = "The time and date the volume was last updated."]
     #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
@@ -1978,7 +1978,7 @@ pub struct Invoice {
     pub statement_descriptor: Option<String>,
     #[doc = "The status of the invoice, one of `draft`, `open`, `paid`, `uncollectible`, or `void`.\n\n[Learn more](https://stripe.com/docs/billing/invoices/workflow#workflow-overview)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub status: Option<Status>,
+    pub status: Option<InvoiceStatus>,
     #[doc = "Total of all subscriptions, invoice items, and prorations on the invoice before any invoice level discount or tax is applied.\n\nItem discounts are already incorporated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub subtotal: Option<f64>,
@@ -2061,13 +2061,13 @@ pub enum InvoiceStatus {
 pub struct Jetstream {
     #[doc = "The Jetstream config."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub config: Option<Config>,
+    pub config: Option<JetstreamConfig>,
     #[doc = "Meta information about the cluster."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub meta: Option<Meta>,
+    pub meta: Option<MetaClusterInfo>,
     #[doc = "Jetstream statistics."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub stats: Option<Stats>,
+    pub stats: Option<JetstreamStats>,
 }
 
 #[doc = "Jetstream API statistics."]
@@ -2115,7 +2115,7 @@ pub struct JetstreamStats {
     pub accounts: Option<i64>,
     #[doc = "API stats."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub api: Option<Api>,
+    pub api: Option<JetstreamApiStats>,
     #[doc = "The number of HA assets."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ha_assets: Option<i64>,
@@ -2175,25 +2175,25 @@ pub struct MetaClusterInfo {
 pub struct Metadata {
     #[doc = "Metadata about our cache."]
     #[serde()]
-    pub cache: Cache,
+    pub cache: CacheMetadata,
     #[doc = "Metadata about our engine API connection."]
     #[serde()]
-    pub engine: Engine,
+    pub engine: EngineMetadata,
     #[doc = "The environment we are running in."]
     #[serde()]
     pub environment: Environment,
     #[doc = "Metadata about our executor API connection."]
     #[serde()]
-    pub executor: Executor,
+    pub executor: ExecutorMetadata,
     #[doc = "Metadata about our file system."]
     #[serde()]
-    pub fs: Fs,
+    pub fs: FileSystemMetadata,
     #[doc = "The git hash of the server."]
     #[serde()]
     pub git_hash: String,
     #[doc = "Metadata about our pub-sub connection."]
     #[serde()]
-    pub pubsub: Pubsub,
+    pub pubsub: Connection,
 }
 
 #[doc = "The Request Method (VERB)\n\nThis type also contains constants for a number of common HTTP methods such as GET, POST, etc.\n\nCurrently includes 8 variants representing the 8 methods defined in [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH, and an Extension variant for all extensions."]
@@ -2320,7 +2320,7 @@ pub struct PaymentMethod {
     pub billing_info: BillingInfo,
     #[doc = "The card, if it is one. For our purposes, this is the only type of payment method that we support."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub card: Option<Card>,
+    pub card: Option<CardDetails>,
     #[doc = "Time at which the object was created."]
     #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
@@ -2332,7 +2332,7 @@ pub struct PaymentMethod {
     pub metadata: Option<std::collections::HashMap<String, String>>,
     #[doc = "The type of payment method."]
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: PaymentMethodType,
 }
 
 #[doc = "Card checks."]
@@ -2591,16 +2591,16 @@ pub struct UnitConversion {
     pub output: Option<f64>,
     #[doc = "The output format of the unit conversion."]
     #[serde()]
-    pub output_format: OutputFormat,
+    pub output_format: UnitMetricFormat,
     #[doc = "The source format of the unit conversion."]
     #[serde()]
-    pub src_format: SrcFormat,
+    pub src_format: UnitMetricFormat,
     #[doc = "The time and date the unit conversion was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the unit conversion."]
     #[serde()]
-    pub status: Status,
+    pub status: ApiCallStatus,
     #[doc = "The time and date the unit conversion was last updated."]
     #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
