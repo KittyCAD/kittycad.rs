@@ -44,3 +44,10 @@ pub fn generate_files(api: &openapiv3::OpenAPI) -> Result<BTreeMap<String, Strin
 
     Ok(tag_files)
 }
+
+/// Generate the docs for the given operation.
+fn generate_docs(name: &str, method: &str, op: &openapiv3::Operation) -> Result<String> {
+    let mut docs = String::new();
+
+    Ok(docs)
+}
