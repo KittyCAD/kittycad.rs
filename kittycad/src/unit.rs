@@ -13,7 +13,7 @@ impl Unit {
     }
 
     #[doc = "Convert units.\n\nConvert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions."]
-    pub fn create_conversion(
+    pub async fn create_conversion(
         &self,
         _output_format: crate::types::UnitMetricFormat,
         _src_format: crate::types::UnitMetricFormat,

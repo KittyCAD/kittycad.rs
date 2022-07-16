@@ -38,10 +38,19 @@ pub fn generate_files(spec: &openapiv3::OpenAPI) -> Result<BTreeMap<String, Stri
 
             // Get the function args.
             let args = get_args(op, spec)?;
+            // Make sure if we have args, we start with a comma.
+            let args = if args.is_empty() {
+                quote!()
+            } else {
+                quote!(,#(#args),*)
+            };
+
+            // Get the request body for the function if there is one.
+            let request_body = get_request_body(op, spec)?;
 
             let function = quote! {
                 #[doc = #docs]
-                pub fn #fn_name_ident(&self, #(#args),*) -> Result<#response_type> {
+                pub async fn #fn_name_ident(&self #args #request_body) -> Result<#response_type> {
                     todo!()
                 }
             };
@@ -244,4 +253,45 @@ fn get_args(
     }
 
     Ok(args)
+}
+
+/// Return the request body type for the operation.
+fn get_request_body(
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<proc_macro2::TokenStream> {
+    if let Some(request_body) = &op.request_body {
+        // Then let's get the type for the response.
+        let request_body = match request_body {
+            openapiv3::ReferenceOr::Reference { reference } => {
+                anyhow::bail!(
+                    "request body `{}` is a reference and not supported yet",
+                    reference
+                )
+            }
+            openapiv3::ReferenceOr::Item(r) => r.clone(),
+        };
+
+        // Iterate over all the media types and return the first request.
+        for (_name, content) in &request_body.content {
+            if let Some(s) = &content.schema {
+                let t = match s {
+                    openapiv3::ReferenceOr::Reference { .. } => {
+                        types::get_type_name_from_reference(&s.reference()?, spec, false)?
+                    }
+                    openapiv3::ReferenceOr::Item(s) => {
+                        types::get_type_name_for_schema("", s, spec, false)?
+                    }
+                };
+
+                // Return early since we found the type.
+                // We start with a comma here so it's not weird.
+                return Ok(quote!(, body: &#t));
+            }
+        }
+    }
+
+    // We don't have a request body.
+    // So we return nothing.
+    Ok(quote!())
 }

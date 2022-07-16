@@ -14,7 +14,7 @@ async fn test_create_file_conversion() {
         .create_conversion(
             crate::types::FileOutputFormat::Step,
             crate::types::FileSourceFormat::Obj,
-            body.to_vec(),
+            &body.to_vec().into(),
         )
         .await
         .unwrap();
@@ -35,7 +35,7 @@ async fn test_create_file_conversion_with_base64_helper() {
         .create_conversion(
             crate::types::FileOutputFormat::Step,
             crate::types::FileSourceFormat::Obj,
-            body.to_vec(),
+            &body.to_vec().into(),
         )
         .await
         .unwrap();
@@ -56,7 +56,7 @@ async fn test_create_file_volume() {
 
     let result = client
         .file()
-        .create_volume(crate::types::FileSourceFormat::Obj, body.to_vec())
+        .create_volume(crate::types::FileSourceFormat::Obj, &body.to_vec().into())
         .await
         .unwrap();
 

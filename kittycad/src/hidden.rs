@@ -13,12 +13,15 @@ impl Hidden {
     }
 
     #[doc = "Create an email verification request for a user."]
-    pub fn listen_auth_email(&self) -> Result<crate::types::VerificationToken> {
+    pub async fn listen_auth_email(
+        &self,
+        _body: &crate::types::EmailAuthenticationForm,
+    ) -> Result<crate::types::VerificationToken> {
         todo!()
     }
 
     #[doc = "Listen for callbacks for email verification for users."]
-    pub fn listen_auth_email_callback(
+    pub async fn listen_auth_email_callback(
         &self,
         _callback_url: Option<url::Url>,
         _email: String,
@@ -28,7 +31,7 @@ impl Hidden {
     }
 
     #[doc = "This endpoint removes the session cookie for a user.\n\nThis is used in logout scenarios."]
-    pub fn logout(&self) -> Result<()> {
+    pub async fn logout(&self) -> Result<()> {
         todo!()
     }
 }
