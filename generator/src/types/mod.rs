@@ -4,12 +4,14 @@ pub mod base64;
 pub mod exts;
 pub mod paginate;
 
-use std::{collections::BTreeMap, str::FromStr};
+use std::str::FromStr;
 
 use anyhow::Result;
 use numeral::Cardinal;
 
-use crate::types::exts::{ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt};
+use crate::types::exts::{
+    ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt, StatusCodeExt,
+};
 
 /// Generate Rust types from an OpenAPI v3 spec.
 pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
@@ -803,6 +805,8 @@ fn render_object(
     let pagination_properties = PaginationProperties::from_object(o, spec)?;
     if pagination_properties.can_paginate() {
         let page_item = pagination_properties.item_type()?;
+        let next_page_str = pagination_properties.next_page_str()?;
+        let next_page_ident = format_ident!("{}", next_page_str);
 
         pagination = quote!(
             impl crate::types::paginate::Pagination for #struct_name {
@@ -815,7 +819,7 @@ fn render_object(
                 fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request> {
                     let mut req = req.try_clone().ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
                     req.url_mut().query_pairs_mut()
-                        .append_pair("page_token", &self.next_page.as_ref().map(|s| s.as_str()).unwrap_or(""));
+                        .append_pair(#next_page_str, self.#next_page_ident.as_deref().unwrap_or(""));
 
                     Ok(req)
                 }
@@ -1100,62 +1104,137 @@ fn get_paginate_mod() -> Result<proc_macro2::TokenStream> {
 }
 
 /// Information about an operation and the attributes that make allow for pagination.
+#[derive(Debug, Clone, Default)]
 pub struct PaginationProperties {
-    /// The pagination properties.
-    pub types: BTreeMap<String, proc_macro2::TokenStream>,
+    /// The property for the next page.
+    pub next_page: Option<(String, proc_macro2::TokenStream)>,
+    /// The property for the items.
+    pub items: Option<(String, proc_macro2::TokenStream)>,
+    /// The path of the operation.
+    pub path: Option<String>,
+    /// The method of the operation.
+    pub method: Option<http::Method>,
 }
 
 impl PaginationProperties {
     /// Get the pagination properties for an object.
     pub fn from_object(o: &openapiv3::ObjectType, spec: &openapiv3::OpenAPI) -> Result<Self> {
-        let mut types = BTreeMap::new();
+        let mut properties = PaginationProperties::default();
 
         for (k, v) in &o.properties {
             let prop = crate::types::clean_property_name(k);
-            if is_pagination_property(&prop) {
-                // Get the schema for the property.
-                let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
-                    let s = &**i;
-                    s.clone()
-                } else {
-                    v.get_schema_from_reference(spec, true)?
-                };
+            // Get the schema for the property.
+            let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
+                let s = &**i;
+                s.clone()
+            } else {
+                v.get_schema_from_reference(spec, true)?
+            };
 
-                // Get the type name for the schema.
-                let mut type_name =
-                    crate::types::get_type_name_for_schema(&prop, &inner_schema, spec, true)?;
-                // Check if this type is required.
-                if !o.required.contains(k)
-                    && !crate::types::get_text(&type_name)?.starts_with("Option<")
-                {
-                    // Make the type optional.
-                    type_name = quote!(Option<#type_name>);
-                }
+            // Get the type name for the schema.
+            let mut type_name =
+                crate::types::get_type_name_for_schema(&prop, &inner_schema, spec, true)?;
+            // Check if this type is required.
+            if !o.required.contains(k)
+                && !crate::types::get_text(&type_name)?.starts_with("Option<")
+            {
+                // Make the type optional.
+                type_name = quote!(Option<#type_name>);
+            }
 
-                types.insert(prop, type_name);
+            if is_pagination_property_next_page(&prop) {
+                properties.next_page = Some((prop, type_name));
+            } else if is_pagination_property_items(&prop, &type_name)? {
+                properties.items = Some((prop, type_name));
             }
         }
 
-        Ok(PaginationProperties { types })
+        Ok(properties)
+    }
+
+    /// Get the pagination properties for an operation.
+    pub fn from_operation(
+        name: &str,
+        method: &http::Method,
+        op: &openapiv3::Operation,
+        spec: &openapiv3::OpenAPI,
+    ) -> Result<Self> {
+        // If the method is not a get, we can return early.
+        if method != http::Method::GET {
+            return Ok(PaginationProperties::default());
+        }
+
+        // Get the return type for the operation.
+        let mut schema = None;
+        for (status_code, response) in &op.responses.responses {
+            // We only care if the response is a success since this is for the function
+            // to return upon success.
+            if status_code.is_success() {
+                // Then let's get the type for the response.
+                let response = response.expand(spec)?;
+
+                // Iterate over all the media types and return the first response.
+                for (_name, content) in &response.content {
+                    if let Some(s) = &content.schema {
+                        schema = Some(s.get_schema_from_reference(spec, true)?);
+                        break;
+                    }
+                }
+            }
+        }
+
+        let schema = if let Some(schema) = schema {
+            schema
+        } else {
+            // We don't have a response, so we can't get the pagination properties.
+            return Ok(PaginationProperties::default());
+        };
+
+        let mut properties =
+            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
+                // Get the pagination properties for the object.
+                PaginationProperties::from_object(o, spec)?
+            } else {
+                // We don't have an object, so we can't get the pagination properties.
+                return Ok(PaginationProperties::default());
+            };
+
+        properties.path = Some(name.to_string());
+        properties.method = Some(method.clone());
+
+        Ok(properties)
     }
 
     /// Return is we can paginate this object.
     pub fn can_paginate(&self) -> bool {
-        !self.types.is_empty()
+        self.next_page.is_some() && self.items.is_some()
     }
 
     /// Get the item type for this object.
     pub fn item_type(&self) -> Result<proc_macro2::TokenStream> {
-        if let Some(items) = self.types.get("items") {
-            return Ok(items.clone());
+        if let Some((_k, v)) = &self.items {
+            return Ok(v.clone());
         }
 
-        anyhow::bail!("No item type  found")
+        anyhow::bail!("No item type found")
+    }
+
+    /// Get the item type for this object.
+    pub fn next_page_str(&self) -> Result<String> {
+        if let Some((k, _v)) = &self.next_page {
+            return Ok(k.to_string());
+        }
+
+        anyhow::bail!("No next page property found")
     }
 }
 
-fn is_pagination_property(s: &str) -> bool {
-    ["next_page", "items"].contains(&s)
+fn is_pagination_property_next_page(s: &str) -> bool {
+    ["next_page", "next"].contains(&s)
+}
+
+fn is_pagination_property_items(s: &str, t: &proc_macro2::TokenStream) -> Result<bool> {
+    Ok(["items", "data"].contains(&s) && get_text(t)?.starts_with("Vec<"))
 }
 
 #[cfg(test)]

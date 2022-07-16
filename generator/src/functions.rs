@@ -15,7 +15,10 @@ pub fn generate_files(spec: &openapiv3::OpenAPI) -> Result<BTreeMap<String, Stri
     for (name, path) in spec.paths.iter() {
         let op = path.item()?;
 
-        let mut gen = |name: &str, method: &str, op: Option<&openapiv3::Operation>| -> Result<()> {
+        let mut gen = |name: &str,
+                       method: &http::Method,
+                       op: Option<&openapiv3::Operation>|
+         -> Result<()> {
             // Ensure we have an operation for this path and method, otherwise return early.
             let op = if let Some(op) = op {
                 op
@@ -86,23 +89,27 @@ pub fn generate_files(spec: &openapiv3::OpenAPI) -> Result<BTreeMap<String, Stri
                 tag_files.get_mut(&tag).unwrap().push_str(&fn_str);
             }
 
+            // Let's check if this function can be paginated.
+            let pagination_properties = get_pagination_properties(name, method, op, spec)?;
+            if pagination_properties.can_paginate() {}
+
             Ok(())
         };
 
-        gen(name.as_str(), "GET", op.get.as_ref())?;
-        gen(name.as_str(), "PUT", op.put.as_ref())?;
-        gen(name.as_str(), "POST", op.post.as_ref())?;
-        gen(name.as_str(), "DELETE", op.delete.as_ref())?;
-        gen(name.as_str(), "HEAD", op.head.as_ref())?;
-        gen(name.as_str(), "PATCH", op.patch.as_ref())?;
-        gen(name.as_str(), "TRACE", op.trace.as_ref())?;
+        gen(name.as_str(), &http::Method::GET, op.get.as_ref())?;
+        gen(name.as_str(), &http::Method::PUT, op.put.as_ref())?;
+        gen(name.as_str(), &http::Method::POST, op.post.as_ref())?;
+        gen(name.as_str(), &http::Method::DELETE, op.delete.as_ref())?;
+        gen(name.as_str(), &http::Method::HEAD, op.head.as_ref())?;
+        gen(name.as_str(), &http::Method::PATCH, op.patch.as_ref())?;
+        gen(name.as_str(), &http::Method::TRACE, op.trace.as_ref())?;
     }
 
     Ok(tag_files)
 }
 
 /// Generate the docs for the given operation.
-fn generate_docs(name: &str, method: &str, op: &openapiv3::Operation) -> Result<String> {
+fn generate_docs(name: &str, method: &http::Method, op: &openapiv3::Operation) -> Result<String> {
     let mut docs = if let Some(summary) = &op.summary {
         summary.to_string()
     } else {
@@ -138,7 +145,12 @@ fn generate_docs(name: &str, method: &str, op: &openapiv3::Operation) -> Result<
 }
 
 /// Return the function name for the operation.
-fn get_fn_name(name: &str, method: &str, tag: &str, op: &openapiv3::Operation) -> Result<String> {
+fn get_fn_name(
+    name: &str,
+    method: &http::Method,
+    tag: &str,
+    op: &openapiv3::Operation,
+) -> Result<String> {
     let mut name = op
         .operation_id
         .as_ref()
@@ -289,12 +301,12 @@ fn get_request_body(
 /// Return the function body for the operation.
 fn get_function_body(
     name: &str,
-    method: &str,
+    method: &http::Method,
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
 ) -> Result<proc_macro2::TokenStream> {
     let path = name.trim_start_matches('/');
-    let method_ident = format_ident!("{}", method);
+    let method_ident = format_ident!("{}", method.to_string());
 
     // Let's get the path parameters.
     let mut path_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
@@ -525,11 +537,11 @@ fn get_function_body(
 }
 
 /// Check if a operation is paginated.
-fn pagination_properties(
+fn get_pagination_properties(
     name: &str,
-    method: &str,
+    method: &http::Method,
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
 ) -> Result<crate::types::PaginationProperties> {
-    todo!()
+    crate::types::PaginationProperties::from_operation(name, method, op, spec)
 }
