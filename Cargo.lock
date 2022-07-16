@@ -471,15 +471,21 @@ version = "0.0.0"
 dependencies = [
  "Inflector",
  "anyhow",
+ "data-encoding",
+ "expectorate",
  "getopts",
  "http",
+ "numeral",
  "openapiv3",
+ "pretty_assertions",
  "proc-macro2",
  "quote",
+ "regex",
+ "rustfmt-wrapper",
+ "schemars",
  "serde",
  "serde_json",
  "serde_yaml",
- "types",
 ]
 
 [[package]]
@@ -1752,26 +1758,6 @@ name = "typenum"
 version = "1.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dcf81ac59edc17cc8697ff311e8f5ef2d99fcbd9817b34cec66f90b6c3dfd987"
-
-[[package]]
-name = "types"
-version = "0.0.0"
-dependencies = [
- "Inflector",
- "anyhow",
- "data-encoding",
- "expectorate",
- "numeral",
- "openapiv3",
- "pretty_assertions",
- "proc-macro2",
- "quote",
- "regex",
- "rustfmt-wrapper",
- "schemars",
- "serde",
- "serde_json",
-]
 
 [[package]]
 name = "ucd-trie"

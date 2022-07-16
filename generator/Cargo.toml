@@ -3,17 +3,25 @@ name = "generator"
 version = "0.0.0"
 edition = "2018"
 license = "MPL-2.0"
-description = "An OpenAPI client generator, bespoke for the GitHub API."
+description = "An OpenAPI client generator."
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
+data-encoding = "^2.3.2"
 getopts = "0.2"
 http = "^0.2.8"
 Inflector = "^0.11.4"
+numeral = "1"
+openapiv3 = "1"
 proc-macro2 = "1"
 quote = "1"
+regex = "^1.6"
+rustfmt-wrapper = "^0.2"
+schemars = { version = "0.8", features = ["bigdecimal", "chrono", "url", "uuid1"] }
 serde = { version = "1", features = [ "derive" ]}
 serde_json = "1"
 serde_yaml = "^0.8.17"
-openapiv3 = "1"
-types = { path = "../types" }
+
+[dev-dependencies]
+expectorate = "1"
+pretty_assertions = "1"

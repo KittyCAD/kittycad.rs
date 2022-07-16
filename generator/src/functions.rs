@@ -1,7 +1,7 @@
 use std::{collections::BTreeMap, fmt::Write as _};
 
+use crate::types::exts::{ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt};
 use anyhow::Result;
-use types::exts::{ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt};
 
 /*
  * Generate a function for each Operation.
@@ -70,7 +70,7 @@ pub fn generate_files(spec: &openapiv3::OpenAPI) -> Result<BTreeMap<String, Stri
                 }
             };
 
-            let mut fn_str = types::get_text_fmt(&function)?;
+            let mut fn_str = crate::types::get_text_fmt(&function)?;
 
             // Add our function to our existing tag file, or create a new one.
             if let std::collections::btree_map::Entry::Vacant(e) = tag_files.entry(tag.to_string())
@@ -178,10 +178,14 @@ fn get_response_type(
                 if let Some(s) = &content.schema {
                     let t = match s {
                         openapiv3::ReferenceOr::Reference { .. } => {
-                            types::get_type_name_from_reference(&s.reference()?, spec, false)?
+                            crate::types::get_type_name_from_reference(
+                                &s.reference()?,
+                                spec,
+                                false,
+                            )?
                         }
                         openapiv3::ReferenceOr::Item(s) => {
-                            types::get_type_name_for_schema("", s, spec, false)?
+                            crate::types::get_type_name_for_schema("", s, spec, false)?
                         }
                     };
 
@@ -227,7 +231,7 @@ fn get_args(
         // Get the data for the parameter.
         let data = (&parameter).data()?;
 
-        let name = types::clean_property_name(&data.name);
+        let name = crate::types::clean_property_name(&data.name);
         let name_ident = format_ident!("{}", name);
         // Get the schema for the parameter.
         let schema = data.format.schema()?;
@@ -235,15 +239,15 @@ fn get_args(
         // Get the type for the parameter.
         let mut t = match schema {
             openapiv3::ReferenceOr::Reference { .. } => {
-                types::get_type_name_from_reference(&schema.reference()?, spec, false)?
+                crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
             }
             openapiv3::ReferenceOr::Item(s) => {
-                types::get_type_name_for_schema("", &s, spec, false)?
+                crate::types::get_type_name_for_schema("", &s, spec, false)?
             }
         };
 
         // Make it an option if it's optional.
-        if !data.required && !types::get_text(&t)?.starts_with("Option<") {
+        if !data.required && !crate::types::get_text(&t)?.starts_with("Option<") {
             t = quote!(Option<#t>);
         }
 
@@ -270,10 +274,10 @@ fn get_request_body(
             if let Some(s) = &content.schema {
                 let t = match s {
                     openapiv3::ReferenceOr::Reference { .. } => {
-                        types::get_type_name_from_reference(&s.reference()?, spec, false)?
+                        crate::types::get_type_name_from_reference(&s.reference()?, spec, false)?
                     }
                     openapiv3::ReferenceOr::Item(s) => {
-                        types::get_type_name_for_schema("", s, spec, false)?
+                        crate::types::get_type_name_for_schema("", s, spec, false)?
                     }
                 };
 
@@ -322,15 +326,15 @@ fn get_function_body(
             // Get the type for the parameter.
             let mut t = match schema {
                 openapiv3::ReferenceOr::Reference { .. } => {
-                    types::get_type_name_from_reference(&schema.reference()?, spec, false)?
+                    crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
                 }
                 openapiv3::ReferenceOr::Item(s) => {
-                    types::get_type_name_for_schema("", &s, spec, false)?
+                    crate::types::get_type_name_for_schema("", &s, spec, false)?
                 }
             };
 
             // Make it an option if it's optional.
-            if !parameter_data.required && !types::get_text(&t)?.starts_with("Option<") {
+            if !parameter_data.required && !crate::types::get_text(&t)?.starts_with("Option<") {
                 t = quote!(Option<#t>);
             }
 
@@ -342,10 +346,10 @@ fn get_function_body(
         let mut clean_string = quote!();
         for (name, t) in &path_params {
             let url_string = format!("{{{}}}", name);
-            let cleaned_name = types::clean_property_name(name);
+            let cleaned_name = crate::types::clean_property_name(name);
             let name_ident = format_ident!("{}", cleaned_name);
 
-            let type_text = types::get_text(t)?;
+            let type_text = crate::types::get_text(t)?;
 
             clean_string = if type_text == "String" {
                 quote! {
@@ -384,15 +388,15 @@ fn get_function_body(
             // Get the type for the parameter.
             let mut t = match schema {
                 openapiv3::ReferenceOr::Reference { .. } => {
-                    types::get_type_name_from_reference(&schema.reference()?, spec, false)?
+                    crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
                 }
                 openapiv3::ReferenceOr::Item(s) => {
-                    types::get_type_name_for_schema("", &s, spec, false)?
+                    crate::types::get_type_name_for_schema("", &s, spec, false)?
                 }
             };
 
             // Make it an option if it's optional.
-            if !parameter_data.required && !types::get_text(&t)?.starts_with("Option<") {
+            if !parameter_data.required && !crate::types::get_text(&t)?.starts_with("Option<") {
                 t = quote!(Option<#t>);
             }
 
@@ -403,10 +407,10 @@ fn get_function_body(
     let query_params_code = if !query_params.is_empty() {
         let mut array = Vec::new();
         for (name, t) in &query_params {
-            let cleaned_name = types::clean_property_name(name);
+            let cleaned_name = crate::types::clean_property_name(name);
             let name_ident = format_ident!("{}", cleaned_name);
 
-            let type_text = types::get_text(t)?;
+            let type_text = crate::types::get_text(t)?;
 
             if !type_text.starts_with("Option<") {
                 if type_text == "String" {
@@ -524,7 +528,7 @@ fn get_function_body(
         } else {
             // Return a human error.
             // TODO: Try to return the error type.
-            // serde_json::from_str::<crate::types::Error>(&text).map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            // serde_json::from_str::<crate::crate::types::Error>(&text).map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
             Err(anyhow::anyhow!("response was not successful `{}` -> `{}`", status, text))
         }
     })

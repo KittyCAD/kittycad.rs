@@ -1,19 +1,14 @@
 //! A library for converting OpenAPI schemas to Rust types.
 
-#![deny(missing_docs)]
-
 pub mod base64;
 pub mod exts;
-
-#[macro_use]
-extern crate quote;
 
 use std::str::FromStr;
 
 use anyhow::Result;
 use numeral::Cardinal;
 
-use crate::exts::{ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt};
+use crate::types::exts::{ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt};
 
 /// Generate Rust types from an OpenAPI v3 spec.
 pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
@@ -1068,7 +1063,7 @@ mod test {
     #[test]
     fn test_generate_kittycad_types() {
         let result =
-            super::generate_types(&super::load_spec(include_str!("../../spec.json")).unwrap())
+            super::generate_types(&super::load_spec(include_str!("../../../spec.json")).unwrap())
                 .unwrap();
         expectorate::assert_contents("tests/kittycad.rs.gen", &result);
     }
@@ -1078,7 +1073,7 @@ mod test {
     #[ignore]
     fn test_generate_github_types() {
         let result = super::generate_types(
-            &super::load_spec(include_str!("../tests/api.github.com.json")).unwrap(),
+            &super::load_spec(include_str!("../../tests/api.github.com.json")).unwrap(),
         )
         .unwrap();
         expectorate::assert_contents("tests/github.rs.gen", &result);
