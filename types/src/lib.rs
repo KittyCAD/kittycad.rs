@@ -20,7 +20,7 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
             let schema = schema.get_schema_from_reference(spec, true)?;
             println!("{} => {:?}", name, schema.schema_kind);
             // Let's handle all the kinds of schemas.
-            match handle_schema(name, &schema) {
+            match render_schema(name, &schema) {
                 Ok(t) => {
                     rendered = quote! {
                         #rendered
@@ -36,33 +36,34 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
         }
     }
 
-    Ok(get_text_fmt(&rendered)?)
+    get_text_fmt(&rendered)
 }
 
-fn handle_schema(name: &str, schema: &openapiv3::Schema) -> Result<proc_macro2::TokenStream> {
+/// Render a schema into a Rust type.
+/// This generates the Rust type.
+pub fn render_schema(name: &str, schema: &openapiv3::Schema) -> Result<proc_macro2::TokenStream> {
     match &schema.schema_kind {
         openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
-            handle_string_type(name, s, &schema.schema_data)
+            render_string_type(name, s, &schema.schema_data)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Number(_n)) => {
-            println!("{} => Number", name);
-            anyhow::bail!("XXX number not supported yet");
+            // We don't render numbers yet, since it is a primitive type.
+            Ok(quote!())
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Integer(_i)) => {
-            println!("{} => Integer", name);
-            anyhow::bail!("XXX integer not supported yet");
+            // We don't render integers yet, since it is a primitive type.
+            Ok(quote!())
         }
-        openapiv3::SchemaKind::Type(openapiv3::Type::Object(_o)) => {
-            println!("{} => Object", name);
-            anyhow::bail!("XXX object not supported yet");
+        openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
+            render_object(name, o, &schema.schema_data)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Array(_a)) => {
             println!("{} => Array", name);
             anyhow::bail!("XXX array not supported yet");
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => {
-            println!("{} => Boolean", name);
-            anyhow::bail!("XXX boolean not supported yet");
+            // We don't render booleans yet, since it is a primitive type.
+            Ok(quote!())
         }
         openapiv3::SchemaKind::OneOf { one_of: _ } => {
             println!("{} => OneOf", name);
@@ -87,7 +88,57 @@ fn handle_schema(name: &str, schema: &openapiv3::Schema) -> Result<proc_macro2::
     }
 }
 
-fn handle_string_type(
+/// Return the type name for a schema.
+pub fn get_type_name_for_schema(
+    name: &str,
+    schema: &openapiv3::Schema,
+) -> Result<proc_macro2::TokenStream> {
+    match &schema.schema_kind {
+        openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
+            get_type_name_for_string(name, s, &schema.schema_data)
+        }
+        openapiv3::SchemaKind::Type(openapiv3::Type::Number(n)) => {
+            get_type_name_for_number(name, n, &schema.schema_data)
+        }
+        openapiv3::SchemaKind::Type(openapiv3::Type::Integer(i)) => {
+            get_type_name_for_integer(name, i, &schema.schema_data)
+        }
+        openapiv3::SchemaKind::Type(openapiv3::Type::Object(_o)) => {
+            // We have an object type.
+            // Get the name for the object.
+            let ident = get_type_name(name, &schema.schema_data)?;
+            Ok(quote!(#ident))
+        }
+        openapiv3::SchemaKind::Type(openapiv3::Type::Array(_a)) => {
+            println!("{} => Array", name);
+            anyhow::bail!("XXX array not supported yet");
+        }
+        openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => Ok(quote!(bool)),
+        openapiv3::SchemaKind::OneOf { one_of: _ } => {
+            println!("{} => OneOf", name);
+            anyhow::bail!("XXX one of not supported yet");
+        }
+        openapiv3::SchemaKind::AllOf { all_of: _ } => {
+            println!("{} => AllOf", name);
+            anyhow::bail!("XXX all of not supported yet");
+        }
+        openapiv3::SchemaKind::AnyOf { any_of: _ } => {
+            println!("{} => AnyOf", name);
+            anyhow::bail!("XXX any of not supported yet");
+        }
+        openapiv3::SchemaKind::Not { not: _ } => {
+            println!("{} => Not", name);
+            anyhow::bail!("XXX not not supported yet");
+        }
+        openapiv3::SchemaKind::Any(_any) => {
+            println!("{} => Any", name);
+            anyhow::bail!("XXX any not supported yet");
+        }
+    }
+}
+
+/// Render a string type.
+fn render_string_type(
     name: &str,
     s: &openapiv3::StringType,
     data: &openapiv3::SchemaData,
@@ -108,9 +159,24 @@ fn handle_string_type(
         anyhow::bail!("XXX min_length not supported here yet: {:?}", min_length);
     }
 
-    anyhow::bail!("XXX string not supported yet");
+    // We don't render primitives yet.
+    Ok(quote!())
+}
 
-    Ok(match &s.format {
+/// Get the type name for a string type.
+fn get_type_name_for_string(
+    name: &str,
+    s: &openapiv3::StringType,
+    data: &openapiv3::SchemaData,
+) -> Result<proc_macro2::TokenStream> {
+    if !s.enumeration.is_empty() {
+        // We have an enum type.
+        // Get the name for the enum.
+        let ident = get_type_name(name, data)?;
+        return Ok(quote!(#ident));
+    }
+
+    let t = match &s.format {
         openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::DateTime) => {
             quote!(chrono::DateTime<chrono::Utc>)
         }
@@ -146,9 +212,124 @@ fn handle_string_type(
                 anyhow::bail!("XXX unknown string format {}", f)
             }
         },
-    })
+    };
+
+    Ok(t)
 }
 
+/// Get the type name for a number type.
+fn get_type_name_for_number(
+    name: &str,
+    n: &openapiv3::NumberType,
+    data: &openapiv3::SchemaData,
+) -> Result<proc_macro2::TokenStream> {
+    println!("{} => Number", name);
+    println!("{} => {:?}", name, n);
+    println!("{} => {:?}", name, data);
+
+    let t = match &n.format {
+        openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::NumberFormat::Float) => {
+            quote!(f64)
+        }
+        openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::NumberFormat::Double) => {
+            quote!(f64)
+        }
+        openapiv3::VariantOrUnknownOrEmpty::Empty => quote!(f64),
+        openapiv3::VariantOrUnknownOrEmpty::Unknown(f) => {
+            anyhow::bail!("XXX unknown number format {}", f)
+        }
+    };
+
+    Ok(t)
+}
+
+/// Get the type name for an integer type.
+fn get_type_name_for_integer(
+    name: &str,
+    i: &openapiv3::IntegerType,
+    data: &openapiv3::SchemaData,
+) -> Result<proc_macro2::TokenStream> {
+    println!("{} => Integer", name);
+    println!("{} => {:?}", name, i);
+    println!("{} => {:?}", name, data);
+
+    let t = match &i.format {
+        openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::IntegerFormat::Int32) => {
+            quote!(i32)
+        }
+        openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::IntegerFormat::Int64) => {
+            quote!(i64)
+        }
+        openapiv3::VariantOrUnknownOrEmpty::Empty => quote!(i64),
+        openapiv3::VariantOrUnknownOrEmpty::Unknown(f) => {
+            let uint;
+            let width;
+            match f.as_str() {
+                "uint" | "uint32" => {
+                    uint = true;
+                    width = 32;
+                }
+                "uint8" => {
+                    uint = true;
+                    width = 8;
+                }
+                "uint16" => {
+                    uint = true;
+                    width = 16;
+                }
+                "uint64" => {
+                    uint = true;
+                    width = 64;
+                }
+                "int8" => {
+                    uint = false;
+                    width = 8;
+                }
+                "int16" => {
+                    uint = false;
+                    width = 16;
+                }
+                /* int32 and int64 are build it and parse as the integer type */
+                f => anyhow::bail!("unknown integer format {}", f),
+            }
+
+            if uint {
+                match width {
+                    8 => quote!(u8),
+                    16 => quote!(u16),
+                    32 => quote!(u32),
+                    64 => quote!(u64),
+                    _ => anyhow::bail!("unknown uint width {}", width),
+                }
+            } else {
+                match width {
+                    8 => quote!(i8),
+                    16 => quote!(i16),
+                    32 => quote!(i32),
+                    64 => quote!(i64),
+                    _ => anyhow::bail!("unknown int width {}", width),
+                }
+            }
+        }
+    };
+
+    Ok(t)
+}
+
+/// Render the full type for an object.
+fn render_object(
+    name: &str,
+    o: &openapiv3::ObjectType,
+    data: &openapiv3::SchemaData,
+) -> Result<proc_macro2::TokenStream> {
+    println!("{} => Object", name);
+    println!("{} => {:?}", name, o);
+    println!("{} => {:?}", name, data);
+
+    anyhow::bail!("XXX object not supported yet");
+}
+
+/// Render the full type for an enum.
 fn render_enum(
     name: &str,
     s: &openapiv3::StringType,
@@ -165,20 +346,7 @@ fn render_enum(
     };
 
     // Get the struct name version of the name of the enum.
-    let enum_name = format_ident!(
-        "{}",
-        if !name.is_empty() {
-            struct_name(name)
-        } else if let Some(title) = &data.title {
-            struct_name(title)
-        } else {
-            anyhow::bail!(
-                "Cannot render enum without name or title: {:?} {:?}",
-                s,
-                data
-            );
-        }
-    );
+    let enum_name = get_type_name(name, data)?;
 
     let mut values = quote!();
     for e in &s.enumeration {
@@ -189,16 +357,16 @@ fn render_enum(
 
         let e = e.as_ref().unwrap().to_string();
 
-        if struct_name(&e).is_empty() || e.trim().is_empty() {
+        if proper_name(&e).is_empty() || e.trim().is_empty() {
             // TODO: do something for empty(?)
             continue;
         }
 
-        let e_name = format_ident!("{}", struct_name(&e));
+        let e_name = format_ident!("{}", proper_name(&e));
         let mut e_value = quote!(
             #e_name,
         );
-        if struct_name(&e) != e {
+        if proper_name(&e) != e {
             e_value = quote!(
                 #[serde(rename = #e)]
                 #[display(#e)]
@@ -216,7 +384,7 @@ fn render_enum(
     // If the data for the enum has a default value, implement default for the enum.
     let default = if let Some(default) = &data.default {
         let default = default.to_string();
-        let default = format_ident!("{}", struct_name(&default));
+        let default = format_ident!("{}", proper_name(&default));
         quote!(
             impl Default for #enum_name {
                 fn default() -> Self {
@@ -226,7 +394,7 @@ fn render_enum(
         )
     } else if s.enumeration.len() == 1 {
         let default = s.enumeration[0].as_ref().unwrap().to_string();
-        let default = format_ident!("{}", struct_name(&default));
+        let default = format_ident!("{}", proper_name(&default));
         quote!(
             impl Default for #enum_name {
                 fn default() -> Self {
@@ -251,7 +419,9 @@ fn render_enum(
     Ok(rendered)
 }
 
-fn struct_name(s: &str) -> String {
+/// Return a proper rust name for a string.
+/// For example, this gets used as the enum and struct name.
+fn proper_name(s: &str) -> String {
     // Check if s is a number like 1 or 2, etc.
     // If it is a number we want to convert it to a string as follows:
     // 1 => One
@@ -265,6 +435,22 @@ fn struct_name(s: &str) -> String {
     };
 
     inflector::cases::pascalcase::to_pascal_case(&s)
+}
+
+/// Return the name for a type based on a name if passed or the title of the schema data.
+fn get_type_name(name: &str, data: &openapiv3::SchemaData) -> Result<proc_macro2::Ident> {
+    let t = format_ident!(
+        "{}",
+        if !name.is_empty() {
+            proper_name(name)
+        } else if let Some(title) = &data.title {
+            proper_name(title)
+        } else {
+            anyhow::bail!("Cannot get type name without name or title: {:?}", data);
+        }
+    );
+
+    Ok(t)
 }
 
 fn clean_text(s: &str) -> String {
@@ -303,9 +489,9 @@ mod test {
     }
 
     #[test]
-    fn test_struct_name_number() {
-        assert_eq!(super::struct_name("1"), "One");
-        assert_eq!(super::struct_name("2"), "Two");
-        assert_eq!(super::struct_name("100"), "OneHundred");
+    fn test_proper_name_number() {
+        assert_eq!(super::proper_name("1"), "One");
+        assert_eq!(super::proper_name("2"), "Two");
+        assert_eq!(super::proper_name("100"), "OneHundred");
     }
 }
