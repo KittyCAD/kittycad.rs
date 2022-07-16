@@ -141,8 +141,7 @@ pub fn get_type_name_for_schema(
             }
 
             let internal_schema = &one_of[0].get_schema_from_reference(spec, true)?;
-            let ident = get_type_name(name, &internal_schema.schema_data)?;
-            quote!(#ident)
+            get_type_name_for_schema(name, internal_schema, spec)?
         }
         openapiv3::SchemaKind::AllOf { all_of } => {
             if all_of.len() != 1 {
@@ -150,7 +149,7 @@ pub fn get_type_name_for_schema(
             }
 
             let internal_schema = &all_of[0].get_schema_from_reference(spec, true)?;
-            get_type_name_for_schema(name, &internal_schema, spec)?
+            get_type_name_for_schema(name, internal_schema, spec)?
         }
         openapiv3::SchemaKind::AnyOf { any_of: _ } => {
             anyhow::bail!("XXX any of not supported yet");
