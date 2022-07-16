@@ -540,6 +540,7 @@ dependencies = [
  "slog-scope",
  "slog-stdlog",
  "slog-term",
+ "url",
 ]
 
 [[package]]

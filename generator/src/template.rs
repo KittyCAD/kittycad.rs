@@ -177,7 +177,7 @@ pub fn generate_docs(
 //! Alternatively, the library can search for most of the variables required for
 //! the client in the environment:
 //!
-//! - `{}_API_TOKEN`
+//! - `{}`
 //!
 //! And then you can create a client from the environment.
 //!
@@ -191,7 +191,12 @@ pub fn generate_docs(
         name.replace('_', "-").to_lowercase(),
         version,
         name,
-        to_screaming_snake_case(name),
+        get_token_env_variable(name),
         name,
     ))
+}
+
+/// Get the name of the environment variable for the API token.
+pub fn get_token_env_variable(name: &str) -> String {
+    format!("{}_API_TOKEN", to_screaming_snake_case(name))
 }

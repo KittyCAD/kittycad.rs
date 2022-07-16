@@ -26,7 +26,8 @@ kittycad: target/debug/generator
 		-o kittycad \
 		-n kittycad \
 		-d "A fully generated & opinionated API client for the KittyCAD API." \
-		--spec-url "https://api.kittycad.io" $(EXTRA_ARGS)
+		--spec-url "https://api.kittycad.io" \
+		--base-url "https://api.kittycad.io" $(EXTRA_ARGS)
 	cargo fmt -p kittycad
 	cargo clippy -p kittycad --fix --allow-dirty
 

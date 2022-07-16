@@ -142,7 +142,7 @@ impl Client {
         }
     }
 
-    /// Set the base URL for the client to something other than the default: `https://api.kittycad.io`.
+    /// Set the base URL for the client to something other than the default: <BASEURL>.
     pub fn set_base_url<H>(&mut self, base_url: H)
     where
         H: Into<String> + std::fmt::Display,
@@ -150,7 +150,7 @@ impl Client {
         self.base_url = base_url.to_string().trim_end_matches('/').to_string();
     }
 
-    /// Create a new Client struct from the environment variable: KITTYCAD_API_TOKEN.
+    /// Create a new Client struct from the environment variable: `KITTYCAD_API_TOKEN`.
     pub fn new_from_env() -> Self {
         let token = env::var("KITTYCAD_API_TOKEN").expect("must set KITTYCAD_API_TOKEN");
 

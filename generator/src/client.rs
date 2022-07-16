@@ -1,8 +1,14 @@
 //! Client templates for our generated library.
 
 /// Generate the base of the API client.
-pub fn generate_client() -> String {
-    CLIENT_FUNCTIONS.to_string()
+pub fn generate_client(name: &str, base_url: &url::Url) -> String {
+    CLIENT_FUNCTIONS
+        .replace(
+            "ENV_VARIABLE",
+            &crate::template::get_token_env_variable(name),
+        )
+        .replace("BASE_URL", base_url.to_string().trim_end_matches('/'))
+        .to_string()
 }
 
 const CLIENT_FUNCTIONS: &str = r#"
@@ -41,7 +47,7 @@ impl Client {
             Ok(c) => {
                 Client {
                     token: token.to_string(),
-                    base_url: "https://api.kittycad.io".to_string(),
+                    base_url: "BASE_URL".to_string(),
 
                     client: c,
                 }
@@ -50,7 +56,7 @@ impl Client {
         }
     }
 
-    /// Set the base URL for the client to something other than the default: `https://api.kittycad.io`.
+    /// Set the base URL for the client to something other than the default: <BASEURL>.
     pub fn set_base_url<H>(&mut self, base_url: H)
     where
         H: Into<String> + std::fmt::Display,
@@ -58,10 +64,10 @@ impl Client {
         self.base_url = base_url.to_string().trim_end_matches('/').to_string();
     }
 
-    /// Create a new Client struct from the environment variable: KITTYCAD_API_TOKEN.
+    /// Create a new Client struct from the environment variable: `ENV_VARIABLE`.
     pub fn new_from_env() -> Self
     {
-        let token = env::var("KITTYCAD_API_TOKEN").expect("must set KITTYCAD_API_TOKEN");
+        let token = env::var("ENV_VARIABLE").expect("must set ENV_VARIABLE");
 
         Client::new(
             token,
