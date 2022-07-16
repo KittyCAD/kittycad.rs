@@ -7,6 +7,8 @@ pub mod exts;
 #[macro_use]
 extern crate quote;
 
+use std::str::FromStr;
+
 use anyhow::Result;
 use numeral::Cardinal;
 
@@ -14,8 +16,15 @@ use crate::exts::{ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt};
 
 /// Generate Rust types from an OpenAPI v3 spec.
 pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
+    // Include the base64 data type for byte data.
+    let base64_mod = get_base64_mod()?;
+
     // Let's start with the components if there are any.
-    let mut rendered = quote!();
+    let mut rendered = quote!(
+        //! This module contains the generated types for the library.
+
+        #base64_mod
+    );
 
     if let Some(components) = &spec.components {
         // Parse the schemas.
@@ -199,9 +208,9 @@ fn get_type_name_for_string(
         openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Password) => {
             quote!(String)
         }
-        // TODO: as per the spec this is base64 encoded chars.
         openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Byte) => {
-            quote!(bytes::Bytes)
+            // Use our custom base64 data type.
+            quote!(base64::Base64Data)
         }
         openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Binary) => {
             quote!(bytes::Bytes)
@@ -939,6 +948,16 @@ fn get_text_fmt(output: &proc_macro2::TokenStream) -> Result<String> {
 /// Parse an OpenAPI v3 spec JSON string as an OpenAPI struct.
 pub fn load_spec(s: &str) -> Result<openapiv3::OpenAPI> {
     serde_json::from_str(s).map_err(|e| anyhow::anyhow!(e))
+}
+
+fn get_base64_mod() -> Result<proc_macro2::TokenStream> {
+    let file = include_str!("base64.rs");
+    let stream = proc_macro2::TokenStream::from_str(file).map_err(|e| anyhow::anyhow!("{}", e))?;
+    Ok(quote!(
+        mod base64 {
+            #stream
+        }
+    ))
 }
 
 #[cfg(test)]
