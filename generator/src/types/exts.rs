@@ -317,3 +317,31 @@ impl StatusCodeExt for openapiv3::StatusCode {
         }
     }
 }
+
+/// A trait for utility functions on token streams.
+pub trait TokenStreamExt {
+    /// Return `true` if the token stream is already an option.
+    fn is_option(&self) -> Result<bool>;
+
+    /// Render the token stream as a string.
+    fn rendered(&self) -> Result<String>;
+
+    /// Render and `rustfmt` the token stream as a string.
+    fn rendered_fmt(&self) -> Result<String>;
+}
+
+impl TokenStreamExt for proc_macro2::TokenStream {
+    fn is_option(&self) -> Result<bool> {
+        let rendered = self.rendered()?;
+        // The phone number type is also a nested option.
+        Ok(rendered.starts_with("Option<") || rendered.ends_with("phone_number::PhoneNumber"))
+    }
+
+    fn rendered(&self) -> Result<String> {
+        crate::types::get_text(self)
+    }
+
+    fn rendered_fmt(&self) -> Result<String> {
+        crate::types::get_text_fmt(self)
+    }
+}

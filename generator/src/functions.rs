@@ -4,7 +4,9 @@ use std::{collections::BTreeMap, fmt::Write as _};
 
 use anyhow::Result;
 
-use crate::types::exts::{ParameterSchemaOrContentExt, ReferenceOrExt, StatusCodeExt};
+use crate::types::exts::{
+    ParameterSchemaOrContentExt, ReferenceOrExt, StatusCodeExt, TokenStreamExt,
+};
 
 /// Generate functions for each path operation.
 pub fn generate_files(
@@ -342,7 +344,7 @@ fn get_path_params(
             };
 
             // Make it an option if it's optional.
-            if !parameter_data.required && !crate::types::get_text(&t)?.starts_with("Option<") {
+            if !parameter_data.required && !t.is_option()? {
                 t = quote!(Option<#t>);
             }
 
@@ -389,7 +391,7 @@ fn get_query_params(
             };
 
             // Make it an option if it's optional.
-            if !parameter_data.required && !crate::types::get_text(&t)?.starts_with("Option<") {
+            if !parameter_data.required && !t.is_option()? {
                 t = quote!(Option<#t>);
             }
 
@@ -448,7 +450,7 @@ fn get_function_body(
 
             let type_text = crate::types::get_text(t)?;
 
-            if !type_text.starts_with("Option<") {
+            if !t.is_option()? {
                 if type_text == "String" {
                     array.push(quote! {
                        query_params.push((#name, #name_ident));

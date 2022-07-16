@@ -11,7 +11,7 @@ use anyhow::Result;
 use numeral::Cardinal;
 
 use crate::types::exts::{
-    ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt, StatusCodeExt,
+    ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt, StatusCodeExt, TokenStreamExt,
 };
 
 /// Generate Rust types from an OpenAPI v3 spec.
@@ -199,7 +199,7 @@ pub fn get_type_name_for_schema(
         openapiv3::SchemaKind::Any(_any) => quote!(serde_json::Value),
     };
 
-    if schema.schema_data.nullable {
+    if schema.schema_data.nullable && !t.is_option()? {
         Ok(quote!(Option<#t>))
     } else {
         Ok(t)
@@ -767,7 +767,7 @@ fn render_object(
         // Get the type name for the schema.
         let mut type_name = get_type_name_for_schema(&prop, &inner_schema, spec, true)?;
         // Check if this type is required.
-        if !o.required.contains(k) && !get_text(&type_name)?.starts_with("Option<") {
+        if !o.required.contains(k) && !type_name.is_option()? {
             // Make the type optional.
             type_name = quote!(Option<#type_name>);
         }
@@ -787,7 +787,7 @@ fn render_object(
             ));
         }
 
-        if type_name_text.starts_with("Option<") {
+        if type_name.is_option()? {
             serde_props.push(quote!(default));
             serde_props.push(quote!(skip_serializing_if = "Option::is_none"));
         }
@@ -1159,7 +1159,7 @@ impl PaginationProperties {
 
             let type_name_str = crate::types::get_text(&type_name)?;
             // Check if this type is required.
-            if !o.required.contains(k) && !type_name_str.starts_with("Option<") {
+            if !o.required.contains(k) && !type_name.is_option()? {
                 // Make the type optional.
                 type_name = quote!(Option<#type_name>);
             }

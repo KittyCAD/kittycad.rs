@@ -122,3 +122,58 @@ async fn test_stream() {
 
     assert!(stream.len() > limit as usize);
 }
+
+#[test]
+fn test_empty_phone_number() {
+    let user_info = crate::types::UpdateUser {
+        first_name: Some("John".to_string()),
+        last_name: Some("Doe".to_string()),
+        phone: Default::default(),
+        company: Some("Example Company".to_string()),
+        github: Some("@example-company".to_string()),
+        discord: Some("@example-company".to_string()),
+    };
+
+    assert_eq!(
+        serde_json::to_string_pretty(&user_info).unwrap(),
+        r#"{
+  "company": "Example Company",
+  "discord": "@example-company",
+  "first_name": "John",
+  "github": "@example-company",
+  "last_name": "Doe"
+}"#
+    );
+
+    let user_info_str = r#"{"first_name":"John","last_name":"Doe","company":"Example Company","github":"@example-company","discord":"@example-company"}"#;
+    assert_eq!(
+        serde_json::from_str::<crate::types::UpdateUser>(user_info_str).unwrap(),
+        user_info
+    );
+
+    let billing_info = crate::types::BillingInfo {
+        name: Some("John".to_string()),
+        phone: Default::default(),
+        address: None,
+    };
+
+    assert_eq!(
+        serde_json::to_string_pretty(&billing_info).unwrap(),
+        r#"{
+  "name": "John"
+}"#
+    );
+
+    let billing_info_str = r#"{"name":"John"}"#;
+    assert_eq!(
+        serde_json::from_str::<crate::types::BillingInfo>(billing_info_str).unwrap(),
+        billing_info
+    );
+}
+
+#[tokio::test]
+async fn test_user_self() {
+    let client = test_client();
+
+    let _result = client.users().get_user_self().await.unwrap();
+}

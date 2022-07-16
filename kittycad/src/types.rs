@@ -146,26 +146,26 @@ pub mod paginate {
 }
 
 pub mod phone_number {
-    #![doc = " A library to implement phone numbers for JSON serialization and deserialization."]
+    #![doc = " A library to implement phone numbers for our database and JSON serialization and deserialization."]
     use schemars::JsonSchema;
     use std::str::FromStr;
     #[doc = " A phone number."]
-    #[derive(Debug, Clone, PartialEq, Hash, Eq)]
-    pub struct PhoneNumber(pub phonenumber::PhoneNumber);
+    #[derive(Debug, Default, Clone, PartialEq, Hash, Eq)]
+    pub struct PhoneNumber(pub Option<phonenumber::PhoneNumber>);
     impl From<phonenumber::PhoneNumber> for PhoneNumber {
-        fn from(phone: phonenumber::PhoneNumber) -> PhoneNumber {
-            PhoneNumber(phone)
+        fn from(id: phonenumber::PhoneNumber) -> PhoneNumber {
+            PhoneNumber(Some(id))
         }
     }
 
-    impl AsRef<phonenumber::PhoneNumber> for PhoneNumber {
-        fn as_ref(&self) -> &phonenumber::PhoneNumber {
+    impl AsRef<Option<phonenumber::PhoneNumber>> for PhoneNumber {
+        fn as_ref(&self) -> &Option<phonenumber::PhoneNumber> {
             &self.0
         }
     }
 
     impl std::ops::Deref for PhoneNumber {
-        type Target = phonenumber::PhoneNumber;
+        type Target = Option<phonenumber::PhoneNumber>;
         fn deref(&self) -> &Self::Target {
             &self.0
         }
@@ -194,7 +194,7 @@ pub mod phone_number {
         type Err = anyhow::Error;
         fn from_str(s: &str) -> Result<Self, Self::Err> {
             if s.trim().is_empty() {
-                return Err(anyhow::anyhow!("phone number cannot be empty"));
+                return Ok(PhoneNumber(None));
             }
             let s = if !s.trim().starts_with('+') {
                 format!("+1{}", s)
@@ -208,17 +208,23 @@ pub mod phone_number {
                     .replace(')', "")
                     .replace(' ', "")
             };
-            Ok(PhoneNumber(phonenumber::parse(None, &s).map_err(|e| {
-                anyhow::anyhow!("invalid phone number `{}`: {}", s, e)
-            })?))
+            Ok(PhoneNumber(Some(phonenumber::parse(None, &s).map_err(
+                |e| anyhow::anyhow!("invalid phone number `{}`: {}", s, e),
+            )?)))
         }
     }
 
-    impl std::string::ToString for PhoneNumber {
-        fn to_string(&self) -> String {
-            self.format()
-                .mode(phonenumber::Mode::International)
-                .to_string()
+    impl std::fmt::Display for PhoneNumber {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            let s = if let Some(phone) = &self.0 {
+                phone
+                    .format()
+                    .mode(phonenumber::Mode::International)
+                    .to_string()
+            } else {
+                String::new()
+            };
+            write!(f, "{}", s)
         }
     }
 
@@ -247,7 +253,7 @@ pub mod phone_number {
             let mut phone = "+1-555-555-5555";
             let mut phone_parsed: PhoneNumber =
                 serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
-            let mut expected = PhoneNumber(phonenumber::parse(None, phone).unwrap());
+            let mut expected = PhoneNumber(Some(phonenumber::parse(None, phone).unwrap()));
             assert_eq!(phone_parsed, expected);
             let mut expected_str = "+1 555-555-5555";
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
@@ -265,7 +271,7 @@ pub mod phone_number {
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
             phone = "(510) 864-1234";
             phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
-            expected = PhoneNumber(phonenumber::parse(None, "+15108641234").unwrap());
+            expected = PhoneNumber(Some(phonenumber::parse(None, "+15108641234").unwrap()));
             assert_eq!(phone_parsed, expected);
             expected_str = "+1 510-864-1234";
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
@@ -274,16 +280,13 @@ pub mod phone_number {
             assert_eq!(phone_parsed, expected);
             expected_str = "+1 510-864-1234";
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
-            assert_eq!(
-                serde_json::from_str::<PhoneNumber>(r#""""#)
-                    .err()
-                    .unwrap()
-                    .to_string(),
-                "phone number cannot be empty"
-            );
+            phone = "";
+            phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+            assert_eq!(phone_parsed, PhoneNumber(None));
+            assert_eq!("", serde_json::json!(phone_parsed));
             phone = "+49 30  1234 1234";
             phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
-            expected = PhoneNumber(phonenumber::parse(None, phone).unwrap());
+            expected = PhoneNumber(Some(phonenumber::parse(None, phone).unwrap()));
             assert_eq!(phone_parsed, expected);
             expected_str = "+49 30 12341234";
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
@@ -890,8 +893,7 @@ pub struct BillingInfo {
     pub name: Option<String>,
     #[doc = "The phone for the customer."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[tabled(skip)]
-    pub phone: Option<phone_number::PhoneNumber>,
+    pub phone: phone_number::PhoneNumber,
 }
 
 impl std::fmt::Display for BillingInfo {
@@ -1832,8 +1834,7 @@ pub struct Customer {
     pub name: Option<String>,
     #[doc = "The customer's phone number."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[tabled(skip)]
-    pub phone: Option<phone_number::PhoneNumber>,
+    pub phone: phone_number::PhoneNumber,
 }
 
 impl std::fmt::Display for Customer {
@@ -2414,8 +2415,7 @@ pub struct ExtendedUser {
     pub name: Option<String>,
     #[doc = "The user's phone number."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[tabled(skip)]
-    pub phone: Option<phone_number::PhoneNumber>,
+    pub phone: phone_number::PhoneNumber,
     #[doc = "The user's Stripe ID. This is mostly used for internal mapping."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
@@ -4127,8 +4127,7 @@ pub struct UpdateUser {
     pub last_name: Option<String>,
     #[doc = "The user's phone number."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[tabled(skip)]
-    pub phone: Option<phone_number::PhoneNumber>,
+    pub phone: phone_number::PhoneNumber,
 }
 
 impl std::fmt::Display for UpdateUser {
@@ -4196,8 +4195,7 @@ pub struct User {
     pub name: Option<String>,
     #[doc = "The user's phone number."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[tabled(skip)]
-    pub phone: Option<phone_number::PhoneNumber>,
+    pub phone: phone_number::PhoneNumber,
     #[doc = "The date and time the user was last updated."]
     #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
