@@ -1,10 +1,13 @@
+use std::fmt::Write as _;
+
+use anyhow::Result;
 use inflector::cases::kebabcase::to_kebab_case;
 
 fn generate_docs_openapi_info(
     api: &openapiv3::OpenAPI,
     spec_link: &str,
     package_name: &str,
-) -> String {
+) -> Result<String> {
     let mut description = String::new();
     if let Some(d) = &api.info.description {
         description = d.replace('\n', "\n//! ");
@@ -50,13 +53,13 @@ fn generate_docs_openapi_info(
         }
 
         if !name.is_empty() {
-            contact.push_str(&format!("| {} ", name));
+            write!(contact, "| {} ", name)?;
         }
         if !url.is_empty() {
-            contact.push_str(&format!("| <{}> ", url));
+            write!(contact, "| <{}> ", url)?;
         }
         if !email.is_empty() {
-            contact.push_str(&format!("| {} ", email));
+            write!(contact, "| {} ", email)?;
         }
         if !contact.is_empty() {
             contact.push_str("|\n//! ");
@@ -87,9 +90,9 @@ fn generate_docs_openapi_info(
         }
         license.push_str("|\n//! ");
 
-        license.push_str(&format!("| {} ", l.name));
+        write!(license, "| {} ", l.name)?;
         if !url.is_empty() {
-            license.push_str(&format!("| <{}> ", url));
+            write!(license, "| <{}> ", url)?;
         }
         license.push_str("|\n//! ");
 
@@ -98,7 +101,7 @@ fn generate_docs_openapi_info(
 
     let api_version = format!("based on API spec version `{}`", api.info.version);
 
-    format!(
+    Ok(format!(
         r#"//! A fully generated, opinionated API client library for KittyCAD.
 //!
 //! [![docs.rs](https://docs.rs/{}/badge.svg)](https://docs.rs/{})
@@ -127,7 +130,7 @@ fn generate_docs_openapi_info(
         license,
         spec_link,
         api_version,
-    )
+    ))
 }
 
 pub fn generate_docs(
@@ -135,9 +138,9 @@ pub fn generate_docs(
     name: &str,
     version: &str,
     spec_link: &str,
-) -> String {
-    let info = generate_docs_openapi_info(api, spec_link, name);
-    format!(
+) -> Result<String> {
+    let info = generate_docs_openapi_info(api, spec_link, name)?;
+    Ok(format!(
         r#"{}
 //!
 //! To install the library, add the following to your `Cargo.toml` file.
@@ -178,5 +181,5 @@ pub fn generate_docs(
         version,
         name,
         name,
-    )
+    ))
 }

@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, fmt::Write as _};
 
 use anyhow::Result;
 use types::exts::{ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt};
@@ -20,11 +20,10 @@ pub fn generate_files(spec: &openapiv3::OpenAPI) -> Result<BTreeMap<String, Stri
                 return Ok(());
             };
 
-            let tag = crate::clean_tag_name(op.tags.first().ok_or(anyhow::anyhow!(
-                "operation `{}` `{}` has no tags",
-                name,
-                method
-            ))?);
+            let tag =
+                crate::clean_tag_name(op.tags.first().ok_or_else(|| {
+                    anyhow::anyhow!("operation `{}` `{}` has no tags", name, method)
+                })?);
 
             // Get the docs.
             let docs = generate_docs(name, method, op)?;
@@ -58,13 +57,14 @@ pub fn generate_files(spec: &openapiv3::OpenAPI) -> Result<BTreeMap<String, Stri
             let mut fn_str = types::get_text_fmt(&function)?;
 
             // Add our function to our existing tag file, or create a new one.
-            if tag_files.contains_key(&tag) {
+            if let std::collections::btree_map::Entry::Vacant(e) = tag_files.entry(tag.to_string())
+            {
+                e.insert(fn_str);
+            } else {
                 // Add some new lines.
                 fn_str = format!("\n\n{}", fn_str);
 
                 tag_files.get_mut(&tag).unwrap().push_str(&fn_str);
-            } else {
-                tag_files.insert(tag, fn_str);
             }
 
             Ok(())
@@ -105,15 +105,13 @@ fn generate_docs(name: &str, method: &str, op: &openapiv3::Operation) -> Result<
     if let Some(external_docs) = &op.external_docs {
         docs.push_str("\n\n");
         if let Some(description) = &external_docs.description {
-            docs.push_str(&format!(
+            write!(
+                docs,
                 "See <{}|{}> for more information.",
                 external_docs.url, description
-            ));
+            )?;
         } else {
-            docs.push_str(&format!(
-                "See <{}> for more information.",
-                external_docs.url
-            ));
+            write!(docs, "See <{}> for more information.", external_docs.url)?;
         }
     }
 
@@ -125,11 +123,7 @@ fn get_fn_name(name: &str, method: &str, tag: &str, op: &openapiv3::Operation) -
     let mut name = op
         .operation_id
         .as_ref()
-        .ok_or(anyhow::anyhow!(
-            "operation `{}` `{}` has no operation_id",
-            name,
-            method
-        ))?
+        .ok_or_else(|| anyhow::anyhow!("operation `{}` `{}` has no operation_id", name, method))?
         .to_string();
 
     // Remove any stutters with the tag name.
@@ -140,7 +134,7 @@ fn get_fn_name(name: &str, method: &str, tag: &str, op: &openapiv3::Operation) -
         name = name.trim_end_matches(&format!("_{}", tag)).to_string();
     }
     if name.contains(&format!("_{}_", tag)) {
-        name = name.replace(&format!("_{}_", tag), "_").to_string();
+        name = name.replace(&format!("_{}_", tag), "_");
     }
 
     Ok(name)
@@ -189,8 +183,8 @@ pub trait StatusCodeExt {
 impl StatusCodeExt for openapiv3::StatusCode {
     fn is_success(&self) -> bool {
         match self {
-            openapiv3::StatusCode::Code(c) => c >= &200 && c < &300,
-            openapiv3::StatusCode::Range(r) => r.to_string().starts_with("2"),
+            openapiv3::StatusCode::Code(c) => (&200..&300).contains(&c),
+            openapiv3::StatusCode::Range(r) => r.to_string().starts_with('2'),
         }
     }
 }

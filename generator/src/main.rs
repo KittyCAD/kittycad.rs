@@ -519,7 +519,7 @@ rustdoc-args = ["--cfg", "docsrs"]
             /*
              * Generate our documentation for the library.
              */
-            let docs = template::generate_docs(&api, &to_snake_case(&name), &version, &spec_link);
+            let docs = template::generate_docs(&api, &to_snake_case(&name), &version, &spec_link)?;
             let mut readme = root.clone();
             readme.push("README.md");
             save(
