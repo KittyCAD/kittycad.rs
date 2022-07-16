@@ -17,6 +17,7 @@ pub struct Opts {
     pub json: bool,
 
     /// The input OpenAPI definition document (JSON | YAML).
+    // TODO: We could also load from a URL.
     #[clap(short, long, parse(from_os_str), required = true)]
     pub input: std::path::PathBuf,
 
