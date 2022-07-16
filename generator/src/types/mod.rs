@@ -1238,9 +1238,10 @@ mod test {
 
     #[test]
     fn test_generate_kittycad_types() {
-        let result =
-            super::generate_types(&super::load_spec(include_str!("../../../spec.json")).unwrap())
-                .unwrap();
+        let result = super::generate_types(
+            &crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
+        )
+        .unwrap();
         expectorate::assert_contents("tests/kittycad.rs.gen", &result);
     }
 
@@ -1249,7 +1250,7 @@ mod test {
     #[ignore]
     fn test_generate_github_types() {
         let result = super::generate_types(
-            &super::load_spec(include_str!("../../tests/api.github.com.json")).unwrap(),
+            &crate::load_json_spec(include_str!("../../tests/api.github.com.json")).unwrap(),
         )
         .unwrap();
         expectorate::assert_contents("tests/github.rs.gen", &result);
