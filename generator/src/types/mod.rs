@@ -815,7 +815,8 @@ fn render_object(
                 fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request> {
                     let mut req = req.try_clone().ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
                     req.url_mut().query_pairs_mut()
-                        .append_pair("page_token", &self.next_page.unwrap().to_string());
+                        .append_pair("page_token", &self.next_page.as_ref().map(|s| s.as_str()).unwrap_or(""));
+
                     Ok(req)
                 }
             }

@@ -457,9 +457,10 @@ impl crate::types::paginate::Pagination for ApiCallWithPriceResultsPage {
         let mut req = req
             .try_clone()
             .ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
-        req.url_mut()
-            .query_pairs_mut()
-            .append_pair("page_token", &self.next_page.unwrap().to_string());
+        req.url_mut().query_pairs_mut().append_pair(
+            "page_token",
+            &self.next_page.as_ref().map(|s| s.as_str()).unwrap_or(""),
+        );
         Ok(req)
     }
 }
@@ -548,9 +549,10 @@ impl crate::types::paginate::Pagination for ApiTokenResultsPage {
         let mut req = req
             .try_clone()
             .ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
-        req.url_mut()
-            .query_pairs_mut()
-            .append_pair("page_token", &self.next_page.unwrap().to_string());
+        req.url_mut().query_pairs_mut().append_pair(
+            "page_token",
+            &self.next_page.as_ref().map(|s| s.as_str()).unwrap_or(""),
+        );
         Ok(req)
     }
 }
@@ -680,9 +682,10 @@ impl crate::types::paginate::Pagination for AsyncApiCallResultsPage {
         let mut req = req
             .try_clone()
             .ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
-        req.url_mut()
-            .query_pairs_mut()
-            .append_pair("page_token", &self.next_page.unwrap().to_string());
+        req.url_mut().query_pairs_mut().append_pair(
+            "page_token",
+            &self.next_page.as_ref().map(|s| s.as_str()).unwrap_or(""),
+        );
         Ok(req)
     }
 }
@@ -2320,9 +2323,10 @@ impl crate::types::paginate::Pagination for ExtendedUserResultsPage {
         let mut req = req
             .try_clone()
             .ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
-        req.url_mut()
-            .query_pairs_mut()
-            .append_pair("page_token", &self.next_page.unwrap().to_string());
+        req.url_mut().query_pairs_mut().append_pair(
+            "page_token",
+            &self.next_page.as_ref().map(|s| s.as_str()).unwrap_or(""),
+        );
         Ok(req)
     }
 }
@@ -4090,9 +4094,10 @@ impl crate::types::paginate::Pagination for UserResultsPage {
         let mut req = req
             .try_clone()
             .ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
-        req.url_mut()
-            .query_pairs_mut()
-            .append_pair("page_token", &self.next_page.unwrap().to_string());
+        req.url_mut().query_pairs_mut().append_pair(
+            "page_token",
+            &self.next_page.as_ref().map(|s| s.as_str()).unwrap_or(""),
+        );
         Ok(req)
     }
 }

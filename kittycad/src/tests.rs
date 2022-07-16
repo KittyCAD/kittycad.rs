@@ -76,3 +76,35 @@ async fn test_get_status_of_async_operation() {
         .await
         .unwrap();
 }
+
+#[tokio::test]
+async fn serialize_one_of() {
+    let client = test_client();
+
+    let result = client
+        .api_calls()
+        .get_async_operation("23a9759f-ee9b-47de-9a55-deb1ed035793".to_string())
+        .await
+        .unwrap();
+
+    expectorate::assert_contents(
+        "tests/one_of.json",
+        &serde_json::to_string_pretty(&result).unwrap(),
+    );
+}
+
+#[tokio::test]
+async fn tabled_one_of() {
+    let client = test_client();
+
+    let result = client
+        .api_calls()
+        .get_async_operation("23a9759f-ee9b-47de-9a55-deb1ed035793".to_string())
+        .await
+        .unwrap();
+
+    expectorate::assert_contents(
+        "tests/one_of_tabled.txt",
+        &tabled::Table::new(vec![result]).to_string(),
+    );
+}

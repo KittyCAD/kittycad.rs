@@ -830,6 +830,7 @@ dependencies = [
  "clap",
  "data-encoding",
  "dirs",
+ "expectorate",
  "format_serde_error",
  "http",
  "hyperx",
