@@ -115,10 +115,14 @@ pub fn generate_files(
 
                         // Get the result from our other function.
                         let mut result = self.#fn_name_ident(#inner_args #body_arg).await?;
+                        let mut items = result.items();
                         if result.has_more_pages()? {
                             result = {
                                 #paginated_function_body
                             }?;
+
+                            // Add our new items to the existing ones.
+                            items.extend(result.items());
                         }
 
                         Ok(result)
