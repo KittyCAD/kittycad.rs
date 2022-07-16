@@ -302,25 +302,77 @@ fn get_function_body(
     let path = name.trim_start_matches('/');
     let method_ident = format_ident!("{}", method);
 
+    // Let's get the path parameters.
+    let mut path_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
+    // Let's get the arguments for the function.
+    for parameter in &op.parameters {
+        // Get the parameter.
+        let parameter = parameter.expand(spec)?;
+
+        // Get the data for the parameter.
+        // We only care about path parameters, currently.
+        if let openapiv3::Parameter::Path {
+            parameter_data,
+            style: _,
+        } = parameter
+        {
+            // Get the schema for the parameter.
+            let schema = parameter_data.format.schema()?;
+
+            // Get the type for the parameter.
+            let mut t = match schema {
+                openapiv3::ReferenceOr::Reference { .. } => {
+                    types::get_type_name_from_reference(&schema.reference()?, spec, false)?
+                }
+                openapiv3::ReferenceOr::Item(s) => {
+                    types::get_type_name_for_schema("", &s, spec, false)?
+                }
+            };
+
+            // Make it an option if it's optional.
+            if !parameter_data.required && !types::get_text(&t)?.starts_with("Option<") {
+                t = quote!(Option<#t>);
+            }
+
+            // Add path parameter to our list.
+            path_params.insert(parameter_data.name, t);
+        }
+    }
+    let clean_url = if !path_params.is_empty() {
+        let mut clean_string = quote!();
+        for (name, _t) in &path_params {
+            let url_string = format!("{{{}}}", name);
+            let cleaned_name = types::clean_property_name(&name);
+            let name_ident = format_ident!("{}", cleaned_name);
+
+            clean_string = quote! {
+                #clean_string.replace(#url_string, &format!("{}", #name_ident))
+            }
+        }
+        clean_string
+    } else {
+        quote!()
+    };
+
     // Get if there is a request body.
     let request_body = if let Some(request_body) = get_request_body(op, spec)? {
         match request_body.media_type.as_str() {
             "application/json" => {
                 quote! {
                     // Add the json body.
-                    rb = rb.json(body);
+                    req = req.json(body);
                 }
             }
             "application/x-www-form-urlencoded" => {
                 quote! {
                     // Add the form body.
-                    rb = rb.form(body);
+                    req = req.form(body);
                 }
             }
             "application/octet-stream" => {
                 quote! {
                     // Add the raw body.
-                    rb = rb.body(body.clone());
+                    req = req.body(body.clone());
                 }
             }
             _ => {
@@ -336,46 +388,54 @@ fn get_function_body(
     };
 
     // Get the response if there is one.
-    let response = if let Some(response) = get_response(op, spec)? {
-        quote! {
-            // Get the response.
-            let response = rb.send()?;
-            // Get the status code.
-            let status_code = response.status();
-            // Get the body.
-            let body = response.text()?;
-            // Get the type.
-            let type_ = types::get_type_name_for_schema("", &response.headers(), spec, false)?;
-            // Get the result.
-            let result = match status_code {
-                // If the status code is a success, then we return the body.
-                200..=299 => Ok(body),
-                // Otherwise we return the error.
-                _ => Err(anyhow::anyhow!("{} {}", status_code, body)),
-            };
-            // Return the result.
-            result
+    let response = if let Some(response) = get_response_type(op, spec)? {
+        match response.media_type.as_str() {
+            "application/json" => {
+                quote! {
+                    // Parse the json response.
+                    // Return a human error.
+                    serde_json::from_str(&text).map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+                }
+            }
+            _ => {
+                anyhow::bail!(
+                    "unsupported media type for response: {}",
+                    response.media_type
+                );
+            }
         }
     } else {
         // Do nothing.
-        quote!()
+        quote!(Ok(()))
     };
 
     Ok(quote! {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::#method_ident,
-            &format!("{}/{}", self.client.base_url, #path),
+            &format!("{}/{}", self.client.base_url, #path#clean_url),
         );
 
         // Add in our authentication.
-        rb = rb.bearer_auth(self.client.token);
+        req = req.bearer_auth(&self.client.token);
 
         #request_body
 
-        // Build the request.
-        let req = rb.build()?;
-
         // Send the request.
-        let resp = self.client.client.execute(req).await?;
+        let resp = req.send().await?;
+
+        // Get the response status.
+        let status = resp.status();
+
+        // Get the text for the response.
+        let text = resp.text().await.unwrap_or_default();
+
+        if status.is_success() {
+            #response
+        } else {
+            // Return a human error.
+            // TODO: Try to return the error type.
+            // serde_json::from_str::<crate::types::Error>(&text).map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            Err(anyhow::anyhow!("response was not successful `{}` -> `{}`", status, text))
+        }
     })
 }

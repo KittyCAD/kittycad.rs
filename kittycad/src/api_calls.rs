@@ -17,14 +17,24 @@ impl ApiCalls {
         &self,
         group_by: crate::types::ApiCallQueryGroupBy,
     ) -> Result<Vec<crate::types::ApiCallQueryGroup>> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "api-call-metrics"),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "List API calls.\n\nThis endpoint requires authentication by a KittyCAD employee. The API calls are returned in order of creation, with the most recently created API calls first."]
@@ -34,26 +44,50 @@ impl ApiCalls {
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> Result<crate::types::ApiCallWithPriceResultsPage> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "api-calls"),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "Get details of an API call.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\nIf the user is not authenticated to view the specified API call, then it is not returned.\nOnly KittyCAD employees can view API calls for other users."]
     pub async fn get_api_call(&self, id: String) -> Result<crate::types::ApiCallWithPrice> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "api-calls/{id}"),
+            &format!(
+                "{}/{}",
+                self.client.base_url,
+                "api-calls/{id}".replace("{id}", &format!("{}", id))
+            ),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "List async operations.\n\nFor async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\nThis endpoint requires authentication by a KittyCAD employee."]
@@ -64,14 +98,24 @@ impl ApiCalls {
         sort_by: Option<crate::types::CreatedAtSortMode>,
         status: Option<crate::types::ApiCallStatus>,
     ) -> Result<crate::types::AsyncApiCallResultsPage> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "async/operations"),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "Get an async operation.\n\nGet the status and output of an async operation.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested async operation for the user.\nIf the user is not authenticated to view the specified async operation, then it is not returned.\nOnly KittyCAD employees with the proper access can view async operations for other users."]
@@ -79,14 +123,28 @@ impl ApiCalls {
         &self,
         id: String,
     ) -> Result<crate::types::AsyncApiCallOutput> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "async/operations/{id}"),
+            &format!(
+                "{}/{}",
+                self.client.base_url,
+                "async/operations/{id}".replace("{id}", &format!("{}", id))
+            ),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "List API calls for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user.\nThe API calls are returned in order of creation, with the most recently created API calls first."]
@@ -96,14 +154,24 @@ impl ApiCalls {
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> Result<crate::types::ApiCallWithPriceResultsPage> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "user/api-calls"),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "Get an API call for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user."]
@@ -111,14 +179,28 @@ impl ApiCalls {
         &self,
         id: String,
     ) -> Result<crate::types::ApiCallWithPrice> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user/api-calls/{id}"),
+            &format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/api-calls/{id}".replace("{id}", &format!("{}", id))
+            ),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "List API calls for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\nAlternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\nIf the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\nThe API calls are returned in order of creation, with the most recently created API calls first."]
@@ -129,13 +211,27 @@ impl ApiCalls {
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> Result<crate::types::ApiCallWithPriceResultsPage> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "users/{id}/api-calls"),
+            &format!(
+                "{}/{}",
+                self.client.base_url,
+                "users/{id}/api-calls".replace("{id}", &format!("{}", id))
+            ),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 }

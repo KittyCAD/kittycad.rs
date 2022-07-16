@@ -17,15 +17,24 @@ impl Oauth2 {
         &self,
         body: &crate::types::DeviceAuthRequestForm,
     ) -> Result<()> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "oauth2/device/auth"),
         );
-        rb = rb.bearer_auth(self.client.token);
-        rb = rb.form(body);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        req = req.form(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            Ok(())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "Confirm an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/oauth2/device/token`."]
@@ -33,15 +42,24 @@ impl Oauth2 {
         &self,
         body: &crate::types::DeviceAuthVerifyParams,
     ) -> Result<()> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "oauth2/device/confirm"),
         );
-        rb = rb.bearer_auth(self.client.token);
-        rb = rb.json(body);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            Ok(())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "Request a device access token.\n\nThis endpoint should be polled by the client until the user code is verified and the grant is confirmed."]
@@ -49,27 +67,45 @@ impl Oauth2 {
         &self,
         body: &crate::types::DeviceAccessTokenRequestForm,
     ) -> Result<()> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "oauth2/device/token"),
         );
-        rb = rb.bearer_auth(self.client.token);
-        rb = rb.form(body);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        req = req.form(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            Ok(())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "Verify an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website."]
     pub async fn device_auth_verify(&self, user_code: String) -> Result<()> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "oauth2/device/verify"),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            Ok(())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "Listen for callbacks for the OAuth 2.0 provider."]
@@ -79,17 +115,28 @@ impl Oauth2 {
         code: Option<String>,
         state: Option<String>,
     ) -> Result<()> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
                 "{}/{}",
-                self.client.base_url, "oauth2/provider/{provider}/callback"
+                self.client.base_url,
+                "oauth2/provider/{provider}/callback"
+                    .replace("{provider}", &format!("{}", provider))
             ),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            Ok(())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "Get the consent URL and other information for the OAuth 2.0 provider."]
@@ -98,16 +145,28 @@ impl Oauth2 {
         provider: crate::types::AccountProvider,
         callback_url: Option<String>,
     ) -> Result<crate::types::Oauth2ClientInfo> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
                 "{}/{}",
-                self.client.base_url, "oauth2/provider/{provider}/consent"
+                self.client.base_url,
+                "oauth2/provider/{provider}/consent"
+                    .replace("{provider}", &format!("{}", provider))
             ),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 }

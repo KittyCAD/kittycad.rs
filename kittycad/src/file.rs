@@ -19,30 +19,57 @@ impl File {
         src_format: crate::types::FileSourceFormat,
         body: &bytes::Bytes,
     ) -> Result<crate::types::FileConversion> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::POST,
             &format!(
                 "{}/{}",
-                self.client.base_url, "file/conversion/{src_format}/{output_format}"
+                self.client.base_url,
+                "file/conversion/{src_format}/{output_format}"
+                    .replace("{output_format}", &format!("{}", output_format))
+                    .replace("{src_format}", &format!("{}", src_format))
             ),
         );
-        rb = rb.bearer_auth(self.client.token);
-        rb = rb.body(body.clone());
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        req = req.body(body.clone());
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "Get a file conversion.\n\nGet the status and output of an async file conversion.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\nIf the user is not authenticated to view the specified file conversion, then it is not returned.\nOnly KittyCAD employees with the proper access can view file conversions for other users."]
     pub async fn get_conversion(&self, id: String) -> Result<crate::types::AsyncApiCallOutput> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "file/conversions/{id}"),
+            &format!(
+                "{}/{}",
+                self.client.base_url,
+                "file/conversions/{id}".replace("{id}", &format!("{}", id))
+            ),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint."]
@@ -52,15 +79,25 @@ impl File {
         src_format: crate::types::FileSourceFormat,
         body: &bytes::Bytes,
     ) -> Result<crate::types::FileDensity> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "file/density"),
         );
-        rb = rb.bearer_auth(self.client.token);
-        rb = rb.body(body.clone());
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        req = req.body(body.clone());
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "Execute a KittyCAD program in a specific language."]
@@ -70,15 +107,29 @@ impl File {
         output: Option<String>,
         body: &bytes::Bytes,
     ) -> Result<crate::types::CodeOutput> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::POST,
-            &format!("{}/{}", self.client.base_url, "file/execute/{lang}"),
+            &format!(
+                "{}/{}",
+                self.client.base_url,
+                "file/execute/{lang}".replace("{lang}", &format!("{}", lang))
+            ),
         );
-        rb = rb.bearer_auth(self.client.token);
-        rb = rb.body(body.clone());
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        req = req.body(body.clone());
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "Get CAD file mass.\n\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint."]
@@ -88,15 +139,25 @@ impl File {
         src_format: crate::types::FileSourceFormat,
         body: &bytes::Bytes,
     ) -> Result<crate::types::FileMass> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "file/mass"),
         );
-        rb = rb.bearer_auth(self.client.token);
-        rb = rb.body(body.clone());
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        req = req.body(body.clone());
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "Get CAD file volume.\n\nGet the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint."]
@@ -105,15 +166,25 @@ impl File {
         src_format: crate::types::FileSourceFormat,
         body: &bytes::Bytes,
     ) -> Result<crate::types::FileVolume> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "file/volume"),
         );
-        rb = rb.bearer_auth(self.client.token);
-        rb = rb.body(body.clone());
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        req = req.body(body.clone());
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "Get a file conversion for your user.\n\nGet the status and output of an async file conversion. If completed, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user."]
@@ -121,13 +192,27 @@ impl File {
         &self,
         id: String,
     ) -> Result<crate::types::AsyncApiCallOutput> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user/file/conversions/{id}"),
+            &format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/file/conversions/{id}".replace("{id}", &format!("{}", id))
+            ),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 }

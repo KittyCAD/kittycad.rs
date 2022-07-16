@@ -19,16 +19,29 @@ impl Unit {
         src_format: crate::types::UnitMetricFormat,
         value: f64,
     ) -> Result<crate::types::UnitConversion> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::POST,
             &format!(
                 "{}/{}",
-                self.client.base_url, "unit/conversion/{src_format}/{output_format}"
+                self.client.base_url,
+                "unit/conversion/{src_format}/{output_format}"
+                    .replace("{output_format}", &format!("{}", output_format))
+                    .replace("{src_format}", &format!("{}", src_format))
             ),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 }

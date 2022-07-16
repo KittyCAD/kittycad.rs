@@ -29,7 +29,6 @@ kittycad: target/debug/generator
 		-d "A fully generated & opinionated API client for the kittycad API." \
 		--spec-link "https://github.com/$(SPEC_REPO)" $(EXTRA_ARGS)
 	cargo fmt -p kittycad
-	cargo clippy -p kittycad --fix --allow-dirty
 
 .PHONY: tag
 tag: ## Create a new git tag to prepare to build a release.

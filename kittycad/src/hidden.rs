@@ -17,15 +17,25 @@ impl Hidden {
         &self,
         body: &crate::types::EmailAuthenticationForm,
     ) -> Result<crate::types::VerificationToken> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "auth/email"),
         );
-        rb = rb.bearer_auth(self.client.token);
-        rb = rb.json(body);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "Listen for callbacks for email verification for users."]
@@ -35,25 +45,43 @@ impl Hidden {
         email: String,
         token: String,
     ) -> Result<()> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "auth/email/callback"),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            Ok(())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
     #[doc = "This endpoint removes the session cookie for a user.\n\nThis is used in logout scenarios."]
     pub async fn logout(&self) -> Result<()> {
-        let mut rb = self.client.client.request(
+        let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "logout"),
         );
-        rb = rb.bearer_auth(self.client.token);
-        let req = rb.build()?;
-        let resp = self.client.client.execute(req).await?;
-        resp.json()?
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            Ok(())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 }
