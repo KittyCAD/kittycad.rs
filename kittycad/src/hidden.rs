@@ -50,11 +50,14 @@ impl Hidden {
             &format!("{}/{}", self.client.base_url, "auth/email/callback"),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[
-            ("callback_url", callback_url),
-            ("email", email),
-            ("token", token),
-        ]);
+        let mut query_params = Vec::new();
+        if let Some(p) = callback_url {
+            query_params.push(("callback_url", format!("{}", p)));
+        }
+
+        query_params.push(("email", email));
+        query_params.push(("token", token));
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();

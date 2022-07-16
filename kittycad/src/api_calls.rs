@@ -22,7 +22,9 @@ impl ApiCalls {
             &format!("{}/{}", self.client.base_url, "api-call-metrics"),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[("group_by", group_by)]);
+        let mut query_params = Vec::new();
+        query_params.push(("group_by", format!("{}", group_by)));
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();
@@ -50,11 +52,20 @@ impl ApiCalls {
             &format!("{}/{}", self.client.base_url, "api-calls"),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[
-            ("limit", limit),
-            ("page_token", page_token),
-            ("sort_by", sort_by),
-        ]);
+        let mut query_params = Vec::new();
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        if let Some(p) = sort_by {
+            query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();
@@ -77,7 +88,7 @@ impl ApiCalls {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "api-calls/{id}".replace("{id}", &format!("{}", id))
+                "api-calls/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -109,12 +120,24 @@ impl ApiCalls {
             &format!("{}/{}", self.client.base_url, "async/operations"),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[
-            ("limit", limit),
-            ("page_token", page_token),
-            ("sort_by", sort_by),
-            ("status", status),
-        ]);
+        let mut query_params = Vec::new();
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        if let Some(p) = sort_by {
+            query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        if let Some(p) = status {
+            query_params.push(("status", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();
@@ -140,7 +163,7 @@ impl ApiCalls {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "async/operations/{id}".replace("{id}", &format!("{}", id))
+                "async/operations/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -171,11 +194,20 @@ impl ApiCalls {
             &format!("{}/{}", self.client.base_url, "user/api-calls"),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[
-            ("limit", limit),
-            ("page_token", page_token),
-            ("sort_by", sort_by),
-        ]);
+        let mut query_params = Vec::new();
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        if let Some(p) = sort_by {
+            query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();
@@ -201,7 +233,7 @@ impl ApiCalls {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/api-calls/{id}".replace("{id}", &format!("{}", id))
+                "user/api-calls/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -233,15 +265,24 @@ impl ApiCalls {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "users/{id}/api-calls".replace("{id}", &format!("{}", id))
+                "users/{id}/api-calls".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[
-            ("limit", limit),
-            ("page_token", page_token),
-            ("sort_by", sort_by),
-        ]);
+        let mut query_params = Vec::new();
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        if let Some(p) = sort_by {
+            query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();

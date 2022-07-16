@@ -30,7 +30,9 @@ impl Unit {
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[("value", value)]);
+        let mut query_params = Vec::new();
+        query_params.push(("value", format!("{}", value)));
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();

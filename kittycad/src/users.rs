@@ -115,11 +115,20 @@ impl Users {
             &format!("{}/{}", self.client.base_url, "users"),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[
-            ("limit", limit),
-            ("page_token", page_token),
-            ("sort_by", sort_by),
-        ]);
+        let mut query_params = Vec::new();
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        if let Some(p) = sort_by {
+            query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();
@@ -147,11 +156,20 @@ impl Users {
             &format!("{}/{}", self.client.base_url, "users-extended"),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[
-            ("limit", limit),
-            ("page_token", page_token),
-            ("sort_by", sort_by),
-        ]);
+        let mut query_params = Vec::new();
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        if let Some(p) = sort_by {
+            query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();
@@ -174,7 +192,7 @@ impl Users {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "users-extended/{id}".replace("{id}", &format!("{}", id))
+                "users-extended/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -200,7 +218,7 @@ impl Users {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "users/{id}".replace("{id}", &format!("{}", id))
+                "users/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);

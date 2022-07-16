@@ -53,7 +53,7 @@ impl File {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "file/conversions/{id}".replace("{id}", &format!("{}", id))
+                "file/conversions/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -84,7 +84,10 @@ impl File {
             &format!("{}/{}", self.client.base_url, "file/density"),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[("material_mass", material_mass), ("src_format", src_format)]);
+        let mut query_params = Vec::new();
+        query_params.push(("material_mass", format!("{}", material_mass)));
+        query_params.push(("src_format", format!("{}", src_format)));
+        req = req.query(&query_params);
         req = req.body(body.clone());
         let resp = req.send().await?;
         let status = resp.status();
@@ -117,7 +120,12 @@ impl File {
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[("output", output)]);
+        let mut query_params = Vec::new();
+        if let Some(p) = output {
+            query_params.push(("output", p));
+        }
+
+        req = req.query(&query_params);
         req = req.body(body.clone());
         let resp = req.send().await?;
         let status = resp.status();
@@ -146,10 +154,10 @@ impl File {
             &format!("{}/{}", self.client.base_url, "file/mass"),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[
-            ("material_density", material_density),
-            ("src_format", src_format),
-        ]);
+        let mut query_params = Vec::new();
+        query_params.push(("material_density", format!("{}", material_density)));
+        query_params.push(("src_format", format!("{}", src_format)));
+        req = req.query(&query_params);
         req = req.body(body.clone());
         let resp = req.send().await?;
         let status = resp.status();
@@ -177,7 +185,9 @@ impl File {
             &format!("{}/{}", self.client.base_url, "file/volume"),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[("src_format", src_format)]);
+        let mut query_params = Vec::new();
+        query_params.push(("src_format", format!("{}", src_format)));
+        req = req.query(&query_params);
         req = req.body(body.clone());
         let resp = req.send().await?;
         let status = resp.status();
@@ -204,7 +214,7 @@ impl File {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/file/conversions/{id}".replace("{id}", &format!("{}", id))
+                "user/file/conversions/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);

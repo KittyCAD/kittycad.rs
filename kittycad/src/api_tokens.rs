@@ -24,11 +24,20 @@ impl ApiTokens {
             &format!("{}/{}", self.client.base_url, "user/api-tokens"),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[
-            ("limit", limit),
-            ("page_token", page_token),
-            ("sort_by", sort_by),
-        ]);
+        let mut query_params = Vec::new();
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        if let Some(p) = sort_by {
+            query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();

@@ -94,7 +94,9 @@ impl Oauth2 {
             &format!("{}/{}", self.client.base_url, "oauth2/device/verify"),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[("user_code", user_code)]);
+        let mut query_params = Vec::new();
+        query_params.push(("user_code", user_code));
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();
@@ -126,7 +128,16 @@ impl Oauth2 {
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[("code", code), ("state", state)]);
+        let mut query_params = Vec::new();
+        if let Some(p) = code {
+            query_params.push(("code", p));
+        }
+
+        if let Some(p) = state {
+            query_params.push(("state", p));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();
@@ -157,7 +168,12 @@ impl Oauth2 {
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.query(&[("callback_url", callback_url)]);
+        let mut query_params = Vec::new();
+        if let Some(p) = callback_url {
+            query_params.push(("callback_url", p));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();

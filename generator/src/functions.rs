@@ -340,14 +340,22 @@ fn get_function_body(
     }
     let clean_url = if !path_params.is_empty() {
         let mut clean_string = quote!();
-        for (name, _t) in &path_params {
+        for (name, t) in &path_params {
             let url_string = format!("{{{}}}", name);
-            let cleaned_name = types::clean_property_name(&name);
+            let cleaned_name = types::clean_property_name(name);
             let name_ident = format_ident!("{}", cleaned_name);
 
-            clean_string = quote! {
-                #clean_string.replace(#url_string, &format!("{}", #name_ident))
-            }
+            let type_text = types::get_text(t)?;
+
+            clean_string = if type_text == "String" {
+                quote! {
+                    #clean_string.replace(#url_string, &#name_ident)
+                }
+            } else {
+                quote! {
+                    #clean_string.replace(#url_string, &format!("{}", #name_ident))
+                }
+            };
         }
         clean_string
     } else {
@@ -394,17 +402,41 @@ fn get_function_body(
     }
     let query_params_code = if !query_params.is_empty() {
         let mut array = Vec::new();
-        for (name, _t) in &query_params {
-            let cleaned_name = types::clean_property_name(&name);
+        for (name, t) in &query_params {
+            let cleaned_name = types::clean_property_name(name);
             let name_ident = format_ident!("{}", cleaned_name);
 
-            array.push(quote! {
-                (#name, format!("{}", #name_ident))
-            })
+            let type_text = types::get_text(t)?;
+
+            if !type_text.starts_with("Option<") {
+                if type_text == "String" {
+                    array.push(quote! {
+                       query_params.push((#name, #name_ident));
+                    })
+                } else {
+                    array.push(quote! {
+                       query_params.push((#name, format!("{}", #name_ident)));
+                    })
+                }
+            } else if type_text == "Option<String>" {
+                array.push(quote! {
+                    if let Some(p) = #name_ident {
+                        query_params.push((#name, p));
+                    }
+                })
+            } else {
+                array.push(quote! {
+                    if let Some(p) = #name_ident {
+                        query_params.push((#name, format!("{}", p)));
+                    }
+                })
+            }
         }
 
         quote! {
-            req = req.query(&[#(#array),*]);
+            let mut query_params = Vec::new();
+            #(#array)*
+            req = req.query(&query_params);
         }
     } else {
         quote!()
