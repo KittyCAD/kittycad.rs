@@ -22,6 +22,7 @@ impl ApiCalls {
             &format!("{}/{}", self.client.base_url, "api-call-metrics"),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req.query(&[("group_by", group_by)]);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();
@@ -49,6 +50,11 @@ impl ApiCalls {
             &format!("{}/{}", self.client.base_url, "api-calls"),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req.query(&[
+            ("limit", limit),
+            ("page_token", page_token),
+            ("sort_by", sort_by),
+        ]);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();
@@ -103,6 +109,12 @@ impl ApiCalls {
             &format!("{}/{}", self.client.base_url, "async/operations"),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req.query(&[
+            ("limit", limit),
+            ("page_token", page_token),
+            ("sort_by", sort_by),
+            ("status", status),
+        ]);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();
@@ -159,6 +171,11 @@ impl ApiCalls {
             &format!("{}/{}", self.client.base_url, "user/api-calls"),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req.query(&[
+            ("limit", limit),
+            ("page_token", page_token),
+            ("sort_by", sort_by),
+        ]);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();
@@ -220,6 +237,11 @@ impl ApiCalls {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req.query(&[
+            ("limit", limit),
+            ("page_token", page_token),
+            ("sort_by", sort_by),
+        ]);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();

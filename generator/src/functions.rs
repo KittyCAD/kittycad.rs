@@ -354,6 +354,62 @@ fn get_function_body(
         quote!()
     };
 
+    // Let's get the query parameters.
+    let mut query_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
+    // Let's get the arguments for the function.
+    for parameter in &op.parameters {
+        // Get the parameter.
+        let parameter = parameter.expand(spec)?;
+
+        // Get the data for the parameter.
+        // We only care about query parameters, currently.
+        if let openapiv3::Parameter::Query {
+            parameter_data,
+            style: _,
+            allow_reserved: _,
+            allow_empty_value: _,
+        } = parameter
+        {
+            // Get the schema for the parameter.
+            let schema = parameter_data.format.schema()?;
+
+            // Get the type for the parameter.
+            let mut t = match schema {
+                openapiv3::ReferenceOr::Reference { .. } => {
+                    types::get_type_name_from_reference(&schema.reference()?, spec, false)?
+                }
+                openapiv3::ReferenceOr::Item(s) => {
+                    types::get_type_name_for_schema("", &s, spec, false)?
+                }
+            };
+
+            // Make it an option if it's optional.
+            if !parameter_data.required && !types::get_text(&t)?.starts_with("Option<") {
+                t = quote!(Option<#t>);
+            }
+
+            // Add query parameter to our list.
+            query_params.insert(parameter_data.name, t);
+        }
+    }
+    let query_params_code = if !query_params.is_empty() {
+        let mut array = Vec::new();
+        for (name, _t) in &query_params {
+            let cleaned_name = types::clean_property_name(&name);
+            let name_ident = format_ident!("{}", cleaned_name);
+
+            array.push(quote! {
+                (#name, format!("{}", #name_ident))
+            })
+        }
+
+        quote! {
+            req = req.query(&[#(#array),*]);
+        }
+    } else {
+        quote!()
+    };
+
     // Get if there is a request body.
     let request_body = if let Some(request_body) = get_request_body(op, spec)? {
         match request_body.media_type.as_str() {
@@ -417,6 +473,8 @@ fn get_function_body(
 
         // Add in our authentication.
         req = req.bearer_auth(&self.client.token);
+
+        #query_params_code
 
         #request_body
 

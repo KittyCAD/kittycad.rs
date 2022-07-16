@@ -84,6 +84,7 @@ impl File {
             &format!("{}/{}", self.client.base_url, "file/density"),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req.query(&[("material_mass", material_mass), ("src_format", src_format)]);
         req = req.body(body.clone());
         let resp = req.send().await?;
         let status = resp.status();
@@ -116,6 +117,7 @@ impl File {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req.query(&[("output", output)]);
         req = req.body(body.clone());
         let resp = req.send().await?;
         let status = resp.status();
@@ -144,6 +146,10 @@ impl File {
             &format!("{}/{}", self.client.base_url, "file/mass"),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req.query(&[
+            ("material_density", material_density),
+            ("src_format", src_format),
+        ]);
         req = req.body(body.clone());
         let resp = req.send().await?;
         let status = resp.status();
@@ -171,6 +177,7 @@ impl File {
             &format!("{}/{}", self.client.base_url, "file/volume"),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req.query(&[("src_format", src_format)]);
         req = req.body(body.clone());
         let resp = req.send().await?;
         let status = resp.status();

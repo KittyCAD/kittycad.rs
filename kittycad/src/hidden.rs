@@ -50,6 +50,11 @@ impl Hidden {
             &format!("{}/{}", self.client.base_url, "auth/email/callback"),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req.query(&[
+            ("callback_url", callback_url),
+            ("email", email),
+            ("token", token),
+        ]);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();

@@ -94,6 +94,7 @@ impl Oauth2 {
             &format!("{}/{}", self.client.base_url, "oauth2/device/verify"),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req.query(&[("user_code", user_code)]);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();
@@ -125,6 +126,7 @@ impl Oauth2 {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req.query(&[("code", code), ("state", state)]);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();
@@ -155,6 +157,7 @@ impl Oauth2 {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req.query(&[("callback_url", callback_url)]);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();

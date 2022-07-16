@@ -24,6 +24,11 @@ impl ApiTokens {
             &format!("{}/{}", self.client.base_url, "user/api-tokens"),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req.query(&[
+            ("limit", limit),
+            ("page_token", page_token),
+            ("sort_by", sort_by),
+        ]);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();

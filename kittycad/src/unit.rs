@@ -30,6 +30,7 @@ impl Unit {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req.query(&[("value", value)]);
         let resp = req.send().await?;
         let status = resp.status();
         let text = resp.text().await.unwrap_or_default();
