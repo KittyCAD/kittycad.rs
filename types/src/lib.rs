@@ -2,6 +2,7 @@
 
 #![deny(missing_docs)]
 
+pub mod base64;
 pub mod exts;
 
 #[macro_use]
