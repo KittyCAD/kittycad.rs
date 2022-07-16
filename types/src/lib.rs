@@ -44,10 +44,7 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
         }
         // Parse the parameters.
         for (name, parameter) in &components.parameters {
-            let schema = (&parameter.expand(spec)?)
-                .data()?
-                .format
-                .schema()?;
+            let schema = (&parameter.expand(spec)?).data()?.format.schema()?;
             // Let's get the schema from the reference.
             let schema = schema.get_schema_from_reference(spec, true)?;
             // Let's handle all the kinds of schemas.
@@ -670,12 +667,11 @@ fn render_one_of(
         );
     }
 
-    // TODO: tabled
     let rendered = quote! {
         #additional_types
 
         #description
-        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema)]
+        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema, tabled::Tabled)]
         #serde_options
         pub enum #one_of_name {
             #values
@@ -780,23 +776,37 @@ fn render_object(
             serde_props.push(quote!(skip_serializing_if = "Option::is_none"));
         }
 
+        let mut tabled_props = quote!();
+        if type_name_text.starts_with("Option<")
+            || type_name_text.starts_with("Vec<")
+            || type_name_text.starts_with("std::collections::HashMap<")
+        {
+            tabled_props = quote!(#[tabled(skip)]);
+        }
+
         values = quote!(
             #values
 
             #prop_desc
             #[serde(#(#serde_props),*)]
+            #tabled_props
             #prop_value
         );
     }
 
     // TODO: defaults
 
-    // TODO: tabled
     let rendered = quote! {
         #description
-        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema)]
+        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema, tabled::Tabled)]
         pub struct #struct_name {
             #values
+        }
+
+        impl std::fmt::Display for #struct_name {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+                write!(f, "{}", serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?)
+            }
         }
     };
 
