@@ -159,6 +159,7 @@ rustdoc-args = ["--cfg", "docsrs"]
     let docs = generator::template::generate_docs(
         &spec,
         &inflector::cases::snakecase::to_snake_case(&opts.name),
+        &opts.description,
         &opts.version,
         &opts.spec_url,
     )?;

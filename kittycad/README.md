@@ -1,6 +1,6 @@
 # `kittycad`
 
-A fully generated, opinionated API client library for KittyCAD.
+A fully generated & opinionated API client for the KittyCAD API.
 
 [![docs.rs](https://docs.rs/kittycad/badge.svg)](https://docs.rs/kittycad)
 
@@ -42,7 +42,7 @@ a user agent string and set of credentials.
 ```
 use kittycad::Client;
 
-let kittycad = Client::new(
+let client = Client::new(
     String::from("api-key"),
 );
 ```
@@ -57,5 +57,5 @@ And then you can create a client from the environment.
 ```
 use kittycad::Client;
 
-let kittycad = Client::new_from_env();
+let client = Client::new_from_env();
 ```

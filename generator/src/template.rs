@@ -3,16 +3,17 @@
 use std::fmt::Write as _;
 
 use anyhow::Result;
-use inflector::cases::kebabcase::to_kebab_case;
+use inflector::cases::{kebabcase::to_kebab_case, screamingsnakecase::to_screaming_snake_case};
 
 fn generate_docs_openapi_info(
     spec: &openapiv3::OpenAPI,
     spec_link: &Option<String>,
     package_name: &str,
+    description: &str,
 ) -> Result<String> {
-    let mut description = String::new();
+    let mut desc = String::new();
     if let Some(d) = &spec.info.description {
-        description = d.replace('\n', "\n//! ");
+        desc = d.replace('\n', "\n//! ");
     }
 
     let mut tos = String::new();
@@ -110,7 +111,7 @@ fn generate_docs_openapi_info(
     };
 
     Ok(format!(
-        r#"//! A fully generated, opinionated API client library for KittyCAD.
+        r#"//! {}
 //!
 //! [![docs.rs](https://docs.rs/{}/badge.svg)](https://docs.rs/{})
 //!
@@ -130,9 +131,10 @@ fn generate_docs_openapi_info(
 //! The documentation for the crate is generated
 //! along with the code to make this library easy to use.
 //! "#,
-        to_kebab_case(package_name),
-        to_kebab_case(package_name),
         description,
+        to_kebab_case(package_name),
+        to_kebab_case(package_name),
+        desc,
         tos,
         contact,
         license,
@@ -144,10 +146,11 @@ fn generate_docs_openapi_info(
 pub fn generate_docs(
     spec: &openapiv3::OpenAPI,
     name: &str,
+    description: &str,
     version: &str,
     spec_link: &Option<String>,
 ) -> Result<String> {
-    let info = generate_docs_openapi_info(spec, spec_link, name)?;
+    let info = generate_docs_openapi_info(spec, spec_link, name, description)?;
     Ok(format!(
         r#"{}
 //!
@@ -166,7 +169,7 @@ pub fn generate_docs(
 //! ```
 //! use {}::Client;
 //!
-//! let kittycad = Client::new(
+//! let client = Client::new(
 //!     String::from("api-key"),
 //! );
 //! ```
@@ -174,20 +177,21 @@ pub fn generate_docs(
 //! Alternatively, the library can search for most of the variables required for
 //! the client in the environment:
 //!
-//! - `KITTYCAD_API_TOKEN`
+//! - `{}_API_TOKEN`
 //!
 //! And then you can create a client from the environment.
 //!
 //! ```
 //! use {}::Client;
 //!
-//! let kittycad = Client::new_from_env();
+//! let client = Client::new_from_env();
 //! ```
 //!"#,
         info,
         name.replace('_', "-").to_lowercase(),
         version,
         name,
+        to_screaming_snake_case(name),
         name,
     ))
 }
