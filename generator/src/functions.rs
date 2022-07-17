@@ -3,7 +3,6 @@
 use std::{
     collections::{BTreeMap, HashMap},
     fmt::Write as _,
-    str::FromStr,
 };
 
 use anyhow::Result;
@@ -109,7 +108,8 @@ pub fn generate_files(
                 example.insert(
                     "example".to_string(),
                     parse_and_fmt_example(&format!(
-                        "// {}\nclient.{}().{}(self{}{}).await?;",
+                        r#"// {}
+client.{}().{}(&self{}{}).await?;"#,
                         docs.replace('\n', "\n// "),
                         tag,
                         fn_name,
@@ -123,7 +123,8 @@ pub fn generate_files(
                 example.insert(
                     "example".to_string(),
                     parse_and_fmt_example(&format!(
-                        "// {}\nlet result: {} = client.{}().{}(self{}{}).await?;",
+                        r#"// {}
+let result: {} = client.{}().{}(&self{}{}).await?;"#,
                         docs.replace('\n', "\n// "),
                         response_type.rendered()?,
                         tag,
@@ -802,8 +803,10 @@ fn add_fn_to_tag(
 
 /// Parse a code example as rust code to verify it compiles.
 fn parse_and_fmt_example(s: &str) -> Result<String> {
-    let t = proc_macro2::TokenStream::from_str(s)
-        .map_err(|err| anyhow::anyhow!("failed to parse example: {}", err))?;
+    //let t = proc_macro2::TokenStream::from_str(s)
+    // .map_err(|err| anyhow::anyhow!("failed to parse example: {}", err))?;
     // `rustfmt` the code.
-    crate::types::get_text_fmt(&t)
+    //crate::types::get_text_fmt(&t)
+    // TODO: Figure out a way to do this.
+    Ok(s.to_string())
 }
