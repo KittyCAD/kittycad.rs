@@ -366,6 +366,6 @@ impl TokenStreamExt for proc_macro2::TokenStream {
             return Ok(quote!(&'a str));
         }
 
-        return Ok(self.clone());
+        Ok(self.clone())
     }
 }
