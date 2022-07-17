@@ -476,8 +476,6 @@ fn get_function_body(
             let cleaned_name = crate::types::clean_property_name(name);
             let name_ident = format_ident!("{}", cleaned_name);
 
-            let type_text = crate::types::get_text(t)?;
-
             clean_string = if t.is_string()? {
                 quote! {
                     #clean_string.replace(#url_string, &#name_ident)
