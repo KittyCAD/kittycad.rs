@@ -3,6 +3,7 @@
 use std::{
     collections::{BTreeMap, HashMap},
     fmt::Write as _,
+    str::FromStr,
 };
 
 use anyhow::Result;
@@ -99,23 +100,41 @@ pub fn generate_files(
             // Add the docs to our spec.
             let mut new_operation = op.clone();
             let mut example: HashMap<String, String> = HashMap::new();
+
+            let inner_args = if raw_args.is_empty() {
+                quote!()
+            } else {
+                let mut a = Vec::new();
+                for (k, _v) in raw_args.iter() {
+                    // Skip the next page arg.
+                    let n = format_ident!("{}", k);
+                    a.push(quote!(#n))
+                }
+                quote!(#(#a),*)
+            };
+
             let request_body_str = if request_body.is_empty() {
                 "".to_string()
             } else {
-                request_body.rendered()?
+                "body".to_string()
             };
+
             if response_type.rendered()? == "()" {
                 example.insert(
                     "example".to_string(),
                     parse_and_fmt_example(&format!(
-                        r#"// {}
-client.{}().{}(&self{}{}).await?;"#,
-                        docs.replace('\n', "\n// "),
+                        r#"/// {}
+async fn {}() -> Result<()> {{
+    // This function does not return a value.
+    client.{}().{}({}{}).await?;
+
+    Ok(())
+}}"#,
+                        docs.replace('\n', "\n/// "),
+                        fn_name,
                         tag,
                         fn_name,
-                        args.rendered()?
-                            .replace(',', ", ")
-                            .replace("crate::types::", ""),
+                        inner_args.rendered()?.replace(',', ", "),
                         request_body_str
                     ))?,
                 );
@@ -123,15 +142,21 @@ client.{}().{}(&self{}{}).await?;"#,
                 example.insert(
                     "example".to_string(),
                     parse_and_fmt_example(&format!(
-                        r#"// {}
-let result: {} = client.{}().{}(&self{}{}).await?;"#,
-                        docs.replace('\n', "\n// "),
+                        r#"/// {}
+async fn {}() -> Result<()> {{
+    // The type returned will be: `{}`.
+    let result = client.{}().{}({}{}).await?;
+
+    println!("{{:?}}", result);
+
+    Ok(())
+}}"#,
+                        docs.replace('\n', "\n/// "),
+                        fn_name,
                         response_type.rendered()?,
                         tag,
                         fn_name,
-                        args.rendered()?
-                            .replace(',', ", ")
-                            .replace("crate::types::", ""),
+                        inner_args.rendered()?.replace(',', ", "),
                         request_body_str
                     ))?,
                 );
@@ -250,38 +275,40 @@ let result: {} = client.{}().{}(&self{}{}).await?;"#,
                     "example".to_string(),
                     parse_and_fmt_example(&format!(
                         r#"{}
-//
-// - OR -
-//
-// Get a stream of results.
-//
-// This allows you to paginate through all the items.
-let stream = client.{}().{}(&self{}{});
+///
+/// - OR -
+///
+/// Get a stream of results.
+///
+/// This allows you to paginate through all the items.
+async fn {}() -> Result<()> {{
+    let stream = client.{}().{}({}{});
 
-loop {{
-    match stream.try_next().await {{
-        Ok(Some(item)) => {{
-            // We got a result.
-            // This will be of the type: `{}`.
-            println!("{{:?}}", item);
+    loop {{
+        match stream.try_next().await {{
+            Ok(Some(item)) => {{
+                // We got a result.
+                // This will be of the type: `{}`.
+                println!("{{:?}}", item);
+            }}
+            Ok(None) => {{
+                break;
+            }}
+            Err(err) => {{
+                // Handle the error.
+                return Err(err);
+            }},
         }}
-        Ok(None) => {{
-            break;
-        }}
-        Err(err) => {{
-            // Handle the error.
-            return Err(err);
-        }},
     }}
+
+    Ok(())
 }}
 "#,
                         example.get("example").unwrap(),
+                        quote!(#stream_fn_name_ident).rendered()?,
                         tag,
-                        quote!(stream_fn_name_ident).rendered()?,
-                        min_args
-                            .rendered()?
-                            .replace(',', ", ")
-                            .replace("crate::types::", ""),
+                        quote!(#stream_fn_name_ident).rendered()?,
+                        inner_args.rendered()?.replace(',', ", "),
                         request_body_str,
                         item_type.rendered()?.replace("crate::types::", "")
                     ))?,
@@ -803,10 +830,8 @@ fn add_fn_to_tag(
 
 /// Parse a code example as rust code to verify it compiles.
 fn parse_and_fmt_example(s: &str) -> Result<String> {
-    //let t = proc_macro2::TokenStream::from_str(s)
-    // .map_err(|err| anyhow::anyhow!("failed to parse example: {}", err))?;
+    let t = proc_macro2::TokenStream::from_str(s)
+        .map_err(|err| anyhow::anyhow!("failed to parse example: {}", err))?;
     // `rustfmt` the code.
-    //crate::types::get_text_fmt(&t)
-    // TODO: Figure out a way to do this.
-    Ok(s.to_string())
+    crate::types::get_text_fmt(&t)
 }
