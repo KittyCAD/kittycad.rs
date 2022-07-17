@@ -194,7 +194,7 @@ impl Payments {
     }
 
     #[doc = "Delete a payment method for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the specified payment method for the authenticated user."]
-    pub async fn delete_payment_method_for_user(&self, id: String) -> Result<()> {
+    pub async fn delete_payment_method_for_user(&self, id: &str) -> Result<()> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
             &format!(

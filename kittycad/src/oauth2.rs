@@ -86,14 +86,14 @@ impl Oauth2 {
     }
 
     #[doc = "Verify an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website."]
-    pub async fn device_auth_verify(&self, user_code: String) -> Result<()> {
+    pub async fn device_auth_verify(&self, user_code: &str) -> Result<()> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "oauth2/device/verify"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = Vec::new();
-        query_params.push(("user_code", user_code));
+        query_params.push(("user_code", format!("{}", user_code)));
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();

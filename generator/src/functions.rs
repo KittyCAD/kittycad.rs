@@ -100,8 +100,13 @@ pub fn generate_files(
                 } else {
                     let mut a = Vec::new();
                     for (k, v) in raw_args.iter() {
+                        let mut v = v.clone();
                         // Skip the next page arg.
                         if k != &page_param_str {
+                            let rendered = v.rendered()?;
+                            if rendered == "&str" {
+                                v = quote!(&'a str);
+                            }
                             let n = format_ident!("{}", k);
                             a.push(quote!(#n: #v))
                         }
@@ -139,7 +144,7 @@ pub fn generate_files(
 
                 let function = quote! {
                     #[doc = #docs]
-                    pub fn #stream_fn_name_ident(&self #min_args #request_body) -> impl futures::Stream<Item = Result<#item_type>> + Unpin + '_ {
+                    pub fn #stream_fn_name_ident<'a>(&'a self #min_args #request_body) -> impl futures::Stream<Item = Result<#item_type>> + Unpin + '_ {
                         use futures::{StreamExt, TryFutureExt, TryStreamExt};
                         use crate::types::paginate::Pagination;
 
@@ -397,7 +402,7 @@ fn get_path_params(
             }
 
             // Add path parameter to our list.
-            path_params.insert(parameter_data.name, t);
+            path_params.insert(parameter_data.name, t.get_parameter_value()?);
         }
     }
 
@@ -444,7 +449,7 @@ fn get_query_params(
             }
 
             // Add query parameter to our list.
-            query_params.insert(parameter_data.name, t);
+            query_params.insert(parameter_data.name, t.get_parameter_value()?);
         }
     }
 
@@ -473,7 +478,7 @@ fn get_function_body(
 
             let type_text = crate::types::get_text(t)?;
 
-            clean_string = if type_text == "String" {
+            clean_string = if t.is_string()? {
                 quote! {
                     #clean_string.replace(#url_string, &#name_ident)
                 }

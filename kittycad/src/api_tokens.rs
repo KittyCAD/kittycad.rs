@@ -52,8 +52,8 @@ impl ApiTokens {
     }
 
     #[doc = "List API tokens for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first."]
-    pub fn list_for_user_stream(
-        &self,
+    pub fn list_for_user_stream<'a>(
+        &'a self,
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> impl futures::Stream<Item = Result<crate::types::ApiToken>> + Unpin + '_ {

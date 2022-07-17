@@ -73,7 +73,7 @@ async fn test_get_status_of_async_operation() {
 
     let _result = client
         .api_calls()
-        .get_async_operation("23a9759f-ee9b-47de-9a55-deb1ed035793".to_string())
+        .get_async_operation("23a9759f-ee9b-47de-9a55-deb1ed035793")
         .await
         .unwrap();
 }
@@ -84,7 +84,7 @@ async fn serialize_one_of() {
 
     let result = client
         .api_calls()
-        .get_async_operation("23a9759f-ee9b-47de-9a55-deb1ed035793".to_string())
+        .get_async_operation("23a9759f-ee9b-47de-9a55-deb1ed035793")
         .await
         .unwrap();
 
@@ -100,7 +100,7 @@ async fn tabled_one_of() {
 
     let result = client
         .api_calls()
-        .get_async_operation("23a9759f-ee9b-47de-9a55-deb1ed035793".to_string())
+        .get_async_operation("23a9759f-ee9b-47de-9a55-deb1ed035793")
         .await
         .unwrap();
 

@@ -323,11 +323,17 @@ pub trait TokenStreamExt {
     /// Return `true` if the token stream is already an option.
     fn is_option(&self) -> Result<bool>;
 
+    /// Return `true` if the token stream is a string.
+    fn is_string(&self) -> Result<bool>;
+
     /// Render the token stream as a string.
     fn rendered(&self) -> Result<String>;
 
     /// Render and `rustfmt` the token stream as a string.
     fn rendered_fmt(&self) -> Result<String>;
+
+    /// Get the value of an argument from it's type.
+    fn get_parameter_value(&self) -> Result<proc_macro2::TokenStream>;
 }
 
 impl TokenStreamExt for proc_macro2::TokenStream {
@@ -337,11 +343,26 @@ impl TokenStreamExt for proc_macro2::TokenStream {
         Ok(rendered.starts_with("Option<") || rendered.ends_with("phone_number::PhoneNumber"))
     }
 
+    fn is_string(&self) -> Result<bool> {
+        let rendered = self.rendered()?;
+        Ok(rendered.starts_with("String") || rendered.ends_with("&str"))
+    }
+
     fn rendered(&self) -> Result<String> {
         crate::types::get_text(self)
     }
 
     fn rendered_fmt(&self) -> Result<String> {
         crate::types::get_text_fmt(self)
+    }
+
+    /// Get the value of an argument from it's type.
+    fn get_parameter_value(&self) -> Result<proc_macro2::TokenStream> {
+        let rendered = self.rendered()?;
+        if rendered == "String" {
+            return Ok(quote!(&str));
+        }
+
+        return Ok(self.clone());
     }
 }

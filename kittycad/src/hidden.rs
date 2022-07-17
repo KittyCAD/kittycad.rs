@@ -40,8 +40,8 @@ impl Hidden {
     pub async fn listen_auth_email_callback(
         &self,
         callback_url: Option<url::Url>,
-        email: String,
-        token: String,
+        email: &str,
+        token: &str,
     ) -> Result<()> {
         let mut req = self.client.client.request(
             http::Method::GET,
@@ -53,8 +53,8 @@ impl Hidden {
             query_params.push(("callback_url", format!("{}", p)));
         }
 
-        query_params.push(("email", email));
-        query_params.push(("token", token));
+        query_params.push(("email", format!("{}", email)));
+        query_params.push(("token", format!("{}", token)));
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();

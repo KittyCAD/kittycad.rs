@@ -80,8 +80,8 @@ impl ApiCalls {
     }
 
     #[doc = "List API calls.\n\nThis endpoint requires authentication by a KittyCAD employee. The API calls are returned in order of creation, with the most recently created API calls first."]
-    pub fn list_stream(
-        &self,
+    pub fn list_stream<'a>(
+        &'a self,
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> impl futures::Stream<Item = Result<crate::types::ApiCallWithPrice>> + Unpin + '_ {
@@ -136,7 +136,7 @@ impl ApiCalls {
     }
 
     #[doc = "Get details of an API call.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\nIf the user is not authenticated to view the specified API call, then it is not returned.\nOnly KittyCAD employees can view API calls for other users."]
-    pub async fn get_api_call(&self, id: String) -> Result<crate::types::ApiCallWithPrice> {
+    pub async fn get_api_call(&self, id: &str) -> Result<crate::types::ApiCallWithPrice> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
@@ -208,8 +208,8 @@ impl ApiCalls {
     }
 
     #[doc = "List async operations.\n\nFor async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\nThis endpoint requires authentication by a KittyCAD employee."]
-    pub fn list_async_operations_stream(
-        &self,
+    pub fn list_async_operations_stream<'a>(
+        &'a self,
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
         status: Option<crate::types::ApiCallStatus>,
@@ -265,10 +265,7 @@ impl ApiCalls {
     }
 
     #[doc = "Get an async operation.\n\nGet the status and output of an async operation.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested async operation for the user.\nIf the user is not authenticated to view the specified async operation, then it is not returned.\nOnly KittyCAD employees with the proper access can view async operations for other users."]
-    pub async fn get_async_operation(
-        &self,
-        id: String,
-    ) -> Result<crate::types::AsyncApiCallOutput> {
+    pub async fn get_async_operation(&self, id: &str) -> Result<crate::types::AsyncApiCallOutput> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
@@ -335,8 +332,8 @@ impl ApiCalls {
     }
 
     #[doc = "List API calls for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user.\nThe API calls are returned in order of creation, with the most recently created API calls first."]
-    pub fn user_list_stream(
-        &self,
+    pub fn user_list_stream<'a>(
+        &'a self,
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> impl futures::Stream<Item = Result<crate::types::ApiCallWithPrice>> + Unpin + '_ {
@@ -391,10 +388,7 @@ impl ApiCalls {
     }
 
     #[doc = "Get an API call for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user."]
-    pub async fn get_api_call_for_user(
-        &self,
-        id: String,
-    ) -> Result<crate::types::ApiCallWithPrice> {
+    pub async fn get_api_call_for_user(&self, id: &str) -> Result<crate::types::ApiCallWithPrice> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
@@ -422,7 +416,7 @@ impl ApiCalls {
     #[doc = "List API calls for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\nAlternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\nIf the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\nThe API calls are returned in order of creation, with the most recently created API calls first."]
     pub async fn list_for_user(
         &self,
-        id: String,
+        id: &str,
         limit: Option<u32>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
@@ -466,9 +460,9 @@ impl ApiCalls {
     }
 
     #[doc = "List API calls for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\nAlternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\nIf the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\nThe API calls are returned in order of creation, with the most recently created API calls first."]
-    pub fn list_for_user_stream(
-        &self,
-        id: String,
+    pub fn list_for_user_stream<'a>(
+        &'a self,
+        id: &'a str,
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> impl futures::Stream<Item = Result<crate::types::ApiCallWithPrice>> + Unpin + '_ {

@@ -143,8 +143,8 @@ impl Users {
     }
 
     #[doc = "List users.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first."]
-    pub fn list_stream(
-        &self,
+    pub fn list_stream<'a>(
+        &'a self,
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> impl futures::Stream<Item = Result<crate::types::User>> + Unpin + '_ {
@@ -240,8 +240,8 @@ impl Users {
     }
 
     #[doc = "List users with extended information.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first."]
-    pub fn list_extended_stream(
-        &self,
+    pub fn list_extended_stream<'a>(
+        &'a self,
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> impl futures::Stream<Item = Result<crate::types::ExtendedUser>> + Unpin + '_ {
@@ -296,7 +296,7 @@ impl Users {
     }
 
     #[doc = "Get extended information about a user.\n\nTo get information about yourself, use `/users-extended/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user/extended` endpoint.\nTo get information about any KittyCAD user, you must be a KittyCAD employee."]
-    pub async fn get_user_extended(&self, id: String) -> Result<crate::types::ExtendedUser> {
+    pub async fn get_user_extended(&self, id: &str) -> Result<crate::types::ExtendedUser> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
@@ -322,7 +322,7 @@ impl Users {
     }
 
     #[doc = "Get a user.\n\nTo get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user` endpoint.\nTo get information about any KittyCAD user, you must be a KittyCAD employee."]
-    pub async fn get_user(&self, id: String) -> Result<crate::types::User> {
+    pub async fn get_user(&self, id: &str) -> Result<crate::types::User> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(

@@ -45,7 +45,7 @@ impl File {
     }
 
     #[doc = "Get a file conversion.\n\nGet the status and output of an async file conversion.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\nIf the user is not authenticated to view the specified file conversion, then it is not returned.\nOnly KittyCAD employees with the proper access can view file conversions for other users."]
-    pub async fn get_conversion(&self, id: String) -> Result<crate::types::AsyncApiCallOutput> {
+    pub async fn get_conversion(&self, id: &str) -> Result<crate::types::AsyncApiCallOutput> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
@@ -205,7 +205,7 @@ impl File {
     #[doc = "Get a file conversion for your user.\n\nGet the status and output of an async file conversion. If completed, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user."]
     pub async fn get_conversion_for_user(
         &self,
-        id: String,
+        id: &str,
     ) -> Result<crate::types::AsyncApiCallOutput> {
         let mut req = self.client.client.request(
             http::Method::GET,
