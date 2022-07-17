@@ -108,11 +108,13 @@ pub fn generate_files(
                 example.insert(
                     "example".to_string(),
                     format!(
-                        "{}\nclient.{}().{}(self{}{}).await?;",
-                        docs,
+                        "// {}\nclient.{}().{}(self{}{}).await?;",
+                        docs.replace('\n', "\n// "),
                         tag,
                         fn_name,
-                        args.rendered()?,
+                        args.rendered()?
+                            .replace(",", ", ")
+                            .replace("crate::types::", ""),
                         request_body_str
                     ),
                 );
@@ -120,12 +122,14 @@ pub fn generate_files(
                 example.insert(
                     "example".to_string(),
                     format!(
-                        "{}\nlet result: {} = client.{}().{}(self{}{}).await?;",
-                        docs,
+                        "// {}\nlet result: {} = client.{}().{}(self{}{}).await?;",
+                        docs.replace('\n', "\n// "),
                         response_type.rendered()?,
                         tag,
                         fn_name,
-                        args.rendered()?,
+                        args.rendered()?
+                            .replace(",", ", ")
+                            .replace("crate::types::", ""),
                         request_body_str
                     ),
                 );
@@ -239,33 +243,75 @@ pub fn generate_files(
 
                 add_fn_to_tag(&mut tag_files, &tag, &function)?;
 
-                // Update our api spec with the new functions.
-                new_operation
-                    .extensions
-                    .insert("x-rust".to_string(), serde_json::json!(example));
-                match method.clone() {
-                    http::Method::GET => {
-                        new_path.get = Some(new_operation);
-                    }
-                    http::Method::POST => {
-                        new_path.post = Some(new_operation);
-                    }
-                    http::Method::PUT => {
-                        new_path.put = Some(new_operation);
-                    }
-                    http::Method::PATCH => {
-                        new_path.patch = Some(new_operation);
-                    }
-                    http::Method::DELETE => {
-                        new_path.delete = Some(new_operation);
-                    }
-                    _ => {}
-                }
-                new_spec.paths.paths.insert(
-                    name.to_string(),
-                    openapiv3::ReferenceOr::Item(new_path.clone()),
+                // Add the stream function to our examples as well.
+                example.insert(
+                    "example".to_string(),
+                    format!(
+                        r#"{}
+//
+// - OR -
+//
+// Get a stream of results.
+//
+// This allows you to paginate through all the items.
+let stream = client.{}().{}(&self{}{});
+
+loop {{
+    match stream.try_next().await {{
+        Ok(Some(item)) => {{
+            // We got a result.
+            // This will be of the type: `{}`.
+            println!("{{:?}}", item);
+        }}
+        Ok(None) => {{
+            break;
+        }}
+        Err(err) => {{
+            // Handle the error.
+            return Err(err);
+        }},
+    }}
+}}
+"#,
+                        example.get("example").unwrap(),
+                        tag,
+                        quote!(stream_fn_name_ident).rendered()?,
+                        min_args
+                            .rendered()?
+                            .replace(",", ", ")
+                            .replace("crate::types::", ""),
+                        request_body_str,
+                        item_type.rendered()?.replace("crate::types::", "")
+                    ),
                 );
             }
+
+            // Update our api spec with the new functions.
+            new_operation
+                .extensions
+                .insert("x-rust".to_string(), serde_json::json!(example));
+            match method.clone() {
+                http::Method::GET => {
+                    new_path.get = Some(new_operation);
+                }
+                http::Method::POST => {
+                    new_path.post = Some(new_operation);
+                }
+                http::Method::PUT => {
+                    new_path.put = Some(new_operation);
+                }
+                http::Method::PATCH => {
+                    new_path.patch = Some(new_operation);
+                }
+                http::Method::DELETE => {
+                    new_path.delete = Some(new_operation);
+                }
+                _ => {}
+            }
+            new_spec.paths.paths.insert(
+                name.to_string(),
+                openapiv3::ReferenceOr::Item(new_path.clone()),
+            );
 
             Ok(())
         };
