@@ -1,6 +1,9 @@
 //! Utilities for generating rust functions from an OpenAPI spec.
 
-use std::{collections::BTreeMap, fmt::Write as _};
+use std::{
+    collections::{BTreeMap, HashMap},
+    fmt::Write as _,
+};
 
 use anyhow::Result;
 
@@ -11,11 +14,19 @@ use crate::types::exts::{
 /// Generate functions for each path operation.
 pub fn generate_files(
     spec: &openapiv3::OpenAPI,
-) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
+) -> Result<(
+    BTreeMap<String, proc_macro2::TokenStream>,
+    openapiv3::OpenAPI,
+)> {
     let mut tag_files: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
+
+    // Make a spec we can modify for the docs.
+    let mut new_spec = spec.clone();
 
     for (name, path) in spec.paths.iter() {
         let op = path.item()?;
+
+        let mut new_path = op.clone();
 
         let mut gen = |name: &str,
                        method: &http::Method,
@@ -83,6 +94,51 @@ pub fn generate_files(
             };
 
             add_fn_to_tag(&mut tag_files, &tag, &function)?;
+
+            // Let's pause here and update our spec with the new function.
+            // Add the docs to our spec.
+            let mut new_operation = op.clone();
+            let mut example: HashMap<String, String> = HashMap::new();
+            let request_body_str = if request_body.is_empty() {
+                "".to_string()
+            } else {
+                request_body.rendered()?
+            };
+            if response_type.rendered()? == "()" {
+                example.insert(
+                    "example".to_string(),
+                    format!(
+                        "{}\nclient.{}().{}(self{}{}).await?;",
+                        docs,
+                        tag,
+                        fn_name,
+                        args.rendered()?,
+                        request_body_str
+                    ),
+                );
+            } else {
+                example.insert(
+                    "example".to_string(),
+                    format!(
+                        "{}\nlet result: {} = client.{}().{}(self{}{}).await?;",
+                        docs,
+                        response_type.rendered()?,
+                        tag,
+                        fn_name,
+                        args.rendered()?,
+                        request_body_str
+                    ),
+                );
+            }
+            example.insert(
+                "libDocsLink".to_string(),
+                format!(
+                    "https://docs.rs/kittycad/latest/kittycad/{}/struct.{}.html#method.{}",
+                    tag,
+                    crate::types::proper_name(&tag),
+                    fn_name
+                ),
+            );
 
             // Let's check if this function can be paginated.
             let pagination_properties = get_pagination_properties(name, method, op, spec)?;
@@ -182,6 +238,33 @@ pub fn generate_files(
                 };
 
                 add_fn_to_tag(&mut tag_files, &tag, &function)?;
+
+                // Update our api spec with the new functions.
+                new_operation
+                    .extensions
+                    .insert("x-rust".to_string(), serde_json::json!(example));
+                match method.clone() {
+                    http::Method::GET => {
+                        new_path.get = Some(new_operation);
+                    }
+                    http::Method::POST => {
+                        new_path.post = Some(new_operation);
+                    }
+                    http::Method::PUT => {
+                        new_path.put = Some(new_operation);
+                    }
+                    http::Method::PATCH => {
+                        new_path.patch = Some(new_operation);
+                    }
+                    http::Method::DELETE => {
+                        new_path.delete = Some(new_operation);
+                    }
+                    _ => {}
+                }
+                new_spec.paths.paths.insert(
+                    name.to_string(),
+                    openapiv3::ReferenceOr::Item(new_path.clone()),
+                );
             }
 
             Ok(())
@@ -196,7 +279,7 @@ pub fn generate_files(
         gen(name.as_str(), &http::Method::TRACE, op.trace.as_ref())?;
     }
 
-    Ok(tag_files)
+    Ok((tag_files, new_spec))
 }
 
 /// Generate the docs for the given operation.

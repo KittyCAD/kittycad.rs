@@ -9,7 +9,7 @@ pub mod types;
 #[macro_use]
 extern crate quote;
 
-use std::io::Write;
+use std::{collections::HashMap, io::Write};
 
 use anyhow::Result;
 use clap::Parser;
@@ -286,7 +286,7 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     crate::save(typesrs, types.as_str())?;
 
     // Create the Rust source files for each of the tags functions.
-    let files = crate::functions::generate_files(spec)?;
+    let (files, modified_spec) = crate::functions::generate_files(spec)?;
     // We have a map of our files, let's write to them.
     for (f, content) in files {
         let mut tagrs = src.clone();
@@ -314,6 +314,42 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
         };
         crate::save(tagrs, &crate::types::get_text_fmt(&output)?)?;
     }
+
+    // Also add our installation information to the modified_spec.
+    let mut extension: HashMap<String, String> = HashMap::new();
+    extension.insert(
+        "install".to_string(),
+        format!("[dependencies]\nkittycad = \"{}\"", opts.version),
+    );
+    extension.insert(
+        "client".to_string(),
+        r#"use kittycad::Client;
+// Authenticate via an API token.
+let client = Client::new("$TOKEN");
+// - OR -
+// Authenticate with your token and host parsed from the environment variables:
+// KITTYCAD_API_TOKEN.
+let client = Client::new_from_env();"#
+            .to_string(),
+    );
+
+    // Add in our version information
+    let mut modified_spec = modified_spec.clone();
+    modified_spec
+        .info
+        .extensions
+        .insert("x-rust".to_string(), serde_json::json!(extension));
+
+    // Create a JSON patch file with our changes.
+    let patch = json_patch::diff(
+        &serde_json::to_value(spec)?,
+        &serde_json::to_value(modified_spec)?,
+    );
+    // Save our patch file.
+    let mut patch_file = std::env::current_dir()?;
+    patch_file.push(format!("{}.rs.patch.json", opts.name));
+    crate::save(&patch_file, &serde_json::to_string_pretty(&patch)?)?;
+    log::info!("Patch file has been saved to {}", patch_file.display());
 
     Ok(())
 }

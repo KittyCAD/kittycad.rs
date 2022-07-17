@@ -1,0 +1,66 @@
+[
+  {
+    "op": "add",
+    "path": "/info/x-rust",
+    "value": {
+      "client": "use kittycad::Client;\n// Authenticate via an API token.\nlet client = Client::new(\"$TOKEN\");\n// - OR -\n// Authenticate with your token and host parsed from the environment variables:\n// KITTYCAD_API_TOKEN.\nlet client = Client::new_from_env();",
+      "install": "[dependencies]\nkittycad = \"0.1.8\""
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1api-calls/get/x-rust",
+    "value": {
+      "example": "List API calls.\n\nThis endpoint requires authentication by a KittyCAD employee. The API calls are returned in order of creation, with the most recently created API calls first.\nlet result: crate::types::ApiCallWithPriceResultsPage = client.api_calls().list(self,limit:Option<u32>,page_token:Option<String>,sort_by:Option<crate::types::CreatedAtSortMode>).await?;",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.list"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1async~1operations/get/x-rust",
+    "value": {
+      "example": "List async operations.\n\nFor async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\nThis endpoint requires authentication by a KittyCAD employee.\nlet result: crate::types::AsyncApiCallResultsPage = client.api_calls().list_async_operations(self,limit:Option<u32>,page_token:Option<String>,sort_by:Option<crate::types::CreatedAtSortMode>,status:Option<crate::types::ApiCallStatus>).await?;",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.list_async_operations"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1api-calls/get/x-rust",
+    "value": {
+      "example": "List API calls for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user.\nThe API calls are returned in order of creation, with the most recently created API calls first.\nlet result: crate::types::ApiCallWithPriceResultsPage = client.api_calls().user_list(self,limit:Option<u32>,page_token:Option<String>,sort_by:Option<crate::types::CreatedAtSortMode>).await?;",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.user_list"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1api-tokens/get/x-rust",
+    "value": {
+      "example": "List API tokens for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first.\nlet result: crate::types::ApiTokenResultsPage = client.api_tokens().list_for_user(self,limit:Option<u32>,page_token:Option<String>,sort_by:Option<crate::types::CreatedAtSortMode>).await?;",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_tokens/struct.ApiTokens.html#method.list_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1users/get/x-rust",
+    "value": {
+      "example": "List users.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\nlet result: crate::types::UserResultsPage = client.users().list(self,limit:Option<u32>,page_token:Option<String>,sort_by:Option<crate::types::CreatedAtSortMode>).await?;",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.list"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1users-extended/get/x-rust",
+    "value": {
+      "example": "List users with extended information.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\nlet result: crate::types::ExtendedUserResultsPage = client.users().list_extended(self,limit:Option<u32>,page_token:Option<String>,sort_by:Option<crate::types::CreatedAtSortMode>).await?;",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.list_extended"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1users~1{id}~1api-calls/get/x-rust",
+    "value": {
+      "example": "List API calls for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\nAlternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\nIf the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\nThe API calls are returned in order of creation, with the most recently created API calls first.\nlet result: crate::types::ApiCallWithPriceResultsPage = client.api_calls().list_for_user(self,id:&'astr,limit:Option<u32>,page_token:Option<String>,sort_by:Option<crate::types::CreatedAtSortMode>).await?;",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.list_for_user"
+    }
+  }
+]
