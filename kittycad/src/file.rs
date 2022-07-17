@@ -54,7 +54,7 @@ impl File {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "file/conversions/{id}".replace("{id}", &id)
+                "file/conversions/{id}".replace("{id}", id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -215,7 +215,7 @@ impl File {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/file/conversions/{id}".replace("{id}", &id)
+                "user/file/conversions/{id}".replace("{id}", id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
