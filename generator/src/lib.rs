@@ -334,7 +334,7 @@ let client = Client::new_from_env();"#
     );
 
     // Add in our version information
-    let mut modified_spec = modified_spec.clone();
+    let mut modified_spec = modified_spec;
     modified_spec
         .info
         .extensions

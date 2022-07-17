@@ -3,6 +3,7 @@
 use std::{
     collections::{BTreeMap, HashMap},
     fmt::Write as _,
+    str::FromStr,
 };
 
 use anyhow::Result;
@@ -107,31 +108,31 @@ pub fn generate_files(
             if response_type.rendered()? == "()" {
                 example.insert(
                     "example".to_string(),
-                    format!(
+                    parse_and_fmt_example(&format!(
                         "// {}\nclient.{}().{}(self{}{}).await?;",
                         docs.replace('\n', "\n// "),
                         tag,
                         fn_name,
                         args.rendered()?
-                            .replace(",", ", ")
+                            .replace(',', ", ")
                             .replace("crate::types::", ""),
                         request_body_str
-                    ),
+                    ))?,
                 );
             } else {
                 example.insert(
                     "example".to_string(),
-                    format!(
+                    parse_and_fmt_example(&format!(
                         "// {}\nlet result: {} = client.{}().{}(self{}{}).await?;",
                         docs.replace('\n', "\n// "),
                         response_type.rendered()?,
                         tag,
                         fn_name,
                         args.rendered()?
-                            .replace(",", ", ")
+                            .replace(',', ", ")
                             .replace("crate::types::", ""),
                         request_body_str
-                    ),
+                    ))?,
                 );
             }
             example.insert(
@@ -246,7 +247,7 @@ pub fn generate_files(
                 // Add the stream function to our examples as well.
                 example.insert(
                     "example".to_string(),
-                    format!(
+                    parse_and_fmt_example(&format!(
                         r#"{}
 //
 // - OR -
@@ -278,11 +279,11 @@ loop {{
                         quote!(stream_fn_name_ident).rendered()?,
                         min_args
                             .rendered()?
-                            .replace(",", ", ")
+                            .replace(',', ", ")
                             .replace("crate::types::", ""),
                         request_body_str,
                         item_type.rendered()?.replace("crate::types::", "")
-                    ),
+                    ))?,
                 );
             }
 
@@ -797,4 +798,12 @@ fn add_fn_to_tag(
     }
 
     Ok(())
+}
+
+/// Parse a code example as rust code to verify it compiles.
+fn parse_and_fmt_example(s: &str) -> Result<String> {
+    let t = proc_macro2::TokenStream::from_str(s)
+        .map_err(|err| anyhow::anyhow!("failed to parse example: {}", err))?;
+    // `rustfmt` the code.
+    crate::types::get_text_fmt(&t)
 }
