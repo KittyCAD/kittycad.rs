@@ -105,6 +105,28 @@ impl Payments {
         }
     }
 
+    #[doc = "Get balance for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It gets the balance information for the authenticated user."]
+    pub async fn get_payment_balance_for_user(&self) -> Result<crate::types::CustomerBalance> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            &format!("{}/{}", self.client.base_url, "user/payment/balance"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
+    }
+
     #[doc = "Create a payment intent for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It creates a new payment intent for the authenticated user."]
     pub async fn create_payment_intent_for_user(&self) -> Result<crate::types::PaymentIntent> {
         let mut req = self.client.client.request(

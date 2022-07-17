@@ -437,6 +437,7 @@ chrono-humanize = "^0.2.1"
 data-encoding = "^2.3.2"
 dirs = {{ version = "^4.0.0", optional = true }}
 format_serde_error = "^0.3.0"
+futures = "0.3.21"
 http = "^0.2.8"
 hyperx = "1"
 log = {{ version = "^0.4", features = ["serde"] }}

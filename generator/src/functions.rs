@@ -91,14 +91,39 @@ pub fn generate_files(
                 let stream_fn_name_ident = format_ident!("{}_stream", fn_name);
 
                 // Get the inner args for the function.
+                let page_param_str = pagination_properties.page_param_str()?;
+
+                // Make sure if we have args, we start with a comma.
+                // Get the args again without the page param.
+                let min_args = if raw_args.is_empty() {
+                    quote!()
+                } else {
+                    let mut a = Vec::new();
+                    for (k, v) in raw_args.iter() {
+                        // Skip the next page arg.
+                        if k != &page_param_str {
+                            let n = format_ident!("{}", k);
+                            a.push(quote!(#n: #v))
+                        }
+                    }
+                    quote!(,#(#a),*)
+                };
+
                 let inner_args = if raw_args.is_empty() {
                     quote!()
                 } else {
-                    let a = raw_args.iter().map(|(k, _v)| {
-                        let n = format_ident!("{}", k);
-                        quote!(#n)
-                    });
-                    quote!(#(#a.clone()),*)
+                    let mut a = Vec::new();
+                    for (k, _v) in raw_args.iter() {
+                        // Skip the next page arg.
+                        if k != &page_param_str {
+                            let n = format_ident!("{}", k);
+                            a.push(quote!(#n))
+                        } else {
+                            // Make the arg none for our page parameter.
+                            a.push(quote!(None))
+                        }
+                    }
+                    quote!(#(#a),*)
                 };
 
                 // Check if we have a body as an arg.
@@ -114,23 +139,46 @@ pub fn generate_files(
 
                 let function = quote! {
                     #[doc = #docs]
-                    pub async fn #stream_fn_name_ident(&self #args #request_body) -> Result<Vec<#item_type>> {
+                    pub fn #stream_fn_name_ident(&self #min_args #request_body) -> impl futures::Stream<Item = Result<#item_type>> + Unpin + '_ {
+                        use futures::{StreamExt, TryFutureExt, TryStreamExt};
                         use crate::types::paginate::Pagination;
 
-                        // Get the result from our other function.
-                        let mut result = self.#fn_name_ident(#inner_args #body_arg).await?;
-                        let mut items = result.items();
-                        if result.has_more_pages()? {
-                            result = {
-                                #paginated_function_body
-                            }?;
+                        // Get the result from our main function.
+                        self.#fn_name_ident(#inner_args #body_arg)
+                            .map_ok(move |result| {
+                                let items = futures::stream::iter(result.items().into_iter().map(Ok));
 
-                            // Add our new items to the existing ones.
-                            items.extend(result.items());
+                                // Get the next pages.
+                                let next_pages = futures::stream::try_unfold(
+                                    result,
+                                    move |new_result| async move {
+                                        if new_result.has_more_pages()? {
+                                            // Get the next page, we modify the request directly,
+                                            // so that if we want to generate an API that uses
+                                            // Link headers or any other weird shit it works.
+                                            async {
+                                                #paginated_function_body
+                                            }.map_ok(|result: #response_type| {
+                                                Some((futures::stream::iter(
+                                                        result.items().into_iter().map(Ok),
+                                                    ),
+                                                    result,
+                                                ))
+                                            })
+                                            .await
+                                        } else {
+                                            // We have no more pages.
+                                            Ok(None)
+                                        }
+                                    }
+                                )
+                                .try_flatten();
+
+                                items.chain(next_pages)
+                            })
+                            .try_flatten_stream()
+                            .boxed()
                         }
-
-                        Ok(items)
-                    }
                 };
 
                 add_fn_to_tag(&mut tag_files, &tag, &function)?;
@@ -544,7 +592,7 @@ fn get_function_body(
             // Build the request.
             let mut request = req.build()?;
             // Now we will modify the request to add the pagination.
-            request = result.next_page(request)?;
+            request = new_result.next_page(request)?;
             // Now we will execute the request.
             let resp = self.client.client.execute(request).await?;
         )

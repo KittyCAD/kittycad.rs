@@ -1,3 +1,4 @@
+use futures::TryStreamExt;
 use pretty_assertions::assert_eq;
 
 fn test_client() -> crate::Client {
@@ -114,13 +115,28 @@ async fn test_stream() {
     let client = test_client();
 
     let limit = 2;
-    let stream = client
-        .api_calls()
-        .list_stream(Some(limit), None, None)
-        .await
-        .unwrap();
+    let mut stream = client.api_calls().list_stream(Some(limit), None);
 
-    assert!(stream.len() > limit as usize);
+    let mut ids: Vec<String> = Default::default();
+    loop {
+        match stream.try_next().await {
+            Ok(Some(item)) => {
+                // Make sure we are not repeating items.
+                if !ids.contains(&item.id.to_string()) {
+                    ids.push(item.id.to_string());
+                }
+                if ids.len() > (limit * 20) as usize {
+                    break;
+                }
+            }
+            Ok(None) => {
+                break;
+            }
+            Err(err) => {
+                panic!(err)
+            }
+        }
+    }
 }
 
 #[test]

@@ -80,45 +80,59 @@ impl ApiCalls {
     }
 
     #[doc = "List API calls.\n\nThis endpoint requires authentication by a KittyCAD employee. The API calls are returned in order of creation, with the most recently created API calls first."]
-    pub async fn list_stream(
+    pub fn list_stream(
         &self,
         limit: Option<u32>,
-        page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<Vec<crate::types::ApiCallWithPrice>> {
+    ) -> impl futures::Stream<Item = Result<crate::types::ApiCallWithPrice>> + Unpin + '_ {
         use crate::types::paginate::Pagination;
-        let mut result = self
-            .list(limit, page_token.clone(), sort_by.clone())
-            .await?;
-        let mut items = result.items();
-        if result.has_more_pages()? {
-            result = {
-                let mut req = self.client.client.request(
-                    http::Method::GET,
-                    &format!("{}/{}", self.client.base_url, "api-calls"),
-                );
-                req = req.bearer_auth(&self.client.token);
-                let mut request = req.build()?;
-                request = result.next_page(request)?;
-                let resp = self.client.client.execute(request).await?;
-                let status = resp.status();
-                let text = resp.text().await.unwrap_or_default();
-                if status.is_success() {
-                    serde_json::from_str(&text).map_err(|err| {
-                        format_serde_error::SerdeError::new(text.to_string(), err).into()
+        use futures::{StreamExt, TryFutureExt, TryStreamExt};
+        self.list(limit, None, sort_by)
+            .map_ok(move |result| {
+                let items = futures::stream::iter(result.items().into_iter().map(Ok));
+                let next_pages =
+                    futures::stream::try_unfold(result, move |new_result| async move {
+                        if new_result.has_more_pages()? {
+                            async {
+                                let mut req = self.client.client.request(
+                                    http::Method::GET,
+                                    &format!("{}/{}", self.client.base_url, "api-calls"),
+                                );
+                                req = req.bearer_auth(&self.client.token);
+                                let mut request = req.build()?;
+                                request = new_result.next_page(request)?;
+                                let resp = self.client.client.execute(request).await?;
+                                let status = resp.status();
+                                let text = resp.text().await.unwrap_or_default();
+                                if status.is_success() {
+                                    serde_json::from_str(&text).map_err(|err| {
+                                        format_serde_error::SerdeError::new(text.to_string(), err)
+                                            .into()
+                                    })
+                                } else {
+                                    Err(anyhow::anyhow!(
+                                        "response was not successful `{}` -> `{}`",
+                                        status,
+                                        text
+                                    ))
+                                }
+                            }
+                            .map_ok(|result: crate::types::ApiCallWithPriceResultsPage| {
+                                Some((
+                                    futures::stream::iter(result.items().into_iter().map(Ok)),
+                                    result,
+                                ))
+                            })
+                            .await
+                        } else {
+                            Ok(None)
+                        }
                     })
-                } else {
-                    Err(anyhow::anyhow!(
-                        "response was not successful `{}` -> `{}`",
-                        status,
-                        text
-                    ))
-                }
-            }?;
-            items.extend(result.items());
-        }
-
-        Ok(items)
+                    .try_flatten();
+                items.chain(next_pages)
+            })
+            .try_flatten_stream()
+            .boxed()
     }
 
     #[doc = "Get details of an API call.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\nIf the user is not authenticated to view the specified API call, then it is not returned.\nOnly KittyCAD employees can view API calls for other users."]
@@ -194,51 +208,60 @@ impl ApiCalls {
     }
 
     #[doc = "List async operations.\n\nFor async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\nThis endpoint requires authentication by a KittyCAD employee."]
-    pub async fn list_async_operations_stream(
+    pub fn list_async_operations_stream(
         &self,
         limit: Option<u32>,
-        page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
         status: Option<crate::types::ApiCallStatus>,
-    ) -> Result<Vec<crate::types::AsyncApiCall>> {
+    ) -> impl futures::Stream<Item = Result<crate::types::AsyncApiCall>> + Unpin + '_ {
         use crate::types::paginate::Pagination;
-        let mut result = self
-            .list_async_operations(
-                limit,
-                page_token.clone(),
-                sort_by.clone(),
-                status.clone(),
-            )
-            .await?;
-        let mut items = result.items();
-        if result.has_more_pages()? {
-            result = {
-                let mut req = self.client.client.request(
-                    http::Method::GET,
-                    &format!("{}/{}", self.client.base_url, "async/operations"),
-                );
-                req = req.bearer_auth(&self.client.token);
-                let mut request = req.build()?;
-                request = result.next_page(request)?;
-                let resp = self.client.client.execute(request).await?;
-                let status = resp.status();
-                let text = resp.text().await.unwrap_or_default();
-                if status.is_success() {
-                    serde_json::from_str(&text).map_err(|err| {
-                        format_serde_error::SerdeError::new(text.to_string(), err).into()
+        use futures::{StreamExt, TryFutureExt, TryStreamExt};
+        self.list_async_operations(limit, None, sort_by, status)
+            .map_ok(move |result| {
+                let items = futures::stream::iter(result.items().into_iter().map(Ok));
+                let next_pages =
+                    futures::stream::try_unfold(result, move |new_result| async move {
+                        if new_result.has_more_pages()? {
+                            async {
+                                let mut req = self.client.client.request(
+                                    http::Method::GET,
+                                    &format!("{}/{}", self.client.base_url, "async/operations"),
+                                );
+                                req = req.bearer_auth(&self.client.token);
+                                let mut request = req.build()?;
+                                request = new_result.next_page(request)?;
+                                let resp = self.client.client.execute(request).await?;
+                                let status = resp.status();
+                                let text = resp.text().await.unwrap_or_default();
+                                if status.is_success() {
+                                    serde_json::from_str(&text).map_err(|err| {
+                                        format_serde_error::SerdeError::new(text.to_string(), err)
+                                            .into()
+                                    })
+                                } else {
+                                    Err(anyhow::anyhow!(
+                                        "response was not successful `{}` -> `{}`",
+                                        status,
+                                        text
+                                    ))
+                                }
+                            }
+                            .map_ok(|result: crate::types::AsyncApiCallResultsPage| {
+                                Some((
+                                    futures::stream::iter(result.items().into_iter().map(Ok)),
+                                    result,
+                                ))
+                            })
+                            .await
+                        } else {
+                            Ok(None)
+                        }
                     })
-                } else {
-                    Err(anyhow::anyhow!(
-                        "response was not successful `{}` -> `{}`",
-                        status,
-                        text
-                    ))
-                }
-            }?;
-            items.extend(result.items());
-        }
-
-        Ok(items)
+                    .try_flatten();
+                items.chain(next_pages)
+            })
+            .try_flatten_stream()
+            .boxed()
     }
 
     #[doc = "Get an async operation.\n\nGet the status and output of an async operation.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested async operation for the user.\nIf the user is not authenticated to view the specified async operation, then it is not returned.\nOnly KittyCAD employees with the proper access can view async operations for other users."]
@@ -312,45 +335,59 @@ impl ApiCalls {
     }
 
     #[doc = "List API calls for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user.\nThe API calls are returned in order of creation, with the most recently created API calls first."]
-    pub async fn user_list_stream(
+    pub fn user_list_stream(
         &self,
         limit: Option<u32>,
-        page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<Vec<crate::types::ApiCallWithPrice>> {
+    ) -> impl futures::Stream<Item = Result<crate::types::ApiCallWithPrice>> + Unpin + '_ {
         use crate::types::paginate::Pagination;
-        let mut result = self
-            .user_list(limit, page_token.clone(), sort_by.clone())
-            .await?;
-        let mut items = result.items();
-        if result.has_more_pages()? {
-            result = {
-                let mut req = self.client.client.request(
-                    http::Method::GET,
-                    &format!("{}/{}", self.client.base_url, "user/api-calls"),
-                );
-                req = req.bearer_auth(&self.client.token);
-                let mut request = req.build()?;
-                request = result.next_page(request)?;
-                let resp = self.client.client.execute(request).await?;
-                let status = resp.status();
-                let text = resp.text().await.unwrap_or_default();
-                if status.is_success() {
-                    serde_json::from_str(&text).map_err(|err| {
-                        format_serde_error::SerdeError::new(text.to_string(), err).into()
+        use futures::{StreamExt, TryFutureExt, TryStreamExt};
+        self.user_list(limit, None, sort_by)
+            .map_ok(move |result| {
+                let items = futures::stream::iter(result.items().into_iter().map(Ok));
+                let next_pages =
+                    futures::stream::try_unfold(result, move |new_result| async move {
+                        if new_result.has_more_pages()? {
+                            async {
+                                let mut req = self.client.client.request(
+                                    http::Method::GET,
+                                    &format!("{}/{}", self.client.base_url, "user/api-calls"),
+                                );
+                                req = req.bearer_auth(&self.client.token);
+                                let mut request = req.build()?;
+                                request = new_result.next_page(request)?;
+                                let resp = self.client.client.execute(request).await?;
+                                let status = resp.status();
+                                let text = resp.text().await.unwrap_or_default();
+                                if status.is_success() {
+                                    serde_json::from_str(&text).map_err(|err| {
+                                        format_serde_error::SerdeError::new(text.to_string(), err)
+                                            .into()
+                                    })
+                                } else {
+                                    Err(anyhow::anyhow!(
+                                        "response was not successful `{}` -> `{}`",
+                                        status,
+                                        text
+                                    ))
+                                }
+                            }
+                            .map_ok(|result: crate::types::ApiCallWithPriceResultsPage| {
+                                Some((
+                                    futures::stream::iter(result.items().into_iter().map(Ok)),
+                                    result,
+                                ))
+                            })
+                            .await
+                        } else {
+                            Ok(None)
+                        }
                     })
-                } else {
-                    Err(anyhow::anyhow!(
-                        "response was not successful `{}` -> `{}`",
-                        status,
-                        text
-                    ))
-                }
-            }?;
-            items.extend(result.items());
-        }
-
-        Ok(items)
+                    .try_flatten();
+                items.chain(next_pages)
+            })
+            .try_flatten_stream()
+            .boxed()
     }
 
     #[doc = "Get an API call for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user."]
@@ -429,54 +466,63 @@ impl ApiCalls {
     }
 
     #[doc = "List API calls for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\nAlternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\nIf the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\nThe API calls are returned in order of creation, with the most recently created API calls first."]
-    pub async fn list_for_user_stream(
+    pub fn list_for_user_stream(
         &self,
         id: String,
         limit: Option<u32>,
-        page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<Vec<crate::types::ApiCallWithPrice>> {
+    ) -> impl futures::Stream<Item = Result<crate::types::ApiCallWithPrice>> + Unpin + '_ {
         use crate::types::paginate::Pagination;
-        let mut result = self
-            .list_for_user(
-                id.clone(),
-                limit,
-                page_token.clone(),
-                sort_by.clone(),
-            )
-            .await?;
-        let mut items = result.items();
-        if result.has_more_pages()? {
-            result = {
-                let mut req = self.client.client.request(
-                    http::Method::GET,
-                    &format!(
-                        "{}/{}",
-                        self.client.base_url,
-                        "users/{id}/api-calls".replace("{id}", &id)
-                    ),
-                );
-                req = req.bearer_auth(&self.client.token);
-                let mut request = req.build()?;
-                request = result.next_page(request)?;
-                let resp = self.client.client.execute(request).await?;
-                let status = resp.status();
-                let text = resp.text().await.unwrap_or_default();
-                if status.is_success() {
-                    serde_json::from_str(&text).map_err(|err| {
-                        format_serde_error::SerdeError::new(text.to_string(), err).into()
+        use futures::{StreamExt, TryFutureExt, TryStreamExt};
+        self.list_for_user(id, limit, None, sort_by)
+            .map_ok(move |result| {
+                let items = futures::stream::iter(result.items().into_iter().map(Ok));
+                let next_pages =
+                    futures::stream::try_unfold(result, move |new_result| async move {
+                        if new_result.has_more_pages()? {
+                            async {
+                                let mut req = self.client.client.request(
+                                    http::Method::GET,
+                                    &format!(
+                                        "{}/{}",
+                                        self.client.base_url,
+                                        "users/{id}/api-calls".replace("{id}", &id)
+                                    ),
+                                );
+                                req = req.bearer_auth(&self.client.token);
+                                let mut request = req.build()?;
+                                request = new_result.next_page(request)?;
+                                let resp = self.client.client.execute(request).await?;
+                                let status = resp.status();
+                                let text = resp.text().await.unwrap_or_default();
+                                if status.is_success() {
+                                    serde_json::from_str(&text).map_err(|err| {
+                                        format_serde_error::SerdeError::new(text.to_string(), err)
+                                            .into()
+                                    })
+                                } else {
+                                    Err(anyhow::anyhow!(
+                                        "response was not successful `{}` -> `{}`",
+                                        status,
+                                        text
+                                    ))
+                                }
+                            }
+                            .map_ok(|result: crate::types::ApiCallWithPriceResultsPage| {
+                                Some((
+                                    futures::stream::iter(result.items().into_iter().map(Ok)),
+                                    result,
+                                ))
+                            })
+                            .await
+                        } else {
+                            Ok(None)
+                        }
                     })
-                } else {
-                    Err(anyhow::anyhow!(
-                        "response was not successful `{}` -> `{}`",
-                        status,
-                        text
-                    ))
-                }
-            }?;
-            items.extend(result.items());
-        }
-
-        Ok(items)
+                    .try_flatten();
+                items.chain(next_pages)
+            })
+            .try_flatten_stream()
+            .boxed()
     }
 }

@@ -291,7 +291,7 @@ fn get_type_name_for_string(
             "hostname" => quote!(String),
             "time" => quote!(chrono::NaiveTime),
             "date-time" => quote!(chrono::DateTime<chrono::Utc>),
-            "partial-date-time" => quote!(chrono::DateTime<chrono::Utc>),
+            "partial-date-time" => quote!(chrono::NaiveDate),
             f => {
                 anyhow::bail!("XXX unknown string format {}", f)
             }
@@ -1130,6 +1130,8 @@ fn get_phone_number_mod() -> Result<proc_macro2::TokenStream> {
 pub struct PaginationProperties {
     /// The property for the next page.
     pub next_page: Option<(String, proc_macro2::TokenStream)>,
+    /// The parameter we send back to the server to get the next page.
+    pub page_param: Option<(String, proc_macro2::TokenStream)>,
     /// The property for the items.
     pub items: Option<(String, proc_macro2::TokenStream)>,
     /// The path of the operation.
@@ -1211,6 +1213,42 @@ impl PaginationProperties {
             }
         }
 
+        // Iterate over the parameters and get the page param.
+        let mut page_param = None;
+        for param in &op.parameters {
+            // Get the parameter.
+            let param = param.expand(spec)?;
+            if let openapiv3::Parameter::Query {
+                parameter_data,
+                style: _,
+                allow_reserved: _,
+                allow_empty_value: _,
+            } = param
+            {
+                // Get the schema for the parameter.
+                let s = parameter_data.format.schema()?;
+
+                // Get the type for the parameter.
+                let mut t = match s {
+                    openapiv3::ReferenceOr::Reference { .. } => {
+                        crate::types::get_type_name_from_reference(&s.reference()?, spec, false)?
+                    }
+                    openapiv3::ReferenceOr::Item(s) => {
+                        crate::types::get_type_name_for_schema("", &s, spec, false)?
+                    }
+                };
+
+                // Make it an option if it's optional.
+                if !parameter_data.required && !t.is_option()? {
+                    t = quote!(Option<#t>);
+                }
+
+                if is_pagination_property_param_page(&parameter_data.name) {
+                    page_param = Some((parameter_data.name.to_string(), t.clone()));
+                }
+            }
+        }
+
         let schema = if let Some(schema) = schema {
             schema
         } else {
@@ -1229,6 +1267,7 @@ impl PaginationProperties {
 
         properties.path = Some(name.to_string());
         properties.method = Some(method.clone());
+        properties.page_param = page_param;
 
         Ok(properties)
     }
@@ -1268,10 +1307,23 @@ impl PaginationProperties {
 
         anyhow::bail!("No next page property found")
     }
+
+    /// Get the item type for this object.
+    pub fn page_param_str(&self) -> Result<String> {
+        if let Some((k, _v)) = &self.page_param {
+            return Ok(k.to_string());
+        }
+
+        anyhow::bail!("No next page property found")
+    }
 }
 
 fn is_pagination_property_next_page(s: &str) -> bool {
     ["next_page", "next"].contains(&s)
+}
+
+fn is_pagination_property_param_page(s: &str) -> bool {
+    ["page_token", "page"].contains(&s)
 }
 
 fn is_pagination_property_items(s: &str, t: &proc_macro2::TokenStream) -> Result<bool> {
