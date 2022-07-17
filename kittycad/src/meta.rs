@@ -11,7 +11,7 @@ impl Meta {
     }
 
     #[doc = "Get OpenAPI schema."]
-    pub async fn get_schema(&self) -> Result<serde_json::Value> {
+    pub async fn get_schema<'a>(&'a self) -> Result<serde_json::Value> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, ""),
@@ -33,7 +33,7 @@ impl Meta {
     }
 
     #[doc = "Get the metadata about our currently running server.\n\nThis includes information on any of our other distributed systems it is connected to.\nYou must be a KittyCAD employee to perform this request."]
-    pub async fn get_metadata(&self) -> Result<crate::types::Metadata> {
+    pub async fn get_metadata<'a>(&'a self) -> Result<crate::types::Metadata> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "_meta/info"),
@@ -55,7 +55,7 @@ impl Meta {
     }
 
     #[doc = "Return pong."]
-    pub async fn ping(&self) -> Result<crate::types::Pong> {
+    pub async fn ping<'a>(&'a self) -> Result<crate::types::Pong> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "ping"),

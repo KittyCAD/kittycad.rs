@@ -345,7 +345,7 @@ impl TokenStreamExt for proc_macro2::TokenStream {
 
     fn is_string(&self) -> Result<bool> {
         let rendered = self.rendered()?;
-        Ok(rendered.starts_with("String") || rendered.ends_with("&str"))
+        Ok(rendered == "String" || rendered == "&str" || rendered == "&'a str")
     }
 
     fn rendered(&self) -> Result<String> {

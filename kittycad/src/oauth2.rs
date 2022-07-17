@@ -11,8 +11,8 @@ impl Oauth2 {
     }
 
     #[doc = "Start an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint is designed to be accessed from an *unauthenticated* API client. It generates and records a `device_code` and `user_code` which must be verified and confirmed prior to a token being granted."]
-    pub async fn device_auth_request(
-        &self,
+    pub async fn device_auth_request<'a>(
+        &'a self,
         body: &crate::types::DeviceAuthRequestForm,
     ) -> Result<()> {
         let mut req = self.client.client.request(
@@ -36,8 +36,8 @@ impl Oauth2 {
     }
 
     #[doc = "Confirm an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/oauth2/device/token`."]
-    pub async fn device_auth_confirm(
-        &self,
+    pub async fn device_auth_confirm<'a>(
+        &'a self,
         body: &crate::types::DeviceAuthVerifyParams,
     ) -> Result<()> {
         let mut req = self.client.client.request(
@@ -61,8 +61,8 @@ impl Oauth2 {
     }
 
     #[doc = "Request a device access token.\n\nThis endpoint should be polled by the client until the user code is verified and the grant is confirmed."]
-    pub async fn device_access_token(
-        &self,
+    pub async fn device_access_token<'a>(
+        &'a self,
         body: &crate::types::DeviceAccessTokenRequestForm,
     ) -> Result<()> {
         let mut req = self.client.client.request(
@@ -86,7 +86,7 @@ impl Oauth2 {
     }
 
     #[doc = "Verify an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website."]
-    pub async fn device_auth_verify(&self, user_code: &str) -> Result<()> {
+    pub async fn device_auth_verify<'a>(&'a self, user_code: &'a str) -> Result<()> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "oauth2/device/verify"),
@@ -110,8 +110,8 @@ impl Oauth2 {
     }
 
     #[doc = "Listen for callbacks for the OAuth 2.0 provider."]
-    pub async fn listen_provider_callback(
-        &self,
+    pub async fn listen_provider_callback<'a>(
+        &'a self,
         code: Option<String>,
         provider: crate::types::AccountProvider,
         state: Option<String>,
@@ -151,8 +151,8 @@ impl Oauth2 {
     }
 
     #[doc = "Get the consent URL and other information for the OAuth 2.0 provider."]
-    pub async fn listen_provider_consent(
-        &self,
+    pub async fn listen_provider_consent<'a>(
+        &'a self,
         callback_url: Option<String>,
         provider: crate::types::AccountProvider,
     ) -> Result<crate::types::Oauth2ClientInfo> {

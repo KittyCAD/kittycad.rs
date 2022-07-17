@@ -77,7 +77,7 @@ pub fn generate_files(
 
             let function = quote! {
                 #[doc = #docs]
-                pub async fn #fn_name_ident(&self #args #request_body) -> Result<#response_type> {
+                pub async fn #fn_name_ident<'a>(&'a self #args #request_body) -> Result<#response_type> {
                     #function_body
                 }
             };
@@ -100,13 +100,8 @@ pub fn generate_files(
                 } else {
                     let mut a = Vec::new();
                     for (k, v) in raw_args.iter() {
-                        let mut v = v.clone();
                         // Skip the next page arg.
                         if k != &page_param_str {
-                            let rendered = v.rendered()?;
-                            if rendered == "&str" {
-                                v = quote!(&'a str);
-                            }
                             let n = format_ident!("{}", k);
                             a.push(quote!(#n: #v))
                         }

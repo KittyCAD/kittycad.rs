@@ -11,7 +11,10 @@ impl Sessions {
     }
 
     #[doc = "Get a session for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user."]
-    pub async fn get_session_for_user(&self, token: uuid::Uuid) -> Result<crate::types::Session> {
+    pub async fn get_session_for_user<'a>(
+        &'a self,
+        token: uuid::Uuid,
+    ) -> Result<crate::types::Session> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(

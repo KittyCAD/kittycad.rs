@@ -11,8 +11,8 @@ impl Hidden {
     }
 
     #[doc = "Create an email verification request for a user."]
-    pub async fn listen_auth_email(
-        &self,
+    pub async fn listen_auth_email<'a>(
+        &'a self,
         body: &crate::types::EmailAuthenticationForm,
     ) -> Result<crate::types::VerificationToken> {
         let mut req = self.client.client.request(
@@ -37,11 +37,11 @@ impl Hidden {
     }
 
     #[doc = "Listen for callbacks for email verification for users."]
-    pub async fn listen_auth_email_callback(
-        &self,
+    pub async fn listen_auth_email_callback<'a>(
+        &'a self,
         callback_url: Option<url::Url>,
-        email: &str,
-        token: &str,
+        email: &'a str,
+        token: &'a str,
     ) -> Result<()> {
         let mut req = self.client.client.request(
             http::Method::GET,
@@ -71,7 +71,7 @@ impl Hidden {
     }
 
     #[doc = "This endpoint removes the session cookie for a user.\n\nThis is used in logout scenarios."]
-    pub async fn logout(&self) -> Result<()> {
+    pub async fn logout<'a>(&'a self) -> Result<()> {
         let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "logout"),

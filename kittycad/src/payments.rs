@@ -11,7 +11,7 @@ impl Payments {
     }
 
     #[doc = "Get payment info about your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It gets the payment information for the authenticated user."]
-    pub async fn get_payment_information_for_user(&self) -> Result<crate::types::Customer> {
+    pub async fn get_payment_information_for_user<'a>(&'a self) -> Result<crate::types::Customer> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "user/payment"),
@@ -33,8 +33,8 @@ impl Payments {
     }
 
     #[doc = "Update payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It updates the payment information for the authenticated user."]
-    pub async fn update_payment_information_for_user(
-        &self,
+    pub async fn update_payment_information_for_user<'a>(
+        &'a self,
         body: &crate::types::BillingInfo,
     ) -> Result<crate::types::Customer> {
         let mut req = self.client.client.request(
@@ -59,8 +59,8 @@ impl Payments {
     }
 
     #[doc = "Create payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It creates the payment information for the authenticated user."]
-    pub async fn create_payment_information_for_user(
-        &self,
+    pub async fn create_payment_information_for_user<'a>(
+        &'a self,
         body: &crate::types::BillingInfo,
     ) -> Result<crate::types::Customer> {
         let mut req = self.client.client.request(
@@ -85,7 +85,7 @@ impl Payments {
     }
 
     #[doc = "Delete payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It deletes the payment information for the authenticated user."]
-    pub async fn delete_payment_information_for_user(&self) -> Result<()> {
+    pub async fn delete_payment_information_for_user<'a>(&'a self) -> Result<()> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
             &format!("{}/{}", self.client.base_url, "user/payment"),
@@ -106,7 +106,9 @@ impl Payments {
     }
 
     #[doc = "Get balance for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It gets the balance information for the authenticated user."]
-    pub async fn get_payment_balance_for_user(&self) -> Result<crate::types::CustomerBalance> {
+    pub async fn get_payment_balance_for_user<'a>(
+        &'a self,
+    ) -> Result<crate::types::CustomerBalance> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "user/payment/balance"),
@@ -128,7 +130,9 @@ impl Payments {
     }
 
     #[doc = "Create a payment intent for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It creates a new payment intent for the authenticated user."]
-    pub async fn create_payment_intent_for_user(&self) -> Result<crate::types::PaymentIntent> {
+    pub async fn create_payment_intent_for_user<'a>(
+        &'a self,
+    ) -> Result<crate::types::PaymentIntent> {
         let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "user/payment/intent"),
@@ -150,7 +154,7 @@ impl Payments {
     }
 
     #[doc = "List invoices for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It lists invoices for the authenticated user."]
-    pub async fn list_invoices_for_user(&self) -> Result<Vec<crate::types::Invoice>> {
+    pub async fn list_invoices_for_user<'a>(&'a self) -> Result<Vec<crate::types::Invoice>> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "user/payment/invoices"),
@@ -172,7 +176,9 @@ impl Payments {
     }
 
     #[doc = "List payment methods for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It lists payment methods for the authenticated user."]
-    pub async fn list_payment_methods_for_user(&self) -> Result<Vec<crate::types::PaymentMethod>> {
+    pub async fn list_payment_methods_for_user<'a>(
+        &'a self,
+    ) -> Result<Vec<crate::types::PaymentMethod>> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "user/payment/methods"),
@@ -194,7 +200,7 @@ impl Payments {
     }
 
     #[doc = "Delete a payment method for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the specified payment method for the authenticated user."]
-    pub async fn delete_payment_method_for_user(&self, id: &str) -> Result<()> {
+    pub async fn delete_payment_method_for_user<'a>(&'a self, id: &'a str) -> Result<()> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
             &format!(

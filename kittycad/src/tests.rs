@@ -115,7 +115,8 @@ async fn test_stream() {
     let client = test_client();
 
     let limit = 2;
-    let mut stream = client.api_calls().list_stream(Some(limit), None);
+    let api_calls = client.api_calls();
+    let mut stream = api_calls.list_stream(Some(limit), None);
 
     let mut ids: Vec<String> = Default::default();
     loop {
@@ -133,7 +134,7 @@ async fn test_stream() {
                 break;
             }
             Err(err) => {
-                panic!(err)
+                std::panic::panic_any(err)
             }
         }
     }

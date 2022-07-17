@@ -139,7 +139,7 @@ pub mod paginate {
         #[doc = " Returns true if the response has more pages."]
         fn has_more_pages(&self) -> Result<bool>;
         #[doc = " Modify a request to get the next page."]
-        fn next_page(&self, rb: reqwest::Request) -> Result<reqwest::Request>;
+        fn next_page(&self, req: reqwest::Request) -> Result<reqwest::Request>;
         #[doc = " Get the items from a page."]
         fn items(&self) -> Vec<Self::Item>;
     }
@@ -1802,7 +1802,7 @@ pub struct Customer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub address: Option<Address>,
-    #[doc = "Current balance, if any, being stored on the customer.\n\nIf negative, the customer has credit to apply to their next invoice. If positive, the customer has an amount owed that will be added to their next invoice. The balance does not refer to any unpaid invoices; it solely takes into account amounts that have yet to be successfully applied to any invoice. This balance is only taken into account as invoices are finalized."]
+    #[doc = "Current balance, if any, being stored on the customer in the payments service.\n\nIf negative, the customer has credit to apply to their next invoice. If positive, the customer has an amount owed that will be added to their next invoice. The balance does not refer to any unpaid invoices; it solely takes into account amounts that have yet to be successfully applied to any invoice. This balance is only taken into account as invoices are finalized."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub balance: Option<f64>,
@@ -1838,6 +1838,54 @@ pub struct Customer {
 }
 
 impl std::fmt::Display for Customer {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[doc = "A balance for a user.\n\nThis holds information about the financial balance for the user."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub struct CustomerBalance {
+    #[doc = "The date and time the balance was created."]
+    #[serde()]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The unique identifier for the balance."]
+    #[serde()]
+    pub id: uuid::Uuid,
+    #[doc = "The monthy credits remaining in the balance. This gets re-upped every month, but if the credits are not used for a month they do not carry over to the next month. It is a stable amount granted to the user per month."]
+    #[serde()]
+    pub monthly_credits_remaining: f64,
+    #[doc = "The amount of pre-pay cash remaining in the balance. This number goes down as the user uses their pre-paid credits. The reason we track this amount is if a user ever wants to withdraw their pre-pay cash, we can use this amount to determine how much to give them. Say a user has $100 in pre-paid cash, their bill is worth, $50 after subtracting any other credits (like monthly etc.) Their bill is $50, their pre-pay cash remaining will be subtracted by 50 to pay the bill and their `pre_pay_credits_remaining` will be subtracted by 50 to pay the bill. This way if they want to withdraw money after, they can only withdraw $50 since that is the amount of cash they have remaining."]
+    #[serde()]
+    pub pre_pay_cash_remaining: f64,
+    #[doc = "The amount of credits remaining in the balance. This is typically the amount of cash * some multiplier they get for pre-paying their account. This number lowers every time a bill is paid with the balance. This number increases every time a user adds funds to their balance. This may be through a subscription or a one off payment."]
+    #[serde()]
+    pub pre_pay_credits_remaining: f64,
+    #[doc = "This includes any outstanding, draft, or open invoices and any pending invoice items. This does not include any credits the user has on their account."]
+    #[serde()]
+    pub total_due: f64,
+    #[doc = "The date and time the balance was last updated."]
+    #[serde()]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID the balance belongs to."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[tabled(skip)]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for CustomerBalance {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
