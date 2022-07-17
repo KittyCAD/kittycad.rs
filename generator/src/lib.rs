@@ -286,7 +286,7 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     crate::save(typesrs, types.as_str())?;
 
     // Create the Rust source files for each of the tags functions.
-    let (files, modified_spec) = crate::functions::generate_files(spec)?;
+    let (files, modified_spec) = crate::functions::generate_files(spec, opts)?;
     // We have a map of our files, let's write to them.
     for (f, content) in files {
         let mut tagrs = src.clone();
@@ -319,18 +319,28 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     let mut extension: HashMap<String, String> = HashMap::new();
     extension.insert(
         "install".to_string(),
-        format!("[dependencies]\nkittycad = \"{}\"", opts.version),
+        format!(
+            "[dependencies]\n{} = \"{}\"",
+            opts.name.replace('_', "-").to_lowercase(),
+            opts.version
+        ),
     );
     extension.insert(
         "client".to_string(),
-        r#"use kittycad::Client;
+        format!(
+            r#"use {}::Client;
+
 // Authenticate via an API token.
 let client = Client::new("$TOKEN");
+
 // - OR -
+
 // Authenticate with your token and host parsed from the environment variables:
-// KITTYCAD_API_TOKEN.
-let client = Client::new_from_env();"#
-            .to_string(),
+// `{}`.
+let client = Client::new_from_env();"#,
+            opts.name,
+            crate::template::get_token_env_variable(&opts.name),
+        ),
     );
 
     // Add in our version information

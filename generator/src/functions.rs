@@ -15,6 +15,7 @@ use crate::types::exts::{
 /// Generate functions for each path operation.
 pub fn generate_files(
     spec: &openapiv3::OpenAPI,
+    opts: &crate::Opts,
 ) -> Result<(
     BTreeMap<String, proc_macro2::TokenStream>,
     openapiv3::OpenAPI,
@@ -164,7 +165,9 @@ async fn {}() -> Result<()> {{
             example.insert(
                 "libDocsLink".to_string(),
                 format!(
-                    "https://docs.rs/kittycad/latest/kittycad/{}/struct.{}.html#method.{}",
+                    "https://docs.rs/{}/latest/{}/{}/struct.{}.html#method.{}",
+                    opts.name,
+                    opts.name,
                     tag,
                     crate::types::proper_name(&tag),
                     fn_name
