@@ -206,7 +206,7 @@ impl Payments {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/payment/methods/{id}".replace("{id}", id)
+                "user/payment/methods/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);

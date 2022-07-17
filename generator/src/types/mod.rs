@@ -1,6 +1,7 @@
 //! A library for converting OpenAPI schemas to Rust types.
 
 pub mod base64;
+pub mod example;
 pub mod exts;
 pub mod paginate;
 pub mod phone_number;
@@ -167,6 +168,7 @@ pub fn get_type_name_for_schema(
 
             let internal_schema = &one_of[0];
             match internal_schema {
+
                 openapiv3::ReferenceOr::Reference { .. } => {
                     get_type_name_from_reference(&internal_schema.reference()?, spec, in_crate)?
                 }
@@ -291,7 +293,7 @@ fn get_type_name_for_string(
             "hostname" => quote!(String),
             "time" => quote!(chrono::NaiveTime),
             "date-time" => quote!(chrono::DateTime<chrono::Utc>),
-            "partial-date-time" => quote!(chrono::NaiveDate),
+            "partial-date-time" => quote!(chrono::NaiveDateTime),
             f => {
                 anyhow::bail!("XXX unknown string format {}", f)
             }
