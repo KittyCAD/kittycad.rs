@@ -139,7 +139,7 @@ pub fn generate_files(
 
                 let function = quote! {
                     #[doc = #docs]
-                    pub fn #stream_fn_name_ident<'a>(&'a self #min_args #request_body) -> impl futures::Stream<Item = Result<#item_type>> + Unpin + '_ {
+                    pub fn #stream_fn_name_ident<'a>(&'a self #min_args #request_body) -> impl futures::Stream<Item = Result<#item_type>> + Unpin + '_  {
                         use futures::{StreamExt, TryFutureExt, TryStreamExt};
                         use crate::types::paginate::Pagination;
 

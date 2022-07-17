@@ -345,7 +345,10 @@ impl TokenStreamExt for proc_macro2::TokenStream {
 
     fn is_string(&self) -> Result<bool> {
         let rendered = self.rendered()?;
-        Ok(rendered == "String" || rendered == "&str" || rendered == "&'a str")
+        Ok(rendered == "String"
+            || rendered == "&str"
+            || rendered == "&'astr"
+            || rendered == "&'_str")
     }
 
     fn rendered(&self) -> Result<String> {
@@ -360,7 +363,7 @@ impl TokenStreamExt for proc_macro2::TokenStream {
     fn get_parameter_value(&self) -> Result<proc_macro2::TokenStream> {
         let rendered = self.rendered()?;
         if rendered == "String" {
-            return Ok(quote!(&str));
+            return Ok(quote!(&'a str));
         }
 
         return Ok(self.clone());
