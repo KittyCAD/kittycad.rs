@@ -357,6 +357,9 @@ pub trait TokenStreamExt {
     /// Return `true` if the token stream is already an option.
     fn is_option(&self) -> Result<bool>;
 
+    /// Remove the Option<> from the type.
+    fn strip_option(&self) -> Result<proc_macro2::TokenStream>;
+
     /// Return `true` if the token stream is a string.
     fn is_string(&self) -> Result<bool>;
 
@@ -375,6 +378,16 @@ impl TokenStreamExt for proc_macro2::TokenStream {
         let rendered = self.rendered()?;
         // The phone number type is also a nested option.
         Ok(rendered.starts_with("Option<") || rendered.ends_with("phone_number::PhoneNumber"))
+    }
+
+    fn strip_option(&self) -> Result<proc_macro2::TokenStream> {
+        if !self.is_option()? {
+            return Ok(self.clone());
+        }
+
+        let rendered = self.rendered()?;
+        let rendered = rendered.trim_start_matches("Option<").trim_end_matches('>');
+        rendered.parse().map_err(|e| anyhow::anyhow!("{}", e))
     }
 
     fn is_string(&self) -> Result<bool> {

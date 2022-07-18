@@ -3,7 +3,6 @@
 use std::{
     collections::{BTreeMap, HashMap},
     fmt::Write as _,
-    str::FromStr,
 };
 
 use anyhow::Result;
@@ -102,66 +101,11 @@ pub fn generate_files(
             let mut new_operation = op.clone();
             let mut example: HashMap<String, String> = HashMap::new();
 
-            let inner_args = if raw_args.is_empty() {
-                quote!()
-            } else {
-                let mut a = Vec::new();
-                for (k, _v) in raw_args.iter() {
-                    // Skip the next page arg.
-                    let n = format_ident!("{}", k);
-                    a.push(quote!(#n))
-                }
-                quote!(#(#a),*)
-            };
+            example.insert(
+                "example".to_string(),
+                generate_example_code_fn(name, method, &tag, op, spec)?,
+            );
 
-            let request_body_str = if request_body.is_empty() {
-                "".to_string()
-            } else {
-                "body".to_string()
-            };
-
-            if response_type.rendered()? == "()" {
-                example.insert(
-                    "example".to_string(),
-                    parse_and_fmt_example(&format!(
-                        r#"/// {}
-async fn {}() -> Result<()> {{
-    // This function does not return a value.
-    client.{}().{}({}{}).await?;
-
-    Ok(())
-}}"#,
-                        docs.replace('\n', "\n/// "),
-                        fn_name,
-                        tag,
-                        fn_name,
-                        inner_args.rendered()?.replace(',', ", "),
-                        request_body_str
-                    ))?,
-                );
-            } else {
-                example.insert(
-                    "example".to_string(),
-                    parse_and_fmt_example(&format!(
-                        r#"/// {}
-async fn {}() -> Result<()> {{
-    // The type returned will be: `{}`.
-    let result = client.{}().{}({}{}).await?;
-
-    println!("{{:?}}", result);
-
-    Ok(())
-}}"#,
-                        docs.replace('\n', "\n/// "),
-                        fn_name,
-                        response_type.rendered()?,
-                        tag,
-                        fn_name,
-                        inner_args.rendered()?.replace(',', ", "),
-                        request_body_str
-                    ))?,
-                );
-            }
             example.insert(
                 "libDocsLink".to_string(),
                 format!(
@@ -272,50 +216,6 @@ async fn {}() -> Result<()> {{
                 };
 
                 add_fn_to_tag(&mut tag_files, &tag, &function)?;
-
-                // Add the stream function to our examples as well.
-                example.insert(
-                    "example".to_string(),
-                    parse_and_fmt_example(&format!(
-                        r#"{}
-///
-/// - OR -
-///
-/// Get a stream of results.
-///
-/// This allows you to paginate through all the items.
-async fn {}() -> Result<()> {{
-    let stream = client.{}().{}({}{});
-
-    loop {{
-        match stream.try_next().await {{
-            Ok(Some(item)) => {{
-                // We got a result.
-                // This will be of the type: `{}`.
-                println!("{{:?}}", item);
-            }}
-            Ok(None) => {{
-                break;
-            }}
-            Err(err) => {{
-                // Handle the error.
-                return Err(err);
-            }},
-        }}
-    }}
-
-    Ok(())
-}}
-"#,
-                        example.get("example").unwrap(),
-                        quote!(#stream_fn_name_ident).rendered()?,
-                        tag,
-                        quote!(#stream_fn_name_ident).rendered()?,
-                        inner_args.rendered()?.replace(',', ", "),
-                        request_body_str,
-                        item_type.rendered()?.replace("crate::types::", "")
-                    ))?,
-                );
             }
 
             // Update our api spec with the new functions.
@@ -520,13 +420,101 @@ fn get_request_body(
     Ok(None)
 }
 
-/// Return the path params for the operation.
-fn get_path_params(
+/// Return the request body type example for the operation.
+fn get_request_body_example(
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<Option<RequestOrResponse>> {
+    if let Some(request_body) = &op.request_body {
+        // Then let's get the type for the response.
+        let request_body = request_body.expand(spec)?;
+
+        // Iterate over all the media types and return the first request.
+        for (name, content) in &request_body.content {
+            if let Some(s) = &content.schema {
+                let t = match s {
+                    openapiv3::ReferenceOr::Reference { .. } => {
+                        let name = crate::types::get_type_name_from_reference(
+                            &s.reference()?,
+                            spec,
+                            false,
+                        )?;
+                        crate::types::example::generate_example_rust_from_schema(
+                            &name.rendered()?,
+                            &s.expand(spec)?,
+                            spec,
+                        )?
+                    }
+                    openapiv3::ReferenceOr::Item(s) => {
+                        crate::types::example::generate_example_rust_from_schema("", s, spec)?
+                    }
+                };
+
+                // Return early since we found the type.
+                // We start with a comma here so it's not weird.
+                return Ok(Some(RequestOrResponse {
+                    media_type: name.to_string(),
+                    type_name: t,
+                }));
+            }
+        }
+    }
+
+    // We don't have a request body.
+    // So we return nothing.
+    Ok(None)
+}
+
+/// Return the function arguments for the operation.
+fn get_example_args(
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
+    let mut params = get_query_params_schema(op, spec)?;
+    params.append(&mut get_path_params_schema(op, spec)?);
+
+    let mut new_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
+
+    for (name, (schema, parameter_data)) in params {
+        // Let's get the example rust code for the schema.
+        let mut example = crate::types::example::generate_example_rust_from_schema(
+            &name,
+            &schema.expand(spec)?,
+            spec,
+        )?;
+
+        if !parameter_data.required {
+            example = quote!(Some(#example));
+        }
+
+        new_params.insert(name, example);
+    }
+
+    Ok(new_params)
+}
+
+/// Return the path params for the operation.
+fn get_path_params_schema(
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<
+    BTreeMap<
+        String,
+        (
+            openapiv3::ReferenceOr<openapiv3::Schema>,
+            openapiv3::ParameterData,
+        ),
+    >,
+> {
     // Let's get the path parameters.
-    let mut path_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
+    let mut path_params: BTreeMap<
+        String,
+        (
+            openapiv3::ReferenceOr<openapiv3::Schema>,
+            openapiv3::ParameterData,
+        ),
+    > = Default::default();
+
     // Let's get the arguments for the function.
     for parameter in &op.parameters {
         // Get the parameter.
@@ -542,36 +530,67 @@ fn get_path_params(
             // Get the schema for the parameter.
             let schema = parameter_data.format.schema()?;
 
-            // Get the type for the parameter.
-            let mut t = match schema {
-                openapiv3::ReferenceOr::Reference { .. } => {
-                    crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
-                }
-                openapiv3::ReferenceOr::Item(s) => {
-                    crate::types::get_type_name_for_schema("", &s, spec, false)?
-                }
-            };
-
-            // Make it an option if it's optional.
-            if !parameter_data.required && !t.is_option()? {
-                t = quote!(Option<#t>);
-            }
-
             // Add path parameter to our list.
-            path_params.insert(parameter_data.name, t.get_parameter_value()?);
+            path_params.insert(parameter_data.name.to_string(), (schema, parameter_data));
         }
     }
 
     Ok(path_params)
 }
 
-/// Return the query params for the operation.
-fn get_query_params(
+/// Return the path params for the operation.
+fn get_path_params(
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
-    // Let's get the query parameters.
-    let mut query_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
+    let params = get_path_params_schema(op, spec)?;
+
+    let mut path_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
+
+    for (name, (schema, parameter_data)) in params {
+        // Get the type for the parameter.
+        let mut t = match schema {
+            openapiv3::ReferenceOr::Reference { .. } => {
+                crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
+            }
+            openapiv3::ReferenceOr::Item(s) => {
+                crate::types::get_type_name_for_schema("", &s, spec, false)?
+            }
+        };
+
+        // Make it an option if it's optional.
+        if !parameter_data.required && !t.is_option()? {
+            t = quote!(Option<#t>);
+        }
+
+        // Add path parameter to our list.
+        path_params.insert(name, t.get_parameter_value()?);
+    }
+
+    Ok(path_params)
+}
+
+/// Return the query params for the operation.
+fn get_query_params_schema(
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<
+    BTreeMap<
+        String,
+        (
+            openapiv3::ReferenceOr<openapiv3::Schema>,
+            openapiv3::ParameterData,
+        ),
+    >,
+> {
+    // Let's get the path parameters.
+    let mut query_params: BTreeMap<
+        String,
+        (
+            openapiv3::ReferenceOr<openapiv3::Schema>,
+            openapiv3::ParameterData,
+        ),
+    > = Default::default();
     // Let's get the arguments for the function.
     for parameter in &op.parameters {
         // Get the parameter.
@@ -589,24 +608,41 @@ fn get_query_params(
             // Get the schema for the parameter.
             let schema = parameter_data.format.schema()?;
 
-            // Get the type for the parameter.
-            let mut t = match schema {
-                openapiv3::ReferenceOr::Reference { .. } => {
-                    crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
-                }
-                openapiv3::ReferenceOr::Item(s) => {
-                    crate::types::get_type_name_for_schema("", &s, spec, false)?
-                }
-            };
-
-            // Make it an option if it's optional.
-            if !parameter_data.required && !t.is_option()? {
-                t = quote!(Option<#t>);
-            }
-
             // Add query parameter to our list.
-            query_params.insert(parameter_data.name, t.get_parameter_value()?);
+            query_params.insert(parameter_data.name.to_string(), (schema, parameter_data));
         }
+    }
+
+    Ok(query_params)
+}
+
+/// Return the query params for the operation.
+fn get_query_params(
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
+    let params = get_query_params_schema(op, spec)?;
+
+    let mut query_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
+
+    for (name, (schema, parameter_data)) in params {
+        // Get the type for the parameter.
+        let mut t = match schema {
+            openapiv3::ReferenceOr::Reference { .. } => {
+                crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
+            }
+            openapiv3::ReferenceOr::Item(s) => {
+                crate::types::get_type_name_for_schema("", &s, spec, false)?
+            }
+        };
+
+        // Make it an option if it's optional.
+        if !parameter_data.required && !t.is_option()? {
+            t = quote!(Option<#t>);
+        }
+
+        // Add query parameter to our list.
+        query_params.insert(name, t.get_parameter_value()?);
     }
 
     Ok(query_params)
@@ -828,10 +864,139 @@ fn add_fn_to_tag(
     Ok(())
 }
 
-/// Parse a code example as rust code to verify it compiles.
-fn parse_and_fmt_example(s: &str) -> Result<String> {
-    let t = proc_macro2::TokenStream::from_str(s)
-        .map_err(|err| anyhow::anyhow!("failed to parse example: {}", err))?;
-    // `rustfmt` the code.
-    crate::types::get_text_fmt(&t)
+/// Generate example code for afunction.
+fn generate_example_code_fn(
+    name: &str,
+    method: &http::Method,
+    tag: &str,
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<String> {
+    // Get the docs.
+    let docs = generate_docs(name, method, op)?;
+
+    // Get the function name.
+    let fn_name = get_fn_name(name, method, tag, op)?;
+    let fn_name_ident = format_ident!("{}", fn_name);
+    let example_fn_name_ident = format_ident!("example_{}", fn_name);
+
+    let tag_ident = format_ident!("{}", tag);
+
+    let mut function_start = quote!();
+    let mut print_result = quote!();
+    if let Some(response) = get_response_type(op, spec)? {
+        let t = response.type_name;
+        function_start = quote!(let result: #t = );
+        print_result = quote!(println!("{:?}", result););
+    }
+
+    // Get the function args.
+    let raw_args = get_example_args(op, spec)?;
+    let args = if raw_args.is_empty() {
+        quote!()
+    } else {
+        let a = raw_args.iter().map(|(k, v)| {
+            let n = format_ident!("{}", k);
+            quote!(#n: #v)
+        });
+        quote!(#(#a),*,)
+    };
+
+    // Get the request body for the function if there is one.
+    let request_body = if let Some(rb) = get_request_body_example(op, spec)? {
+        let t = rb.type_name;
+        // We add the comma at the front, so it works.
+        quote!(body: &#t)
+    } else {
+        // We don't have a request body, so we'll return nothing.
+        quote!()
+    };
+
+    let function = quote!(
+        async fn #example_fn_name_ident() -> Result<()> {
+            #function_start client.#tag_ident().#fn_name_ident(#args #request_body).await?;
+
+            #print_result
+
+            Ok(())
+        }
+    );
+
+    // Let's check if this function can be paginated.
+    let pagination_properties = get_pagination_properties(name, method, op, spec)?;
+    if pagination_properties.can_paginate() {
+        // We need to generate the stream function as well.
+        let stream_fn_name_ident = format_ident!("{}_stream", fn_name);
+        let example_stream_fn_name_ident = format_ident!("example_{}_stream", fn_name);
+
+        // We want all the args except for the page_token.
+        let page_param_str = pagination_properties.page_param_str()?;
+        let mut min_args = if raw_args.is_empty() {
+            quote!()
+        } else {
+            let mut a = Vec::new();
+            for (k, v) in raw_args.iter() {
+                // Skip the next page arg.
+                if k != &page_param_str {
+                    let n = format_ident!("{}", k);
+                    a.push(quote!(#n: #v))
+                }
+            }
+            quote!(#(#a),*)
+        };
+
+        // Make sure we don't just have a comma.
+        if min_args.rendered()? == "," {
+            min_args = quote!();
+        }
+
+        let stream_function = quote!(
+            async fn #example_stream_fn_name_ident() -> Result<()> {
+                let stream =  client.#tag_ident().#stream_fn_name_ident(#min_args #request_body);
+
+                // Loop over the items in the stream.
+                loop {
+                    match stream.try_next().await {
+                        Ok(Some(item)) => {
+                            // We got a result.
+                            println!("{:?}", item);
+                        }
+                        Ok(None) => {
+                            break;
+                        }
+                        Err(err) => {
+                            // Handle the error.
+                            return Err(err);
+                        },
+                    }
+                }
+
+                Ok(())
+            }
+        );
+
+        // Return the formatted example.
+        Ok(format!(
+            r#"/// {}
+{}
+
+/// - OR -
+
+/// Get a stream of results.
+///
+/// This allows you to paginate through all the items.
+{}"#,
+            docs,
+            crate::types::get_text_fmt(&function)?,
+            crate::types::get_text_fmt(&stream_function)?
+        ))
+    } else {
+        // Return the formatted example.
+        Ok(format!(
+            r#"/// {}
+{}"#,
+            docs,
+            crate::types::get_text_fmt(&function)?
+        ))
+    }
 }

@@ -5,7 +5,10 @@ use std::fmt::Write as _;
 use anyhow::Result;
 use rand::Rng;
 
-use crate::types::{exts::ReferenceOrExt, random::Random};
+use crate::types::{
+    exts::{ReferenceOrExt, TokenStreamExt},
+    random::Random,
+};
 
 /// Generates examples for our JSON schema types.
 pub fn generate_example_json_from_schema(
@@ -303,9 +306,11 @@ pub fn generate_example_rust_from_schema(
     Ok(match &schema.schema_kind {
         openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
             let random_value = generate_example_json_from_schema(schema, spec)?.to_string();
+            let random_value = random_value.trim_start_matches('"').trim_end_matches('"');
 
             if !s.enumeration.is_empty() {
-                let name_ident = format_ident!("{}", name);
+                let name_ident: proc_macro2::TokenStream =
+                    name.parse().map_err(|e| anyhow::anyhow!("{}", e))?;
                 // Get a random item from the enum.
                 let item_ident = format_ident!("{}", crate::types::proper_name(&random_value));
 
@@ -381,15 +386,18 @@ pub fn generate_example_rust_from_schema(
             }
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Number(_)) => {
-            let t = crate::types::get_type_name_for_schema(name, schema, spec, false)?;
+            let mut t = crate::types::get_type_name_for_schema(name, schema, spec, false)?;
+            t = t.strip_option()?;
             quote!(3.14 as #t)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Integer(_)) => {
-            let t = crate::types::get_type_name_for_schema(name, schema, spec, false)?;
+            let mut t = crate::types::get_type_name_for_schema(name, schema, spec, false)?;
+            t = t.strip_option()?;
             quote!(4 as #t)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
-            let object_name = format_ident!("{}", name);
+            let object_name: proc_macro2::TokenStream =
+                name.parse().map_err(|e| anyhow::anyhow!("{}", e))?;
             // Generate a random object.
             let mut args = Vec::new();
             for (k, v) in o.properties.iter() {
@@ -514,5 +522,23 @@ mod test {
         let rendered = result.rendered().unwrap();
 
         assert!(rendered == "true" || rendered == "false");
+    }
+
+    #[test]
+    fn test_generate_example_rust_string() {
+        let spec: openapiv3::OpenAPI = Default::default();
+        // Lets get a specific schema.
+        let schema = openapiv3::Schema {
+            schema_data: Default::default(),
+            schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::String(
+                openapiv3::StringType {
+                    ..Default::default()
+                },
+            )),
+        };
+        let result = super::generate_example_rust_from_schema("", &schema, &spec).unwrap();
+
+        // Make sure it's not a double quoted string.
+        assert!(!result.rendered().unwrap().ends_with("\"\""));
     }
 }
