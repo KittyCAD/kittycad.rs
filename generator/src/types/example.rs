@@ -84,7 +84,7 @@ pub fn generate_example_json_from_schema(
                         // Return a random URI template.
                         let mut uri = String::new();
                         for _ in 0..rng.gen_range(8..16) {
-                            uri.push_str(&format!("{}.", rng.gen_range(0..255)));
+                            write!(uri, "{}.", rng.gen_range(0..255))?;
                         }
                         uri.pop();
                         serde_json::Value::String(uri)
@@ -94,12 +94,12 @@ pub fn generate_example_json_from_schema(
                         // Return a random email address.
                         let mut email = String::new();
                         for _ in 0..rng.gen_range(8..16) {
-                            email.push_str(&format!("{}.", rng.gen_range(0..255)));
+                            write!(email, "{}.", rng.gen_range(0..255))?;
                         }
                         email.pop();
-                        email.push_str("@");
+                        email.push('@');
                         for _ in 0..rng.gen_range(8..16) {
-                            email.push_str(&format!("{}.", rng.gen_range(0..255)));
+                            write!(email, "{}.", rng.gen_range(0..255))?;
                         }
                         email.pop();
                         serde_json::Value::String(email)

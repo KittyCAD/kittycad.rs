@@ -1,6 +1,6 @@
 //! Utility functions for generating random values.
 
-use std::str::FromStr;
+use std::{fmt::Write as _, str::FromStr};
 
 use anyhow::Result;
 use chrono::TimeZone;
@@ -97,7 +97,7 @@ impl Random for std::net::Ipv4Addr {
         // Return a random IPv4 address.
         let mut ip = String::new();
         for _ in 0..4 {
-            ip.push_str(&format!("{}.", rng.gen_range(0..255)));
+            write!(ip, "{}.", rng.gen_range(0..255))?;
         }
         ip.pop();
         Ok(ip.parse()?)
@@ -110,7 +110,7 @@ impl Random for std::net::Ipv6Addr {
         // Return a random IPv6 address.
         let mut ip = String::new();
         for _ in 0..8 {
-            ip.push_str(&format!("{:x}:", rng.gen_range(0..16)));
+            write!(ip, "{:x}:", rng.gen_range(0..16))?;
         }
         ip.pop();
         Ok(ip.parse()?)
@@ -143,11 +143,11 @@ impl Random for url::Url {
         }
         let mut host = String::new();
         for _ in 0..rng.gen_range(1..10) {
-            host.push_str(&format!("{}.", rng.gen_range(0..255)));
+            write!(host, "{}.", rng.gen_range(0..255))?;
         }
         host.pop();
         url.push_str(&host);
-        url.push_str(&format!("/{}", rng.gen_range(0..10)));
+        write!(url, "/{}", rng.gen_range(0..10))?;
         Ok(url::Url::parse(&url)?)
     }
 }
