@@ -3,7 +3,6 @@
 use std::fmt::Write as _;
 
 use anyhow::Result;
-use chrono::{TimeZone, Timelike};
 use rand::Rng;
 
 use crate::types::{exts::ReferenceOrExt, random::Random};
@@ -44,42 +43,12 @@ pub fn generate_example_json_from_schema(
 
             match &s.format {
                 openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::DateTime) => {
-                    // Return a random date.
-                    let year = rng.gen_range(1970..2100);
-                    let month = rng.gen_range(1..13);
-                    let day = rng.gen_range(1..29);
-                    let hour = rng.gen_range(0..24);
-                    let minute = rng.gen_range(0..60);
-                    let second = rng.gen_range(0..60);
-                    let nanosecond = rng.gen_range(0..1_000_000_000);
                     serde_json::Value::String(
-                        chrono::Utc
-                            .ymd(year, month, day)
-                            .and_hms(hour, minute, second)
-                            .with_nanosecond(nanosecond)
-                            .ok_or_else(|| {
-                                anyhow::anyhow!(
-                                    "invalid date: {}-{}-{} {}:{}:{}.{}",
-                                    year,
-                                    month,
-                                    day,
-                                    hour,
-                                    minute,
-                                    second,
-                                    nanosecond
-                                )
-                            })?
-                            .to_rfc3339(),
+                        chrono::DateTime::<chrono::Utc>::random()?.to_rfc3339(),
                     )
                 }
                 openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Date) => {
-                    // Return a random `chrono::NaiveDate`.
-                    let year = rng.gen_range(1970..2100);
-                    let month = rng.gen_range(1..13);
-                    let day = rng.gen_range(1..29);
-                    serde_json::Value::String(
-                        chrono::NaiveDate::from_ymd(year, month, day).to_string(),
-                    )
+                    serde_json::Value::String(chrono::NaiveDate::random()?.to_string())
                 }
                 openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Password) => {
                     // Return a random password.
@@ -90,19 +59,14 @@ pub fn generate_example_json_from_schema(
                     serde_json::Value::String(password)
                 }
                 openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Byte) => {
-                    // Generate some random bytes.
-                    let mut bytes = vec![];
-                    for _ in 0..rng.gen_range(8..16) {
-                        bytes.push(rng.gen_range(0..256) as u8);
-                    }
-                    let data = crate::types::base64::Base64Data(bytes);
-                    serde_json::Value::String(data.to_string())
+                    serde_json::Value::String(
+                        crate::types::base64::Base64Data::random()?.to_string(),
+                    )
                 }
                 openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Binary) => {
-                    // Generate some random bytes.
-                    let bytes = vec![0; rng.gen_range(0..100)];
-                    let data = crate::types::base64::Base64Data(bytes);
-                    serde_json::Value::String(data.to_string())
+                    serde_json::Value::String(
+                        crate::types::base64::Base64Data::random()?.to_string(),
+                    )
                 }
                 openapiv3::VariantOrUnknownOrEmpty::Empty => {
                     // Return an empty string.
@@ -153,41 +117,13 @@ pub fn generate_example_json_from_schema(
                         hostname.pop();
                         serde_json::Value::String(hostname)
                     }
-                    "time" => {
-                        // Return a random time.
-                        // This needs to be a chrono::NaiveTime.
-                        let time = chrono::NaiveTime::from_hms_milli(
-                            rng.gen_range(0..24),
-                            rng.gen_range(0..60),
-                            rng.gen_range(0..60),
-                            rng.gen_range(0..1_000),
-                        );
-                        serde_json::Value::String(time.to_string())
-                    }
-                    "date-time" => {
-                        // Return a random date-time.
-                        // This needs to be a chrono::NaiveDateTime.
-                        let date_time = chrono::Utc
-                            .ymd(
-                                rng.gen_range(1900..2100),
-                                rng.gen_range(1..13),
-                                rng.gen_range(1..32),
-                            )
-                            .and_hms_milli(
-                                rng.gen_range(0..24),
-                                rng.gen_range(0..60),
-                                rng.gen_range(0..60),
-                                rng.gen_range(0..1_000),
-                            );
-                        serde_json::Value::String(date_time.to_rfc3339())
-                    }
+                    "time" => serde_json::Value::String(chrono::NaiveTime::random()?.to_string()),
+                    "date" => serde_json::Value::String(chrono::NaiveDate::random()?.to_string()),
+                    "date-time" => serde_json::Value::String(
+                        chrono::DateTime::<chrono::Utc>::random()?.to_rfc3339(),
+                    ),
                     "partial-date-time" => {
-                        // This needs to be a chrono::NaiveDateTime.
-                        let date_time = chrono::NaiveDateTime::from_timestamp(
-                            rng.gen_range(0..1_000_000_000),
-                            0,
-                        );
-                        serde_json::Value::String(date_time.to_string())
+                        serde_json::Value::String(chrono::NaiveDateTime::random()?.to_string())
                     }
                     f => {
                         anyhow::bail!("XXX unknown string format {}", f)
@@ -197,20 +133,10 @@ pub fn generate_example_json_from_schema(
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Number(n)) => match &n.format {
             openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::NumberFormat::Float) => {
-                // Return a random float.
-                let f = rng.gen_range(0.0..1234.0);
-                serde_json::Value::Number(
-                    serde_json::value::Number::from_f64(f)
-                        .ok_or_else(|| anyhow::anyhow!("failed to convert {} to f64", f))?,
-                )
+                serde_json::from_str(&f64::random()?.to_string())?
             }
             openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::NumberFormat::Double) => {
-                // Return a random double.
-                let f = rng.gen_range(0.0..1.0);
-                serde_json::Value::Number(
-                    serde_json::value::Number::from_f64(f)
-                        .ok_or_else(|| anyhow::anyhow!("failed to convert {} to f64", f))?,
-                )
+                serde_json::from_str(&f64::random()?.to_string())?
             }
             openapiv3::VariantOrUnknownOrEmpty::Empty => {
                 // Return an empty number.
@@ -229,22 +155,8 @@ pub fn generate_example_json_from_schema(
                 };
 
                 match width {
-                    32 => {
-                        // Generate a random 32-bit number.
-                        let i = rng.gen_range(0.0..std::f32::MAX);
-                        serde_json::Value::Number(
-                            serde_json::value::Number::from_f64(i.into())
-                                .ok_or_else(|| anyhow::anyhow!("failed to convert {} to f64", i))?,
-                        )
-                    }
-                    64 => {
-                        // Generate a random 64-bit number.
-                        let i = rng.gen_range(0.0..std::f64::MAX);
-                        serde_json::Value::Number(
-                            serde_json::value::Number::from_f64(i)
-                                .ok_or_else(|| anyhow::anyhow!("failed to convert {} to f64", i))?,
-                        )
-                    }
+                    32 => serde_json::from_str(&f32::random()?.to_string())?,
+                    64 => serde_json::from_str(&f64::random()?.to_string())?,
                     _ => anyhow::bail!("unknown number width {}", width),
                 }
             }
@@ -423,7 +335,7 @@ pub fn generate_example_json_from_schema(
             }
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => {
-            serde_json::Value::Bool(rng.gen())
+            serde_json::Value::Bool(bool::random()?)
         }
         openapiv3::SchemaKind::OneOf { one_of } => {
             // Generate a random one of.
@@ -457,8 +369,7 @@ pub fn generate_example_json_from_schema(
         }
         openapiv3::SchemaKind::Any(_any) => {
             // Generate any random value.
-            let i = rng.gen();
-            serde_json::Value::Bool(i)
+            serde_json::Value::Bool(bool::random()?)
         }
     })
 }

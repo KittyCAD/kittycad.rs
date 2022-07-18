@@ -3,6 +3,7 @@
 use std::str::FromStr;
 
 use anyhow::Result;
+use chrono::TimeZone;
 use rand::Rng;
 
 /// A triat that implements generating a random value of a given type.
@@ -121,6 +122,73 @@ impl Random for url::Url {
     }
 }
 
+impl Random for chrono::NaiveTime {
+    fn random() -> Result<Self> {
+        // Generate a random time.
+        let mut rng = rand::thread_rng();
+        let hour = rng.gen_range(0..24);
+        let minute = rng.gen_range(0..60);
+        let second = rng.gen_range(0..60);
+        Ok(chrono::NaiveTime::from_hms(hour, minute, second))
+    }
+}
+
+impl Random for chrono::NaiveDate {
+    fn random() -> Result<Self> {
+        // Generate a random date.
+        let mut rng = rand::thread_rng();
+        let year = rng.gen_range(1900..2100);
+        let month = rng.gen_range(1..13);
+        let day = rng.gen_range(1..32);
+        Ok(chrono::NaiveDate::from_ymd(year, month, day))
+    }
+}
+
+impl Random for chrono::NaiveDateTime {
+    fn random() -> Result<Self> {
+        // Generate a random date and time.
+        let date = chrono::NaiveDate::random()?;
+        let time = chrono::NaiveTime::random()?;
+        Ok(chrono::NaiveDateTime::new(date, time))
+    }
+}
+
+impl Random for chrono::DateTime<chrono::Utc> {
+    fn random() -> Result<Self> {
+        // Generate a random date and time.
+        let mut rng = rand::thread_rng();
+        Ok(chrono::Utc
+            .ymd(
+                rng.gen_range(1900..2100),
+                rng.gen_range(1..13),
+                rng.gen_range(1..32),
+            )
+            .and_hms_milli(
+                rng.gen_range(0..24),
+                rng.gen_range(0..60),
+                rng.gen_range(0..60),
+                rng.gen_range(0..1_000),
+            ))
+    }
+}
+
+impl Random for bool {
+    fn random() -> Result<Self> {
+        Ok(rand::thread_rng().gen())
+    }
+}
+
+impl Random for crate::types::base64::Base64Data {
+    fn random() -> Result<Self> {
+        let mut rng = rand::thread_rng();
+        let mut bytes = Vec::new();
+        for _ in 0..rng.gen_range(8..16) {
+            bytes.push(rng.gen_range(0..256) as u8);
+        }
+        Ok(crate::types::base64::Base64Data(bytes))
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::Random;
@@ -178,5 +246,35 @@ mod test {
     #[test]
     fn test_random_url() {
         url::Url::random().unwrap();
+    }
+
+    #[test]
+    fn test_random_naive_time() {
+        chrono::NaiveTime::random().unwrap();
+    }
+
+    #[test]
+    fn test_random_naive_date() {
+        chrono::NaiveDate::random().unwrap();
+    }
+
+    #[test]
+    fn test_random_naive_datetime() {
+        chrono::NaiveDateTime::random().unwrap();
+    }
+
+    #[test]
+    fn test_random_datetime() {
+        chrono::DateTime::<chrono::Utc>::random().unwrap();
+    }
+
+    #[test]
+    fn test_random_bool() {
+        bool::random().unwrap();
+    }
+
+    #[test]
+    fn test_random_base64() {
+        crate::types::base64::Base64Data::random().unwrap();
     }
 }

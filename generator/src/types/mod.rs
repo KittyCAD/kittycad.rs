@@ -299,6 +299,7 @@ fn get_type_name_for_string(
             "uuid" => quote!(uuid::Uuid),
             "hostname" => quote!(String),
             "time" => quote!(chrono::NaiveTime),
+            "date" => quote!(chrono::NaiveDate),
             "date-time" => quote!(chrono::DateTime<chrono::Utc>),
             "partial-date-time" => quote!(chrono::NaiveDateTime),
             f => {
