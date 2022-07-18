@@ -1,6 +1,7 @@
 //! A library for converting OpenAPI schemas to Rust types.
 
 pub mod base64;
+pub mod error;
 pub mod example;
 pub mod exts;
 pub mod paginate;
@@ -26,6 +27,9 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
     // Include the phone number data type for phone numbers.
     let phone_number_mod = get_phone_number_mod()?;
 
+    // Include the error data type for phone numbers.
+    let error_mod = get_error_mod()?;
+
     // Let's start with the components if there are any.
     let mut rendered = quote!(
         //! This module contains the generated types for the library.
@@ -37,6 +41,8 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
         #paginate_mod
 
         #phone_number_mod
+
+        #error_mod
     );
 
     if let Some(components) = &spec.components {
@@ -168,7 +174,6 @@ pub fn get_type_name_for_schema(
 
             let internal_schema = &one_of[0];
             match internal_schema {
-
                 openapiv3::ReferenceOr::Reference { .. } => {
                     get_type_name_from_reference(&internal_schema.reference()?, spec, in_crate)?
                 }
@@ -1122,6 +1127,16 @@ fn get_phone_number_mod() -> Result<proc_macro2::TokenStream> {
     let stream = proc_macro2::TokenStream::from_str(file).map_err(|e| anyhow::anyhow!("{}", e))?;
     Ok(quote!(
         pub mod phone_number {
+            #stream
+        }
+    ))
+}
+
+fn get_error_mod() -> Result<proc_macro2::TokenStream> {
+    let file = include_str!("error.rs");
+    let stream = proc_macro2::TokenStream::from_str(file).map_err(|e| anyhow::anyhow!("{}", e))?;
+    Ok(quote!(
+        pub mod error {
             #stream
         }
     ))

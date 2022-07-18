@@ -7,7 +7,7 @@ use rand::Rng;
 use crate::types::exts::ReferenceOrExt;
 
 /// Generates examples for our JSON schema types.
-fn generate_example_json_from_schema(
+pub fn generate_example_json_from_schema(
     schema: &openapiv3::Schema,
     spec: &openapiv3::OpenAPI,
 ) -> Result<serde_json::Value> {

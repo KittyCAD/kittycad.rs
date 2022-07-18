@@ -11,6 +11,7 @@ chrono = { version = "0.4", features = ["serde"] }
 clap = { version = "^3.2.12", features = ["cargo", "derive", "env", "unicode"] }
 data-encoding = "^2.3.2"
 http = "^0.2.8"
+format_serde_error = "^0.3.0"
 futures-util = "^0.3.21"
 Inflector = "^0.11.4"
 json-patch = "0.2.6"
@@ -34,6 +35,7 @@ slog-json = "^2.6.1"
 slog-scope = "^4.4.0"
 slog-stdlog = "^4.1.1"
 slog-term = "^2.9.0"
+thiserror = "1"
 tokio = { version = "1.20.0", features = ["full"] }
 url = { version = "^2.2.2", features = ["serde"] }
 uuid = { version = "1", features = ["serde", "v4"] }

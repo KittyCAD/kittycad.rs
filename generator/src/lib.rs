@@ -498,7 +498,7 @@ serde_json = "1"
 serde_with = "1"
 serde_urlencoded = "^0.7"
 tabled = {{ version = "0.7.0", features = ["color"] }}
-thiserror = "^1"
+thiserror = "1"
 url = {{ version = "2", features = ["serde"] }}
 uuid = {{ version = "1", features = ["serde", "v4"] }}
 
