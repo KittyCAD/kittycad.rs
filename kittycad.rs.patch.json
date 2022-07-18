@@ -1,0 +1,410 @@
+[
+  {
+    "op": "add",
+    "path": "/info/x-rust",
+    "value": {
+      "client": "use kittycad::Client;\n\n// Authenticate via an API token.\nlet client = Client::new(\"$TOKEN\");\n\n// - OR -\n\n// Authenticate with your token and host parsed from the environment variables:\n// `KITTYCAD_API_TOKEN`.\nlet client = Client::new_from_env();",
+      "install": "[dependencies]\nkittycad = \"0.1.8\""
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get OpenAPI schema.\"]\nasync fn get_schema() -> Result<()> {\n    let result = client.meta().get_schema().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.get_schema"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1_meta~1info/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get the metadata about our currently running server.\"]\n#[doc = \" \"]\n#[doc = \" This includes information on any of our other distributed systems it is connected to.\"]\n#[doc = \" You must be a KittyCAD employee to perform this request.\"]\nasync fn get_metadata() -> Result<()> {\n    let result = client.meta().get_metadata().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.get_metadata"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1api-call-metrics/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get API call metrics.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by a KittyCAD employee. The API calls are grouped by the parameter passed.\"]\nasync fn get_api_call_metrics() -> Result<()> {\n    let result = client.api_calls().get_api_call_metrics(group_by).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.get_api_call_metrics"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1api-calls/get/x-rust",
+    "value": {
+      "example": "#[doc = \" List API calls.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by a KittyCAD employee. The API calls are returned in order of creation, with the most recently created API calls first.\"]\nasync fn list() -> Result<()> {\n    let result = client.api_calls().list(limit, page_token, sort_by).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n#[doc = \"\"]\n#[doc = \" - OR -\"]\n#[doc = \"\"]\n#[doc = \" Get a stream of results.\"]\n#[doc = \"\"]\n#[doc = \" This allows you to paginate through all the items.\"]\nasync fn list_stream() -> Result<()> {\n    let stream = client.api_calls().list_stream(limit, None, sort_by);\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.list"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1api-calls~1{id}/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get details of an API call.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\"]\n#[doc = \" If the user is not authenticated to view the specified API call, then it is not returned.\"]\n#[doc = \" Only KittyCAD employees can view API calls for other users.\"]\nasync fn get_api_call() -> Result<()> {\n    let result = client.api_calls().get_api_call(id).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.get_api_call"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1async~1operations/get/x-rust",
+    "value": {
+      "example": "#[doc = \" List async operations.\"]\n#[doc = \" \"]\n#[doc = \" For async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\"]\n#[doc = \" This endpoint requires authentication by a KittyCAD employee.\"]\nasync fn list_async_operations() -> Result<()> {\n    let result = client\n        .api_calls()\n        .list_async_operations(limit, page_token, sort_by, status)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n#[doc = \"\"]\n#[doc = \" - OR -\"]\n#[doc = \"\"]\n#[doc = \" Get a stream of results.\"]\n#[doc = \"\"]\n#[doc = \" This allows you to paginate through all the items.\"]\nasync fn list_async_operations_stream() -> Result<()> {\n    let stream = client\n        .api_calls()\n        .list_async_operations_stream(limit, None, sort_by, status);\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.list_async_operations"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1async~1operations~1{id}/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get an async operation.\"]\n#[doc = \" \"]\n#[doc = \" Get the status and output of an async operation.\"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It returns details of the requested async operation for the user.\"]\n#[doc = \" If the user is not authenticated to view the specified async operation, then it is not returned.\"]\n#[doc = \" Only KittyCAD employees with the proper access can view async operations for other users.\"]\nasync fn get_async_operation() -> Result<()> {\n    let result = client.api_calls().get_async_operation(id).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.get_async_operation"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1auth~1email/post/x-rust",
+    "value": {
+      "example": "#[doc = \" Create an email verification request for a user.\"]\nasync fn listen_auth_email() -> Result<()> {\n    let result = client.hidden().listen_auth_email(body).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.listen_auth_email"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1auth~1email~1callback/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Listen for callbacks for email verification for users.\"]\nasync fn listen_auth_email_callback() -> Result<()> {\n    client\n        .hidden()\n        .listen_auth_email_callback(callback_url, email, token)\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.listen_auth_email_callback"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1file~1conversion~1{src_format}~1{output_format}/post/x-rust",
+    "value": {
+      "example": "#[doc = \" Convert CAD file.\"]\n#[doc = \" \"]\n#[doc = \" Convert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\"]\n#[doc = \" If the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\"]\n#[doc = \" If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\"]\nasync fn create_conversion() -> Result<()> {\n    let result = client\n        .file()\n        .create_conversion(output_format, src_formatbody)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1file~1conversions~1{id}/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get a file conversion.\"]\n#[doc = \" \"]\n#[doc = \" Get the status and output of an async file conversion.\"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\"]\n#[doc = \" If the user is not authenticated to view the specified file conversion, then it is not returned.\"]\n#[doc = \" Only KittyCAD employees with the proper access can view file conversions for other users.\"]\nasync fn get_conversion() -> Result<()> {\n    let result = client.file().get_conversion(id).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.get_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1file~1density/post/x-rust",
+    "value": {
+      "example": "#[doc = \" Get CAD file density.\"]\n#[doc = \" \"]\n#[doc = \" Get the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\"]\n#[doc = \" If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\"]\nasync fn create_density() -> Result<()> {\n    let result = client\n        .file()\n        .create_density(material_mass, src_formatbody)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_density"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1file~1execute~1{lang}/post/x-rust",
+    "value": {
+      "example": "#[doc = \" Execute a KittyCAD program in a specific language.\"]\nasync fn create_execution() -> Result<()> {\n    let result = client.file().create_execution(lang, outputbody).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_execution"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1file~1mass/post/x-rust",
+    "value": {
+      "example": "#[doc = \" Get CAD file mass.\"]\n#[doc = \" \"]\n#[doc = \" Get the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\"]\n#[doc = \" If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\"]\nasync fn create_mass() -> Result<()> {\n    let result = client\n        .file()\n        .create_mass(material_density, src_formatbody)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_mass"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1file~1volume/post/x-rust",
+    "value": {
+      "example": "#[doc = \" Get CAD file volume.\"]\n#[doc = \" \"]\n#[doc = \" Get the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\"]\n#[doc = \" If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\"]\nasync fn create_volume() -> Result<()> {\n    let result = client.file().create_volume(src_formatbody).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_volume"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1logout/post/x-rust",
+    "value": {
+      "example": "#[doc = \" This endpoint removes the session cookie for a user.\"]\n#[doc = \" \"]\n#[doc = \" This is used in logout scenarios.\"]\nasync fn logout() -> Result<()> {\n    client.hidden().logout().await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.logout"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1oauth2~1device~1auth/post/x-rust",
+    "value": {
+      "example": "#[doc = \" Start an OAuth 2.0 Device Authorization Grant.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint is designed to be accessed from an *unauthenticated* API client. It generates and records a `device_code` and `user_code` which must be verified and confirmed prior to a token being granted.\"]\nasync fn device_auth_request() -> Result<()> {\n    client.oauth2().device_auth_request(body).await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.device_auth_request"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1oauth2~1device~1confirm/post/x-rust",
+    "value": {
+      "example": "#[doc = \" Confirm an OAuth 2.0 Device Authorization Grant.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/oauth2/device/token`.\"]\nasync fn device_auth_confirm() -> Result<()> {\n    client.oauth2().device_auth_confirm(body).await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.device_auth_confirm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1oauth2~1device~1token/post/x-rust",
+    "value": {
+      "example": "#[doc = \" Request a device access token.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint should be polled by the client until the user code is verified and the grant is confirmed.\"]\nasync fn device_access_token() -> Result<()> {\n    client.oauth2().device_access_token(body).await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.device_access_token"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1oauth2~1device~1verify/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Verify an OAuth 2.0 Device Authorization Grant.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website.\"]\nasync fn device_auth_verify() -> Result<()> {\n    client.oauth2().device_auth_verify(user_code).await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.device_auth_verify"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1oauth2~1provider~1{provider}~1callback/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Listen for callbacks for the OAuth 2.0 provider.\"]\nasync fn listen_provider_callback() -> Result<()> {\n    client\n        .oauth2()\n        .listen_provider_callback(code, provider, state)\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.listen_provider_callback"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1oauth2~1provider~1{provider}~1consent/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get the consent URL and other information for the OAuth 2.0 provider.\"]\nasync fn listen_provider_consent() -> Result<()> {\n    let result = client\n        .oauth2()\n        .listen_provider_consent(callback_url, provider)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.listen_provider_consent"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1ping/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Return pong.\"]\nasync fn ping() -> Result<()> {\n    let result = client.meta().ping().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.ping"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1{src_format}~1{output_format}/post/x-rust",
+    "value": {
+      "example": "#[doc = \" Convert units.\"]\n#[doc = \" \"]\n#[doc = \" Convert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions.\"]\nasync fn create_conversion() -> Result<()> {\n    let result = client\n        .unit()\n        .create_conversion(output_format, src_format, value)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.create_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user/delete/x-rust",
+    "value": {
+      "example": "#[doc = \" Delete your user.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It deletes the authenticated user from KittyCAD's database.\"]\n#[doc = \" This call will only succeed if all invoices associated with the user have been paid in full and there is no outstanding balance.\"]\nasync fn delete_user_self() -> Result<()> {\n    client.users().delete_user_self().await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.delete_user_self"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get your user.\"]\n#[doc = \" \"]\n#[doc = \" Get the user information for the authenticated user.\"]\n#[doc = \" Alternatively, you can also use the `/users/me` endpoint.\"]\nasync fn get_user_self() -> Result<()> {\n    let result = client.users().get_user_self().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_user_self"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user/put/x-rust",
+    "value": {
+      "example": "#[doc = \" Update your user.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It updates information about the authenticated user.\"]\nasync fn update_user_self() -> Result<()> {\n    let result = client.users().update_user_self(body).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.update_user_self"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1api-calls/get/x-rust",
+    "value": {
+      "example": "#[doc = \" List API calls for your user.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user.\"]\n#[doc = \" The API calls are returned in order of creation, with the most recently created API calls first.\"]\nasync fn user_list() -> Result<()> {\n    let result = client\n        .api_calls()\n        .user_list(limit, page_token, sort_by)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n#[doc = \"\"]\n#[doc = \" - OR -\"]\n#[doc = \"\"]\n#[doc = \" Get a stream of results.\"]\n#[doc = \"\"]\n#[doc = \" This allows you to paginate through all the items.\"]\nasync fn user_list_stream() -> Result<()> {\n    let stream = client.api_calls().user_list_stream(limit, None, sort_by);\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.user_list"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1api-calls~1{id}/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get an API call for a user.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\"]\nasync fn get_api_call_for_user() -> Result<()> {\n    let result = client.api_calls().get_api_call_for_user(id).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.get_api_call_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1api-tokens/get/x-rust",
+    "value": {
+      "example": "#[doc = \" List API tokens for your user.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\"]\n#[doc = \" The API tokens are returned in order of creation, with the most recently created API tokens first.\"]\nasync fn list_for_user() -> Result<()> {\n    let result = client\n        .api_tokens()\n        .list_for_user(limit, page_token, sort_by)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n#[doc = \"\"]\n#[doc = \" - OR -\"]\n#[doc = \"\"]\n#[doc = \" Get a stream of results.\"]\n#[doc = \"\"]\n#[doc = \" This allows you to paginate through all the items.\"]\nasync fn list_for_user_stream() -> Result<()> {\n    let stream = client\n        .api_tokens()\n        .list_for_user_stream(limit, None, sort_by);\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_tokens/struct.ApiTokens.html#method.list_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1api-tokens/post/x-rust",
+    "value": {
+      "example": "#[doc = \" Create a new API token for your user.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It creates a new API token for the authenticated user.\"]\nasync fn create_api_token_for_user() -> Result<()> {\n    let result = client.api_tokens().create_api_token_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_tokens/struct.ApiTokens.html#method.create_api_token_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1api-tokens~1{token}/delete/x-rust",
+    "value": {
+      "example": "#[doc = \" Delete an API token for your user.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\"]\n#[doc = \" This endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.\"]\nasync fn delete_api_token_for_user() -> Result<()> {\n    client.api_tokens().delete_api_token_for_user(token).await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_tokens/struct.ApiTokens.html#method.delete_api_token_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1api-tokens~1{token}/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get an API token for your user.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\"]\nasync fn get_api_token_for_user() -> Result<()> {\n    let result = client.api_tokens().get_api_token_for_user(token).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_tokens/struct.ApiTokens.html#method.get_api_token_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1extended/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get extended information about your user.\"]\n#[doc = \" \"]\n#[doc = \" Get the user information for the authenticated user.\"]\n#[doc = \" Alternatively, you can also use the `/users-extended/me` endpoint.\"]\nasync fn get_user_self_extended() -> Result<()> {\n    let result = client.users().get_user_self_extended().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_user_self_extended"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1file~1conversions~1{id}/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get a file conversion for your user.\"]\n#[doc = \" \"]\n#[doc = \" Get the status and output of an async file conversion. If completed, the contents of the converted file (`output`) will be returned as a base64 encoded string.\"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\"]\nasync fn get_conversion_for_user() -> Result<()> {\n    let result = client.file().get_conversion_for_user(id).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.get_conversion_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1payment/delete/x-rust",
+    "value": {
+      "example": "#[doc = \" Delete payment info for your user.\"]\n#[doc = \" \"]\n#[doc = \" This includes billing address, phone, and name.\"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It deletes the payment information for the authenticated user.\"]\nasync fn delete_payment_information_for_user() -> Result<()> {\n    client\n        .payments()\n        .delete_payment_information_for_user()\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.delete_payment_information_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1payment/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get payment info about your user.\"]\n#[doc = \" \"]\n#[doc = \" This includes billing address, phone, and name.\"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It gets the payment information for the authenticated user.\"]\nasync fn get_payment_information_for_user() -> Result<()> {\n    let result = client.payments().get_payment_information_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_payment_information_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1payment/post/x-rust",
+    "value": {
+      "example": "#[doc = \" Create payment info for your user.\"]\n#[doc = \" \"]\n#[doc = \" This includes billing address, phone, and name.\"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It creates the payment information for the authenticated user.\"]\nasync fn create_payment_information_for_user() -> Result<()> {\n    let result = client\n        .payments()\n        .create_payment_information_for_user(body)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.create_payment_information_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1payment/put/x-rust",
+    "value": {
+      "example": "#[doc = \" Update payment info for your user.\"]\n#[doc = \" \"]\n#[doc = \" This includes billing address, phone, and name.\"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It updates the payment information for the authenticated user.\"]\nasync fn update_payment_information_for_user() -> Result<()> {\n    let result = client\n        .payments()\n        .update_payment_information_for_user(body)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.update_payment_information_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1payment~1balance/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get balance for your user.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It gets the balance information for the authenticated user.\"]\nasync fn get_payment_balance_for_user() -> Result<()> {\n    let result = client.payments().get_payment_balance_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_payment_balance_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1payment~1intent/post/x-rust",
+    "value": {
+      "example": "#[doc = \" Create a payment intent for your user.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It creates a new payment intent for the authenticated user.\"]\nasync fn create_payment_intent_for_user() -> Result<()> {\n    let result = client.payments().create_payment_intent_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.create_payment_intent_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1payment~1invoices/get/x-rust",
+    "value": {
+      "example": "#[doc = \" List invoices for your user.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It lists invoices for the authenticated user.\"]\nasync fn list_invoices_for_user() -> Result<()> {\n    let result = client.payments().list_invoices_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.list_invoices_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1payment~1methods/get/x-rust",
+    "value": {
+      "example": "#[doc = \" List payment methods for your user.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It lists payment methods for the authenticated user.\"]\nasync fn list_payment_methods_for_user() -> Result<()> {\n    let result = client.payments().list_payment_methods_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.list_payment_methods_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1payment~1methods~1{id}/delete/x-rust",
+    "value": {
+      "example": "#[doc = \" Delete a payment method for your user.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It deletes the specified payment method for the authenticated user.\"]\nasync fn delete_payment_method_for_user() -> Result<()> {\n    client.payments().delete_payment_method_for_user(id).await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.delete_payment_method_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1session~1{token}/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get a session for your user.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\"]\nasync fn get_session_for_user() -> Result<()> {\n    let result = client.sessions().get_session_for_user(token).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/sessions/struct.Sessions.html#method.get_session_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1users/get/x-rust",
+    "value": {
+      "example": "#[doc = \" List users.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\"]\nasync fn list() -> Result<()> {\n    let result = client.users().list(limit, page_token, sort_by).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n#[doc = \"\"]\n#[doc = \" - OR -\"]\n#[doc = \"\"]\n#[doc = \" Get a stream of results.\"]\n#[doc = \"\"]\n#[doc = \" This allows you to paginate through all the items.\"]\nasync fn list_stream() -> Result<()> {\n    let stream = client.users().list_stream(limit, None, sort_by);\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.list"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1users-extended/get/x-rust",
+    "value": {
+      "example": "#[doc = \" List users with extended information.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\"]\nasync fn list_extended() -> Result<()> {\n    let result = client\n        .users()\n        .list_extended(limit, page_token, sort_by)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n#[doc = \"\"]\n#[doc = \" - OR -\"]\n#[doc = \"\"]\n#[doc = \" Get a stream of results.\"]\n#[doc = \"\"]\n#[doc = \" This allows you to paginate through all the items.\"]\nasync fn list_extended_stream() -> Result<()> {\n    let stream = client.users().list_extended_stream(limit, None, sort_by);\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.list_extended"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1users-extended~1{id}/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get extended information about a user.\"]\n#[doc = \" \"]\n#[doc = \" To get information about yourself, use `/users-extended/me` as the endpoint. By doing so you will get the user information for the authenticated user.\"]\n#[doc = \" Alternatively, to get information about the authenticated user, use `/user/extended` endpoint.\"]\n#[doc = \" To get information about any KittyCAD user, you must be a KittyCAD employee.\"]\nasync fn get_user_extended() -> Result<()> {\n    let result = client.users().get_user_extended(id).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_user_extended"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1users~1{id}/get/x-rust",
+    "value": {
+      "example": "#[doc = \" Get a user.\"]\n#[doc = \" \"]\n#[doc = \" To get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\"]\n#[doc = \" Alternatively, to get information about the authenticated user, use `/user` endpoint.\"]\n#[doc = \" To get information about any KittyCAD user, you must be a KittyCAD employee.\"]\nasync fn get_user() -> Result<()> {\n    let result = client.users().get_user(id).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1users~1{id}~1api-calls/get/x-rust",
+    "value": {
+      "example": "#[doc = \" List API calls for a user.\"]\n#[doc = \" \"]\n#[doc = \" This endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \\\"me\\\" is passed as the user id.\"]\n#[doc = \" Alternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\"]\n#[doc = \" If the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\"]\n#[doc = \" The API calls are returned in order of creation, with the most recently created API calls first.\"]\nasync fn list_for_user() -> Result<()> {\n    let result = client\n        .api_calls()\n        .list_for_user(id, limit, page_token, sort_by)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n#[doc = \"\"]\n#[doc = \" - OR -\"]\n#[doc = \"\"]\n#[doc = \" Get a stream of results.\"]\n#[doc = \"\"]\n#[doc = \" This allows you to paginate through all the items.\"]\nasync fn list_for_user_stream() -> Result<()> {\n    let stream = client\n        .api_calls()\n        .list_for_user_stream(id, limit, None, sort_by);\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.list_for_user"
+    }
+  }
+]

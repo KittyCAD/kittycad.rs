@@ -5,10 +5,10 @@ SPEC = $(CURDIR)/spec.json
 VERSION = $(shell cat VERSION.txt)
 
 generate: kittycad
-	cargo test tests -- --nocapture
-	cargo clippy
+	cargo clippy --all
+	cargo test --all -- --nocapture
 
-target/debug/generator: generator/src/*.rs generator/Cargo.toml
+target/debug/generator: generator/src/*.rs generator/src/*/*.rs generator/Cargo.toml spec.json
 	cargo build --bin generator
 
 update: update-specs
@@ -25,10 +25,12 @@ kittycad: target/debug/generator
 	./target/debug/generator -i $(SPEC) -v $(VERSION) \
 		-o kittycad \
 		-n kittycad \
-		-d "A fully generated & opinionated API client for the kittycad API." \
-		--spec-link "https://github.com/$(SPEC_REPO)" $(EXTRA_ARGS)
+		-d "A fully generated & opinionated API client for the KittyCAD API." \
+		--spec-url "https://api.kittycad.io" \
+		--base-url "https://api.kittycad.io" \
+		--repo-name "KittyCAD/kittycad.rs" $(EXTRA_ARGS)
 	cargo fmt -p kittycad
-	cargo clippy --fix --allow-dirty
+	cargo clippy -p kittycad --fix --allow-dirty
 
 .PHONY: tag
 tag: ## Create a new git tag to prepare to build a release.

@@ -1,7 +1,5 @@
-use anyhow::Result;
-
 use crate::Client;
-
+use anyhow::Result;
 pub struct Meta {
     pub client: Client,
 }
@@ -9,40 +7,72 @@ pub struct Meta {
 impl Meta {
     #[doc(hidden)]
     pub fn new(client: Client) -> Self {
-        Meta { client }
+        Self { client }
     }
 
-    /**
-    * Get OpenAPI schema.
-    *
-    * This function performs a `GET` to the `/` endpoint.
-    */
-    pub async fn get_schema(&self) -> Result<()> {
-        let url = "".to_string();
-
-        self.client.get(&url, None).await
+    #[doc = "Get OpenAPI schema."]
+    pub async fn get_schema<'a>(&'a self) -> Result<serde_json::Value> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            &format!("{}/{}", self.client.base_url, ""),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
-    /**
-    * Get the metadata about our currently running server.
-    *
-    * This function performs a `GET` to the `/_meta/info` endpoint.
-    *
-    * This includes information on any of our other distributed systems it is connected to.
-    * You must be a KittyCAD employee to perform this request.
-    */
-    pub async fn get_data(&self) -> Result<crate::types::Metadata> {
-        let url = "/_meta/info".to_string();
-        self.client.get(&url, None).await
+    #[doc = "Get the metadata about our currently running server.\n\nThis includes information on any of our other distributed systems it is connected to.\nYou must be a KittyCAD employee to perform this request."]
+    pub async fn get_metadata<'a>(&'a self) -> Result<crate::types::Metadata> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            &format!("{}/{}", self.client.base_url, "_meta/info"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
-    /**
-    * Return pong.
-    *
-    * This function performs a `GET` to the `/ping` endpoint.
-    */
-    pub async fn ping(&self) -> Result<crate::types::Pong> {
-        let url = "/ping".to_string();
-        self.client.get(&url, None).await
+    #[doc = "Return pong."]
+    pub async fn ping<'a>(&'a self) -> Result<crate::types::Pong> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            &format!("{}/{}", self.client.base_url, "ping"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 }

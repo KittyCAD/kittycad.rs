@@ -1,6 +1,6 @@
 # `kittycad`
 
-A fully generated, opinionated API client library for KittyCAD.
+A fully generated & opinionated API client for the KittyCAD API.
 
 [![docs.rs](https://docs.rs/kittycad/badge.svg)](https://docs.rs/kittycad)
 
@@ -21,9 +21,9 @@ API server for KittyCAD
 
 ## Client Details
 
-This client is generated from the [KittyCAD OpenAPI
-specs](https://github.com/) based on API spec version `0.1.0`. This way it will remain
-up to date as features are added. The documentation for the crate is generated
+This client is generated from the [OpenAPI specs](https://api.kittycad.io) based on API spec version `0.1.0`. This way it will remain up to date as features are added.
+
+The documentation for the crate is generated
 along with the code to make this library easy to use.
 
 
@@ -31,7 +31,7 @@ To install the library, add the following to your `Cargo.toml` file.
 
 ```toml
 [dependencies]
-kittycad = "0.1.6"
+kittycad = "0.1.8"
 ```
 
 ## Basic example
@@ -42,7 +42,7 @@ a user agent string and set of credentials.
 ```
 use kittycad::Client;
 
-let kittycad = Client::new(
+let client = Client::new(
     String::from("api-key"),
 );
 ```
@@ -57,5 +57,5 @@ And then you can create a client from the environment.
 ```
 use kittycad::Client;
 
-let kittycad = Client::new_from_env();
+let client = Client::new_from_env();
 ```

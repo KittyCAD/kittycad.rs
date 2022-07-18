@@ -1,10 +1,10 @@
 [package]
 name = "kittycad"
-description = "A fully generated & opinionated API client for the kittycad API."
-version = "0.1.6"
-documentation = "https://docs.rs/kittycad/"
-repository = "https://github.com/Kittycad/kittycad.rs/tree/main/kittycad"
+description = "A fully generated & opinionated API client for the KittyCAD API."
+version = "0.1.8"
+documentation = "https://docs.rs/kittycad"
 readme = "README.md"
+repository = "https://github.com/KittyCAD/kittycad.rs/tree/main/kittycad"
 edition = "2018"
 license = "MIT"
 
@@ -17,17 +17,20 @@ chrono = { version = "0.4", features = ["serde"] }
 chrono-humanize = "^0.2.1"
 data-encoding = "^2.3.2"
 dirs = { version = "^4.0.0", optional = true }
+format_serde_error = "^0.3.0"
+futures = "0.3.21"
 http = "^0.2.8"
 hyperx = "1"
 log = { version = "^0.4", features = ["serde"] }
 mime = "0.3"
 parse-display = "^0.5"
 percent-encoding = "2.1"
+phonenumber = "^0.3.1"
 reqwest = { version = "0.11", default-features = false, features = ["json", "multipart", "rustls-tls"] }
 schemars = { version = "0.8", features = ["bytes", "chrono", "url", "uuid1"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-serde_with = "2"
+serde_with = "1"
 serde_urlencoded = "^0.7"
 tabled = { version = "0.7.0", features = ["color"] }
 thiserror = "^1"
@@ -35,6 +38,7 @@ url = { version = "2", features = ["serde"] }
 uuid = { version = "1", features = ["serde", "v4"] }
 
 [dev-dependencies]
+expectorate = "1"
 pretty_assertions = "1"
 tokio = { version = "1.20.0", features = ["full"] }
 

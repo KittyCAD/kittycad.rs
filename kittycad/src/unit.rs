@@ -1,7 +1,5 @@
-use anyhow::Result;
-
 use crate::Client;
-
+use anyhow::Result;
 pub struct Unit {
     pub client: Client,
 }
@@ -9,40 +7,42 @@ pub struct Unit {
 impl Unit {
     #[doc(hidden)]
     pub fn new(client: Client) -> Self {
-        Unit { client }
+        Self { client }
     }
 
-    /**
-    * Convert units.
-    *
-    * This function performs a `POST` to the `/unit/conversion/{src_format}/{output_format}` endpoint.
-    *
-    * Convert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions.
-    *
-    * **Parameters:**
-    *
-    * * `output_format: crate::types::UnitMetricFormat` -- The valid types of metric unit formats.
-    * * `src_format: crate::types::UnitMetricFormat` -- The valid types of metric unit formats.
-    * * `value: f64` -- The initial value.
-    */
-    pub async fn create_conversion(
-        &self,
+    #[doc = "Convert units.\n\nConvert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions."]
+    pub async fn create_conversion<'a>(
+        &'a self,
         output_format: crate::types::UnitMetricFormat,
         src_format: crate::types::UnitMetricFormat,
         value: f64,
     ) -> Result<crate::types::UnitConversion> {
-        let mut query_args: Vec<(String, String)> = Default::default();
-        if !value.to_string().is_empty() {
-            query_args.push(("value".to_string(), value.to_string()));
-        }
-        let query_ = serde_urlencoded::to_string(&query_args).unwrap();
-        let url = format!(
-            "/unit/conversion/{}/{}?{}",
-            crate::progenitor_support::encode_path(&src_format.to_string()),
-            crate::progenitor_support::encode_path(&output_format.to_string()),
-            query_
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            &format!(
+                "{}/{}",
+                self.client.base_url,
+                "unit/conversion/{src_format}/{output_format}"
+                    .replace("{output_format}", &format!("{}", output_format))
+                    .replace("{src_format}", &format!("{}", src_format))
+            ),
         );
-
-        self.client.post(&url, None).await
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = Vec::new();
+        query_params.push(("value", format!("{}", value)));
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 }

@@ -1,7 +1,5 @@
-use anyhow::Result;
-
 use crate::Client;
-
+use anyhow::Result;
 pub struct Sessions {
     pub client: Client,
 }
@@ -9,26 +7,35 @@ pub struct Sessions {
 impl Sessions {
     #[doc(hidden)]
     pub fn new(client: Client) -> Self {
-        Sessions { client }
+        Self { client }
     }
 
-    /**
-    * Get a session for your user.
-    *
-    * This function performs a `GET` to the `/user/session/{token}` endpoint.
-    *
-    * This endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.
-    *
-    * **Parameters:**
-    *
-    * * `token: &str` -- The API token.
-    */
-    pub async fn get_for_user(&self, token: &str) -> Result<crate::types::Session> {
-        let url = format!(
-            "/user/session/{}",
-            crate::progenitor_support::encode_path(token),
+    #[doc = "Get a session for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user."]
+    pub async fn get_session_for_user<'a>(
+        &'a self,
+        token: uuid::Uuid,
+    ) -> Result<crate::types::Session> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            &format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/session/{token}".replace("{token}", &format!("{}", token))
+            ),
         );
-
-        self.client.get(&url, None).await
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 }

@@ -1,1006 +1,840 @@
-use std::collections::{BTreeMap, HashMap};
+//! Utilities for generating rust functions from an OpenAPI spec.
 
-use anyhow::{bail, Result};
-use inflector::cases::snakecase::to_snake_case;
-
-use crate::{
-    clean_fn_name, clean_name, get_parameter_data, oid_to_object_name, path_to_operation_id,
-    struct_name, template::parse, ExtractJsonMediaType, ParameterDataExt, ReferenceOrExt, TypeId,
-    TypeSpace,
+use std::{
+    collections::{BTreeMap, HashMap},
+    fmt::Write as _,
+    str::FromStr,
 };
 
-/*
- * Generate a function for each Operation.
- */
+use anyhow::Result;
+
+use crate::types::exts::{
+    ParameterSchemaOrContentExt, ReferenceOrExt, StatusCodeExt, TokenStreamExt,
+};
+
+/// Generate functions for each path operation.
 pub fn generate_files(
-    api: &openapiv3::OpenAPI,
-    ts: &mut TypeSpace,
-    parameters: &BTreeMap<String, &openapiv3::Parameter>,
-) -> Result<(BTreeMap<String, String>, openapiv3::OpenAPI)> {
-    let mut new_api = api.clone();
+    spec: &openapiv3::OpenAPI,
+    opts: &crate::Opts,
+) -> Result<(
+    BTreeMap<String, proc_macro2::TokenStream>,
+    openapiv3::OpenAPI,
+)> {
+    let mut tag_files: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
 
-    let mut tag_files: BTreeMap<String, String> = Default::default();
+    // Make a spec we can modify for the docs.
+    let mut new_spec = spec.clone();
 
-    let mut fn_names: Vec<String> = Default::default();
-    for (pn, path) in api.paths.iter() {
-        let op = path.item().unwrap_or_else(|e| panic!("bad path: {}", e));
+    for (name, path) in spec.paths.iter() {
+        let op = path.item()?;
 
-        let mut new_op = op.clone();
+        let mut new_path = op.clone();
 
-        let mut gen = |p: &str,
-                       m: &str,
-                       o: Option<&openapiv3::Operation>,
-                       new_op: &mut openapiv3::PathItem|
+        let mut gen = |name: &str,
+                       method: &http::Method,
+                       op: Option<&openapiv3::Operation>|
          -> Result<()> {
-            let o = if let Some(o) = o {
-                o
+            // Ensure we have an operation for this path and method, otherwise return early.
+            let op = if let Some(op) = op {
+                op
             } else {
                 return Ok(());
             };
 
-            let op_id = if o.operation_id.is_none() {
-                // Make the operation id, the function.
-                path_to_operation_id(pn, m)
+            let tag =
+                crate::clean_tag_name(op.tags.first().ok_or_else(|| {
+                    anyhow::anyhow!("operation `{}` `{}` has no tags", name, method)
+                })?);
+
+            // Get the docs.
+            let docs = generate_docs(name, method, op)?;
+
+            // Get the function name.
+            let fn_name = get_fn_name(name, method, &tag, op)?;
+            let fn_name_ident = format_ident!("{}", fn_name);
+
+            // Get the response for the function.
+            let response_type = if let Some(response) = get_response_type(op, spec)? {
+                let t = response.type_name;
+                quote!(#t)
             } else {
-                o.operation_id.as_ref().unwrap().to_string()
-            };
-            let od = to_snake_case(&op_id);
-
-            // Make sure we have exactly 1 tag. This likely needs to change in the
-            // future but for now it seems fairly consistent.
-            let mut tags = o.tags.clone();
-            if tags.is_empty() {
-                // This "x-tags" bullshit is for Gusto.
-                if let Some(x) = o.extensions.get("x-tags") {
-                    let xtags: Vec<String> = serde_json::from_value(x.clone()).unwrap();
-                    tags = xtags;
-                }
-            }
-            if tags.is_empty() {
-                // If we still have no tags...., parse it from
-                // the path.
-                let split = pn.trim_start_matches('/').split('/');
-                let vec = split.collect::<Vec<&str>>();
-
-                tags.push(vec.first().unwrap().to_string());
-            }
-            let tag = to_snake_case(&clean_name(tags.first().unwrap()));
-
-            let oid = clean_fn_name(&od, &tag);
-
-            let mut out = String::new();
-            if let Some(o) = tag_files.get(&tag) {
-                out = o.to_string();
-            }
-
-            let mut a = |s: &str| {
-                out.push_str(s);
-                out.push('\n');
+                // We don't have a response, so we'll return `()`.
+                quote!(())
             };
 
-            let mut print_fn = |docs: &str,
-                                bounds: &Vec<String>,
-                                fn_params_str: &Vec<String>,
-                                body_param: &Option<String>,
-                                response_type: &str,
-                                template: &str,
-                                fn_inner: &str,
-                                fn_name: &str| {
-                // Print the function docs.
-                a(docs);
-
-                if bounds.is_empty() {
-                    a(&format!("pub async fn {}(", fn_name,));
-                } else {
-                    a(&format!("pub async fn {}<{}>(", fn_name, bounds.join(", ")));
-                }
-                a("&self,");
-
-                if !fn_params_str.is_empty() {
-                    a(&fn_params_str.join(" "));
-                }
-
-                if let Some(bp) = &body_param {
-                    a(&format!("body: {}", bp));
-                }
-
-                a(&format!(") -> Result<{}> {{", response_type));
-
-                a(template);
-
-                a(fn_inner);
-
-                a("}");
-                a("");
-            };
-
-            let docs = get_fn_docs(o, m, p, parameters, ts)?;
-
-            let mut bounds: Vec<String> = Vec::new();
-
-            let (body_param, body_func) = if let Some(b) = &o.request_body {
-                if let Ok(b) = b.item() {
-                    if b.is_binary()? {
-                        bounds.push("B: Into<reqwest::Body>".to_string());
-                        (Some("B".to_string()), Some("body".to_string()))
-                    } else {
-                        let (ct, mt) = b.content.first().unwrap();
-                        if ct == "application/json"
-                            || ct == "application/octet-stream"
-                            || ct.contains("application/json")
-                        {
-                            if let Some(s) = &mt.schema {
-                                let object_name = format!("{} request", oid_to_object_name(&od));
-                                let id = ts.select(Some(&object_name), s, "")?;
-                                let et = ts.id_to_entry.get(&id).unwrap();
-                                if let crate::TypeDetails::Object(p, _) = &et.details {
-                                    // We want to make sure we actally have properties
-                                    // in our object.
-                                    if p.is_empty() {
-                                        (None, None)
-                                    } else {
-                                        let rt = ts.render_type(&id, false)?;
-                                        if rt.starts_with("Vec") {
-                                            (
-                                                Some(format!(
-                                                    "&[{}]",
-                                                    rt.trim_start_matches("Vec<")
-                                                        .trim_end_matches('>')
-                                                )),
-                                                Some("json".to_string()),
-                                            )
-                                        } else {
-                                            (Some(format!("&{}", rt)), Some("json".to_string()))
-                                        }
-                                    }
-                                } else {
-                                    let rt = ts.render_type(&id, false)?;
-                                    if rt.starts_with("Vec") {
-                                        (
-                                            Some(format!(
-                                                "&[{}]",
-                                                rt.trim_start_matches("Vec<").trim_end_matches('>')
-                                            )),
-                                            Some("json".to_string()),
-                                        )
-                                    } else {
-                                        (Some(format!("&{}", rt)), Some("json".to_string()))
-                                    }
-                                }
-                            } else {
-                                (None, None)
-                            }
-                        } else if ct == "multipart/form-data" {
-                            println!("got multipart/formdata for {}", oid);
-                            // Skip it for now.
-                            // TODO: fix this later.
-                            (None, None)
-                        } else if ct == "application/x-www-form-urlencoded" {
-                            println!("got application/x-www-form-urlencoded for {}", oid);
-                            // Skip it for now.
-                            // TODO: fix this later.
-                            (None, None)
-                        } else if let Some(s) = &mt.schema {
-                            let tid = ts.select(None, s, "")?;
-                            let rt = ts.render_type(&tid, false)?;
-                            bounds.push("T: Into<reqwest::Body>".to_string());
-                            if rt == "String" {
-                                (Some("T".to_string()), Some("body".to_string()))
-                            } else {
-                                (Some(rt), Some("body".to_string()))
-                            }
-                        } else {
-                            (None, None)
-                        }
-                    }
-                } else if let openapiv3::ReferenceOr::Reference { reference } = b {
-                    // We must have had a reference.
-                    let object_name = format!("{} request", oid_to_object_name(&od));
-                    let id = ts.select_ref(Some(&clean_name(&object_name)), reference)?;
-                    let rt = ts.render_type(&id, false)?;
-                    (Some(format!("&{}", rt)), Some("json".to_string()))
-                } else {
-                    (None, None)
-                }
+            // Get the function args.
+            let raw_args = get_args(op, spec)?;
+            // Make sure if we have args, we start with a comma.
+            let args = if raw_args.is_empty() {
+                quote!()
             } else {
-                (None, None)
+                let a = raw_args.iter().map(|(k, v)| {
+                    let n = format_ident!("{}", k);
+                    quote!(#n: #v)
+                });
+                quote!(,#(#a),*)
             };
 
-            /*
-             * Get the function parameters.
-             */
-            let (fn_params_str, query_params) = get_fn_params(ts, o, false)?;
+            // Get the request body for the function if there is one.
+            let request_body = if let Some(rb) = get_request_body(op, spec)? {
+                let t = rb.type_name;
+                // We add the comma at the front, so it works.
+                quote!(, body: &#t)
+            } else {
+                // We don't have a request body, so we'll return nothing.
+                quote!()
+            };
 
-            /*
-             * Generate the URL for the request.
-             */
-            let tmp = parse(p)?;
-            let template = tmp.compile(query_params);
+            // Get the function body.
+            let function_body = get_function_body(name, method, op, spec, false)?;
 
-            /*
-             * Get the response type.
-             */
-            let (mut response_type, _tid, inner_response_type, pagination_property) =
-                get_response_type(&od, ts, o)?;
+            let function = quote! {
+                #[doc = #docs]
+                pub async fn #fn_name_ident<'a>(&'a self #args #request_body) -> Result<#response_type> {
+                    #function_body
+                }
+            };
 
-            // We shouldn't ever have an optional response type, thats just annoying.
-            if response_type.starts_with("Option<") {
-                response_type = response_type
-                    .trim_start_matches("Option<")
-                    .trim_end_matches('>')
-                    .to_string();
-            }
+            add_fn_to_tag(&mut tag_files, &tag, &function)?;
 
-            let fn_inner = get_fn_inner(
-                &oid,
-                m,
-                &body_func,
-                &response_type,
-                &inner_response_type,
-                &pagination_property,
-                false,
-            )?;
-
-            // Get the function without the function inners.
-            // This is specifically for Ramp.
-            // We do this directly before we print the other function.
-            let mut frt = response_type.to_string();
-            if !inner_response_type.is_empty() {
-                frt = inner_response_type.to_string();
-            }
-
-            let mut fn_name = oid
-                .trim_start_matches(&tag)
-                .trim_start_matches('_')
-                .to_string();
-            if !frt.starts_with("Vec<")
-                && !frt.ends_with("Response")
-                && !frt.ends_with("Summary")
-                && http::Method::GET == m
-                && !fn_name.ends_with("address")
-                && !fn_name.ends_with("has")
-                && !fn_name.ends_with("access")
-            {
-                // Make sure we don't add an s where we don't need one.
-                // Don't make a function plural where it is not needed.
-                fn_name = fn_name.trim_end_matches('s').to_string();
-            } else if frt.starts_with("Vec<") && fn_name == "get" {
-                fn_name = "get_page".to_string()
-            }
-
-            // Fix if we somehow created a function that is actually a keyword.
-            if fn_name == "move" {
-                fn_name = "mv".to_string();
-            }
-
-            // Do this right before printing. Check if we already have this function name.
-            // This will ensure we don't have any duplicates.
-            if fn_names.contains(&(fn_name.clone() + &tag)) {
-                fn_name = format!("{}_{}", fn_name, tag);
-            }
-            fn_names.push(fn_name.clone() + &tag);
-
-            // Print our standard function.
-            print_fn(
-                &docs,
-                &bounds,
-                &fn_params_str,
-                &body_param,
-                &frt,
-                &template,
-                &fn_inner,
-                &fn_name,
-            );
-
+            // Let's pause here and update our spec with the new function.
             // Add the docs to our spec.
-            let mut new_operation = o.clone();
-
-            let mut docs_params: Vec<String> = Vec::new();
-            for param in fn_params_str {
-                let split = param.split(':').collect::<Vec<&str>>();
-                docs_params.push(split[0].to_string());
-            }
-            if body_param.is_some() {
-                docs_params.push("body".to_string());
-            }
+            let mut new_operation = op.clone();
             let mut example: HashMap<String, String> = HashMap::new();
-            if frt == "()" {
+
+            let inner_args = if raw_args.is_empty() {
+                quote!()
+            } else {
+                let mut a = Vec::new();
+                for (k, _v) in raw_args.iter() {
+                    // Skip the next page arg.
+                    let n = format_ident!("{}", k);
+                    a.push(quote!(#n))
+                }
+                quote!(#(#a),*)
+            };
+
+            let request_body_str = if request_body.is_empty() {
+                "".to_string()
+            } else {
+                "body".to_string()
+            };
+
+            if response_type.rendered()? == "()" {
                 example.insert(
                     "example".to_string(),
-                    format!(
-                        "{}\nclient.{}().{}({}).await?;",
-                        docs,
+                    parse_and_fmt_example(&format!(
+                        r#"/// {}
+async fn {}() -> Result<()> {{
+    // This function does not return a value.
+    client.{}().{}({}{}).await?;
+
+    Ok(())
+}}"#,
+                        docs.replace('\n', "\n/// "),
+                        fn_name,
                         tag,
                         fn_name,
-                        docs_params.join(", ")
-                    ),
+                        inner_args.rendered()?.replace(',', ", "),
+                        request_body_str
+                    ))?,
                 );
             } else {
                 example.insert(
                     "example".to_string(),
-                    format!(
-                        "{}\nlet {} = client.{}().{}({}).await?;",
-                        docs,
-                        to_snake_case(&frt).trim_start_matches("crate_types_"),
+                    parse_and_fmt_example(&format!(
+                        r#"/// {}
+async fn {}() -> Result<()> {{
+    // The type returned will be: `{}`.
+    let result = client.{}().{}({}{}).await?;
+
+    println!("{{:?}}", result);
+
+    Ok(())
+}}"#,
+                        docs.replace('\n', "\n/// "),
+                        fn_name,
+                        response_type.rendered()?,
                         tag,
                         fn_name,
-                        docs_params.join(", ")
-                    ),
+                        inner_args.rendered()?.replace(',', ", "),
+                        request_body_str
+                    ))?,
                 );
             }
             example.insert(
                 "libDocsLink".to_string(),
                 format!(
-                    "https://docs.rs/kittycad/latest/kittycad/{}/struct.{}.html#method.{}",
+                    "https://docs.rs/{}/latest/{}/{}/struct.{}.html#method.{}",
+                    opts.name,
+                    opts.name,
                     tag,
-                    struct_name(&tag),
+                    crate::types::proper_name(&tag),
                     fn_name
                 ),
             );
 
-            // If we are returning a list of things and we have page, etc as
-            // params, let's get all the pages.
-            if frt.starts_with("Vec<") && http::Method::GET == m && !pagination_property.is_empty()
-            {
-                let docs = get_fn_docs_all(
-                    o,
-                    m,
-                    p,
-                    oid.trim_start_matches(&tag).trim_start_matches('_'),
-                )?;
+            // Let's check if this function can be paginated.
+            let pagination_properties = get_pagination_properties(name, method, op, spec)?;
+            if pagination_properties.can_paginate() {
+                // If we can paginate we should generate a paginated stream function.
+                let stream_fn_name_ident = format_ident!("{}_stream", fn_name);
 
-                let (fn_params_str, query_params) = get_fn_params(ts, o, true)?;
+                // Get the inner args for the function.
+                let page_param_str = pagination_properties.page_param_str()?;
 
-                let tmp = parse(p)?;
-                let template = tmp.compile(query_params);
+                // Make sure if we have args, we start with a comma.
+                // Get the args again without the page param.
+                let min_args = if raw_args.is_empty() {
+                    quote!()
+                } else {
+                    let mut a = Vec::new();
+                    for (k, v) in raw_args.iter() {
+                        // Skip the next page arg.
+                        if k != &page_param_str {
+                            let n = format_ident!("{}", k);
+                            a.push(quote!(#n: #v))
+                        }
+                    }
+                    quote!(,#(#a),*)
+                };
 
-                let fn_inner = get_fn_inner(
-                    &oid,
-                    m,
-                    &body_func,
-                    &response_type,
-                    &inner_response_type,
-                    &pagination_property,
-                    true,
-                )?;
+                let inner_args = if raw_args.is_empty() {
+                    quote!()
+                } else {
+                    let mut a = Vec::new();
+                    for (k, _v) in raw_args.iter() {
+                        // Skip the next page arg.
+                        if k != &page_param_str {
+                            let n = format_ident!("{}", k);
+                            a.push(quote!(#n))
+                        } else {
+                            // Make the arg none for our page parameter.
+                            a.push(quote!(None))
+                        }
+                    }
+                    quote!(#(#a),*)
+                };
 
-                let mut fn_name = oid
-                    .replace("_get_", "_get_all_")
-                    .replace("_list_", "_list_all_")
-                    .trim_start_matches(&tag)
-                    .trim_start_matches('_')
-                    .to_string();
+                // Check if we have a body as an arg.
+                let body_arg = if request_body.is_empty() {
+                    quote!()
+                } else {
+                    quote!(,body)
+                };
 
-                if fn_name == "list" {
-                    fn_name = "list_all".to_string();
-                } else if fn_name == "get" {
-                    fn_name = "get_all".to_string();
-                } else if fn_name.starts_with("get_") && !fn_name.starts_with("get_all") {
-                    fn_name = fn_name.replace("get_", "get_all_");
-                } else if fn_name.starts_with("list_") && !fn_name.starts_with("list_all") {
-                    fn_name = fn_name.replace("list_", "list_all_");
-                } else if !fn_name.contains("get")
-                    && !fn_name.contains("get_all")
-                    && !fn_name.contains("list")
-                    && !fn_name.contains("list_all")
-                {
-                    fn_name = format!("get_all_{}", fn_name);
-                }
+                let paginated_function_body = get_function_body(name, method, op, spec, true)?;
 
-                // Do this right before printing. Check if we already have this function name.
-                // This will ensure we don't have any duplicates.
-                if fn_names.contains(&(fn_name.clone() + &tag)) {
-                    fn_name = format!("{}_all", fn_name);
-                }
-                fn_names.push(fn_name.clone() + &tag);
+                let item_type = pagination_properties.item_type(false)?;
 
-                // Now let's print the new function.
-                print_fn(
-                    &docs,
-                    &bounds,
-                    &fn_params_str,
-                    &body_param,
-                    &frt,
-                    &template,
-                    &fn_inner,
-                    &fn_name,
-                );
+                let function = quote! {
+                    #[doc = #docs]
+                    pub fn #stream_fn_name_ident<'a>(&'a self #min_args #request_body) -> impl futures::Stream<Item = Result<#item_type>> + Unpin + '_  {
+                        use futures::{StreamExt, TryFutureExt, TryStreamExt};
+                        use crate::types::paginate::Pagination;
 
-                if let Some(index) = docs_params.iter().position(|x| *x == "page_token") {
-                    docs_params.remove(index);
-                }
-                if let Some(index) = docs_params.iter().position(|x| *x == "limit") {
-                    docs_params.remove(index);
-                }
+                        // Get the result from our main function.
+                        self.#fn_name_ident(#inner_args #body_arg)
+                            .map_ok(move |result| {
+                                let items = futures::stream::iter(result.items().into_iter().map(Ok));
 
+                                // Get the next pages.
+                                let next_pages = futures::stream::try_unfold(
+                                    result,
+                                    move |new_result| async move {
+                                        if new_result.has_more_pages()? {
+                                            // Get the next page, we modify the request directly,
+                                            // so that if we want to generate an API that uses
+                                            // Link headers or any other weird shit it works.
+                                            async {
+                                                #paginated_function_body
+                                            }.map_ok(|result: #response_type| {
+                                                Some((futures::stream::iter(
+                                                        result.items().into_iter().map(Ok),
+                                                    ),
+                                                    result,
+                                                ))
+                                            })
+                                            .await
+                                        } else {
+                                            // We have no more pages.
+                                            Ok(None)
+                                        }
+                                    }
+                                )
+                                .try_flatten();
+
+                                items.chain(next_pages)
+                            })
+                            .try_flatten_stream()
+                            .boxed()
+                        }
+                };
+
+                add_fn_to_tag(&mut tag_files, &tag, &function)?;
+
+                // Add the stream function to our examples as well.
                 example.insert(
                     "example".to_string(),
-                    format!(
-                        "{}\n\n// - OR -\n\n{}\nlet {} = client.{}().{}({}).await?;",
+                    parse_and_fmt_example(&format!(
+                        r#"{}
+///
+/// - OR -
+///
+/// Get a stream of results.
+///
+/// This allows you to paginate through all the items.
+async fn {}() -> Result<()> {{
+    let stream = client.{}().{}({}{});
+
+    loop {{
+        match stream.try_next().await {{
+            Ok(Some(item)) => {{
+                // We got a result.
+                // This will be of the type: `{}`.
+                println!("{{:?}}", item);
+            }}
+            Ok(None) => {{
+                break;
+            }}
+            Err(err) => {{
+                // Handle the error.
+                return Err(err);
+            }},
+        }}
+    }}
+
+    Ok(())
+}}
+"#,
                         example.get("example").unwrap(),
-                        docs,
-                        to_snake_case(&frt).trim_start_matches("crate_types_"),
+                        quote!(#stream_fn_name_ident).rendered()?,
                         tag,
-                        fn_name,
-                        docs_params.join(", ")
-                    ),
+                        quote!(#stream_fn_name_ident).rendered()?,
+                        inner_args.rendered()?.replace(',', ", "),
+                        request_body_str,
+                        item_type.rendered()?.replace("crate::types::", "")
+                    ))?,
                 );
             }
 
+            // Update our api spec with the new functions.
             new_operation
                 .extensions
                 .insert("x-rust".to_string(), serde_json::json!(example));
-            match m {
-                "GET" => {
-                    new_op.get = Some(new_operation);
+            match method.clone() {
+                http::Method::GET => {
+                    new_path.get = Some(new_operation);
                 }
-                "POST" => {
-                    new_op.post = Some(new_operation);
+                http::Method::POST => {
+                    new_path.post = Some(new_operation);
                 }
-                "PUT" => {
-                    new_op.put = Some(new_operation);
+                http::Method::PUT => {
+                    new_path.put = Some(new_operation);
                 }
-                "PATCH" => {
-                    new_op.patch = Some(new_operation);
+                http::Method::PATCH => {
+                    new_path.patch = Some(new_operation);
                 }
-                "DELETE" => {
-                    new_op.delete = Some(new_operation);
+                http::Method::DELETE => {
+                    new_path.delete = Some(new_operation);
                 }
                 _ => {}
             }
-            new_api
-                .paths
-                .paths
-                .insert(pn.to_string(), openapiv3::ReferenceOr::Item(new_op.clone()));
-
-            // Add this to our map of functions based on the tag name.
-            tag_files.insert(tag, out.to_string());
+            new_spec.paths.paths.insert(
+                name.to_string(),
+                openapiv3::ReferenceOr::Item(new_path.clone()),
+            );
 
             Ok(())
         };
 
-        gen(pn.as_str(), "GET", op.get.as_ref(), &mut new_op)?;
-        gen(pn.as_str(), "PUT", op.put.as_ref(), &mut new_op)?;
-        gen(pn.as_str(), "POST", op.post.as_ref(), &mut new_op)?;
-        gen(pn.as_str(), "DELETE", op.delete.as_ref(), &mut new_op)?;
-        gen(pn.as_str(), "HEAD", op.head.as_ref(), &mut new_op)?;
-        gen(pn.as_str(), "PATCH", op.patch.as_ref(), &mut new_op)?;
-        gen(pn.as_str(), "TRACE", op.trace.as_ref(), &mut new_op)?;
+        gen(name.as_str(), &http::Method::GET, op.get.as_ref())?;
+        gen(name.as_str(), &http::Method::PUT, op.put.as_ref())?;
+        gen(name.as_str(), &http::Method::POST, op.post.as_ref())?;
+        gen(name.as_str(), &http::Method::DELETE, op.delete.as_ref())?;
+        gen(name.as_str(), &http::Method::HEAD, op.head.as_ref())?;
+        gen(name.as_str(), &http::Method::PATCH, op.patch.as_ref())?;
+        gen(name.as_str(), &http::Method::TRACE, op.trace.as_ref())?;
     }
 
-    Ok((tag_files, new_api))
+    Ok((tag_files, new_spec))
 }
 
-fn get_response_type_from_object(
-    od: &str,
-    ts: &mut TypeSpace,
-    s: Option<&openapiv3::ReferenceOr<openapiv3::Schema>>,
-    r: Option<&openapiv3::ReferenceOr<openapiv3::Response>>,
-) -> Result<(
-    String,        // original response type
-    crate::TypeId, // type id
-    String,        // optional vec response type if this struct paginates
-    String,        // optional name of vec response property if this struct paginates
-)> {
-    let object_name = format!("{} response", oid_to_object_name(od));
-    let mut tid = TypeId(0);
+/// Generate the docs for the given operation.
+fn generate_docs(name: &str, method: &http::Method, op: &openapiv3::Operation) -> Result<String> {
+    let mut docs = if let Some(summary) = &op.summary {
+        summary.to_string()
+    } else {
+        format!("Perform a `{}` request to `{}`.", method, name)
+    };
 
-    if let Some(s) = s {
-        tid = ts.select(Some(&clean_name(&object_name)), s, "")?;
-
-        if let openapiv3::ReferenceOr::Reference { reference } = s {
-            tid = ts.select_ref(Some(&clean_name(&object_name)), reference)?;
-        }
+    if let Some(description) = &op.description {
+        docs.push_str("\n\n");
+        docs.push_str(description);
     }
 
-    if let Some(openapiv3::ReferenceOr::Reference { reference }) = r {
-        tid = ts.select_ref(Some(&clean_name(&object_name)), reference)?;
+    // TODO: document the params.
+
+    if op.deprecated {
+        docs.push_str("\n\n");
+        docs.push_str("**NOTE:** This operation is marked as deprecated.");
     }
 
-    if tid == TypeId(0) {
-        bail!("should have gotten type id for {}", od);
-    }
-
-    let og_rt = ts.render_type(&tid, false)?;
-    let mut et = ts.id_to_entry.get(&tid).unwrap();
-
-    if let crate::TypeDetails::NamedType(id, _) = &et.details {
-        et = ts.id_to_entry.get(id).unwrap();
-    }
-
-    if let crate::TypeDetails::Object(p, _) = &et.details {
-        // For KittyCAD, the pagination values are passed _in_ the resulting
-        // struct, so we want to ignore them and just get the data.
-        if let Some(pid) = p.get("next_page") {
-            let rt = ts.render_type(pid, false)?;
-            if rt == "String" {
-                if let Some(did) = p.get("items") {
-                    let rt = ts.render_type(did, false)?;
-                    return Ok((og_rt, did.clone(), rt, "items".to_string()));
-                } else {
-                    for (n, id) in p {
-                        // Now we must find the property with the vector for this struct.
-                        let rt = ts.render_type(id, false)?;
-                        if rt.starts_with("Vec<") {
-                            return Ok((og_rt, id.clone(), rt, to_snake_case(n)));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Ok((og_rt, tid, "".to_string(), "".to_string()))
-}
-
-fn get_response_type(
-    od: &str,
-    ts: &mut TypeSpace,
-    o: &openapiv3::Operation,
-) -> Result<(
-    String,        // original response type
-    crate::TypeId, // type id
-    String,        // optional vec response type if this struct paginates
-    String,        // optional name of vec response property if this struct paginates
-)> {
-    if o.responses.responses.is_empty() {
-        // Return empty.
-        return Ok((
-            "()".to_string(),
-            crate::TypeId(0),
-            "".to_string(),
-            "".to_string(),
-        ));
-    }
-
-    // Get the first response.
-    let first = o.responses.responses.first().unwrap();
-    if let Ok(i) = first.1.item() {
-        if i.content.is_empty() {
-            // Return empty.
-            return Ok((
-                "()".to_string(),
-                crate::TypeId(0),
-                "".to_string(),
-                "".to_string(),
-            ));
-        }
-
-        // Get the json response, if it exists.
-        if let Some(mt) = i.content.get("application/json") {
-            if !mt.encoding.is_empty() {
-                bail!("media type encoding not empty: {:#?}", mt);
-            }
-
-            if let Some(s) = &mt.schema {
-                if let Ok(item) = s.item() {
-                    // We have an item, we want to check
-                    // if its an ANY kind and empty, then we can ignore it.
-                    if let openapiv3::SchemaKind::Any(any) = &item.schema_kind {
-                        if any.properties.is_empty() && any.format.is_none() && any.items.is_none()
-                        {
-                            // Return empty.
-                            return Ok((
-                                "()".to_string(),
-                                crate::TypeId(0),
-                                "".to_string(),
-                                "".to_string(),
-                            ));
-                        }
-                    }
-                }
-
-                // Get response type from object.
-                return get_response_type_from_object(od, ts, Some(s), None);
-            }
-        }
-
-        // Get the first response.
-        let (ct, mt) = i.content.first().unwrap();
-        if ct == "text/plain"
-            || ct == "text/html"
-            || ct == "application/octocat-stream"
-            || ct == "*/*"
-        {
-            if let Some(s) = &mt.schema {
-                let tid = ts.select(None, s, "")?;
-                let rt = ts.render_type(&tid, false)?;
-                return Ok((rt, tid, "".to_string(), "".to_string()));
-            }
-        } else if ct == "application/scim+json" {
-            if !mt.encoding.is_empty() {
-                bail!("media type encoding not empty: {:#?}", mt);
-            }
-
-            if let Some(s) = &mt.schema {
-                let object_name = format!("{} response", oid_to_object_name(od));
-                let tid = ts.select(Some(&clean_name(&object_name)), s, "")?;
-                let rt = ts.render_type(&tid, false)?;
-                return Ok((rt, tid, "".to_string(), "".to_string()));
-            }
-        }
-    } else if let openapiv3::ReferenceOr::Reference { reference: _ } = first.1 {
-        // Get response type from object.
-        return get_response_type_from_object(od, ts, None, Some(first.1));
-    }
-
-    // Basically if we get here, likely its just an empty struct or something.
-    // We never actually hit here before Zoom but then it was just an empty response.
-    Ok((
-        "()".to_string(),
-        crate::TypeId(0),
-        "".to_string(),
-        "".to_string(),
-    ))
-}
-
-fn sort_parameters(o: &openapiv3::Operation) -> Result<BTreeMap<String, openapiv3::Parameter>> {
-    let mut parameters = BTreeMap::new();
-
-    for param in o.parameters.iter() {
-        let param = param.item()?;
-
-        let parameter_data = match get_parameter_data(param) {
-            Some(s) => s,
-            None => return Ok(parameters),
-        };
-
-        parameters.insert(parameter_data.name.to_string(), param.clone());
-    }
-
-    let mut sorted_keys = parameters.keys().collect::<Vec<_>>();
-    sorted_keys.sort();
-    let mut sorted_parameters: BTreeMap<String, openapiv3::Parameter> = BTreeMap::new();
-    for k in sorted_keys {
-        sorted_parameters.insert(k.to_string(), parameters.get(k).unwrap().clone());
-    }
-
-    Ok(sorted_parameters)
-}
-
-#[allow(clippy::type_complexity)]
-fn get_fn_params(
-    ts: &mut TypeSpace,
-    o: &openapiv3::Operation,
-    all_pages: bool,
-) -> Result<(Vec<String>, BTreeMap<String, (String, String)>)> {
-    /*
-     * Query parameters are sorted lexicographically to ensure a stable
-     * order in the generated code.
-     */
-    let mut fn_params_str: Vec<String> = Default::default();
-    let mut fn_params: Vec<String> = Default::default();
-    let mut query_params: BTreeMap<String, (String, String)> = Default::default();
-    let gp = sort_parameters(o)?;
-    for (param_name, item) in gp.iter() {
-        let parameter_data = get_parameter_data(item).unwrap();
-        let nam = &to_snake_case(&parameter_data.name);
-
-        if !fn_params.contains(nam) && !fn_params.contains(&format!("{}_", nam)) {
-            let typ = parameter_data.render_type(param_name, ts)?;
-            if nam == "ref"
-                || nam == "type"
-                || nam == "foo"
-                || nam == "enum"
-                || nam == "const"
-                || nam == "use"
-            {
-                fn_params_str.push(format!("{}_: {},", nam, typ));
-                fn_params.push(nam.to_string() + "_");
-            } else if nam == "i_ds" {
-                fn_params_str.push(format!("ids: {},", typ));
-                fn_params.push("ids".to_string());
-            } else if (!all_pages || !is_page_param(nam))
-                && nam != "authorization"
-                && !nam.starts_with("authorization_bearer")
-            {
-                if typ == "chrono::DateTime<chrono::Utc>" {
-                    fn_params_str.push(format!("{}: Option<{}>,", nam, typ));
-                    fn_params.push(nam.to_string());
-                } else {
-                    let p = format!("{}: {},", nam, typ);
-                    if !fn_params.contains(nam) {
-                        fn_params_str.push(p);
-                        fn_params.push(nam.to_string());
-                    }
-                }
-            }
-
-            // Check if we have a query.
-            // TODO: make this a bool ext.
-            if let openapiv3::Parameter::Query {
-                parameter_data: _,
-                allow_reserved: _,
-                style: openapiv3::QueryStyle::Form,
-                // We can ignore the allow empty value, we support this by default and
-                // aren't strict about not allowing empty values on other parameters
-                // merely because specs cannot be trusted.
-                allow_empty_value: _,
-            } = item
-            {
-                if nam == "ref"
-                    || nam == "type"
-                    || nam == "foo"
-                    || nam == "enum"
-                    || nam == "const"
-                    || nam == "use"
-                {
-                    query_params.insert(
-                        format!("{}_", nam),
-                        (typ.to_string(), parameter_data.name.to_string()),
-                    );
-                } else if nam == "i_ds" {
-                    query_params.insert(
-                        "ids".to_string(),
-                        (typ.to_string(), parameter_data.name.to_string()),
-                    );
-                } else if (!all_pages || !is_page_param(nam))
-                    && nam != "authorization"
-                    && !nam.starts_with("authorization_bearer")
-                {
-                    if typ == "chrono::DateTime<chrono::Utc>" {
-                        query_params.insert(
-                            nam.to_string(),
-                            (format!("Option<{}>", typ), parameter_data.name.to_string()),
-                        );
-                    } else {
-                        query_params.insert(
-                            nam.to_string(),
-                            (typ.to_string(), parameter_data.name.to_string()),
-                        );
-                    }
-                }
-            }
-        }
-    }
-
-    Ok((fn_params_str, query_params))
-}
-
-/*
- * Perform the function.
- */
-// TODO: Fix this
-#[allow(clippy::too_many_arguments)]
-fn get_fn_inner(
-    oid: &str,
-    m: &str,
-    body_func: &Option<String>,
-    response_type: &str,
-    inner_response_type: &str,
-    pagination_property: &str,
-    all_pages: bool,
-) -> Result<String> {
-    let body = if let Some(f) = &body_func {
-        if f == "json" {
-            "Some(reqwest::Body::from(serde_json::to_vec(body)?))"
+    if let Some(external_docs) = &op.external_docs {
+        docs.push_str("\n\n");
+        if let Some(description) = &external_docs.description {
+            write!(
+                docs,
+                "See <{}|{}> for more information.",
+                external_docs.url, description
+            )?;
         } else {
-            "Some(body.into())"
+            write!(docs, "See <{}> for more information.", external_docs.url)?;
+        }
+    }
+
+    Ok(docs)
+}
+
+/// Return the function name for the operation.
+fn get_fn_name(
+    name: &str,
+    method: &http::Method,
+    tag: &str,
+    op: &openapiv3::Operation,
+) -> Result<String> {
+    let mut name = op
+        .operation_id
+        .as_ref()
+        .ok_or_else(|| anyhow::anyhow!("operation `{}` `{}` has no operation_id", name, method))?
+        .to_string();
+
+    // Remove any stutters with the tag name.
+    if name.starts_with(&format!("{}_", tag)) {
+        name = name.trim_start_matches(&format!("{}_", tag)).to_string();
+    }
+    if name.ends_with(&format!("_{}", tag)) {
+        name = name.trim_end_matches(&format!("_{}", tag)).to_string();
+    }
+    if name.contains(&format!("_{}_", tag)) {
+        name = name.replace(&format!("_{}_", tag), "_");
+    }
+
+    Ok(name)
+}
+
+struct RequestOrResponse {
+    media_type: String,
+    type_name: proc_macro2::TokenStream,
+}
+
+/// Return the response type for the operation.
+fn get_response_type(
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<Option<RequestOrResponse>> {
+    for (status_code, response) in &op.responses.responses {
+        // We only care if the response is a success since this is for the function
+        // to return upon success.
+        if status_code.is_success() {
+            // Then let's get the type for the response.
+            let response = response.expand(spec)?;
+
+            // Iterate over all the media types and return the first response.
+            for (name, content) in &response.content {
+                if let Some(s) = &content.schema {
+                    let t = match s {
+                        openapiv3::ReferenceOr::Reference { .. } => {
+                            crate::types::get_type_name_from_reference(
+                                &s.reference()?,
+                                spec,
+                                false,
+                            )?
+                        }
+                        openapiv3::ReferenceOr::Item(s) => {
+                            crate::types::get_type_name_for_schema("", s, spec, false)?
+                        }
+                    };
+
+                    // Return early since we found the type.
+                    return Ok(Some(RequestOrResponse {
+                        media_type: name.to_string(),
+                        type_name: t,
+                    }));
+                }
+            }
+        }
+    }
+
+    // We couldn't find a type for the response.
+    Ok(None)
+}
+
+/// Return the function arguments for the operation.
+fn get_args(
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
+    let query_params = get_query_params(op, spec)?;
+    let path_params = get_path_params(op, spec)?;
+
+    Ok(query_params
+        .into_iter()
+        .chain(path_params.into_iter())
+        .collect())
+}
+
+/// Return the request body type for the operation.
+fn get_request_body(
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<Option<RequestOrResponse>> {
+    if let Some(request_body) = &op.request_body {
+        // Then let's get the type for the response.
+        let request_body = request_body.expand(spec)?;
+
+        // Iterate over all the media types and return the first request.
+        for (name, content) in &request_body.content {
+            if let Some(s) = &content.schema {
+                let t = match s {
+                    openapiv3::ReferenceOr::Reference { .. } => {
+                        crate::types::get_type_name_from_reference(&s.reference()?, spec, false)?
+                    }
+                    openapiv3::ReferenceOr::Item(s) => {
+                        crate::types::get_type_name_for_schema("", s, spec, false)?
+                    }
+                };
+
+                // Return early since we found the type.
+                // We start with a comma here so it's not weird.
+                return Ok(Some(RequestOrResponse {
+                    media_type: name.to_string(),
+                    type_name: t,
+                }));
+            }
+        }
+    }
+
+    // We don't have a request body.
+    // So we return nothing.
+    Ok(None)
+}
+
+/// Return the path params for the operation.
+fn get_path_params(
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
+    // Let's get the path parameters.
+    let mut path_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
+    // Let's get the arguments for the function.
+    for parameter in &op.parameters {
+        // Get the parameter.
+        let parameter = parameter.expand(spec)?;
+
+        // Get the data for the parameter.
+        // We only care about path parameters, currently.
+        if let openapiv3::Parameter::Path {
+            parameter_data,
+            style: _,
+        } = parameter
+        {
+            // Get the schema for the parameter.
+            let schema = parameter_data.format.schema()?;
+
+            // Get the type for the parameter.
+            let mut t = match schema {
+                openapiv3::ReferenceOr::Reference { .. } => {
+                    crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
+                }
+                openapiv3::ReferenceOr::Item(s) => {
+                    crate::types::get_type_name_for_schema("", &s, spec, false)?
+                }
+            };
+
+            // Make it an option if it's optional.
+            if !parameter_data.required && !t.is_option()? {
+                t = quote!(Option<#t>);
+            }
+
+            // Add path parameter to our list.
+            path_params.insert(parameter_data.name, t.get_parameter_value()?);
+        }
+    }
+
+    Ok(path_params)
+}
+
+/// Return the query params for the operation.
+fn get_query_params(
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
+    // Let's get the query parameters.
+    let mut query_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
+    // Let's get the arguments for the function.
+    for parameter in &op.parameters {
+        // Get the parameter.
+        let parameter = parameter.expand(spec)?;
+
+        // Get the data for the parameter.
+        // We only care about query parameters, currently.
+        if let openapiv3::Parameter::Query {
+            parameter_data,
+            style: _,
+            allow_reserved: _,
+            allow_empty_value: _,
+        } = parameter
+        {
+            // Get the schema for the parameter.
+            let schema = parameter_data.format.schema()?;
+
+            // Get the type for the parameter.
+            let mut t = match schema {
+                openapiv3::ReferenceOr::Reference { .. } => {
+                    crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
+                }
+                openapiv3::ReferenceOr::Item(s) => {
+                    crate::types::get_type_name_for_schema("", &s, spec, false)?
+                }
+            };
+
+            // Make it an option if it's optional.
+            if !parameter_data.required && !t.is_option()? {
+                t = quote!(Option<#t>);
+            }
+
+            // Add query parameter to our list.
+            query_params.insert(parameter_data.name, t.get_parameter_value()?);
+        }
+    }
+
+    Ok(query_params)
+}
+
+/// Return the function body for the operation.
+fn get_function_body(
+    name: &str,
+    method: &http::Method,
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+    paginated: bool,
+) -> Result<proc_macro2::TokenStream> {
+    let path = name.trim_start_matches('/');
+    let method_ident = format_ident!("{}", method.to_string());
+
+    // Let's get the path parameters.
+    let path_params = get_path_params(op, spec)?;
+    let clean_url = if !path_params.is_empty() {
+        let mut clean_string = quote!();
+        for (name, t) in &path_params {
+            let url_string = format!("{{{}}}", name);
+            let cleaned_name = crate::types::clean_property_name(name);
+            let name_ident = format_ident!("{}", cleaned_name);
+
+            clean_string = if t.is_string()? {
+                quote! {
+                    #clean_string.replace(#url_string, &#name_ident)
+                }
+            } else {
+                quote! {
+                    #clean_string.replace(#url_string, &format!("{}", #name_ident))
+                }
+            };
+        }
+        clean_string
+    } else {
+        quote!()
+    };
+
+    // Let's get the query parameters.
+    let query_params = get_query_params(op, spec)?;
+    let query_params_code = if !query_params.is_empty() && !paginated {
+        let mut array = Vec::new();
+        for (name, t) in &query_params {
+            let cleaned_name = crate::types::clean_property_name(name);
+            let name_ident = format_ident!("{}", cleaned_name);
+
+            let type_text = crate::types::get_text(t)?;
+
+            if !t.is_option()? {
+                if type_text == "String" {
+                    array.push(quote! {
+                       query_params.push((#name, #name_ident));
+                    })
+                } else {
+                    array.push(quote! {
+                       query_params.push((#name, format!("{}", #name_ident)));
+                    })
+                }
+            } else if type_text == "Option<String>" {
+                array.push(quote! {
+                    if let Some(p) = #name_ident {
+                        query_params.push((#name, p));
+                    }
+                })
+            } else {
+                array.push(quote! {
+                    if let Some(p) = #name_ident {
+                        query_params.push((#name, format!("{}", p)));
+                    }
+                })
+            }
+        }
+
+        quote! {
+            let mut query_params = Vec::new();
+            #(#array)*
+            req = req.query(&query_params);
         }
     } else {
-        "None"
+        quote!()
     };
 
-    if all_pages && pagination_property.is_empty() {
-        return Ok(format!("self.client.get_all_pages(&url, {}).await", body));
-    } else if all_pages {
-        // We will do a custom function here.
-        let inner = format!(
-            r#"let mut resp: {} = self.client.{}(&url, {}).await?;
-
-            let mut {} = resp.{};
-            let mut page = resp.next_page;
-
-            // Paginate if we should.
-            while !page.is_empty() {{
-                if !url.contains('?') {{
-                    resp = self.client.{}(&format!("{{}}?page={{}}", url, page), {}).await?;
-                }} else {{
-                    resp = self.client.{}(&format!("{{}}&page={{}}", url, page), {}).await?;
-                }}
-
-
-                {}.append(&mut resp.{});
-
-                if !resp.next_page.is_empty() && resp.next_page != page {{
-                    page = resp.next_page.to_string();
-                }} else {{
-                    page = "".to_string();
-                }}
-            }}
-
-            // Return our response data.
-            Ok({})"#,
-            response_type,
-            m.to_lowercase(),
-            body,
-            pagination_property,
-            pagination_property,
-            m.to_lowercase(),
-            body,
-            m.to_lowercase(),
-            body,
-            pagination_property,
-            pagination_property,
-            pagination_property,
-        );
-
-        return Ok(inner);
-    } else if all_pages && !pagination_property.is_empty() {
-        bail!(
-            "must implement custom pagination function for {}",
-            pagination_property
-        );
-    }
-
-    if (m == http::Method::GET
-        || m == http::Method::POST
-        || m == http::Method::PATCH
-        || m == http::Method::PUT
-        || m == http::Method::DELETE)
-        && oid != "apps_create_installation_access_token"
-    {
-        if inner_response_type.is_empty() {
-            return Ok(format!(
-                "self.client.{}(&url, {}).await",
-                m.to_lowercase(),
-                body
-            ));
-        }
-
-        // Okay we have an inner response type, let's return that instead.
-        return Ok(format!(
-            r#"let resp: {} = self.client.{}(&url, {}).await?;
-
-                // Return our response data.
-                Ok(resp.{})"#,
-            response_type,
-            m.to_lowercase(),
-            body,
-            pagination_property
-        ));
-    }
-
-    if oid != "apps_create_installation_access_token" {
-        bail!("function {} should be authenticated", oid);
-    }
-
-    Ok(r#"self.client.post_media(
-            &url,
-            Some(reqwest::Body::from(serde_json::to_vec(body)?)),
-            crate::utils::MediaType::Json,
-            crate::auth::AuthenticationConstraint::JWT,
-        ).await"#
-        .to_string())
-}
-
-fn get_fn_docs(
-    o: &openapiv3::Operation,
-    m: &str,
-    p: &str,
-    parameters: &BTreeMap<String, &openapiv3::Parameter>,
-    ts: &mut TypeSpace,
-) -> Result<String> {
-    let mut out = String::new();
-
-    let mut a = |s: &str| {
-        out.push_str(s);
-        out.push('\n');
-    };
-
-    a("/**");
-    if let Some(summary) = &o.summary {
-        a(&format!("* {}.", summary.trim_end_matches('.')));
-        a("*");
-    }
-    a(&format!(
-        "* This function performs a `{}` to the `{}` endpoint.",
-        m, p
-    ));
-    if let Some(description) = &o.description {
-        a("*");
-        a(&format!("* {}", description.replace('\n', "\n* ")));
-    }
-    if let Some(external_docs) = &o.external_docs {
-        a("*");
-        a(&format!("* FROM: <{}>", external_docs.url));
-    }
-    if !o.parameters.is_empty() {
-        a("*");
-        a("* **Parameters:**");
-        a("*");
-    }
-    // Iterate over the function parameters and add any data those had as well.
-    for par in o.parameters.iter() {
-        let mut param_name = "".to_string();
-        let item = match par {
-            openapiv3::ReferenceOr::Reference { reference } => {
-                param_name = struct_name(&reference.replace("#/components/parameters/", ""));
-                // Get the parameter from our BTreeMap.
-                if let Some(param) = parameters.get(&param_name) {
-                    param
-                } else {
-                    bail!("could not find parameter with reference: {}", reference);
+    // Get if there is a request body.
+    let request_body = if let Some(request_body) = get_request_body(op, spec)? {
+        match request_body.media_type.as_str() {
+            "application/json" => {
+                quote! {
+                    // Add the json body.
+                    req = req.json(body);
                 }
             }
-            openapiv3::ReferenceOr::Item(item) => item,
-        };
-
-        let parameter_data = get_parameter_data(item).unwrap();
-
-        let pid = ts.select_param(None, par)?;
-        let mut docs = ts.render_docs(&pid);
-        if let Some(d) = &parameter_data.description {
-            if !d.is_empty() && d.len() > docs.len() {
-                docs = format!(" -- {}.", d.trim_end_matches('.').replace('\n', "\n*   "));
-            } else if !docs.is_empty() {
-                docs = format!(
-                    " -- {}.",
-                    docs.trim_start_matches('*').trim_end_matches('.').trim()
+            "application/x-www-form-urlencoded" => {
+                quote! {
+                    // Add the form body.
+                    req = req.form(body);
+                }
+            }
+            "application/octet-stream" => {
+                quote! {
+                    // Add the raw body.
+                    req = req.body(body.clone());
+                }
+            }
+            _ => {
+                anyhow::bail!(
+                    "unsupported media type for request body: {}",
+                    request_body.media_type
                 );
             }
-        } else if !docs.is_empty() {
-            docs = format!(
-                " -- {}.",
-                docs.trim_start_matches('*').trim_end_matches('.').trim()
-            );
         }
-
-        let nam = &to_snake_case(&clean_name(&parameter_data.name));
-        let typ = parameter_data.render_type(&param_name, ts)?;
-
-        if nam == "ref"
-            || nam == "type"
-            || nam == "foo"
-            || nam == "enum"
-            || nam == "const"
-            || nam == "use"
-        {
-            a(&format!("* * `{}_: {}`{}", nam, typ, docs));
-        } else {
-            a(&format!("* * `{}: {}`{}", nam, typ, docs));
-        }
-    }
-    a("*/");
-
-    Ok(out.trim().to_string())
-}
-
-fn get_fn_docs_all(o: &openapiv3::Operation, m: &str, p: &str, fn_name: &str) -> Result<String> {
-    let mut out = String::new();
-
-    let mut a = |s: &str| {
-        out.push_str(s);
-        out.push('\n');
+    } else {
+        // Do nothing.
+        quote!()
     };
 
-    a("/**");
-    if let Some(summary) = &o.summary {
-        a(&format!("* {}.", summary.trim_end_matches('.')));
-        a("*");
-    }
-    a(&format!(
-        "* This function performs a `{}` to the `{}` endpoint.",
-        m, p
-    ));
-    a("*");
-    a(&format!(
-        "* As opposed to `{}`, this function returns all the pages of the request at once.",
-        fn_name
-    ));
-    if let Some(description) = &o.description {
-        a("*");
-        a(&format!("* {}", description.replace('\n', "\n* ")));
-    }
-    if let Some(external_docs) = &o.external_docs {
-        a("*");
-        a(&format!("* FROM: <{}>", external_docs.url));
-    }
-    a("*/");
+    // Get the response if there is one.
+    let response = if let Some(response) = get_response_type(op, spec)? {
+        match response.media_type.as_str() {
+            "application/json" => {
+                quote! {
+                    // Parse the json response.
+                    // Return a human error.
+                    serde_json::from_str(&text).map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+                }
+            }
+            _ => {
+                anyhow::bail!(
+                    "unsupported media type for response: {}",
+                    response.media_type
+                );
+            }
+        }
+    } else {
+        // Do nothing.
+        quote!(Ok(()))
+    };
 
-    Ok(out.trim().to_string())
+    let send_request = if paginated {
+        quote!(
+            // Build the request.
+            let mut request = req.build()?;
+            // Now we will modify the request to add the pagination.
+            request = new_result.next_page(request)?;
+            // Now we will execute the request.
+            let resp = self.client.client.execute(request).await?;
+        )
+    } else {
+        // Do nothing.
+        quote!(
+            // Send the request.
+            let resp = req.send().await?;
+        )
+    };
+
+    Ok(quote! {
+        let mut req = self.client.client.request(
+            http::Method::#method_ident,
+            &format!("{}/{}", self.client.base_url, #path#clean_url),
+        );
+
+        // Add in our authentication.
+        req = req.bearer_auth(&self.client.token);
+
+        #query_params_code
+
+        #request_body
+
+        #send_request
+
+        // Get the response status.
+        let status = resp.status();
+
+        // Get the text for the response.
+        let text = resp.text().await.unwrap_or_default();
+
+        if status.is_success() {
+            #response
+        } else {
+            // Return a human error.
+            // TODO: Try to return the error type.
+            // serde_json::from_str::<crate::crate::types::Error>(&text).map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            Err(anyhow::anyhow!("response was not successful `{}` -> `{}`", status, text))
+        }
+    })
 }
 
-fn is_page_param(s: &str) -> bool {
-    s == "next_page" || s == "page_token" || s == "limit"
+/// Check if a operation is paginated.
+fn get_pagination_properties(
+    name: &str,
+    method: &http::Method,
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<crate::types::PaginationProperties> {
+    crate::types::PaginationProperties::from_operation(name, method, op, spec)
+}
+
+/// Add a function to our list of tagged functions.
+fn add_fn_to_tag(
+    tag_files: &mut BTreeMap<String, proc_macro2::TokenStream>,
+    tag: &str,
+    function: &proc_macro2::TokenStream,
+) -> Result<()> {
+    // Add our function to our existing tag file, or create a new one.
+    if let std::collections::btree_map::Entry::Vacant(e) = tag_files.entry(tag.to_string()) {
+        e.insert(function.clone());
+    } else {
+        let current = tag_files
+            .get(tag)
+            .ok_or_else(|| anyhow::anyhow!("failed to find tag file for tag `{}`", tag))?;
+        tag_files.insert(
+            tag.to_string(),
+            quote! {
+                #current
+
+                #function
+            },
+        );
+    }
+
+    Ok(())
+}
+
+/// Parse a code example as rust code to verify it compiles.
+fn parse_and_fmt_example(s: &str) -> Result<String> {
+    let t = proc_macro2::TokenStream::from_str(s)
+        .map_err(|err| anyhow::anyhow!("failed to parse example: {}", err))?;
+    // `rustfmt` the code.
+    crate::types::get_text_fmt(&t)
 }

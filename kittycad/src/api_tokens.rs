@@ -1,7 +1,5 @@
-use anyhow::Result;
-
 use crate::Client;
-
+use anyhow::Result;
 pub struct ApiTokens {
     pub client: Client,
 }
@@ -9,153 +7,179 @@ pub struct ApiTokens {
 impl ApiTokens {
     #[doc(hidden)]
     pub fn new(client: Client) -> Self {
-        ApiTokens { client }
+        Self { client }
     }
 
-    /**
-    * List API tokens for your user.
-    *
-    * This function performs a `GET` to the `/user/api-tokens` endpoint.
-    *
-    * This endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.
-    * The API tokens are returned in order of creation, with the most recently created API tokens first.
-    *
-    * **Parameters:**
-    *
-    * * `limit: u32` -- Maximum number of items returned by a single call.
-    * * `page_token: &str` -- Token returned by previous call to retrieve the subsequent page.
-    * * `sort_by: crate::types::CreatedAtSortMode` -- Supported set of sort modes for scanning by created_at only.
-    *  
-    *  Currently, we only support scanning in ascending order.
-    */
-    pub async fn list_tokens_for_user(
-        &self,
-        limit: u32,
-        page_token: &str,
-        sort_by: crate::types::CreatedAtSortMode,
-    ) -> Result<Vec<crate::types::ApiToken>> {
-        let mut query_args: Vec<(String, String)> = Default::default();
-        if !limit.to_string().is_empty() {
-            query_args.push(("limit".to_string(), limit.to_string()));
-        }
-        if !page_token.is_empty() {
-            query_args.push(("page_token".to_string(), page_token.to_string()));
-        }
-        if !sort_by.to_string().is_empty() {
-            query_args.push(("sort_by".to_string(), sort_by.to_string()));
-        }
-        let query_ = serde_urlencoded::to_string(&query_args).unwrap();
-        let url = format!("/user/api-tokens?{}", query_);
-
-        let resp: crate::types::ApiTokenResultsPage = self.client.get(&url, None).await?;
-
-        // Return our response data.
-        Ok(resp.items)
-    }
-
-    /**
-    * List API tokens for your user.
-    *
-    * This function performs a `GET` to the `/user/api-tokens` endpoint.
-    *
-    * As opposed to `list_tokens_for_user`, this function returns all the pages of the request at once.
-    *
-    * This endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.
-    * The API tokens are returned in order of creation, with the most recently created API tokens first.
-    */
-    pub async fn list_all_tokens_for_user(
-        &self,
-        sort_by: crate::types::CreatedAtSortMode,
-    ) -> Result<Vec<crate::types::ApiToken>> {
-        let mut query_args: Vec<(String, String)> = Default::default();
-        if !sort_by.to_string().is_empty() {
-            query_args.push(("sort_by".to_string(), sort_by.to_string()));
-        }
-        let query_ = serde_urlencoded::to_string(&query_args).unwrap();
-        let url = format!("/user/api-tokens?{}", query_);
-
-        let mut resp: crate::types::ApiTokenResultsPage = self.client.get(&url, None).await?;
-
-        let mut items = resp.items;
-        let mut page = resp.next_page;
-
-        // Paginate if we should.
-        while !page.is_empty() {
-            if !url.contains('?') {
-                resp = self
-                    .client
-                    .get(&format!("{}?page={}", url, page), None)
-                    .await?;
-            } else {
-                resp = self
-                    .client
-                    .get(&format!("{}&page={}", url, page), None)
-                    .await?;
-            }
-
-            items.append(&mut resp.items);
-
-            if !resp.next_page.is_empty() && resp.next_page != page {
-                page = resp.next_page.to_string();
-            } else {
-                page = "".to_string();
-            }
-        }
-
-        // Return our response data.
-        Ok(items)
-    }
-
-    /**
-    * Create a new API token for your user.
-    *
-    * This function performs a `POST` to the `/user/api-tokens` endpoint.
-    *
-    * This endpoint requires authentication by any KittyCAD user. It creates a new API token for the authenticated user.
-    */
-    pub async fn create_token_for_user(&self) -> Result<crate::types::ApiToken> {
-        let url = "/user/api-tokens".to_string();
-        self.client.post(&url, None).await
-    }
-
-    /**
-    * Get an API token for your user.
-    *
-    * This function performs a `GET` to the `/user/api-tokens/{token}` endpoint.
-    *
-    * This endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.
-    *
-    * **Parameters:**
-    *
-    * * `token: &str` -- The API token.
-    */
-    pub async fn get_token_for_user(&self, token: &str) -> Result<crate::types::ApiToken> {
-        let url = format!(
-            "/user/api-tokens/{}",
-            crate::progenitor_support::encode_path(token),
+    #[doc = "List API tokens for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first."]
+    pub async fn list_for_user<'a>(
+        &'a self,
+        limit: Option<u32>,
+        page_token: Option<String>,
+        sort_by: Option<crate::types::CreatedAtSortMode>,
+    ) -> Result<crate::types::ApiTokenResultsPage> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            &format!("{}/{}", self.client.base_url, "user/api-tokens"),
         );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = Vec::new();
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
 
-        self.client.get(&url, None).await
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        if let Some(p) = sort_by {
+            query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 
-    /**
-    * Delete an API token for your user.
-    *
-    * This function performs a `DELETE` to the `/user/api-tokens/{token}` endpoint.
-    *
-    * This endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.
-    * This endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.
-    *
-    * **Parameters:**
-    *
-    * * `token: &str` -- The API token.
-    */
-    pub async fn delete_token_for_user(&self, token: &str) -> Result<()> {
-        let url = format!(
-            "/user/api-tokens/{}",
-            crate::progenitor_support::encode_path(token),
-        );
+    #[doc = "List API tokens for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first."]
+    pub fn list_for_user_stream<'a>(
+        &'a self,
+        limit: Option<u32>,
+        sort_by: Option<crate::types::CreatedAtSortMode>,
+    ) -> impl futures::Stream<Item = Result<crate::types::ApiToken>> + Unpin + '_ {
+        use crate::types::paginate::Pagination;
+        use futures::{StreamExt, TryFutureExt, TryStreamExt};
+        self.list_for_user(limit, None, sort_by)
+            .map_ok(move |result| {
+                let items = futures::stream::iter(result.items().into_iter().map(Ok));
+                let next_pages =
+                    futures::stream::try_unfold(result, move |new_result| async move {
+                        if new_result.has_more_pages()? {
+                            async {
+                                let mut req = self.client.client.request(
+                                    http::Method::GET,
+                                    &format!("{}/{}", self.client.base_url, "user/api-tokens"),
+                                );
+                                req = req.bearer_auth(&self.client.token);
+                                let mut request = req.build()?;
+                                request = new_result.next_page(request)?;
+                                let resp = self.client.client.execute(request).await?;
+                                let status = resp.status();
+                                let text = resp.text().await.unwrap_or_default();
+                                if status.is_success() {
+                                    serde_json::from_str(&text).map_err(|err| {
+                                        format_serde_error::SerdeError::new(text.to_string(), err)
+                                            .into()
+                                    })
+                                } else {
+                                    Err(anyhow::anyhow!(
+                                        "response was not successful `{}` -> `{}`",
+                                        status,
+                                        text
+                                    ))
+                                }
+                            }
+                            .map_ok(|result: crate::types::ApiTokenResultsPage| {
+                                Some((
+                                    futures::stream::iter(result.items().into_iter().map(Ok)),
+                                    result,
+                                ))
+                            })
+                            .await
+                        } else {
+                            Ok(None)
+                        }
+                    })
+                    .try_flatten();
+                items.chain(next_pages)
+            })
+            .try_flatten_stream()
+            .boxed()
+    }
 
-        self.client.delete(&url, None).await
+    #[doc = "Create a new API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It creates a new API token for the authenticated user."]
+    pub async fn create_api_token_for_user<'a>(&'a self) -> Result<crate::types::ApiToken> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            &format!("{}/{}", self.client.base_url, "user/api-tokens"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
+    }
+
+    #[doc = "Get an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user."]
+    pub async fn get_api_token_for_user<'a>(
+        &'a self,
+        token: uuid::Uuid,
+    ) -> Result<crate::types::ApiToken> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            &format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/api-tokens/{token}".replace("{token}", &format!("{}", token))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            serde_json::from_str(&text)
+                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
+    }
+
+    #[doc = "Delete an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\nThis endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes."]
+    pub async fn delete_api_token_for_user<'a>(&'a self, token: uuid::Uuid) -> Result<()> {
+        let mut req = self.client.client.request(
+            http::Method::DELETE,
+            &format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/api-tokens/{token}".replace("{token}", &format!("{}", token))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        let text = resp.text().await.unwrap_or_default();
+        if status.is_success() {
+            Ok(())
+        } else {
+            Err(anyhow::anyhow!(
+                "response was not successful `{}` -> `{}`",
+                status,
+                text
+            ))
+        }
     }
 }
