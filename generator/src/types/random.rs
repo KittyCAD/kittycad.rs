@@ -169,7 +169,7 @@ impl Random for chrono::NaiveDate {
         let mut rng = rand::thread_rng();
         let year = rng.gen_range(1900..2100);
         let month = rng.gen_range(1..13);
-        let day = rng.gen_range(1..32);
+        let day = rng.gen_range(1..28);
         Ok(chrono::NaiveDate::from_ymd(year, month, day))
     }
 }
@@ -191,7 +191,7 @@ impl Random for chrono::DateTime<chrono::Utc> {
             .ymd(
                 rng.gen_range(1900..2100),
                 rng.gen_range(1..13),
-                rng.gen_range(1..32),
+                rng.gen_range(1..28),
             )
             .and_hms_milli(
                 rng.gen_range(0..24),
