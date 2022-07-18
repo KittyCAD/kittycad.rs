@@ -483,6 +483,17 @@ fn get_example_args(
             spec,
         )?;
 
+        // Get the type for the parameter.
+        // TODO: fix &str
+        /*let t = match schema {
+            openapiv3::ReferenceOr::Reference { .. } => {
+                crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
+            }
+            openapiv3::ReferenceOr::Item(s) => {
+                crate::types::get_type_name_for_schema("", &s, spec, false)?
+            }
+        };*/
+
         if !parameter_data.required {
             example = quote!(Some(#example));
         }
@@ -895,10 +906,7 @@ fn generate_example_code_fn(
     let args = if raw_args.is_empty() {
         quote!()
     } else {
-        let a = raw_args.iter().map(|(k, v)| {
-            let n = format_ident!("{}", k);
-            quote!(#n: #v)
-        });
+        let a = raw_args.iter().map(|(_k, v)| quote!(#v));
         quote!(#(#a),*,)
     };
 
@@ -906,7 +914,7 @@ fn generate_example_code_fn(
     let request_body = if let Some(rb) = get_request_body_example(op, spec)? {
         let t = rb.type_name;
         // We add the comma at the front, so it works.
-        quote!(body: &#t)
+        quote!(&#t)
     } else {
         // We don't have a request body, so we'll return nothing.
         quote!()
@@ -938,8 +946,7 @@ fn generate_example_code_fn(
             for (k, v) in raw_args.iter() {
                 // Skip the next page arg.
                 if k != &page_param_str {
-                    let n = format_ident!("{}", k);
-                    a.push(quote!(#n: #v))
+                    a.push(quote!(#v))
                 }
             }
             quote!(#(#a),*)

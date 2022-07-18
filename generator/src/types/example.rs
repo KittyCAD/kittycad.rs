@@ -316,7 +316,7 @@ pub fn generate_example_rust_from_schema(
 
                 quote!(#name_ident::#item_ident)
             } else if s.format.is_empty() {
-                quote!(#random_value)
+                quote!(#random_value.to_string())
             } else {
                 match &s.format {
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::DateTime) => {
@@ -330,19 +330,19 @@ pub fn generate_example_rust_from_schema(
                         )
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Password) => {
-                        quote!(#random_value)
+                        quote!(#random_value.to_string())
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Byte) => {
-                        quote!(#random_value)
+                        quote!(#random_value.to_string())
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Binary) => {
-                        quote!(#random_value)
+                        quote!(#random_value.to_string())
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Empty => quote!(""),
                     openapiv3::VariantOrUnknownOrEmpty::Unknown(f) => match f.as_str() {
-                        "float" => quote!(#random_value),
-                        "int64" => quote!(#random_value),
-                        "uint64" => quote!(#random_value),
+                        "float" => quote!(#random_value.to_string()),
+                        "int64" => quote!(#random_value.to_string()),
+                        "uint64" => quote!(#random_value.to_string()),
                         "ipv4" => quote!(std::net::Ipv4Addr::from_str(#random_value)?),
                         "ipv6" => {
                             quote!(std::net::Ipv6Addr::from_str(#random_value)?)
@@ -377,7 +377,6 @@ pub fn generate_example_rust_from_schema(
                         "partial-date-time" => {
                             quote!(chrono::NaiveDateTime::parse_from_str(#random_value, "%Y-%m-%d %H:%M:%S")?)
                         }
-
                         f => {
                             anyhow::bail!("XXX unknown string format {}", f)
                         }
@@ -401,8 +400,21 @@ pub fn generate_example_rust_from_schema(
             // Generate a random object.
             let mut args = Vec::new();
             for (k, v) in o.properties.iter() {
+                let inner_name = match v {
+                    openapiv3::ReferenceOr::Reference { .. } => {
+                        crate::types::get_type_name_from_reference(&v.reference()?, spec, false)?
+                    }
+                    openapiv3::ReferenceOr::Item(s) => {
+                        crate::types::get_type_name_for_schema("", &s, spec, false)?
+                    }
+                }
+                .strip_option()?
+                .rendered()?;
+
                 let inner_schema = v.get_schema_from_reference(spec, true)?;
-                let example = generate_example_rust_from_schema("", &inner_schema, spec)?;
+
+                let example = generate_example_rust_from_schema(&inner_name, &inner_schema, spec)?;
+
                 let k_ident = format_ident!("{}", k);
                 args.push(quote!(#k_ident: #example));
             }
