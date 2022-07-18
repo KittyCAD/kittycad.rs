@@ -31,6 +31,18 @@ impl Random for uuid::Uuid {
     }
 }
 
+impl Random for i8 {
+    fn random() -> Result<Self> {
+        Ok(rand::thread_rng().gen_range(std::i8::MIN..std::i8::MAX))
+    }
+}
+
+impl Random for i16 {
+    fn random() -> Result<Self> {
+        Ok(rand::thread_rng().gen_range(std::i16::MIN..std::i16::MAX))
+    }
+}
+
 impl Random for i32 {
     fn random() -> Result<Self> {
         Ok(rand::thread_rng().gen_range(std::i32::MIN..std::i32::MAX))
@@ -52,6 +64,24 @@ impl Random for f32 {
 impl Random for f64 {
     fn random() -> Result<Self> {
         Ok(rand::thread_rng().gen_range(0.0..std::f64::MAX))
+    }
+}
+
+impl Random for u8 {
+    fn random() -> Result<Self> {
+        Ok(rand::thread_rng().gen_range(std::u8::MIN..std::u8::MAX))
+    }
+}
+
+impl Random for u16 {
+    fn random() -> Result<Self> {
+        Ok(rand::thread_rng().gen_range(std::u16::MIN..std::u16::MAX))
+    }
+}
+
+impl Random for u32 {
+    fn random() -> Result<Self> {
+        Ok(rand::thread_rng().gen_range(std::u32::MIN..std::u32::MAX))
     }
 }
 
@@ -204,6 +234,16 @@ mod test {
     }
 
     #[test]
+    fn test_random_i8() {
+        i8::random().unwrap();
+    }
+
+    #[test]
+    fn test_random_i16() {
+        i16::random().unwrap();
+    }
+
+    #[test]
     fn test_random_i32() {
         i32::random().unwrap();
     }
@@ -221,6 +261,21 @@ mod test {
     #[test]
     fn test_random_f64() {
         f64::random().unwrap();
+    }
+
+    #[test]
+    fn test_random_u8() {
+        u8::random().unwrap();
+    }
+
+    #[test]
+    fn test_random_u16() {
+        u16::random().unwrap();
+    }
+
+    #[test]
+    fn test_random_u32() {
+        u32::random().unwrap();
     }
 
     #[test]

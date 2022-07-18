@@ -164,28 +164,12 @@ pub fn generate_example_json_from_schema(
         openapiv3::SchemaKind::Type(openapiv3::Type::Integer(i)) => {
             match &i.format {
                 openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::IntegerFormat::Int32) => {
-                    // Return a random 32-bit number.
-                    let i = rng.gen_range(0..std::i32::MAX);
-                    serde_json::Value::Number(
-                        serde_json::value::Number::from_f64(i as f64)
-                            .ok_or_else(|| anyhow::anyhow!("failed to convert {} to f64", i))?,
-                    )
+                    serde_json::from_str(&i32::random()?.to_string())?
                 }
                 openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::IntegerFormat::Int64) => {
-                    // Return a random 64-bit number.
-                    let i = rng.gen_range(0..std::i64::MAX);
-                    serde_json::Value::Number(
-                        serde_json::value::Number::from_f64(i as f64)
-                            .ok_or_else(|| anyhow::anyhow!("failed to convert {} to f64", i))?,
-                    )
+                    serde_json::from_str(&i64::random()?.to_string())?
                 }
-                openapiv3::VariantOrUnknownOrEmpty::Empty => {
-                    // Return an empty number.
-                    serde_json::Value::Number(
-                        serde_json::value::Number::from_f64(0.0)
-                            .ok_or_else(|| anyhow::anyhow!("failed to convert 0.0 to f64"))?,
-                    )
-                }
+                openapiv3::VariantOrUnknownOrEmpty::Empty => serde_json::from_str("0")?,
                 openapiv3::VariantOrUnknownOrEmpty::Unknown(f) => {
                     let uint;
                     let width;
@@ -224,82 +208,18 @@ pub fn generate_example_json_from_schema(
 
                     if uint {
                         match width {
-                            8 => {
-                                // Generate a random 8-bit number.
-                                let i = rng.gen_range(0..std::u8::MAX);
-                                serde_json::Value::Number(
-                                    serde_json::value::Number::from_f64(i as f64).ok_or_else(
-                                        || anyhow::anyhow!("failed to convert {} to f64", i),
-                                    )?,
-                                )
-                            }
-                            16 => {
-                                // Generate a random 16-bit number.
-                                let i = rng.gen_range(0..std::u16::MAX);
-                                serde_json::Value::Number(
-                                    serde_json::value::Number::from_f64(i as f64).ok_or_else(
-                                        || anyhow::anyhow!("failed to convert {} to f64", i),
-                                    )?,
-                                )
-                            }
-                            32 => {
-                                // Generate a random 32-bit number.
-                                let i = rng.gen_range(0..std::u32::MAX);
-                                serde_json::Value::Number(
-                                    serde_json::value::Number::from_f64(i as f64).ok_or_else(
-                                        || anyhow::anyhow!("failed to convert {} to f64", i),
-                                    )?,
-                                )
-                            }
-                            64 => {
-                                // Generate a random 64-bit number.
-                                let i = rng.gen_range(0..std::u64::MAX);
-                                serde_json::Value::Number(
-                                    serde_json::value::Number::from_f64(i as f64).ok_or_else(
-                                        || anyhow::anyhow!("failed to convert {} to f64", i),
-                                    )?,
-                                )
-                            }
+                            8 => serde_json::from_str(&u8::random()?.to_string())?,
+                            16 => serde_json::from_str(&u16::random()?.to_string())?,
+                            32 => serde_json::from_str(&u32::random()?.to_string())?,
+                            64 => serde_json::from_str(&u64::random()?.to_string())?,
                             _ => anyhow::bail!("unknown uint width {}", width),
                         }
                     } else {
                         match width {
-                            8 => {
-                                // Generate a random 8-bit number.
-                                let i = rng.gen_range(std::i8::MIN..std::i8::MAX);
-                                serde_json::Value::Number(
-                                    serde_json::value::Number::from_f64(i as f64).ok_or_else(
-                                        || anyhow::anyhow!("failed to convert {} to f64", i),
-                                    )?,
-                                )
-                            }
-                            16 => {
-                                // Generate a random 16-bit number.
-                                let i = rng.gen_range(std::i16::MIN..std::i16::MAX);
-                                serde_json::Value::Number(
-                                    serde_json::value::Number::from_f64(i as f64).ok_or_else(
-                                        || anyhow::anyhow!("failed to convert {} to f64", i),
-                                    )?,
-                                )
-                            }
-                            32 => {
-                                // Generate a random 32-bit number.
-                                let i = rng.gen_range(std::i32::MIN..std::i32::MAX);
-                                serde_json::Value::Number(
-                                    serde_json::value::Number::from_f64(i as f64).ok_or_else(
-                                        || anyhow::anyhow!("failed to convert {} to f64", i),
-                                    )?,
-                                )
-                            }
-                            64 => {
-                                // Generate a random 64-bit number.
-                                let i = rng.gen_range(std::i64::MIN..std::i64::MAX);
-                                serde_json::Value::Number(
-                                    serde_json::value::Number::from_f64(i as f64).ok_or_else(
-                                        || anyhow::anyhow!("failed to convert {} to f64", i),
-                                    )?,
-                                )
-                            }
+                            8 => serde_json::from_str(&i8::random()?.to_string())?,
+                            16 => serde_json::from_str(&i16::random()?.to_string())?,
+                            32 => serde_json::from_str(&i32::random()?.to_string())?,
+                            64 => serde_json::from_str(&i64::random()?.to_string())?,
                             _ => anyhow::bail!("unknown int width {}", width),
                         }
                     }
