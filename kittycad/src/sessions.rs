@@ -14,7 +14,7 @@ impl Sessions {
     pub async fn get_session_for_user<'a>(
         &'a self,
         token: uuid::Uuid,
-    ) -> Result<crate::types::Session> {
+    ) -> Result<crate::types::Session, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
@@ -26,16 +26,16 @@ impl Sessions {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 }

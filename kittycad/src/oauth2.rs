@@ -14,7 +14,7 @@ impl Oauth2 {
     pub async fn device_auth_request<'a>(
         &'a self,
         body: &crate::types::DeviceAuthRequestForm,
-    ) -> Result<()> {
+    ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "oauth2/device/auth"),
@@ -23,15 +23,11 @@ impl Oauth2 {
         req = req.form(body);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
+            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -39,7 +35,7 @@ impl Oauth2 {
     pub async fn device_auth_confirm<'a>(
         &'a self,
         body: &crate::types::DeviceAuthVerifyParams,
-    ) -> Result<()> {
+    ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "oauth2/device/confirm"),
@@ -48,15 +44,11 @@ impl Oauth2 {
         req = req.json(body);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
+            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -64,7 +56,7 @@ impl Oauth2 {
     pub async fn device_access_token<'a>(
         &'a self,
         body: &crate::types::DeviceAccessTokenRequestForm,
-    ) -> Result<()> {
+    ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "oauth2/device/token"),
@@ -73,20 +65,19 @@ impl Oauth2 {
         req = req.form(body);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
+            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
     #[doc = "Verify an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website."]
-    pub async fn device_auth_verify<'a>(&'a self, user_code: &'a str) -> Result<()> {
+    pub async fn device_auth_verify<'a>(
+        &'a self,
+        user_code: &'a str,
+    ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "oauth2/device/verify"),
@@ -97,15 +88,11 @@ impl Oauth2 {
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
+            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -115,7 +102,7 @@ impl Oauth2 {
         code: Option<String>,
         provider: crate::types::AccountProvider,
         state: Option<String>,
-    ) -> Result<()> {
+    ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
@@ -138,15 +125,11 @@ impl Oauth2 {
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
+            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -155,7 +138,7 @@ impl Oauth2 {
         &'a self,
         callback_url: Option<String>,
         provider: crate::types::AccountProvider,
-    ) -> Result<crate::types::Oauth2ClientInfo> {
+    ) -> Result<crate::types::Oauth2ClientInfo, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
@@ -174,16 +157,16 @@ impl Oauth2 {
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 }

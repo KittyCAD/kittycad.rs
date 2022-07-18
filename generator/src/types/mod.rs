@@ -832,12 +832,12 @@ fn render_object(
             impl crate::types::paginate::Pagination for #struct_name {
                 type Item = #page_item;
 
-                fn has_more_pages(&self) -> anyhow::Result<bool> {
-                    Ok(self.next_page.is_some())
+                fn has_more_pages(&self) -> bool {
+                    self.next_page.is_some()
                 }
 
-                fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request> {
-                    let mut req = req.try_clone().ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
+                fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+                    let mut req = req.try_clone().ok_or_else(|| crate::types::error::Error::InvalidRequest(format!("failed to clone request: {:?}", req)))?;
                     req.url_mut().query_pairs_mut()
                         .append_pair(#next_page_str, self.#next_page_ident.as_deref().unwrap_or(""));
 

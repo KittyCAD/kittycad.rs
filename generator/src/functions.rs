@@ -90,7 +90,7 @@ pub fn generate_files(
 
             let function = quote! {
                 #[doc = #docs]
-                pub async fn #fn_name_ident<'a>(&'a self #args #request_body) -> Result<#response_type> {
+                pub async fn #fn_name_ident<'a>(&'a self #args #request_body) -> Result<#response_type, crate::types::error::Error> {
                     #function_body
                 }
             };
@@ -229,7 +229,7 @@ async fn {}() -> Result<()> {{
 
                 let function = quote! {
                     #[doc = #docs]
-                    pub fn #stream_fn_name_ident<'a>(&'a self #min_args #request_body) -> impl futures::Stream<Item = Result<#item_type>> + Unpin + '_  {
+                    pub fn #stream_fn_name_ident<'a>(&'a self #min_args #request_body) -> impl futures::Stream<Item = Result<#item_type, crate::types::error::Error>> + Unpin + '_  {
                         use futures::{StreamExt, TryFutureExt, TryStreamExt};
                         use crate::types::paginate::Pagination;
 
@@ -242,7 +242,7 @@ async fn {}() -> Result<()> {{
                                 let next_pages = futures::stream::try_unfold(
                                     result,
                                     move |new_result| async move {
-                                        if new_result.has_more_pages()? {
+                                        if new_result.has_more_pages() {
                                             // Get the next page, we modify the request directly,
                                             // so that if we want to generate an API that uses
                                             // Link headers or any other weird shit it works.
@@ -731,7 +731,7 @@ fn get_function_body(
                 quote! {
                     // Parse the json response.
                     // Return a human error.
-                    serde_json::from_str(&text).map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+                    serde_json::from_str(&text).map_err(|err| crate::types::error::Error::from_serde_error(format_serde_error::SerdeError::new(text.to_string(), err), status).into())
                 }
             }
             _ => {
@@ -781,16 +781,13 @@ fn get_function_body(
         // Get the response status.
         let status = resp.status();
 
-        // Get the text for the response.
-        let text = resp.text().await.unwrap_or_default();
-
         if status.is_success() {
+            // Get the text for the response.
+            let text = resp.text().await.unwrap_or_default();
+
             #response
         } else {
-            // Return a human error.
-            // TODO: Try to return the error type.
-            // serde_json::from_str::<crate::crate::types::Error>(&text).map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
-            Err(anyhow::anyhow!("response was not successful `{}` -> `{}`", status, text))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     })
 }

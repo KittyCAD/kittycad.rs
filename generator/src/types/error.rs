@@ -1,10 +1,6 @@
 //! Error methods.
 
 /// Error produced by generated client methods.
-///
-/// The type parameter may be a struct if there's a single expected error type
-/// or an enum if there are multiple valid error types. It can be the unit type
-/// if there are no structured returns expected.
 pub enum Error {
     /// The request did not conform to API requirements.
     InvalidRequest(String),
@@ -16,8 +12,8 @@ pub enum Error {
     SerdeError {
         /// The error.
         error: format_serde_error::SerdeError,
-        /// The full response.
-        response: reqwest::Response,
+        /// The response status.
+        status: reqwest::StatusCode,
     },
 
     /// An expected error response.
@@ -39,10 +35,18 @@ impl Error {
         match self {
             Error::InvalidRequest(_) => None,
             Error::CommunicationError(e) => e.status(),
-            Error::SerdeError { error: _, response } => Some(response.status()),
+            Error::SerdeError { error: _, status } => Some(*status),
             Error::InvalidResponsePayload { error: _, response } => Some(response.status()),
             Error::UnexpectedResponse(r) => Some(r.status()),
         }
+    }
+
+    /// Creates a new error from a response status and a serde error.
+    pub fn from_serde_error(
+        e: format_serde_error::SerdeError,
+        status: reqwest::StatusCode,
+    ) -> Self {
+        Self::SerdeError { error: e, status }
     }
 }
 
@@ -61,7 +65,7 @@ impl std::fmt::Display for Error {
             Error::CommunicationError(e) => {
                 write!(f, "Communication Error: {}", e)
             }
-            Error::SerdeError { error, response: _ } => {
+            Error::SerdeError { error, status: _ } => {
                 write!(f, "Serde Error: {}", error)
             }
             Error::InvalidResponsePayload { error, response: _ } => {
@@ -88,7 +92,7 @@ impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Error::CommunicationError(e) => Some(e),
-            Error::SerdeError { error, response: _ } => Some(error),
+            Error::SerdeError { error, status: _ } => Some(error),
             Error::InvalidResponsePayload { error, response: _ } => Some(error),
             _ => None,
         }

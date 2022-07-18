@@ -14,7 +14,7 @@ impl Hidden {
     pub async fn listen_auth_email<'a>(
         &'a self,
         body: &crate::types::EmailAuthenticationForm,
-    ) -> Result<crate::types::VerificationToken> {
+    ) -> Result<crate::types::VerificationToken, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "auth/email"),
@@ -23,16 +23,16 @@ impl Hidden {
         req = req.json(body);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -42,7 +42,7 @@ impl Hidden {
         callback_url: Option<url::Url>,
         email: &'a str,
         token: &'a str,
-    ) -> Result<()> {
+    ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "auth/email/callback"),
@@ -58,20 +58,16 @@ impl Hidden {
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
+            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
     #[doc = "This endpoint removes the session cookie for a user.\n\nThis is used in logout scenarios."]
-    pub async fn logout<'a>(&'a self) -> Result<()> {
+    pub async fn logout<'a>(&'a self) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "logout"),
@@ -79,15 +75,11 @@ impl Hidden {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
+            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 }

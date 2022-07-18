@@ -11,7 +11,9 @@ impl Payments {
     }
 
     #[doc = "Get payment info about your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It gets the payment information for the authenticated user."]
-    pub async fn get_payment_information_for_user<'a>(&'a self) -> Result<crate::types::Customer> {
+    pub async fn get_payment_information_for_user<'a>(
+        &'a self,
+    ) -> Result<crate::types::Customer, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "user/payment"),
@@ -19,16 +21,16 @@ impl Payments {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -36,7 +38,7 @@ impl Payments {
     pub async fn update_payment_information_for_user<'a>(
         &'a self,
         body: &crate::types::BillingInfo,
-    ) -> Result<crate::types::Customer> {
+    ) -> Result<crate::types::Customer, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::PUT,
             &format!("{}/{}", self.client.base_url, "user/payment"),
@@ -45,16 +47,16 @@ impl Payments {
         req = req.json(body);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -62,7 +64,7 @@ impl Payments {
     pub async fn create_payment_information_for_user<'a>(
         &'a self,
         body: &crate::types::BillingInfo,
-    ) -> Result<crate::types::Customer> {
+    ) -> Result<crate::types::Customer, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "user/payment"),
@@ -71,21 +73,23 @@ impl Payments {
         req = req.json(body);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
     #[doc = "Delete payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It deletes the payment information for the authenticated user."]
-    pub async fn delete_payment_information_for_user<'a>(&'a self) -> Result<()> {
+    pub async fn delete_payment_information_for_user<'a>(
+        &'a self,
+    ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
             &format!("{}/{}", self.client.base_url, "user/payment"),
@@ -93,22 +97,18 @@ impl Payments {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
+            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
     #[doc = "Get balance for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It gets the balance information for the authenticated user."]
     pub async fn get_payment_balance_for_user<'a>(
         &'a self,
-    ) -> Result<crate::types::CustomerBalance> {
+    ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "user/payment/balance"),
@@ -116,23 +116,23 @@ impl Payments {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
     #[doc = "Create a payment intent for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It creates a new payment intent for the authenticated user."]
     pub async fn create_payment_intent_for_user<'a>(
         &'a self,
-    ) -> Result<crate::types::PaymentIntent> {
+    ) -> Result<crate::types::PaymentIntent, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "user/payment/intent"),
@@ -140,21 +140,23 @@ impl Payments {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
     #[doc = "List invoices for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It lists invoices for the authenticated user."]
-    pub async fn list_invoices_for_user<'a>(&'a self) -> Result<Vec<crate::types::Invoice>> {
+    pub async fn list_invoices_for_user<'a>(
+        &'a self,
+    ) -> Result<Vec<crate::types::Invoice>, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "user/payment/invoices"),
@@ -162,23 +164,23 @@ impl Payments {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
     #[doc = "List payment methods for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It lists payment methods for the authenticated user."]
     pub async fn list_payment_methods_for_user<'a>(
         &'a self,
-    ) -> Result<Vec<crate::types::PaymentMethod>> {
+    ) -> Result<Vec<crate::types::PaymentMethod>, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "user/payment/methods"),
@@ -186,21 +188,24 @@ impl Payments {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
     #[doc = "Delete a payment method for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the specified payment method for the authenticated user."]
-    pub async fn delete_payment_method_for_user<'a>(&'a self, id: &'a str) -> Result<()> {
+    pub async fn delete_payment_method_for_user<'a>(
+        &'a self,
+        id: &'a str,
+    ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
             &format!(
@@ -212,15 +217,11 @@ impl Payments {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
+            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 }

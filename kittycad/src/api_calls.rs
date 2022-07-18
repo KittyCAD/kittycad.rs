@@ -14,7 +14,7 @@ impl ApiCalls {
     pub async fn get_api_call_metrics<'a>(
         &'a self,
         group_by: crate::types::ApiCallQueryGroupBy,
-    ) -> Result<Vec<crate::types::ApiCallQueryGroup>> {
+    ) -> Result<Vec<crate::types::ApiCallQueryGroup>, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "api-call-metrics"),
@@ -25,16 +25,16 @@ impl ApiCalls {
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -44,7 +44,7 @@ impl ApiCalls {
         limit: Option<u32>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::ApiCallWithPriceResultsPage> {
+    ) -> Result<crate::types::ApiCallWithPriceResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "api-calls"),
@@ -66,16 +66,16 @@ impl ApiCalls {
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -84,7 +84,10 @@ impl ApiCalls {
         &'a self,
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> impl futures::Stream<Item = Result<crate::types::ApiCallWithPrice>> + Unpin + '_ {
+    ) -> impl futures::Stream<
+        Item = Result<crate::types::ApiCallWithPrice, crate::types::error::Error>,
+    > + Unpin
+           + '_ {
         use crate::types::paginate::Pagination;
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
         self.list(limit, None, sort_by)
@@ -92,7 +95,7 @@ impl ApiCalls {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages =
                     futures::stream::try_unfold(result, move |new_result| async move {
-                        if new_result.has_more_pages()? {
+                        if new_result.has_more_pages() {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
@@ -103,18 +106,19 @@ impl ApiCalls {
                                 request = new_result.next_page(request)?;
                                 let resp = self.client.client.execute(request).await?;
                                 let status = resp.status();
-                                let text = resp.text().await.unwrap_or_default();
                                 if status.is_success() {
+                                    let text = resp.text().await.unwrap_or_default();
                                     serde_json::from_str(&text).map_err(|err| {
-                                        format_serde_error::SerdeError::new(text.to_string(), err)
-                                            .into()
+                                        crate::types::error::Error::from_serde_error(
+                                            format_serde_error::SerdeError::new(
+                                                text.to_string(),
+                                                err,
+                                            ),
+                                            status,
+                                        )
                                     })
                                 } else {
-                                    Err(anyhow::anyhow!(
-                                        "response was not successful `{}` -> `{}`",
-                                        status,
-                                        text
-                                    ))
+                                    Err(crate::types::error::Error::UnexpectedResponse(resp))
                                 }
                             }
                             .map_ok(|result: crate::types::ApiCallWithPriceResultsPage| {
@@ -136,7 +140,10 @@ impl ApiCalls {
     }
 
     #[doc = "Get details of an API call.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\nIf the user is not authenticated to view the specified API call, then it is not returned.\nOnly KittyCAD employees can view API calls for other users."]
-    pub async fn get_api_call<'a>(&'a self, id: &'a str) -> Result<crate::types::ApiCallWithPrice> {
+    pub async fn get_api_call<'a>(
+        &'a self,
+        id: &'a str,
+    ) -> Result<crate::types::ApiCallWithPrice, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
@@ -148,16 +155,16 @@ impl ApiCalls {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -168,7 +175,7 @@ impl ApiCalls {
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
         status: Option<crate::types::ApiCallStatus>,
-    ) -> Result<crate::types::AsyncApiCallResultsPage> {
+    ) -> Result<crate::types::AsyncApiCallResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "async/operations"),
@@ -194,16 +201,16 @@ impl ApiCalls {
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -213,7 +220,9 @@ impl ApiCalls {
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
         status: Option<crate::types::ApiCallStatus>,
-    ) -> impl futures::Stream<Item = Result<crate::types::AsyncApiCall>> + Unpin + '_ {
+    ) -> impl futures::Stream<Item = Result<crate::types::AsyncApiCall, crate::types::error::Error>>
+           + Unpin
+           + '_ {
         use crate::types::paginate::Pagination;
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
         self.list_async_operations(limit, None, sort_by, status)
@@ -221,7 +230,7 @@ impl ApiCalls {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages =
                     futures::stream::try_unfold(result, move |new_result| async move {
-                        if new_result.has_more_pages()? {
+                        if new_result.has_more_pages() {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
@@ -232,18 +241,19 @@ impl ApiCalls {
                                 request = new_result.next_page(request)?;
                                 let resp = self.client.client.execute(request).await?;
                                 let status = resp.status();
-                                let text = resp.text().await.unwrap_or_default();
                                 if status.is_success() {
+                                    let text = resp.text().await.unwrap_or_default();
                                     serde_json::from_str(&text).map_err(|err| {
-                                        format_serde_error::SerdeError::new(text.to_string(), err)
-                                            .into()
+                                        crate::types::error::Error::from_serde_error(
+                                            format_serde_error::SerdeError::new(
+                                                text.to_string(),
+                                                err,
+                                            ),
+                                            status,
+                                        )
                                     })
                                 } else {
-                                    Err(anyhow::anyhow!(
-                                        "response was not successful `{}` -> `{}`",
-                                        status,
-                                        text
-                                    ))
+                                    Err(crate::types::error::Error::UnexpectedResponse(resp))
                                 }
                             }
                             .map_ok(|result: crate::types::AsyncApiCallResultsPage| {
@@ -268,7 +278,7 @@ impl ApiCalls {
     pub async fn get_async_operation<'a>(
         &'a self,
         id: &'a str,
-    ) -> Result<crate::types::AsyncApiCallOutput> {
+    ) -> Result<crate::types::AsyncApiCallOutput, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
@@ -280,16 +290,16 @@ impl ApiCalls {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -299,7 +309,7 @@ impl ApiCalls {
         limit: Option<u32>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::ApiCallWithPriceResultsPage> {
+    ) -> Result<crate::types::ApiCallWithPriceResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "user/api-calls"),
@@ -321,16 +331,16 @@ impl ApiCalls {
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -339,7 +349,10 @@ impl ApiCalls {
         &'a self,
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> impl futures::Stream<Item = Result<crate::types::ApiCallWithPrice>> + Unpin + '_ {
+    ) -> impl futures::Stream<
+        Item = Result<crate::types::ApiCallWithPrice, crate::types::error::Error>,
+    > + Unpin
+           + '_ {
         use crate::types::paginate::Pagination;
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
         self.user_list(limit, None, sort_by)
@@ -347,7 +360,7 @@ impl ApiCalls {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages =
                     futures::stream::try_unfold(result, move |new_result| async move {
-                        if new_result.has_more_pages()? {
+                        if new_result.has_more_pages() {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
@@ -358,18 +371,19 @@ impl ApiCalls {
                                 request = new_result.next_page(request)?;
                                 let resp = self.client.client.execute(request).await?;
                                 let status = resp.status();
-                                let text = resp.text().await.unwrap_or_default();
                                 if status.is_success() {
+                                    let text = resp.text().await.unwrap_or_default();
                                     serde_json::from_str(&text).map_err(|err| {
-                                        format_serde_error::SerdeError::new(text.to_string(), err)
-                                            .into()
+                                        crate::types::error::Error::from_serde_error(
+                                            format_serde_error::SerdeError::new(
+                                                text.to_string(),
+                                                err,
+                                            ),
+                                            status,
+                                        )
                                     })
                                 } else {
-                                    Err(anyhow::anyhow!(
-                                        "response was not successful `{}` -> `{}`",
-                                        status,
-                                        text
-                                    ))
+                                    Err(crate::types::error::Error::UnexpectedResponse(resp))
                                 }
                             }
                             .map_ok(|result: crate::types::ApiCallWithPriceResultsPage| {
@@ -394,7 +408,7 @@ impl ApiCalls {
     pub async fn get_api_call_for_user<'a>(
         &'a self,
         id: &'a str,
-    ) -> Result<crate::types::ApiCallWithPrice> {
+    ) -> Result<crate::types::ApiCallWithPrice, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
@@ -406,16 +420,16 @@ impl ApiCalls {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -426,7 +440,7 @@ impl ApiCalls {
         limit: Option<u32>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::ApiCallWithPriceResultsPage> {
+    ) -> Result<crate::types::ApiCallWithPriceResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
@@ -452,16 +466,16 @@ impl ApiCalls {
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -471,7 +485,10 @@ impl ApiCalls {
         id: &'a str,
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> impl futures::Stream<Item = Result<crate::types::ApiCallWithPrice>> + Unpin + '_ {
+    ) -> impl futures::Stream<
+        Item = Result<crate::types::ApiCallWithPrice, crate::types::error::Error>,
+    > + Unpin
+           + '_ {
         use crate::types::paginate::Pagination;
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
         self.list_for_user(id, limit, None, sort_by)
@@ -479,7 +496,7 @@ impl ApiCalls {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages =
                     futures::stream::try_unfold(result, move |new_result| async move {
-                        if new_result.has_more_pages()? {
+                        if new_result.has_more_pages() {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
@@ -494,18 +511,19 @@ impl ApiCalls {
                                 request = new_result.next_page(request)?;
                                 let resp = self.client.client.execute(request).await?;
                                 let status = resp.status();
-                                let text = resp.text().await.unwrap_or_default();
                                 if status.is_success() {
+                                    let text = resp.text().await.unwrap_or_default();
                                     serde_json::from_str(&text).map_err(|err| {
-                                        format_serde_error::SerdeError::new(text.to_string(), err)
-                                            .into()
+                                        crate::types::error::Error::from_serde_error(
+                                            format_serde_error::SerdeError::new(
+                                                text.to_string(),
+                                                err,
+                                            ),
+                                            status,
+                                        )
                                     })
                                 } else {
-                                    Err(anyhow::anyhow!(
-                                        "response was not successful `{}` -> `{}`",
-                                        status,
-                                        text
-                                    ))
+                                    Err(crate::types::error::Error::UnexpectedResponse(resp))
                                 }
                             }
                             .map_ok(|result: crate::types::ApiCallWithPriceResultsPage| {

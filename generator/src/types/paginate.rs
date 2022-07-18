@@ -8,10 +8,13 @@ pub trait Pagination {
     type Item: serde::de::DeserializeOwned;
 
     /// Returns true if the response has more pages.
-    fn has_more_pages(&self) -> Result<bool>;
+    fn has_more_pages(&self) -> bool;
 
     /// Modify a request to get the next page.
-    fn next_page(&self, req: reqwest::Request) -> Result<reqwest::Request>;
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> Result<reqwest::Request, crate::types::error::Error>;
 
     /// Get the items from a page.
     fn items(&self) -> Vec<Self::Item>;

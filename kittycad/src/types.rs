@@ -137,9 +137,12 @@ pub mod paginate {
         #[doc = " The item that is paginated."]
         type Item: serde::de::DeserializeOwned;
         #[doc = " Returns true if the response has more pages."]
-        fn has_more_pages(&self) -> Result<bool>;
+        fn has_more_pages(&self) -> bool;
         #[doc = " Modify a request to get the next page."]
-        fn next_page(&self, req: reqwest::Request) -> Result<reqwest::Request>;
+        fn next_page(
+            &self,
+            req: reqwest::Request,
+        ) -> Result<reqwest::Request, crate::types::error::Error>;
         #[doc = " Get the items from a page."]
         fn items(&self) -> Vec<Self::Item>;
     }
@@ -297,10 +300,6 @@ pub mod phone_number {
 pub mod error {
     #![doc = " Error methods."]
     #[doc = " Error produced by generated client methods."]
-    #[doc = ""]
-    #[doc = " The type parameter may be a struct if there's a single expected error type"]
-    #[doc = " or an enum if there are multiple valid error types. It can be the unit type"]
-    #[doc = " if there are no structured returns expected."]
     pub enum Error {
         #[doc = " The request did not conform to API requirements."]
         InvalidRequest(String),
@@ -310,8 +309,8 @@ pub mod error {
         SerdeError {
             #[doc = " The error."]
             error: format_serde_error::SerdeError,
-            #[doc = " The full response."]
-            response: reqwest::Response,
+            #[doc = " The response status."]
+            status: reqwest::StatusCode,
         },
         #[doc = " An expected error response."]
         InvalidResponsePayload {
@@ -331,10 +330,18 @@ pub mod error {
             match self {
                 Error::InvalidRequest(_) => None,
                 Error::CommunicationError(e) => e.status(),
-                Error::SerdeError { error: _, response } => Some(response.status()),
+                Error::SerdeError { error: _, status } => Some(*status),
                 Error::InvalidResponsePayload { error: _, response } => Some(response.status()),
                 Error::UnexpectedResponse(r) => Some(r.status()),
             }
+        }
+
+        #[doc = " Creates a new error from a response status and a serde error."]
+        pub fn from_serde_error(
+            e: format_serde_error::SerdeError,
+            status: reqwest::StatusCode,
+        ) -> Self {
+            Self::SerdeError { error: e, status }
         }
     }
 
@@ -353,7 +360,7 @@ pub mod error {
                 Error::CommunicationError(e) => {
                     write!(f, "Communication Error: {}", e)
                 }
-                Error::SerdeError { error, response: _ } => {
+                Error::SerdeError { error, status: _ } => {
                     write!(f, "Serde Error: {}", error)
                 }
                 Error::InvalidResponsePayload { error, response: _ } => {
@@ -380,7 +387,7 @@ pub mod error {
         fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
             match self {
                 Error::CommunicationError(e) => Some(e),
-                Error::SerdeError { error, response: _ } => Some(error),
+                Error::SerdeError { error, status: _ } => Some(error),
                 Error::InvalidResponsePayload { error, response: _ } => Some(error),
                 _ => None,
             }
@@ -694,14 +701,20 @@ impl std::fmt::Display for ApiCallWithPriceResultsPage {
 
 impl crate::types::paginate::Pagination for ApiCallWithPriceResultsPage {
     type Item = ApiCallWithPrice;
-    fn has_more_pages(&self) -> anyhow::Result<bool> {
-        Ok(self.next_page.is_some())
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
     }
 
-    fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request> {
-        let mut req = req
-            .try_clone()
-            .ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
         req.url_mut()
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
@@ -789,14 +802,20 @@ impl std::fmt::Display for ApiTokenResultsPage {
 
 impl crate::types::paginate::Pagination for ApiTokenResultsPage {
     type Item = ApiToken;
-    fn has_more_pages(&self) -> anyhow::Result<bool> {
-        Ok(self.next_page.is_some())
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
     }
 
-    fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request> {
-        let mut req = req
-            .try_clone()
-            .ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
         req.url_mut()
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
@@ -925,14 +944,20 @@ impl std::fmt::Display for AsyncApiCallResultsPage {
 
 impl crate::types::paginate::Pagination for AsyncApiCallResultsPage {
     type Item = AsyncApiCall;
-    fn has_more_pages(&self) -> anyhow::Result<bool> {
-        Ok(self.next_page.is_some())
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
     }
 
-    fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request> {
-        let mut req = req
-            .try_clone()
-            .ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
         req.url_mut()
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
@@ -2614,14 +2639,20 @@ impl std::fmt::Display for ExtendedUserResultsPage {
 
 impl crate::types::paginate::Pagination for ExtendedUserResultsPage {
     type Item = ExtendedUser;
-    fn has_more_pages(&self) -> anyhow::Result<bool> {
-        Ok(self.next_page.is_some())
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
     }
 
-    fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request> {
-        let mut req = req
-            .try_clone()
-            .ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
         req.url_mut()
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
@@ -4386,14 +4417,20 @@ impl std::fmt::Display for UserResultsPage {
 
 impl crate::types::paginate::Pagination for UserResultsPage {
     type Item = User;
-    fn has_more_pages(&self) -> anyhow::Result<bool> {
-        Ok(self.next_page.is_some())
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
     }
 
-    fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request> {
-        let mut req = req
-            .try_clone()
-            .ok_or_else(|| anyhow::anyhow!("failed to clone request: {:?}", req))?;
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
         req.url_mut()
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));

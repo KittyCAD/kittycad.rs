@@ -11,7 +11,9 @@ impl Users {
     }
 
     #[doc = "Get your user.\n\nGet the user information for the authenticated user.\nAlternatively, you can also use the `/users/me` endpoint."]
-    pub async fn get_user_self<'a>(&'a self) -> Result<crate::types::User> {
+    pub async fn get_user_self<'a>(
+        &'a self,
+    ) -> Result<crate::types::User, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "user"),
@@ -19,16 +21,16 @@ impl Users {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -36,7 +38,7 @@ impl Users {
     pub async fn update_user_self<'a>(
         &'a self,
         body: &crate::types::UpdateUser,
-    ) -> Result<crate::types::User> {
+    ) -> Result<crate::types::User, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::PUT,
             &format!("{}/{}", self.client.base_url, "user"),
@@ -45,21 +47,21 @@ impl Users {
         req = req.json(body);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
     #[doc = "Delete your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the authenticated user from KittyCAD's database.\nThis call will only succeed if all invoices associated with the user have been paid in full and there is no outstanding balance."]
-    pub async fn delete_user_self<'a>(&'a self) -> Result<()> {
+    pub async fn delete_user_self<'a>(&'a self) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
             &format!("{}/{}", self.client.base_url, "user"),
@@ -67,20 +69,18 @@ impl Users {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
+            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
     #[doc = "Get extended information about your user.\n\nGet the user information for the authenticated user.\nAlternatively, you can also use the `/users-extended/me` endpoint."]
-    pub async fn get_user_self_extended<'a>(&'a self) -> Result<crate::types::ExtendedUser> {
+    pub async fn get_user_self_extended<'a>(
+        &'a self,
+    ) -> Result<crate::types::ExtendedUser, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "user/extended"),
@@ -88,16 +88,16 @@ impl Users {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -107,7 +107,7 @@ impl Users {
         limit: Option<u32>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::UserResultsPage> {
+    ) -> Result<crate::types::UserResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "users"),
@@ -129,16 +129,16 @@ impl Users {
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -147,7 +147,8 @@ impl Users {
         &'a self,
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> impl futures::Stream<Item = Result<crate::types::User>> + Unpin + '_ {
+    ) -> impl futures::Stream<Item = Result<crate::types::User, crate::types::error::Error>> + Unpin + '_
+    {
         use crate::types::paginate::Pagination;
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
         self.list(limit, None, sort_by)
@@ -155,7 +156,7 @@ impl Users {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages =
                     futures::stream::try_unfold(result, move |new_result| async move {
-                        if new_result.has_more_pages()? {
+                        if new_result.has_more_pages() {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
@@ -166,18 +167,19 @@ impl Users {
                                 request = new_result.next_page(request)?;
                                 let resp = self.client.client.execute(request).await?;
                                 let status = resp.status();
-                                let text = resp.text().await.unwrap_or_default();
                                 if status.is_success() {
+                                    let text = resp.text().await.unwrap_or_default();
                                     serde_json::from_str(&text).map_err(|err| {
-                                        format_serde_error::SerdeError::new(text.to_string(), err)
-                                            .into()
+                                        crate::types::error::Error::from_serde_error(
+                                            format_serde_error::SerdeError::new(
+                                                text.to_string(),
+                                                err,
+                                            ),
+                                            status,
+                                        )
                                     })
                                 } else {
-                                    Err(anyhow::anyhow!(
-                                        "response was not successful `{}` -> `{}`",
-                                        status,
-                                        text
-                                    ))
+                                    Err(crate::types::error::Error::UnexpectedResponse(resp))
                                 }
                             }
                             .map_ok(|result: crate::types::UserResultsPage| {
@@ -204,7 +206,7 @@ impl Users {
         limit: Option<u32>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::ExtendedUserResultsPage> {
+    ) -> Result<crate::types::ExtendedUserResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "users-extended"),
@@ -226,16 +228,16 @@ impl Users {
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -244,7 +246,9 @@ impl Users {
         &'a self,
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> impl futures::Stream<Item = Result<crate::types::ExtendedUser>> + Unpin + '_ {
+    ) -> impl futures::Stream<Item = Result<crate::types::ExtendedUser, crate::types::error::Error>>
+           + Unpin
+           + '_ {
         use crate::types::paginate::Pagination;
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
         self.list_extended(limit, None, sort_by)
@@ -252,7 +256,7 @@ impl Users {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages =
                     futures::stream::try_unfold(result, move |new_result| async move {
-                        if new_result.has_more_pages()? {
+                        if new_result.has_more_pages() {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
@@ -263,18 +267,19 @@ impl Users {
                                 request = new_result.next_page(request)?;
                                 let resp = self.client.client.execute(request).await?;
                                 let status = resp.status();
-                                let text = resp.text().await.unwrap_or_default();
                                 if status.is_success() {
+                                    let text = resp.text().await.unwrap_or_default();
                                     serde_json::from_str(&text).map_err(|err| {
-                                        format_serde_error::SerdeError::new(text.to_string(), err)
-                                            .into()
+                                        crate::types::error::Error::from_serde_error(
+                                            format_serde_error::SerdeError::new(
+                                                text.to_string(),
+                                                err,
+                                            ),
+                                            status,
+                                        )
                                     })
                                 } else {
-                                    Err(anyhow::anyhow!(
-                                        "response was not successful `{}` -> `{}`",
-                                        status,
-                                        text
-                                    ))
+                                    Err(crate::types::error::Error::UnexpectedResponse(resp))
                                 }
                             }
                             .map_ok(|result: crate::types::ExtendedUserResultsPage| {
@@ -299,7 +304,7 @@ impl Users {
     pub async fn get_user_extended<'a>(
         &'a self,
         id: &'a str,
-    ) -> Result<crate::types::ExtendedUser> {
+    ) -> Result<crate::types::ExtendedUser, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
@@ -311,21 +316,24 @@ impl Users {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
     #[doc = "Get a user.\n\nTo get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user` endpoint.\nTo get information about any KittyCAD user, you must be a KittyCAD employee."]
-    pub async fn get_user<'a>(&'a self, id: &'a str) -> Result<crate::types::User> {
+    pub async fn get_user<'a>(
+        &'a self,
+        id: &'a str,
+    ) -> Result<crate::types::User, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
@@ -337,16 +345,16 @@ impl Users {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 }

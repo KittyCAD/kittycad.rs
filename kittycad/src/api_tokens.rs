@@ -16,7 +16,7 @@ impl ApiTokens {
         limit: Option<u32>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::ApiTokenResultsPage> {
+    ) -> Result<crate::types::ApiTokenResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!("{}/{}", self.client.base_url, "user/api-tokens"),
@@ -38,16 +38,16 @@ impl ApiTokens {
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -56,7 +56,9 @@ impl ApiTokens {
         &'a self,
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> impl futures::Stream<Item = Result<crate::types::ApiToken>> + Unpin + '_ {
+    ) -> impl futures::Stream<Item = Result<crate::types::ApiToken, crate::types::error::Error>>
+           + Unpin
+           + '_ {
         use crate::types::paginate::Pagination;
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
         self.list_for_user(limit, None, sort_by)
@@ -64,7 +66,7 @@ impl ApiTokens {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages =
                     futures::stream::try_unfold(result, move |new_result| async move {
-                        if new_result.has_more_pages()? {
+                        if new_result.has_more_pages() {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
@@ -75,18 +77,19 @@ impl ApiTokens {
                                 request = new_result.next_page(request)?;
                                 let resp = self.client.client.execute(request).await?;
                                 let status = resp.status();
-                                let text = resp.text().await.unwrap_or_default();
                                 if status.is_success() {
+                                    let text = resp.text().await.unwrap_or_default();
                                     serde_json::from_str(&text).map_err(|err| {
-                                        format_serde_error::SerdeError::new(text.to_string(), err)
-                                            .into()
+                                        crate::types::error::Error::from_serde_error(
+                                            format_serde_error::SerdeError::new(
+                                                text.to_string(),
+                                                err,
+                                            ),
+                                            status,
+                                        )
                                     })
                                 } else {
-                                    Err(anyhow::anyhow!(
-                                        "response was not successful `{}` -> `{}`",
-                                        status,
-                                        text
-                                    ))
+                                    Err(crate::types::error::Error::UnexpectedResponse(resp))
                                 }
                             }
                             .map_ok(|result: crate::types::ApiTokenResultsPage| {
@@ -108,7 +111,9 @@ impl ApiTokens {
     }
 
     #[doc = "Create a new API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It creates a new API token for the authenticated user."]
-    pub async fn create_api_token_for_user<'a>(&'a self) -> Result<crate::types::ApiToken> {
+    pub async fn create_api_token_for_user<'a>(
+        &'a self,
+    ) -> Result<crate::types::ApiToken, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
             &format!("{}/{}", self.client.base_url, "user/api-tokens"),
@@ -116,16 +121,16 @@ impl ApiTokens {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
@@ -133,7 +138,7 @@ impl ApiTokens {
     pub async fn get_api_token_for_user<'a>(
         &'a self,
         token: uuid::Uuid,
-    ) -> Result<crate::types::ApiToken> {
+    ) -> Result<crate::types::ApiToken, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
@@ -145,21 +150,24 @@ impl ApiTokens {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
-            serde_json::from_str(&text)
-                .map_err(|err| format_serde_error::SerdeError::new(text.to_string(), err).into())
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
     #[doc = "Delete an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\nThis endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes."]
-    pub async fn delete_api_token_for_user<'a>(&'a self, token: uuid::Uuid) -> Result<()> {
+    pub async fn delete_api_token_for_user<'a>(
+        &'a self,
+        token: uuid::Uuid,
+    ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
             &format!(
@@ -171,15 +179,11 @@ impl ApiTokens {
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
-        let text = resp.text().await.unwrap_or_default();
         if status.is_success() {
+            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
-            Err(anyhow::anyhow!(
-                "response was not successful `{}` -> `{}`",
-                status,
-                text
-            ))
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 }
