@@ -16,9 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version: '1.x'
       - name: make generate
         shell: bash
         run: |
@@ -39,26 +36,26 @@ jobs:
       # Checkout the docs repo since we will want to update the files there.
       - uses: actions/checkout@v3
         with:
-          repository: 'kittycad/kittycad.py'
-          path: 'kittycad.py'
+          repository: 'kittycad/docs'
+          path: 'docs'
           token: ${{secrets.GLOBAL_PAT}}
-      - name: move spec to docs
+      - name: move json patch file to docs
         shell: bash
         run: |
-          rm kittycad.py/spec.json || true
-          cp spec.json kittycad.py/spec.json
-      - name: commit the changes in the kittycad.py repo
+          rm docs/kittycad.rs.patch.json || true
+          cp kittycad.rs.patch.json docs/kittycad.rs.patch.json
+      - name: commit the changes in the docs repo
         shell: bash
         run: |
           export VERSION=$(cat VERSION.txt);
-          cd kittycad.py
+          cd docs
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add .
           git commit -am "YOYO NEW RUST SPEC DOCS ${VERSION}!" || exit 0
           git fetch origin
           git rebase origin/main || exit 0
-          export NEW_BRANCH="update-spec-${VERSION}"
+          export NEW_BRANCH="update-spec-rust"
           git checkout -b "$NEW_BRANCH"
           git push -f origin "$NEW_BRANCH"
           gh pr create --title "Update rust lang spec docs for ${VERSION}" \
