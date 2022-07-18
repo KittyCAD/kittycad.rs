@@ -10,7 +10,7 @@ impl Unit {
         Self { client }
     }
 
-    #[doc = "Convert units.\n\nConvert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions."]
+    #[doc = "Convert units.\n\nConvert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n\n```\n/// Convert units.\n/// \n/// Convert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions.\nasync fn example_create_conversion() -> anyhow::Result<()> {\n    let result: crate::types::UnitConversion = client\n        .unit()\n        .create_conversion(\n            crate::types::OutputFormat::Deca,\n            crate::types::SrcFormat::Atto,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
     pub async fn create_conversion<'a>(
         &'a self,
         output_format: crate::types::UnitMetricFormat,
@@ -40,6 +40,7 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

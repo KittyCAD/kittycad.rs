@@ -10,7 +10,7 @@ impl ApiCalls {
         Self { client }
     }
 
-    #[doc = "Get API call metrics.\n\nThis endpoint requires authentication by a KittyCAD employee. The API calls are grouped by the parameter passed."]
+    #[doc = "Get API call metrics.\n\nThis endpoint requires authentication by a KittyCAD employee. The API calls are grouped by the parameter passed.\n\n```\n/// Get API call metrics.\n/// \n/// This endpoint requires authentication by a KittyCAD employee. The API calls are grouped by the parameter passed.\nasync fn example_get_api_call_metrics() -> anyhow::Result<()> {\n    let result: Vec<crate::types::ApiCallQueryGroup> = client\n        .api_calls()\n        .get_api_call_metrics(crate::types::GroupBy::UserId)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
     pub async fn get_api_call_metrics<'a>(
         &'a self,
         group_by: crate::types::ApiCallQueryGroupBy,
@@ -32,13 +32,14 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
-    #[doc = "List API calls.\n\nThis endpoint requires authentication by a KittyCAD employee. The API calls are returned in order of creation, with the most recently created API calls first."]
+    #[doc = "List API calls.\n\nThis endpoint requires authentication by a KittyCAD employee. The API calls are returned in order of creation, with the most recently created API calls first.\n\n```\n/// List API calls.\n/// \n/// This endpoint requires authentication by a KittyCAD employee. The API calls are returned in order of creation, with the most recently created API calls first.\nasync fn example_list() -> anyhow::Result<()> {\n    let result: crate::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .list(\n            Some(4 as u32),\n            Some(\"hbb\".to_string()),\n            Some(crate::types::SortBy::CreatedAtAscending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nasync fn example_list_stream() -> anyhow::Result<()> {\n    let stream = client.api_calls().list_stream(\n        Some(4 as u32),\n        Some(crate::types::SortBy::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n\n```"]
     pub async fn list<'a>(
         &'a self,
         limit: Option<u32>,
@@ -73,13 +74,14 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
-    #[doc = "List API calls.\n\nThis endpoint requires authentication by a KittyCAD employee. The API calls are returned in order of creation, with the most recently created API calls first."]
+    #[doc = "List API calls.\n\nThis endpoint requires authentication by a KittyCAD employee. The API calls are returned in order of creation, with the most recently created API calls first.\n\n```\n/// List API calls.\n/// \n/// This endpoint requires authentication by a KittyCAD employee. The API calls are returned in order of creation, with the most recently created API calls first.\nasync fn example_list() -> anyhow::Result<()> {\n    let result: crate::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .list(\n            Some(4 as u32),\n            Some(\"hbb\".to_string()),\n            Some(crate::types::SortBy::CreatedAtAscending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nasync fn example_list_stream() -> anyhow::Result<()> {\n    let stream = client.api_calls().list_stream(\n        Some(4 as u32),\n        Some(crate::types::SortBy::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n\n```"]
     pub fn list_stream<'a>(
         &'a self,
         limit: Option<u32>,
@@ -116,6 +118,7 @@ impl ApiCalls {
                                             ),
                                             status,
                                         )
+                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -139,7 +142,7 @@ impl ApiCalls {
             .boxed()
     }
 
-    #[doc = "Get details of an API call.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\nIf the user is not authenticated to view the specified API call, then it is not returned.\nOnly KittyCAD employees can view API calls for other users."]
+    #[doc = "Get details of an API call.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\nIf the user is not authenticated to view the specified API call, then it is not returned.\nOnly KittyCAD employees can view API calls for other users.\n\n```\n/// Get details of an API call.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\n/// If the user is not authenticated to view the specified API call, then it is not returned.\n/// Only KittyCAD employees can view API calls for other users.\nasync fn example_get_api_call() -> anyhow::Result<()> {\n    let result: crate::types::ApiCallWithPrice =\n        client.api_calls().get_api_call(\"dha\".to_string()).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
     pub async fn get_api_call<'a>(
         &'a self,
         id: &'a str,
@@ -149,7 +152,7 @@ impl ApiCalls {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "api-calls/{id}".replace("{id}", id)
+                "api-calls/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -162,13 +165,14 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
-    #[doc = "List async operations.\n\nFor async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\nThis endpoint requires authentication by a KittyCAD employee."]
+    #[doc = "List async operations.\n\nFor async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\nThis endpoint requires authentication by a KittyCAD employee.\n\n```\n/// List async operations.\n/// \n/// For async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\n/// This endpoint requires authentication by a KittyCAD employee.\nasync fn example_list_async_operations() -> anyhow::Result<()> {\n    let result: crate::types::AsyncApiCallResultsPage = client\n        .api_calls()\n        .list_async_operations(\n            Some(4 as u32),\n            Some(\"jw\".to_string()),\n            Some(crate::types::SortBy::CreatedAtDescending),\n            Some(crate::types::Status::Uploaded),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nasync fn example_list_async_operations_stream() -> anyhow::Result<()> {\n    let stream = client.api_calls().list_async_operations_stream(\n        Some(4 as u32),\n        Some(crate::types::SortBy::CreatedAtDescending),\n        Some(crate::types::Status::Uploaded),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n\n```"]
     pub async fn list_async_operations<'a>(
         &'a self,
         limit: Option<u32>,
@@ -208,13 +212,14 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
-    #[doc = "List async operations.\n\nFor async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\nThis endpoint requires authentication by a KittyCAD employee."]
+    #[doc = "List async operations.\n\nFor async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\nThis endpoint requires authentication by a KittyCAD employee.\n\n```\n/// List async operations.\n/// \n/// For async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\n/// This endpoint requires authentication by a KittyCAD employee.\nasync fn example_list_async_operations() -> anyhow::Result<()> {\n    let result: crate::types::AsyncApiCallResultsPage = client\n        .api_calls()\n        .list_async_operations(\n            Some(4 as u32),\n            Some(\"jw\".to_string()),\n            Some(crate::types::SortBy::CreatedAtDescending),\n            Some(crate::types::Status::Uploaded),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nasync fn example_list_async_operations_stream() -> anyhow::Result<()> {\n    let stream = client.api_calls().list_async_operations_stream(\n        Some(4 as u32),\n        Some(crate::types::SortBy::CreatedAtDescending),\n        Some(crate::types::Status::Uploaded),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n\n```"]
     pub fn list_async_operations_stream<'a>(
         &'a self,
         limit: Option<u32>,
@@ -251,6 +256,7 @@ impl ApiCalls {
                                             ),
                                             status,
                                         )
+                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -274,7 +280,7 @@ impl ApiCalls {
             .boxed()
     }
 
-    #[doc = "Get an async operation.\n\nGet the status and output of an async operation.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested async operation for the user.\nIf the user is not authenticated to view the specified async operation, then it is not returned.\nOnly KittyCAD employees with the proper access can view async operations for other users."]
+    #[doc = "Get an async operation.\n\nGet the status and output of an async operation.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested async operation for the user.\nIf the user is not authenticated to view the specified async operation, then it is not returned.\nOnly KittyCAD employees with the proper access can view async operations for other users.\n\n```\n/// Get an async operation.\n/// \n/// Get the status and output of an async operation.\n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested async operation for the user.\n/// If the user is not authenticated to view the specified async operation, then it is not returned.\n/// Only KittyCAD employees with the proper access can view async operations for other users.\nasync fn example_get_async_operation() -> anyhow::Result<()> {\n    let result: crate::types::AsyncApiCallOutput = client\n        .api_calls()\n        .get_async_operation(\"glgo\".to_string())\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
     pub async fn get_async_operation<'a>(
         &'a self,
         id: &'a str,
@@ -284,7 +290,7 @@ impl ApiCalls {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "async/operations/{id}".replace("{id}", id)
+                "async/operations/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -297,13 +303,14 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
-    #[doc = "List API calls for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user.\nThe API calls are returned in order of creation, with the most recently created API calls first."]
+    #[doc = "List API calls for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user.\nThe API calls are returned in order of creation, with the most recently created API calls first.\n\n```\n/// List API calls for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user.\n/// The API calls are returned in order of creation, with the most recently created API calls first.\nasync fn example_user_list() -> anyhow::Result<()> {\n    let result: crate::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .user_list(\n            Some(4 as u32),\n            Some(\"\".to_string()),\n            Some(crate::types::SortBy::CreatedAtAscending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nasync fn example_user_list_stream() -> anyhow::Result<()> {\n    let stream = client.api_calls().user_list_stream(\n        Some(4 as u32),\n        Some(crate::types::SortBy::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n\n```"]
     pub async fn user_list<'a>(
         &'a self,
         limit: Option<u32>,
@@ -338,13 +345,14 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
-    #[doc = "List API calls for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user.\nThe API calls are returned in order of creation, with the most recently created API calls first."]
+    #[doc = "List API calls for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user.\nThe API calls are returned in order of creation, with the most recently created API calls first.\n\n```\n/// List API calls for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user.\n/// The API calls are returned in order of creation, with the most recently created API calls first.\nasync fn example_user_list() -> anyhow::Result<()> {\n    let result: crate::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .user_list(\n            Some(4 as u32),\n            Some(\"\".to_string()),\n            Some(crate::types::SortBy::CreatedAtAscending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nasync fn example_user_list_stream() -> anyhow::Result<()> {\n    let stream = client.api_calls().user_list_stream(\n        Some(4 as u32),\n        Some(crate::types::SortBy::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n\n```"]
     pub fn user_list_stream<'a>(
         &'a self,
         limit: Option<u32>,
@@ -381,6 +389,7 @@ impl ApiCalls {
                                             ),
                                             status,
                                         )
+                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -404,7 +413,7 @@ impl ApiCalls {
             .boxed()
     }
 
-    #[doc = "Get an API call for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user."]
+    #[doc = "Get an API call for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\n\n```\n/// Get an API call for a user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\nasync fn example_get_api_call_for_user() -> anyhow::Result<()> {\n    let result: crate::types::ApiCallWithPrice = client\n        .api_calls()\n        .get_api_call_for_user(\"ekvge\".to_string())\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
     pub async fn get_api_call_for_user<'a>(
         &'a self,
         id: &'a str,
@@ -414,7 +423,7 @@ impl ApiCalls {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/api-calls/{id}".replace("{id}", id)
+                "user/api-calls/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -427,13 +436,14 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
-    #[doc = "List API calls for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\nAlternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\nIf the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\nThe API calls are returned in order of creation, with the most recently created API calls first."]
+    #[doc = "List API calls for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\nAlternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\nIf the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\nThe API calls are returned in order of creation, with the most recently created API calls first.\n\n```\n/// List API calls for a user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\n/// Alternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\n/// If the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\n/// The API calls are returned in order of creation, with the most recently created API calls first.\nasync fn example_list_for_user() -> anyhow::Result<()> {\n    let result: crate::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .list_for_user(\n            \"uf\".to_string(),\n            Some(4 as u32),\n            Some(\"nmsbd\".to_string()),\n            Some(crate::types::SortBy::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nasync fn example_list_for_user_stream() -> anyhow::Result<()> {\n    let stream = client.api_calls().list_for_user_stream(\n        \"uf\".to_string(),\n        Some(4 as u32),\n        Some(crate::types::SortBy::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n\n```"]
     pub async fn list_for_user<'a>(
         &'a self,
         id: &'a str,
@@ -446,7 +456,7 @@ impl ApiCalls {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "users/{id}/api-calls".replace("{id}", id)
+                "users/{id}/api-calls".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -473,13 +483,14 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
-    #[doc = "List API calls for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\nAlternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\nIf the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\nThe API calls are returned in order of creation, with the most recently created API calls first."]
+    #[doc = "List API calls for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\nAlternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\nIf the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\nThe API calls are returned in order of creation, with the most recently created API calls first.\n\n```\n/// List API calls for a user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\n/// Alternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\n/// If the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\n/// The API calls are returned in order of creation, with the most recently created API calls first.\nasync fn example_list_for_user() -> anyhow::Result<()> {\n    let result: crate::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .list_for_user(\n            \"uf\".to_string(),\n            Some(4 as u32),\n            Some(\"nmsbd\".to_string()),\n            Some(crate::types::SortBy::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nasync fn example_list_for_user_stream() -> anyhow::Result<()> {\n    let stream = client.api_calls().list_for_user_stream(\n        \"uf\".to_string(),\n        Some(4 as u32),\n        Some(crate::types::SortBy::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n\n```"]
     pub fn list_for_user_stream<'a>(
         &'a self,
         id: &'a str,
@@ -503,7 +514,7 @@ impl ApiCalls {
                                     &format!(
                                         "{}/{}",
                                         self.client.base_url,
-                                        "users/{id}/api-calls".replace("{id}", id)
+                                        "users/{id}/api-calls".replace("{id}", &id)
                                     ),
                                 );
                                 req = req.bearer_auth(&self.client.token);
@@ -521,6 +532,7 @@ impl ApiCalls {
                                             ),
                                             status,
                                         )
+                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))

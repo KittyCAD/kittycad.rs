@@ -309,10 +309,9 @@ pub fn generate_example_rust_from_schema(
             let random_value = random_value.trim_start_matches('"').trim_end_matches('"');
 
             if !s.enumeration.is_empty() {
-                let name_ident: proc_macro2::TokenStream =
-                    name.parse().map_err(|e| anyhow::anyhow!("{}", e))?;
+                let name_ident = crate::types::get_type_name_for_schema(name, schema, spec, false)?;
                 // Get a random item from the enum.
-                let item_ident = format_ident!("{}", crate::types::proper_name(&random_value));
+                let item_ident = format_ident!("{}", crate::types::proper_name(random_value));
 
                 quote!(#name_ident::#item_ident)
             } else if s.format.is_empty() {
@@ -405,7 +404,7 @@ pub fn generate_example_rust_from_schema(
                         crate::types::get_type_name_from_reference(&v.reference()?, spec, false)?
                     }
                     openapiv3::ReferenceOr::Item(s) => {
-                        crate::types::get_type_name_for_schema("", &s, spec, false)?
+                        crate::types::get_type_name_for_schema("", s, spec, false)?
                     }
                 }
                 .strip_option()?

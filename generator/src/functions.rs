@@ -87,6 +87,18 @@ pub fn generate_files(
             // Get the function body.
             let function_body = get_function_body(name, method, op, spec, false)?;
 
+            let example_code_fn = generate_example_code_fn(name, method, &tag, op, spec)?;
+            // Add our example code to our docs.
+            // This way we can test the examples compile by running `rust doc`.
+            let docs = format!(
+                r#"{}
+
+```
+{}
+```"#,
+                docs, example_code_fn
+            );
+
             let function = quote! {
                 #[doc = #docs]
                 pub async fn #fn_name_ident<'a>(&'a self #args #request_body) -> Result<#response_type, crate::types::error::Error> {
@@ -101,10 +113,7 @@ pub fn generate_files(
             let mut new_operation = op.clone();
             let mut example: HashMap<String, String> = HashMap::new();
 
-            example.insert(
-                "example".to_string(),
-                generate_example_code_fn(name, method, &tag, op, spec)?,
-            );
+            example.insert("example".to_string(), example_code_fn);
 
             example.insert(
                 "libDocsLink".to_string(),
@@ -885,6 +894,7 @@ fn generate_example_code_fn(
 ) -> Result<String> {
     // Get the docs.
     let docs = generate_docs(name, method, op)?;
+    let docs = docs.replace('\n', "\n/// ");
 
     // Get the function name.
     let fn_name = get_fn_name(name, method, tag, op)?;
@@ -921,7 +931,7 @@ fn generate_example_code_fn(
     };
 
     let function = quote!(
-        async fn #example_fn_name_ident() -> Result<()> {
+        async fn #example_fn_name_ident() -> anyhow::Result<()> {
             #function_start client.#tag_ident().#fn_name_ident(#args #request_body).await?;
 
             #print_result
@@ -958,7 +968,7 @@ fn generate_example_code_fn(
         }
 
         let stream_function = quote!(
-            async fn #example_stream_fn_name_ident() -> Result<()> {
+            async fn #example_stream_fn_name_ident() -> anyhow::Result<()> {
                 let stream =  client.#tag_ident().#stream_fn_name_ident(#min_args #request_body);
 
                 // Loop over the items in the stream.
