@@ -45,6 +45,7 @@ impl ApiTokens {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -87,6 +88,7 @@ impl ApiTokens {
                                             ),
                                             status,
                                         )
+                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -128,6 +130,7 @@ impl ApiTokens {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -157,6 +160,7 @@ impl ApiTokens {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -180,7 +184,6 @@ impl ApiTokens {
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
-            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

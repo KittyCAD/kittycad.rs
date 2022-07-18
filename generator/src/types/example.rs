@@ -28,6 +28,18 @@ pub fn generate_example_json_from_schema(
                 ));
             }
 
+            if s.format.is_empty() {
+                let min_length = s.min_length.unwrap_or(0);
+                let max_length = s.max_length.unwrap_or(10);
+
+                // Generate a random string.
+                let mut s = String::new();
+                for _ in 0..rng.gen_range(min_length..max_length) {
+                    s.push(rng.gen_range(b'a'..b'z') as char);
+                }
+                return Ok(serde_json::Value::String(s));
+            }
+
             match &s.format {
                 openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::DateTime) => {
                     // Return a random date.
@@ -76,8 +88,11 @@ pub fn generate_example_json_from_schema(
                     serde_json::Value::String(password)
                 }
                 openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Byte) => {
-                    // Generate some random base64 encoded bytes.
-                    let bytes = vec![0; rng.gen_range(0..100)];
+                    // Generate some random bytes.
+                    let mut bytes = vec![];
+                    for _ in 0..rng.gen_range(8..16) {
+                        bytes.push(rng.gen_range(0..256) as u8);
+                    }
                     let data = crate::types::base64::Base64Data(bytes);
                     serde_json::Value::String(data.to_string())
                 }
@@ -439,12 +454,10 @@ pub fn generate_example_json_from_schema(
             // Generate a random object.
             let mut obj = serde_json::Map::new();
             for (k, v) in o.properties.iter() {
+                let inner_schema = v.get_schema_from_reference(spec, true)?;
                 obj.insert(
                     k.clone(),
-                    generate_example_json_from_schema(
-                        &v.get_schema_from_reference(spec, true)?,
-                        spec,
-                    )?,
+                    generate_example_json_from_schema(&inner_schema, spec)?,
                 );
             }
             serde_json::Value::Object(obj)
@@ -504,4 +517,31 @@ pub fn generate_example_json_from_schema(
             serde_json::Value::Bool(i)
         }
     })
+}
+
+#[cfg(test)]
+mod test {
+
+    use crate::types::exts::ReferenceOrExt;
+
+    #[test]
+    fn test_generate_example_file_conversion() {
+        let spec = crate::load_json_spec(include_str!("../../../spec.json")).unwrap();
+        // Lets get a specific schema.
+        let schema = spec
+            .components
+            .as_ref()
+            .unwrap()
+            .schemas
+            .get("FileConversion")
+            .unwrap();
+        let result =
+            super::generate_example_json_from_schema(&schema.expand(&spec).unwrap(), &spec)
+                .unwrap();
+
+        let example_json = serde_json::to_string_pretty(&result).unwrap();
+
+        // TODO: have a better way to test that this object can serialize and deserialize.
+        assert!(example_json.contains(r#""completed_at": ""#));
+    }
 }

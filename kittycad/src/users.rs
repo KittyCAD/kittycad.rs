@@ -28,6 +28,7 @@ impl Users {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -54,6 +55,7 @@ impl Users {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -70,7 +72,6 @@ impl Users {
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
-            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -95,6 +96,7 @@ impl Users {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -136,6 +138,7 @@ impl Users {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -177,6 +180,7 @@ impl Users {
                                             ),
                                             status,
                                         )
+                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -235,6 +239,7 @@ impl Users {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -277,6 +282,7 @@ impl Users {
                                             ),
                                             status,
                                         )
+                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -310,7 +316,7 @@ impl Users {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "users-extended/{id}".replace("{id}", id)
+                "users-extended/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -323,6 +329,7 @@ impl Users {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -339,7 +346,7 @@ impl Users {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "users/{id}".replace("{id}", id)
+                "users/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -352,6 +359,7 @@ impl Users {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

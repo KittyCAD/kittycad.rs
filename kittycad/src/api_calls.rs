@@ -32,6 +32,7 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -73,6 +74,7 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -116,6 +118,7 @@ impl ApiCalls {
                                             ),
                                             status,
                                         )
+                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -149,7 +152,7 @@ impl ApiCalls {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "api-calls/{id}".replace("{id}", id)
+                "api-calls/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -162,6 +165,7 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -208,6 +212,7 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -251,6 +256,7 @@ impl ApiCalls {
                                             ),
                                             status,
                                         )
+                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -284,7 +290,7 @@ impl ApiCalls {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "async/operations/{id}".replace("{id}", id)
+                "async/operations/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -297,6 +303,7 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -338,6 +345,7 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -381,6 +389,7 @@ impl ApiCalls {
                                             ),
                                             status,
                                         )
+                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -414,7 +423,7 @@ impl ApiCalls {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/api-calls/{id}".replace("{id}", id)
+                "user/api-calls/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -427,6 +436,7 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -446,7 +456,7 @@ impl ApiCalls {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "users/{id}/api-calls".replace("{id}", id)
+                "users/{id}/api-calls".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -473,6 +483,7 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -503,7 +514,7 @@ impl ApiCalls {
                                     &format!(
                                         "{}/{}",
                                         self.client.base_url,
-                                        "users/{id}/api-calls".replace("{id}", id)
+                                        "users/{id}/api-calls".replace("{id}", &id)
                                     ),
                                 );
                                 req = req.bearer_auth(&self.client.token);
@@ -521,6 +532,7 @@ impl ApiCalls {
                                             ),
                                             status,
                                         )
+                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))

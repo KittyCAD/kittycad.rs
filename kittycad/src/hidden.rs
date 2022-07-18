@@ -30,6 +30,7 @@ impl Hidden {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -53,13 +54,12 @@ impl Hidden {
             query_params.push(("callback_url", format!("{}", p)));
         }
 
-        query_params.push(("email", email.to_string()));
-        query_params.push(("token", token.to_string()));
+        query_params.push(("email", format!("{}", email)));
+        query_params.push(("token", format!("{}", token)));
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
-            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -76,7 +76,6 @@ impl Hidden {
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
-            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

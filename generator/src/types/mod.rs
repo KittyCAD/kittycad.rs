@@ -1357,7 +1357,7 @@ mod test {
             &crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
         )
         .unwrap();
-        expectorate::assert_contents("tests/kittycad.rs.gen", &result);
+        expectorate::assert_contents("tests/types/kittycad.rs.gen", &result);
     }
 
     #[test]
@@ -1368,7 +1368,7 @@ mod test {
             &crate::load_json_spec(include_str!("../../tests/api.github.com.json")).unwrap(),
         )
         .unwrap();
-        expectorate::assert_contents("tests/github.rs.gen", &result);
+        expectorate::assert_contents("tests/types/github.rs.gen", &result);
     }
 
     #[test]

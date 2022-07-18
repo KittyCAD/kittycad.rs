@@ -28,6 +28,7 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -54,6 +55,7 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -80,6 +82,7 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -98,7 +101,6 @@ impl Payments {
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
-            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -123,6 +125,7 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -147,6 +150,7 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -171,6 +175,7 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -195,6 +200,7 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -211,14 +217,13 @@ impl Payments {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/payment/methods/{id}".replace("{id}", id)
+                "user/payment/methods/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
-            let _text = resp.text().await.unwrap_or_default();
             Ok(())
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

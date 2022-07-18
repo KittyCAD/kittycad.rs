@@ -729,6 +729,9 @@ fn get_function_body(
         match response.media_type.as_str() {
             "application/json" => {
                 quote! {
+                    // Get the text for the response.
+                    let text = resp.text().await.unwrap_or_default();
+
                     // Parse the json response.
                     // Return a human error.
                     serde_json::from_str(&text).map_err(|err| crate::types::error::Error::from_serde_error(format_serde_error::SerdeError::new(text.to_string(), err), status).into())
@@ -782,9 +785,6 @@ fn get_function_body(
         let status = resp.status();
 
         if status.is_success() {
-            // Get the text for the response.
-            let text = resp.text().await.unwrap_or_default();
-
             #response
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

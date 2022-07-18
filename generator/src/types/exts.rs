@@ -7,6 +7,9 @@ pub trait SchemaExt {
     /// Returns the schema for the type.
     fn recurse(&self, spec: &openapiv3::OpenAPI) -> Result<openapiv3::Schema>;
 
+    /// Returns a cleaned reference name for the type.
+    fn clean_reference_name(s: &str) -> String;
+
     /// Returns the type for the reference.
     fn get_reference(name: &str, spec: &openapiv3::OpenAPI) -> Result<openapiv3::ReferenceOr<Self>>
     where
@@ -22,8 +25,8 @@ impl SchemaExt for openapiv3::Schema {
 
                 let r = match first {
                     openapiv3::ReferenceOr::Item(i) => i,
-                    openapiv3::ReferenceOr::Reference { reference: _ } => {
-                        first.get_schema_from_reference(spec, true)?
+                    openapiv3::ReferenceOr::Reference { reference } => {
+                        Self::get_reference(&reference, spec)?.expand(spec)?
                     }
                 };
 
@@ -34,15 +37,16 @@ impl SchemaExt for openapiv3::Schema {
         Ok(self.clone())
     }
 
+    fn clean_reference_name(s: &str) -> String {
+        s.trim_start_matches("#/components/schemas/").to_string()
+    }
+
     fn get_reference(
         name: &str,
         spec: &openapiv3::OpenAPI,
     ) -> Result<openapiv3::ReferenceOr<Self>> {
         if let Some(components) = &spec.components {
-            if let Some(schema) = components
-                .schemas
-                .get(name.trim_start_matches("#/components/schemas/"))
-            {
+            if let Some(schema) = components.schemas.get(&Self::clean_reference_name(name)) {
                 return Ok(schema.clone());
             }
         }
@@ -52,8 +56,28 @@ impl SchemaExt for openapiv3::Schema {
 }
 
 impl SchemaExt for Box<openapiv3::Schema> {
-    fn recurse(&self, _spec: &openapiv3::OpenAPI) -> Result<openapiv3::Schema> {
-        anyhow::bail!("`recurse` not implemented for `Box<openapiv3::Schema>`")
+    fn recurse(&self, spec: &openapiv3::OpenAPI) -> Result<openapiv3::Schema> {
+        if let openapiv3::SchemaKind::AllOf { all_of } = &self.schema_kind {
+            if all_of.len() == 1 {
+                let first = all_of[0].clone();
+
+                let r = match first {
+                    openapiv3::ReferenceOr::Item(i) => i,
+                    openapiv3::ReferenceOr::Reference { reference } => {
+                        openapiv3::Schema::get_reference(&reference, spec)?.expand(spec)?
+                    }
+                };
+
+                return Ok(r);
+            }
+        }
+
+        let s = &**self;
+        Ok(s.clone())
+    }
+
+    fn clean_reference_name(s: &str) -> String {
+        s.trim_start_matches("#/components/schemas/").to_string()
     }
 
     fn get_reference(
@@ -67,6 +91,10 @@ impl SchemaExt for Box<openapiv3::Schema> {
 impl SchemaExt for openapiv3::PathItem {
     fn recurse(&self, _spec: &openapiv3::OpenAPI) -> Result<openapiv3::Schema> {
         anyhow::bail!("`recurse` not implemented for `PathItem`")
+    }
+
+    fn clean_reference_name(_s: &str) -> String {
+        "`clean_reference_name` not implemented for `PathItem`".to_string()
     }
 
     fn get_reference(
@@ -89,6 +117,11 @@ impl SchemaExt for openapiv3::RequestBody {
         anyhow::bail!("RequestBody does not have a schema: {:?}", self)
     }
 
+    fn clean_reference_name(s: &str) -> String {
+        s.trim_start_matches("#/components/request_bodies/")
+            .to_string()
+    }
+
     fn get_reference(
         name: &str,
         spec: &openapiv3::OpenAPI,
@@ -96,7 +129,7 @@ impl SchemaExt for openapiv3::RequestBody {
         if let Some(components) = &spec.components {
             if let Some(request_body) = components
                 .request_bodies
-                .get(name.trim_start_matches("#/components/request_bodies/"))
+                .get(&Self::clean_reference_name(name))
             {
                 return Ok(request_body.clone());
             }
@@ -116,15 +149,16 @@ impl SchemaExt for openapiv3::Parameter {
         schema.recurse(spec)
     }
 
+    fn clean_reference_name(s: &str) -> String {
+        s.trim_start_matches("#/components/parameters/").to_string()
+    }
+
     fn get_reference(
         name: &str,
         spec: &openapiv3::OpenAPI,
     ) -> Result<openapiv3::ReferenceOr<Self>> {
         if let Some(components) = &spec.components {
-            if let Some(parameter) = components
-                .parameters
-                .get(name.trim_start_matches("#/components/parameters/"))
-            {
+            if let Some(parameter) = components.parameters.get(&Self::clean_reference_name(name)) {
                 return Ok(parameter.clone());
             }
         }
@@ -145,15 +179,16 @@ impl SchemaExt for openapiv3::Response {
         anyhow::bail!("Response does not have a schema: {:?}", self)
     }
 
+    fn clean_reference_name(s: &str) -> String {
+        s.trim_start_matches("#/components/responses/").to_string()
+    }
+
     fn get_reference(
         name: &str,
         spec: &openapiv3::OpenAPI,
     ) -> Result<openapiv3::ReferenceOr<Self>> {
         if let Some(components) = &spec.components {
-            if let Some(response) = components
-                .responses
-                .get(name.trim_start_matches("#/components/responses/"))
-            {
+            if let Some(response) = components.responses.get(&Self::clean_reference_name(name)) {
                 return Ok(response.clone());
             }
         }
@@ -183,7 +218,7 @@ pub trait ReferenceOrExt<T> {
     fn expand(&self, spec: &openapiv3::OpenAPI) -> Result<T>;
 }
 
-impl<T: SchemaExt + Clone> ReferenceOrExt<T> for openapiv3::ReferenceOr<T> {
+impl<T: SchemaExt + Clone + std::fmt::Debug> ReferenceOrExt<T> for openapiv3::ReferenceOr<T> {
     fn item(&self) -> Result<&T> {
         match self {
             openapiv3::ReferenceOr::Item(i) => Ok(i),
@@ -207,10 +242,9 @@ impl<T: SchemaExt + Clone> ReferenceOrExt<T> for openapiv3::ReferenceOr<T> {
             openapiv3::ReferenceOr::Item(..) => {
                 anyhow::bail!("item not supported here");
             }
-            // TODO: use the function on the reference shit above, so this works for all types.
-            openapiv3::ReferenceOr::Reference { reference } => Ok(reference
-                .trim_start_matches("#/components/schemas/")
-                .to_string()),
+            openapiv3::ReferenceOr::Reference { reference } => {
+                Ok(T::clean_reference_name(reference))
+            }
         }
     }
 
@@ -239,7 +273,7 @@ impl<T: SchemaExt + Clone> ReferenceOrExt<T> for openapiv3::ReferenceOr<T> {
         } else {
             match self.recurse(spec) {
                 Ok(s) => Ok(s),
-                Err(_) => self.get_schema_from_reference(spec, recursive),
+                Err(err) => Err(err),
             }
         }
     }
