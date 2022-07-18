@@ -294,10 +294,155 @@ pub fn generate_example_json_from_schema(
     })
 }
 
+/// Generates example rust code for creating a specific type.
+pub fn generate_example_rust_from_schema(
+    name: &str,
+    schema: &openapiv3::Schema,
+    spec: &openapiv3::OpenAPI,
+) -> Result<proc_macro2::TokenStream> {
+    Ok(match &schema.schema_kind {
+        openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
+            let random_value = generate_example_json_from_schema(schema, spec)?.to_string();
+
+            if !s.enumeration.is_empty() {
+                let name_ident = format_ident!("{}", name);
+                // Get a random item from the enum.
+                let item_ident = format_ident!("{}", crate::types::proper_name(&random_value));
+
+                quote!(#name_ident::#item_ident)
+            } else {
+                if s.format.is_empty() {
+                    quote!(#random_value)
+                } else {
+                    match &s.format {
+                        openapiv3::VariantOrUnknownOrEmpty::Item(
+                            openapiv3::StringFormat::DateTime,
+                        ) => quote!(
+                            chrono::DateTime::<chrono::Utc>::parse_from_rfc3339(#random_value)?
+                        ),
+                        openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Date) => {
+                            quote!(
+                                chrono::NaiveDate::parse_from_str(#random_value, "%Y-%m-%d")?
+                            )
+                        }
+                        openapiv3::VariantOrUnknownOrEmpty::Item(
+                            openapiv3::StringFormat::Password,
+                        ) => {
+                            quote!(#random_value)
+                        }
+                        openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Byte) => {
+                            quote!(#random_value)
+                        }
+                        openapiv3::VariantOrUnknownOrEmpty::Item(
+                            openapiv3::StringFormat::Binary,
+                        ) => quote!(#random_value),
+                        openapiv3::VariantOrUnknownOrEmpty::Empty => quote!(""),
+                        openapiv3::VariantOrUnknownOrEmpty::Unknown(f) => match f.as_str() {
+                            "float" => quote!(#random_value),
+                            "int64" => quote!(#random_value),
+                            "uint64" => quote!(#random_value),
+                            "ipv4" => quote!(std::net::Ipv4Addr::from_str(#random_value)?),
+                            "ipv6" => {
+                                quote!(std::net::Ipv6Addr::from_str(#random_value)?)
+                            }
+                            "ip" => {
+                                quote!(std::net::IpAddr::from_str(#random_value)?)
+                            }
+                            "uri" => quote!(url::Url::from_str(#random_value)?),
+                            "uri-template" => {
+                                quote!(#random_value)
+                            }
+                            "url" => quote!(url::Url::from_str(#random_value)?),
+                            "email" => {
+                                quote!(#random_value)
+                            }
+                            "phone" => quote!(
+                                crate::types::phone_number::PhoneNumber::from_str(#random_value)?
+                            ),
+                            "uuid" => quote!(uuid::Uuid::from_str(#random_value)?),
+                            "hostname" => {
+                                quote!(#random_value)
+                            }
+                            "time" => {
+                                quote!(chrono::NaiveTime::parse_from_str(#random_value, "%H:%M:%S")?)
+                            }
+                            "date" => {
+                                quote!(chrono::NaiveDate::parse_from_str(#random_value, "%Y-%m-%d")?)
+                            }
+                            "date-time" => quote!(
+                            chrono::DateTime::<chrono::Utc>::parse_from_rfc3339(#random_value)?
+                            ),
+                            "partial-date-time" => {
+                                quote!(chrono::NaiveDateTime::parse_from_str(#random_value, "%Y-%m-%d %H:%M:%S")?)
+                            }
+
+                            f => {
+                                anyhow::bail!("XXX unknown string format {}", f)
+                            }
+                        },
+                    }
+                }
+            }
+        }
+        openapiv3::SchemaKind::Type(openapiv3::Type::Number(_)) => {
+            let t = crate::types::get_type_name_for_schema(name, schema, spec, false)?;
+            quote!(3.14 as #t)
+        }
+        openapiv3::SchemaKind::Type(openapiv3::Type::Integer(_)) => {
+            let t = crate::types::get_type_name_for_schema(name, schema, spec, false)?;
+            quote!(4 as #t)
+        }
+        openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
+            let object_name = format_ident!("{}", name);
+            // Generate a random object.
+            let mut args = Vec::new();
+            for (k, v) in o.properties.iter() {
+                let inner_schema = v.get_schema_from_reference(spec, true)?;
+                let example = generate_example_rust_from_schema("", &inner_schema, spec)?;
+                let k_ident = format_ident!("{}", k);
+                args.push(quote!(#k_ident: #example));
+            }
+
+            quote!(#object_name {
+                #(#args),*
+            })
+        }
+        openapiv3::SchemaKind::Type(openapiv3::Type::Array(a)) => {
+            // Make sure we have a reference for our type.
+            if let Some(ref s) = a.items {
+                let items = s.get_schema_from_reference(spec, true)?;
+                let item_example = generate_example_rust_from_schema(name, &items, spec)?;
+                quote!(vec![#item_example])
+            } else {
+                // We have no items.
+                anyhow::bail!("no items in array, cannot get type name")
+            }
+        }
+        openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => {
+            let b = format_ident!("{}", bool::random()?);
+            quote!(#b)
+        }
+        openapiv3::SchemaKind::OneOf { one_of: _ } => {
+            anyhow::bail!("XXX one of not supported yet");
+        }
+        openapiv3::SchemaKind::AllOf { all_of: _ } => {
+            anyhow::bail!("XXX all of not supported yet");
+        }
+        openapiv3::SchemaKind::AnyOf { any_of: _ } => {
+            anyhow::bail!("XXX any of not supported yet");
+        }
+        openapiv3::SchemaKind::Not { not: _ } => {
+            anyhow::bail!("XXX not not supported yet");
+        }
+        openapiv3::SchemaKind::Any(_any) => {
+            anyhow::bail!("XXX any supported yet");
+        }
+    })
+}
+
 #[cfg(test)]
 mod test {
-
-    use crate::types::exts::ReferenceOrExt;
+    use crate::types::exts::{ReferenceOrExt, TokenStreamExt};
 
     #[test]
     fn test_generate_example_file_conversion() {
@@ -318,5 +463,60 @@ mod test {
 
         // TODO: have a better way to test that this object can serialize and deserialize.
         assert!(example_json.contains(r#""completed_at": ""#));
+    }
+
+    #[test]
+    fn test_generate_example_rust_number() {
+        let spec: openapiv3::OpenAPI = Default::default();
+        // Lets get a specific schema.
+        let schema = openapiv3::Schema {
+            schema_data: Default::default(),
+            schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Number(
+                openapiv3::NumberType {
+                    format: openapiv3::VariantOrUnknownOrEmpty::Item(
+                        openapiv3::NumberFormat::Float,
+                    ),
+                    ..Default::default()
+                },
+            )),
+        };
+        let result = super::generate_example_rust_from_schema("", &schema, &spec).unwrap();
+
+        assert!(result.rendered().unwrap().ends_with("asf64"));
+    }
+
+    #[test]
+    fn test_generate_example_rust_integer() {
+        let spec: openapiv3::OpenAPI = Default::default();
+        // Lets get a specific schema.
+        let schema = openapiv3::Schema {
+            schema_data: Default::default(),
+            schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Integer(
+                openapiv3::IntegerType {
+                    format: openapiv3::VariantOrUnknownOrEmpty::Item(
+                        openapiv3::IntegerFormat::Int32,
+                    ),
+                    ..Default::default()
+                },
+            )),
+        };
+        let result = super::generate_example_rust_from_schema("", &schema, &spec).unwrap();
+
+        assert!(result.rendered().unwrap().ends_with("asi32"));
+    }
+
+    #[test]
+    fn test_generate_example_rust_bool() {
+        let spec: openapiv3::OpenAPI = Default::default();
+        // Lets get a specific schema.
+        let schema = openapiv3::Schema {
+            schema_data: Default::default(),
+            schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Boolean {}),
+        };
+        let result = super::generate_example_rust_from_schema("", &schema, &spec).unwrap();
+
+        let rendered = result.rendered().unwrap();
+
+        assert!(rendered == "true" || rendered == "false");
     }
 }
