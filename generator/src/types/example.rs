@@ -310,77 +310,73 @@ pub fn generate_example_rust_from_schema(
                 let item_ident = format_ident!("{}", crate::types::proper_name(&random_value));
 
                 quote!(#name_ident::#item_ident)
+            } else if s.format.is_empty() {
+                quote!(#random_value)
             } else {
-                if s.format.is_empty() {
-                    quote!(#random_value)
-                } else {
-                    match &s.format {
-                        openapiv3::VariantOrUnknownOrEmpty::Item(
-                            openapiv3::StringFormat::DateTime,
-                        ) => quote!(
+                match &s.format {
+                    openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::DateTime) => {
+                        quote!(
                             chrono::DateTime::<chrono::Utc>::parse_from_rfc3339(#random_value)?
-                        ),
-                        openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Date) => {
-                            quote!(
-                                chrono::NaiveDate::parse_from_str(#random_value, "%Y-%m-%d")?
-                            )
-                        }
-                        openapiv3::VariantOrUnknownOrEmpty::Item(
-                            openapiv3::StringFormat::Password,
-                        ) => {
-                            quote!(#random_value)
-                        }
-                        openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Byte) => {
-                            quote!(#random_value)
-                        }
-                        openapiv3::VariantOrUnknownOrEmpty::Item(
-                            openapiv3::StringFormat::Binary,
-                        ) => quote!(#random_value),
-                        openapiv3::VariantOrUnknownOrEmpty::Empty => quote!(""),
-                        openapiv3::VariantOrUnknownOrEmpty::Unknown(f) => match f.as_str() {
-                            "float" => quote!(#random_value),
-                            "int64" => quote!(#random_value),
-                            "uint64" => quote!(#random_value),
-                            "ipv4" => quote!(std::net::Ipv4Addr::from_str(#random_value)?),
-                            "ipv6" => {
-                                quote!(std::net::Ipv6Addr::from_str(#random_value)?)
-                            }
-                            "ip" => {
-                                quote!(std::net::IpAddr::from_str(#random_value)?)
-                            }
-                            "uri" => quote!(url::Url::from_str(#random_value)?),
-                            "uri-template" => {
-                                quote!(#random_value)
-                            }
-                            "url" => quote!(url::Url::from_str(#random_value)?),
-                            "email" => {
-                                quote!(#random_value)
-                            }
-                            "phone" => quote!(
-                                crate::types::phone_number::PhoneNumber::from_str(#random_value)?
-                            ),
-                            "uuid" => quote!(uuid::Uuid::from_str(#random_value)?),
-                            "hostname" => {
-                                quote!(#random_value)
-                            }
-                            "time" => {
-                                quote!(chrono::NaiveTime::parse_from_str(#random_value, "%H:%M:%S")?)
-                            }
-                            "date" => {
-                                quote!(chrono::NaiveDate::parse_from_str(#random_value, "%Y-%m-%d")?)
-                            }
-                            "date-time" => quote!(
-                            chrono::DateTime::<chrono::Utc>::parse_from_rfc3339(#random_value)?
-                            ),
-                            "partial-date-time" => {
-                                quote!(chrono::NaiveDateTime::parse_from_str(#random_value, "%Y-%m-%d %H:%M:%S")?)
-                            }
-
-                            f => {
-                                anyhow::bail!("XXX unknown string format {}", f)
-                            }
-                        },
+                        )
                     }
+                    openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Date) => {
+                        quote!(
+                            chrono::NaiveDate::parse_from_str(#random_value, "%Y-%m-%d")?
+                        )
+                    }
+                    openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Password) => {
+                        quote!(#random_value)
+                    }
+                    openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Byte) => {
+                        quote!(#random_value)
+                    }
+                    openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Binary) => {
+                        quote!(#random_value)
+                    }
+                    openapiv3::VariantOrUnknownOrEmpty::Empty => quote!(""),
+                    openapiv3::VariantOrUnknownOrEmpty::Unknown(f) => match f.as_str() {
+                        "float" => quote!(#random_value),
+                        "int64" => quote!(#random_value),
+                        "uint64" => quote!(#random_value),
+                        "ipv4" => quote!(std::net::Ipv4Addr::from_str(#random_value)?),
+                        "ipv6" => {
+                            quote!(std::net::Ipv6Addr::from_str(#random_value)?)
+                        }
+                        "ip" => {
+                            quote!(std::net::IpAddr::from_str(#random_value)?)
+                        }
+                        "uri" => quote!(url::Url::from_str(#random_value)?),
+                        "uri-template" => {
+                            quote!(#random_value)
+                        }
+                        "url" => quote!(url::Url::from_str(#random_value)?),
+                        "email" => {
+                            quote!(#random_value)
+                        }
+                        "phone" => quote!(
+                            crate::types::phone_number::PhoneNumber::from_str(#random_value)?
+                        ),
+                        "uuid" => quote!(uuid::Uuid::from_str(#random_value)?),
+                        "hostname" => {
+                            quote!(#random_value)
+                        }
+                        "time" => {
+                            quote!(chrono::NaiveTime::parse_from_str(#random_value, "%H:%M:%S")?)
+                        }
+                        "date" => {
+                            quote!(chrono::NaiveDate::parse_from_str(#random_value, "%Y-%m-%d")?)
+                        }
+                        "date-time" => quote!(
+                        chrono::DateTime::<chrono::Utc>::parse_from_rfc3339(#random_value)?
+                        ),
+                        "partial-date-time" => {
+                            quote!(chrono::NaiveDateTime::parse_from_str(#random_value, "%Y-%m-%d %H:%M:%S")?)
+                        }
+
+                        f => {
+                            anyhow::bail!("XXX unknown string format {}", f)
+                        }
+                    },
                 }
             }
         }
