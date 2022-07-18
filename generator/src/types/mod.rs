@@ -6,6 +6,7 @@ pub mod example;
 pub mod exts;
 pub mod paginate;
 pub mod phone_number;
+pub mod random;
 
 use std::str::FromStr;
 
@@ -282,6 +283,7 @@ fn get_type_name_for_string(
             "int64" => quote!(i64),
             "uint64" => quote!(u64),
             "ipv4" => quote!(std::net::Ipv4Addr),
+            "ipv6" => quote!(std::net::Ipv6Addr),
             "ip" => quote!(std::net::Ipv4Addr),
             "uri" => quote!(url::Url),
             "uri-template" => quote!(String),

@@ -1,10 +1,12 @@
 //! Modules for generating example code.
 
+use std::fmt::Write as _;
+
 use anyhow::Result;
 use chrono::{TimeZone, Timelike};
 use rand::Rng;
 
-use crate::types::exts::ReferenceOrExt;
+use crate::types::{exts::ReferenceOrExt, random::Random};
 
 /// Generates examples for our JSON schema types.
 pub fn generate_example_json_from_schema(
@@ -107,53 +109,13 @@ pub fn generate_example_json_from_schema(
                     serde_json::Value::String(String::new())
                 }
                 openapiv3::VariantOrUnknownOrEmpty::Unknown(f) => match f.as_str() {
-                    "float" => {
-                        // Return a random float.
-                        let f = rng.gen_range(0.0..1.0);
-                        serde_json::Value::String(f.to_string())
-                    }
-                    "int64" => {
-                        // Return a random integer.
-                        let i = rng.gen_range(0..1_000_000_000);
-                        serde_json::Value::String(i.to_string())
-                    }
-                    "uint64" => {
-                        // Return a random unsigned integer.
-                        let i = rng.gen_range(0..1_000_000_000);
-                        serde_json::Value::String(i.to_string())
-                    }
-                    "ipv4" => {
-                        // Return a random IPv4 address.
-                        let mut ip = String::new();
-                        for _ in 0..4 {
-                            ip.push_str(&format!("{}.", rng.gen_range(0..255)));
-                        }
-                        ip.pop();
-                        serde_json::Value::String(ip)
-                    }
-                    "ip" => {
-                        // Return a random IPv4 or IPv6 address.
-                        let mut ip = String::new();
-                        for _ in 0..4 {
-                            ip.push_str(&format!("{}.", rng.gen_range(0..255)));
-                        }
-                        ip.pop();
-                        ip.push_str("::");
-                        for _ in 0..6 {
-                            ip.push_str(&format!("{}.", rng.gen_range(0..255)));
-                        }
-                        ip.pop();
-                        serde_json::Value::String(ip)
-                    }
-                    "uri" => {
-                        // Return a random URI.
-                        let mut uri = String::new();
-                        for _ in 0..rng.gen_range(8..16) {
-                            uri.push_str(&format!("{}.", rng.gen_range(0..255)));
-                        }
-                        uri.pop();
-                        serde_json::Value::String(uri)
-                    }
+                    "float" => serde_json::Value::String(f64::random()?.to_string()),
+                    "int64" => serde_json::Value::String(i64::random()?.to_string()),
+                    "uint64" => serde_json::Value::String(u64::random()?.to_string()),
+                    "ipv4" => serde_json::Value::String(std::net::Ipv4Addr::random()?.to_string()),
+                    "ipv6" => serde_json::Value::String(std::net::Ipv6Addr::random()?.to_string()),
+                    "ip" => serde_json::Value::String(std::net::IpAddr::random()?.to_string()),
+                    "uri" => serde_json::Value::String(url::Url::random()?.to_string()),
                     "uri-template" => {
                         // Return a random URI template.
                         let mut uri = String::new();
@@ -163,15 +125,7 @@ pub fn generate_example_json_from_schema(
                         uri.pop();
                         serde_json::Value::String(uri)
                     }
-                    "url" => {
-                        // Return a random URL.
-                        let mut url = String::new();
-                        for _ in 0..rng.gen_range(8..16) {
-                            url.push_str(&format!("{}.", rng.gen_range(0..255)));
-                        }
-                        url.pop();
-                        serde_json::Value::String(url)
-                    }
+                    "url" => serde_json::Value::String(url::Url::random()?.to_string()),
                     "email" => {
                         // Return a random email address.
                         let mut email = String::new();
@@ -186,25 +140,15 @@ pub fn generate_example_json_from_schema(
                         email.pop();
                         serde_json::Value::String(email)
                     }
-                    "phone" => {
-                        // Return a random phone number.
-                        let mut phone = String::new();
-                        for _ in 0..rng.gen_range(8..16) {
-                            phone.push_str(&format!("{}.", rng.gen_range(0..255)));
-                        }
-                        phone.pop();
-                        serde_json::Value::String(phone)
-                    }
-                    "uuid" => {
-                        // Return a random UUID.
-                        let uuid = uuid::Uuid::new_v4();
-                        serde_json::Value::String(uuid.to_string())
-                    }
+                    "phone" => serde_json::Value::String(
+                        crate::types::phone_number::PhoneNumber::random()?.to_string(),
+                    ),
+                    "uuid" => serde_json::Value::String(uuid::Uuid::random()?.to_string()),
                     "hostname" => {
                         // Return a random hostname.
                         let mut hostname = String::new();
                         for _ in 0..rng.gen_range(8..16) {
-                            hostname.push_str(&format!("{}.", rng.gen_range(0..255)));
+                            write!(hostname, "{}.", rng.gen_range(0..255))?;
                         }
                         hostname.pop();
                         serde_json::Value::String(hostname)
