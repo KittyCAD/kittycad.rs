@@ -21,9 +21,9 @@ impl File {
              example_file_create_conversion() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::FileConversion = \
              client\n        .file()\n        .create_conversion(\n            \
-             kittycad::types::FileOutputFormat::Step,\n            \
-             kittycad::types::FileSourceFormat::Dae,\n            \
-             &bytes::Bytes::from(\"Bz5V9RGl8Rlw1oJuUkU\"),\n        )\n        .await?;\n    \
+             kittycad::types::FileOutputFormat::Fbx,\n            \
+             kittycad::types::FileSourceFormat::Step,\n            \
+             &bytes::Bytes::from(\"wzqrMJgPUDU\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_conversion<'a>(
         &'a self,
@@ -58,7 +58,7 @@ impl File {
         }
     }
 
-    #[doc = "Get a file conversion.\n\nGet the status and output of an async file conversion.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\nIf the user is not authenticated to view the specified file conversion, then it is not returned.\nOnly KittyCAD employees with the proper access can view file conversions for other users.\n\n```rust,no_run\nasync fn example_file_get_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallOutput = client.file().get_conversion(\"cqpcyll\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get a file conversion.\n\nGet the status and output of an async file conversion.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\nIf the user is not authenticated to view the specified file conversion, then it is not returned.\nOnly KittyCAD employees with the proper access can view file conversions for other users.\n\n```rust,no_run\nasync fn example_file_get_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallOutput = client.file().get_conversion(\"ccrqkdv\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn get_conversion<'a>(
         &'a self,
         id: &'a str,
@@ -87,7 +87,7 @@ impl File {
         }
     }
 
-    #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Obj,\n            &bytes::Bytes::from(\"vf8t-OR_JoYrQwKF\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Fbx,\n            &bytes::Bytes::from(\"ucmO6mvfPFHyfg\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_density<'a>(
         &'a self,
         material_mass: f64,
@@ -124,7 +124,7 @@ impl File {
              kittycad::Client::new_from_env();\n    let result: kittycad::types::CodeOutput = \
              client\n        .file()\n        .create_execution(\n            \
              kittycad::types::CodeLanguage::Go,\n            Some(\"\".to_string()),\n            \
-             &bytes::Bytes::from(\"CUktllkoK-gL_6c\"),\n        )\n        .await?;\n    \
+             &bytes::Bytes::from(\"dqpXSna9d9CZGB5Veu8\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_execution<'a>(
         &'a self,
@@ -171,8 +171,8 @@ impl File {
              example_file_create_mass() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::FileMass = \
              client\n        .file()\n        .create_mass(\n            3.14 as f64,\n            \
-             kittycad::types::FileSourceFormat::Obj,\n            \
-             &bytes::Bytes::from(\"jbv-v0vTv1Xe\"),\n        )\n        .await?;\n    \
+             kittycad::types::FileSourceFormat::Stl,\n            \
+             &bytes::Bytes::from(\"PeqQ_8ue5kSeZ9tb064B\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_mass<'a>(
         &'a self,
@@ -213,8 +213,8 @@ impl File {
              example_file_create_volume() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::FileVolume = \
              client\n        .file()\n        .create_volume(\n            \
-             kittycad::types::FileSourceFormat::Step,\n            \
-             &bytes::Bytes::from(\"7wd_B1Tlq6o\"),\n        )\n        .await?;\n    \
+             kittycad::types::FileSourceFormat::Stl,\n            \
+             &bytes::Bytes::from(\"SH_gb2onpGrB\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_volume<'a>(
         &'a self,
@@ -252,7 +252,7 @@ impl File {
              user.\n\n```rust,no_run\nasync fn example_file_get_conversion_for_user() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::AsyncApiCallOutput =\n        \
-             client.file().get_conversion_for_user(\"vjlq\").await?;\n    println!(\"{:?}\", \
+             client.file().get_conversion_for_user(\"xgt\").await?;\n    println!(\"{:?}\", \
              result);\n    Ok(())\n}\n```"]
     pub async fn get_conversion_for_user<'a>(
         &'a self,
