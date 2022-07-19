@@ -33,12 +33,10 @@
             "type": "string"
           },
           "created_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The time and date the address was created."
+            "description": "The time and date the address was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "id": {
             "allOf": [
@@ -61,12 +59,10 @@
             "type": "string"
           },
           "updated_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The time and date the address was last updated."
+            "description": "The time and date the address was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "user_id": {
             "description": "The user ID that this address belongs to.",
@@ -128,21 +124,17 @@
         "description": "An API call with the price.\n\nThis is a join of the `ApiCall` and `ApiCallPrice` tables.",
         "properties": {
           "completed_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The date and time the API call completed billing.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "created_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the API call was created."
+            "description": "The date and time the API call was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "duration": {
             "description": "The duration of the API call.",
@@ -215,13 +207,11 @@
             "type": "string"
           },
           "started_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The date and time the API call started billing.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "status_code": {
             "description": "The status code returned by the API call.",
@@ -243,12 +233,10 @@
             "description": "The API token that made the API call."
           },
           "updated_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the API call was last updated."
+            "description": "The date and time the API call was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "user_agent": {
             "description": "The user agent of the request.",
@@ -294,12 +282,10 @@
         "description": "An API token.\n\nThese are used to authenticate users with Bearer authentication.",
         "properties": {
           "created_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the API token was created."
+            "description": "The date and time the API token was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "id": {
             "description": "The unique identifier for the API token.",
@@ -318,12 +304,10 @@
             "description": "The API token itself."
           },
           "updated_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the API token was last updated."
+            "description": "The date and time the API token was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "user_id": {
             "description": "The ID of the user that owns the API token.",
@@ -363,21 +347,17 @@
         "description": "An async API call.",
         "properties": {
           "completed_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The time and date the async API call was completed.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "created_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The time and date the async API call was created."
+            "description": "The time and date the async API call was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "error": {
             "description": "The error the function returned, if any.",
@@ -401,13 +381,11 @@
             "nullable": true
           },
           "started_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The time and date the async API call was started.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "status": {
             "allOf": [
@@ -426,12 +404,10 @@
             "description": "The type of async API call."
           },
           "updated_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The time and date the async API call was last updated."
+            "description": "The time and date the async API call was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "user_id": {
             "description": "The user ID of the user who created the async API call.",
@@ -458,21 +434,17 @@
             "description": "A file conversion.",
             "properties": {
               "completed_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
                 "description": "The time and date the file conversion was completed.",
-                "nullable": true
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
               },
               "created_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
-                "description": "The time and date the file conversion was created."
+                "description": "The time and date the file conversion was created.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
               },
               "error": {
                 "description": "The error the function returned, if any.",
@@ -511,13 +483,11 @@
                 "description": "The source format of the file conversion."
               },
               "started_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
                 "description": "The time and date the file conversion was started.",
-                "nullable": true
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
               },
               "status": {
                 "allOf": [
@@ -534,12 +504,10 @@
                 "type": "string"
               },
               "updated_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
-                "description": "The time and date the file conversion was last updated."
+                "description": "The time and date the file conversion was last updated.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
               },
               "user_id": {
                 "description": "The user ID of the user who created the file conversion.",
@@ -561,21 +529,17 @@
             "description": "A file mass.",
             "properties": {
               "completed_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
                 "description": "The time and date the mass was completed.",
-                "nullable": true
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
               },
               "created_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
-                "description": "The time and date the mass was created."
+                "description": "The time and date the mass was created.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
               },
               "error": {
                 "description": "The error the function returned, if any.",
@@ -611,13 +575,11 @@
                 "description": "The source format of the file."
               },
               "started_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
                 "description": "The time and date the mass was started.",
-                "nullable": true
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
               },
               "status": {
                 "allOf": [
@@ -634,12 +596,10 @@
                 "type": "string"
               },
               "updated_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
-                "description": "The time and date the mass was last updated."
+                "description": "The time and date the mass was last updated.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
               },
               "user_id": {
                 "description": "The user ID of the user who created the mass.",
@@ -660,21 +620,17 @@
             "description": "A file volume.",
             "properties": {
               "completed_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
                 "description": "The time and date the volume was completed.",
-                "nullable": true
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
               },
               "created_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
-                "description": "The time and date the volume was created."
+                "description": "The time and date the volume was created.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
               },
               "error": {
                 "description": "The error the function returned, if any.",
@@ -698,13 +654,11 @@
                 "description": "The source format of the file."
               },
               "started_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
                 "description": "The time and date the volume was started.",
-                "nullable": true
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
               },
               "status": {
                 "allOf": [
@@ -721,12 +675,10 @@
                 "type": "string"
               },
               "updated_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
-                "description": "The time and date the volume was last updated."
+                "description": "The time and date the volume was last updated.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
               },
               "user_id": {
                 "description": "The user ID of the user who created the volume.",
@@ -753,21 +705,17 @@
             "description": "A file density.",
             "properties": {
               "completed_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
                 "description": "The time and date the density was completed.",
-                "nullable": true
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
               },
               "created_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
-                "description": "The time and date the density was created."
+                "description": "The time and date the density was created.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
               },
               "density": {
                 "description": "The resulting density.",
@@ -803,13 +751,11 @@
                 "description": "The source format of the file."
               },
               "started_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
                 "description": "The time and date the density was started.",
-                "nullable": true
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
               },
               "status": {
                 "allOf": [
@@ -826,12 +772,10 @@
                 "type": "string"
               },
               "updated_at": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/DateTime"
-                  }
-                ],
-                "description": "The time and date the density was last updated."
+                "description": "The time and date the density was last updated.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
               },
               "user_id": {
                 "description": "The user ID of the user who created the density.",
@@ -1615,12 +1559,10 @@
         "description": "A balance for a user.\n\nThis holds information about the financial balance for the user.",
         "properties": {
           "created_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the balance was created."
+            "description": "The date and time the balance was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "id": {
             "allOf": [
@@ -1655,12 +1597,10 @@
             "type": "number"
           },
           "updated_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the balance was last updated."
+            "description": "The date and time the balance was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "user_id": {
             "description": "The user ID the balance belongs to.",
@@ -1677,11 +1617,6 @@
           "updated_at"
         ],
         "type": "object"
-      },
-      "DateTime": {
-        "description": "A date and time.",
-        "format": "date-time",
-        "type": "string"
       },
       "DeviceAccessTokenRequestForm": {
         "description": "The form for a device access token request.",
@@ -2236,12 +2171,10 @@
             "type": "string"
           },
           "created_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the user was created."
+            "description": "The date and time the user was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "discord": {
             "description": "The user's Discord handle.",
@@ -2253,13 +2186,11 @@
             "type": "string"
           },
           "email_verified": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The date and time the email address was verified.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "first_name": {
             "description": "The user's first name.",
@@ -2305,12 +2236,10 @@
             "type": "string"
           },
           "updated_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the user was last updated."
+            "description": "The date and time the user was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "zendesk_id": {
             "description": "The user's Zendesk ID. This is mostly used for internal mapping.",
@@ -2350,21 +2279,17 @@
         "description": "A file conversion.",
         "properties": {
           "completed_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The time and date the file conversion was completed.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "created_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The time and date the file conversion was created."
+            "description": "The time and date the file conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "error": {
             "description": "The error the function returned, if any.",
@@ -2403,13 +2328,11 @@
             "description": "The source format of the file conversion."
           },
           "started_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The time and date the file conversion was started.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "status": {
             "allOf": [
@@ -2420,12 +2343,10 @@
             "description": "The status of the file conversion."
           },
           "updated_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The time and date the file conversion was last updated."
+            "description": "The time and date the file conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "user_id": {
             "description": "The user ID of the user who created the file conversion.",
@@ -2446,21 +2367,17 @@
         "description": "A file density result.",
         "properties": {
           "completed_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The time and date the density was completed.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "created_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The time and date the density was created."
+            "description": "The time and date the density was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "density": {
             "description": "The resulting density.",
@@ -2496,13 +2413,11 @@
             "description": "The source format of the file."
           },
           "started_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The time and date the density was started.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "status": {
             "allOf": [
@@ -2513,12 +2428,10 @@
             "description": "The status of the density."
           },
           "updated_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The time and date the density was last updated."
+            "description": "The time and date the density was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "user_id": {
             "description": "The user ID of the user who created the density.",
@@ -2538,21 +2451,17 @@
         "description": "A file mass result.",
         "properties": {
           "completed_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The time and date the mass was completed.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "created_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The time and date the mass was created."
+            "description": "The time and date the mass was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "error": {
             "description": "The error the function returned, if any.",
@@ -2588,13 +2497,11 @@
             "description": "The source format of the file."
           },
           "started_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The time and date the mass was started.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "status": {
             "allOf": [
@@ -2605,12 +2512,10 @@
             "description": "The status of the mass."
           },
           "updated_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The time and date the mass was last updated."
+            "description": "The time and date the mass was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "user_id": {
             "description": "The user ID of the user who created the mass.",
@@ -2666,21 +2571,17 @@
         "description": "A file volume result.",
         "properties": {
           "completed_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The time and date the volume was completed.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "created_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The time and date the volume was created."
+            "description": "The time and date the volume was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "error": {
             "description": "The error the function returned, if any.",
@@ -2704,13 +2605,11 @@
             "description": "The source format of the file."
           },
           "started_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The time and date the volume was started.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "status": {
             "allOf": [
@@ -2721,12 +2620,10 @@
             "description": "The status of the volume."
           },
           "updated_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The time and date the volume was last updated."
+            "description": "The time and date the volume was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "user_id": {
             "description": "The user ID of the user who created the volume.",
@@ -3554,20 +3451,16 @@
         "description": "An authentication session.\n\nFor our UIs, these are automatically created by Next.js.",
         "properties": {
           "created_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the session was created."
+            "description": "The date and time the session was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "expires": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the session expires."
+            "description": "The date and time the session expires.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "id": {
             "description": "The unique identifier for the session.",
@@ -3582,12 +3475,10 @@
             "description": "The session token."
           },
           "updated_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the session was last updated."
+            "description": "The date and time the session was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "user_id": {
             "description": "The user ID of the user that the session belongs to.",
@@ -3648,21 +3539,17 @@
         "description": "A unit conversion.",
         "properties": {
           "completed_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The time and date the unit conversion was completed.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "created_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The time and date the unit conversion was created."
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "error": {
             "description": "The error the function returned, if any.",
@@ -3706,13 +3593,11 @@
             "description": "The source format of the unit conversion."
           },
           "started_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The time and date the unit conversion was started.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "status": {
             "allOf": [
@@ -3723,12 +3608,10 @@
             "description": "The status of the unit conversion."
           },
           "updated_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The time and date the unit conversion was last updated."
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "user_id": {
             "description": "The user ID of the user who created the unit conversion.",
@@ -3809,12 +3692,10 @@
             "type": "string"
           },
           "created_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the user was created."
+            "description": "The date and time the user was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "discord": {
             "description": "The user's Discord handle.",
@@ -3826,13 +3707,11 @@
             "type": "string"
           },
           "email_verified": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
             "description": "The date and time the email address was verified.",
-            "nullable": true
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
           },
           "first_name": {
             "description": "The user's first name.",
@@ -3868,12 +3747,10 @@
             "type": "string"
           },
           "updated_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the user was last updated."
+            "description": "The date and time the user was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           }
         },
         "required": [
@@ -3913,20 +3790,16 @@
         "description": "A verification token for a user.\n\nThis is typically used to verify a user's email address.",
         "properties": {
           "created_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the verification token was created."
+            "description": "The date and time the verification token was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "expires": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the verification token expires."
+            "description": "The date and time the verification token expires.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           },
           "id": {
             "description": "The token used for verification. This is used as the id for the table since it is unique per record.",
@@ -3937,12 +3810,10 @@
             "type": "string"
           },
           "updated_at": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DateTime"
-              }
-            ],
-            "description": "The date and time the verification token was last updated."
+            "description": "The date and time the verification token was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
           }
         },
         "required": [
