@@ -450,9 +450,7 @@ impl SchemaRenderExt for openapiv3::ReferenceOr<openapiv3::Schema> {
                             Ok(false)
                         }
                     }
-                    openapiv3::SchemaKind::Type(openapiv3::Type::Object(_)) => {
-                        return Ok(true);
-                    }
+                    openapiv3::SchemaKind::Type(openapiv3::Type::Object(_)) => Ok(true),
                     _ => Ok(false),
                 }
             }
