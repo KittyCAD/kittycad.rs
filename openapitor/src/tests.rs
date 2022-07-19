@@ -120,7 +120,10 @@ async fn run_cargo_test(opts: &crate::Opts) -> Result<()> {
     };
 
     let mut cmd = tokio::process::Command::new("cargo");
-    cmd.args(["test"]).current_dir(output);
+    cmd.args(["test"])
+        .current_dir(output)
+        // So that we can run fresh and not fail.
+        .env("EXPECTORATE", "overwrite");
 
     let output = cmd.output().await?;
     if !output.status.success() {
