@@ -10,7 +10,7 @@ impl Sessions {
         Self { client }
     }
 
-    #[doc = "Get a session for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_sessions_get_session_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Session = client\n        .sessions()\n        .get_session_for_user(uuid::Uuid::from_str(\n            \"4e08c34d-bf22-4731-9b68-319b7a347cb4\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get a session for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_sessions_get_session_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Session = client\n        .sessions()\n        .get_session_for_user(uuid::Uuid::from_str(\n            \"e192b50a-76df-4294-b2ee-1791143f2bc0\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn get_session_for_user<'a>(
         &'a self,
         token: uuid::Uuid,
