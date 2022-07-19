@@ -11,14 +11,7 @@ impl Unit {
         Self { client }
     }
 
-    #[doc = "Convert units.\n\nConvert a metric unit value to another metric unit value. This is a \
-             nice endpoint to use for helper functions.\n\n```rust,no_run\nasync fn \
-             example_unit_create_conversion() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitConversion = \
-             client\n        .unit()\n        .create_conversion(\n            \
-             kittycad::types::UnitMetricFormat::Giga,\n            \
-             kittycad::types::UnitMetricFormat::Exa,\n            3.14 as f64,\n        )\n        \
-             .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Convert units.\n\nConvert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n\n```rust,no_run\nasync fn example_unit_create_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitConversion = client\n        .unit()\n        .create_conversion(\n            kittycad::types::UnitMetricFormat::Deci,\n            kittycad::types::UnitMetricFormat::Micro,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_conversion<'a>(
         &'a self,
         output_format: crate::types::UnitMetricFormat,

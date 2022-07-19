@@ -93,20 +93,7 @@ pub fn generate_example_json_from_schema(
                         serde_json::Value::String(uri)
                     }
                     "url" => serde_json::Value::String(url::Url::random()?.to_string()),
-                    "email" => {
-                        // Return a random email address.
-                        let mut email = String::new();
-                        for _ in 0..rng.gen_range(8..16) {
-                            write!(email, "{}.", rng.gen_range(0..255))?;
-                        }
-                        email.pop();
-                        email.push('@');
-                        for _ in 0..rng.gen_range(8..16) {
-                            write!(email, "{}.", rng.gen_range(0..255))?;
-                        }
-                        email.pop();
-                        serde_json::Value::String(email)
-                    }
+                    "email" => serde_json::Value::String("email@example.com".to_string()),
                     "phone" => serde_json::Value::String(
                         crate::types::phone_number::PhoneNumber::random()?.to_string(),
                     ),
@@ -353,7 +340,7 @@ pub fn generate_example_rust_from_schema(
                         }
                         "url" => quote!(url::Url::from_str(#random_value)?),
                         "email" => {
-                            quote!(#random_value)
+                            quote!(#random_value.to_string())
                         }
                         "phone" => quote!(
                             crate::types::phone_number::PhoneNumber::from_str(#random_value)?
