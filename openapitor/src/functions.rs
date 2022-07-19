@@ -362,6 +362,9 @@ fn get_fn_name(
         .ok_or_else(|| anyhow::anyhow!("operation `{}` `{}` has no operation_id", name, method))?
         .to_string();
 
+    // Convert to snake case.
+    name = inflector::cases::snakecase::to_snake_case(&name);
+
     // Remove any stutters with the tag name.
     name = remove_stutters(&name, tag);
     // Remove any stutters with the singular tag name.
@@ -1132,4 +1135,69 @@ fn generate_example_client_env(opts: &crate::Opts) -> String {
 fn fmt_external_example_code(t: &proc_macro2::TokenStream, opts: &crate::Opts) -> Result<String> {
     let rendered = crate::types::get_text_fmt(t)?;
     Ok(rendered.replace("crate::types::", &format!("{}::types::", opts.name)))
+}
+
+#[cfg(test)]
+mod tests {
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn test_fn_name() {
+        // Test remove stutters.
+        assert_eq!(
+            super::get_fn_name(
+                "/foo/bar",
+                &http::Method::GET,
+                "things",
+                &openapiv3::Operation {
+                    operation_id: Some("getThings".to_string()),
+                    ..Default::default()
+                }
+            )
+            .unwrap(),
+            "get"
+        );
+
+        assert_eq!(
+            super::get_fn_name(
+                "/foo/bar",
+                &http::Method::GET,
+                "things",
+                &openapiv3::Operation {
+                    operation_id: Some("getThingsFromZoo".to_string()),
+                    ..Default::default()
+                }
+            )
+            .unwrap(),
+            "get_from_zoo"
+        );
+
+        assert_eq!(
+            super::get_fn_name(
+                "/foo/bar",
+                &http::Method::GET,
+                "things",
+                &openapiv3::Operation {
+                    operation_id: Some("ThingFromZoo".to_string()),
+                    ..Default::default()
+                }
+            )
+            .unwrap(),
+            "from_zoo"
+        );
+
+        assert_eq!(
+            super::get_fn_name(
+                "/foo/bar",
+                &http::Method::GET,
+                "things",
+                &openapiv3::Operation {
+                    operation_id: Some("meta/info".to_string()),
+                    ..Default::default()
+                }
+            )
+            .unwrap(),
+            "meta_info"
+        );
+    }
 }

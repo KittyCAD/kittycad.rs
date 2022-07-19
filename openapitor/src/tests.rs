@@ -81,13 +81,13 @@ async fn test_kittycad_generation(ctx: &mut TestContext) {
 
 #[test_context(TestContext)]
 #[tokio::test]
-#[ignore] // TODO: eventually make this work
 async fn test_github_generation(ctx: &mut TestContext) {
     let opts = crate::Opts {
         debug: true,
         json: false,
         input: ctx.tmp_dir.clone(),
-        output: ctx.tmp_dir.clone(),
+       // output: ctx.tmp_dir.clone(),
+        output: std::env::current_dir().unwrap().join("../github"),
         base_url: "https://api.github.com".parse().unwrap(),
         name: "octorust".to_string(),
         version: "1.0.0".to_string(),
