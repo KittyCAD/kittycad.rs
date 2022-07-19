@@ -27,7 +27,7 @@ impl AsyncTestContext for TestContext {
     async fn teardown(self) {
         println!("Removing {}", self.tmp_dir.display());
         // Delete the temporary directory.
-        //std::fs::remove_dir_all(&self.tmp_dir).unwrap();
+        std::fs::remove_dir_all(&self.tmp_dir).unwrap();
     }
 }
 
