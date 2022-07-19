@@ -1128,10 +1128,10 @@ impl tabled::Tabled for AsyncApiCall {
 )]
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
-    FileConversion(FileConversion),
-    FileMass(FileMass),
-    FileVolume(FileVolume),
-    FileDensity(FileDensity),
+    FileConversion,
+    FileMass,
+    FileVolume,
+    FileDensity,
 }
 
 #[doc = "A single page of results"]
@@ -5346,7 +5346,7 @@ pub enum Oauth2GrantType {
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
 
-impl Default for Oauth2GrantType {
+impl std::default::Default for Oauth2GrantType {
     fn default() -> Self {
         Oauth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode
     }
@@ -5579,7 +5579,7 @@ pub enum PaymentMethodType {
     Card,
 }
 
-impl Default for PaymentMethodType {
+impl std::default::Default for PaymentMethodType {
     fn default() -> Self {
         PaymentMethodType::Card
     }

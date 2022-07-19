@@ -725,7 +725,7 @@ fn render_enum_object_internal(
                 if modified_properties == existing.properties {
                     // We have the same properties.
                     // We can just use the existing object.
-                    return Ok(quote!(#struct_name));
+                    return Ok(quote!(#struct_name(#struct_name)));
                 }
             }
         }
