@@ -10,7 +10,7 @@ impl ApiTokens {
         Self { client }
     }
 
-    #[doc = "List API tokens for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first.\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_api_tokens_list_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_tokens = client.api_tokens();\n    let mut stream = api_tokens.list_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List API tokens for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first.\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_api_tokens_list_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_tokens = client.api_tokens();\n    let mut stream = api_tokens.list_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     pub async fn list_for_user<'a>(
         &'a self,
         limit: Option<u32>,
@@ -52,7 +52,7 @@ impl ApiTokens {
         }
     }
 
-    #[doc = "List API tokens for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first.\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_api_tokens_list_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_tokens = client.api_tokens();\n    let mut stream = api_tokens.list_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List API tokens for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first.\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_api_tokens_list_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_tokens = client.api_tokens();\n    let mut stream = api_tokens.list_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     pub fn list_for_user_stream<'a>(
         &'a self,
         limit: Option<u32>,
@@ -137,7 +137,7 @@ impl ApiTokens {
         }
     }
 
-    #[doc = "Get an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_api_tokens_get_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = client\n        .api_tokens()\n        .get_api_token_for_user(uuid::Uuid::from_str(\n            \"698365c1-d98c-4d8e-bd14-993942cc428c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_api_tokens_get_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = client\n        .api_tokens()\n        .get_api_token_for_user(uuid::Uuid::from_str(\n            \"1dfa0cdf-7b3f-4328-9cb4-fb839942ed87\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn get_api_token_for_user<'a>(
         &'a self,
         token: uuid::Uuid,
@@ -167,7 +167,7 @@ impl ApiTokens {
         }
     }
 
-    #[doc = "Delete an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\nThis endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_api_tokens_delete_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .api_tokens()\n        .delete_api_token_for_user(uuid::Uuid::from_str(\n            \"edae226f-9ee0-48f2-9b22-db448e7e346b\",\n        )?)\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Delete an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\nThis endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_api_tokens_delete_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .api_tokens()\n        .delete_api_token_for_user(uuid::Uuid::from_str(\n            \"0b137042-4c6d-4a08-adc0-582483cedf46\",\n        )?)\n        .await?;\n    Ok(())\n}\n```"]
     pub async fn delete_api_token_for_user<'a>(
         &'a self,
         token: uuid::Uuid,

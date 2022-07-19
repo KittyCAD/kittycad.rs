@@ -43,10 +43,6 @@ futures-util = "^0.3.21"
 pretty_assertions = "1"
 tokio = { version = "1.20.0", features = ["full"] }
 
-[features]
-# enable etag-based http_cache functionality
-httpcache = ["dirs"]
-
 [package.metadata.docs.rs]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]

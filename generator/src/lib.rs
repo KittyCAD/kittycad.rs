@@ -317,6 +317,9 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
         crate::save(tagrs, &crate::types::get_text_fmt(&output)?)?;
     }
 
+    // Run clippy in our output directory.
+    run_cargo_clippy(opts).await?;
+
     // Also add our installation information to the modified_spec.
     let mut extension: HashMap<String, String> = HashMap::new();
     extension.insert(
@@ -505,7 +508,27 @@ rustdoc-args = ["--cfg", "docsrs"]
     )
 }
 
-fn run_cargo_clippy(opts: &Opts) -> Result<()> {
+async fn run_cargo_clippy(opts: &Opts) -> Result<()> {
+    log::info!("Running `cargo clippy`...");
 
+    // Shell out and run cargo clippy on the output directory.
+    let output = if opts.output.display().to_string() == "." {
+        "".to_string()
+    } else {
+        opts.output.display().to_string()
+    };
 
+    let mut cmd = tokio::process::Command::new("cargo");
+    cmd.args(["clippy", "--fix", "--allow-dirty"])
+        .current_dir(output);
+
+    let output = cmd.output().await?;
+    if !output.status.success() {
+        anyhow::bail!(
+            "cargo clippy failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    Ok(())
 }

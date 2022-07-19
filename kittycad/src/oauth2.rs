@@ -10,7 +10,7 @@ impl Oauth2 {
         Self { client }
     }
 
-    #[doc = "Start an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint is designed to be accessed from an *unauthenticated* API client. It generates and records a `device_code` and `user_code` which must be verified and confirmed prior to a token being granted.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_device_auth_request() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_auth_request(&kittycad::types::DeviceAuthRequestForm {\n            client_id: uuid::Uuid::from_str(\"423d0aab-afdf-4f8f-89cb-1065c5abba76\")?,\n        })\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Start an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint is designed to be accessed from an *unauthenticated* API client. It generates and records a `device_code` and `user_code` which must be verified and confirmed prior to a token being granted.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_device_auth_request() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_auth_request(&kittycad::types::DeviceAuthRequestForm {\n            client_id: uuid::Uuid::from_str(\"328ecc64-1f83-4165-bed2-e748636d37aa\")?,\n        })\n        .await?;\n    Ok(())\n}\n```"]
     pub async fn device_auth_request<'a>(
         &'a self,
         body: &crate::types::DeviceAuthRequestForm,
@@ -30,7 +30,7 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Confirm an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/oauth2/device/token`.\n\n```rust,no_run\nasync fn example_oauth2_device_auth_confirm() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_auth_confirm(&kittycad::types::DeviceAuthVerifyParams {\n            user_code: \"kqe\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Confirm an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/oauth2/device/token`.\n\n```rust,no_run\nasync fn example_oauth2_device_auth_confirm() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_auth_confirm(&kittycad::types::DeviceAuthVerifyParams {\n            user_code: \"asxwv\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n```"]
     pub async fn device_auth_confirm<'a>(
         &'a self,
         body: &crate::types::DeviceAuthVerifyParams,
@@ -50,7 +50,7 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Request a device access token.\n\nThis endpoint should be polled by the client until the user code is verified and the grant is confirmed.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_device_access_token() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_access_token(&kittycad::types::DeviceAccessTokenRequestForm {\n            client_id: uuid::Uuid::from_str(\"c88f8a86-dc60-44b7-b6ee-c098234e17c8\")?,\n            device_code: uuid::Uuid::from_str(\"b4a2da0d-f19b-480c-987a-2ac8a6780c97\")?,\n            grant_type: kittycad::types::Oauth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode,\n        })\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Request a device access token.\n\nThis endpoint should be polled by the client until the user code is verified and the grant is confirmed.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_device_access_token() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_access_token(&kittycad::types::DeviceAccessTokenRequestForm {\n            client_id: uuid::Uuid::from_str(\"d42b0021-6dae-4e28-94f2-40473a1906dc\")?,\n            device_code: uuid::Uuid::from_str(\"f55bfe98-6116-4c48-b9c2-c982bd0dd773\")?,\n            grant_type: kittycad::types::Oauth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode,\n        })\n        .await?;\n    Ok(())\n}\n```"]
     pub async fn device_access_token<'a>(
         &'a self,
         body: &crate::types::DeviceAccessTokenRequestForm,
@@ -70,7 +70,7 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Verify an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website.\n\n```rust,no_run\nasync fn example_oauth2_device_auth_verify() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.oauth2().device_auth_verify(\"hhbnjmr\").await?;\n    Ok(())\n}\n```"]
+    #[doc = "Verify an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website.\n\n```rust,no_run\nasync fn example_oauth2_device_auth_verify() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.oauth2().device_auth_verify(\"vgrv\").await?;\n    Ok(())\n}\n```"]
     pub async fn device_auth_verify<'a>(
         &'a self,
         user_code: &'a str,
@@ -92,7 +92,7 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Listen for callbacks for the OAuth 2.0 provider.\n\n```rust,no_run\nasync fn example_oauth2_listen_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .listen_provider_callback(\n            Some(\"uesvhrxo\".to_string()),\n            kittycad::types::AccountProvider::Github,\n            Some(\"fisy\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Listen for callbacks for the OAuth 2.0 provider.\n\n```rust,no_run\nasync fn example_oauth2_listen_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .listen_provider_callback(\n            Some(\"\".to_string()),\n            kittycad::types::AccountProvider::Google,\n            Some(\"abq\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n```"]
     pub async fn listen_provider_callback<'a>(
         &'a self,
         code: Option<String>,
@@ -128,7 +128,7 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Get the consent URL and other information for the OAuth 2.0 provider.\n\n```rust,no_run\nasync fn example_oauth2_listen_provider_consent() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo = client\n        .oauth2()\n        .listen_provider_consent(Some(\"f\".to_string()), kittycad::types::AccountProvider::Google)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get the consent URL and other information for the OAuth 2.0 provider.\n\n```rust,no_run\nasync fn example_oauth2_listen_provider_consent() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo = client\n        .oauth2()\n        .listen_provider_consent(Some(\"\".to_string()), kittycad::types::AccountProvider::Github)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn listen_provider_consent<'a>(
         &'a self,
         callback_url: Option<String>,
