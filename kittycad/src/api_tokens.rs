@@ -149,7 +149,7 @@ impl ApiTokens {
              kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = \
              client\n        .api_tokens()\n        \
              .get_api_token_for_user(uuid::Uuid::from_str(\n            \
-             \"536bfec5-8fcb-49fa-9bba-db391d4a3eb1\",\n        )?)\n        .await?;\n    \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn get_api_token_for_user<'a>(
         &'a self,
@@ -179,7 +179,7 @@ impl ApiTokens {
         }
     }
 
-    #[doc = "Delete an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\nThis endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_api_tokens_delete_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .api_tokens()\n        .delete_api_token_for_user(uuid::Uuid::from_str(\n            \"263765ba-f3cb-4116-bf57-b65f0c253835\",\n        )?)\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Delete an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\nThis endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_api_tokens_delete_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .api_tokens()\n        .delete_api_token_for_user(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    Ok(())\n}\n```"]
     pub async fn delete_api_token_for_user<'a>(
         &'a self,
         token: uuid::Uuid,

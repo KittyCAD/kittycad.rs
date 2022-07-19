@@ -40,7 +40,7 @@ jobs:
       - name: Ensure no files changed
         shell: bash
         run: |
-          if [[ `git status --porcelain kittycad/README.md` ]]; then
+          if [[ `git status --porcelain kittycad/` ]]; then
             echo "Files changed, exiting";
             exit 1;
           else

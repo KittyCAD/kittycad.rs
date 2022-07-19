@@ -292,72 +292,71 @@ pub fn generate_example_rust_from_schema(
 ) -> Result<proc_macro2::TokenStream> {
     Ok(match &schema.schema_kind {
         openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
-            let random_value = generate_example_json_from_schema(schema, spec)?.to_string();
-            let random_value = random_value.trim_start_matches('"').trim_end_matches('"');
-
             if !s.enumeration.is_empty() {
                 let name_ident = crate::types::get_type_name_for_schema(name, schema, spec, false)?;
                 // Get a random item from the enum.
+                let random_value = generate_example_json_from_schema(schema, spec)?.to_string();
+                let random_value = random_value.trim_start_matches('"').trim_end_matches('"');
                 let item_ident = format_ident!("{}", crate::types::proper_name(random_value));
 
                 quote!(#name_ident::#item_ident)
             } else if s.format.is_empty() {
-                quote!(#random_value.to_string())
+                quote!("some-string".to_string())
             } else {
                 match &s.format {
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::DateTime) => {
                         quote!(chrono::Utc::now())
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Date) => {
-                        quote!(
-                            chrono::NaiveDate::parse_from_str(#random_value, "%Y-%m-%d")?
-                        )
+                        quote!(chrono::Utc::now().date().naive_utc())
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Password) => {
-                        quote!(#random_value.to_string())
+                        quote!("some-password".to_string())
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Byte) => {
-                        quote!(#random_value.to_string())
+                        quote!("some-base64-encoded-string".to_string())
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Binary) => {
-                        quote!(bytes::Bytes::from(#random_value))
+                        quote!(bytes::Bytes::from("some-string"))
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Empty => quote!(""),
                     openapiv3::VariantOrUnknownOrEmpty::Unknown(f) => match f.as_str() {
-                        "float" => quote!(#random_value.to_string()),
-                        "int64" => quote!(#random_value.to_string()),
-                        "uint64" => quote!(#random_value.to_string()),
-                        "ipv4" => quote!(std::net::Ipv4Addr::from_str(#random_value)?),
+                        "float" => quote!("123.245"),
+                        "int64" => quote!("123"),
+                        "uint64" => quote!("123"),
+                        "ipv4" => quote!(std::net::Ipv4Addr::from_str("203.0.113.1")?),
                         "ipv6" => {
-                            quote!(std::net::Ipv6Addr::from_str(#random_value)?)
+                            quote!(std::net::Ipv6Addr::from_str("2001:db8:8:4::2")?)
                         }
                         "ip" => {
-                            quote!(std::net::IpAddr::from_str(#random_value)?)
+                            quote!(std::net::IpAddr::from_str("2001:db8:8:4::2")?)
                         }
-                        "uri" => quote!(url::Url::from_str(#random_value)?),
+                        "uri" => quote!(url::Url::from_str("https://example.com/foo/bar")?),
                         "uri-template" => {
-                            quote!(#random_value)
+                            quote!("http://example.com/{folder}/{file}.json")
                         }
-                        "url" => quote!(url::Url::from_str(#random_value)?),
+                        "url" => quote!(url::Url::from_str("https://example.com/foo/bar")?),
                         "email" => {
-                            quote!(#random_value.to_string())
+                            quote!("email@example.com".to_string())
                         }
-                        "phone" => quote!(
-                            crate::types::phone_number::PhoneNumber::from_str(#random_value)?
-                        ),
-                        "uuid" => quote!(uuid::Uuid::from_str(#random_value)?),
+                        "phone" => quote!(crate::types::phone_number::PhoneNumber::from_str(
+                            "+1555-555-5555"
+                        )?),
+                        "uuid" => quote!(uuid::Uuid::from_str(
+                            "d9797f8d-9ad6-4e08-90d7-2ec17e13471c"
+                        )?),
                         "hostname" => {
-                            quote!(#random_value)
+                            quote!("localhost")
                         }
                         "time" => {
-                            quote!(chrono::NaiveTime::parse_from_str(#random_value, "%H:%M:%S")?)
+                            quote!(chrono::Utc::now().time())
                         }
                         "date" => {
-                            quote!(chrono::NaiveDate::parse_from_str(#random_value, "%Y-%m-%d")?)
+                            quote!(chrono::Utc::now().date().naive_utc())
                         }
                         "date-time" => quote!(chrono::Utc::now()),
                         "partial-date-time" => {
-                            quote!(chrono::NaiveDateTime::parse_from_str(#random_value, "%Y-%m-%d %H:%M:%S")?)
+                            quote!(chrono::Utc::now().naive_utc())
                         }
                         f => {
                             anyhow::bail!("XXX unknown string format {}", f)
