@@ -10,7 +10,7 @@ impl Payments {
         Self { client }
     }
 
-    #[doc = "Get payment info about your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It gets the payment information for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_get_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer =\n        client.payments().get_payment_information_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
+    #[doc = "Get payment info about your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It gets the payment information for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_get_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer =\n        client.payments().get_payment_information_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn get_payment_information_for_user<'a>(
         &'a self,
     ) -> Result<crate::types::Customer, crate::types::error::Error> {
@@ -34,7 +34,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Update payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It updates the payment information for the authenticated user.\n\n```rust,no_run\n\nuse std::str::FromStr;\nasync fn example_payments_update_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = client\n        .payments()\n        .update_payment_information_for_user(&kittycad::types::BillingInfo {\n            address: Some(kittycad::types::Address {\n                city: Some(\"kglgkutfj\".to_string()),\n                country: Some(\"qoicecdkq\".to_string()),\n                created_at: chrono::Utc::now(),\n                id: uuid::Uuid::from_str(\"005ee479-890b-481c-bc17-1cde352778ba\")?,\n                state: Some(\"hesfxwgdx\".to_string()),\n                street_1: Some(\"oxhbi\".to_string()),\n                street_2: Some(\"\".to_string()),\n                updated_at: chrono::Utc::now(),\n                user_id: Some(\"lnh\".to_string()),\n                zip: Some(\"colhkgall\".to_string()),\n            }),\n            name: Some(\"ouff\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1 268-472-4053\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
+    #[doc = "Update payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It updates the payment information for the authenticated user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_payments_update_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = client\n        .payments()\n        .update_payment_information_for_user(&kittycad::types::BillingInfo {\n            address: Some(Address {\n                city: Some(\"ydwlpl\".to_string()),\n                country: Some(\"qtuyigxlo\".to_string()),\n                created_at: chrono::Utc::now(),\n                id: uuid::Uuid::from_str(\"39bdb3ee-efa3-4b85-8199-e19ffcd0a936\")?,\n                state: Some(\"cewc\".to_string()),\n                street_1: Some(\"\".to_string()),\n                street_2: Some(\"sxdpuylnj\".to_string()),\n                updated_at: chrono::Utc::now(),\n                user_id: Some(\"gxtlro\".to_string()),\n                zip: Some(\"hnempcqvg\".to_string()),\n            }),\n            name: Some(\"qvvmtydvk\".to_string()),\n            phone: Some(kittycad::types::phone_number::PhoneNumber::from_str(\n                \"+1 277-127-6160\",\n            )?),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn update_payment_information_for_user<'a>(
         &'a self,
         body: &crate::types::BillingInfo,
@@ -60,7 +60,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Create payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It creates the payment information for the authenticated user.\n\n```rust,no_run\n\nuse std::str::FromStr;\nasync fn example_payments_create_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = client\n        .payments()\n        .create_payment_information_for_user(&kittycad::types::BillingInfo {\n            address: Some(kittycad::types::Address {\n                city: Some(\"baq\".to_string()),\n                country: Some(\"gfsyvxhcm\".to_string()),\n                created_at: chrono::Utc::now(),\n                id: uuid::Uuid::from_str(\"d480689a-1c9e-49cf-b6ea-9e2567eda587\")?,\n                state: Some(\"jjrs\".to_string()),\n                street_1: Some(\"hpdco\".to_string()),\n                street_2: Some(\"p\".to_string()),\n                updated_at: chrono::Utc::now(),\n                user_id: Some(\"cvlo\".to_string()),\n                zip: Some(\"jblgplxgo\".to_string()),\n            }),\n            name: Some(\"sooo\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1 350-848-2875\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
+    #[doc = "Create payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It creates the payment information for the authenticated user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_payments_create_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = client\n        .payments()\n        .create_payment_information_for_user(&kittycad::types::BillingInfo {\n            address: Some(Address {\n                city: Some(\"wyhyn\".to_string()),\n                country: Some(\"ib\".to_string()),\n                created_at: chrono::Utc::now(),\n                id: uuid::Uuid::from_str(\"8960aae0-cc64-4d7b-b691-4d27bfd91831\")?,\n                state: Some(\"cgmcuykip\".to_string()),\n                street_1: Some(\"rrnyqruqd\".to_string()),\n                street_2: Some(\"hatkf\".to_string()),\n                updated_at: chrono::Utc::now(),\n                user_id: Some(\"e\".to_string()),\n                zip: Some(\"\".to_string()),\n            }),\n            name: Some(\"\".to_string()),\n            phone: Some(kittycad::types::phone_number::PhoneNumber::from_str(\n                \"+1 467-464-4366\",\n            )?),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_payment_information_for_user<'a>(
         &'a self,
         body: &crate::types::BillingInfo,
@@ -86,7 +86,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Delete payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It deletes the payment information for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_delete_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_payment_information_for_user()\n        .await?;\n    Ok(())\n}\n\n```"]
+    #[doc = "Delete payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It deletes the payment information for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_delete_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_payment_information_for_user()\n        .await?;\n    Ok(())\n}\n```"]
     pub async fn delete_payment_information_for_user<'a>(
         &'a self,
     ) -> Result<(), crate::types::error::Error> {
@@ -104,7 +104,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Get balance for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It gets the balance information for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_get_payment_balance_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance =\n        client.payments().get_payment_balance_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
+    #[doc = "Get balance for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It gets the balance information for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_get_payment_balance_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance =\n        client.payments().get_payment_balance_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn get_payment_balance_for_user<'a>(
         &'a self,
     ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
@@ -128,7 +128,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Create a payment intent for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It creates a new payment intent for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_create_payment_intent_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PaymentIntent =\n        client.payments().create_payment_intent_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
+    #[doc = "Create a payment intent for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It creates a new payment intent for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_create_payment_intent_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PaymentIntent =\n        client.payments().create_payment_intent_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_payment_intent_for_user<'a>(
         &'a self,
     ) -> Result<crate::types::PaymentIntent, crate::types::error::Error> {
@@ -152,7 +152,7 @@ impl Payments {
         }
     }
 
-    #[doc = "List invoices for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It lists invoices for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_list_invoices_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::Invoice> = client.payments().list_invoices_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
+    #[doc = "List invoices for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It lists invoices for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_list_invoices_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::Invoice> = client.payments().list_invoices_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn list_invoices_for_user<'a>(
         &'a self,
     ) -> Result<Vec<crate::types::Invoice>, crate::types::error::Error> {
@@ -176,7 +176,7 @@ impl Payments {
         }
     }
 
-    #[doc = "List payment methods for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It lists payment methods for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_list_payment_methods_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::PaymentMethod> =\n        client.payments().list_payment_methods_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
+    #[doc = "List payment methods for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It lists payment methods for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_list_payment_methods_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::PaymentMethod> =\n        client.payments().list_payment_methods_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn list_payment_methods_for_user<'a>(
         &'a self,
     ) -> Result<Vec<crate::types::PaymentMethod>, crate::types::error::Error> {
@@ -200,7 +200,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Delete a payment method for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the specified payment method for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_delete_payment_method_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_payment_method_for_user(\"caamfgv\")\n        .await?;\n    Ok(())\n}\n\n```"]
+    #[doc = "Delete a payment method for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the specified payment method for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_delete_payment_method_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_payment_method_for_user(\"f\")\n        .await?;\n    Ok(())\n}\n```"]
     pub async fn delete_payment_method_for_user<'a>(
         &'a self,
         id: &'a str,

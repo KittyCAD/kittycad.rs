@@ -390,17 +390,17 @@ pub fn generate_example_rust_from_schema(
             quote!(4 as #t)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
-            let object_name: proc_macro2::TokenStream =
-                name.parse().map_err(|e| anyhow::anyhow!("{}", e))?;
+            let object_name = crate::types::get_type_name_for_schema(name, schema, spec, false)?;
+
             // Generate a random object.
             let mut args = Vec::new();
             for (k, v) in o.properties.iter() {
                 let inner_name = match v {
                     openapiv3::ReferenceOr::Reference { .. } => {
-                        crate::types::get_type_name_from_reference(&v.reference()?, spec, false)?
+                        crate::types::get_type_name_from_reference(&v.reference()?, spec, true)?
                     }
                     openapiv3::ReferenceOr::Item(s) => {
-                        crate::types::get_type_name_for_schema("", s, spec, false)?
+                        crate::types::get_type_name_for_schema("", s, spec, true)?
                     }
                 }
                 .strip_option()?

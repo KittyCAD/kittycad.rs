@@ -93,7 +93,8 @@ pub fn generate_files(
             let rust_doc_example_code_fn = &example_code_fn[example_code_fn
                 .find("\nuse ")
                 .unwrap_or_else(|| example_code_fn.find("async fn example_").unwrap_or(0))
-                ..example_code_fn.len()];
+                ..example_code_fn.len()]
+                .trim();
 
             // Add our example code to our docs.
             // This way we can test the examples compile by running `rust doc`.
@@ -1001,7 +1002,8 @@ fn generate_example_code_fn(
             async fn #example_stream_fn_name_ident() -> anyhow::Result<()> {
                 #client_code
 
-                let stream =  client.#tag_ident().#stream_fn_name_ident(#min_args #request_body);
+                let mut #tag_ident =  client.#tag_ident();
+                let mut stream = #tag_ident.#stream_fn_name_ident(#min_args #request_body);
 
                 // Loop over the items in the stream.
                 loop {
@@ -1015,7 +1017,7 @@ fn generate_example_code_fn(
                         }
                         Err(err) => {
                             // Handle the error.
-                            return Err(err);
+                            return Err(err.into());
                         },
                     }
                 }
