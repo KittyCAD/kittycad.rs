@@ -53,7 +53,7 @@ pub fn generate_files(
             let fn_name_ident = format_ident!("{}", fn_name);
 
             // Get the response for the function.
-            let response_type = if let Some(response) = get_response_type(op, spec)? {
+            let response_type = if let Some(response) = get_response_type(name, method, op, spec)? {
                 let t = response.type_name;
                 quote!(#t)
             } else {
@@ -75,7 +75,7 @@ pub fn generate_files(
             };
 
             // Get the request body for the function if there is one.
-            let request_body = if let Some(rb) = get_request_body(op, spec)? {
+            let request_body = if let Some(rb) = get_request_body(name, method, op, spec)? {
                 let t = rb.type_name;
                 // We add the comma at the front, so it works.
                 quote!(, body: &#t)
@@ -405,6 +405,8 @@ struct RequestOrResponse {
 
 /// Return the response type for the operation.
 fn get_response_type(
+    name: &str,
+    method: &http::Method,
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
 ) -> Result<Option<RequestOrResponse>> {
@@ -416,7 +418,7 @@ fn get_response_type(
             let response = response.expand(spec)?;
 
             // Iterate over all the media types and return the first response.
-            for (name, content) in &response.content {
+            for (media_type, content) in &response.content {
                 if let Some(s) = &content.schema {
                     let t = match s {
                         openapiv3::ReferenceOr::Reference { .. } => {
@@ -426,14 +428,17 @@ fn get_response_type(
                                 false,
                             )?
                         }
-                        openapiv3::ReferenceOr::Item(s) => {
-                            crate::types::get_type_name_for_schema("", s, spec, false)?
-                        }
+                        openapiv3::ReferenceOr::Item(s) => crate::types::get_type_name_for_schema(
+                            &generate_name_for_fn_schema(name, method, &s, op, "Response"),
+                            s,
+                            spec,
+                            false,
+                        )?,
                     };
 
                     // Return early since we found the type.
                     return Ok(Some(RequestOrResponse {
-                        media_type: name.to_string(),
+                        media_type: media_type.to_string(),
                         type_name: t,
                     }));
                 }
@@ -443,6 +448,26 @@ fn get_response_type(
 
     // We couldn't find a type for the response.
     Ok(None)
+}
+
+/// Return the schema name for the type.
+/// We use this for populating the name of the type, if there is not one.
+fn generate_name_for_fn_schema(
+    name: &str,
+    method: &http::Method,
+    schema: &openapiv3::Schema,
+    op: &openapiv3::Operation,
+    addition: &str,
+) -> String {
+    if let Some(title) = &schema.schema_data.title {
+        return title.to_string();
+    }
+
+    if let Some(operation_id) = &op.operation_id {
+        return format!("{} {}", operation_id, addition);
+    }
+
+    format!("{} {} {}", name, method, addition)
 }
 
 /// Return the function arguments for the operation.
@@ -461,6 +486,8 @@ fn get_args(
 
 /// Return the request body type for the operation.
 fn get_request_body(
+    name: &str,
+    method: &http::Method,
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
 ) -> Result<Option<RequestOrResponse>> {
@@ -469,21 +496,24 @@ fn get_request_body(
         let request_body = request_body.expand(spec)?;
 
         // Iterate over all the media types and return the first request.
-        for (name, content) in &request_body.content {
+        for (media_type, content) in &request_body.content {
             if let Some(s) = &content.schema {
                 let t = match s {
                     openapiv3::ReferenceOr::Reference { .. } => {
                         crate::types::get_type_name_from_reference(&s.reference()?, spec, false)?
                     }
-                    openapiv3::ReferenceOr::Item(s) => {
-                        crate::types::get_type_name_for_schema("", s, spec, false)?
-                    }
+                    openapiv3::ReferenceOr::Item(s) => crate::types::get_type_name_for_schema(
+                        &generate_name_for_fn_schema(name, method, &s, op, "Request Body"),
+                        s,
+                        spec,
+                        false,
+                    )?,
                 };
 
                 // Return early since we found the type.
                 // We start with a comma here so it's not weird.
                 return Ok(Some(RequestOrResponse {
-                    media_type: name.to_string(),
+                    media_type: media_type.to_string(),
                     type_name: t,
                 }));
             }
@@ -497,6 +527,8 @@ fn get_request_body(
 
 /// Return the request body type example for the operation.
 fn get_request_body_example(
+    name: &str,
+    method: &http::Method,
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
 ) -> Result<Option<RequestOrResponse>> {
@@ -505,7 +537,7 @@ fn get_request_body_example(
         let request_body = request_body.expand(spec)?;
 
         // Iterate over all the media types and return the first request.
-        for (name, content) in &request_body.content {
+        for (media_type, content) in &request_body.content {
             if let Some(s) = &content.schema {
                 let t = match s {
                     openapiv3::ReferenceOr::Reference { .. } => {
@@ -521,14 +553,18 @@ fn get_request_body_example(
                         )?
                     }
                     openapiv3::ReferenceOr::Item(s) => {
-                        crate::types::example::generate_example_rust_from_schema("", s, spec)?
+                        crate::types::example::generate_example_rust_from_schema(
+                            &generate_name_for_fn_schema(name, method, &s, op, "Request Body"),
+                            s,
+                            spec,
+                        )?
                     }
                 };
 
                 // Return early since we found the type.
                 // We start with a comma here so it's not weird.
                 return Ok(Some(RequestOrResponse {
-                    media_type: name.to_string(),
+                    media_type: media_type.to_string(),
                     type_name: t,
                 }));
             }
@@ -816,7 +852,7 @@ fn get_function_body(
     };
 
     // Get if there is a request body.
-    let request_body = if let Some(request_body) = get_request_body(op, spec)? {
+    let request_body = if let Some(request_body) = get_request_body(name, method, op, spec)? {
         match request_body.media_type.as_str() {
             "application/json" => {
                 quote! {
@@ -849,7 +885,7 @@ fn get_function_body(
     };
 
     // Get the response if there is one.
-    let response = if let Some(response) = get_response_type(op, spec)? {
+    let response = if let Some(response) = get_response_type(name, method, op, spec)? {
         match response.media_type.as_str() {
             "application/json" => {
                 quote! {
@@ -974,7 +1010,7 @@ fn generate_example_code_fn(
 
     let mut function_start = quote!();
     let mut print_result = quote!();
-    if let Some(response) = get_response_type(op, spec)? {
+    if let Some(response) = get_response_type(name, method, op, spec)? {
         let t = response.type_name;
         function_start = quote!(let result: #t = );
         print_result = quote!(println!("{:?}", result););
@@ -990,7 +1026,7 @@ fn generate_example_code_fn(
     };
 
     // Get the request body for the function if there is one.
-    let request_body = if let Some(rb) = get_request_body_example(op, spec)? {
+    let request_body = if let Some(rb) = get_request_body_example(name, method, op, spec)? {
         let t = rb.type_name;
         // We add the comma at the front, so it works.
         quote!(&#t)

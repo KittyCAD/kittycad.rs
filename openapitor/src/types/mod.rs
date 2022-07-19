@@ -190,26 +190,7 @@ pub fn get_type_name_for_schema(
             }
         }
         openapiv3::SchemaKind::AllOf { all_of } => {
-            if all_of.len() != 1 {
-                // This became an object type, so render it as such.
-                return get_type_name_for_object(
-                    name,
-                    &openapiv3::ObjectType::default(),
-                    &schema.schema_data,
-                    spec,
-                    in_crate,
-                );
-            }
-
-            let internal_schema = &all_of[0];
-            match internal_schema {
-                openapiv3::ReferenceOr::Reference { .. } => {
-                    get_type_name_from_reference(&internal_schema.reference()?, spec, in_crate)?
-                }
-                openapiv3::ReferenceOr::Item(s) => {
-                    get_type_name_for_schema(name, s, spec, in_crate)?
-                }
-            }
+            get_type_name_for_all_of(name, all_of, &schema.schema_data, spec, in_crate)?
         }
         openapiv3::SchemaKind::AnyOf { any_of: _ } => get_type_name_for_object(
             name,
@@ -494,6 +475,13 @@ fn get_type_name_for_object(
         }
     }
 
+    if o == &openapiv3::ObjectType::default()
+        && name.is_empty()
+        && data == &openapiv3::SchemaData::default()
+    {
+        anyhow::bail!("object `{}` has no properties: {:?} => {:?}", name, o, data);
+    }
+
     // We have an object type.
     // Get the name for the object.
     let ident = get_type_name(name, data)?;
@@ -502,6 +490,35 @@ fn get_type_name_for_object(
     } else {
         quote!(crate::types::#ident)
     };
+    Ok(t)
+}
+
+/// Get the type name for an all of type.
+fn get_type_name_for_all_of(
+    name: &str,
+    all_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
+    data: &openapiv3::SchemaData,
+    spec: &openapiv3::OpenAPI,
+    in_crate: bool,
+) -> Result<proc_macro2::TokenStream> {
+    if all_ofs.len() == 1 {
+        let internal_schema = &all_ofs[0];
+        return match internal_schema {
+            openapiv3::ReferenceOr::Reference { .. } => {
+                get_type_name_from_reference(&internal_schema.reference()?, spec, in_crate)
+            }
+            openapiv3::ReferenceOr::Item(s) => get_type_name_for_schema(name, s, spec, in_crate),
+        };
+    }
+
+    // This became its own object.
+    let ident = get_type_name(name, data)?;
+    let t = if in_crate {
+        quote!(#ident)
+    } else {
+        quote!(crate::types::#ident)
+    };
+
     Ok(t)
 }
 
