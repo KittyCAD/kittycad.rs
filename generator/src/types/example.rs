@@ -402,18 +402,19 @@ pub fn generate_example_rust_from_schema(
                     openapiv3::ReferenceOr::Item(s) => {
                         crate::types::get_type_name_for_schema("", s, spec, true)?
                     }
-                }
-                .strip_option()?
-                .rendered()?;
+                };
+
+                let inner_name_rendered = inner_name.strip_option()?.rendered()?;
 
                 let inner_schema = v.get_schema_from_reference(spec, true)?;
 
-                let example = generate_example_rust_from_schema(&inner_name, &inner_schema, spec)?;
+                let example =
+                    generate_example_rust_from_schema(&inner_name_rendered, &inner_schema, spec)?;
 
                 let k_ident = format_ident!("{}", crate::types::clean_property_name(k));
 
                 // Check if this type is required.
-                if !o.required.contains(k) && inner_name != "PhoneNumber" {
+                if !o.required.contains(k) && !inner_name.is_option()? {
                     args.push(quote!(#k_ident: Some(#example)));
                 } else {
                     args.push(quote!(#k_ident: #example));
