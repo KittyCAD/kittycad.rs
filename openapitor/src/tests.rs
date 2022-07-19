@@ -27,7 +27,7 @@ impl AsyncTestContext for TestContext {
     async fn teardown(self) {
         println!("Removing {}", self.tmp_dir.display());
         // Delete the temporary directory.
-        std::fs::remove_dir_all(&self.tmp_dir).unwrap();
+        // std::fs::remove_dir_all(&self.tmp_dir).unwrap();
     }
 }
 
@@ -42,7 +42,7 @@ async fn test_kittycad_generation(ctx: &mut TestContext) {
         base_url: "https://api.kittycad.io".parse().unwrap(),
         name: "kittycad".to_string(),
         version: "1.0.0".to_string(),
-        description: "KittyCad is a tool for generating 3D models of cats.".to_string(),
+        description: "KittyCAD is a tool for generating 3D models of cats.".to_string(),
         spec_url: Some("https://api.kittycad.io".to_string()),
         repo_name: Some("kittycad/kittycad.rs".to_string()),
     };
