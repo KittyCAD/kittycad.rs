@@ -333,7 +333,7 @@ pub fn generate_example_rust_from_schema(
                         quote!(#random_value.to_string())
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Binary) => {
-                        quote!(#random_value.to_string())
+                        quote!(bytes::Bytes::from(#random_value))
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Empty => quote!(""),
                     openapiv3::VariantOrUnknownOrEmpty::Unknown(f) => match f.as_str() {
