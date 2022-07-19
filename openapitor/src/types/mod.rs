@@ -809,8 +809,6 @@ fn render_object(
         );
     }
 
-    // TODO: defaults
-
     // Implement pagination for this type if we should.
     let mut pagination = quote!();
     let pagination_properties = PaginationProperties::from_object(o, spec)?;
