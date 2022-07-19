@@ -1,0 +1,65 @@
+#[doc = "A route defines a rule that governs where traffic should be sent based on its destination."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct RouterRoute {
+    #[doc = "human-readable free-form text about a resource"]
+    pub description: String,
+    #[doc = "A `RouteDestination` is used to match traffic with a routing rule, on the destination of that traffic.\n\nWhen traffic is to be sent to a destination that is within a given `RouteDestination`, the corresponding [`RouterRoute`] applies, and traffic will be forward to the [`RouteTarget`] for that rule."]
+    pub destination: RouteDestination,
+    #[doc = "unique, immutable, system-controlled identifier for each resource"]
+    pub id: uuid::Uuid,
+    #[doc = "Describes the kind of router. Set at creation. `read-only`"]
+    pub kind: RouterRouteKind,
+    #[doc = "unique, mutable, user-controlled identifier for each resource"]
+    pub name: String,
+    #[doc = "A `RouteTarget` describes the possible locations that traffic matching a route destination can be sent."]
+    pub target: RouteTarget,
+    #[doc = "timestamp when this resource was created"]
+    pub time_created: chrono::DateTime<chrono::Utc>,
+    #[doc = "timestamp when this resource was last modified"]
+    pub time_modified: chrono::DateTime<chrono::Utc>,
+    #[doc = "The VPC Router to which the route belongs."]
+    pub vpc_router_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for RouterRoute {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for RouterRoute {
+    const LENGTH: usize = 9;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            self.description.clone(),
+            format!("{:?}", self.destination),
+            format!("{:?}", self.id),
+            format!("{:?}", self.kind),
+            self.name.clone(),
+            format!("{:?}", self.target),
+            format!("{:?}", self.time_created),
+            format!("{:?}", self.time_modified),
+            format!("{:?}", self.vpc_router_id),
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "description".to_string(),
+            "destination".to_string(),
+            "id".to_string(),
+            "kind".to_string(),
+            "name".to_string(),
+            "target".to_string(),
+            "time_created".to_string(),
+            "time_modified".to_string(),
+            "vpc_router_id".to_string(),
+        ]
+    }
+}

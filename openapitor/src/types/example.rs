@@ -518,8 +518,64 @@ pub fn generate_example_rust_from_schema(
                 quote!(#type_name::#enum_name(#example))
             }
         }
-        openapiv3::SchemaKind::AllOf { all_of: _ } => {
-            anyhow::bail!("XXX all of not supported yet");
+        openapiv3::SchemaKind::AllOf { all_of } => {
+            if all_of.len() == 1 {
+                let all_of_item = &all_of[0];
+                let all_of_item_schema = all_of_item.get_schema_from_reference(spec, true)?;
+                generate_example_rust_from_schema(name, &all_of_item_schema, spec)?
+            } else {
+                // The all of needs to be an object with all the values.
+                // We want to iterate over each of the subschemas and combine all of the types.
+                // We assume all of the subschemas are objects.
+                let mut properties: IndexMap<
+                    String,
+                    openapiv3::ReferenceOr<Box<openapiv3::Schema>>,
+                > = IndexMap::new();
+                let mut required: Vec<String> = Vec::new();
+                for a in all_of {
+                    // Get the schema for this all of.
+                    let schema = a.get_schema_from_reference(spec, true)?;
+
+                    // Ensure the type is an object.
+                    if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
+                        &schema.schema_kind
+                    {
+                        for (k, v) in o.properties.iter() {
+                            properties.insert(k.clone(), v.clone());
+                        }
+                        required.extend(o.required.iter().cloned());
+                    } else {
+                        // We got something that is not an object.
+                        // Therefore we need to render this as a one of instead.
+                        // Since it includes primitive types, we need to render this as a one of.
+                        return generate_example_rust_from_schema(
+                            name,
+                            &openapiv3::Schema {
+                                schema_data: schema.schema_data.clone(),
+                                schema_kind: openapiv3::SchemaKind::OneOf {
+                                    one_of: all_of.clone(),
+                                },
+                            },
+                            spec,
+                        );
+                    }
+                }
+
+                generate_example_rust_from_schema(
+                    name,
+                    &openapiv3::Schema {
+                        schema_data: schema.schema_data.clone(),
+                        schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(
+                            openapiv3::ObjectType {
+                                properties,
+                                required,
+                                ..Default::default()
+                            },
+                        )),
+                    },
+                    spec,
+                )?
+            }
         }
         openapiv3::SchemaKind::AnyOf { any_of } => {
             if any_of.len() == 1 {

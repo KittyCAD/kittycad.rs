@@ -581,11 +581,10 @@ fn render_all_of(
             }
             required.extend(o.required.iter().cloned());
         } else {
-            anyhow::bail!(
-                "all of is not an object, cannot get type name: {} => {:?}",
-                name,
-                all_of
-            );
+            // We got something that is not an object.
+            // Therefore we need to render this as a one of instead.
+            // Since it includes primitive types, we need to render this as a one of.
+            return render_one_of(name, all_ofs, data, spec);
         }
     }
 
@@ -989,7 +988,12 @@ fn render_object(
         };
 
         // Get the type name for the schema.
-        let mut type_name = get_type_name_for_schema(&prop, &inner_schema, spec, true)?;
+        let mut type_name = if let openapiv3::ReferenceOr::Item(i) = v {
+            get_type_name_for_schema(&prop, &i, spec, true)?
+        } else {
+            get_type_name_from_reference(&v.reference()?, spec, true)?
+        };
+
         // Check if this type is required.
         if !o.required.contains(k) && !type_name.is_option()? {
             // Make the type optional.
@@ -1294,7 +1298,7 @@ fn render_enum(
         let default = default.to_string();
         let default = format_ident!("{}", proper_name(&default));
         quote!(
-            impl Default for #enum_name {
+            impl std::default::Default for #enum_name {
                 fn default() -> Self {
                     #default
                 }
@@ -1304,7 +1308,7 @@ fn render_enum(
         let default = s.enumeration[0].as_ref().unwrap().to_string();
         let default = format_ident!("{}", proper_name(&default));
         quote!(
-            impl Default for #enum_name {
+            impl std::default::Default for #enum_name {
                 fn default() -> Self {
                     #enum_name::#default
                 }
@@ -1680,6 +1684,15 @@ mod test {
     }
 
     #[test]
+    fn test_generate_oxide_types() {
+        let result = super::generate_types(
+            &crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
+        )
+        .unwrap();
+        expectorate::assert_contents("tests/types/oxide.rs.gen", &result);
+    }
+
+    #[test]
     fn test_proper_name_number() {
         assert_eq!(super::proper_name("1"), "One");
         assert_eq!(super::proper_name("2"), "Two");
@@ -1700,5 +1713,87 @@ mod test {
     fn test_clean_property_name() {
         assert_eq!(super::clean_property_name("+1"), "plus_one");
         assert_eq!(super::clean_property_name("-1"), "minus_one");
+    }
+
+    #[test]
+    fn test_schema_parsing_with_refs() {
+        let schema = r##"{
+        "description": "A route defines a rule that governs where traffic should be sent based on its destination.",
+        "type": "object",
+        "properties": {
+          "description": {
+            "description": "human-readable free-form text about a resource",
+            "type": "string"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/RouteDestination"
+          },
+          "id": {
+            "description": "unique, immutable, system-controlled identifier for each resource",
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "description": "Describes the kind of router. Set at creation. `read-only`",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RouterRouteKind"
+              }
+            ]
+          },
+          "name": {
+            "description": "unique, mutable, user-controlled identifier for each resource",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Name"
+              }
+            ]
+          },
+          "target": {
+            "$ref": "#/components/schemas/RouteTarget"
+          },
+          "time_created": {
+            "description": "timestamp when this resource was created",
+            "type": "string",
+            "format": "date-time"
+          },
+          "time_modified": {
+            "description": "timestamp when this resource was last modified",
+            "type": "string",
+            "format": "date-time"
+          },
+          "vpc_router_id": {
+            "description": "The VPC Router to which the route belongs.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "description",
+          "destination",
+          "id",
+          "kind",
+          "name",
+          "target",
+          "time_created",
+          "time_modified",
+          "vpc_router_id"
+        ]
+      }"##;
+
+        let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
+        println!("{:?}", schema);
+
+        let result = super::render_schema(
+            "RouterRoute",
+            &schema,
+            &crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
+        )
+        .unwrap();
+
+        expectorate::assert_contents(
+            "tests/types/oxide.router-route.rs.gen",
+            &super::get_text_fmt(&result).unwrap(),
+        );
     }
 }
