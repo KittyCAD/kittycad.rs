@@ -152,7 +152,7 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Get the consent URL and other information for the OAuth 2.0 provider.\n\n```rust,no_run\nasync fn example_oauth2_listen_provider_consent() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo = client\n        .oauth2()\n        .listen_provider_consent(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Github,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get the consent URL and other information for the OAuth 2.0 provider.\n\n```rust,no_run\nasync fn example_oauth2_listen_provider_consent() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo = client\n        .oauth2()\n        .listen_provider_consent(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Google,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn listen_provider_consent<'a>(
         &'a self,
         callback_url: Option<String>,
