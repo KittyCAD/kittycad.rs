@@ -105,7 +105,7 @@ impl Oauth2 {
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = Vec::new();
-        query_params.push(("user_code", format!("{}", user_code)));
+        query_params.push(("user_code", user_code.to_string()));
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -116,7 +116,7 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Listen for callbacks for the OAuth 2.0 provider.\n\n```rust,no_run\nasync fn example_oauth2_listen_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .listen_provider_callback(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Github,\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Listen for callbacks for the OAuth 2.0 provider.\n\n```rust,no_run\nasync fn example_oauth2_listen_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .listen_provider_callback(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Google,\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n```"]
     pub async fn listen_provider_callback<'a>(
         &'a self,
         code: Option<String>,
@@ -183,7 +183,6 @@ impl Oauth2 {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
