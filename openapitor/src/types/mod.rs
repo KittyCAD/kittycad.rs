@@ -15,7 +15,8 @@ use indexmap::map::IndexMap;
 use numeral::Cardinal;
 
 use crate::types::exts::{
-    ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt, StatusCodeExt, TokenStreamExt,
+    ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt, SchemaRenderExt, StatusCodeExt,
+    TokenStreamExt,
 };
 
 /// Our collection of all our parsed types.
@@ -101,8 +102,6 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
             type_space.render_request_body(name, &request_body.expand(spec)?)?;
         }
     }
-
-    println!("{:?}", type_space);
 
     get_text_fmt(&rendered)
 }
@@ -400,10 +399,16 @@ impl TypeSpace {
                         // This shows up as `any == true || any == false` in the spec.
                         // We should just ignore these.
                     }
-                    openapiv3::AdditionalProperties::Schema(schema) => {
-                        let rendered = self.render_schema(name, schema.item()?)?;
-                        return Ok(rendered);
-                    }
+                    openapiv3::AdditionalProperties::Schema(schema) => match schema.item() {
+                        Ok(item) => {
+                            return self.render_schema(name, item);
+                        }
+                        Err(_) => {
+                            // We have a reference, ignore this, since it is a reference we don't
+                            // need to render it.
+                            return Ok(quote!());
+                        }
+                    },
                 }
             }
         }
@@ -430,7 +435,7 @@ impl TypeSpace {
             };
 
             // Get the type name for the schema.
-            let mut type_name = if v.should_render(&self.spec)? {
+            let mut type_name = if v.should_render()? {
                 let t = proper_name(&format!("{} {}", struct_name, prop));
                 // Render the schema.
                 let rendered = self.render_schema(&t, &inner_schema)?;

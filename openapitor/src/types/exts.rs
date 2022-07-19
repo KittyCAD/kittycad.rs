@@ -220,10 +220,6 @@ pub trait ReferenceOrExt<T> {
 
     /// Get the type from a ReferenceOr.
     fn expand(&self, spec: &openapiv3::OpenAPI) -> Result<T>;
-
-    /// Returns if the schema is a type that should be rendered.
-    /// For example, an enum that is not a reference, an object that is not a reference.
-    fn should_render(&self, spec: &openapiv3::OpenAPI) -> Result<bool>;
 }
 
 impl<T: SchemaExt + Clone + std::fmt::Debug> ReferenceOrExt<T> for openapiv3::ReferenceOr<T> {
@@ -293,28 +289,6 @@ impl<T: SchemaExt + Clone + std::fmt::Debug> ReferenceOrExt<T> for openapiv3::Re
                 let ref_or = T::get_reference(reference, spec)?;
                 ref_or.expand(spec)
             }
-        }
-    }
-
-    fn should_render(&self, spec: &openapiv3::OpenAPI) -> Result<bool> {
-        match self {
-            openapiv3::ReferenceOr::Item(i) => {
-                // Check if the type is an enum.
-                match &i.recurse(spec)?.schema_kind {
-                    openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
-                        if !s.enumeration.is_empty() {
-                            Ok(true)
-                        } else {
-                            Ok(false)
-                        }
-                    }
-                    openapiv3::SchemaKind::Type(openapiv3::Type::Object(_)) => {
-                        return Ok(true);
-                    }
-                    _ => Ok(false),
-                }
-            }
-            openapiv3::ReferenceOr::Reference { reference: _ } => Ok(false),
         }
     }
 }
@@ -453,5 +427,64 @@ impl TokenStreamExt for proc_macro2::TokenStream {
         }
 
         Ok(self.clone())
+    }
+}
+
+/// A trait for types that have a `Schema`.
+pub trait SchemaRenderExt {
+    /// Returns if the schema is a type that should be rendered.
+    /// For example, an enum that is not a reference, an object that is not a reference.
+    fn should_render(&self) -> Result<bool>;
+}
+
+impl SchemaRenderExt for openapiv3::ReferenceOr<openapiv3::Schema> {
+    fn should_render(&self) -> Result<bool> {
+        match self {
+            openapiv3::ReferenceOr::Item(i) => {
+                // Check if the type is an enum.
+                match &i.schema_kind {
+                    openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
+                        if !s.enumeration.is_empty() {
+                            Ok(true)
+                        } else {
+                            Ok(false)
+                        }
+                    }
+                    openapiv3::SchemaKind::Type(openapiv3::Type::Object(_)) => {
+                        return Ok(true);
+                    }
+                    _ => Ok(false),
+                }
+            }
+            openapiv3::ReferenceOr::Reference { reference: _ } => Ok(false),
+        }
+    }
+}
+
+impl SchemaRenderExt for openapiv3::ReferenceOr<Box<openapiv3::Schema>> {
+    fn should_render(&self) -> Result<bool> {
+        match self {
+            openapiv3::ReferenceOr::Item(i) => {
+                // Check if the type is an enum.
+                match &i.schema_kind {
+                    openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
+                        if !s.enumeration.is_empty() {
+                            Ok(true)
+                        } else {
+                            Ok(false)
+                        }
+                    }
+                    openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
+                        if o.properties.is_empty() {
+                            Ok(false)
+                        } else {
+                            Ok(true)
+                        }
+                    }
+                    _ => Ok(false),
+                }
+            }
+            openapiv3::ReferenceOr::Reference { reference: _ } => Ok(false),
+        }
     }
 }
