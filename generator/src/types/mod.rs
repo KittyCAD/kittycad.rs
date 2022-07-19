@@ -1155,7 +1155,10 @@ fn get_phone_number_mod() -> Result<proc_macro2::TokenStream> {
 fn get_error_mod(opts: &Opts) -> Result<proc_macro2::TokenStream> {
     let mut file = include_str!("error.rs").to_string();
     if let Some(error) = &opts.error_type {
-        file = file.replace("error: String", &format!("error: {}", proper_name(&error)));
+        file = file.replace(
+            "error: String",
+            &format!("error: crate::types::{}", proper_name(&error)),
+        );
     }
     let stream = proc_macro2::TokenStream::from_str(&file).map_err(|e| anyhow::anyhow!("{}", e))?;
     Ok(quote!(

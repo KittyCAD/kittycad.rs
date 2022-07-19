@@ -834,6 +834,8 @@ fn get_function_body(
         )
     };
 
+    let error_response_types =
+
     Ok(quote! {
         let mut req = self.client.client.request(
             http::Method::#method_ident,

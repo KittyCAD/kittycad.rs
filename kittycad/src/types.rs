@@ -142,7 +142,7 @@ pub mod paginate {
         #[doc = " Returns true if the response has more pages."]
         fn has_more_pages(&self) -> bool;
         #[doc = " Modify a request to get the next page."]
-        fn next_page<T>(
+        fn next_page(
             &self,
             req: reqwest::Request,
         ) -> Result<reqwest::Request, crate::types::error::Error>;
@@ -321,7 +321,7 @@ pub mod error {
         #[doc = " An expected error response."]
         InvalidResponsePayload {
             #[doc = " The error."]
-            error: Error,
+            error: crate::types::Error,
             #[doc = " The full response."]
             response: reqwest::Response,
         },
