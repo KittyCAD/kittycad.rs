@@ -578,47 +578,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "generator"
-version = "0.0.0"
-dependencies = [
- "Inflector",
- "anyhow",
- "chrono",
- "clap",
- "data-encoding",
- "expectorate",
- "format_serde_error",
- "futures-util",
- "http",
- "json-patch",
- "log",
- "numeral",
- "openapiv3",
- "phonenumber",
- "pretty_assertions",
- "proc-macro2",
- "quote",
- "rand",
- "regex",
- "reqwest",
- "rustfmt-wrapper",
- "schemars",
- "serde",
- "serde_json",
- "serde_yaml",
- "slog",
- "slog-async",
- "slog-json",
- "slog-scope",
- "slog-stdlog",
- "slog-term",
- "thiserror",
- "tokio",
- "url",
- "uuid",
-]
-
-[[package]]
 name = "generic-array"
 version = "0.12.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1152,6 +1111,47 @@ name = "oncemutex"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "44d11de466f4a3006fe8a5e7ec84e93b79c70cb992ae0aa0eb631ad2df8abfe2"
+
+[[package]]
+name = "openapitor"
+version = "0.0.1"
+dependencies = [
+ "Inflector",
+ "anyhow",
+ "chrono",
+ "clap",
+ "data-encoding",
+ "expectorate",
+ "format_serde_error",
+ "futures-util",
+ "http",
+ "json-patch",
+ "log",
+ "numeral",
+ "openapiv3",
+ "phonenumber",
+ "pretty_assertions",
+ "proc-macro2",
+ "quote",
+ "rand",
+ "regex",
+ "reqwest",
+ "rustfmt-wrapper",
+ "schemars",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "slog",
+ "slog-async",
+ "slog-json",
+ "slog-scope",
+ "slog-stdlog",
+ "slog-term",
+ "thiserror",
+ "tokio",
+ "url",
+ "uuid",
+]
 
 [[package]]
 name = "openapiv3"

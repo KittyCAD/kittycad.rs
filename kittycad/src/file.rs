@@ -22,7 +22,7 @@ impl File {
              kittycad::Client::new_from_env();\n    let result: kittycad::types::FileConversion = \
              client\n        .file()\n        .create_conversion(\n            \
              kittycad::types::FileOutputFormat::Step,\n            \
-             kittycad::types::FileSourceFormat::Obj,\n            \
+             kittycad::types::FileSourceFormat::Stl,\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_conversion<'a>(
@@ -52,6 +52,7 @@ impl File {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -77,7 +78,7 @@ impl File {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "file/conversions/{id}".replace("{id}", id)
+                "file/conversions/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -90,13 +91,14 @@ impl File {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
-    #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Step,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Obj,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_density<'a>(
         &'a self,
         material_mass: f64,
@@ -122,6 +124,7 @@ impl File {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -132,7 +135,7 @@ impl File {
              example_file_create_execution() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::CodeOutput = \
              client\n        .file()\n        .create_execution(\n            \
-             kittycad::types::CodeLanguage::Python,\n            \
+             kittycad::types::CodeLanguage::Node,\n            \
              Some(\"some-string\".to_string()),\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
@@ -167,6 +170,7 @@ impl File {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -181,7 +185,7 @@ impl File {
              example_file_create_mass() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::FileMass = \
              client\n        .file()\n        .create_mass(\n            3.14 as f64,\n            \
-             kittycad::types::FileSourceFormat::Stl,\n            \
+             kittycad::types::FileSourceFormat::Dae,\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_mass<'a>(
@@ -209,6 +213,7 @@ impl File {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -249,6 +254,7 @@ impl File {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -273,7 +279,7 @@ impl File {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/file/conversions/{id}".replace("{id}", id)
+                "user/file/conversions/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -286,6 +292,7 @@ impl File {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

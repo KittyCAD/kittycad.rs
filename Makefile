@@ -8,8 +8,8 @@ generate: kittycad
 	cargo clippy --all
 	cargo test --all -- --nocapture
 
-target/debug/generator: generator/src/*.rs generator/src/*/*.rs generator/Cargo.toml spec.json
-	cargo build --bin generator
+target/debug/openapitor: openapitor/src/*.rs openapitor/src/*/*.rs openapitor/Cargo.toml spec.json
+	cargo build --bin openapitor
 
 update: update-specs
 
@@ -21,8 +21,8 @@ $(SPEC):
 	curl -sSL $(SPEC_REMOTE) -o $@
 
 .PHONY: kittycad
-kittycad: target/debug/generator
-	./target/debug/generator -i $(SPEC) -v $(VERSION) \
+kittycad: target/debug/openapitor
+	./target/debug/openapitor -i $(SPEC) -v $(VERSION) \
 		-o kittycad \
 		-n kittycad \
 		-d "A fully generated & opinionated API client for the KittyCAD API." \

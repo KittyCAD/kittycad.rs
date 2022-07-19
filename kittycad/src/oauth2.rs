@@ -105,7 +105,7 @@ impl Oauth2 {
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = Vec::new();
-        query_params.push(("user_code", user_code.to_string()));
+        query_params.push(("user_code", format!("{}", user_code)));
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -183,6 +183,7 @@ impl Oauth2 {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
