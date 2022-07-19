@@ -11,6 +11,8 @@ impl TestContext {
         let tmp_dir = std::env::temp_dir();
         let tmp_dir = tmp_dir.join(&format!("openapitor-{}", uuid::Uuid::new_v4()));
         std::fs::create_dir_all(&tmp_dir)?;
+        let src_dir = tmp_dir.clone().join("src");
+        std::fs::create_dir_all(&src_dir)?;
 
         Ok(TestContext { tmp_dir })
     }
@@ -44,8 +46,14 @@ async fn test_kittycad_generation(ctx: &mut TestContext) {
         repo_name: Some("kittycad/kittycad.rs".to_string()),
     };
 
-    // Generate the library.
+    // Load our spec.
     let spec = crate::load_json_spec(include_str!("../../spec.json")).unwrap();
+
+    // Move our test file to our output directory.
+    let test_file = include_str!("../tests/library/kittycad.tests.rs");
+    // Write our temporary file.
+    let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
+    std::fs::write(&test_file_path, test_file).unwrap();
 
     // Generate the library.
     crate::generate(&spec, &opts).await.unwrap();

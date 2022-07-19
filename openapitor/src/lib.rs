@@ -555,8 +555,13 @@ async fn run_cargo_clippy(opts: &Opts) -> Result<()> {
     };
 
     let mut cmd = tokio::process::Command::new("cargo");
-    cmd.args(["clippy", "--fix", "--allow-dirty"])
-        .current_dir(output);
+    cmd.args([
+        "clippy",
+        "--fix",
+        "--allow-dirty",
+        "--allow-no-vcs", // We need this arg for the tests.
+    ])
+    .current_dir(output);
 
     let output = cmd.output().await?;
     if !output.status.success() {

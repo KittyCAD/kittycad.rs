@@ -2335,7 +2335,7 @@ pub struct InstallationToken {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub repository_selection: Option<RepositorySelection>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub repositories: Option<Vec<crate::types::Repository>>,
+    pub repositories: Option<Vec<Repository>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub single_file: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3539,7 +3539,7 @@ pub struct Runner {
     #[doc = "The status of the runner."]
     pub status: String,
     pub busy: bool,
-    pub labels: Vec<crate::types::RunnerLabel>,
+    pub labels: Vec<RunnerLabel>,
 }
 
 impl std::fmt::Display for Runner {
@@ -3653,7 +3653,7 @@ pub struct AuthenticationToken {
     pub permissions: Option<Permissions>,
     #[doc = "The repositories this token has access to"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub repositories: Option<Vec<crate::types::Repository>>,
+    pub repositories: Option<Vec<Repository>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub single_file: Option<String>,
     #[doc = "Describe whether all repositories have been selected or there's a selection involved"]
@@ -4426,7 +4426,7 @@ pub struct CodeScanningAlertInstance {
     pub html_url: Option<String>,
     #[doc = "Classifications that have been applied to the file that triggered the alert.\nFor example identifying it as documentation, or a generated file."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub classifications: Option<Vec<Option<crate::types::CodeScanningAlertClassification>>>,
+    pub classifications: Option<Vec<Option<CodeScanningAlertClassification>>>,
 }
 
 impl std::fmt::Display for CodeScanningAlertInstance {
@@ -5238,8 +5238,7 @@ impl tabled::Tabled for AdvancedSecurityActiveCommittersUser {
 pub struct AdvancedSecurityActiveCommittersRepository {
     pub name: String,
     pub advanced_security_committers: i64,
-    pub advanced_security_committers_breakdown:
-        Vec<crate::types::AdvancedSecurityActiveCommittersUser>,
+    pub advanced_security_committers_breakdown: Vec<AdvancedSecurityActiveCommittersUser>,
 }
 
 impl std::fmt::Display for AdvancedSecurityActiveCommittersRepository {
@@ -5279,7 +5278,7 @@ pub struct AdvancedSecurityActiveCommitters {
     pub total_advanced_security_committers: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_count: Option<i64>,
-    pub repositories: Vec<crate::types::AdvancedSecurityActiveCommittersRepository>,
+    pub repositories: Vec<AdvancedSecurityActiveCommittersRepository>,
 }
 
 impl std::fmt::Display for AdvancedSecurityActiveCommitters {
@@ -5801,7 +5800,7 @@ pub struct Issue {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub assignee: Option<Assignee>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub assignees: Option<Vec<crate::types::SimpleUser>>,
+    pub assignees: Option<Vec<SimpleUser>>,
     #[doc = "A collection of related issues and pull requests."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub milestone: Option<Milestone>,
@@ -6656,7 +6655,7 @@ pub struct GistSimple {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub forks: Option<Vec<Forks>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub history: Option<Vec<crate::types::GistHistory>>,
+    pub history: Option<Vec<GistHistory>>,
     #[doc = "Gist"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fork_of: Option<ForkOf>,
@@ -10342,7 +10341,7 @@ pub struct Migration {
     pub exclude_releases: bool,
     pub exclude_owner_projects: bool,
     pub org_metadata_only: bool,
-    pub repositories: Vec<crate::types::Repository>,
+    pub repositories: Vec<Repository>,
     pub url: url::Url,
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub updated_at: chrono::DateTime<chrono::Utc>,
@@ -13360,7 +13359,7 @@ pub struct WorkflowRun {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub run_attempt: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub referenced_workflows: Option<Vec<crate::types::ReferencedWorkflow>>,
+    pub referenced_workflows: Option<Vec<ReferencedWorkflow>>,
     pub event: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
@@ -13372,7 +13371,7 @@ pub struct WorkflowRun {
     pub url: String,
     pub html_url: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pull_requests: Option<Vec<crate::types::PullRequestMinimal>>,
+    pub pull_requests: Option<Vec<PullRequestMinimal>>,
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "Simple User"]
@@ -14608,7 +14607,7 @@ pub struct Commit {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stats: Option<Stats>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub files: Option<Vec<crate::types::DiffEntry>>,
+    pub files: Option<Vec<DiffEntry>>,
 }
 
 impl std::fmt::Display for Commit {
@@ -15023,7 +15022,7 @@ pub struct CheckRun {
     #[doc = "GitHub apps are a new way to extend GitHub. They can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. GitHub apps are first class actors within GitHub."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub app: Option<App>,
-    pub pull_requests: Vec<crate::types::PullRequestMinimal>,
+    pub pull_requests: Vec<PullRequestMinimal>,
     #[doc = "A deployment created as the result of an Actions check run from a workflow that references an environment"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub deployment: Option<Deployment>,
@@ -15228,7 +15227,7 @@ pub struct CheckSuite {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub after: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pull_requests: Option<Vec<crate::types::PullRequestMinimal>>,
+    pub pull_requests: Option<Vec<PullRequestMinimal>>,
     #[doc = "GitHub apps are a new way to extend GitHub. They can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. GitHub apps are first class actors within GitHub."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub app: Option<App>,
@@ -16669,11 +16668,11 @@ pub struct PullRequestSimple {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub assignee: Option<Assignee>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub assignees: Option<Vec<crate::types::SimpleUser>>,
+    pub assignees: Option<Vec<SimpleUser>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub requested_reviewers: Option<Vec<crate::types::SimpleUser>>,
+    pub requested_reviewers: Option<Vec<SimpleUser>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub requested_teams: Option<Vec<crate::types::Team>>,
+    pub requested_teams: Option<Vec<Team>>,
     pub head: Head,
     pub base: Base,
     #[serde(rename = "_links")]
@@ -16878,7 +16877,7 @@ impl tabled::Tabled for SimpleCommitStatus {
 )]
 pub struct CombinedCommitStatus {
     pub state: String,
-    pub statuses: Vec<crate::types::SimpleCommitStatus>,
+    pub statuses: Vec<SimpleCommitStatus>,
     pub sha: String,
     pub total_count: i64,
     #[doc = "Minimal Repository"]
@@ -17136,9 +17135,9 @@ pub struct CommitComparison {
     pub ahead_by: i64,
     pub behind_by: i64,
     pub total_commits: i64,
-    pub commits: Vec<crate::types::Commit>,
+    pub commits: Vec<Commit>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub files: Option<Vec<crate::types::DiffEntry>>,
+    pub files: Option<Vec<DiffEntry>>,
 }
 
 impl std::fmt::Display for CommitComparison {
@@ -19044,7 +19043,7 @@ pub struct NullableIssue {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub assignee: Option<Assignee>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub assignees: Option<Vec<crate::types::SimpleUser>>,
+    pub assignees: Option<Vec<SimpleUser>>,
     #[doc = "A collection of related issues and pull requests."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub milestone: Option<Milestone>,
@@ -21416,7 +21415,7 @@ pub struct TimelineLineCommentedEvent {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub node_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub comments: Option<Vec<crate::types::PullRequestReviewComment>>,
+    pub comments: Option<Vec<PullRequestReviewComment>>,
 }
 
 impl std::fmt::Display for TimelineLineCommentedEvent {
@@ -21472,7 +21471,7 @@ pub struct TimelineCommitCommentedEvent {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub commit_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub comments: Option<Vec<crate::types::CommitComment>>,
+    pub comments: Option<Vec<CommitComment>>,
 }
 
 impl std::fmt::Display for TimelineCommitCommentedEvent {
@@ -22514,11 +22513,11 @@ pub struct PullRequest {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub assignee: Option<Assignee>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub assignees: Option<Vec<crate::types::SimpleUser>>,
+    pub assignees: Option<Vec<SimpleUser>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub requested_reviewers: Option<Vec<crate::types::SimpleUser>>,
+    pub requested_reviewers: Option<Vec<SimpleUser>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub requested_teams: Option<Vec<crate::types::TeamSimple>>,
+    pub requested_teams: Option<Vec<TeamSimple>>,
     pub head: Head,
     pub base: Base,
     #[serde(rename = "_links")]
@@ -22737,8 +22736,8 @@ impl tabled::Tabled for PullRequestMergeResult {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PullRequestReviewRequest {
-    pub users: Vec<crate::types::SimpleUser>,
-    pub teams: Vec<crate::types::Team>,
+    pub users: Vec<SimpleUser>,
+    pub teams: Vec<Team>,
 }
 
 impl std::fmt::Display for PullRequestReviewRequest {
@@ -23240,7 +23239,7 @@ pub struct Release {
     pub published_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "Simple User"]
     pub author: Author,
-    pub assets: Vec<crate::types::ReleaseAsset>,
+    pub assets: Vec<ReleaseAsset>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub body_html: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -24127,7 +24126,7 @@ impl tabled::Tabled for Traffic {
 pub struct CloneTraffic {
     pub count: i64,
     pub uniques: i64,
-    pub clones: Vec<crate::types::Traffic>,
+    pub clones: Vec<Traffic>,
 }
 
 impl std::fmt::Display for CloneTraffic {
@@ -24247,7 +24246,7 @@ impl tabled::Tabled for ReferrerTraffic {
 pub struct ViewTraffic {
     pub count: i64,
     pub uniques: i64,
-    pub views: Vec<crate::types::Traffic>,
+    pub views: Vec<Traffic>,
 }
 
 impl std::fmt::Display for ViewTraffic {
@@ -24735,7 +24734,7 @@ pub struct ScimUserList {
     #[serde(rename = "startIndex")]
     pub start_index: i64,
     #[serde(rename = "Resources")]
-    pub resources: Vec<crate::types::ScimUser>,
+    pub resources: Vec<ScimUser>,
 }
 
 impl std::fmt::Display for ScimUserList {
@@ -25030,7 +25029,7 @@ pub struct IssueSearchResultItem {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub active_lock_reason: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub assignees: Option<Vec<crate::types::SimpleUser>>,
+    pub assignees: Option<Vec<SimpleUser>>,
     #[doc = "Simple User"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user: Option<User>,
@@ -26908,7 +26907,7 @@ pub struct SimpleCheckSuite {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub after: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pull_requests: Option<Vec<crate::types::PullRequestMinimal>>,
+    pub pull_requests: Option<Vec<PullRequestMinimal>>,
     #[doc = "GitHub apps are a new way to extend GitHub. They can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. GitHub apps are first class actors within GitHub."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub app: Option<App>,
@@ -27057,7 +27056,7 @@ pub struct CheckRunWithSimpleCheckSuite {
     #[doc = "GitHub apps are a new way to extend GitHub. They can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. GitHub apps are first class actors within GitHub."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub app: Option<App>,
-    pub pull_requests: Vec<crate::types::PullRequestMinimal>,
+    pub pull_requests: Vec<PullRequestMinimal>,
     #[doc = "A deployment created as the result of an Actions check run from a workflow that references an environment"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub deployment: Option<Deployment>,
