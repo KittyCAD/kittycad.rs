@@ -1782,7 +1782,6 @@ mod test {
       }"##;
 
         let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
-        println!("{:?}", schema);
 
         let result = super::render_schema(
             "RouterRoute",
@@ -1793,6 +1792,44 @@ mod test {
 
         expectorate::assert_contents(
             "tests/types/oxide.router-route.rs.gen",
+            &super::get_text_fmt(&result).unwrap(),
+        );
+    }
+
+    #[test]
+    fn test_schema_parsing_one_of_with_titles() {
+        let schema = r##"{
+        "oneOf": [
+          {
+            "title": "v4",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Ipv4Net"
+              }
+            ]
+          },
+          {
+            "title": "v6",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Ipv6Net"
+              }
+            ]
+          }
+        ]
+      }"##;
+
+        let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
+
+        let result = super::render_schema(
+            "IpNet",
+            &schema,
+            &crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
+        )
+        .unwrap();
+
+        expectorate::assert_contents(
+            "tests/types/oxide.ip-net.rs.gen",
             &super::get_text_fmt(&result).unwrap(),
         );
     }

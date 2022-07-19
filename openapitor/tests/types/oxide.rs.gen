@@ -617,7 +617,7 @@ pub struct Disk {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub snapshot_id: Option<uuid::Uuid>,
     #[doc = "State of a Disk (primarily: attached or not)"]
-    pub state: State,
+    pub state: DiskState,
     #[doc = "timestamp when this resource was created"]
     pub time_created: chrono::DateTime<chrono::Utc>,
     #[doc = "timestamp when this resource was last modified"]
@@ -1291,9 +1291,9 @@ impl tabled::Tabled for Error {
 pub struct FieldSchema {
     pub name: String,
     #[doc = "The source from which a field is derived, the target or metric."]
-    pub source: Source,
+    pub source: FieldSource,
     #[doc = "The `FieldType` identifies the data type of a target or metric field."]
-    pub ty: Ty,
+    pub ty: FieldType,
 }
 
 impl std::fmt::Display for FieldSchema {
@@ -1442,7 +1442,7 @@ pub struct FleetRoleRoleAssignment {
     pub identity_id: uuid::Uuid,
     #[doc = "Describes what kind of identity is described by an id"]
     pub identity_type: IdentityType,
-    pub role_name: RoleName,
+    pub role_name: FleetRole,
 }
 
 impl std::fmt::Display for FleetRoleRoleAssignment {
@@ -2256,7 +2256,7 @@ pub struct Instance {
     #[doc = "id for the project containing this Instance"]
     pub project_id: uuid::Uuid,
     #[doc = "Running state of an Instance (primarily: booted or stopped)\n\nThis typically reflects whether it's starting, running, stopping, or stopped, but also includes states related to the Instance's lifecycle"]
-    pub run_state: RunState,
+    pub run_state: InstanceState,
     #[doc = "timestamp when this resource was created"]
     pub time_created: chrono::DateTime<chrono::Utc>,
     #[doc = "timestamp when this resource was last modified"]
@@ -2873,7 +2873,7 @@ impl tabled::Tabled for IpPoolCreate {
 )]
 pub struct IpPoolRange {
     pub id: uuid::Uuid,
-    pub range: Range,
+    pub range: IpRange,
     pub time_created: chrono::DateTime<chrono::Utc>,
 }
 
@@ -3619,7 +3619,7 @@ pub struct OrganizationRoleRoleAssignment {
     pub identity_id: uuid::Uuid,
     #[doc = "Describes what kind of identity is described by an id"]
     pub identity_type: IdentityType,
-    pub role_name: RoleName,
+    pub role_name: OrganizationRole,
 }
 
 impl std::fmt::Display for OrganizationRoleRoleAssignment {
@@ -3909,7 +3909,7 @@ pub struct ProjectRoleRoleAssignment {
     pub identity_id: uuid::Uuid,
     #[doc = "Describes what kind of identity is described by an id"]
     pub identity_type: IdentityType,
-    pub role_name: RoleName,
+    pub role_name: ProjectRole,
 }
 
 impl std::fmt::Display for ProjectRoleRoleAssignment {
@@ -4229,7 +4229,7 @@ impl tabled::Tabled for Ip {
 pub struct IpNet {
     #[serde(rename = "type")]
     pub type_: Type,
-    pub value: Value,
+    pub value: IpNet,
 }
 
 impl std::fmt::Display for IpNet {
@@ -4530,7 +4530,7 @@ pub struct RouterRoute {
     #[doc = "human-readable free-form text about a resource"]
     pub description: String,
     #[doc = "A `RouteDestination` is used to match traffic with a routing rule, on the destination of that traffic.\n\nWhen traffic is to be sent to a destination that is within a given `RouteDestination`, the corresponding [`RouterRoute`] applies, and traffic will be forward to the [`RouteTarget`] for that rule."]
-    pub destination: Destination,
+    pub destination: RouteDestination,
     #[doc = "unique, immutable, system-controlled identifier for each resource"]
     pub id: uuid::Uuid,
     #[doc = "Describes the kind of router. Set at creation. `read-only`"]
@@ -4538,7 +4538,7 @@ pub struct RouterRoute {
     #[doc = "unique, mutable, user-controlled identifier for each resource"]
     pub name: String,
     #[doc = "A `RouteTarget` describes the possible locations that traffic matching a route destination can be sent."]
-    pub target: Target,
+    pub target: RouteTarget,
     #[doc = "timestamp when this resource was created"]
     pub time_created: chrono::DateTime<chrono::Utc>,
     #[doc = "timestamp when this resource was last modified"]
@@ -4595,11 +4595,11 @@ impl tabled::Tabled for RouterRoute {
 pub struct RouterRouteCreateParams {
     pub description: String,
     #[doc = "A `RouteDestination` is used to match traffic with a routing rule, on the destination of that traffic.\n\nWhen traffic is to be sent to a destination that is within a given `RouteDestination`, the corresponding [`RouterRoute`] applies, and traffic will be forward to the [`RouteTarget`] for that rule."]
-    pub destination: Destination,
+    pub destination: RouteDestination,
     #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
     pub name: String,
     #[doc = "A `RouteTarget` describes the possible locations that traffic matching a route destination can be sent."]
-    pub target: Target,
+    pub target: RouteTarget,
 }
 
 impl std::fmt::Display for RouterRouteCreateParams {
@@ -4738,11 +4738,11 @@ pub struct RouterRouteUpdateParams {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     #[doc = "A `RouteDestination` is used to match traffic with a routing rule, on the destination of that traffic.\n\nWhen traffic is to be sent to a destination that is within a given `RouteDestination`, the corresponding [`RouterRoute`] applies, and traffic will be forward to the [`RouteTarget`] for that rule."]
-    pub destination: Destination,
+    pub destination: RouteDestination,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[doc = "A `RouteTarget` describes the possible locations that traffic matching a route destination can be sent."]
-    pub target: Target,
+    pub target: RouteTarget,
 }
 
 impl std::fmt::Display for RouterRouteUpdateParams {
@@ -4789,7 +4789,7 @@ impl tabled::Tabled for RouterRouteUpdateParams {
 )]
 pub struct Saga {
     pub id: uuid::Uuid,
-    pub state: State,
+    pub state: SagaState,
 }
 
 impl std::fmt::Display for Saga {
@@ -5110,7 +5110,7 @@ impl tabled::Tabled for Succeeded {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Failed {
-    pub error_info: ErrorInfo,
+    pub error_info: SagaErrorInfo,
     pub error_node_name: String,
     pub state: State,
 }
@@ -5545,7 +5545,7 @@ pub struct SiloRoleRoleAssignment {
     pub identity_id: uuid::Uuid,
     #[doc = "Describes what kind of identity is described by an id"]
     pub identity_type: IdentityType,
-    pub role_name: RoleName,
+    pub role_name: SiloRole,
 }
 
 impl std::fmt::Display for SiloRoleRoleAssignment {
@@ -6837,7 +6837,7 @@ impl tabled::Tabled for Ip {
 pub struct IpNet {
     #[serde(rename = "type")]
     pub type_: Type,
-    pub value: Value,
+    pub value: IpNet,
 }
 
 impl std::fmt::Display for IpNet {
@@ -7069,7 +7069,7 @@ impl tabled::Tabled for Ip {
 pub struct IpNet {
     #[serde(rename = "type")]
     pub type_: Type,
-    pub value: Value,
+    pub value: IpNet,
 }
 
 impl std::fmt::Display for IpNet {
@@ -7313,7 +7313,7 @@ pub struct VpcRouter {
     pub description: String,
     #[doc = "unique, immutable, system-controlled identifier for each resource"]
     pub id: uuid::Uuid,
-    pub kind: Kind,
+    pub kind: VpcRouterKind,
     #[doc = "unique, mutable, user-controlled identifier for each resource"]
     pub name: String,
     #[doc = "timestamp when this resource was created"]
