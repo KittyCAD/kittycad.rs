@@ -9,18 +9,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install latest stable
-        uses: actions-rs/toolchain@v1
-        with:
-            toolchain: stable
-            override: true
-            components: rustfmt, clippy
-      - name: Install latest nightly
-        uses: actions-rs/toolchain@v1
-        with:
-            toolchain: stable
-            override: true
-            components: rustfmt, clippy
+      - name: Install latest stable/nightly
+        shell: bash
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
+          rustup default nightly
+          rustup default stable
+          rustup component add rustfmt
+          rustup component add rustfmt --toolchain nightly
+          rustup component add clippy
+          echo PATH="${HOME}/.cargo/bin:${PATH}" >> ${GITHUB_ENV}
       - name: Cache cargo registry
         uses: actions/cache@v3.0.5
         with:

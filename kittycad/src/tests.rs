@@ -190,5 +190,5 @@ fn test_empty_phone_number() {
 async fn test_user_self() {
     let client = test_client();
 
-    let _result = client.users().get_user_self().await.unwrap();
+    let _result = client.users().get_self().await.unwrap();
 }
