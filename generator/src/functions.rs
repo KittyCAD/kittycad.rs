@@ -87,7 +87,7 @@ pub fn generate_files(
             // Get the function body.
             let function_body = get_function_body(name, method, op, spec, false)?;
 
-            let example_code_fn = generate_example_code_fn(name, method, &tag, op, spec)?;
+            let example_code_fn = generate_example_code_fn(name, method, &tag, op, spec, opts)?;
             // Add our example code to our docs.
             // This way we can test the examples compile by running `rust doc`.
             let docs = format!(
@@ -485,23 +485,22 @@ fn get_example_args(
     let mut new_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
 
     for (name, (schema, parameter_data)) in params {
+        // Get the type for the parameter.
+        let t = match &schema {
+            openapiv3::ReferenceOr::Reference { .. } => {
+                crate::types::get_type_name_from_reference(&schema.reference()?, spec, true)?
+            }
+            openapiv3::ReferenceOr::Item(s) => {
+                crate::types::get_type_name_for_schema("", &s, spec, true)?
+            }
+        };
+
         // Let's get the example rust code for the schema.
         let mut example = crate::types::example::generate_example_rust_from_schema(
-            &name,
+            &t.rendered()?,
             &schema.expand(spec)?,
             spec,
         )?;
-
-        // Get the type for the parameter.
-        // TODO: fix &str
-        /*let t = match schema {
-            openapiv3::ReferenceOr::Reference { .. } => {
-                crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
-            }
-            openapiv3::ReferenceOr::Item(s) => {
-                crate::types::get_type_name_for_schema("", &s, spec, false)?
-            }
-        };*/
 
         if !parameter_data.required {
             example = quote!(Some(#example));
@@ -891,6 +890,7 @@ fn generate_example_code_fn(
     tag: &str,
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
+    opts: &crate::Opts,
 ) -> Result<String> {
     // Get the docs.
     let docs = generate_docs(name, method, op)?;
@@ -930,8 +930,24 @@ fn generate_example_code_fn(
         quote!()
     };
 
+    let mut imports = quote!();
+    if args.rendered()?.contains("::from_str(") || request_body.rendered()?.contains("::from_str(")
+    {
+        imports = quote!(
+            use std::str::FromStr;
+        );
+    }
+
+    let client_code: proc_macro2::TokenStream = generate_example_client_env(opts)
+        .parse()
+        .map_err(|e| anyhow::anyhow!("{}", e))?;
+
     let function = quote!(
+        #imports
+
         async fn #example_fn_name_ident() -> anyhow::Result<()> {
+            #client_code
+
             #function_start client.#tag_ident().#fn_name_ident(#args #request_body).await?;
 
             #print_result
@@ -968,7 +984,11 @@ fn generate_example_code_fn(
         }
 
         let stream_function = quote!(
+            use futures_util::stream::try_stream::TryStreamExt;
+
             async fn #example_stream_fn_name_ident() -> anyhow::Result<()> {
+                #client_code
+
                 let stream =  client.#tag_ident().#stream_fn_name_ident(#min_args #request_body);
 
                 // Loop over the items in the stream.
@@ -1004,8 +1024,8 @@ fn generate_example_code_fn(
 /// This allows you to paginate through all the items.
 {}"#,
             docs,
-            crate::types::get_text_fmt(&function)?,
-            crate::types::get_text_fmt(&stream_function)?
+            fmt_external_example_code(&function, opts)?,
+            fmt_external_example_code(&stream_function, opts)?
         ))
     } else {
         // Return the formatted example.
@@ -1013,7 +1033,36 @@ fn generate_example_code_fn(
             r#"/// {}
 {}"#,
             docs,
-            crate::types::get_text_fmt(&function)?
+            fmt_external_example_code(&function, opts)?
         ))
     }
+}
+
+/// Generate the example client code.
+pub fn generate_example_client(opts: &crate::Opts) -> String {
+    format!(
+        r#"// Authenticate via an API token.
+let client = {}::Client::new("$TOKEN");
+
+// - OR -
+
+// Authenticate with your token and host parsed from the environment variables:
+// `{}`.
+{}"#,
+        opts.name,
+        crate::template::get_token_env_variable(&opts.name),
+        generate_example_client_env(opts),
+    )
+}
+
+/// Generate the env example client code.
+fn generate_example_client_env(opts: &crate::Opts) -> String {
+    format!(r#"let client = {}::Client::new_from_env();"#, opts.name)
+}
+
+/// This is a helper function that formats and fixes code for external usage, not
+/// usage inside the crate.
+fn fmt_external_example_code(t: &proc_macro2::TokenStream, opts: &crate::Opts) -> Result<String> {
+    let rendered = crate::types::get_text_fmt(t)?;
+    Ok(rendered.replace("crate::types::", &format!("{}::types::", opts.name)))
 }

@@ -415,7 +415,15 @@ pub fn generate_example_rust_from_schema(
                 let example = generate_example_rust_from_schema(&inner_name, &inner_schema, spec)?;
 
                 let k_ident = format_ident!("{}", k);
-                args.push(quote!(#k_ident: #example));
+
+                // Check if this type is required.
+                if !o.required.contains(k)
+                    && inner_name != "crate::types::phone_number::PhoneNumber"
+                {
+                    args.push(quote!(#k_ident: Some(#example)));
+                } else {
+                    args.push(quote!(#k_ident: #example));
+                }
             }
 
             quote!(#object_name {

@@ -10,7 +10,7 @@ impl ApiTokens {
         Self { client }
     }
 
-    #[doc = "List API tokens for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first.\n\n```\n/// List API tokens for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\n/// The API tokens are returned in order of creation, with the most recently created API tokens first.\nasync fn example_list_for_user() -> anyhow::Result<()> {\n    let result: crate::types::ApiTokenResultsPage = client\n        .api_tokens()\n        .list_for_user(\n            Some(4 as u32),\n            Some(\"thon\".to_string()),\n            Some(crate::types::SortBy::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nasync fn example_list_for_user_stream() -> anyhow::Result<()> {\n    let stream = client.api_tokens().list_for_user_stream(\n        Some(4 as u32),\n        Some(crate::types::SortBy::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n\n```"]
+    #[doc = "List API tokens for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first.\n\n```\n/// List API tokens for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\n/// The API tokens are returned in order of creation, with the most recently created API tokens first.\nasync fn example_list_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiTokenResultsPage = client\n        .api_tokens()\n        .list_for_user(\n            Some(4 as u32),\n            Some(\"wprdwft\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::stream::try_stream::TryStreamExt;\nasync fn example_list_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let stream = client.api_tokens().list_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n\n```"]
     pub async fn list_for_user<'a>(
         &'a self,
         limit: Option<u32>,
@@ -45,14 +45,13 @@ impl ApiTokens {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
-    #[doc = "List API tokens for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first.\n\n```\n/// List API tokens for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\n/// The API tokens are returned in order of creation, with the most recently created API tokens first.\nasync fn example_list_for_user() -> anyhow::Result<()> {\n    let result: crate::types::ApiTokenResultsPage = client\n        .api_tokens()\n        .list_for_user(\n            Some(4 as u32),\n            Some(\"thon\".to_string()),\n            Some(crate::types::SortBy::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nasync fn example_list_for_user_stream() -> anyhow::Result<()> {\n    let stream = client.api_tokens().list_for_user_stream(\n        Some(4 as u32),\n        Some(crate::types::SortBy::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n\n```"]
+    #[doc = "List API tokens for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first.\n\n```\n/// List API tokens for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\n/// The API tokens are returned in order of creation, with the most recently created API tokens first.\nasync fn example_list_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiTokenResultsPage = client\n        .api_tokens()\n        .list_for_user(\n            Some(4 as u32),\n            Some(\"wprdwft\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::stream::try_stream::TryStreamExt;\nasync fn example_list_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let stream = client.api_tokens().list_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err);\n            }\n        }\n    }\n\n    Ok(())\n}\n\n```"]
     pub fn list_for_user_stream<'a>(
         &'a self,
         limit: Option<u32>,
@@ -88,7 +87,6 @@ impl ApiTokens {
                                             ),
                                             status,
                                         )
-                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -112,7 +110,7 @@ impl ApiTokens {
             .boxed()
     }
 
-    #[doc = "Create a new API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It creates a new API token for the authenticated user.\n\n```\n/// Create a new API token for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It creates a new API token for the authenticated user.\nasync fn example_create_api_token_for_user() -> anyhow::Result<()> {\n    let result: crate::types::ApiToken = client.api_tokens().create_api_token_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
+    #[doc = "Create a new API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It creates a new API token for the authenticated user.\n\n```\n/// Create a new API token for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It creates a new API token for the authenticated user.\nasync fn example_create_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = client.api_tokens().create_api_token_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
     pub async fn create_api_token_for_user<'a>(
         &'a self,
     ) -> Result<crate::types::ApiToken, crate::types::error::Error> {
@@ -130,14 +128,13 @@ impl ApiTokens {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
-    #[doc = "Get an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\n\n```\n/// Get an API token for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\nasync fn example_get_api_token_for_user() -> anyhow::Result<()> {\n    let result: crate::types::ApiToken = client\n        .api_tokens()\n        .get_api_token_for_user(uuid::Uuid::from_str(\n            \"c65fb63c-cc71-438d-8358-bc2c6451c694\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
+    #[doc = "Get an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\n\n```\n/// Get an API token for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\nuse std::str::FromStr;\nasync fn example_get_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = client\n        .api_tokens()\n        .get_api_token_for_user(uuid::Uuid::from_str(\n            \"516c6f1e-1dcd-4e2f-a108-e3bb9aa2fe33\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n```"]
     pub async fn get_api_token_for_user<'a>(
         &'a self,
         token: uuid::Uuid,
@@ -160,14 +157,13 @@ impl ApiTokens {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
-    #[doc = "Delete an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\nThis endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.\n\n```\n/// Delete an API token for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\n/// This endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.\nasync fn example_delete_api_token_for_user() -> anyhow::Result<()> {\n    client\n        .api_tokens()\n        .delete_api_token_for_user(uuid::Uuid::from_str(\n            \"f70d78a2-f137-4b38-9c17-3d1650e16219\",\n        )?)\n        .await?;\n    Ok(())\n}\n\n```"]
+    #[doc = "Delete an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\nThis endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.\n\n```\n/// Delete an API token for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\n/// This endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.\nuse std::str::FromStr;\nasync fn example_delete_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .api_tokens()\n        .delete_api_token_for_user(uuid::Uuid::from_str(\n            \"3b35ede6-f0df-4dc9-9c19-dc012b9b6fbb\",\n        )?)\n        .await?;\n    Ok(())\n}\n\n```"]
     pub async fn delete_api_token_for_user<'a>(
         &'a self,
         token: uuid::Uuid,

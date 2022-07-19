@@ -327,20 +327,7 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     );
     extension.insert(
         "client".to_string(),
-        format!(
-            r#"use {}::Client;
-
-// Authenticate via an API token.
-let client = Client::new("$TOKEN");
-
-// - OR -
-
-// Authenticate with your token and host parsed from the environment variables:
-// `{}`.
-let client = Client::new_from_env();"#,
-            opts.name,
-            crate::template::get_token_env_variable(&opts.name),
-        ),
+        crate::functions::generate_example_client(opts),
     );
 
     // Add in our version information
