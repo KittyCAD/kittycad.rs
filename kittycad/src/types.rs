@@ -1136,10 +1136,10 @@ impl tabled::Tabled for AsyncApiCall {
 )]
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
-    FileConversion,
-    FileMass,
-    FileVolume,
-    FileDensity,
+    FileConversion(FileConversion),
+    FileMass(FileMass),
+    FileVolume(FileVolume),
+    FileDensity(FileDensity),
 }
 
 #[doc = "A single page of results"]
