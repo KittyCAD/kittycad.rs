@@ -116,7 +116,7 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Listen for callbacks for the OAuth 2.0 provider.\n\n```rust,no_run\nasync fn example_oauth2_listen_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .listen_provider_callback(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Github,\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Listen for callbacks for the OAuth 2.0 provider.\n\n```rust,no_run\nasync fn example_oauth2_listen_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .listen_provider_callback(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Google,\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n```"]
     pub async fn listen_provider_callback<'a>(
         &'a self,
         code: Option<String>,
