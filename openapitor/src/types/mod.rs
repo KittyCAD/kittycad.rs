@@ -517,12 +517,7 @@ fn get_type_name_for_array(
     // Make sure we have a reference for our type.
     let t = if let Some(ref s) = a.items {
         if let Ok(r) = s.reference() {
-            let reference = crate::types::get_type_name_from_reference(&r, spec, false)?;
-            if in_crate {
-                quote!(#reference)
-            } else {
-                quote!(crate::types::#reference)
-            }
+            crate::types::get_type_name_from_reference(&r, spec, in_crate)?
         } else {
             // We have an item.
             let item = s.item()?;
@@ -1493,10 +1488,10 @@ impl PaginationProperties {
                 // Get the type for the parameter.
                 let mut t = match s {
                     openapiv3::ReferenceOr::Reference { .. } => {
-                        crate::types::get_type_name_from_reference(&s.reference()?, spec, false)?
+                        crate::types::get_type_name_from_reference(&s.reference()?, spec, true)?
                     }
                     openapiv3::ReferenceOr::Item(s) => {
-                        crate::types::get_type_name_for_schema("", &s, spec, false)?
+                        crate::types::get_type_name_for_schema("", &s, spec, true)?
                     }
                 };
 
