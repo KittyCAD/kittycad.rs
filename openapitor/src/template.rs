@@ -166,7 +166,7 @@ pub fn generate_docs(
 //! Typical use will require intializing a `Client`. This requires
 //! a user agent string and set of credentials.
 //!
-//! ```
+//! ```rust,no_run
 //! use {}::Client;
 //!
 //! let client = Client::new(
@@ -181,7 +181,7 @@ pub fn generate_docs(
 //!
 //! And then you can create a client from the environment.
 //!
-//! ```
+//! ```rust,no_run
 //! use {}::Client;
 //!
 //! let client = Client::new_from_env();

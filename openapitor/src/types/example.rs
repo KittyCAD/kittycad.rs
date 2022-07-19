@@ -329,9 +329,9 @@ pub fn generate_example_rust_from_schema(
                         quote!("some-password".to_string())
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Byte) => {
-                        quote!(crate::types::base64::Base64Data::from_str(
-                            "some-base64-encoded-string"
-                        )?)
+                        quote!(crate::types::base64::Base64Data(
+                            "some-base64-encoded-string".as_bytes().to_vec()
+                        ))
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Binary) => {
                         quote!(bytes::Bytes::from("some-string"))
