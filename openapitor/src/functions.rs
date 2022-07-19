@@ -111,6 +111,7 @@ pub fn generate_files(
 
             let function = quote! {
                 #[doc = #docs]
+                #[tracing::instrument]
                 pub async fn #fn_name_ident<'a>(&'a self #args #request_body) -> Result<#response_type, crate::types::error::Error> {
                     #function_body
                 }
@@ -192,6 +193,7 @@ pub fn generate_files(
 
                 let function = quote! {
                     #[doc = #docs]
+                    #[tracing::instrument]
                     pub fn #stream_fn_name_ident<'a>(&'a self #min_args #request_body) -> impl futures::Stream<Item = Result<#item_type, crate::types::error::Error>> + Unpin + '_  {
                         use futures::{StreamExt, TryFutureExt, TryStreamExt};
                         use crate::types::paginate::Pagination;
@@ -429,7 +431,7 @@ fn get_response_type(
                             )?
                         }
                         openapiv3::ReferenceOr::Item(s) => crate::types::get_type_name_for_schema(
-                            &generate_name_for_fn_schema(name, method, &s, op, "Response"),
+                            &generate_name_for_fn_schema(name, method, s, op, "Response"),
                             s,
                             spec,
                             false,
@@ -503,7 +505,7 @@ fn get_request_body(
                         crate::types::get_type_name_from_reference(&s.reference()?, spec, false)?
                     }
                     openapiv3::ReferenceOr::Item(s) => crate::types::get_type_name_for_schema(
-                        &generate_name_for_fn_schema(name, method, &s, op, "Request Body"),
+                        &generate_name_for_fn_schema(name, method, s, op, "Request Body"),
                         s,
                         spec,
                         false,
@@ -554,7 +556,7 @@ fn get_request_body_example(
                     }
                     openapiv3::ReferenceOr::Item(s) => {
                         crate::types::example::generate_example_rust_from_schema(
-                            &generate_name_for_fn_schema(name, method, &s, op, "Request Body"),
+                            &generate_name_for_fn_schema(name, method, s, op, "Request Body"),
                             s,
                             spec,
                         )?
@@ -593,7 +595,7 @@ fn get_example_args(
                 crate::types::get_type_name_from_reference(&schema.reference()?, spec, true)?
             }
             openapiv3::ReferenceOr::Item(s) => {
-                crate::types::get_type_name_for_schema("", s, spec, true)?
+                crate::types::get_type_name_for_schema(&name, s, spec, true)?
             }
         };
 
@@ -678,7 +680,7 @@ fn get_path_params(
                 crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
             }
             openapiv3::ReferenceOr::Item(s) => {
-                crate::types::get_type_name_for_schema("", &s, spec, false)?
+                crate::types::get_type_name_for_schema(&name, &s, spec, false)?
             }
         };
 
@@ -756,7 +758,7 @@ fn get_query_params(
                 crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
             }
             openapiv3::ReferenceOr::Item(s) => {
-                crate::types::get_type_name_for_schema("", &s, spec, false)?
+                crate::types::get_type_name_for_schema(&name, &s, spec, false)?
             }
         };
 
@@ -873,16 +875,25 @@ fn get_function_body(
                 }
             }
             _ => {
-                anyhow::bail!(
-                    "unsupported media type for request body: {}",
-                    request_body.media_type
-                );
+                if request_body.type_name.is_string()? {
+                    quote! {
+                        // Add the raw body.
+                        req = req.body(body.clone());
+                    }
+                } else {
+                    anyhow::bail!(
+                        "unsupported media type for request body: {}",
+                        request_body.media_type
+                    );
+                }
             }
         }
     } else {
         // Do nothing.
         quote!()
     };
+
+    // TODO: we should add the headers.
 
     // Get the response if there is one.
     let response = if let Some(response) = get_response_type(name, method, op, spec)? {
@@ -897,11 +908,40 @@ fn get_function_body(
                     serde_json::from_str(&text).map_err(|err| crate::types::error::Error::from_serde_error(format_serde_error::SerdeError::new(text.to_string(), err), status).into())
                 }
             }
+            "application/vnd.github.v3.object" => {
+                quote! {
+                    // Get the text for the response.
+                    let text = resp.text().await.unwrap_or_default();
+
+                    // Parse the json response.
+                    // Return a human error.
+                    serde_json::from_str(&text).map_err(|err| crate::types::error::Error::from_serde_error(format_serde_error::SerdeError::new(text.to_string(), err), status).into())
+                }
+            }
+            "application/scim+json" => {
+                quote! {
+                    // Get the text for the response.
+                    let text = resp.text().await.unwrap_or_default();
+
+                    // Parse the json response.
+                    // Return a human error.
+                    serde_json::from_str(&text).map_err(|err| crate::types::error::Error::from_serde_error(format_serde_error::SerdeError::new(text.to_string(), err), status).into())
+                }
+            }
             _ => {
-                anyhow::bail!(
-                    "unsupported media type for response: {}",
-                    response.media_type
-                );
+                if response.type_name.is_string()? {
+                    quote! {
+                        // Get the text for the response.
+                        let text = resp.text().await?;
+
+                        Ok(text)
+                    }
+                } else {
+                    anyhow::bail!(
+                        "unsupported media type for response: {}",
+                        response.media_type
+                    );
+                }
             }
         }
     } else {

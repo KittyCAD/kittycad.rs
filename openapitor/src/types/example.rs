@@ -3,6 +3,7 @@
 use std::fmt::Write as _;
 
 use anyhow::Result;
+use indexmap::map::IndexMap;
 use rand::Rng;
 
 use crate::types::{
@@ -21,12 +22,23 @@ pub fn generate_example_json_from_schema(
             if !s.enumeration.is_empty() {
                 // We have an enum type.
                 // Return a random value from the enum.
-                let index = rng.gen_range(0..s.enumeration.len());
+                // Remove any null values from the array.
+                let values = s.enumeration.iter().cloned().collect::<Vec<_>>();
+                // Remove null values from the array.
+                let values = values
+                    .into_iter()
+                    .filter(|v| v.is_some())
+                    .collect::<Vec<_>>();
+                let index = rng.gen_range(0..values.len());
                 return Ok(serde_json::Value::String(
-                    s.enumeration[index]
+                    values[index]
                         .as_ref()
                         .ok_or_else(|| {
-                            anyhow::anyhow!("enum type has no value at index: {}", index)
+                            anyhow::anyhow!(
+                                "enum type has no value at index `{}`: {:?}",
+                                index,
+                                values
+                            )
                         })?
                         .to_string(),
                 ));
@@ -297,7 +309,9 @@ pub fn generate_example_rust_from_schema(
                 // Get a random item from the enum.
                 let random_value = generate_example_json_from_schema(schema, spec)?.to_string();
                 let random_value = random_value.trim_start_matches('"').trim_end_matches('"');
-                let item_ident = format_ident!("{}", crate::types::proper_name(random_value));
+                let item_ident: proc_macro2::TokenStream = crate::types::proper_name(random_value)
+                    .parse()
+                    .map_err(|err| anyhow::anyhow!("{}", err))?;
 
                 quote!(#name_ident::#item_ident)
             } else if s.format.is_empty() {
@@ -386,7 +400,7 @@ pub fn generate_example_rust_from_schema(
                         crate::types::get_type_name_from_reference(&v.reference()?, spec, true)?
                     }
                     openapiv3::ReferenceOr::Item(s) => {
-                        crate::types::get_type_name_for_schema("", s, spec, true)?
+                        crate::types::get_type_name_for_schema(name, s, spec, true)?
                     }
                 };
 
@@ -430,20 +444,109 @@ pub fn generate_example_rust_from_schema(
             let b = format_ident!("{}", bool::random()?);
             quote!(#b)
         }
-        openapiv3::SchemaKind::OneOf { one_of: _ } => {
-            anyhow::bail!("XXX one of not supported yet");
+        openapiv3::SchemaKind::OneOf { one_of } => {
+            if one_of.len() == 1 {
+                let one_of_item = &one_of[0];
+                let one_of_item_schema = one_of_item.get_schema_from_reference(spec, true)?;
+                generate_example_rust_from_schema(name, &one_of_item_schema, spec)?
+            } else {
+                let type_name = crate::types::get_type_name_for_schema(name, schema, spec, false)?;
+
+                let tag = crate::types::get_one_of_tag(one_of, spec)?;
+                let (values, _, _) = crate::types::get_one_of_values(name, one_of, spec, &tag)?;
+
+                let mut enum_name = quote!();
+                let mut example = quote!();
+                if let Some((k, v)) = values.into_iter().next() {
+                    enum_name = k.parse().map_err(|e| anyhow::anyhow!("{}", e))?;
+
+                    let inner_name = match &v {
+                        openapiv3::ReferenceOr::Reference { .. } => {
+                            crate::types::get_type_name_from_reference(&v.reference()?, spec, true)?
+                        }
+                        openapiv3::ReferenceOr::Item(s) => {
+                            crate::types::get_type_name_for_schema(&k, s, spec, true)?
+                        }
+                    };
+                    example = generate_example_rust_from_schema(
+                        &inner_name.rendered()?,
+                        &v.expand(spec)?,
+                        spec,
+                    )?;
+                }
+
+                // Build our enum.
+                quote!(#type_name::#enum_name(#example))
+            }
         }
         openapiv3::SchemaKind::AllOf { all_of: _ } => {
             anyhow::bail!("XXX all of not supported yet");
         }
-        openapiv3::SchemaKind::AnyOf { any_of: _ } => {
-            anyhow::bail!("XXX any of not supported yet");
+        openapiv3::SchemaKind::AnyOf { any_of } => {
+            if any_of.len() == 1 {
+                let any_of_item = &any_of[0];
+                let any_of_item_schema = any_of_item.get_schema_from_reference(spec, true)?;
+                generate_example_rust_from_schema(name, &any_of_item_schema, spec)?
+            } else {
+                // The any of needs to be an object with optional values since it can be any (one or more) of multiple types.
+                // We want to iterate over each of the subschemas and combine all of the types.
+                // We assume all of the subschemas are objects.
+                let mut properties: IndexMap<
+                    String,
+                    openapiv3::ReferenceOr<Box<openapiv3::Schema>>,
+                > = IndexMap::new();
+                for a in any_of {
+                    // Get the schema for this any of.
+                    let schema = a.get_schema_from_reference(spec, true)?;
+
+                    // Ensure the type is an object.
+                    if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
+                        &schema.schema_kind
+                    {
+                        for (k, v) in o.properties.iter() {
+                            properties.insert(k.clone(), v.clone());
+                        }
+                    } else {
+                        // We got something that is not an object.
+                        // Therefore we need to render this as a one of instead.
+                        // Since it includes primitive types, we need to render this as a one of.
+                        return generate_example_rust_from_schema(
+                            name,
+                            &openapiv3::Schema {
+                                schema_data: schema.schema_data.clone(),
+                                schema_kind: openapiv3::SchemaKind::OneOf {
+                                    one_of: any_of.clone(),
+                                },
+                            },
+                            spec,
+                        );
+                    }
+                }
+
+                generate_example_rust_from_schema(
+                    name,
+                    &openapiv3::Schema {
+                        schema_data: schema.schema_data.clone(),
+                        schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(
+                            openapiv3::ObjectType {
+                                properties,
+                                ..Default::default()
+                            },
+                        )),
+                    },
+                    spec,
+                )?
+            }
         }
         openapiv3::SchemaKind::Not { not: _ } => {
             anyhow::bail!("XXX not not supported yet");
         }
-        openapiv3::SchemaKind::Any(_any) => {
-            anyhow::bail!("XXX any supported yet");
+        openapiv3::SchemaKind::Any(any) => {
+            if name == "serde_json::Value" {
+                quote!(serde_json::Value::String("some-string".to_string()))
+            } else {
+                anyhow::bail!("XXX any supported yet: {} => {:?}", name, any);
+            }
         }
     })
 }

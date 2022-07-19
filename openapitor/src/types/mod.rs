@@ -8,7 +8,7 @@ pub mod paginate;
 pub mod phone_number;
 pub mod random;
 
-use std::str::FromStr;
+use std::{collections::BTreeMap, str::FromStr};
 
 use anyhow::Result;
 use indexmap::map::IndexMap;
@@ -653,7 +653,7 @@ fn render_any_of(
 /// Render the full type for a one of.
 fn render_one_of(
     name: &str,
-    one_of: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
+    one_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
     data: &openapiv3::SchemaData,
     spec: &openapiv3::OpenAPI,
 ) -> Result<proc_macro2::TokenStream> {
@@ -667,22 +667,47 @@ fn render_one_of(
     let one_of_name = get_type_name(name, data)?;
 
     // Check if this this a one_of with a single item.
-    if one_of.len() == 1 {
-        let first = one_of[0].item()?;
+    if one_ofs.len() == 1 {
+        let first = one_ofs[0].item()?;
         // Return the one_of type.
         return render_schema(name, first, spec);
     }
 
-    // Any additional types we might need for rendering this type.
-    let mut additional_types = quote!();
+    let tag = get_one_of_tag(one_ofs, spec)?;
 
+    let serde_options = if !tag.is_empty() {
+        quote!(#[serde(tag = #tag)])
+    } else {
+        quote!()
+    };
+
+    let (_, values, additional_types) = get_one_of_values(name, one_ofs, spec, &tag)?;
+
+    let rendered = quote! {
+        #additional_types
+
+        #description
+        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema, tabled::Tabled)]
+        #serde_options
+        pub enum #one_of_name {
+            #values
+        }
+    };
+
+    Ok(rendered)
+}
+
+fn get_one_of_tag(
+    one_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
+    spec: &openapiv3::OpenAPI,
+) -> Result<String> {
     let mut tag = "".to_string();
     // TODO: should we set the content?, like if its a object w only 2 properties, the one that is
     // not the tag should be the content.
 
-    for o in one_of {
+    for one_of in one_ofs {
         // Get the schema for this OneOf.
-        let schema = o.get_schema_from_reference(spec, true)?;
+        let schema = one_of.get_schema_from_reference(spec, true)?;
         // Determine if we can do anything fancy with the resulting enum and flatten it.
         if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = schema.schema_kind {
             // If the object contains a property that is an enum of 1, then that is the tag.
@@ -706,22 +731,34 @@ fn render_one_of(
         }
     }
 
-    let serde_options = if !tag.is_empty() {
-        quote!(#[serde(tag = #tag)])
-    } else {
-        quote!()
-    };
+    Ok(tag)
+}
 
-    let mut values = quote!();
-    for o in one_of {
+fn get_one_of_values(
+    name: &str,
+    one_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
+    spec: &openapiv3::OpenAPI,
+    tag: &str,
+) -> Result<(
+    BTreeMap<String, openapiv3::ReferenceOr<openapiv3::Schema>>,
+    proc_macro2::TokenStream,
+    proc_macro2::TokenStream,
+)> {
+    let mut values: BTreeMap<String, openapiv3::ReferenceOr<openapiv3::Schema>> =
+        Default::default();
+    let mut rendered_value = quote!();
+    // Any additional types we might need for rendering this type.
+    let mut additional_types = quote!();
+
+    for one_of in one_ofs {
         // Get the schema for this OneOf.
-        let schema = o.get_schema_from_reference(spec, true)?;
+        let schema = one_of.get_schema_from_reference(spec, true)?;
 
         // If we have a tag use the value of that property for the enum.
         let tag_name = if !tag.is_empty() {
             if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
                 // Get the value of this tag.
-                let v = match o.properties.get(&tag) {
+                let v = match o.properties.get(tag) {
                     Some(v) => v,
                     None => {
                         anyhow::bail!(
@@ -760,14 +797,16 @@ fn render_one_of(
             "".to_string()
         };
 
-        let o_type = if let openapiv3::ReferenceOr::Reference { .. } = o {
+        let o_type = if let openapiv3::ReferenceOr::Reference { .. } = one_of {
             // If the one of is a reference just use the reference.
-            let reference = o.reference()?;
-            let reference_name = format_ident!("{}", proper_name(&reference));
+            let reference = proper_name(&one_of.reference()?);
+            let reference_name = format_ident!("{}", reference);
 
             if !tag_name.is_empty() {
                 let p = proper_name(&tag_name);
-                let n = format_ident!("{}", proper_name(&tag_name));
+                let n = format_ident!("{}", p);
+                values.insert(p.to_string(), one_of.clone());
+
                 if p != tag_name {
                     // Rename serde to the correct tag name.
                     quote!(
@@ -780,6 +819,7 @@ fn render_one_of(
                     )
                 }
             } else {
+                values.insert(reference.to_string(), one_of.clone());
                 quote!(
                     #reference_name(#reference_name),
                 )
@@ -813,12 +853,14 @@ fn render_one_of(
                         quote!(#ident)
                     }
                 }
-                _ => get_type_name_for_schema("", &schema, spec, true)?,
+                _ => get_type_name_for_schema(name, &schema, spec, true)?,
             };
 
             if !tag_name.is_empty() {
                 let p = proper_name(&tag_name);
-                let n = format_ident!("{}", proper_name(&tag_name));
+                let n = format_ident!("{}", p);
+                values.insert(p.to_string(), one_of.clone());
+
                 if p != tag_name {
                     // Rename serde to the correct tag name.
                     quote!(
@@ -831,31 +873,22 @@ fn render_one_of(
                     )
                 }
             } else {
+                values.insert(rendered_type.rendered()?, one_of.clone());
+
                 quote!(
                     #rendered_type(#rendered_type),
                 )
             }
         };
 
-        values = quote!(
-            #values
+        rendered_value = quote!(
+            #rendered_value
 
             #o_type
         );
     }
 
-    let rendered = quote! {
-        #additional_types
-
-        #description
-        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema, tabled::Tabled)]
-        #serde_options
-        pub enum #one_of_name {
-            #values
-        }
-    };
-
-    Ok(rendered)
+    Ok((values, rendered_value, additional_types))
 }
 
 /// Render the full type for any.
@@ -1505,9 +1538,12 @@ impl PaginationProperties {
                     openapiv3::ReferenceOr::Reference { .. } => {
                         crate::types::get_type_name_from_reference(&s.reference()?, spec, true)?
                     }
-                    openapiv3::ReferenceOr::Item(s) => {
-                        crate::types::get_type_name_for_schema("", &s, spec, true)?
-                    }
+                    openapiv3::ReferenceOr::Item(s) => crate::types::get_type_name_for_schema(
+                        &parameter_data.name,
+                        &s,
+                        spec,
+                        true,
+                    )?,
                 };
 
                 // Make it an option if it's optional.
