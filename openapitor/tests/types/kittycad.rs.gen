@@ -470,16 +470,44 @@ impl tabled::Tabled for Address {
     const LENGTH: usize = 10;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.city),
-            format!("{:?}", self.country),
+            if let Some(city) = &self.city {
+                format!("{:?}", city)
+            } else {
+                String::new()
+            },
+            if let Some(country) = &self.country {
+                format!("{:?}", country)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.created_at),
             format!("{:?}", self.id),
-            format!("{:?}", self.state),
-            format!("{:?}", self.street_1),
-            format!("{:?}", self.street_2),
+            if let Some(state) = &self.state {
+                format!("{:?}", state)
+            } else {
+                String::new()
+            },
+            if let Some(street_1) = &self.street_1 {
+                format!("{:?}", street_1)
+            } else {
+                String::new()
+            },
+            if let Some(street_2) = &self.street_2 {
+                format!("{:?}", street_2)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.updated_at),
-            format!("{:?}", self.user_id),
-            format!("{:?}", self.zip),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+            if let Some(zip) = &self.zip {
+                format!("{:?}", zip)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -676,27 +704,87 @@ impl tabled::Tabled for ApiCallWithPrice {
     const LENGTH: usize = 21;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.completed_at),
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.created_at),
-            format!("{:?}", self.duration),
-            format!("{:?}", self.email),
-            format!("{:?}", self.endpoint),
+            if let Some(duration) = &self.duration {
+                format!("{:?}", duration)
+            } else {
+                String::new()
+            },
+            if let Some(email) = &self.email {
+                format!("{:?}", email)
+            } else {
+                String::new()
+            },
+            if let Some(endpoint) = &self.endpoint {
+                format!("{:?}", endpoint)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.id),
-            format!("{:?}", self.ip_address),
+            if let Some(ip_address) = &self.ip_address {
+                format!("{:?}", ip_address)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.method),
-            format!("{:?}", self.minutes),
-            format!("{:?}", self.origin),
-            format!("{:?}", self.price),
-            format!("{:?}", self.request_body),
-            format!("{:?}", self.request_query_params),
-            format!("{:?}", self.response_body),
-            format!("{:?}", self.started_at),
-            format!("{:?}", self.status_code),
-            format!("{:?}", self.stripe_invoice_item_id),
+            if let Some(minutes) = &self.minutes {
+                format!("{:?}", minutes)
+            } else {
+                String::new()
+            },
+            if let Some(origin) = &self.origin {
+                format!("{:?}", origin)
+            } else {
+                String::new()
+            },
+            if let Some(price) = &self.price {
+                format!("{:?}", price)
+            } else {
+                String::new()
+            },
+            if let Some(request_body) = &self.request_body {
+                format!("{:?}", request_body)
+            } else {
+                String::new()
+            },
+            if let Some(request_query_params) = &self.request_query_params {
+                format!("{:?}", request_query_params)
+            } else {
+                String::new()
+            },
+            if let Some(response_body) = &self.response_body {
+                format!("{:?}", response_body)
+            } else {
+                String::new()
+            },
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            if let Some(status_code) = &self.status_code {
+                format!("{:?}", status_code)
+            } else {
+                String::new()
+            },
+            if let Some(stripe_invoice_item_id) = &self.stripe_invoice_item_id {
+                format!("{:?}", stripe_invoice_item_id)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.token),
             format!("{:?}", self.updated_at),
             self.user_agent.clone(),
-            format!("{:?}", self.user_id),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -780,7 +868,14 @@ impl crate::types::paginate::Pagination for ApiCallWithPriceResultsPage {
 impl tabled::Tabled for ApiCallWithPriceResultsPage {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.items), format!("{:?}", self.next_page)]
+        vec![
+            format!("{:?}", self.items),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page)
+            } else {
+                String::new()
+            },
+        ]
     }
 
     fn headers() -> Vec<String> {
@@ -828,11 +923,19 @@ impl tabled::Tabled for ApiToken {
     fn fields(&self) -> Vec<String> {
         vec![
             format!("{:?}", self.created_at),
-            format!("{:?}", self.id),
+            if let Some(id) = &self.id {
+                format!("{:?}", id)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.is_valid),
             format!("{:?}", self.token),
             format!("{:?}", self.updated_at),
-            format!("{:?}", self.user_id),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -901,7 +1004,14 @@ impl crate::types::paginate::Pagination for ApiTokenResultsPage {
 impl tabled::Tabled for ApiTokenResultsPage {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.items), format!("{:?}", self.next_page)]
+        vec![
+            format!("{:?}", self.items),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page)
+            } else {
+                String::new()
+            },
+        ]
     }
 
     fn headers() -> Vec<String> {
@@ -966,18 +1076,46 @@ impl tabled::Tabled for AsyncApiCall {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.completed_at),
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.created_at),
-            format!("{:?}", self.error),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.id),
-            format!("{:?}", self.input),
-            format!("{:?}", self.output),
-            format!("{:?}", self.started_at),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.status),
             format!("{:?}", self.type_),
             format!("{:?}", self.updated_at),
-            format!("{:?}", self.user_id),
-            format!("{:?}", self.worker),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+            if let Some(worker) = &self.worker {
+                format!("{:?}", worker)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -1070,7 +1208,14 @@ impl crate::types::paginate::Pagination for AsyncApiCallResultsPage {
 impl tabled::Tabled for AsyncApiCallResultsPage {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.items), format!("{:?}", self.next_page)]
+        vec![
+            format!("{:?}", self.items),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page)
+            } else {
+                String::new()
+            },
+        ]
     }
 
     fn headers() -> Vec<String> {
@@ -1130,8 +1275,16 @@ impl tabled::Tabled for BillingInfo {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.address),
-            format!("{:?}", self.name),
+            if let Some(address) = &self.address {
+                format!("{:?}", address)
+            } else {
+                String::new()
+            },
+            if let Some(name) = &self.name {
+                format!("{:?}", name)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.phone),
         ]
     }
@@ -1221,14 +1374,46 @@ impl tabled::Tabled for CardDetails {
     const LENGTH: usize = 8;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.brand),
-            format!("{:?}", self.checks),
-            format!("{:?}", self.country),
-            format!("{:?}", self.exp_month),
-            format!("{:?}", self.exp_year),
-            format!("{:?}", self.fingerprint),
-            format!("{:?}", self.funding),
-            format!("{:?}", self.last_4),
+            if let Some(brand) = &self.brand {
+                format!("{:?}", brand)
+            } else {
+                String::new()
+            },
+            if let Some(checks) = &self.checks {
+                format!("{:?}", checks)
+            } else {
+                String::new()
+            },
+            if let Some(country) = &self.country {
+                format!("{:?}", country)
+            } else {
+                String::new()
+            },
+            if let Some(exp_month) = &self.exp_month {
+                format!("{:?}", exp_month)
+            } else {
+                String::new()
+            },
+            if let Some(exp_year) = &self.exp_year {
+                format!("{:?}", exp_year)
+            } else {
+                String::new()
+            },
+            if let Some(fingerprint) = &self.fingerprint {
+                format!("{:?}", fingerprint)
+            } else {
+                String::new()
+            },
+            if let Some(funding) = &self.funding {
+                format!("{:?}", funding)
+            } else {
+                String::new()
+            },
+            if let Some(last_4) = &self.last_4 {
+                format!("{:?}", last_4)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -1285,12 +1470,36 @@ impl tabled::Tabled for Cluster {
     const LENGTH: usize = 6;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.addr),
-            format!("{:?}", self.auth_timeout),
-            format!("{:?}", self.cluster_port),
-            format!("{:?}", self.name),
-            format!("{:?}", self.tls_timeout),
-            format!("{:?}", self.urls),
+            if let Some(addr) = &self.addr {
+                format!("{:?}", addr)
+            } else {
+                String::new()
+            },
+            if let Some(auth_timeout) = &self.auth_timeout {
+                format!("{:?}", auth_timeout)
+            } else {
+                String::new()
+            },
+            if let Some(cluster_port) = &self.cluster_port {
+                format!("{:?}", cluster_port)
+            } else {
+                String::new()
+            },
+            if let Some(name) = &self.name {
+                format!("{:?}", name)
+            } else {
+                String::new()
+            },
+            if let Some(tls_timeout) = &self.tls_timeout {
+                format!("{:?}", tls_timeout)
+            } else {
+                String::new()
+            },
+            if let Some(urls) = &self.urls {
+                format!("{:?}", urls)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -1363,9 +1572,21 @@ impl tabled::Tabled for CodeOutput {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.output_files),
-            format!("{:?}", self.stderr),
-            format!("{:?}", self.stdout),
+            if let Some(output_files) = &self.output_files {
+                format!("{:?}", output_files)
+            } else {
+                String::new()
+            },
+            if let Some(stderr) = &self.stderr {
+                format!("{:?}", stderr)
+            } else {
+                String::new()
+            },
+            if let Some(stdout) = &self.stdout {
+                format!("{:?}", stdout)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -1404,7 +1625,18 @@ impl std::fmt::Display for Commit {
 impl tabled::Tabled for Commit {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.expected), format!("{:?}", self.id)]
+        vec![
+            if let Some(expected) = &self.expected {
+                format!("{:?}", expected)
+            } else {
+                String::new()
+            },
+            if let Some(id) = &self.id {
+                format!("{:?}", id)
+            } else {
+                String::new()
+            },
+        ]
     }
 
     fn headers() -> Vec<String> {
@@ -1569,52 +1801,216 @@ impl tabled::Tabled for Connection {
     const LENGTH: usize = 46;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.auth_timeout),
-            format!("{:?}", self.cluster),
+            if let Some(auth_timeout) = &self.auth_timeout {
+                format!("{:?}", auth_timeout)
+            } else {
+                String::new()
+            },
+            if let Some(cluster) = &self.cluster {
+                format!("{:?}", cluster)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.config_load_time),
-            format!("{:?}", self.connections),
-            format!("{:?}", self.cores),
-            format!("{:?}", self.cpu),
-            format!("{:?}", self.gateway),
-            format!("{:?}", self.git_commit),
-            format!("{:?}", self.go),
-            format!("{:?}", self.gomaxprocs),
+            if let Some(connections) = &self.connections {
+                format!("{:?}", connections)
+            } else {
+                String::new()
+            },
+            if let Some(cores) = &self.cores {
+                format!("{:?}", cores)
+            } else {
+                String::new()
+            },
+            if let Some(cpu) = &self.cpu {
+                format!("{:?}", cpu)
+            } else {
+                String::new()
+            },
+            if let Some(gateway) = &self.gateway {
+                format!("{:?}", gateway)
+            } else {
+                String::new()
+            },
+            if let Some(git_commit) = &self.git_commit {
+                format!("{:?}", git_commit)
+            } else {
+                String::new()
+            },
+            if let Some(go) = &self.go {
+                format!("{:?}", go)
+            } else {
+                String::new()
+            },
+            if let Some(gomaxprocs) = &self.gomaxprocs {
+                format!("{:?}", gomaxprocs)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.host),
-            format!("{:?}", self.http_base_path),
-            format!("{:?}", self.http_host),
-            format!("{:?}", self.http_port),
+            if let Some(http_base_path) = &self.http_base_path {
+                format!("{:?}", http_base_path)
+            } else {
+                String::new()
+            },
+            if let Some(http_host) = &self.http_host {
+                format!("{:?}", http_host)
+            } else {
+                String::new()
+            },
+            if let Some(http_port) = &self.http_port {
+                format!("{:?}", http_port)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.http_req_stats),
-            format!("{:?}", self.https_port),
-            format!("{:?}", self.in_bytes),
-            format!("{:?}", self.in_msgs),
-            format!("{:?}", self.jetstream),
-            format!("{:?}", self.leaf),
-            format!("{:?}", self.leafnodes),
-            format!("{:?}", self.max_connections),
-            format!("{:?}", self.max_control_line),
-            format!("{:?}", self.max_payload),
-            format!("{:?}", self.max_pending),
-            format!("{:?}", self.mem),
+            if let Some(https_port) = &self.https_port {
+                format!("{:?}", https_port)
+            } else {
+                String::new()
+            },
+            if let Some(in_bytes) = &self.in_bytes {
+                format!("{:?}", in_bytes)
+            } else {
+                String::new()
+            },
+            if let Some(in_msgs) = &self.in_msgs {
+                format!("{:?}", in_msgs)
+            } else {
+                String::new()
+            },
+            if let Some(jetstream) = &self.jetstream {
+                format!("{:?}", jetstream)
+            } else {
+                String::new()
+            },
+            if let Some(leaf) = &self.leaf {
+                format!("{:?}", leaf)
+            } else {
+                String::new()
+            },
+            if let Some(leafnodes) = &self.leafnodes {
+                format!("{:?}", leafnodes)
+            } else {
+                String::new()
+            },
+            if let Some(max_connections) = &self.max_connections {
+                format!("{:?}", max_connections)
+            } else {
+                String::new()
+            },
+            if let Some(max_control_line) = &self.max_control_line {
+                format!("{:?}", max_control_line)
+            } else {
+                String::new()
+            },
+            if let Some(max_payload) = &self.max_payload {
+                format!("{:?}", max_payload)
+            } else {
+                String::new()
+            },
+            if let Some(max_pending) = &self.max_pending {
+                format!("{:?}", max_pending)
+            } else {
+                String::new()
+            },
+            if let Some(mem) = &self.mem {
+                format!("{:?}", mem)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.now),
-            format!("{:?}", self.out_bytes),
-            format!("{:?}", self.out_msgs),
-            format!("{:?}", self.ping_interval),
-            format!("{:?}", self.ping_max),
-            format!("{:?}", self.port),
-            format!("{:?}", self.proto),
-            format!("{:?}", self.remotes),
-            format!("{:?}", self.routes),
-            format!("{:?}", self.server_id),
-            format!("{:?}", self.server_name),
-            format!("{:?}", self.slow_consumers),
+            if let Some(out_bytes) = &self.out_bytes {
+                format!("{:?}", out_bytes)
+            } else {
+                String::new()
+            },
+            if let Some(out_msgs) = &self.out_msgs {
+                format!("{:?}", out_msgs)
+            } else {
+                String::new()
+            },
+            if let Some(ping_interval) = &self.ping_interval {
+                format!("{:?}", ping_interval)
+            } else {
+                String::new()
+            },
+            if let Some(ping_max) = &self.ping_max {
+                format!("{:?}", ping_max)
+            } else {
+                String::new()
+            },
+            if let Some(port) = &self.port {
+                format!("{:?}", port)
+            } else {
+                String::new()
+            },
+            if let Some(proto) = &self.proto {
+                format!("{:?}", proto)
+            } else {
+                String::new()
+            },
+            if let Some(remotes) = &self.remotes {
+                format!("{:?}", remotes)
+            } else {
+                String::new()
+            },
+            if let Some(routes) = &self.routes {
+                format!("{:?}", routes)
+            } else {
+                String::new()
+            },
+            if let Some(server_id) = &self.server_id {
+                format!("{:?}", server_id)
+            } else {
+                String::new()
+            },
+            if let Some(server_name) = &self.server_name {
+                format!("{:?}", server_name)
+            } else {
+                String::new()
+            },
+            if let Some(slow_consumers) = &self.slow_consumers {
+                format!("{:?}", slow_consumers)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.start),
-            format!("{:?}", self.subscriptions),
-            format!("{:?}", self.system_account),
-            format!("{:?}", self.tls_timeout),
-            format!("{:?}", self.total_connections),
-            format!("{:?}", self.uptime),
-            format!("{:?}", self.version),
-            format!("{:?}", self.write_deadline),
+            if let Some(subscriptions) = &self.subscriptions {
+                format!("{:?}", subscriptions)
+            } else {
+                String::new()
+            },
+            if let Some(system_account) = &self.system_account {
+                format!("{:?}", system_account)
+            } else {
+                String::new()
+            },
+            if let Some(tls_timeout) = &self.tls_timeout {
+                format!("{:?}", tls_timeout)
+            } else {
+                String::new()
+            },
+            if let Some(total_connections) = &self.total_connections {
+                format!("{:?}", total_connections)
+            } else {
+                String::new()
+            },
+            if let Some(uptime) = &self.uptime {
+                format!("{:?}", uptime)
+            } else {
+                String::new()
+            },
+            if let Some(version) = &self.version {
+                format!("{:?}", version)
+            } else {
+                String::new()
+            },
+            if let Some(write_deadline) = &self.write_deadline {
+                format!("{:?}", write_deadline)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -2180,15 +2576,43 @@ impl tabled::Tabled for Customer {
     const LENGTH: usize = 10;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.address),
-            format!("{:?}", self.balance),
+            if let Some(address) = &self.address {
+                format!("{:?}", address)
+            } else {
+                String::new()
+            },
+            if let Some(balance) = &self.balance {
+                format!("{:?}", balance)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.created_at),
             format!("{:?}", self.currency),
-            format!("{:?}", self.delinquent),
-            format!("{:?}", self.email),
-            format!("{:?}", self.id),
-            format!("{:?}", self.metadata),
-            format!("{:?}", self.name),
+            if let Some(delinquent) = &self.delinquent {
+                format!("{:?}", delinquent)
+            } else {
+                String::new()
+            },
+            if let Some(email) = &self.email {
+                format!("{:?}", email)
+            } else {
+                String::new()
+            },
+            if let Some(id) = &self.id {
+                format!("{:?}", id)
+            } else {
+                String::new()
+            },
+            if let Some(metadata) = &self.metadata {
+                format!("{:?}", metadata)
+            } else {
+                String::new()
+            },
+            if let Some(name) = &self.name {
+                format!("{:?}", name)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.phone),
         ]
     }
@@ -2261,7 +2685,11 @@ impl tabled::Tabled for CustomerBalance {
             format!("{:?}", self.pre_pay_credits_remaining),
             format!("{:?}", self.total_due),
             format!("{:?}", self.updated_at),
-            format!("{:?}", self.user_id),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -2589,66 +3017,306 @@ impl tabled::Tabled for DockerSystemInfo {
     const LENGTH: usize = 60;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.architecture),
-            format!("{:?}", self.bridge_nf_ip_6tables),
-            format!("{:?}", self.bridge_nf_iptables),
-            format!("{:?}", self.cgroup_driver),
-            format!("{:?}", self.cgroup_version),
-            format!("{:?}", self.cluster_advertise),
-            format!("{:?}", self.cluster_store),
-            format!("{:?}", self.containerd_commit),
-            format!("{:?}", self.containers),
-            format!("{:?}", self.containers_paused),
-            format!("{:?}", self.containers_running),
-            format!("{:?}", self.containers_stopped),
-            format!("{:?}", self.cpu_cfs_period),
-            format!("{:?}", self.cpu_cfs_quota),
-            format!("{:?}", self.cpu_set),
-            format!("{:?}", self.cpu_shares),
-            format!("{:?}", self.debug),
-            format!("{:?}", self.default_address_pools),
-            format!("{:?}", self.default_runtime),
-            format!("{:?}", self.docker_root_dir),
-            format!("{:?}", self.driver),
-            format!("{:?}", self.driver_status),
-            format!("{:?}", self.experimental_build),
-            format!("{:?}", self.http_proxy),
-            format!("{:?}", self.https_proxy),
-            format!("{:?}", self.id),
-            format!("{:?}", self.images),
-            format!("{:?}", self.index_server_address),
-            format!("{:?}", self.init_binary),
-            format!("{:?}", self.init_commit),
-            format!("{:?}", self.ipv_4_forwarding),
-            format!("{:?}", self.isolation),
-            format!("{:?}", self.kernel_memory),
-            format!("{:?}", self.kernel_memory_tcp),
-            format!("{:?}", self.kernel_version),
-            format!("{:?}", self.labels),
-            format!("{:?}", self.live_restore_enabled),
-            format!("{:?}", self.logging_driver),
-            format!("{:?}", self.mem_total),
-            format!("{:?}", self.memory_limit),
-            format!("{:?}", self.n_events_listener),
-            format!("{:?}", self.n_fd),
-            format!("{:?}", self.name),
-            format!("{:?}", self.ncpu),
-            format!("{:?}", self.no_proxy),
-            format!("{:?}", self.oom_kill_disable),
-            format!("{:?}", self.operating_system),
-            format!("{:?}", self.os_type),
-            format!("{:?}", self.os_version),
-            format!("{:?}", self.pids_limit),
-            format!("{:?}", self.plugins),
-            format!("{:?}", self.product_license),
-            format!("{:?}", self.registry_config),
-            format!("{:?}", self.runc_commit),
-            format!("{:?}", self.runtimes),
-            format!("{:?}", self.security_options),
-            format!("{:?}", self.server_version),
-            format!("{:?}", self.swap_limit),
-            format!("{:?}", self.system_time),
-            format!("{:?}", self.warnings),
+            if let Some(architecture) = &self.architecture {
+                format!("{:?}", architecture)
+            } else {
+                String::new()
+            },
+            if let Some(bridge_nf_ip_6tables) = &self.bridge_nf_ip_6tables {
+                format!("{:?}", bridge_nf_ip_6tables)
+            } else {
+                String::new()
+            },
+            if let Some(bridge_nf_iptables) = &self.bridge_nf_iptables {
+                format!("{:?}", bridge_nf_iptables)
+            } else {
+                String::new()
+            },
+            if let Some(cgroup_driver) = &self.cgroup_driver {
+                format!("{:?}", cgroup_driver)
+            } else {
+                String::new()
+            },
+            if let Some(cgroup_version) = &self.cgroup_version {
+                format!("{:?}", cgroup_version)
+            } else {
+                String::new()
+            },
+            if let Some(cluster_advertise) = &self.cluster_advertise {
+                format!("{:?}", cluster_advertise)
+            } else {
+                String::new()
+            },
+            if let Some(cluster_store) = &self.cluster_store {
+                format!("{:?}", cluster_store)
+            } else {
+                String::new()
+            },
+            if let Some(containerd_commit) = &self.containerd_commit {
+                format!("{:?}", containerd_commit)
+            } else {
+                String::new()
+            },
+            if let Some(containers) = &self.containers {
+                format!("{:?}", containers)
+            } else {
+                String::new()
+            },
+            if let Some(containers_paused) = &self.containers_paused {
+                format!("{:?}", containers_paused)
+            } else {
+                String::new()
+            },
+            if let Some(containers_running) = &self.containers_running {
+                format!("{:?}", containers_running)
+            } else {
+                String::new()
+            },
+            if let Some(containers_stopped) = &self.containers_stopped {
+                format!("{:?}", containers_stopped)
+            } else {
+                String::new()
+            },
+            if let Some(cpu_cfs_period) = &self.cpu_cfs_period {
+                format!("{:?}", cpu_cfs_period)
+            } else {
+                String::new()
+            },
+            if let Some(cpu_cfs_quota) = &self.cpu_cfs_quota {
+                format!("{:?}", cpu_cfs_quota)
+            } else {
+                String::new()
+            },
+            if let Some(cpu_set) = &self.cpu_set {
+                format!("{:?}", cpu_set)
+            } else {
+                String::new()
+            },
+            if let Some(cpu_shares) = &self.cpu_shares {
+                format!("{:?}", cpu_shares)
+            } else {
+                String::new()
+            },
+            if let Some(debug) = &self.debug {
+                format!("{:?}", debug)
+            } else {
+                String::new()
+            },
+            if let Some(default_address_pools) = &self.default_address_pools {
+                format!("{:?}", default_address_pools)
+            } else {
+                String::new()
+            },
+            if let Some(default_runtime) = &self.default_runtime {
+                format!("{:?}", default_runtime)
+            } else {
+                String::new()
+            },
+            if let Some(docker_root_dir) = &self.docker_root_dir {
+                format!("{:?}", docker_root_dir)
+            } else {
+                String::new()
+            },
+            if let Some(driver) = &self.driver {
+                format!("{:?}", driver)
+            } else {
+                String::new()
+            },
+            if let Some(driver_status) = &self.driver_status {
+                format!("{:?}", driver_status)
+            } else {
+                String::new()
+            },
+            if let Some(experimental_build) = &self.experimental_build {
+                format!("{:?}", experimental_build)
+            } else {
+                String::new()
+            },
+            if let Some(http_proxy) = &self.http_proxy {
+                format!("{:?}", http_proxy)
+            } else {
+                String::new()
+            },
+            if let Some(https_proxy) = &self.https_proxy {
+                format!("{:?}", https_proxy)
+            } else {
+                String::new()
+            },
+            if let Some(id) = &self.id {
+                format!("{:?}", id)
+            } else {
+                String::new()
+            },
+            if let Some(images) = &self.images {
+                format!("{:?}", images)
+            } else {
+                String::new()
+            },
+            if let Some(index_server_address) = &self.index_server_address {
+                format!("{:?}", index_server_address)
+            } else {
+                String::new()
+            },
+            if let Some(init_binary) = &self.init_binary {
+                format!("{:?}", init_binary)
+            } else {
+                String::new()
+            },
+            if let Some(init_commit) = &self.init_commit {
+                format!("{:?}", init_commit)
+            } else {
+                String::new()
+            },
+            if let Some(ipv_4_forwarding) = &self.ipv_4_forwarding {
+                format!("{:?}", ipv_4_forwarding)
+            } else {
+                String::new()
+            },
+            if let Some(isolation) = &self.isolation {
+                format!("{:?}", isolation)
+            } else {
+                String::new()
+            },
+            if let Some(kernel_memory) = &self.kernel_memory {
+                format!("{:?}", kernel_memory)
+            } else {
+                String::new()
+            },
+            if let Some(kernel_memory_tcp) = &self.kernel_memory_tcp {
+                format!("{:?}", kernel_memory_tcp)
+            } else {
+                String::new()
+            },
+            if let Some(kernel_version) = &self.kernel_version {
+                format!("{:?}", kernel_version)
+            } else {
+                String::new()
+            },
+            if let Some(labels) = &self.labels {
+                format!("{:?}", labels)
+            } else {
+                String::new()
+            },
+            if let Some(live_restore_enabled) = &self.live_restore_enabled {
+                format!("{:?}", live_restore_enabled)
+            } else {
+                String::new()
+            },
+            if let Some(logging_driver) = &self.logging_driver {
+                format!("{:?}", logging_driver)
+            } else {
+                String::new()
+            },
+            if let Some(mem_total) = &self.mem_total {
+                format!("{:?}", mem_total)
+            } else {
+                String::new()
+            },
+            if let Some(memory_limit) = &self.memory_limit {
+                format!("{:?}", memory_limit)
+            } else {
+                String::new()
+            },
+            if let Some(n_events_listener) = &self.n_events_listener {
+                format!("{:?}", n_events_listener)
+            } else {
+                String::new()
+            },
+            if let Some(n_fd) = &self.n_fd {
+                format!("{:?}", n_fd)
+            } else {
+                String::new()
+            },
+            if let Some(name) = &self.name {
+                format!("{:?}", name)
+            } else {
+                String::new()
+            },
+            if let Some(ncpu) = &self.ncpu {
+                format!("{:?}", ncpu)
+            } else {
+                String::new()
+            },
+            if let Some(no_proxy) = &self.no_proxy {
+                format!("{:?}", no_proxy)
+            } else {
+                String::new()
+            },
+            if let Some(oom_kill_disable) = &self.oom_kill_disable {
+                format!("{:?}", oom_kill_disable)
+            } else {
+                String::new()
+            },
+            if let Some(operating_system) = &self.operating_system {
+                format!("{:?}", operating_system)
+            } else {
+                String::new()
+            },
+            if let Some(os_type) = &self.os_type {
+                format!("{:?}", os_type)
+            } else {
+                String::new()
+            },
+            if let Some(os_version) = &self.os_version {
+                format!("{:?}", os_version)
+            } else {
+                String::new()
+            },
+            if let Some(pids_limit) = &self.pids_limit {
+                format!("{:?}", pids_limit)
+            } else {
+                String::new()
+            },
+            if let Some(plugins) = &self.plugins {
+                format!("{:?}", plugins)
+            } else {
+                String::new()
+            },
+            if let Some(product_license) = &self.product_license {
+                format!("{:?}", product_license)
+            } else {
+                String::new()
+            },
+            if let Some(registry_config) = &self.registry_config {
+                format!("{:?}", registry_config)
+            } else {
+                String::new()
+            },
+            if let Some(runc_commit) = &self.runc_commit {
+                format!("{:?}", runc_commit)
+            } else {
+                String::new()
+            },
+            if let Some(runtimes) = &self.runtimes {
+                format!("{:?}", runtimes)
+            } else {
+                String::new()
+            },
+            if let Some(security_options) = &self.security_options {
+                format!("{:?}", security_options)
+            } else {
+                String::new()
+            },
+            if let Some(server_version) = &self.server_version {
+                format!("{:?}", server_version)
+            } else {
+                String::new()
+            },
+            if let Some(swap_limit) = &self.swap_limit {
+                format!("{:?}", swap_limit)
+            } else {
+                String::new()
+            },
+            if let Some(system_time) = &self.system_time {
+                format!("{:?}", system_time)
+            } else {
+                String::new()
+            },
+            if let Some(warnings) = &self.warnings {
+                format!("{:?}", warnings)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -2744,7 +3412,14 @@ impl std::fmt::Display for EmailAuthenticationForm {
 impl tabled::Tabled for EmailAuthenticationForm {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.callback_url), self.email.clone()]
+        vec![
+            if let Some(callback_url) = &self.callback_url {
+                format!("{:?}", callback_url)
+            } else {
+                String::new()
+            },
+            self.email.clone(),
+        ]
     }
 
     fn headers() -> Vec<String> {
@@ -2866,7 +3541,11 @@ impl tabled::Tabled for Error {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.error_code),
+            if let Some(error_code) = &self.error_code {
+                format!("{:?}", error_code)
+            } else {
+                String::new()
+            },
             self.message.clone(),
             self.request_id.clone(),
         ]
@@ -2995,22 +3674,70 @@ impl tabled::Tabled for ExtendedUser {
     const LENGTH: usize = 16;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.company),
+            if let Some(company) = &self.company {
+                format!("{:?}", company)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.created_at),
-            format!("{:?}", self.discord),
-            format!("{:?}", self.email),
-            format!("{:?}", self.email_verified),
-            format!("{:?}", self.first_name),
-            format!("{:?}", self.github),
-            format!("{:?}", self.id),
+            if let Some(discord) = &self.discord {
+                format!("{:?}", discord)
+            } else {
+                String::new()
+            },
+            if let Some(email) = &self.email {
+                format!("{:?}", email)
+            } else {
+                String::new()
+            },
+            if let Some(email_verified) = &self.email_verified {
+                format!("{:?}", email_verified)
+            } else {
+                String::new()
+            },
+            if let Some(first_name) = &self.first_name {
+                format!("{:?}", first_name)
+            } else {
+                String::new()
+            },
+            if let Some(github) = &self.github {
+                format!("{:?}", github)
+            } else {
+                String::new()
+            },
+            if let Some(id) = &self.id {
+                format!("{:?}", id)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.image),
-            format!("{:?}", self.last_name),
-            format!("{:?}", self.mailchimp_id),
-            format!("{:?}", self.name),
+            if let Some(last_name) = &self.last_name {
+                format!("{:?}", last_name)
+            } else {
+                String::new()
+            },
+            if let Some(mailchimp_id) = &self.mailchimp_id {
+                format!("{:?}", mailchimp_id)
+            } else {
+                String::new()
+            },
+            if let Some(name) = &self.name {
+                format!("{:?}", name)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.phone),
-            format!("{:?}", self.stripe_id),
+            if let Some(stripe_id) = &self.stripe_id {
+                format!("{:?}", stripe_id)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.updated_at),
-            format!("{:?}", self.zendesk_id),
+            if let Some(zendesk_id) = &self.zendesk_id {
+                format!("{:?}", zendesk_id)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -3089,7 +3816,14 @@ impl crate::types::paginate::Pagination for ExtendedUserResultsPage {
 impl tabled::Tabled for ExtendedUserResultsPage {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.items), format!("{:?}", self.next_page)]
+        vec![
+            format!("{:?}", self.items),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page)
+            } else {
+                String::new()
+            },
+        ]
     }
 
     fn headers() -> Vec<String> {
@@ -3151,17 +3885,37 @@ impl tabled::Tabled for FileConversion {
     const LENGTH: usize = 11;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.completed_at),
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.created_at),
-            format!("{:?}", self.error),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.id),
-            format!("{:?}", self.output),
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
-            format!("{:?}", self.started_at),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
-            format!("{:?}", self.user_id),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -3236,17 +3990,41 @@ impl tabled::Tabled for FileDensity {
     const LENGTH: usize = 11;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.completed_at),
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.created_at),
-            format!("{:?}", self.density),
-            format!("{:?}", self.error),
+            if let Some(density) = &self.density {
+                format!("{:?}", density)
+            } else {
+                String::new()
+            },
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.id),
-            format!("{:?}", self.material_mass),
+            if let Some(material_mass) = &self.material_mass {
+                format!("{:?}", material_mass)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.src_format),
-            format!("{:?}", self.started_at),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
-            format!("{:?}", self.user_id),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -3321,17 +4099,41 @@ impl tabled::Tabled for FileMass {
     const LENGTH: usize = 11;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.completed_at),
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.created_at),
-            format!("{:?}", self.error),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.id),
-            format!("{:?}", self.mass),
-            format!("{:?}", self.material_density),
+            if let Some(mass) = &self.mass {
+                format!("{:?}", mass)
+            } else {
+                String::new()
+            },
+            if let Some(material_density) = &self.material_density {
+                format!("{:?}", material_density)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.src_format),
-            format!("{:?}", self.started_at),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
-            format!("{:?}", self.user_id),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -3503,16 +4305,36 @@ impl tabled::Tabled for FileVolume {
     const LENGTH: usize = 10;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.completed_at),
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.created_at),
-            format!("{:?}", self.error),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.id),
             format!("{:?}", self.src_format),
-            format!("{:?}", self.started_at),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
-            format!("{:?}", self.user_id),
-            format!("{:?}", self.volume),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+            if let Some(volume) = &self.volume {
+                format!("{:?}", volume)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -3568,11 +4390,31 @@ impl tabled::Tabled for Gateway {
     const LENGTH: usize = 5;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.auth_timeout),
-            format!("{:?}", self.host),
-            format!("{:?}", self.name),
-            format!("{:?}", self.port),
-            format!("{:?}", self.tls_timeout),
+            if let Some(auth_timeout) = &self.auth_timeout {
+                format!("{:?}", auth_timeout)
+            } else {
+                String::new()
+            },
+            if let Some(host) = &self.host {
+                format!("{:?}", host)
+            } else {
+                String::new()
+            },
+            if let Some(name) = &self.name {
+                format!("{:?}", name)
+            } else {
+                String::new()
+            },
+            if let Some(port) = &self.port {
+                format!("{:?}", port)
+            } else {
+                String::new()
+            },
+            if let Some(tls_timeout) = &self.tls_timeout {
+                format!("{:?}", tls_timeout)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -3620,10 +4462,26 @@ impl tabled::Tabled for IndexInfo {
     const LENGTH: usize = 4;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.mirrors),
-            format!("{:?}", self.name),
-            format!("{:?}", self.official),
-            format!("{:?}", self.secure),
+            if let Some(mirrors) = &self.mirrors {
+                format!("{:?}", mirrors)
+            } else {
+                String::new()
+            },
+            if let Some(name) = &self.name {
+                format!("{:?}", name)
+            } else {
+                String::new()
+            },
+            if let Some(official) = &self.official {
+                format!("{:?}", official)
+            } else {
+                String::new()
+            },
+            if let Some(secure) = &self.secure {
+                format!("{:?}", secure)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -3730,30 +4588,118 @@ impl tabled::Tabled for Invoice {
     const LENGTH: usize = 24;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.amount_due),
-            format!("{:?}", self.amount_paid),
-            format!("{:?}", self.amount_remaining),
-            format!("{:?}", self.attempt_count),
-            format!("{:?}", self.attempted),
+            if let Some(amount_due) = &self.amount_due {
+                format!("{:?}", amount_due)
+            } else {
+                String::new()
+            },
+            if let Some(amount_paid) = &self.amount_paid {
+                format!("{:?}", amount_paid)
+            } else {
+                String::new()
+            },
+            if let Some(amount_remaining) = &self.amount_remaining {
+                format!("{:?}", amount_remaining)
+            } else {
+                String::new()
+            },
+            if let Some(attempt_count) = &self.attempt_count {
+                format!("{:?}", attempt_count)
+            } else {
+                String::new()
+            },
+            if let Some(attempted) = &self.attempted {
+                format!("{:?}", attempted)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.created_at),
             format!("{:?}", self.currency),
-            format!("{:?}", self.customer_email),
-            format!("{:?}", self.customer_id),
-            format!("{:?}", self.default_payment_method),
-            format!("{:?}", self.description),
-            format!("{:?}", self.id),
-            format!("{:?}", self.lines),
-            format!("{:?}", self.metadata),
-            format!("{:?}", self.number),
-            format!("{:?}", self.paid),
-            format!("{:?}", self.pdf),
-            format!("{:?}", self.receipt_number),
-            format!("{:?}", self.statement_descriptor),
-            format!("{:?}", self.status),
-            format!("{:?}", self.subtotal),
-            format!("{:?}", self.tax),
-            format!("{:?}", self.total),
-            format!("{:?}", self.url),
+            if let Some(customer_email) = &self.customer_email {
+                format!("{:?}", customer_email)
+            } else {
+                String::new()
+            },
+            if let Some(customer_id) = &self.customer_id {
+                format!("{:?}", customer_id)
+            } else {
+                String::new()
+            },
+            if let Some(default_payment_method) = &self.default_payment_method {
+                format!("{:?}", default_payment_method)
+            } else {
+                String::new()
+            },
+            if let Some(description) = &self.description {
+                format!("{:?}", description)
+            } else {
+                String::new()
+            },
+            if let Some(id) = &self.id {
+                format!("{:?}", id)
+            } else {
+                String::new()
+            },
+            if let Some(lines) = &self.lines {
+                format!("{:?}", lines)
+            } else {
+                String::new()
+            },
+            if let Some(metadata) = &self.metadata {
+                format!("{:?}", metadata)
+            } else {
+                String::new()
+            },
+            if let Some(number) = &self.number {
+                format!("{:?}", number)
+            } else {
+                String::new()
+            },
+            if let Some(paid) = &self.paid {
+                format!("{:?}", paid)
+            } else {
+                String::new()
+            },
+            if let Some(pdf) = &self.pdf {
+                format!("{:?}", pdf)
+            } else {
+                String::new()
+            },
+            if let Some(receipt_number) = &self.receipt_number {
+                format!("{:?}", receipt_number)
+            } else {
+                String::new()
+            },
+            if let Some(statement_descriptor) = &self.statement_descriptor {
+                format!("{:?}", statement_descriptor)
+            } else {
+                String::new()
+            },
+            if let Some(status) = &self.status {
+                format!("{:?}", status)
+            } else {
+                String::new()
+            },
+            if let Some(subtotal) = &self.subtotal {
+                format!("{:?}", subtotal)
+            } else {
+                String::new()
+            },
+            if let Some(tax) = &self.tax {
+                format!("{:?}", tax)
+            } else {
+                String::new()
+            },
+            if let Some(total) = &self.total {
+                format!("{:?}", total)
+            } else {
+                String::new()
+            },
+            if let Some(url) = &self.url {
+                format!("{:?}", url)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -3826,12 +4772,32 @@ impl tabled::Tabled for InvoiceLineItem {
     const LENGTH: usize = 6;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.amount),
+            if let Some(amount) = &self.amount {
+                format!("{:?}", amount)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.currency),
-            format!("{:?}", self.description),
-            format!("{:?}", self.id),
-            format!("{:?}", self.invoice_item),
-            format!("{:?}", self.metadata),
+            if let Some(description) = &self.description {
+                format!("{:?}", description)
+            } else {
+                String::new()
+            },
+            if let Some(id) = &self.id {
+                format!("{:?}", id)
+            } else {
+                String::new()
+            },
+            if let Some(invoice_item) = &self.invoice_item {
+                format!("{:?}", invoice_item)
+            } else {
+                String::new()
+            },
+            if let Some(metadata) = &self.metadata {
+                format!("{:?}", metadata)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -3913,9 +4879,21 @@ impl tabled::Tabled for Jetstream {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.config),
-            format!("{:?}", self.meta),
-            format!("{:?}", self.stats),
+            if let Some(config) = &self.config {
+                format!("{:?}", config)
+            } else {
+                String::new()
+            },
+            if let Some(meta) = &self.meta {
+                format!("{:?}", meta)
+            } else {
+                String::new()
+            },
+            if let Some(stats) = &self.stats {
+                format!("{:?}", stats)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -3958,9 +4936,21 @@ impl tabled::Tabled for JetstreamApiStats {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.errors),
-            format!("{:?}", self.inflight),
-            format!("{:?}", self.total),
+            if let Some(errors) = &self.errors {
+                format!("{:?}", errors)
+            } else {
+                String::new()
+            },
+            if let Some(inflight) = &self.inflight {
+                format!("{:?}", inflight)
+            } else {
+                String::new()
+            },
+            if let Some(total) = &self.total {
+                format!("{:?}", total)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -4006,10 +4996,26 @@ impl tabled::Tabled for JetstreamConfig {
     const LENGTH: usize = 4;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.domain),
-            format!("{:?}", self.max_memory),
-            format!("{:?}", self.max_storage),
-            format!("{:?}", self.store_dir),
+            if let Some(domain) = &self.domain {
+                format!("{:?}", domain)
+            } else {
+                String::new()
+            },
+            if let Some(max_memory) = &self.max_memory {
+                format!("{:?}", max_memory)
+            } else {
+                String::new()
+            },
+            if let Some(max_storage) = &self.max_storage {
+                format!("{:?}", max_storage)
+            } else {
+                String::new()
+            },
+            if let Some(store_dir) = &self.store_dir {
+                format!("{:?}", store_dir)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -4065,13 +5071,41 @@ impl tabled::Tabled for JetstreamStats {
     const LENGTH: usize = 7;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.accounts),
-            format!("{:?}", self.api),
-            format!("{:?}", self.ha_assets),
-            format!("{:?}", self.memory),
-            format!("{:?}", self.reserved_memory),
-            format!("{:?}", self.reserved_store),
-            format!("{:?}", self.store),
+            if let Some(accounts) = &self.accounts {
+                format!("{:?}", accounts)
+            } else {
+                String::new()
+            },
+            if let Some(api) = &self.api {
+                format!("{:?}", api)
+            } else {
+                String::new()
+            },
+            if let Some(ha_assets) = &self.ha_assets {
+                format!("{:?}", ha_assets)
+            } else {
+                String::new()
+            },
+            if let Some(memory) = &self.memory {
+                format!("{:?}", memory)
+            } else {
+                String::new()
+            },
+            if let Some(reserved_memory) = &self.reserved_memory {
+                format!("{:?}", reserved_memory)
+            } else {
+                String::new()
+            },
+            if let Some(reserved_store) = &self.reserved_store {
+                format!("{:?}", reserved_store)
+            } else {
+                String::new()
+            },
+            if let Some(store) = &self.store {
+                format!("{:?}", store)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -4121,10 +5155,26 @@ impl tabled::Tabled for LeafNode {
     const LENGTH: usize = 4;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.auth_timeout),
-            format!("{:?}", self.host),
-            format!("{:?}", self.port),
-            format!("{:?}", self.tls_timeout),
+            if let Some(auth_timeout) = &self.auth_timeout {
+                format!("{:?}", auth_timeout)
+            } else {
+                String::new()
+            },
+            if let Some(host) = &self.host {
+                format!("{:?}", host)
+            } else {
+                String::new()
+            },
+            if let Some(port) = &self.port {
+                format!("{:?}", port)
+            } else {
+                String::new()
+            },
+            if let Some(tls_timeout) = &self.tls_timeout {
+                format!("{:?}", tls_timeout)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -4168,9 +5218,21 @@ impl tabled::Tabled for MetaClusterInfo {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.cluster_size),
-            format!("{:?}", self.leader),
-            format!("{:?}", self.name),
+            if let Some(cluster_size) = &self.cluster_size {
+                format!("{:?}", cluster_size)
+            } else {
+                String::new()
+            },
+            if let Some(leader) = &self.leader {
+                format!("{:?}", leader)
+            } else {
+                String::new()
+            },
+            if let Some(name) = &self.name {
+                format!("{:?}", name)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -4326,9 +5388,21 @@ impl tabled::Tabled for Oauth2ClientInfo {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.csrf_token),
-            format!("{:?}", self.pkce_code_verifier),
-            format!("{:?}", self.url),
+            if let Some(csrf_token) = &self.csrf_token {
+                format!("{:?}", csrf_token)
+            } else {
+                String::new()
+            },
+            if let Some(pkce_code_verifier) = &self.pkce_code_verifier {
+                format!("{:?}", pkce_code_verifier)
+            } else {
+                String::new()
+            },
+            if let Some(url) = &self.url {
+                format!("{:?}", url)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -4394,7 +5468,18 @@ impl std::fmt::Display for OutputFile {
 impl tabled::Tabled for OutputFile {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.contents), format!("{:?}", self.name)]
+        vec![
+            if let Some(contents) = &self.contents {
+                format!("{:?}", contents)
+            } else {
+                String::new()
+            },
+            if let Some(name) = &self.name {
+                format!("{:?}", name)
+            } else {
+                String::new()
+            },
+        ]
     }
 
     fn headers() -> Vec<String> {
@@ -4473,10 +5558,22 @@ impl tabled::Tabled for PaymentMethod {
     fn fields(&self) -> Vec<String> {
         vec![
             format!("{:?}", self.billing_info),
-            format!("{:?}", self.card),
+            if let Some(card) = &self.card {
+                format!("{:?}", card)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.created_at),
-            format!("{:?}", self.id),
-            format!("{:?}", self.metadata),
+            if let Some(id) = &self.id {
+                format!("{:?}", id)
+            } else {
+                String::new()
+            },
+            if let Some(metadata) = &self.metadata {
+                format!("{:?}", metadata)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.type_),
         ]
     }
@@ -4527,9 +5624,21 @@ impl tabled::Tabled for PaymentMethodCardChecks {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.address_line_1_check),
-            format!("{:?}", self.address_postal_code_check),
-            format!("{:?}", self.cvc_check),
+            if let Some(address_line_1_check) = &self.address_line_1_check {
+                format!("{:?}", address_line_1_check)
+            } else {
+                String::new()
+            },
+            if let Some(address_postal_code_check) = &self.address_postal_code_check {
+                format!("{:?}", address_postal_code_check)
+            } else {
+                String::new()
+            },
+            if let Some(cvc_check) = &self.cvc_check {
+                format!("{:?}", cvc_check)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -4602,10 +5711,26 @@ impl tabled::Tabled for PluginsInfo {
     const LENGTH: usize = 4;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.authorization),
-            format!("{:?}", self.log),
-            format!("{:?}", self.network),
-            format!("{:?}", self.volume),
+            if let Some(authorization) = &self.authorization {
+                format!("{:?}", authorization)
+            } else {
+                String::new()
+            },
+            if let Some(log) = &self.log {
+                format!("{:?}", log)
+            } else {
+                String::new()
+            },
+            if let Some(network) = &self.network {
+                format!("{:?}", network)
+            } else {
+                String::new()
+            },
+            if let Some(volume) = &self.volume {
+                format!("{:?}", volume)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -4685,11 +5810,35 @@ impl tabled::Tabled for RegistryServiceConfig {
     const LENGTH: usize = 5;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.allow_nondistributable_artifacts_cid_rs),
-            format!("{:?}", self.allow_nondistributable_artifacts_hostnames),
-            format!("{:?}", self.index_configs),
-            format!("{:?}", self.insecure_registry_cid_rs),
-            format!("{:?}", self.mirrors),
+            if let Some(allow_nondistributable_artifacts_cid_rs) =
+                &self.allow_nondistributable_artifacts_cid_rs
+            {
+                format!("{:?}", allow_nondistributable_artifacts_cid_rs)
+            } else {
+                String::new()
+            },
+            if let Some(allow_nondistributable_artifacts_hostnames) =
+                &self.allow_nondistributable_artifacts_hostnames
+            {
+                format!("{:?}", allow_nondistributable_artifacts_hostnames)
+            } else {
+                String::new()
+            },
+            if let Some(index_configs) = &self.index_configs {
+                format!("{:?}", index_configs)
+            } else {
+                String::new()
+            },
+            if let Some(insecure_registry_cid_rs) = &self.insecure_registry_cid_rs {
+                format!("{:?}", insecure_registry_cid_rs)
+            } else {
+                String::new()
+            },
+            if let Some(mirrors) = &self.mirrors {
+                format!("{:?}", mirrors)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -4731,8 +5880,16 @@ impl tabled::Tabled for Runtime {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.path),
-            format!("{:?}", self.runtime_args),
+            if let Some(path) = &self.path {
+                format!("{:?}", path)
+            } else {
+                String::new()
+            },
+            if let Some(runtime_args) = &self.runtime_args {
+                format!("{:?}", runtime_args)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -4782,10 +5939,18 @@ impl tabled::Tabled for Session {
         vec![
             format!("{:?}", self.created_at),
             format!("{:?}", self.expires),
-            format!("{:?}", self.id),
+            if let Some(id) = &self.id {
+                format!("{:?}", id)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.session_token),
             format!("{:?}", self.updated_at),
-            format!("{:?}", self.user_id),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -4881,7 +6046,18 @@ impl std::fmt::Display for SystemInfoDefaultAddressPools {
 impl tabled::Tabled for SystemInfoDefaultAddressPools {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.base), format!("{:?}", self.size)]
+        vec![
+            if let Some(base) = &self.base {
+                format!("{:?}", base)
+            } else {
+                String::new()
+            },
+            if let Some(size) = &self.size {
+                format!("{:?}", size)
+            } else {
+                String::new()
+            },
+        ]
     }
 
     fn headers() -> Vec<String> {
@@ -4975,18 +6151,42 @@ impl tabled::Tabled for UnitConversion {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.completed_at),
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.created_at),
-            format!("{:?}", self.error),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.id),
-            format!("{:?}", self.input),
-            format!("{:?}", self.output),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
-            format!("{:?}", self.started_at),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
-            format!("{:?}", self.user_id),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
         ]
     }
 
@@ -5116,11 +6316,31 @@ impl tabled::Tabled for UpdateUser {
     const LENGTH: usize = 6;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.company),
-            format!("{:?}", self.discord),
-            format!("{:?}", self.first_name),
-            format!("{:?}", self.github),
-            format!("{:?}", self.last_name),
+            if let Some(company) = &self.company {
+                format!("{:?}", company)
+            } else {
+                String::new()
+            },
+            if let Some(discord) = &self.discord {
+                format!("{:?}", discord)
+            } else {
+                String::new()
+            },
+            if let Some(first_name) = &self.first_name {
+                format!("{:?}", first_name)
+            } else {
+                String::new()
+            },
+            if let Some(github) = &self.github {
+                format!("{:?}", github)
+            } else {
+                String::new()
+            },
+            if let Some(last_name) = &self.last_name {
+                format!("{:?}", last_name)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.phone),
         ]
     }
@@ -5197,17 +6417,53 @@ impl tabled::Tabled for User {
     const LENGTH: usize = 13;
     fn fields(&self) -> Vec<String> {
         vec![
-            format!("{:?}", self.company),
+            if let Some(company) = &self.company {
+                format!("{:?}", company)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.created_at),
-            format!("{:?}", self.discord),
-            format!("{:?}", self.email),
-            format!("{:?}", self.email_verified),
-            format!("{:?}", self.first_name),
-            format!("{:?}", self.github),
-            format!("{:?}", self.id),
+            if let Some(discord) = &self.discord {
+                format!("{:?}", discord)
+            } else {
+                String::new()
+            },
+            if let Some(email) = &self.email {
+                format!("{:?}", email)
+            } else {
+                String::new()
+            },
+            if let Some(email_verified) = &self.email_verified {
+                format!("{:?}", email_verified)
+            } else {
+                String::new()
+            },
+            if let Some(first_name) = &self.first_name {
+                format!("{:?}", first_name)
+            } else {
+                String::new()
+            },
+            if let Some(github) = &self.github {
+                format!("{:?}", github)
+            } else {
+                String::new()
+            },
+            if let Some(id) = &self.id {
+                format!("{:?}", id)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.image),
-            format!("{:?}", self.last_name),
-            format!("{:?}", self.name),
+            if let Some(last_name) = &self.last_name {
+                format!("{:?}", last_name)
+            } else {
+                String::new()
+            },
+            if let Some(name) = &self.name {
+                format!("{:?}", name)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.phone),
             format!("{:?}", self.updated_at),
         ]
@@ -5285,7 +6541,14 @@ impl crate::types::paginate::Pagination for UserResultsPage {
 impl tabled::Tabled for UserResultsPage {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.items), format!("{:?}", self.next_page)]
+        vec![
+            format!("{:?}", self.items),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page)
+            } else {
+                String::new()
+            },
+        ]
     }
 
     fn headers() -> Vec<String> {
@@ -5331,8 +6594,16 @@ impl tabled::Tabled for VerificationToken {
         vec![
             format!("{:?}", self.created_at),
             format!("{:?}", self.expires),
-            format!("{:?}", self.id),
-            format!("{:?}", self.identifier),
+            if let Some(id) = &self.id {
+                format!("{:?}", id)
+            } else {
+                String::new()
+            },
+            if let Some(identifier) = &self.identifier {
+                format!("{:?}", identifier)
+            } else {
+                String::new()
+            },
             format!("{:?}", self.updated_at),
         ]
     }
