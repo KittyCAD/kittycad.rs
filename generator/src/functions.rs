@@ -329,17 +329,36 @@ fn get_fn_name(
         .to_string();
 
     // Remove any stutters with the tag name.
-    if name.starts_with(&format!("{}_", tag)) {
-        name = name.trim_start_matches(&format!("{}_", tag)).to_string();
-    }
-    if name.ends_with(&format!("_{}", tag)) {
-        name = name.trim_end_matches(&format!("_{}", tag)).to_string();
-    }
-    if name.contains(&format!("_{}_", tag)) {
-        name = name.replace(&format!("_{}_", tag), "_");
-    }
+    name = remove_stutters(&name, tag);
+    // Remove any stutters with the singular tag name.
+    name = remove_stutters(&name, &singular(tag));
 
     Ok(name)
+}
+
+/// Return the singular version of a string (if it plural).
+fn singular(s: &str) -> String {
+    if let Some(b) = s.strip_suffix('s') {
+        return b.to_string();
+    }
+
+    s.to_string()
+}
+
+/// Remove any stutters with a string.
+fn remove_stutters(whole: &str, s: &str) -> String {
+    let mut whole = whole.to_string();
+    if whole.starts_with(&format!("{}_", s)) {
+        whole = whole.trim_start_matches(&format!("{}_", s)).to_string();
+    }
+    if whole.ends_with(&format!("_{}", s)) {
+        whole = whole.trim_end_matches(&format!("_{}", s)).to_string();
+    }
+    if whole.contains(&format!("_{}_", s)) {
+        whole = whole.replace(&format!("_{}_", s), "_");
+    }
+
+    whole.to_string()
 }
 
 struct RequestOrResponse {
