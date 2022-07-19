@@ -10,7 +10,7 @@ impl File {
         Self { client }
     }
 
-    #[doc = "Convert CAD file.\n\nConvert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\nIf the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_file_create_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileConversion = client\n        .file()\n        .create_conversion(\n            kittycad::types::FileOutputFormat::Dae,\n            kittycad::types::FileSourceFormat::Obj,\n            &\"zPDf0QhrAxf52nF8lJon\".to_string(),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Convert CAD file.\n\nConvert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\nIf the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_file_create_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileConversion = client\n        .file()\n        .create_conversion(\n            kittycad::types::FileOutputFormat::Dae,\n            kittycad::types::FileSourceFormat::Step,\n            &\"w9lseaZUe5ueN92xqLwh\".to_string(),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_conversion<'a>(
         &'a self,
         output_format: crate::types::FileOutputFormat,
@@ -44,7 +44,7 @@ impl File {
         }
     }
 
-    #[doc = "Get a file conversion.\n\nGet the status and output of an async file conversion.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\nIf the user is not authenticated to view the specified file conversion, then it is not returned.\nOnly KittyCAD employees with the proper access can view file conversions for other users.\n\n```rust,no_run\nasync fn example_file_get_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallOutput = client.file().get_conversion(\"vb\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get a file conversion.\n\nGet the status and output of an async file conversion.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\nIf the user is not authenticated to view the specified file conversion, then it is not returned.\nOnly KittyCAD employees with the proper access can view file conversions for other users.\n\n```rust,no_run\nasync fn example_file_get_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallOutput = client.file().get_conversion(\"ywdcu\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn get_conversion<'a>(
         &'a self,
         id: &'a str,
@@ -73,7 +73,7 @@ impl File {
         }
     }
 
-    #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Stl,\n            &\"tb3VYz8IeVu_yQ\".to_string(),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Step,\n            &\"AXEiHTIDmgFbFg\".to_string(),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_density<'a>(
         &'a self,
         material_mass: f64,
@@ -105,7 +105,7 @@ impl File {
         }
     }
 
-    #[doc = "Execute a KittyCAD program in a specific language.\n\n```rust,no_run\nasync fn example_file_create_execution() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CodeOutput = client\n        .file()\n        .create_execution(\n            kittycad::types::CodeLanguage::Node,\n            Some(\"sts\".to_string()),\n            &\"QPOaSRFnFG0\".to_string(),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Execute a KittyCAD program in a specific language.\n\n```rust,no_run\nasync fn example_file_create_execution() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CodeOutput = client\n        .file()\n        .create_execution(\n            kittycad::types::CodeLanguage::Node,\n            Some(\"cev\".to_string()),\n            &\"x7zFPQtb05JjDCIgSKU\".to_string(),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_execution<'a>(
         &'a self,
         lang: crate::types::CodeLanguage,
@@ -143,7 +143,7 @@ impl File {
         }
     }
 
-    #[doc = "Get CAD file mass.\n\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_file_create_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileMass = client\n        .file()\n        .create_mass(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Obj,\n            &\"CKjok3kh_N5cUBOe\".to_string(),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get CAD file mass.\n\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_file_create_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileMass = client\n        .file()\n        .create_mass(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Dae,\n            &\"zsOP-wiiHhWXQwgtboA\".to_string(),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_mass<'a>(
         &'a self,
         material_density: f64,
@@ -175,7 +175,7 @@ impl File {
         }
     }
 
-    #[doc = "Get CAD file volume.\n\nGet the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_file_create_volume() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileVolume = client\n        .file()\n        .create_volume(\n            kittycad::types::FileSourceFormat::Dae,\n            &\"EHHSlbkH8Ik2vQ\".to_string(),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get CAD file volume.\n\nGet the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_file_create_volume() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileVolume = client\n        .file()\n        .create_volume(\n            kittycad::types::FileSourceFormat::Fbx,\n            &\"Sforw11Ia--fiHBr52w3\".to_string(),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_volume<'a>(
         &'a self,
         src_format: crate::types::FileSourceFormat,
@@ -205,7 +205,7 @@ impl File {
         }
     }
 
-    #[doc = "Get a file conversion for your user.\n\nGet the status and output of an async file conversion. If completed, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\n\n```rust,no_run\nasync fn example_file_get_conversion_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallOutput =\n        client.file().get_conversion_for_user(\"odpbkuhj\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get a file conversion for your user.\n\nGet the status and output of an async file conversion. If completed, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\n\n```rust,no_run\nasync fn example_file_get_conversion_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallOutput =\n        client.file().get_conversion_for_user(\"cepcc\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn get_conversion_for_user<'a>(
         &'a self,
         id: &'a str,

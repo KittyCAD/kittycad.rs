@@ -456,7 +456,7 @@ fn get_request_body_example(
                         let name = crate::types::get_type_name_from_reference(
                             &s.reference()?,
                             spec,
-                            false,
+                            true,
                         )?;
                         crate::types::example::generate_example_rust_from_schema(
                             &name.rendered()?,

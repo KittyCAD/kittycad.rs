@@ -34,7 +34,7 @@ impl Users {
         }
     }
 
-    #[doc = "Update your user.\n\nThis endpoint requires authentication by any KittyCAD user. It updates information about the authenticated user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_users_update_user_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client\n        .users()\n        .update_user_self(&kittycad::types::CrateTypesUpdateUser {\n            company: Some(\"\".to_string()),\n            discord: Some(\"jltnguwv\".to_string()),\n            first_name: Some(\"dtdquiom\".to_string()),\n            github: Some(\"dgp\".to_string()),\n            last_name: Some(\"oajbqmuur\".to_string()),\n            phone: Some(kittycad::types::phone_number::PhoneNumber::from_str(\n                \"+1 246-005-6764\",\n            )?),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update your user.\n\nThis endpoint requires authentication by any KittyCAD user. It updates information about the authenticated user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_users_update_user_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client\n        .users()\n        .update_user_self(&kittycad::types::UpdateUser {\n            company: Some(\"hgnpnhmm\".to_string()),\n            discord: Some(\"jjrxqq\".to_string()),\n            first_name: Some(\"bih\".to_string()),\n            github: Some(\"yuujo\".to_string()),\n            last_name: Some(\"kpmupjh\".to_string()),\n            phone: Some(kittycad::types::phone_number::PhoneNumber::from_str(\n                \"+1 681-323-5864\",\n            )?),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn update_user_self<'a>(
         &'a self,
         body: &crate::types::UpdateUser,
@@ -199,7 +199,7 @@ impl Users {
             .boxed()
     }
 
-    #[doc = "List users with extended information.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List users with extended information.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     pub async fn list_extended<'a>(
         &'a self,
         limit: Option<u32>,
@@ -240,7 +240,7 @@ impl Users {
         }
     }
 
-    #[doc = "List users with extended information.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List users with extended information.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     pub fn list_extended_stream<'a>(
         &'a self,
         limit: Option<u32>,
@@ -299,7 +299,7 @@ impl Users {
             .boxed()
     }
 
-    #[doc = "Get extended information about a user.\n\nTo get information about yourself, use `/users-extended/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user/extended` endpoint.\nTo get information about any KittyCAD user, you must be a KittyCAD employee.\n\n```rust,no_run\nasync fn example_users_get_user_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUser = client.users().get_user_extended(\"idxg\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get extended information about a user.\n\nTo get information about yourself, use `/users-extended/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user/extended` endpoint.\nTo get information about any KittyCAD user, you must be a KittyCAD employee.\n\n```rust,no_run\nasync fn example_users_get_user_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUser = client.users().get_user_extended(\"wd\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn get_user_extended<'a>(
         &'a self,
         id: &'a str,
@@ -328,7 +328,7 @@ impl Users {
         }
     }
 
-    #[doc = "Get a user.\n\nTo get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user` endpoint.\nTo get information about any KittyCAD user, you must be a KittyCAD employee.\n\n```rust,no_run\nasync fn example_users_get_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client.users().get_user(\"pm\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get a user.\n\nTo get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user` endpoint.\nTo get information about any KittyCAD user, you must be a KittyCAD employee.\n\n```rust,no_run\nasync fn example_users_get_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client.users().get_user(\"nlcdktwtt\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn get_user<'a>(
         &'a self,
         id: &'a str,
