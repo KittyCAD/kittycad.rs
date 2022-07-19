@@ -8,7 +8,7 @@ fn test_client() -> crate::Client {
 #[tokio::test]
 async fn test_create_file_conversion() {
     let client = test_client();
-    let body = include_bytes!("../../assets/in_obj.obj");
+    let body = include_bytes!("../assets/in_obj.obj");
 
     let conversion = client
         .file()
@@ -29,7 +29,7 @@ async fn test_create_file_conversion() {
 #[tokio::test]
 async fn test_create_file_conversion_with_base64_helper() {
     let client = test_client();
-    let body = include_bytes!("../../assets/in_obj.obj");
+    let body = include_bytes!("../assets/in_obj.obj");
 
     let conversion = client
         .file()
@@ -53,7 +53,7 @@ async fn test_create_file_conversion_with_base64_helper() {
 #[tokio::test]
 async fn test_create_file_volume() {
     let client = test_client();
-    let body = include_bytes!("../../assets/in_obj.obj");
+    let body = include_bytes!("../assets/in_obj.obj");
 
     let result = client
         .file()
