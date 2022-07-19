@@ -72,4 +72,43 @@ impl Client {
             token,
         )
     }
+
+    /// Create a raw request to our API.
+    pub async fn request_raw(
+        &self,
+        method: reqwest::Method,
+        uri: &str,
+        body: Option<reqwest::Body>,
+    ) -> anyhow::Result<reqwest::RequestBuilder>
+    {
+        let u = if uri.starts_with("https://") || uri.starts_with("http://") {
+            uri.to_string()
+        } else {
+            format!("{}/{}", self.base_url, uri.trim_start_matches('/'))
+        };
+
+        let mut req = self.client.request(
+            method,
+            &u,
+        );
+
+        // Add in our authentication.
+        req = req.bearer_auth(&self.token);
+
+        // Set the default headers.
+        req = req.header(
+            reqwest::header::ACCEPT,
+            reqwest::header::HeaderValue::from_static("application/json"),
+        );
+        req = req.header(
+            reqwest::header::CONTENT_TYPE,
+            reqwest::header::HeaderValue::from_static("application/json"),
+        );
+
+        if let Some(body) = body {
+            req = req.body(body);
+        }
+
+        Ok(req)
+    }
 "#;

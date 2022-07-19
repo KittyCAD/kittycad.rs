@@ -46,19 +46,19 @@ jobs:
       # Checkout the docs repo since we will want to update the files there.
       - uses: actions/checkout@v3
         with:
-          repository: 'kittycad/docs'
-          path: 'docs'
+          repository: 'kittycad/website'
+          path: 'website'
           token: ${{secrets.GLOBAL_PAT}}
       - name: move json patch file to docs
         shell: bash
         run: |
-          rm docs/kittycad.rs.patch.json || true
-          cp kittycad.rs.patch.json docs/kittycad.rs.patch.json
-      - name: commit the changes in the docs repo
+          rm website/kittycad.rs.patch.json || true
+          cp kittycad.rs.patch.json website/kittycad.rs.patch.json
+      - name: commit the changes in the website repo
         shell: bash
         run: |
           export VERSION=$(cat VERSION.txt);
-          cd docs
+          cd website
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add .

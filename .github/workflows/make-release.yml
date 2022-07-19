@@ -50,6 +50,7 @@ jobs:
           else
             # No changes
             echo "No files changed, proceeding";
+            git checkout .
           fi
       - name: Get if prerelease
         shell: bash
