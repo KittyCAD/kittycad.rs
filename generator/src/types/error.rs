@@ -19,7 +19,7 @@ pub enum Error {
     /// An expected error response.
     InvalidResponsePayload {
         /// The error.
-        error: String,
+        error: reqwest::Error,
         /// The full response.
         response: reqwest::Response,
     },
@@ -93,6 +93,7 @@ impl std::error::Error for Error {
         match self {
             Error::CommunicationError(e) => Some(e),
             Error::SerdeError { error, status: _ } => Some(error),
+            Error::InvalidResponsePayload { error, response: _ } => Some(error),
             _ => None,
         }
     }

@@ -28,8 +28,7 @@ kittycad: target/debug/generator
 		-d "A fully generated & opinionated API client for the KittyCAD API." \
 		--spec-url "https://api.kittycad.io" \
 		--base-url "https://api.kittycad.io" \
-		--repo-name "KittyCAD/kittycad.rs" \
-		--error-type "Error" $(EXTRA_ARGS)
+		--repo-name "KittyCAD/kittycad.rs" $(EXTRA_ARGS)
 
 .PHONY: tag
 tag: ## Create a new git tag to prepare to build a release.

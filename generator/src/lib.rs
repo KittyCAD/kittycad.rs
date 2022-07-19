@@ -282,7 +282,7 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     crate::save(librs, lib.as_str())?;
 
     // Create the Rust source types file containing the generated types.
-    let types = crate::types::generate_types(spec, &opts.into())?;
+    let types = crate::types::generate_types(spec)?;
     let mut typesrs = src.clone();
     typesrs.push("types.rs");
     crate::save(typesrs, types.as_str())?;
@@ -403,10 +403,6 @@ pub struct Opts {
     /// The repo name, formatted like `{owner}/{name}`, if hosted on GitHub.
     #[clap(short, long)]
     pub repo_name: Option<String>,
-
-    /// The name of the error type as denoted in the spec schemas.
-    #[clap(short, long)]
-    pub error_type: Option<String>,
 }
 
 impl Opts {

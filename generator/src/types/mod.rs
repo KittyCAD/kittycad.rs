@@ -18,7 +18,7 @@ use crate::types::exts::{
 };
 
 /// Generate Rust types from an OpenAPI v3 spec.
-pub fn generate_types(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
+pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
     // Include the base64 data type for byte data.
     let base64_mod = get_base64_mod()?;
 
@@ -29,7 +29,7 @@ pub fn generate_types(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> 
     let phone_number_mod = get_phone_number_mod()?;
 
     // Include the error data type for phone numbers.
-    let error_mod = get_error_mod(opts)?;
+    let error_mod = get_error_mod()?;
 
     // Let's start with the components if there are any.
     let mut rendered = quote!(
@@ -52,7 +52,7 @@ pub fn generate_types(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> 
             // Let's get the schema from the reference.
             let schema = schema.get_schema_from_reference(spec, true)?;
             // Let's handle all the kinds of schemas.
-            let t = render_schema(name, &schema, spec, opts)?;
+            let t = render_schema(name, &schema, spec)?;
             // Add it to our rendered types.
             rendered = quote! {
                 #rendered
@@ -66,7 +66,7 @@ pub fn generate_types(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> 
             // Let's get the schema from the reference.
             let schema = schema.get_schema_from_reference(spec, true)?;
             // Let's handle all the kinds of schemas.
-            let t = render_schema(name, &schema, spec, opts)?;
+            let t = render_schema(name, &schema, spec)?;
             // Add it to our rendered types.
             rendered = quote! {
                 #rendered
@@ -77,12 +77,12 @@ pub fn generate_types(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> 
 
         // Parse the responses.
         for (name, response) in &components.responses {
-            render_response(name, &response.expand(spec)?, spec, opts)?;
+            render_response(name, &response.expand(spec)?, spec)?;
         }
 
         // Parse the request bodies.
         for (name, request_body) in &components.request_bodies {
-            render_request_body(name, &request_body.expand(spec)?, spec, opts)?;
+            render_request_body(name, &request_body.expand(spec)?, spec)?;
         }
     }
 
@@ -95,7 +95,6 @@ pub fn render_schema(
     name: &str,
     schema: &openapiv3::Schema,
     spec: &openapiv3::OpenAPI,
-    opts: &Opts,
 ) -> Result<proc_macro2::TokenStream> {
     match &schema.schema_kind {
         openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
@@ -110,7 +109,7 @@ pub fn render_schema(
             Ok(quote!())
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
-            render_object(name, o, &schema.schema_data, spec, opts)
+            render_object(name, o, &schema.schema_data, spec)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Array(_a)) => {
             anyhow::bail!("XXX array not supported yet");
@@ -120,7 +119,7 @@ pub fn render_schema(
             Ok(quote!())
         }
         openapiv3::SchemaKind::OneOf { one_of } => {
-            render_one_of(name, one_of, &schema.schema_data, spec, opts)
+            render_one_of(name, one_of, &schema.schema_data, spec)
         }
         openapiv3::SchemaKind::AllOf { all_of: _ } => {
             anyhow::bail!("XXX all of not supported yet");
@@ -517,7 +516,6 @@ fn render_one_of(
     one_of: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
     data: &openapiv3::SchemaData,
     spec: &openapiv3::OpenAPI,
-    opts: &Opts,
 ) -> Result<proc_macro2::TokenStream> {
     let description = if let Some(d) = &data.description {
         quote!(#[doc = #d])
@@ -652,7 +650,7 @@ fn render_one_of(
                     if let Some(components) = &spec.components {
                         if !components.schemas.contains_key(&tag_name) {
                             // Ensure we have a type for this type.
-                            let obj = render_object(&tag_name, o, &schema.schema_data, spec, opts)?;
+                            let obj = render_object(&tag_name, o, &schema.schema_data, spec)?;
                             additional_types = quote!(
                                 #additional_types
 
@@ -715,7 +713,6 @@ fn render_object(
     o: &openapiv3::ObjectType,
     data: &openapiv3::SchemaData,
     spec: &openapiv3::OpenAPI,
-    opts: &Opts,
 ) -> Result<proc_macro2::TokenStream> {
     if let Some(min_properties) = o.min_properties {
         anyhow::bail!(
@@ -752,7 +749,7 @@ fn render_object(
                     );
                 }
                 openapiv3::AdditionalProperties::Schema(schema) => {
-                    let rendered = render_schema(name, schema.item()?, spec, opts)?;
+                    let rendered = render_schema(name, schema.item()?, spec)?;
                     return Ok(rendered);
                 }
             }
@@ -813,17 +810,11 @@ fn render_object(
             tabled_props = quote!(#[tabled(skip)]);
         }
 
-        let serde_props_full = if serde_props.is_empty() {
-            quote!()
-        } else {
-            quote!(#[serde(#(#serde_props),*)])
-        };
-
         values = quote!(
             #values
 
             #prop_desc
-            #serde_props_full
+            #[serde(#(#serde_props),*)]
             #tabled_props
             #prop_value
         );
@@ -863,15 +854,9 @@ fn render_object(
         );
     }
 
-    let add_error = if opts.error_type == Some(name.to_string()) {
-        quote!(,thiserror::Error)
-    } else {
-        quote!()
-    };
-
     let rendered = quote! {
         #description
-        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema, tabled::Tabled #add_error)]
+        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema, tabled::Tabled)]
         pub struct #struct_name {
             #values
         }
@@ -893,7 +878,6 @@ fn render_response(
     name: &str,
     response: &openapiv3::Response,
     spec: &openapiv3::OpenAPI,
-    opts: &Opts,
 ) -> Result<proc_macro2::TokenStream> {
     let mut responses = quote!();
 
@@ -901,7 +885,7 @@ fn render_response(
         if let Some(openapiv3::ReferenceOr::Item(i)) = &content.schema {
             // If the schema is a reference we don't care, since we would have already rendered
             // that reference.
-            let rendered = render_schema(&format!("{}_{}", name, content_name), i, spec, opts)?;
+            let rendered = render_schema(&format!("{}_{}", name, content_name), i, spec)?;
             responses = quote!(
                 #responses
 
@@ -918,7 +902,6 @@ fn render_request_body(
     name: &str,
     request_body: &openapiv3::RequestBody,
     spec: &openapiv3::OpenAPI,
-    opts: &Opts,
 ) -> Result<proc_macro2::TokenStream> {
     let mut request_bodies = quote!();
 
@@ -926,7 +909,7 @@ fn render_request_body(
         if let Some(openapiv3::ReferenceOr::Item(i)) = &content.schema {
             // If the schema is a reference we don't care, since we would have already rendered
             // that reference.
-            let rendered = render_schema(&format!("{}_{}", name, content_name), i, spec, opts)?;
+            let rendered = render_schema(&format!("{}_{}", name, content_name), i, spec)?;
             request_bodies = quote!(
                 #request_bodies
 
@@ -1152,12 +1135,9 @@ fn get_phone_number_mod() -> Result<proc_macro2::TokenStream> {
     ))
 }
 
-fn get_error_mod(opts: &Opts) -> Result<proc_macro2::TokenStream> {
-    let mut file = include_str!("error.rs").to_string();
-    if let Some(error) = &opts.error_type {
-        file = file.replace("error: String", &format!("error: {}", proper_name(&error)));
-    }
-    let stream = proc_macro2::TokenStream::from_str(&file).map_err(|e| anyhow::anyhow!("{}", e))?;
+fn get_error_mod() -> Result<proc_macro2::TokenStream> {
+    let file = include_str!("error.rs");
+    let stream = proc_macro2::TokenStream::from_str(file).map_err(|e| anyhow::anyhow!("{}", e))?;
     Ok(quote!(
         pub mod error {
             #stream
@@ -1370,21 +1350,6 @@ fn is_pagination_property_items(s: &str, t: &proc_macro2::TokenStream) -> Result
     Ok(["items", "data"].contains(&s) && get_text(t)?.starts_with("Vec<"))
 }
 
-/// The options for our types generator.
-#[derive(Debug, Clone)]
-pub struct Opts {
-    /// The name of the error type as denoted in the spec schemas.
-    pub error_type: Option<String>,
-}
-
-impl From<&crate::Opts> for Opts {
-    fn from(opts: &crate::Opts) -> Self {
-        Opts {
-            error_type: opts.error_type.clone(),
-        }
-    }
-}
-
 #[cfg(test)]
 mod test {
     use pretty_assertions::assert_eq;
@@ -1393,9 +1358,6 @@ mod test {
     fn test_generate_kittycad_types() {
         let result = super::generate_types(
             &crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
-            &super::Opts {
-                error_type: Some("Error".to_string()),
-            },
         )
         .unwrap();
         expectorate::assert_contents("tests/types/kittycad.rs.gen", &result);
@@ -1407,9 +1369,6 @@ mod test {
     fn test_generate_github_types() {
         let result = super::generate_types(
             &crate::load_json_spec(include_str!("../../tests/api.github.com.json")).unwrap(),
-            &super::Opts {
-                error_type: Some("".to_string()),
-            },
         )
         .unwrap();
         expectorate::assert_contents("tests/types/github.rs.gen", &result);

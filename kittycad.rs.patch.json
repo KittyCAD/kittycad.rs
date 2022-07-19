@@ -27,11 +27,7 @@
     "op": "add",
     "path": "/paths/~1api-call-metrics/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Get API call metrics.\n/// \n/// This endpoint requires authentication by a KittyCAD employee. The API calls are grouped by the parameter passed.\nasync fn example_api_calls_get_api_call_metrics() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::ApiCallQueryGroup> = client\n        .api_calls()\n        .get_api_call_metrics(kittycad::types::ApiCallQueryGroupBy::Email)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Get API call metrics.\n/// \n/// This endpoint requires authentication by a KittyCAD employee. The API calls are grouped by the parameter passed.\nasync fn example_api_calls_get_api_call_metrics() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::ApiCallQueryGroup> = client\n        .api_calls()\n        .get_api_call_metrics(kittycad::types::ApiCallQueryGroupBy::Origin)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.get_api_call_metrics"
     }
   },
@@ -39,11 +35,7 @@
     "op": "add",
     "path": "/paths/~1api-calls/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// List API calls.\n/// \n/// This endpoint requires authentication by a KittyCAD employee. The API calls are returned in order of creation, with the most recently created API calls first.\nasync fn example_api_calls_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .list(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_calls_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_calls = client.api_calls();\n    let mut stream = api_calls.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
-=======
-      "example": "/// List API calls.\n/// \n/// This endpoint requires authentication by a KittyCAD employee. The API calls are returned in order of creation, with the most recently created API calls first.\nasync fn example_api_calls_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .list(\n            Some(4 as u32),\n            Some(\"mcmqwt\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_calls_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_calls = client.api_calls();\n    let mut stream = api_calls.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.list"
     }
   },
@@ -51,11 +43,7 @@
     "op": "add",
     "path": "/paths/~1api-calls~1{id}/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Get details of an API call.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\n/// If the user is not authenticated to view the specified API call, then it is not returned.\n/// Only KittyCAD employees can view API calls for other users.\nasync fn example_api_calls_get_api_call() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPrice =\n        client.api_calls().get_api_call(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Get details of an API call.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\n/// If the user is not authenticated to view the specified API call, then it is not returned.\n/// Only KittyCAD employees can view API calls for other users.\nasync fn example_api_calls_get_api_call() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPrice = client.api_calls().get_api_call(\"axn\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.get_api_call"
     }
   },
@@ -63,11 +51,7 @@
     "op": "add",
     "path": "/paths/~1async~1operations/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// List async operations.\n/// \n/// For async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\n/// This endpoint requires authentication by a KittyCAD employee.\nasync fn example_api_calls_list_async_operations() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallResultsPage = client\n        .api_calls()\n        .list_async_operations(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n            Some(kittycad::types::ApiCallStatus::Queued),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_calls_list_async_operations_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_calls = client.api_calls();\n    let mut stream = api_calls.list_async_operations_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n        Some(kittycad::types::ApiCallStatus::Queued),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
-=======
-      "example": "/// List async operations.\n/// \n/// For async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\n/// This endpoint requires authentication by a KittyCAD employee.\nasync fn example_api_calls_list_async_operations() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallResultsPage = client\n        .api_calls()\n        .list_async_operations(\n            Some(4 as u32),\n            Some(\"f\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n            Some(kittycad::types::ApiCallStatus::Completed),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_calls_list_async_operations_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_calls = client.api_calls();\n    let mut stream = api_calls.list_async_operations_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        Some(kittycad::types::ApiCallStatus::Completed),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.list_async_operations"
     }
   },
@@ -75,11 +59,7 @@
     "op": "add",
     "path": "/paths/~1async~1operations~1{id}/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Get an async operation.\n/// \n/// Get the status and output of an async operation.\n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested async operation for the user.\n/// If the user is not authenticated to view the specified async operation, then it is not returned.\n/// Only KittyCAD employees with the proper access can view async operations for other users.\nasync fn example_api_calls_get_async_operation() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallOutput = client\n        .api_calls()\n        .get_async_operation(\"some-string\")\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Get an async operation.\n/// \n/// Get the status and output of an async operation.\n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested async operation for the user.\n/// If the user is not authenticated to view the specified async operation, then it is not returned.\n/// Only KittyCAD employees with the proper access can view async operations for other users.\nasync fn example_api_calls_get_async_operation() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallOutput =\n        client.api_calls().get_async_operation(\"upvavarm\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.get_async_operation"
     }
   },
@@ -87,11 +67,7 @@
     "op": "add",
     "path": "/paths/~1auth~1email/post/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Create an email verification request for a user.\nuse std::str::FromStr;\nasync fn example_hidden_listen_auth_email() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::VerificationToken = client\n        .hidden()\n        .listen_auth_email(&kittycad::types::EmailAuthenticationForm {\n            callback_url: Some(url::Url::from_str(\"https://example.com/foo/bar\")?),\n            email: \"email@example.com\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Create an email verification request for a user.\nuse std::str::FromStr;\nasync fn example_hidden_listen_auth_email() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::VerificationToken = client\n        .hidden()\n        .listen_auth_email(&kittycad::types::EmailAuthenticationForm {\n            callback_url: Some(url::Url::from_str(\n                \"https://158.222.213.231.82.85.223.194.245/5\",\n            )?),\n            email: \"email@example.com\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.listen_auth_email"
     }
   },
@@ -99,11 +75,7 @@
     "op": "add",
     "path": "/paths/~1auth~1email~1callback/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Listen for callbacks for email verification for users.\nuse std::str::FromStr;\nasync fn example_hidden_listen_auth_email_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .listen_auth_email_callback(\n            Some(url::Url::from_str(\"https://example.com/foo/bar\")?),\n            \"email@example.com\",\n            \"some-string\",\n        )\n        .await?;\n    Ok(())\n}\n",
-=======
-      "example": "/// Listen for callbacks for email verification for users.\nuse std::str::FromStr;\nasync fn example_hidden_listen_auth_email_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .listen_auth_email_callback(\n            Some(url::Url::from_str(\"http://158.0.0.52/4\")?),\n            \"email@example.com\",\n            \"pwuwruc\",\n        )\n        .await?;\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.listen_auth_email_callback"
     }
   },
@@ -111,11 +83,7 @@
     "op": "add",
     "path": "/paths/~1file~1conversion~1{src_format}~1{output_format}/post/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Convert CAD file.\n/// \n/// Convert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\n/// If the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nasync fn example_file_create_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileConversion = client\n        .file()\n        .create_conversion(\n            kittycad::types::FileOutputFormat::Step,\n            kittycad::types::FileSourceFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Convert CAD file.\n/// \n/// Convert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\n/// If the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nasync fn example_file_create_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileConversion = client\n        .file()\n        .create_conversion(\n            kittycad::types::FileOutputFormat::Fbx,\n            kittycad::types::FileSourceFormat::Stl,\n            &bytes::Bytes::from(\"AAn7W5PXMYynf2UCQRQ\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_conversion"
     }
   },
@@ -123,11 +91,7 @@
     "op": "add",
     "path": "/paths/~1file~1conversions~1{id}/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Get a file conversion.\n/// \n/// Get the status and output of an async file conversion.\n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\n/// If the user is not authenticated to view the specified file conversion, then it is not returned.\n/// Only KittyCAD employees with the proper access can view file conversions for other users.\nasync fn example_file_get_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallOutput =\n        client.file().get_conversion(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Get a file conversion.\n/// \n/// Get the status and output of an async file conversion.\n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\n/// If the user is not authenticated to view the specified file conversion, then it is not returned.\n/// Only KittyCAD employees with the proper access can view file conversions for other users.\nasync fn example_file_get_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallOutput = client.file().get_conversion(\"qornamr\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.get_conversion"
     }
   },
@@ -135,11 +99,7 @@
     "op": "add",
     "path": "/paths/~1file~1density/post/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Get CAD file density.\n/// \n/// Get the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Dae,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Get CAD file density.\n/// \n/// Get the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Dae,\n            &bytes::Bytes::from(\"45okqYYAgxCh4qedLw\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_density"
     }
   },
@@ -147,11 +107,7 @@
     "op": "add",
     "path": "/paths/~1file~1execute~1{lang}/post/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Execute a KittyCAD program in a specific language.\nasync fn example_file_create_execution() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CodeOutput = client\n        .file()\n        .create_execution(\n            kittycad::types::CodeLanguage::Node,\n            Some(\"some-string\".to_string()),\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Execute a KittyCAD program in a specific language.\nasync fn example_file_create_execution() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CodeOutput = client\n        .file()\n        .create_execution(\n            kittycad::types::CodeLanguage::Node,\n            Some(\"qxjv\".to_string()),\n            &bytes::Bytes::from(\"xS36kyFpZTSdtw\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_execution"
     }
   },
@@ -159,11 +115,7 @@
     "op": "add",
     "path": "/paths/~1file~1mass/post/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Get CAD file mass.\n/// \n/// Get the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nasync fn example_file_create_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileMass = client\n        .file()\n        .create_mass(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Dae,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Get CAD file mass.\n/// \n/// Get the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nasync fn example_file_create_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileMass = client\n        .file()\n        .create_mass(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Fbx,\n            &bytes::Bytes::from(\"FKuyo2Tnx0g-\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_mass"
     }
   },
@@ -171,11 +123,7 @@
     "op": "add",
     "path": "/paths/~1file~1volume/post/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Get CAD file volume.\n/// \n/// Get the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nasync fn example_file_create_volume() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileVolume = client\n        .file()\n        .create_volume(\n            kittycad::types::FileSourceFormat::Dae,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Get CAD file volume.\n/// \n/// Get the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nasync fn example_file_create_volume() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileVolume = client\n        .file()\n        .create_volume(\n            kittycad::types::FileSourceFormat::Obj,\n            &bytes::Bytes::from(\"4BAy3KyQ1GWfWX4\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_volume"
     }
   },
@@ -191,11 +139,7 @@
     "op": "add",
     "path": "/paths/~1oauth2~1device~1auth/post/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Start an OAuth 2.0 Device Authorization Grant.\n/// \n/// This endpoint is designed to be accessed from an *unauthenticated* API client. It generates and records a `device_code` and `user_code` which must be verified and confirmed prior to a token being granted.\nuse std::str::FromStr;\nasync fn example_oauth2_device_auth_request() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_auth_request(&kittycad::types::DeviceAuthRequestForm {\n            client_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        })\n        .await?;\n    Ok(())\n}\n",
-=======
-      "example": "/// Start an OAuth 2.0 Device Authorization Grant.\n/// \n/// This endpoint is designed to be accessed from an *unauthenticated* API client. It generates and records a `device_code` and `user_code` which must be verified and confirmed prior to a token being granted.\nuse std::str::FromStr;\nasync fn example_oauth2_device_auth_request() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_auth_request(&kittycad::types::DeviceAuthRequestForm {\n            client_id: uuid::Uuid::from_str(\"ac7f39c8-0a2b-4204-9602-bd1bf1fb0c70\")?,\n        })\n        .await?;\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.device_auth_request"
     }
   },
@@ -203,11 +147,7 @@
     "op": "add",
     "path": "/paths/~1oauth2~1device~1confirm/post/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Confirm an OAuth 2.0 Device Authorization Grant.\n/// \n/// This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/oauth2/device/token`.\nasync fn example_oauth2_device_auth_confirm() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_auth_confirm(&kittycad::types::DeviceAuthVerifyParams {\n            user_code: \"some-string\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n",
-=======
-      "example": "/// Confirm an OAuth 2.0 Device Authorization Grant.\n/// \n/// This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/oauth2/device/token`.\nasync fn example_oauth2_device_auth_confirm() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_auth_confirm(&kittycad::types::DeviceAuthVerifyParams {\n            user_code: \"t\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.device_auth_confirm"
     }
   },
@@ -215,11 +155,7 @@
     "op": "add",
     "path": "/paths/~1oauth2~1device~1token/post/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Request a device access token.\n/// \n/// This endpoint should be polled by the client until the user code is verified and the grant is confirmed.\nuse std::str::FromStr;\nasync fn example_oauth2_device_access_token() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_access_token(&kittycad::types::DeviceAccessTokenRequestForm {\n            client_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            device_code: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            grant_type: kittycad::types::Oauth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode,\n        })\n        .await?;\n    Ok(())\n}\n",
-=======
-      "example": "/// Request a device access token.\n/// \n/// This endpoint should be polled by the client until the user code is verified and the grant is confirmed.\nuse std::str::FromStr;\nasync fn example_oauth2_device_access_token() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_access_token(&kittycad::types::DeviceAccessTokenRequestForm {\n            client_id: uuid::Uuid::from_str(\"3a88ba30-4fe6-4279-b5c8-fad8a41cca32\")?,\n            device_code: uuid::Uuid::from_str(\"d07c8c2b-70c5-4140-94ab-63ae0ac9c083\")?,\n            grant_type: kittycad::types::Oauth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode,\n        })\n        .await?;\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.device_access_token"
     }
   },
@@ -227,11 +163,7 @@
     "op": "add",
     "path": "/paths/~1oauth2~1device~1verify/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Verify an OAuth 2.0 Device Authorization Grant.\n/// \n/// This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website.\nasync fn example_oauth2_device_auth_verify() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.oauth2().device_auth_verify(\"some-string\").await?;\n    Ok(())\n}\n",
-=======
-      "example": "/// Verify an OAuth 2.0 Device Authorization Grant.\n/// \n/// This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website.\nasync fn example_oauth2_device_auth_verify() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.oauth2().device_auth_verify(\"es\").await?;\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.device_auth_verify"
     }
   },
@@ -239,11 +171,7 @@
     "op": "add",
     "path": "/paths/~1oauth2~1provider~1{provider}~1callback/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Listen for callbacks for the OAuth 2.0 provider.\nasync fn example_oauth2_listen_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .listen_provider_callback(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Google,\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n",
-=======
-      "example": "/// Listen for callbacks for the OAuth 2.0 provider.\nasync fn example_oauth2_listen_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .listen_provider_callback(\n            Some(\"ivodnquvr\".to_string()),\n            kittycad::types::AccountProvider::Github,\n            Some(\"fxt\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.listen_provider_callback"
     }
   },
@@ -251,11 +179,7 @@
     "op": "add",
     "path": "/paths/~1oauth2~1provider~1{provider}~1consent/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Get the consent URL and other information for the OAuth 2.0 provider.\nasync fn example_oauth2_listen_provider_consent() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo = client\n        .oauth2()\n        .listen_provider_consent(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Github,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Get the consent URL and other information for the OAuth 2.0 provider.\nasync fn example_oauth2_listen_provider_consent() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo = client\n        .oauth2()\n        .listen_provider_consent(\n            Some(\"pdbxgbbpq\".to_string()),\n            kittycad::types::AccountProvider::Google,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.listen_provider_consent"
     }
   },
@@ -271,11 +195,7 @@
     "op": "add",
     "path": "/paths/~1unit~1conversion~1{src_format}~1{output_format}/post/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Convert units.\n/// \n/// Convert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions.\nasync fn example_unit_create_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitConversion = client\n        .unit()\n        .create_conversion(\n            kittycad::types::UnitMetricFormat::Hecto,\n            kittycad::types::UnitMetricFormat::Deci,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Convert units.\n/// \n/// Convert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions.\nasync fn example_unit_create_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitConversion = client\n        .unit()\n        .create_conversion(\n            kittycad::types::UnitMetricFormat::Giga,\n            kittycad::types::UnitMetricFormat::Nano,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.create_conversion"
     }
   },
@@ -299,11 +219,7 @@
     "op": "add",
     "path": "/paths/~1user/put/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Update your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It updates information about the authenticated user.\nuse std::str::FromStr;\nasync fn example_users_update_user_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client\n        .users()\n        .update_user_self(&kittycad::types::UpdateUser {\n            company: Some(\"some-string\".to_string()),\n            discord: Some(\"some-string\".to_string()),\n            first_name: Some(\"some-string\".to_string()),\n            github: Some(\"some-string\".to_string()),\n            last_name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Update your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It updates information about the authenticated user.\nuse std::str::FromStr;\nasync fn example_users_update_user_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client\n        .users()\n        .update_user_self(&kittycad::types::UpdateUser {\n            company: Some(\"\".to_string()),\n            discord: Some(\"vwnvenanq\".to_string()),\n            first_name: Some(\"raxxrvlel\".to_string()),\n            github: Some(\"\".to_string()),\n            last_name: Some(\"bu\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1 1325002584\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.update_user_self"
     }
   },
@@ -311,11 +227,7 @@
     "op": "add",
     "path": "/paths/~1user~1api-calls/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// List API calls for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user.\n/// The API calls are returned in order of creation, with the most recently created API calls first.\nasync fn example_api_calls_user_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .user_list(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_calls_user_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_calls = client.api_calls();\n    let mut stream = api_calls.user_list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
-=======
-      "example": "/// List API calls for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user.\n/// The API calls are returned in order of creation, with the most recently created API calls first.\nasync fn example_api_calls_user_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .user_list(\n            Some(4 as u32),\n            Some(\"mrlor\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_calls_user_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_calls = client.api_calls();\n    let mut stream = api_calls.user_list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.user_list"
     }
   },
@@ -323,11 +235,7 @@
     "op": "add",
     "path": "/paths/~1user~1api-calls~1{id}/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Get an API call for a user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\nasync fn example_api_calls_get_api_call_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPrice = client\n        .api_calls()\n        .get_api_call_for_user(\"some-string\")\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Get an API call for a user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\nasync fn example_api_calls_get_api_call_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPrice =\n        client.api_calls().get_api_call_for_user(\"mavs\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.get_api_call_for_user"
     }
   },
@@ -335,11 +243,7 @@
     "op": "add",
     "path": "/paths/~1user~1api-tokens/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// List API tokens for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\n/// The API tokens are returned in order of creation, with the most recently created API tokens first.\nasync fn example_api_tokens_list_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiTokenResultsPage = client\n        .api_tokens()\n        .list_for_user(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_tokens_list_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_tokens = client.api_tokens();\n    let mut stream = api_tokens.list_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
-=======
-      "example": "/// List API tokens for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\n/// The API tokens are returned in order of creation, with the most recently created API tokens first.\nasync fn example_api_tokens_list_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiTokenResultsPage = client\n        .api_tokens()\n        .list_for_user(\n            Some(4 as u32),\n            Some(\"oyngv\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_tokens_list_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_tokens = client.api_tokens();\n    let mut stream = api_tokens.list_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_tokens/struct.ApiTokens.html#method.list_for_user"
     }
   },
@@ -355,11 +259,7 @@
     "op": "add",
     "path": "/paths/~1user~1api-tokens~1{token}/delete/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Delete an API token for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\n/// This endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.\nuse std::str::FromStr;\nasync fn example_api_tokens_delete_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .api_tokens()\n        .delete_api_token_for_user(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    Ok(())\n}\n",
-=======
-      "example": "/// Delete an API token for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\n/// This endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.\nuse std::str::FromStr;\nasync fn example_api_tokens_delete_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .api_tokens()\n        .delete_api_token_for_user(uuid::Uuid::from_str(\n            \"c29c4f30-fdbf-4f1a-bf7d-1937fba82f4b\",\n        )?)\n        .await?;\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_tokens/struct.ApiTokens.html#method.delete_api_token_for_user"
     }
   },
@@ -367,11 +267,7 @@
     "op": "add",
     "path": "/paths/~1user~1api-tokens~1{token}/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Get an API token for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\nuse std::str::FromStr;\nasync fn example_api_tokens_get_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = client\n        .api_tokens()\n        .get_api_token_for_user(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Get an API token for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\nuse std::str::FromStr;\nasync fn example_api_tokens_get_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = client\n        .api_tokens()\n        .get_api_token_for_user(uuid::Uuid::from_str(\n            \"69900a67-711e-451c-ad85-a3d6457ce6c9\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_tokens/struct.ApiTokens.html#method.get_api_token_for_user"
     }
   },
@@ -387,11 +283,7 @@
     "op": "add",
     "path": "/paths/~1user~1file~1conversions~1{id}/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Get a file conversion for your user.\n/// \n/// Get the status and output of an async file conversion. If completed, the contents of the converted file (`output`) will be returned as a base64 encoded string.\n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\nasync fn example_file_get_conversion_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallOutput =\n        client.file().get_conversion_for_user(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Get a file conversion for your user.\n/// \n/// Get the status and output of an async file conversion. If completed, the contents of the converted file (`output`) will be returned as a base64 encoded string.\n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\nasync fn example_file_get_conversion_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallOutput =\n        client.file().get_conversion_for_user(\"x\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.get_conversion_for_user"
     }
   },
@@ -415,11 +307,7 @@
     "op": "add",
     "path": "/paths/~1user~1payment/post/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Create payment info for your user.\n/// \n/// This includes billing address, phone, and name.\n/// This endpoint requires authentication by any KittyCAD user. It creates the payment information for the authenticated user.\nuse std::str::FromStr;\nasync fn example_payments_create_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = client\n        .payments()\n        .create_payment_information_for_user(&kittycad::types::BillingInfo {\n            address: Some(kittycad::types::Address {\n                city: Some(\"some-string\".to_string()),\n                country: Some(\"some-string\".to_string()),\n                created_at: chrono::Utc::now(),\n                id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                state: Some(\"some-string\".to_string()),\n                street_1: Some(\"some-string\".to_string()),\n                street_2: Some(\"some-string\".to_string()),\n                updated_at: chrono::Utc::now(),\n                user_id: Some(\"some-string\".to_string()),\n                zip: Some(\"some-string\".to_string()),\n            }),\n            name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Create payment info for your user.\n/// \n/// This includes billing address, phone, and name.\n/// This endpoint requires authentication by any KittyCAD user. It creates the payment information for the authenticated user.\nuse std::str::FromStr;\nasync fn example_payments_create_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = client\n        .payments()\n        .create_payment_information_for_user(&kittycad::types::BillingInfo {\n            address: Some(kittycad::types::Address {\n                city: Some(\"l\".to_string()),\n                country: Some(\"lpqmn\".to_string()),\n                created_at: chrono::Utc::now(),\n                id: uuid::Uuid::from_str(\"24d82996-dae7-4d22-8333-f948a2314ed7\")?,\n                state: Some(\"w\".to_string()),\n                street_1: Some(\"yycpct\".to_string()),\n                street_2: Some(\"v\".to_string()),\n                updated_at: chrono::Utc::now(),\n                user_id: Some(\"gpy\".to_string()),\n                zip: Some(\"obeae\".to_string()),\n            }),\n            name: Some(\"upgqth\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1 276-471-1750\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.create_payment_information_for_user"
     }
   },
@@ -427,11 +315,7 @@
     "op": "add",
     "path": "/paths/~1user~1payment/put/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Update payment info for your user.\n/// \n/// This includes billing address, phone, and name.\n/// This endpoint requires authentication by any KittyCAD user. It updates the payment information for the authenticated user.\nuse std::str::FromStr;\nasync fn example_payments_update_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = client\n        .payments()\n        .update_payment_information_for_user(&kittycad::types::BillingInfo {\n            address: Some(kittycad::types::Address {\n                city: Some(\"some-string\".to_string()),\n                country: Some(\"some-string\".to_string()),\n                created_at: chrono::Utc::now(),\n                id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                state: Some(\"some-string\".to_string()),\n                street_1: Some(\"some-string\".to_string()),\n                street_2: Some(\"some-string\".to_string()),\n                updated_at: chrono::Utc::now(),\n                user_id: Some(\"some-string\".to_string()),\n                zip: Some(\"some-string\".to_string()),\n            }),\n            name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Update payment info for your user.\n/// \n/// This includes billing address, phone, and name.\n/// This endpoint requires authentication by any KittyCAD user. It updates the payment information for the authenticated user.\nuse std::str::FromStr;\nasync fn example_payments_update_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = client\n        .payments()\n        .update_payment_information_for_user(&kittycad::types::BillingInfo {\n            address: Some(kittycad::types::Address {\n                city: Some(\"bxbjyh\".to_string()),\n                country: Some(\"oyn\".to_string()),\n                created_at: chrono::Utc::now(),\n                id: uuid::Uuid::from_str(\"d937af2d-d8f1-4d3a-9b9a-d0d515a6aa53\")?,\n                state: Some(\"hucpeqps\".to_string()),\n                street_1: Some(\"wyckydr\".to_string()),\n                street_2: Some(\"qbwkdmv\".to_string()),\n                updated_at: chrono::Utc::now(),\n                user_id: Some(\"svubl\".to_string()),\n                zip: Some(\"gqowkexo\".to_string()),\n            }),\n            name: Some(\"\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1 250-672-3882\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.update_payment_information_for_user"
     }
   },
@@ -471,11 +355,7 @@
     "op": "add",
     "path": "/paths/~1user~1payment~1methods~1{id}/delete/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Delete a payment method for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It deletes the specified payment method for the authenticated user.\nasync fn example_payments_delete_payment_method_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_payment_method_for_user(\"some-string\")\n        .await?;\n    Ok(())\n}\n",
-=======
-      "example": "/// Delete a payment method for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It deletes the specified payment method for the authenticated user.\nasync fn example_payments_delete_payment_method_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_payment_method_for_user(\"lygijoqq\")\n        .await?;\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.delete_payment_method_for_user"
     }
   },
@@ -483,11 +363,7 @@
     "op": "add",
     "path": "/paths/~1user~1session~1{token}/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Get a session for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\nuse std::str::FromStr;\nasync fn example_sessions_get_session_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Session = client\n        .sessions()\n        .get_session_for_user(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Get a session for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\nuse std::str::FromStr;\nasync fn example_sessions_get_session_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Session = client\n        .sessions()\n        .get_session_for_user(uuid::Uuid::from_str(\n            \"d58c30fc-6094-4fad-a09e-5c16981ce1fe\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/sessions/struct.Sessions.html#method.get_session_for_user"
     }
   },
@@ -495,11 +371,7 @@
     "op": "add",
     "path": "/paths/~1users/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// List users.\n/// \n/// This endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\nasync fn example_users_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserResultsPage = client\n        .users()\n        .list(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
-=======
-      "example": "/// List users.\n/// \n/// This endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\nasync fn example_users_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserResultsPage = client\n        .users()\n        .list(\n            Some(4 as u32),\n            Some(\"j\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.list"
     }
   },
@@ -507,11 +379,7 @@
     "op": "add",
     "path": "/paths/~1users-extended/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// List users with extended information.\n/// \n/// This endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\nasync fn example_users_list_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUserResultsPage = client\n        .users()\n        .list_extended(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
-=======
-      "example": "/// List users with extended information.\n/// \n/// This endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\nasync fn example_users_list_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUserResultsPage = client\n        .users()\n        .list_extended(\n            Some(4 as u32),\n            Some(\"or\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.list_extended"
     }
   },
@@ -519,11 +387,7 @@
     "op": "add",
     "path": "/paths/~1users-extended~1{id}/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Get extended information about a user.\n/// \n/// To get information about yourself, use `/users-extended/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n/// Alternatively, to get information about the authenticated user, use `/user/extended` endpoint.\n/// To get information about any KittyCAD user, you must be a KittyCAD employee.\nasync fn example_users_get_user_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUser =\n        client.users().get_user_extended(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Get extended information about a user.\n/// \n/// To get information about yourself, use `/users-extended/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n/// Alternatively, to get information about the authenticated user, use `/user/extended` endpoint.\n/// To get information about any KittyCAD user, you must be a KittyCAD employee.\nasync fn example_users_get_user_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUser = client.users().get_user_extended(\"pal\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_user_extended"
     }
   },
@@ -531,11 +395,7 @@
     "op": "add",
     "path": "/paths/~1users~1{id}/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// Get a user.\n/// \n/// To get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n/// Alternatively, to get information about the authenticated user, use `/user` endpoint.\n/// To get information about any KittyCAD user, you must be a KittyCAD employee.\nasync fn example_users_get_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client.users().get_user(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-=======
-      "example": "/// Get a user.\n/// \n/// To get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n/// Alternatively, to get information about the authenticated user, use `/user` endpoint.\n/// To get information about any KittyCAD user, you must be a KittyCAD employee.\nasync fn example_users_get_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client.users().get_user(\"mwjfi\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_user"
     }
   },
@@ -543,11 +403,7 @@
     "op": "add",
     "path": "/paths/~1users~1{id}~1api-calls/get/x-rust",
     "value": {
-<<<<<<< Updated upstream
       "example": "/// List API calls for a user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\n/// Alternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\n/// If the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\n/// The API calls are returned in order of creation, with the most recently created API calls first.\nasync fn example_api_calls_list_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .list_for_user(\n            \"some-string\",\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_calls_list_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_calls = client.api_calls();\n    let mut stream = api_calls.list_for_user_stream(\n        \"some-string\",\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
-=======
-      "example": "/// List API calls for a user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\n/// Alternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\n/// If the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\n/// The API calls are returned in order of creation, with the most recently created API calls first.\nasync fn example_api_calls_list_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .list_for_user(\n            \"\",\n            Some(4 as u32),\n            Some(\"bwlmklhiv\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_calls_list_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_calls = client.api_calls();\n    let mut stream = api_calls.list_for_user_stream(\n        \"\",\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
->>>>>>> Stashed changes
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.list_for_user"
     }
   }
