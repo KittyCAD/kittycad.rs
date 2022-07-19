@@ -25,8 +25,9 @@ impl AsyncTestContext for TestContext {
     }
 
     async fn teardown(self) {
+        println!("Removing {}", self.tmp_dir.display());
         // Delete the temporary directory.
-        std::fs::remove_dir_all(&self.tmp_dir).unwrap();
+        //std::fs::remove_dir_all(&self.tmp_dir).unwrap();
     }
 }
 
@@ -68,6 +69,39 @@ async fn test_kittycad_generation(ctx: &mut TestContext) {
     while let Some(Ok(entry)) = assets_dir_contents.next() {
         std::fs::copy(&entry.path(), &assets_dir.join(entry.file_name())).unwrap();
     }
+
+    // Run tests.
+    run_cargo_test(&opts).await.unwrap();
+}
+
+#[test_context(TestContext)]
+#[tokio::test]
+#[ignore] // TODO: eventually make this work
+async fn test_github_generation(ctx: &mut TestContext) {
+    let opts = crate::Opts {
+        debug: true,
+        json: false,
+        input: ctx.tmp_dir.clone(),
+        output: ctx.tmp_dir.clone(),
+        base_url: "https://api.github.com".parse().unwrap(),
+        name: "octorust".to_string(),
+        version: "1.0.0".to_string(),
+        description: "GitHub is where we push our code and you do too!".to_string(),
+        spec_url: Some("https://github.com/github/rest-api-description/raw/main/descriptions/api.github.com/api.github.com.json".to_string()),
+        repo_name: Some("kittycad/octorust.rs".to_string()),
+    };
+
+    // Load our spec.
+    let spec = crate::load_json_spec(include_str!("../tests/api.github.com.json")).unwrap();
+
+    // Move our test file to our output directory.
+    let test_file = include_str!("../tests/library/github.tests.rs");
+    // Write our temporary file.
+    let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
+    std::fs::write(&test_file_path, test_file).unwrap();
+
+    // Generate the library.
+    crate::generate(&spec, &opts).await.unwrap();
 
     // Run tests.
     run_cargo_test(&opts).await.unwrap();
