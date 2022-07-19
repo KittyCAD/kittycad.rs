@@ -872,9 +872,13 @@ fn render_object(
             fields.push(quote!(
                 self.#prop_ident.clone()
             ));
-        } else if !o.required.contains(k) && type_name.rendered()? != "PhoneNumber" {
+        } else if !o.required.contains(k) && type_name.rendered()? != "phone_number::PhoneNumber" {
             fields.push(quote!(
-                format!("{:?}", self.#prop_ident.unwrap_or_default())
+                if let Some(#prop_ident) = &self.#prop_ident {
+                    format!("{:?}", #prop_ident)
+                } else {
+                    String::new()
+                }
             ));
         } else if type_name.rendered()? == "PhoneNumber" {
             fields.push(quote!(
