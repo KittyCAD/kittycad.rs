@@ -65,12 +65,15 @@ async fn test_kittycad_generation(ctx: &mut TestContext) {
     // Move each file over.
     while let Some(Ok(entry)) = assets_dir_contents.next() {
         let dest = assets_dir.join(entry.file_name());
-        println!("Moving {} => {}", entry.path().display(), dest.display());
         std::fs::copy(&entry.path(), &dest).unwrap();
     }
 
     // Generate the library.
     crate::generate(&spec, &opts).await.unwrap();
+
+    // Make the output tests directory.
+    let output_tests_dir = ctx.tmp_dir.join("tests");
+    std::fs::create_dir_all(&output_tests_dir).unwrap();
 
     // Run tests.
     run_cargo_test(&opts).await.unwrap();
