@@ -42,5 +42,9 @@ url = { version = "^2.2.2", features = ["serde"] }
 uuid = { version = "1", features = ["serde", "v4"] }
 
 [dev-dependencies]
+async-trait = "^0.1.56"
 expectorate = "1"
+# futures is necessary for test-context
+futures = "0.3"
 pretty_assertions = "1"
+test-context = "^0.1.3"
