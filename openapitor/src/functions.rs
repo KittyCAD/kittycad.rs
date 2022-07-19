@@ -68,7 +68,7 @@ pub fn generate_files(
                 quote!()
             } else {
                 let a = raw_args.iter().map(|(k, v)| {
-                    let n = format_ident!("{}", k);
+                    let n = format_ident!("{}", crate::types::clean_property_name(k));
                     quote!(#n: #v)
                 });
                 quote!(,#(#a),*)
@@ -318,7 +318,11 @@ fn generate_docs(
                 name
             )
         })?;
-        let mut param_docs = format!("- `{}: {}`", name, param_type.rendered()?);
+        let mut param_docs = format!(
+            "- `{}: {}`",
+            crate::types::clean_property_name(&name),
+            param_type.rendered()?
+        );
         if let Some(description) = &parameter_data.description {
             param_docs.push_str(": ");
             param_docs.push_str(description);
