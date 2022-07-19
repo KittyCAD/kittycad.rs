@@ -90,15 +90,19 @@ pub fn generate_files(
             let example_code_fn = generate_example_code_fn(name, method, &tag, op, spec, opts)?;
             // For the rust docs example code we want to trim the doc string since it is
             // repetitive.
-            let rust_doc_example_code_fn = &example_code_fn
-                [example_code_fn.find("async fn example_").unwrap_or(0)..example_code_fn.len()];
+            let rust_doc_example_code_fn = &example_code_fn[example_code_fn
+                .find("use ")
+                .unwrap_or(example_code_fn.find("async fn example_").unwrap_or(0))
+                ..example_code_fn.len()];
 
             // Add our example code to our docs.
             // This way we can test the examples compile by running `rust doc`.
+            // We want the code to comile but not be run as there are functions that
+            // would delete our user etc.
             let docs = format!(
                 r#"{}
 
-```
+```rust,no_run
 {}
 ```"#,
                 docs, rust_doc_example_code_fn
