@@ -363,6 +363,9 @@ pub trait TokenStreamExt {
     /// Return `true` if the token stream is a string.
     fn is_string(&self) -> Result<bool>;
 
+    /// Strip the `.to_string()` from the token such that it becomes a `&str`.
+    fn strip_to_string(&self) -> Result<proc_macro2::TokenStream>;
+
     /// Render the token stream as a string.
     fn rendered(&self) -> Result<String>;
 
@@ -396,6 +399,12 @@ impl TokenStreamExt for proc_macro2::TokenStream {
             || rendered == "&str"
             || rendered == "&'astr"
             || rendered == "&'_str")
+    }
+
+    fn strip_to_string(&self) -> Result<proc_macro2::TokenStream> {
+        let rendered = self.rendered()?;
+        let rendered = rendered.trim_end_matches(".to_string()");
+        rendered.parse().map_err(|e| anyhow::anyhow!("{}", e))
     }
 
     fn rendered(&self) -> Result<String> {

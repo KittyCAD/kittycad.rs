@@ -88,6 +88,11 @@ pub fn generate_files(
             let function_body = get_function_body(name, method, op, spec, false)?;
 
             let example_code_fn = generate_example_code_fn(name, method, &tag, op, spec, opts)?;
+            // For the rust docs example code we want to trim the doc string since it is
+            // repetitive.
+            let rust_doc_example_code_fn = &example_code_fn
+                [example_code_fn.find("async fn example_").unwrap_or(0)..example_code_fn.len()];
+
             // Add our example code to our docs.
             // This way we can test the examples compile by running `rust doc`.
             let docs = format!(
@@ -96,7 +101,7 @@ pub fn generate_files(
 ```
 {}
 ```"#,
-                docs, example_code_fn
+                docs, rust_doc_example_code_fn
             );
 
             let function = quote! {
@@ -504,6 +509,9 @@ fn get_example_args(
 
         if !parameter_data.required {
             example = quote!(Some(#example));
+        } else if t.is_string()? {
+            // Fix the parameter to be a &str, if it is a String.
+            example = example.strip_to_string()?;
         }
 
         new_params.insert(name, example);
@@ -899,7 +907,7 @@ fn generate_example_code_fn(
     // Get the function name.
     let fn_name = get_fn_name(name, method, tag, op)?;
     let fn_name_ident = format_ident!("{}", fn_name);
-    let example_fn_name_ident = format_ident!("example_{}", fn_name);
+    let example_fn_name_ident = format_ident!("example_{}_{}", tag, fn_name);
 
     let tag_ident = format_ident!("{}", tag);
 
@@ -961,7 +969,7 @@ fn generate_example_code_fn(
     if pagination_properties.can_paginate() {
         // We need to generate the stream function as well.
         let stream_fn_name_ident = format_ident!("{}_stream", fn_name);
-        let example_stream_fn_name_ident = format_ident!("example_{}_stream", fn_name);
+        let example_stream_fn_name_ident = format_ident!("example_{}_{}_stream", tag, fn_name);
 
         // We want all the args except for the page_token.
         let page_param_str = pagination_properties.page_param_str()?;
