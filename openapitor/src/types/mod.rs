@@ -672,19 +672,26 @@ fn render_one_of(
         return render_schema(name, first, spec);
     }
 
-    let tag = get_one_of_tag(one_ofs, spec)?;
+    let tag_result = get_one_of_tag(one_ofs, spec)?;
 
-    let serde_options = if !tag.is_empty() {
-        quote!(#[serde(tag = #tag)])
-    } else {
+    let mut serde_options = Vec::new();
+    // Add our tag if we have one.
+    if let Some(tag) = &tag_result.tag {
+        serde_options.push(quote!(tag = #tag))
+    }
+    if let Some(content) = &tag_result.content {
+        serde_options.push(quote!(content = #content))
+    }
+
+    let serde_options = if serde_options.is_empty() {
         quote!()
+    } else {
+        quote!(#[serde(#(#serde_options),*)] )
     };
 
-    let (_, values, additional_types) = get_one_of_values(name, one_ofs, spec, &tag)?;
+    let (_, values) = get_one_of_values(name, one_ofs, spec, &tag_result)?;
 
     let rendered = quote! {
-        #additional_types
-
         #description
         #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema, tabled::Tabled)]
         #serde_options
@@ -696,13 +703,65 @@ fn render_one_of(
     Ok(rendered)
 }
 
+// Render the internal enum type for an object.
+fn render_enum_object_internal(
+    name: &str,
+    o: &openapiv3::ObjectType,
+    spec: &openapiv3::OpenAPI,
+    ignore_key: &str,
+) -> Result<proc_macro2::TokenStream> {
+    let struct_name = format_ident!("{}", proper_name(name));
+    let mut values = quote!();
+    for (k, v) in &o.properties {
+        if k == ignore_key {
+            continue;
+        }
+        // Get the type name for the schema.
+        let mut type_name = if let openapiv3::ReferenceOr::Item(i) = v {
+            get_type_name_for_schema(k, &i, spec, true)?
+        } else {
+            get_type_name_from_reference(&v.reference()?, spec, true)?
+        };
+
+        // Check if this type is required.
+        if !o.required.contains(k) && !type_name.is_option()? {
+            // Make the type optional.
+            type_name = quote!(Option<#type_name>);
+        }
+        let prop_ident = format_ident!("{}", k);
+
+        let prop_value = quote!(
+             #prop_ident: #type_name,
+        );
+
+        values = quote!(
+            #values
+
+            #prop_value
+        );
+    }
+
+    let rendered = quote! {
+        #struct_name {
+            #values
+        }
+    };
+
+    Ok(rendered)
+}
+
+/// A holder for our tag and content for enums.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct TagContent {
+    tag: Option<String>,
+    content: Option<String>,
+}
+
 fn get_one_of_tag(
     one_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
     spec: &openapiv3::OpenAPI,
-) -> Result<String> {
-    let mut tag = "".to_string();
-    // TODO: should we set the content?, like if its a object w only 2 properties, the one that is
-    // not the tag should be the content.
+) -> Result<TagContent> {
+    let mut result: TagContent = Default::default();
 
     for one_of in one_ofs {
         // Get the schema for this OneOf.
@@ -723,41 +782,58 @@ fn get_one_of_tag(
                     inner_schema.schema_kind
                 {
                     if s.enumeration.len() == 1 {
-                        tag = k.to_string();
+                        result.tag = Some(k.to_string());
                     }
                 }
             }
         }
     }
 
-    Ok(tag)
+    if let Some(tag) = &result.tag {
+        // Check if we also have content.
+        // This would be true if the objects only have 2 properties, one of which is the tag and the other is the content.
+        for one_of in one_ofs {
+            // Get the schema for this OneOf.
+            let schema = one_of.get_schema_from_reference(spec, true)?;
+            // Determine if we can do anything fancy with the resulting enum and flatten it.
+            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = schema.schema_kind {
+                if o.properties.len() == 2 {
+                    for (k, _) in &o.properties {
+                        if tag != k {
+                            // This is the content.
+                            result.content = Some(k.to_string());
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(result)
 }
 
 fn get_one_of_values(
     name: &str,
     one_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
     spec: &openapiv3::OpenAPI,
-    tag: &str,
+    tag_result: &TagContent,
 ) -> Result<(
     BTreeMap<String, openapiv3::ReferenceOr<openapiv3::Schema>>,
-    proc_macro2::TokenStream,
     proc_macro2::TokenStream,
 )> {
     let mut values: BTreeMap<String, openapiv3::ReferenceOr<openapiv3::Schema>> =
         Default::default();
     let mut rendered_value = quote!();
-    // Any additional types we might need for rendering this type.
-    let mut additional_types = quote!();
 
-    for one_of in one_ofs {
-        // Get the schema for this OneOf.
-        let schema = one_of.get_schema_from_reference(spec, true)?;
-
-        // If we have a tag use the value of that property for the enum.
-        let tag_name = if !tag.is_empty() {
+    // If we have a tag and/or content this is pretty simple.
+    if let Some(tag) = &tag_result.tag {
+        for one_of in one_ofs {
+            // Get the schema for this OneOf.
+            let schema = one_of.get_schema_from_reference(spec, true)?;
             if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
                 // Get the value of this tag.
-                let v = match o.properties.get(tag) {
+                let tag_schema = match o.properties.get(tag) {
                     Some(v) => v,
                     None => {
                         anyhow::bail!(
@@ -768,14 +844,14 @@ fn get_one_of_values(
                 };
 
                 // Get the single value from the enum.
-                let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
+                let inner_schema = if let openapiv3::ReferenceOr::Item(i) = tag_schema {
                     let s = &**i;
                     s.clone()
                 } else {
-                    v.get_schema_from_reference(spec, true)?
+                    tag_schema.get_schema_from_reference(spec, true)?
                 };
 
-                if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
+                let tag_name = if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
                     inner_schema.schema_kind
                 {
                     if s.enumeration.len() == 1 {
@@ -788,96 +864,106 @@ fn get_one_of_values(
                     }
                 } else {
                     anyhow::bail!("enumeration for tag `{}` is not a string", tag);
-                }
-            } else {
-                anyhow::bail!("one of schema `{:?}` is not an object", schema);
-            }
-        } else {
-            "".to_string()
-        };
+                };
+                let p = proper_name(&tag_name);
+                let n = format_ident!("{}", p);
 
+                if let Some(content) = &tag_result.content {
+                    // Get the value of the content.
+                    let content_schema = match o.properties.get(content) {
+                        Some(v) => v,
+                        None => {
+                            anyhow::bail!(
+                            "no property `{}` in object, even through we thought we had content",
+                            tag
+                        );
+                        }
+                    };
+
+                    // Get the single value from the enum.
+                    let content_name = if let openapiv3::ReferenceOr::Item(i) = content_schema {
+                        let s = &**i;
+                        get_type_name_for_schema(name, s, spec, true)?
+                    } else {
+                        get_type_name_from_reference(&content_schema.reference()?, spec, true)?
+                    };
+
+                    // Get the type name for this value.
+                    values.insert(p.to_string(), one_of.clone());
+
+                    if p != tag_name {
+                        // Rename serde to the correct tag name.
+                        rendered_value = quote!(
+                            #rendered_value
+
+                            #[serde(rename = #tag_name)]
+                            #n(#content_name),
+                        );
+                    } else {
+                        rendered_value = quote!(
+                            #rendered_value
+
+                            #n(#content_name),
+                        );
+                    }
+                } else {
+                    // Render this object.
+                    let content_name = render_enum_object_internal(&tag_name, &o, spec, tag)?;
+                    // Get the type name for this value.
+                    values.insert(p.to_string(), one_of.clone());
+
+                    if p != tag_name {
+                        // Rename serde to the correct tag name.
+                        rendered_value = quote!(
+                            #rendered_value
+
+                            #[serde(rename = #tag_name)]
+                            #content_name,
+                        );
+                    } else {
+                        rendered_value = quote!(
+                            #rendered_value
+
+                            #content_name,
+                        );
+                    }
+                }
+            }
+        }
+
+        // We can return early here, we handled the tagged types.
+        return Ok((values, rendered_value));
+    }
+
+    // Handle the untagged types.
+
+    for one_of in one_ofs {
+        // If we have a tag use the value of that property for the enum.
         let o_type = if let openapiv3::ReferenceOr::Reference { .. } = one_of {
             // If the one of is a reference just use the reference.
             let reference = proper_name(&one_of.reference()?);
             let reference_name = format_ident!("{}", reference);
 
-            if !tag_name.is_empty() {
-                let p = proper_name(&tag_name);
-                let n = format_ident!("{}", p);
-                values.insert(p.to_string(), one_of.clone());
-
-                if p != tag_name {
-                    // Rename serde to the correct tag name.
-                    quote!(
-                        #[serde(rename = #tag_name)]
-                        #n(#reference_name),
-                    )
-                } else {
-                    quote!(
-                        #n(#reference_name),
-                    )
-                }
-            } else {
-                values.insert(reference.to_string(), one_of.clone());
-                quote!(
-                    #reference_name(#reference_name),
-                )
-            }
+            values.insert(reference.to_string(), one_of.clone());
+            quote!(
+                #reference_name(#reference_name),
+            )
         } else {
             // We don't have a reference, we have an item.
             // We need to expand the item.
-            let rendered_type = match &schema.schema_kind {
-                openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
-                    if tag_name.is_empty() {
-                        get_type_name_for_schema(name, &schema, spec, true)?
-                    } else {
-                        // Check if we have a component schema already for this type.
-                        // In some cases the tag name is the same as the type name.
-                        // And it is a an enum of 1 and that corresponds to the schema type.
-                        if let Some(components) = &spec.components {
-                            if !components.schemas.contains_key(&tag_name) {
-                                // Ensure we have a type for this type.
-                                let obj = render_object(&tag_name, o, &schema.schema_data, spec)?;
-                                additional_types = quote!(
-                                    #additional_types
+            let rendered_type = get_type_name_for_schema(name, &one_of.expand(spec)?, spec, true)?;
 
-                                    #obj
-                                );
-                            }
-                            // TODO: ensure the types are equal with the exception of the tag.
-                        }
-
-                        // Return the type name.
-                        let ident = format_ident!("{}", proper_name(&tag_name));
-                        quote!(#ident)
-                    }
-                }
-                _ => get_type_name_for_schema(name, &one_of.expand(spec)?, spec, true)?,
-            };
-
-            if !tag_name.is_empty() {
-                let p = proper_name(&tag_name);
-                let n = format_ident!("{}", p);
-                values.insert(p.to_string(), one_of.clone());
-
-                if p != tag_name {
-                    // Rename serde to the correct tag name.
-                    quote!(
-                        #[serde(rename = #tag_name)]
-                        #n(#rendered_type),
-                    )
-                } else {
-                    quote!(
-                        #n(#rendered_type),
-                    )
-                }
+            let n = if let Some(title) = &one_of.expand(spec)?.schema_data.title {
+                let p = proper_name(&title);
+                p.parse().map_err(|e| anyhow::anyhow!("{}", e))?
             } else {
-                values.insert(rendered_type.rendered()?, one_of.clone());
+                rendered_type.clone()
+            };
+            values.insert(n.rendered()?, one_of.clone());
 
-                quote!(
-                    #rendered_type(#rendered_type),
-                )
-            }
+            quote!(
+                #n(#rendered_type),
+            )
         };
 
         rendered_value = quote!(
@@ -887,7 +973,7 @@ fn get_one_of_values(
         );
     }
 
-    Ok((values, rendered_value, additional_types))
+    Ok((values, rendered_value))
 }
 
 /// Render the full type for any.
@@ -1830,6 +1916,510 @@ mod test {
 
         expectorate::assert_contents(
             "tests/types/oxide.ip-net.rs.gen",
+            &super::get_text_fmt(&result).unwrap(),
+        );
+    }
+
+    #[test]
+    fn test_schema_parsing_one_of_with_tag_content() {
+        let schema = r##"{
+        "description": "A `VpcFirewallRuleTarget` is used to specify the set of [`Instance`]s to which a firewall rule applies.",
+        "oneOf": [
+          {
+            "description": "The rule applies to all instances in the VPC",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "vpc"
+                ]
+              },
+              "value": {
+                "$ref": "#/components/schemas/Name"
+              }
+            },
+            "required": [
+              "type",
+              "value"
+            ]
+          },
+          {
+            "description": "The rule applies to all instances in the VPC Subnet",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "subnet"
+                ]
+              },
+              "value": {
+                "$ref": "#/components/schemas/Name"
+              }
+            },
+            "required": [
+              "type",
+              "value"
+            ]
+          },
+          {
+            "description": "The rule applies to this specific instance",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "instance"
+                ]
+              },
+              "value": {
+                "$ref": "#/components/schemas/Name"
+              }
+            },
+            "required": [
+              "type",
+              "value"
+            ]
+          },
+          {
+            "description": "The rule applies to a specific IP address",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ip"
+                ]
+              },
+              "value": {
+                "type": "string",
+                "format": "ip"
+              }
+            },
+            "required": [
+              "type",
+              "value"
+            ]
+          },
+          {
+            "description": "The rule applies to a specific IP subnet",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ip_net"
+                ]
+              },
+              "value": {
+                "$ref": "#/components/schemas/IpNet"
+              }
+            },
+            "required": [
+              "type",
+              "value"
+            ]
+          }
+        ]
+      }"##;
+
+        let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
+
+        let result = super::render_schema(
+            "VpcFirewallRuleTarget",
+            &schema,
+            &crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
+        )
+        .unwrap();
+
+        expectorate::assert_contents(
+            "tests/types/oxide.vpc-filewall-rule-target.rs.gen",
+            &super::get_text_fmt(&result).unwrap(),
+        );
+    }
+
+    #[test]
+    fn test_schema_parsing_one_of_with_tag_no_content() {
+        let schema = r##"{
+        "description": "The output from the async API call.",
+        "oneOf": [
+          {
+            "description": "A file conversion.",
+            "properties": {
+              "completed_at": {
+                "description": "The time and date the file conversion was completed.",
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
+              },
+              "created_at": {
+                "description": "The time and date the file conversion was created.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
+              },
+              "error": {
+                "description": "The error the function returned, if any.",
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ],
+                "description": "The unique identifier of the file conversion.\n\nThis is the same as the API call ID."
+              },
+              "output": {
+                "description": "The converted file, if completed, base64 encoded.",
+                "format": "byte",
+                "nullable": true,
+                "title": "String",
+                "type": "string"
+              },
+              "output_format": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FileOutputFormat"
+                  }
+                ],
+                "description": "The output format of the file conversion."
+              },
+              "src_format": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FileSourceFormat"
+                  }
+                ],
+                "description": "The source format of the file conversion."
+              },
+              "started_at": {
+                "description": "The time and date the file conversion was started.",
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
+              },
+              "status": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApiCallStatus"
+                  }
+                ],
+                "description": "The status of the file conversion."
+              },
+              "type": {
+                "enum": [
+                  "FileConversion"
+                ],
+                "type": "string"
+              },
+              "updated_at": {
+                "description": "The time and date the file conversion was last updated.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
+              },
+              "user_id": {
+                "description": "The user ID of the user who created the file conversion.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "created_at",
+              "id",
+              "output_format",
+              "src_format",
+              "status",
+              "type",
+              "updated_at"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "A file mass.",
+            "properties": {
+              "completed_at": {
+                "description": "The time and date the mass was completed.",
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
+              },
+              "created_at": {
+                "description": "The time and date the mass was created.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
+              },
+              "error": {
+                "description": "The error the function returned, if any.",
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ],
+                "description": "The unique identifier of the mass request.\n\nThis is the same as the API call ID."
+              },
+              "mass": {
+                "description": "The resulting mass.",
+                "format": "double",
+                "nullable": true,
+                "type": "number"
+              },
+              "material_density": {
+                "default": 0.0,
+                "description": "The material density as denoted by the user.",
+                "format": "float",
+                "type": "number"
+              },
+              "src_format": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FileSourceFormat"
+                  }
+                ],
+                "description": "The source format of the file."
+              },
+              "started_at": {
+                "description": "The time and date the mass was started.",
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
+              },
+              "status": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApiCallStatus"
+                  }
+                ],
+                "description": "The status of the mass."
+              },
+              "type": {
+                "enum": [
+                  "FileMass"
+                ],
+                "type": "string"
+              },
+              "updated_at": {
+                "description": "The time and date the mass was last updated.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
+              },
+              "user_id": {
+                "description": "The user ID of the user who created the mass.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "created_at",
+              "id",
+              "src_format",
+              "status",
+              "type",
+              "updated_at"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "A file volume.",
+            "properties": {
+              "completed_at": {
+                "description": "The time and date the volume was completed.",
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
+              },
+              "created_at": {
+                "description": "The time and date the volume was created.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
+              },
+              "error": {
+                "description": "The error the function returned, if any.",
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ],
+                "description": "The unique identifier of the volume request.\n\nThis is the same as the API call ID."
+              },
+              "src_format": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FileSourceFormat"
+                  }
+                ],
+                "description": "The source format of the file."
+              },
+              "started_at": {
+                "description": "The time and date the volume was started.",
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
+              },
+              "status": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApiCallStatus"
+                  }
+                ],
+                "description": "The status of the volume."
+              },
+              "type": {
+                "enum": [
+                  "FileVolume"
+                ],
+                "type": "string"
+              },
+              "updated_at": {
+                "description": "The time and date the volume was last updated.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
+              },
+              "user_id": {
+                "description": "The user ID of the user who created the volume.",
+                "type": "string"
+              },
+              "volume": {
+                "description": "The resulting volume.",
+                "format": "double",
+                "nullable": true,
+                "type": "number"
+              }
+            },
+            "required": [
+              "created_at",
+              "id",
+              "src_format",
+              "status",
+              "type",
+              "updated_at"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "A file density.",
+            "properties": {
+              "completed_at": {
+                "description": "The time and date the density was completed.",
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
+              },
+              "created_at": {
+                "description": "The time and date the density was created.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
+              },
+              "density": {
+                "description": "The resulting density.",
+                "format": "double",
+                "nullable": true,
+                "type": "number"
+              },
+              "error": {
+                "description": "The error the function returned, if any.",
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ],
+                "description": "The unique identifier of the density request.\n\nThis is the same as the API call ID."
+              },
+              "material_mass": {
+                "default": 0.0,
+                "description": "The material mass as denoted by the user.",
+                "format": "float",
+                "type": "number"
+              },
+              "src_format": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FileSourceFormat"
+                  }
+                ],
+                "description": "The source format of the file."
+              },
+              "started_at": {
+                "description": "The time and date the density was started.",
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
+              },
+              "status": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApiCallStatus"
+                  }
+                ],
+                "description": "The status of the density."
+              },
+              "type": {
+                "enum": [
+                  "FileDensity"
+                ],
+                "type": "string"
+              },
+              "updated_at": {
+                "description": "The time and date the density was last updated.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
+              },
+              "user_id": {
+                "description": "The user ID of the user who created the density.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "created_at",
+              "id",
+              "src_format",
+              "status",
+              "type",
+              "updated_at"
+            ],
+            "type": "object"
+          }
+        ]
+        }"##;
+
+        let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
+
+        let result = super::render_schema(
+            "AsyncApiCallOutput",
+            &schema,
+            &crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
+        )
+        .unwrap();
+
+        expectorate::assert_contents(
+            "tests/types/kittycad.async-api-call-output.rs.gen",
             &super::get_text_fmt(&result).unwrap(),
         );
     }

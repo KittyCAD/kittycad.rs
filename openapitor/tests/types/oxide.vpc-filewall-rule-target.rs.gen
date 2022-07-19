@@ -1,0 +1,23 @@
+#[doc = "A `VpcFirewallRuleTarget` is used to specify the set of [`Instance`]s to which a firewall rule applies."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+#[serde(tag = "type", content = "value")]
+pub enum VpcFirewallRuleTarget {
+    #[serde(rename = "vpc")]
+    Vpc(String),
+    #[serde(rename = "subnet")]
+    Subnet(String),
+    #[serde(rename = "instance")]
+    Instance(String),
+    #[serde(rename = "ip")]
+    Ip(std::net::Ipv4Addr),
+    #[serde(rename = "ip_net")]
+    IpNet(IpNet),
+}

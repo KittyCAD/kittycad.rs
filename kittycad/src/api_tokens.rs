@@ -12,6 +12,7 @@ impl ApiTokens {
     }
 
     #[doc = "List API tokens for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_api_tokens_list_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_tokens = client.api_tokens();\n    let mut stream = api_tokens.list_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn list_for_user<'a>(
         &'a self,
         limit: Option<u32>,
@@ -46,6 +47,7 @@ impl ApiTokens {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -53,6 +55,7 @@ impl ApiTokens {
     }
 
     #[doc = "List API tokens for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_api_tokens_list_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_tokens = client.api_tokens();\n    let mut stream = api_tokens.list_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub fn list_for_user_stream<'a>(
         &'a self,
         limit: Option<u32>,
@@ -89,6 +92,7 @@ impl ApiTokens {
                                             ),
                                             status,
                                         )
+                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -113,6 +117,7 @@ impl ApiTokens {
     }
 
     #[doc = "Create a new API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It creates a new API token for the authenticated user.\n\n```rust,no_run\nasync fn example_api_tokens_create_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = client.api_tokens().create_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn create_for_user<'a>(
         &'a self,
     ) -> Result<crate::types::ApiToken, crate::types::error::Error> {
@@ -130,6 +135,7 @@ impl ApiTokens {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -137,6 +143,7 @@ impl ApiTokens {
     }
 
     #[doc = "Get an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\n\n**Parameters:**\n\n- `token: uuid::Uuid`: The API token. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_api_tokens_get_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = client\n        .api_tokens()\n        .get_for_user(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn get_for_user<'a>(
         &'a self,
         token: uuid::Uuid,
@@ -159,6 +166,7 @@ impl ApiTokens {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -176,6 +184,7 @@ impl ApiTokens {
              .delete_for_user(uuid::Uuid::from_str(\n            \
              \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
              Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn delete_for_user<'a>(
         &'a self,
         token: uuid::Uuid,

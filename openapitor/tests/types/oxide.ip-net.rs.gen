@@ -8,6 +8,6 @@
     tabled :: Tabled,
 )]
 pub enum IpNet {
-    String(String),
-    String(String),
+    V4(String),
+    V6(String),
 }

@@ -20,6 +20,7 @@ impl Sessions {
              client\n        .sessions()\n        .get_for_user(uuid::Uuid::from_str(\n            \
              \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn get_for_user<'a>(
         &'a self,
         token: uuid::Uuid,
@@ -42,6 +43,7 @@ impl Sessions {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

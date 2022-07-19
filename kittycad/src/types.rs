@@ -1136,10 +1136,57 @@ impl tabled::Tabled for AsyncApiCall {
 )]
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
-    FileConversion(FileConversion),
-    FileMass(FileMass),
-    FileVolume(FileVolume),
-    FileDensity(FileDensity),
+    FileConversion {
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        created_at: chrono::DateTime<chrono::Utc>,
+        error: Option<String>,
+        id: uuid::Uuid,
+        output: Option<base64::Base64Data>,
+        output_format: FileOutputFormat,
+        src_format: FileSourceFormat,
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        status: ApiCallStatus,
+        updated_at: chrono::DateTime<chrono::Utc>,
+        user_id: Option<String>,
+    },
+    FileMass {
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        created_at: chrono::DateTime<chrono::Utc>,
+        error: Option<String>,
+        id: uuid::Uuid,
+        mass: Option<f64>,
+        material_density: Option<f64>,
+        src_format: FileSourceFormat,
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        status: ApiCallStatus,
+        updated_at: chrono::DateTime<chrono::Utc>,
+        user_id: Option<String>,
+    },
+    FileVolume {
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        created_at: chrono::DateTime<chrono::Utc>,
+        error: Option<String>,
+        id: uuid::Uuid,
+        src_format: FileSourceFormat,
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        status: ApiCallStatus,
+        updated_at: chrono::DateTime<chrono::Utc>,
+        user_id: Option<String>,
+        volume: Option<f64>,
+    },
+    FileDensity {
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        created_at: chrono::DateTime<chrono::Utc>,
+        density: Option<f64>,
+        error: Option<String>,
+        id: uuid::Uuid,
+        material_mass: Option<f64>,
+        src_format: FileSourceFormat,
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        status: ApiCallStatus,
+        updated_at: chrono::DateTime<chrono::Utc>,
+        user_id: Option<String>,
+    },
 }
 
 #[doc = "A single page of results"]
@@ -5473,7 +5520,7 @@ pub enum Oauth2GrantType {
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
 
-impl Default for Oauth2GrantType {
+impl std::default::Default for Oauth2GrantType {
     fn default() -> Self {
         Oauth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode
     }
@@ -5714,7 +5761,7 @@ pub enum PaymentMethodType {
     Card,
 }
 
-impl Default for PaymentMethodType {
+impl std::default::Default for PaymentMethodType {
     fn default() -> Self {
         PaymentMethodType::Card
     }

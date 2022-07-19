@@ -121,6 +121,7 @@ impl Client {
     /// Create a new Client struct. It takes a type that can convert into
     /// an &str (`String` or `Vec<u8>` for example). As long as the function is
     /// given a valid API key your requests will work.
+    #[tracing::instrument]
     pub fn new<T>(token: T) -> Self
     where
         T: ToString,
@@ -141,6 +142,7 @@ impl Client {
     }
 
     /// Set the base URL for the client to something other than the default: <https://api.kittycad.io>.
+    #[tracing::instrument]
     pub fn set_base_url<H>(&mut self, base_url: H)
     where
         H: Into<String> + std::fmt::Display,
@@ -149,6 +151,7 @@ impl Client {
     }
 
     /// Create a new Client struct from the environment variable: `KITTYCAD_API_TOKEN`.
+    #[tracing::instrument]
     pub fn new_from_env() -> Self {
         let token = env::var("KITTYCAD_API_TOKEN").expect("must set KITTYCAD_API_TOKEN");
 
@@ -156,6 +159,7 @@ impl Client {
     }
 
     /// Create a raw request to our API.
+    #[tracing::instrument]
     pub async fn request_raw(
         &self,
         method: reqwest::Method,

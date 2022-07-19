@@ -492,7 +492,7 @@ pub fn generate_example_rust_from_schema(
                 let type_name = crate::types::get_type_name_for_schema(name, schema, spec, false)?;
 
                 let tag = crate::types::get_one_of_tag(one_of, spec)?;
-                let (values, _, _) = crate::types::get_one_of_values(name, one_of, spec, &tag)?;
+                let (values, _) = crate::types::get_one_of_values(name, one_of, spec, &tag)?;
 
                 let mut enum_name = quote!();
                 let mut example = quote!();

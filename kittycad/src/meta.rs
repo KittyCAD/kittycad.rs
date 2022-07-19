@@ -15,6 +15,7 @@ impl Meta {
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: serde_json::Value = client.meta().get_schema().await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn get_schema<'a>(&'a self) -> Result<serde_json::Value, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
@@ -30,6 +31,7 @@ impl Meta {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -43,6 +45,7 @@ impl Meta {
              kittycad::Client::new_from_env();\n    let result: kittycad::types::Metadata = \
              client.meta().get_metadata().await?;\n    println!(\"{:?}\", result);\n    \
              Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn get_metadata<'a>(
         &'a self,
     ) -> Result<crate::types::Metadata, crate::types::error::Error> {
@@ -60,6 +63,7 @@ impl Meta {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -70,6 +74,7 @@ impl Meta {
              {\n    let client = kittycad::Client::new_from_env();\n    let result: \
              kittycad::types::Pong = client.meta().ping().await?;\n    println!(\"{:?}\", \
              result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn ping<'a>(&'a self) -> Result<crate::types::Pong, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
@@ -85,6 +90,7 @@ impl Meta {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

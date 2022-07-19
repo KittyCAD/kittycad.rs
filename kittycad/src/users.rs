@@ -17,6 +17,7 @@ impl Users {
              {\n    let client = kittycad::Client::new_from_env();\n    let result: \
              kittycad::types::User = client.users().get_self().await?;\n    println!(\"{:?}\", \
              result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn get_self<'a>(&'a self) -> Result<crate::types::User, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
@@ -32,6 +33,7 @@ impl Users {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -39,6 +41,7 @@ impl Users {
     }
 
     #[doc = "Update your user.\n\nThis endpoint requires authentication by any KittyCAD user. It updates information about the authenticated user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_users_update_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client\n        .users()\n        .update_self(&kittycad::types::UpdateUser {\n            company: Some(\"some-string\".to_string()),\n            discord: Some(\"some-string\".to_string()),\n            first_name: Some(\"some-string\".to_string()),\n            github: Some(\"some-string\".to_string()),\n            last_name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn update_self<'a>(
         &'a self,
         body: &crate::types::UpdateUser,
@@ -58,6 +61,7 @@ impl Users {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -70,6 +74,7 @@ impl Users {
              outstanding balance.\n\n```rust,no_run\nasync fn example_users_delete_self() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
              client.users().delete_self().await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn delete_self<'a>(&'a self) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
@@ -86,6 +91,7 @@ impl Users {
     }
 
     #[doc = "Get extended information about your user.\n\nGet the user information for the authenticated user.\nAlternatively, you can also use the `/users-extended/me` endpoint.\n\n```rust,no_run\nasync fn example_users_get_self_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUser = client.users().get_self_extended().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn get_self_extended<'a>(
         &'a self,
     ) -> Result<crate::types::ExtendedUser, crate::types::error::Error> {
@@ -103,6 +109,7 @@ impl Users {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -110,6 +117,7 @@ impl Users {
     }
 
     #[doc = "List users.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn list<'a>(
         &'a self,
         limit: Option<u32>,
@@ -144,6 +152,7 @@ impl Users {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -151,6 +160,7 @@ impl Users {
     }
 
     #[doc = "List users.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub fn list_stream<'a>(
         &'a self,
         limit: Option<u32>,
@@ -186,6 +196,7 @@ impl Users {
                                             ),
                                             status,
                                         )
+                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -210,6 +221,7 @@ impl Users {
     }
 
     #[doc = "List users with extended information.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn list_extended<'a>(
         &'a self,
         limit: Option<u32>,
@@ -244,6 +256,7 @@ impl Users {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -251,6 +264,7 @@ impl Users {
     }
 
     #[doc = "List users with extended information.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub fn list_extended_stream<'a>(
         &'a self,
         limit: Option<u32>,
@@ -287,6 +301,7 @@ impl Users {
                                             ),
                                             status,
                                         )
+                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -320,6 +335,7 @@ impl Users {
              result: kittycad::types::ExtendedUser = \
              client.users().get_extended(\"some-string\").await?;\n    println!(\"{:?}\", \
              result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn get_extended<'a>(
         &'a self,
         id: &'a str,
@@ -329,7 +345,7 @@ impl Users {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "users-extended/{id}".replace("{id}", id)
+                "users-extended/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -342,6 +358,7 @@ impl Users {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -349,6 +366,7 @@ impl Users {
     }
 
     #[doc = "Get a user.\n\nTo get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user` endpoint.\nTo get information about any KittyCAD user, you must be a KittyCAD employee.\n\n**Parameters:**\n\n- `id: &'astr`: The user ID. (required)\n\n```rust,no_run\nasync fn example_users_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client.users().get(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
     pub async fn get<'a>(
         &'a self,
         id: &'a str,
@@ -358,7 +376,7 @@ impl Users {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "users/{id}".replace("{id}", id)
+                "users/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -371,6 +389,7 @@ impl Users {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
