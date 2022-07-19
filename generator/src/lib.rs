@@ -522,7 +522,14 @@ async fn run_cargo_fmt(opts: &Opts) -> Result<()> {
     };
 
     let mut cmd = tokio::process::Command::new("cargo");
-    cmd.args(["fmt"]).current_dir(output);
+    cmd.args([
+        "+nightly",
+        "fmt",
+        "--",
+        "--config",
+        "format_code_in_doc_comments=true,imports_granularity=Crate,group_imports=StdExternalCrate,format_strings=true,max_width=100",
+    ])
+    .current_dir(output);
 
     let output = cmd.output().await?;
     if !output.status.success() {

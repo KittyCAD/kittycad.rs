@@ -40,9 +40,7 @@
 //! ```
 //! use kittycad::Client;
 //!
-//! let client = Client::new(
-//!     String::from("api-key"),
-//! );
+//! let client = Client::new(String::from("api-key"));
 //! ```
 //!
 //! Alternatively, the library can search for most of the variables required for
@@ -57,7 +55,6 @@
 //!
 //! let client = Client::new_from_env();
 //! ```
-//!
 #![allow(missing_docs)]
 #![allow(clippy::needless_lifetimes)]
 #![cfg_attr(docsrs, feature(doc_cfg))]

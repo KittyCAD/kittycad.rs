@@ -1,5 +1,6 @@
-use crate::Client;
 use anyhow::Result;
+
+use crate::Client;
 pub struct ApiTokens {
     pub client: Client,
 }
@@ -59,8 +60,9 @@ impl ApiTokens {
     ) -> impl futures::Stream<Item = Result<crate::types::ApiToken, crate::types::error::Error>>
            + Unpin
            + '_ {
-        use crate::types::paginate::Pagination;
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
+
+        use crate::types::paginate::Pagination;
         self.list_for_user(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
@@ -110,7 +112,13 @@ impl ApiTokens {
             .boxed()
     }
 
-    #[doc = "Create a new API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It creates a new API token for the authenticated user.\n\n```rust,no_run\nasync fn example_api_tokens_create_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = client.api_tokens().create_api_token_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create a new API token for your user.\n\nThis endpoint requires authentication by any \
+             KittyCAD user. It creates a new API token for the authenticated \
+             user.\n\n```rust,no_run\nasync fn example_api_tokens_create_api_token_for_user() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::ApiToken = \
+             client.api_tokens().create_api_token_for_user().await?;\n    println!(\"{:?}\", \
+             result);\n    Ok(())\n}\n```"]
     pub async fn create_api_token_for_user<'a>(
         &'a self,
     ) -> Result<crate::types::ApiToken, crate::types::error::Error> {
@@ -134,7 +142,15 @@ impl ApiTokens {
         }
     }
 
-    #[doc = "Get an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_api_tokens_get_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = client\n        .api_tokens()\n        .get_api_token_for_user(uuid::Uuid::from_str(\n            \"1d94a54b-255a-4e43-9a8a-db5337235fc1\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get an API token for your user.\n\nThis endpoint requires authentication by any \
+             KittyCAD user. It returns details of the requested API token for the \
+             user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_api_tokens_get_api_token_for_user() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = \
+             client\n        .api_tokens()\n        \
+             .get_api_token_for_user(uuid::Uuid::from_str(\n            \
+             \"5055667f-5010-4eae-9035-360e1476b1b5\",\n        )?)\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn get_api_token_for_user<'a>(
         &'a self,
         token: uuid::Uuid,
@@ -163,7 +179,7 @@ impl ApiTokens {
         }
     }
 
-    #[doc = "Delete an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\nThis endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_api_tokens_delete_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .api_tokens()\n        .delete_api_token_for_user(uuid::Uuid::from_str(\n            \"d6c65df9-81a2-4676-89c0-e62e9cac8b0a\",\n        )?)\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Delete an API token for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\nThis endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_api_tokens_delete_api_token_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .api_tokens()\n        .delete_api_token_for_user(uuid::Uuid::from_str(\n            \"2cdd9cac-7160-4927-ab7e-449ba14f8dac\",\n        )?)\n        .await?;\n    Ok(())\n}\n```"]
     pub async fn delete_api_token_for_user<'a>(
         &'a self,
         token: uuid::Uuid,
