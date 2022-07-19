@@ -28,13 +28,14 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
-    #[doc = "Update payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It updates the payment information for the authenticated user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_payments_update_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = client\n        .payments()\n        .update_payment_information_for_user(&kittycad::types::BillingInfo {\n            address: Some(kittycad::types::Address {\n                city: Some(\"hajii\".to_string()),\n                country: Some(\"ncny\".to_string()),\n                created_at: chrono::Utc::now(),\n                id: uuid::Uuid::from_str(\"2428cbf5-c378-4238-b68b-1bc3e5c2a7e1\")?,\n                state: Some(\"ej\".to_string()),\n                street_1: Some(\"lvfsfk\".to_string()),\n                street_2: Some(\"eotljasld\".to_string()),\n                updated_at: chrono::Utc::now(),\n                user_id: Some(\"knafu\".to_string()),\n                zip: Some(\"u\".to_string()),\n            }),\n            name: Some(\"iudevnf\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1 1386534012\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It updates the payment information for the authenticated user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_payments_update_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = client\n        .payments()\n        .update_payment_information_for_user(&kittycad::types::BillingInfo {\n            address: Some(kittycad::types::Address {\n                city: Some(\"vb\".to_string()),\n                country: Some(\"fe\".to_string()),\n                created_at: chrono::Utc::now(),\n                id: uuid::Uuid::from_str(\"c8f325bd-42fa-4096-a6e9-cfbc6c542805\")?,\n                state: Some(\"viidxmedl\".to_string()),\n                street_1: Some(\"h\".to_string()),\n                street_2: Some(\"fptrs\".to_string()),\n                updated_at: chrono::Utc::now(),\n                user_id: Some(\"r\".to_string()),\n                zip: Some(\"ltyaxl\".to_string()),\n            }),\n            name: Some(\"jlohi\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1 726-737-1413\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn update_payment_information_for_user<'a>(
         &'a self,
         body: &crate::types::BillingInfo,
@@ -54,13 +55,14 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
-    #[doc = "Create payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It creates the payment information for the authenticated user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_payments_create_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = client\n        .payments()\n        .create_payment_information_for_user(&kittycad::types::BillingInfo {\n            address: Some(kittycad::types::Address {\n                city: Some(\"okjkikyd\".to_string()),\n                country: Some(\"\".to_string()),\n                created_at: chrono::Utc::now(),\n                id: uuid::Uuid::from_str(\"de4637d6-a0d9-4dc1-8f16-d2bb50bbda43\")?,\n                state: Some(\"p\".to_string()),\n                street_1: Some(\"jcvucv\".to_string()),\n                street_2: Some(\"medpkl\".to_string()),\n                updated_at: chrono::Utc::now(),\n                user_id: Some(\"ewifvd\".to_string()),\n                zip: Some(\"opuxxonon\".to_string()),\n            }),\n            name: Some(\"lqaect\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1 351-220-0826\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It creates the payment information for the authenticated user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_payments_create_payment_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = client\n        .payments()\n        .create_payment_information_for_user(&kittycad::types::BillingInfo {\n            address: Some(kittycad::types::Address {\n                city: Some(\"nlisykdqk\".to_string()),\n                country: Some(\"tupk\".to_string()),\n                created_at: chrono::Utc::now(),\n                id: uuid::Uuid::from_str(\"7968b78e-6cc7-4ed8-887f-5f3a9e1a1577\")?,\n                state: Some(\"cy\".to_string()),\n                street_1: Some(\"k\".to_string()),\n                street_2: Some(\"aofg\".to_string()),\n                updated_at: chrono::Utc::now(),\n                user_id: Some(\"h\".to_string()),\n                zip: Some(\"iajclic\".to_string()),\n            }),\n            name: Some(\"oywcgc\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1 206-164-8137\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn create_payment_information_for_user<'a>(
         &'a self,
         body: &crate::types::BillingInfo,
@@ -80,6 +82,7 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -122,6 +125,7 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -146,6 +150,7 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -170,6 +175,7 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -194,13 +200,14 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
 
-    #[doc = "Delete a payment method for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the specified payment method for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_delete_payment_method_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_payment_method_for_user(\"ftxwmgf\")\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Delete a payment method for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the specified payment method for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_delete_payment_method_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_payment_method_for_user(\"arngqygoq\")\n        .await?;\n    Ok(())\n}\n```"]
     pub async fn delete_payment_method_for_user<'a>(
         &'a self,
         id: &'a str,
@@ -210,7 +217,7 @@ impl Payments {
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/payment/methods/{id}".replace("{id}", id)
+                "user/payment/methods/{id}".replace("{id}", &id)
             ),
         );
         req = req.bearer_auth(&self.client.token);

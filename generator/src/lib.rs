@@ -68,6 +68,8 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
      * Deal with any dependencies we require to produce this client.
      */
     a("#![allow(missing_docs)]"); // TODO: Make this a deny.
+    a("#![allow(clippy::needless_lifetimes)]"); // TODO: Fix this.
+
     a("#![cfg_attr(docsrs, feature(doc_cfg))]");
     a("");
 
@@ -495,14 +497,15 @@ futures-util = "^0.3.21"
 pretty_assertions = "1"
 tokio = {{ version = "1.20.0", features = ["full"] }}
 
-[features]
-# enable etag-based http_cache functionality
-httpcache = ["dirs"]
-
 [package.metadata.docs.rs]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 "#,
         opts.name, opts.description, opts.version, opts.name, repo_info,
     )
+}
+
+fn run_cargo_clippy(opts: &Opts) -> Result<()> {
+
+
 }
