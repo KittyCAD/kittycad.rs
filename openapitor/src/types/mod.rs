@@ -809,6 +809,7 @@ fn get_one_of_tag(
         }
     }
 
+    let mut has_content = false;
     if let Some(tag) = &result.tag {
         // Check if we also have content.
         // This would be true if the objects only have 2 properties, one of which is the tag and the other is the content.
@@ -820,12 +821,29 @@ fn get_one_of_tag(
                 if o.properties.len() == 2 {
                     for (k, _) in &o.properties {
                         if tag != k {
-                            // This is the content.
-                            result.content = Some(k.to_string());
-                            break;
+                            // Make sure they all equal each other.
+                            if has_content {
+                                if Some(k.to_string()) != result.content {
+                                    result.content = None;
+                                    // Return early since we have a mismatch.
+                                    return Ok(result);
+                                }
+                            } else {
+                                has_content = true;
+                                // This is the content.
+                                result.content = Some(k.to_string());
+                            }
                         }
                     }
+                } else {
+                    result.content = None;
+                    // Return early since we have a mismatch.
+                    return Ok(result);
                 }
+            } else {
+                result.content = None;
+                // Return early since we have a mismatch.
+                return Ok(result);
             }
         }
     }
@@ -895,7 +913,7 @@ fn get_one_of_values(
                         None => {
                             anyhow::bail!(
                             "no property `{}` in object, even through we thought we had content",
-                            tag
+                            content
                         );
                         }
                     };

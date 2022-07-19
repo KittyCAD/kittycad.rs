@@ -821,137 +821,6 @@ impl tabled::Tabled for DiskResultsPage {
     }
 }
 
-#[doc = "Create a blank disk"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Blank {
-    #[doc = "size of blocks for this Disk. valid values are: 512, 2048, or 4096"]
-    pub block_size: i64,
-    #[serde(rename = "type")]
-    pub type_: Type,
-}
-
-impl std::fmt::Display for Blank {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Blank {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![
-            format!("{:?}", self.block_size),
-            format!("{:?}", self.type_),
-        ]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["block_size".to_string(), "type_".to_string()]
-    }
-}
-
-#[doc = "Create a disk from a disk snapshot"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Snapshot {
-    pub snapshot_id: uuid::Uuid,
-    #[serde(rename = "type")]
-    pub type_: Type,
-}
-
-impl std::fmt::Display for Snapshot {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Snapshot {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![
-            format!("{:?}", self.snapshot_id),
-            format!("{:?}", self.type_),
-        ]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["snapshot_id".to_string(), "type_".to_string()]
-    }
-}
-
-#[doc = "Create a disk from a project image"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Image {
-    pub image_id: uuid::Uuid,
-    #[serde(rename = "type")]
-    pub type_: Type,
-}
-
-impl std::fmt::Display for Image {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Image {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.image_id), format!("{:?}", self.type_)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["image_id".to_string(), "type_".to_string()]
-    }
-}
-
-#[doc = "Create a disk from a global image"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct GlobalImage {
-    pub image_id: uuid::Uuid,
-    #[serde(rename = "type")]
-    pub type_: Type,
-}
-
-impl std::fmt::Display for GlobalImage {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for GlobalImage {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.image_id), format!("{:?}", self.type_)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["image_id".to_string(), "type_".to_string()]
-    }
-}
-
 #[doc = "Different sources for a disk"]
 #[derive(
     serde :: Serialize,
@@ -965,219 +834,13 @@ impl tabled::Tabled for GlobalImage {
 #[serde(tag = "type")]
 pub enum DiskSource {
     #[serde(rename = "blank")]
-    Blank(Blank),
+    Blank { block_size: i64 },
     #[serde(rename = "snapshot")]
-    Snapshot(Snapshot),
+    Snapshot { snapshot_id: uuid::Uuid },
     #[serde(rename = "image")]
-    Image(Image),
+    Image { image_id: uuid::Uuid },
     #[serde(rename = "global_image")]
-    GlobalImage(GlobalImage),
-}
-
-#[doc = "Disk is being initialized"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Creating {
-    pub state: State,
-}
-
-impl std::fmt::Display for Creating {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Creating {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.state)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["state".to_string()]
-    }
-}
-
-#[doc = "Disk is ready but detached from any Instance"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Detached {
-    pub state: State,
-}
-
-impl std::fmt::Display for Detached {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Detached {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.state)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["state".to_string()]
-    }
-}
-
-#[doc = "Disk is being attached to the given Instance"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Attaching {
-    pub instance: uuid::Uuid,
-    pub state: State,
-}
-
-impl std::fmt::Display for Attaching {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Attaching {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.instance), format!("{:?}", self.state)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["instance".to_string(), "state".to_string()]
-    }
-}
-
-#[doc = "Disk is attached to the given Instance"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Attached {
-    pub instance: uuid::Uuid,
-    pub state: State,
-}
-
-impl std::fmt::Display for Attached {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Attached {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.instance), format!("{:?}", self.state)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["instance".to_string(), "state".to_string()]
-    }
-}
-
-#[doc = "Disk is being detached from the given Instance"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Detaching {
-    pub instance: uuid::Uuid,
-    pub state: State,
-}
-
-impl std::fmt::Display for Detaching {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Detaching {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.instance), format!("{:?}", self.state)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["instance".to_string(), "state".to_string()]
-    }
-}
-
-#[doc = "Disk has been destroyed"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Destroyed {
-    pub state: State,
-}
-
-impl std::fmt::Display for Destroyed {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Destroyed {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.state)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["state".to_string()]
-    }
-}
-
-#[doc = "Disk is unavailable"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Faulted {
-    pub state: State,
-}
-
-impl std::fmt::Display for Faulted {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Faulted {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.state)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["state".to_string()]
-    }
+    GlobalImage { image_id: uuid::Uuid },
 }
 
 #[doc = "State of a Disk (primarily: attached or not)"]
@@ -1193,19 +856,19 @@ impl tabled::Tabled for Faulted {
 #[serde(tag = "state")]
 pub enum DiskState {
     #[serde(rename = "creating")]
-    Creating(Creating),
+    Creating {},
     #[serde(rename = "detached")]
-    Detached(Detached),
+    Detached {},
     #[serde(rename = "attaching")]
-    Attaching(Attaching),
+    Attaching { instance: uuid::Uuid },
     #[serde(rename = "attached")]
-    Attached(Attached),
+    Attached { instance: uuid::Uuid },
     #[serde(rename = "detaching")]
-    Detaching(Detaching),
+    Detaching { instance: uuid::Uuid },
     #[serde(rename = "destroyed")]
-    Destroyed(Destroyed),
+    Destroyed {},
     #[serde(rename = "faulted")]
-    Faulted(Faulted),
+    Faulted {},
 }
 
 #[doc = "OS image distribution"]
@@ -1849,66 +1512,6 @@ impl std::default::Default for IdentityType {
 }
 
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Url {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    pub url: String,
-}
-
-impl std::fmt::Display for Url {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Url {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.url.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "url".to_string()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Base64EncodedXml {
-    pub data: String,
-    #[serde(rename = "type")]
-    pub type_: Type,
-}
-
-impl std::fmt::Display for Base64EncodedXml {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Base64EncodedXml {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![self.data.clone(), format!("{:?}", self.type_)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["data".to_string(), "type_".to_string()]
-    }
-}
-
-#[derive(
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -1920,9 +1523,9 @@ impl tabled::Tabled for Base64EncodedXml {
 #[serde(tag = "type")]
 pub enum IdpMetadataSource {
     #[serde(rename = "url")]
-    Url(Url),
+    Url { url: String },
     #[serde(rename = "base64_encoded_xml")]
-    Base64EncodedXml(Base64EncodedXml),
+    Base64EncodedXml { data: String },
 }
 
 #[doc = "Client view of project Images"]
@@ -2126,96 +1729,6 @@ impl tabled::Tabled for ImageResultsPage {
     }
 }
 
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Url {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    pub url: String,
-}
-
-impl std::fmt::Display for Url {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Url {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.url.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "url".to_string()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Snapshot {
-    pub id: uuid::Uuid,
-    #[serde(rename = "type")]
-    pub type_: Type,
-}
-
-impl std::fmt::Display for Snapshot {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Snapshot {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.id), format!("{:?}", self.type_)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["id".to_string(), "type_".to_string()]
-    }
-}
-
-#[doc = "Boot the Alpine ISO that ships with the Propolis zone. Intended for development purposes only."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct YouCanBootAnythingAsLongAsItsAlpine {
-    #[serde(rename = "type")]
-    pub type_: Type,
-}
-
-impl std::fmt::Display for YouCanBootAnythingAsLongAsItsAlpine {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for YouCanBootAnythingAsLongAsItsAlpine {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string()]
-    }
-}
-
 #[doc = "The source of the underlying image."]
 #[derive(
     serde :: Serialize,
@@ -2229,11 +1742,11 @@ impl tabled::Tabled for YouCanBootAnythingAsLongAsItsAlpine {
 #[serde(tag = "type")]
 pub enum ImageSource {
     #[serde(rename = "url")]
-    Url(Url),
+    Url { url: String },
     #[serde(rename = "snapshot")]
-    Snapshot(Snapshot),
+    Snapshot { id: uuid::Uuid },
     #[serde(rename = "you_can_boot_anything_as_long_as_its_alpine")]
-    YouCanBootAnythingAsLongAsItsAlpine(YouCanBootAnythingAsLongAsItsAlpine),
+    YouCanBootAnythingAsLongAsItsAlpine {},
 }
 
 #[doc = "Client view of an [`Instance`]"]
@@ -2384,87 +1897,6 @@ impl tabled::Tabled for InstanceCreate {
     }
 }
 
-#[doc = "During instance creation, create and attach disks"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Create {
-    pub description: String,
-    #[doc = "initial source for this disk"]
-    pub disk_source: DiskSource,
-    #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
-    pub name: String,
-    #[doc = "total size of the Disk in bytes"]
-    pub size: u64,
-    #[serde(rename = "type")]
-    pub type_: Type,
-}
-
-impl std::fmt::Display for Create {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Create {
-    const LENGTH: usize = 5;
-    fn fields(&self) -> Vec<String> {
-        vec![
-            self.description.clone(),
-            format!("{:?}", self.disk_source),
-            self.name.clone(),
-            format!("{:?}", self.size),
-            format!("{:?}", self.type_),
-        ]
-    }
-
-    fn headers() -> Vec<String> {
-        vec![
-            "description".to_string(),
-            "disk_source".to_string(),
-            "name".to_string(),
-            "size".to_string(),
-            "type_".to_string(),
-        ]
-    }
-}
-
-#[doc = "During instance creation, attach this disk"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Attach {
-    #[doc = "A disk name to attach"]
-    pub name: String,
-    #[serde(rename = "type")]
-    pub type_: Type,
-}
-
-impl std::fmt::Display for Attach {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Attach {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![self.name.clone(), format!("{:?}", self.type_)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["name".to_string(), "type_".to_string()]
-    }
-}
-
 #[doc = "Describe the instance's disks at creation time"]
 #[derive(
     serde :: Serialize,
@@ -2478,9 +1910,14 @@ impl tabled::Tabled for Attach {
 #[serde(tag = "type")]
 pub enum InstanceDiskAttachment {
     #[serde(rename = "create")]
-    Create(Create),
+    Create {
+        description: String,
+        disk_source: DiskSource,
+        name: String,
+        size: u64,
+    },
     #[serde(rename = "attach")]
-    Attach(Attach),
+    Attach { name: String },
 }
 
 #[doc = "Migration parameters for an [`Instance`](omicron_common::api::external::Instance)"]
@@ -2512,97 +1949,6 @@ impl tabled::Tabled for InstanceMigrate {
     }
 }
 
-#[doc = "Create one or more `NetworkInterface`s for the `Instance`.\n\nIf more than one interface is provided, then the first will be designated the primary interface for the instance."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Create {
-    pub params: Vec<NetworkInterfaceCreate>,
-    #[serde(rename = "type")]
-    pub type_: Type,
-}
-
-impl std::fmt::Display for Create {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Create {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.params), format!("{:?}", self.type_)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["params".to_string(), "type_".to_string()]
-    }
-}
-
-#[doc = "The default networking configuration for an instance is to create a single primary interface with an automatically-assigned IP address. The IP will be pulled from the Project's default VPC / VPC Subnet."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Default {
-    #[serde(rename = "type")]
-    pub type_: Type,
-}
-
-impl std::fmt::Display for Default {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Default {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string()]
-    }
-}
-
-#[doc = "No network interfaces at all will be created for the instance."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct None {
-    #[serde(rename = "type")]
-    pub type_: Type,
-}
-
-impl std::fmt::Display for None {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for None {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string()]
-    }
-}
-
 #[doc = "Describes an attachment of a `NetworkInterface` to an `Instance`, at the time the instance is created."]
 #[derive(
     serde :: Serialize,
@@ -2616,11 +1962,11 @@ impl tabled::Tabled for None {
 #[serde(tag = "type")]
 pub enum InstanceNetworkInterfaceAttachment {
     #[serde(rename = "create")]
-    Create(Create),
+    Create { params: Vec<NetworkInterfaceCreate> },
     #[serde(rename = "default")]
-    Default(Default),
+    Default {},
     #[serde(rename = "none")]
-    None(None),
+    None {},
 }
 
 #[doc = "A single page of results"]
@@ -2783,8 +2129,8 @@ pub enum InstanceState {
     tabled :: Tabled,
 )]
 pub enum IpNet {
-    String(String),
-    String(String),
+    V4(String),
+    V6(String),
 }
 
 #[doc = "Identity-related metadata that's included in nearly all public API objects"]
@@ -3093,8 +2439,8 @@ impl tabled::Tabled for IpPoolUpdate {
     tabled :: Tabled,
 )]
 pub enum IpRange {
-    IpRange(IpRange),
-    IpRange(IpRange),
+    V4(Ipv4Range),
+    V6(Ipv6Range),
 }
 
 #[doc = "A non-decreasing IPv4 address range, inclusive of both ends.\n\nThe first address must be less than or equal to the last address."]
@@ -4191,132 +3537,6 @@ impl tabled::Tabled for RoleResultsPage {
     }
 }
 
-#[doc = "Route applies to traffic destined for a specific IP address"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Ip {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    pub value: std::net::Ipv4Addr,
-}
-
-impl std::fmt::Display for Ip {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Ip {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), format!("{:?}", self.value)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
-#[doc = "Route applies to traffic destined for a specific IP subnet"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct IpNet {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    pub value: IpNet,
-}
-
-impl std::fmt::Display for IpNet {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for IpNet {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), format!("{:?}", self.value)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
-#[doc = "Route applies to traffic destined for the given VPC."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Vpc {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
-    pub value: String,
-}
-
-impl std::fmt::Display for Vpc {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Vpc {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.value.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
-#[doc = "Route applies to traffic"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Subnet {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
-    pub value: String,
-}
-
-impl std::fmt::Display for Subnet {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Subnet {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.value.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
 #[doc = "A `RouteDestination` is used to match traffic with a routing rule, on the destination of that traffic.\n\nWhen traffic is to be sent to a destination that is within a given `RouteDestination`, the corresponding [`RouterRoute`] applies, and traffic will be forward to the [`RouteTarget`] for that rule."]
 #[derive(
     serde :: Serialize,
@@ -4327,175 +3547,16 @@ impl tabled::Tabled for Subnet {
     schemars :: JsonSchema,
     tabled :: Tabled,
 )]
-#[serde(tag = "type")]
+#[serde(tag = "type", content = "value")]
 pub enum RouteDestination {
     #[serde(rename = "ip")]
-    Ip(Ip),
+    Ip(std::net::Ipv4Addr),
     #[serde(rename = "ip_net")]
     IpNet(IpNet),
     #[serde(rename = "vpc")]
-    Vpc(Vpc),
+    Vpc(String),
     #[serde(rename = "subnet")]
-    Subnet(Subnet),
-}
-
-#[doc = "Forward traffic to a particular IP address."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Ip {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    pub value: std::net::Ipv4Addr,
-}
-
-impl std::fmt::Display for Ip {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Ip {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), format!("{:?}", self.value)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
-#[doc = "Forward traffic to a VPC"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Vpc {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
-    pub value: String,
-}
-
-impl std::fmt::Display for Vpc {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Vpc {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.value.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
-#[doc = "Forward traffic to a VPC Subnet"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Subnet {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
-    pub value: String,
-}
-
-impl std::fmt::Display for Subnet {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Subnet {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.value.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
-#[doc = "Forward traffic to a specific instance"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Instance {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
-    pub value: String,
-}
-
-impl std::fmt::Display for Instance {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Instance {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.value.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
-#[doc = "Forward traffic to an internet gateway"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct InternetGateway {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
-    pub value: String,
-}
-
-impl std::fmt::Display for InternetGateway {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for InternetGateway {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.value.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
+    Subnet(String),
 }
 
 #[doc = "A `RouteTarget` describes the possible locations that traffic matching a route destination can be sent."]
@@ -4508,18 +3569,18 @@ impl tabled::Tabled for InternetGateway {
     schemars :: JsonSchema,
     tabled :: Tabled,
 )]
-#[serde(tag = "type")]
+#[serde(tag = "type", content = "value")]
 pub enum RouteTarget {
     #[serde(rename = "ip")]
-    Ip(Ip),
+    Ip(std::net::Ipv4Addr),
     #[serde(rename = "vpc")]
-    Vpc(Vpc),
+    Vpc(String),
     #[serde(rename = "subnet")]
-    Subnet(Subnet),
+    Subnet(String),
     #[serde(rename = "instance")]
-    Instance(Instance),
+    Instance(String),
     #[serde(rename = "internet_gateway")]
-    InternetGateway(InternetGateway),
+    InternetGateway(String),
 }
 
 #[doc = "A route defines a rule that governs where traffic should be sent based on its destination."]
@@ -4814,153 +3875,6 @@ impl tabled::Tabled for Saga {
 }
 
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ActionFailed {
-    pub error: Error,
-    pub source_error: serde_json::Value,
-}
-
-impl std::fmt::Display for ActionFailed {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for ActionFailed {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![
-            format!("{:?}", self.error),
-            format!("{:?}", self.source_error),
-        ]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["error".to_string(), "source_error".to_string()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DeserializeFailed {
-    pub error: Error,
-    pub message: String,
-}
-
-impl std::fmt::Display for DeserializeFailed {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for DeserializeFailed {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.error), self.message.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["error".to_string(), "message".to_string()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct InjectedError {
-    pub error: Error,
-}
-
-impl std::fmt::Display for InjectedError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for InjectedError {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.error)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["error".to_string()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct SerializeFailed {
-    pub error: Error,
-    pub message: String,
-}
-
-impl std::fmt::Display for SerializeFailed {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for SerializeFailed {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.error), self.message.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["error".to_string(), "message".to_string()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct SubsagaCreateFailed {
-    pub error: Error,
-    pub message: String,
-}
-
-impl std::fmt::Display for SubsagaCreateFailed {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for SubsagaCreateFailed {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.error), self.message.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["error".to_string(), "message".to_string()]
-    }
-}
-
-#[derive(
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -4972,15 +3886,15 @@ impl tabled::Tabled for SubsagaCreateFailed {
 #[serde(tag = "error")]
 pub enum SagaErrorInfo {
     #[serde(rename = "action_failed")]
-    ActionFailed(ActionFailed),
+    ActionFailed { source_error: serde_json::Value },
     #[serde(rename = "deserialize_failed")]
-    DeserializeFailed(DeserializeFailed),
+    DeserializeFailed { message: String },
     #[serde(rename = "injected_error")]
-    InjectedError(InjectedError),
+    InjectedError {},
     #[serde(rename = "serialize_failed")]
-    SerializeFailed(SerializeFailed),
+    SerializeFailed { message: String },
     #[serde(rename = "subsaga_create_failed")]
-    SubsagaCreateFailed(SubsagaCreateFailed),
+    SubsagaCreateFailed { message: String },
 }
 
 #[doc = "A single page of results"]
@@ -5051,100 +3965,6 @@ impl tabled::Tabled for SagaResultsPage {
 }
 
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Running {
-    pub state: State,
-}
-
-impl std::fmt::Display for Running {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Running {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.state)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["state".to_string()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Succeeded {
-    pub state: State,
-}
-
-impl std::fmt::Display for Succeeded {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Succeeded {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.state)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["state".to_string()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Failed {
-    pub error_info: SagaErrorInfo,
-    pub error_node_name: String,
-    pub state: State,
-}
-
-impl std::fmt::Display for Failed {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Failed {
-    const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
-        vec![
-            format!("{:?}", self.error_info),
-            self.error_node_name.clone(),
-            format!("{:?}", self.state),
-        ]
-    }
-
-    fn headers() -> Vec<String> {
-        vec![
-            "error_info".to_string(),
-            "error_node_name".to_string(),
-            "state".to_string(),
-        ]
-    }
-}
-
-#[derive(
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -5156,11 +3976,14 @@ impl tabled::Tabled for Failed {
 #[serde(tag = "state")]
 pub enum SagaState {
     #[serde(rename = "running")]
-    Running(Running),
+    Running {},
     #[serde(rename = "succeeded")]
-    Succeeded(Succeeded),
+    Succeeded {},
     #[serde(rename = "failed")]
-    Failed(Failed),
+    Failed {
+        error_info: SagaErrorInfo,
+        error_node_name: String,
+    },
 }
 
 #[doc = "Identity-related metadata that's included in nearly all public API objects"]
@@ -6703,164 +5526,6 @@ impl tabled::Tabled for VpcFirewallRuleFilter {
     }
 }
 
-#[doc = "The rule applies to traffic from/to all instances in the VPC"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Vpc {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
-    pub value: String,
-}
-
-impl std::fmt::Display for Vpc {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Vpc {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.value.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
-#[doc = "The rule applies to traffic from/to all instances in the VPC Subnet"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Subnet {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
-    pub value: String,
-}
-
-impl std::fmt::Display for Subnet {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Subnet {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.value.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
-#[doc = "The rule applies to traffic from/to this specific instance"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Instance {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
-    pub value: String,
-}
-
-impl std::fmt::Display for Instance {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Instance {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.value.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
-#[doc = "The rule applies to traffic from/to a specific IP address"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Ip {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    pub value: std::net::Ipv4Addr,
-}
-
-impl std::fmt::Display for Ip {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Ip {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), format!("{:?}", self.value)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
-#[doc = "The rule applies to traffic from/to a specific IP subnet"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct IpNet {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    pub value: IpNet,
-}
-
-impl std::fmt::Display for IpNet {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for IpNet {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), format!("{:?}", self.value)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
 #[doc = "The `VpcFirewallRuleHostFilter` is used to filter traffic on the basis of its source or destination host."]
 #[derive(
     serde :: Serialize,
@@ -6871,16 +5536,16 @@ impl tabled::Tabled for IpNet {
     schemars :: JsonSchema,
     tabled :: Tabled,
 )]
-#[serde(tag = "type")]
+#[serde(tag = "type", content = "value")]
 pub enum VpcFirewallRuleHostFilter {
     #[serde(rename = "vpc")]
-    Vpc(Vpc),
+    Vpc(String),
     #[serde(rename = "subnet")]
-    Subnet(Subnet),
+    Subnet(String),
     #[serde(rename = "instance")]
-    Instance(Instance),
+    Instance(String),
     #[serde(rename = "ip")]
-    Ip(Ip),
+    Ip(std::net::Ipv4Addr),
     #[serde(rename = "ip_net")]
     IpNet(IpNet),
 }
@@ -6935,164 +5600,6 @@ pub enum VpcFirewallRuleStatus {
     Enabled,
 }
 
-#[doc = "The rule applies to all instances in the VPC"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Vpc {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
-    pub value: String,
-}
-
-impl std::fmt::Display for Vpc {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Vpc {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.value.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
-#[doc = "The rule applies to all instances in the VPC Subnet"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Subnet {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
-    pub value: String,
-}
-
-impl std::fmt::Display for Subnet {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Subnet {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.value.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
-#[doc = "The rule applies to this specific instance"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Instance {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
-    pub value: String,
-}
-
-impl std::fmt::Display for Instance {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Instance {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.value.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
-#[doc = "The rule applies to a specific IP address"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Ip {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    pub value: std::net::Ipv4Addr,
-}
-
-impl std::fmt::Display for Ip {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Ip {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), format!("{:?}", self.value)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
-#[doc = "The rule applies to a specific IP subnet"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct IpNet {
-    #[serde(rename = "type")]
-    pub type_: Type,
-    pub value: IpNet,
-}
-
-impl std::fmt::Display for IpNet {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for IpNet {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), format!("{:?}", self.value)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
-    }
-}
-
 #[doc = "A `VpcFirewallRuleTarget` is used to specify the set of [`Instance`]s to which a firewall rule applies."]
 #[derive(
     serde :: Serialize,
@@ -7103,16 +5610,16 @@ impl tabled::Tabled for IpNet {
     schemars :: JsonSchema,
     tabled :: Tabled,
 )]
-#[serde(tag = "type")]
+#[serde(tag = "type", content = "value")]
 pub enum VpcFirewallRuleTarget {
     #[serde(rename = "vpc")]
-    Vpc(Vpc),
+    Vpc(String),
     #[serde(rename = "subnet")]
-    Subnet(Subnet),
+    Subnet(String),
     #[serde(rename = "instance")]
-    Instance(Instance),
+    Instance(String),
     #[serde(rename = "ip")]
-    Ip(Ip),
+    Ip(std::net::Ipv4Addr),
     #[serde(rename = "ip_net")]
     IpNet(IpNet),
 }
