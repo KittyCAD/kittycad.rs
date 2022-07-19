@@ -112,8 +112,17 @@ pub fn render_schema(
         openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
             render_object(name, o, &schema.schema_data, spec)
         }
-        openapiv3::SchemaKind::Type(openapiv3::Type::Array(_a)) => {
-            anyhow::bail!("XXX array not supported yet");
+        openapiv3::SchemaKind::Type(openapiv3::Type::Array(a)) => {
+            // We don't render arrays, since it is a combination of another type.
+            // Let's ensure the items are a reference, otherwise we should render it.
+            if let Some(items) = &a.items {
+                if let openapiv3::ReferenceOr::Item(s) = items {
+                    // We need to render the item.
+                    return render_schema(name, s, spec);
+                }
+            }
+
+            Ok(quote!())
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => {
             // We don't render booleans yet, since it is a primitive type.
@@ -122,18 +131,16 @@ pub fn render_schema(
         openapiv3::SchemaKind::OneOf { one_of } => {
             render_one_of(name, one_of, &schema.schema_data, spec)
         }
-        openapiv3::SchemaKind::AllOf { all_of: _ } => {
-            anyhow::bail!("XXX all of not supported yet");
+        openapiv3::SchemaKind::AllOf { all_of } => {
+            render_all_of(name, all_of, &schema.schema_data, spec)
         }
         openapiv3::SchemaKind::AnyOf { any_of } => {
             render_any_of(name, any_of, &schema.schema_data, spec)
         }
-        openapiv3::SchemaKind::Not { not: _ } => {
-            anyhow::bail!("XXX not not supported yet");
+        openapiv3::SchemaKind::Not { not } => {
+            anyhow::bail!("XXX not not supported yet: {} => {:?}", name, not);
         }
-        openapiv3::SchemaKind::Any(any) => {
-            anyhow::bail!("XXX any not supported yet: {:?}", any);
-        }
+        openapiv3::SchemaKind::Any(any) => render_any(name, any, &schema.schema_data, spec),
     }
 }
 
@@ -186,7 +193,14 @@ pub fn get_type_name_for_schema(
         }
         openapiv3::SchemaKind::AllOf { all_of } => {
             if all_of.len() != 1 {
-                anyhow::bail!("XXX all of with more than one value not supported yet");
+                // This became an object type, so render it as such.
+                return get_type_name_for_object(
+                    name,
+                    &openapiv3::ObjectType::default(),
+                    &schema.schema_data,
+                    spec,
+                    in_crate,
+                );
             }
 
             let internal_schema = &all_of[0];
@@ -199,7 +213,7 @@ pub fn get_type_name_for_schema(
                 }
             }
         }
-        openapiv3::SchemaKind::AnyOf { _any_of } => get_type_name_for_object(
+        openapiv3::SchemaKind::AnyOf { any_of: _ } => get_type_name_for_object(
             name,
             &openapiv3::ObjectType::default(),
             &schema.schema_data,
@@ -230,11 +244,19 @@ fn render_string_type(
     }
 
     if let Some(ref max_length) = s.max_length {
-        anyhow::bail!("XXX max_length not supported here yet: {:?}", max_length);
+        log::warn!(
+            "XXX max_length not supported here yet: {} => {:?}",
+            name,
+            max_length
+        );
     }
 
     if let Some(ref min_length) = s.min_length {
-        anyhow::bail!("XXX min_length not supported here yet: {:?}", min_length);
+        log::warn!(
+            "XXX min_length not supported here yet: {} => {:?}",
+            name,
+            min_length
+        );
     }
 
     // We don't render primitives yet.
@@ -448,11 +470,11 @@ fn get_type_name_for_object(
     if o.properties.is_empty() {
         if let Some(additional_properties) = &o.additional_properties {
             match additional_properties {
-                openapiv3::AdditionalProperties::Any(any) => {
-                    anyhow::bail!(
-                        "additional_properties is not supported for any type: {:?}",
-                        any
-                    );
+                openapiv3::AdditionalProperties::Any(_any) => {
+                    // The GitHub API has additional properties that are not actually
+                    // properties, but are instead literally empty.
+                    // This shows up as `any == true || any == false` in the spec.
+                    // We should just ignore these.
                 }
                 openapiv3::AdditionalProperties::Schema(schema) => {
                     let t = if let Ok(reference) = schema.reference() {
@@ -495,7 +517,7 @@ fn get_type_name_for_array(
     // Make sure we have a reference for our type.
     let t = if let Some(ref s) = a.items {
         if let Ok(r) = s.reference() {
-            let reference = format_ident!("{}", r);
+            let reference = crate::types::get_type_name_from_reference(&r, spec, false)?;
             if in_crate {
                 quote!(#reference)
             } else {
@@ -508,27 +530,89 @@ fn get_type_name_for_array(
             get_type_name_for_schema(name, item, spec, in_crate)?
         }
     } else {
-        // We have no items.
-        anyhow::bail!("no items in array, cannot get type name")
+        anyhow::bail!(
+            "no items in array, cannot get type name: {} => {:?}",
+            name,
+            a
+        );
     };
 
     Ok(quote!(Vec<#t>))
 }
 
-/// Any of means validates the value against any (one or more) of the subschemas.
+/// All of validates the value against all the subschemas.
+fn render_all_of(
+    name: &str,
+    all_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
+    data: &openapiv3::SchemaData,
+    spec: &openapiv3::OpenAPI,
+) -> Result<proc_macro2::TokenStream> {
+    // If it's an all of with length 1, just use the type name.
+    if all_ofs.len() == 1 {
+        let first = all_ofs[0].item()?;
+        // Return the all_of type.
+        return render_schema(name, first, spec);
+    }
+
+    // The all of needs to be an object with all the values.
+    // We want to iterate over each of the subschemas and combine all of the types.
+    // We assume all of the subschemas are objects.
+    let mut properties: IndexMap<String, openapiv3::ReferenceOr<Box<openapiv3::Schema>>> =
+        IndexMap::new();
+    let mut required: Vec<String> = Vec::new();
+    for all_of in all_ofs {
+        // Get the schema for this all of.
+        let schema = all_of.get_schema_from_reference(spec, true)?;
+
+        // Ensure the type is an object.
+        if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
+            for (k, v) in o.properties.iter() {
+                properties.insert(k.clone(), v.clone());
+            }
+            required.extend(o.required.iter().cloned());
+        } else {
+            anyhow::bail!(
+                "all of is not an object, cannot get type name: {} => {:?}",
+                name,
+                all_of
+            );
+        }
+    }
+
+    // Let's render the object.
+    render_object(
+        name,
+        &openapiv3::ObjectType {
+            properties,
+            required,
+            ..Default::default()
+        },
+        data,
+        spec,
+    )
+}
+
+/// Any of validates the value against any (one or more) of the subschemas.
 fn render_any_of(
     name: &str,
     any_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
     data: &openapiv3::SchemaData,
     spec: &openapiv3::OpenAPI,
 ) -> Result<proc_macro2::TokenStream> {
+    // If it's an any of with length 1, just use the type name.
+    if any_ofs.len() == 1 {
+        let first = any_ofs[0].item()?;
+        // Return the any_of type.
+        return render_schema(name, first, spec);
+    }
+
     // The any of needs to be an object with optional values since it can be any (one or more) of multiple types.
     // We want to iterate over each of the subschemas and combine all of the types.
     // We assume all of the subschemas are objects.
     let mut properties: IndexMap<String, openapiv3::ReferenceOr<Box<openapiv3::Schema>>> =
         IndexMap::new();
     for any_of in any_ofs {
-        // Get the schema for this OneOf.
+        // Get the schema for this any of.
         let schema = any_of.get_schema_from_reference(spec, true)?;
 
         // Ensure the type is an object.
@@ -537,7 +621,10 @@ fn render_any_of(
                 properties.insert(k.clone(), v.clone());
             }
         } else {
-            anyhow::bail!("any_of in `{}` is not an object: `{:?}`", name, schema);
+            // We got something that is not an object.
+            // Therefore we need to render this as a one of instead.
+            // Since it includes primitive types, we need to render this as a one of.
+            return render_one_of(name, any_ofs, data, spec);
         }
     }
 
@@ -761,6 +848,34 @@ fn render_one_of(
     Ok(rendered)
 }
 
+/// Render the full type for any.
+fn render_any(
+    name: &str,
+    any: &openapiv3::AnySchema,
+    data: &openapiv3::SchemaData,
+    spec: &openapiv3::OpenAPI,
+) -> Result<proc_macro2::TokenStream> {
+    // The GitHub API is sometimes missing `type: object`.
+    // See: https://github.com/github/rest-api-description/issues/1354
+    // If we have properties, we can assume this is an object.
+    if !any.properties.is_empty() {
+        return render_object(
+            name,
+            &openapiv3::ObjectType {
+                properties: any.properties.clone(),
+                required: any.required.clone(),
+                additional_properties: any.additional_properties.clone(),
+                min_properties: any.min_properties.clone(),
+                max_properties: any.max_properties.clone(),
+            },
+            data,
+            spec,
+        );
+    }
+
+    anyhow::bail!("could not parse any: {} => {:?}", name, any);
+}
+
 /// Render the full type for an object.
 fn render_object(
     name: &str,
@@ -769,15 +884,17 @@ fn render_object(
     spec: &openapiv3::OpenAPI,
 ) -> Result<proc_macro2::TokenStream> {
     if let Some(min_properties) = o.min_properties {
-        anyhow::bail!(
-            "min properties not supported for objects: {:?}",
+        log::warn!(
+            "min properties not supported for objects: {} => {:?}",
+            name,
             min_properties
         );
     }
 
     if let Some(max_properties) = o.max_properties {
-        anyhow::bail!(
-            "max properties not supported for objects: {:?}",
+        log::warn!(
+            "max properties not supported for objects: {} => {:?}",
+            name,
             max_properties
         );
     }
@@ -796,11 +913,11 @@ fn render_object(
     if o.properties.is_empty() {
         if let Some(additional_properties) = &o.additional_properties {
             match additional_properties {
-                openapiv3::AdditionalProperties::Any(any) => {
-                    anyhow::bail!(
-                        "additional_properties is not supported for any type: {:?}",
-                        any
-                    );
+                openapiv3::AdditionalProperties::Any(_any) => {
+                    // The GitHub API has additional properties that are not actually
+                    // properties, but are instead literally empty.
+                    // This shows up as `any == true || any == false` in the spec.
+                    // We should just ignore these.
                 }
                 openapiv3::AdditionalProperties::Schema(schema) => {
                     let rendered = render_schema(name, schema.item()?, spec)?;
@@ -1035,7 +1152,18 @@ fn render_request_body(
 
 /// Clean a property name for an object so we can use it in rust.
 pub fn clean_property_name(s: &str) -> String {
-    let mut prop = inflector::cases::snakecase::to_snake_case(s.trim());
+    let mut prop = s.trim().to_string();
+
+    // These must come first, otherwise when we go to snake_case it will drop the + and -.
+    if prop == "+1" {
+        // Account for any weird types.
+        prop = "plus_one".to_string()
+    } else if prop == "-1" {
+        // Account for any weird types.
+        prop = "minus_one".to_string()
+    }
+
+    prop = inflector::cases::snakecase::to_snake_case(&prop);
 
     // Account for reserved keywords in rust.
     if prop == "ref"
@@ -1052,12 +1180,6 @@ pub fn clean_property_name(s: &str) -> String {
     } else if prop == "$ref" || prop == "$type" {
         // Account for any weird types.
         prop = format!("{}_", prop.replace('$', ""));
-    } else if prop == "+1" {
-        // Account for any weird types.
-        prop = "plus_one".to_string()
-    } else if prop == "-1" {
-        // Account for any weird types.
-        prop = "minus_one".to_string()
     } else if prop.starts_with('@') {
         // Account for any weird types.
         prop = prop.trim_start_matches('@').to_string();
@@ -1076,7 +1198,7 @@ fn render_enum(
     data: &openapiv3::SchemaData,
 ) -> Result<proc_macro2::TokenStream> {
     if s.enumeration.is_empty() {
-        anyhow::bail!("Cannot render empty string enumeration");
+        anyhow::bail!("Cannot render empty string enumeration: {}", name);
     }
 
     let description = if let Some(d) = &data.description {
@@ -1091,7 +1213,15 @@ fn render_enum(
     let mut values = quote!();
     for e in &s.enumeration {
         if e.is_none() {
-            anyhow::bail!("Cannot render None string enumeration");
+            // GitHub will sometimes put in a null value.
+            // But it's fine because they also mark it as null.
+            // Just in case tho let's ensure it's marked as nullable.
+            if !data.nullable {
+                anyhow::bail!("enum `{}` is not nullable, but it has a null value", name);
+            }
+
+            // We can continue early.
+            continue;
         }
 
         let e = e.as_ref().unwrap().to_string();
@@ -1498,5 +1628,11 @@ mod test {
             super::proper_name("webhook-config-insecure-ssl"),
             "WebhookConfigInsecureSsl"
         );
+    }
+
+    #[test]
+    fn test_clean_property_name() {
+        assert_eq!(super::clean_property_name("+1"), "plus_one");
+        assert_eq!(super::clean_property_name("-1"), "minus_one");
     }
 }
