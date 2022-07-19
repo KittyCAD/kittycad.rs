@@ -996,7 +996,7 @@ fn generate_example_code_fn(
         }
 
         let stream_function = quote!(
-            use futures_util::stream::try_stream::TryStreamExt;
+            use futures_util::TryStreamExt;
 
             async fn #example_stream_fn_name_ident() -> anyhow::Result<()> {
                 #client_code

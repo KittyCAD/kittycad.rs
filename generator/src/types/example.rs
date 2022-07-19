@@ -319,9 +319,7 @@ pub fn generate_example_rust_from_schema(
             } else {
                 match &s.format {
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::DateTime) => {
-                        quote!(
-                            chrono::DateTime::<chrono::Utc>::parse_from_rfc3339(#random_value)?
-                        )
+                        quote!(chrono::Utc::now())
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Date) => {
                         quote!(
@@ -370,9 +368,7 @@ pub fn generate_example_rust_from_schema(
                         "date" => {
                             quote!(chrono::NaiveDate::parse_from_str(#random_value, "%Y-%m-%d")?)
                         }
-                        "date-time" => quote!(
-                        chrono::DateTime::<chrono::Utc>::parse_from_rfc3339(#random_value)?
-                        ),
+                        "date-time" => quote!(chrono::Utc::now()),
                         "partial-date-time" => {
                             quote!(chrono::NaiveDateTime::parse_from_str(#random_value, "%Y-%m-%d %H:%M:%S")?)
                         }

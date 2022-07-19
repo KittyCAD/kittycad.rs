@@ -913,6 +913,7 @@ dependencies = [
  "expectorate",
  "format_serde_error",
  "futures",
+ "futures-util",
  "http",
  "hyperx",
  "log",
