@@ -787,8 +787,6 @@ fn render_object(
             pub #prop_ident: #type_name,
         );
 
-        let type_name_text = get_text(&type_name)?;
-
         let mut serde_props = Vec::<proc_macro2::TokenStream>::new();
 
         if &prop != k {
@@ -802,20 +800,11 @@ fn render_object(
             serde_props.push(quote!(skip_serializing_if = "Option::is_none"));
         }
 
-        let mut tabled_props = quote!();
-        if type_name_text.starts_with("Option<")
-            || type_name_text.starts_with("Vec<")
-            || type_name_text.starts_with("std::collections::HashMap<")
-        {
-            tabled_props = quote!(#[tabled(skip)]);
-        }
-
         values = quote!(
             #values
 
             #prop_desc
             #[serde(#(#serde_props),*)]
-            #tabled_props
             #prop_value
         );
     }
@@ -854,9 +843,68 @@ fn render_object(
         );
     }
 
+    let length: proc_macro2::TokenStream = o
+        .properties
+        .len()
+        .to_string()
+        .parse()
+        .map_err(|err| anyhow::anyhow!("{}", err))?;
+    // Let's implement the tabled trait for the object.
+    let mut headers = Vec::new();
+    let mut fields = Vec::new();
+    for (k, v) in &o.properties {
+        let prop = clean_property_name(k);
+        let prop_ident = format_ident!("{}", prop);
+        headers.push(quote!(#prop.to_string()));
+
+        // Get the schema for the property.
+        let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
+            let s = &**i;
+            s.clone()
+        } else {
+            v.get_schema_from_reference(spec, true)?
+        };
+
+        // Get the type name for the schema.
+        let type_name = get_type_name_for_schema(&prop, &inner_schema, spec, true)?;
+        // Check if this type is required.
+        if o.required.contains(k) && type_name.is_string()? {
+            fields.push(quote!(
+                self.#prop_ident.clone()
+            ));
+        } else if !o.required.contains(k) && type_name.rendered()? != "PhoneNumber" {
+            fields.push(quote!(
+                format!("{:?}", self.#prop_ident.unwrap_or_default())
+            ));
+        } else if type_name.rendered()? == "PhoneNumber" {
+            fields.push(quote!(
+                self.#prop_ident.to_string()
+            ));
+        } else {
+            fields.push(quote!(format!("{:?}", self.#prop_ident)));
+        }
+    }
+
+    let tabled = quote! {
+        impl tabled::Tabled for #struct_name {
+            const LENGTH: usize = #length;
+
+            fn fields(&self) -> Vec<String> {
+                vec![
+                    #(#fields),*
+                ]
+            }
+            fn headers() -> Vec<String> {
+                vec![
+                    #(#headers),*
+                ]
+            }
+        }
+    };
+
     let rendered = quote! {
         #description
-        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema, tabled::Tabled)]
+        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema)]
         pub struct #struct_name {
             #values
         }
@@ -868,6 +916,8 @@ fn render_object(
         }
 
         #pagination
+
+        #tabled
     };
 
     Ok(rendered)
