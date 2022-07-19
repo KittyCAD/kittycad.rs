@@ -710,7 +710,27 @@ fn render_enum_object_internal(
     spec: &openapiv3::OpenAPI,
     ignore_key: &str,
 ) -> Result<proc_macro2::TokenStream> {
-    let struct_name = format_ident!("{}", proper_name(name));
+    let proper_name = proper_name(name);
+    let struct_name = format_ident!("{}", proper_name);
+
+    // Check if we have an existing object with this name.
+    if let Some(components) = &spec.components {
+        if let Some(schema) = components.schemas.get(name) {
+            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(existing)) =
+                &schema.expand(spec)?.schema_kind
+            {
+                let mut modified_properties = o.properties.clone();
+                modified_properties.remove(ignore_key);
+                // Check if we have the same properties.
+                if modified_properties == existing.properties {
+                    // We have the same properties.
+                    // We can just use the existing object.
+                    return Ok(quote!(#struct_name));
+                }
+            }
+        }
+    }
+
     let mut values = quote!();
     for (k, v) in &o.properties {
         if k == ignore_key {
