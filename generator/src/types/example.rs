@@ -413,9 +413,7 @@ pub fn generate_example_rust_from_schema(
                 let k_ident = format_ident!("{}", crate::types::clean_property_name(k));
 
                 // Check if this type is required.
-                if !o.required.contains(k)
-                    && inner_name != "crate::types::phone_number::PhoneNumber"
-                {
+                if !o.required.contains(k) && inner_name != "PhoneNumber" {
                     args.push(quote!(#k_ident: Some(#example)));
                 } else {
                     args.push(quote!(#k_ident: #example));

@@ -10,7 +10,7 @@ impl Hidden {
         Self { client }
     }
 
-    #[doc = "Create an email verification request for a user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_hidden_listen_auth_email() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result : crate :: types :: VerificationToken = client . hidden () . listen_auth_email (& crate :: types :: EmailAuthenticationForm { callback_url : Some (url :: Url :: from_str (\"https://78.28.29.80.111/9\") ?) , email : \"173.119.184.156.81.111.4.43.84.128.45.48@225.205.129.81.145.237.108.157.229.108.167.236.89.130\" }) . await ? ;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create an email verification request for a user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_hidden_listen_auth_email() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::VerificationToken = client\n        .hidden()\n        .listen_auth_email(&kittycad::types::EmailAuthenticationForm {\n            callback_url: Some(url::Url::from_str(\"http://187.241.0.189/0\")?),\n            email: \"185.165.52.76.104.17.221.118.112.93.245.124.46.164@105.73.252.111.7.8.5.141\",\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn listen_auth_email<'a>(
         &'a self,
         body: &crate::types::EmailAuthenticationForm,
@@ -36,7 +36,7 @@ impl Hidden {
         }
     }
 
-    #[doc = "Listen for callbacks for email verification for users.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_hidden_listen_auth_email_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .listen_auth_email_callback(\n            Some(url::Url::from_str(\"https://234.0.0.145/0\")?),\n            \"186.4.153.39.62.105.198.92@36.204.42.155.239.43.40.108.242.131.67\",\n            \"ji\",\n        )\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Listen for callbacks for email verification for users.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_hidden_listen_auth_email_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .listen_auth_email_callback(\n            Some(url::Url::from_str(\"http://43.96.0.109/6\")?),\n            \"175.130.95.25.106.242.8.7.186.126.134.107@229.7.190.50.107.137.171.9.46.140.1.123\",\n            \"l\",\n        )\n        .await?;\n    Ok(())\n}\n```"]
     pub async fn listen_auth_email_callback<'a>(
         &'a self,
         callback_url: Option<url::Url>,
