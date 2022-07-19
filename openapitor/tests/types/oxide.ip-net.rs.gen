@@ -1,0 +1,13 @@
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub enum IpNet {
+    String(String),
+    String(String),
+}
