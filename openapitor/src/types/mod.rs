@@ -18,6 +18,15 @@ use crate::types::exts::{
     ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt, StatusCodeExt, TokenStreamExt,
 };
 
+/// Our collection of all our parsed types.
+#[derive(Debug, Clone, PartialEq)]
+pub struct TypeSpace {
+    /// Our types.
+    pub types: IndexMap<String, openapiv3::Schema>,
+    /// Our spec.
+    pub spec: openapiv3::OpenAPI,
+}
+
 /// Generate Rust types from an OpenAPI v3 spec.
 pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
     // Include the base64 data type for byte data.
@@ -47,13 +56,19 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
         #error_mod
     );
 
+    // Create our new type space.
+    let mut type_space = TypeSpace {
+        types: IndexMap::new(),
+        spec: spec.clone(),
+    };
+
     if let Some(components) = &spec.components {
         // Parse the schemas.
         for (name, schema) in &components.schemas {
             // Let's get the schema from the reference.
             let schema = schema.get_schema_from_reference(spec, true)?;
             // Let's handle all the kinds of schemas.
-            let t = render_schema(name, &schema, spec)?;
+            let t = type_space.render_schema(name, &schema)?;
             // Add it to our rendered types.
             rendered = quote! {
                 #rendered
@@ -67,7 +82,7 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
             // Let's get the schema from the reference.
             let schema = schema.get_schema_from_reference(spec, true)?;
             // Let's handle all the kinds of schemas.
-            let t = render_schema(name, &schema, spec)?;
+            let t = type_space.render_schema(name, &schema)?;
             // Add it to our rendered types.
             rendered = quote! {
                 #rendered
@@ -78,67 +93,715 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
 
         // Parse the responses.
         for (name, response) in &components.responses {
-            render_response(name, &response.expand(spec)?, spec)?;
+            type_space.render_response(name, &response.expand(spec)?)?;
         }
 
         // Parse the request bodies.
         for (name, request_body) in &components.request_bodies {
-            render_request_body(name, &request_body.expand(spec)?, spec)?;
+            type_space.render_request_body(name, &request_body.expand(spec)?)?;
         }
     }
+
+    println!("{:?}", type_space);
 
     get_text_fmt(&rendered)
 }
 
-/// Render a schema into a Rust type.
-/// This generates the Rust type.
-pub fn render_schema(
-    name: &str,
-    schema: &openapiv3::Schema,
-    spec: &openapiv3::OpenAPI,
-) -> Result<proc_macro2::TokenStream> {
-    match &schema.schema_kind {
-        openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
-            render_string_type(name, s, &schema.schema_data)
+impl TypeSpace {
+    /// Render a schema into a Rust type.
+    /// This generates the Rust type.
+    pub fn render_schema(
+        &mut self,
+        name: &str,
+        schema: &openapiv3::Schema,
+    ) -> Result<proc_macro2::TokenStream> {
+        match &schema.schema_kind {
+            openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
+                self.render_string_type(name, s, &schema.schema_data)
+            }
+            openapiv3::SchemaKind::Type(openapiv3::Type::Number(_n)) => {
+                // We don't render numbers yet, since it is a primitive type.
+                Ok(quote!())
+            }
+            openapiv3::SchemaKind::Type(openapiv3::Type::Integer(_i)) => {
+                // We don't render integers yet, since it is a primitive type.
+                Ok(quote!())
+            }
+            openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
+                self.render_object(name, o, &schema.schema_data)
+            }
+            openapiv3::SchemaKind::Type(openapiv3::Type::Array(a)) => {
+                // We don't render arrays, since it is a combination of another type.
+                // Let's ensure the items are a reference, otherwise we should render it.
+                if let Some(openapiv3::ReferenceOr::Item(s)) = &a.items {
+                    // We need to render the item.
+                    return self.render_schema(name, s);
+                }
+
+                Ok(quote!())
+            }
+            openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => {
+                // We don't render booleans yet, since it is a primitive type.
+                Ok(quote!())
+            }
+            openapiv3::SchemaKind::OneOf { one_of } => {
+                self.render_one_of(name, one_of, &schema.schema_data)
+            }
+            openapiv3::SchemaKind::AllOf { all_of } => {
+                self.render_all_of(name, all_of, &schema.schema_data)
+            }
+            openapiv3::SchemaKind::AnyOf { any_of } => {
+                self.render_any_of(name, any_of, &schema.schema_data)
+            }
+            openapiv3::SchemaKind::Not { not } => {
+                anyhow::bail!("XXX not not supported yet: {} => {:?}", name, not);
+            }
+            openapiv3::SchemaKind::Any(any) => self.render_any(name, any, &schema.schema_data),
         }
-        openapiv3::SchemaKind::Type(openapiv3::Type::Number(_n)) => {
-            // We don't render numbers yet, since it is a primitive type.
+    }
+
+    /// All of validates the value against all the subschemas.
+    fn render_all_of(
+        &mut self,
+        name: &str,
+        all_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
+        data: &openapiv3::SchemaData,
+    ) -> Result<proc_macro2::TokenStream> {
+        // If it's an all of with length 1, just use the type name.
+        if all_ofs.len() == 1 {
+            let first = if let openapiv3::ReferenceOr::Item(i) = &all_ofs[0] {
+                i.clone()
+            } else {
+                all_ofs[0].get_schema_from_reference(&self.spec, true)?
+            };
+
+            // Return the all_of type.
+            return self.render_schema(name, &first);
+        }
+
+        // The all of needs to be an object with all the values.
+        // We want to iterate over each of the subschemas and combine all of the types.
+        // We assume all of the subschemas are objects.
+        let mut properties: IndexMap<String, openapiv3::ReferenceOr<Box<openapiv3::Schema>>> =
+            IndexMap::new();
+        let mut required: Vec<String> = Vec::new();
+        for all_of in all_ofs {
+            // Get the schema for this all of.
+            let schema = all_of.get_schema_from_reference(&self.spec, true)?;
+
+            // Ensure the type is an object.
+            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
+                for (k, v) in o.properties.iter() {
+                    properties.insert(k.clone(), v.clone());
+                }
+                required.extend(o.required.iter().cloned());
+            } else {
+                // We got something that is not an object.
+                // Therefore we need to render this as a one of instead.
+                // Since it includes primitive types, we need to render this as a one of.
+                return self.render_one_of(name, all_ofs, data);
+            }
+        }
+
+        // Let's render the object.
+        self.render_object(
+            name,
+            &openapiv3::ObjectType {
+                properties,
+                required,
+                ..Default::default()
+            },
+            data,
+        )
+    }
+
+    /// Any of validates the value against any (one or more) of the subschemas.
+    fn render_any_of(
+        &mut self,
+        name: &str,
+        any_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
+        data: &openapiv3::SchemaData,
+    ) -> Result<proc_macro2::TokenStream> {
+        // If it's an any of with length 1, just use the type name.
+        if any_ofs.len() == 1 {
+            let first = any_ofs[0].item()?;
+            // Return the any_of type.
+            return self.render_schema(name, first);
+        }
+
+        // The any of needs to be an object with optional values since it can be any (one or more) of multiple types.
+        // We want to iterate over each of the subschemas and combine all of the types.
+        // We assume all of the subschemas are objects.
+        let mut properties: IndexMap<String, openapiv3::ReferenceOr<Box<openapiv3::Schema>>> =
+            IndexMap::new();
+        for any_of in any_ofs {
+            // Get the schema for this any of.
+            let schema = any_of.get_schema_from_reference(&self.spec, true)?;
+
+            // Ensure the type is an object.
+            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
+                for (k, v) in o.properties.iter() {
+                    properties.insert(k.clone(), v.clone());
+                }
+            } else {
+                // We got something that is not an object.
+                // Therefore we need to render this as a one of instead.
+                // Since it includes primitive types, we need to render this as a one of.
+                return self.render_one_of(name, any_ofs, data);
+            }
+        }
+
+        // Let's render the object.
+        self.render_object(
+            name,
+            &openapiv3::ObjectType {
+                properties,
+                ..Default::default()
+            },
+            data,
+        )
+    }
+
+    /// Render the full type for a one of.
+    fn render_one_of(
+        &mut self,
+        name: &str,
+        one_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
+        data: &openapiv3::SchemaData,
+    ) -> Result<proc_macro2::TokenStream> {
+        let description = if let Some(d) = &data.description {
+            quote!(#[doc = #d])
+        } else {
+            quote!()
+        };
+
+        // Get the proper name version of the type.
+        let one_of_name = get_type_name(name, data)?;
+
+        // Check if this this a one_of with a single item.
+        if one_ofs.len() == 1 {
+            let first = one_ofs[0].item()?;
+            // Return the one_of type.
+            return self.render_schema(name, first);
+        }
+
+        let tag_result = get_one_of_tag(one_ofs, &self.spec)?;
+
+        let mut serde_options = Vec::new();
+        // Add our tag if we have one.
+        if let Some(tag) = &tag_result.tag {
+            serde_options.push(quote!(tag = #tag))
+        }
+        if let Some(content) = &tag_result.content {
+            serde_options.push(quote!(content = #content))
+        }
+
+        let serde_options = if serde_options.is_empty() {
+            quote!()
+        } else {
+            quote!(#[serde(#(#serde_options),*)] )
+        };
+
+        let (_, values) = get_one_of_values(name, one_ofs, &self.spec, &tag_result)?;
+
+        let rendered = quote! {
+            #description
+            #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema, tabled::Tabled)]
+            #serde_options
+            pub enum #one_of_name {
+                #values
+            }
+        };
+
+        // Add the type to our type space.
+        if !self.types.contains_key(&one_of_name.to_string()) {
+            self.types.insert(
+                one_of_name.to_string(),
+                openapiv3::Schema {
+                    schema_data: data.clone(),
+                    schema_kind: openapiv3::SchemaKind::OneOf {
+                        one_of: one_ofs.clone(),
+                    },
+                },
+            );
+            Ok(rendered)
+        } else {
             Ok(quote!())
         }
-        openapiv3::SchemaKind::Type(openapiv3::Type::Integer(_i)) => {
-            // We don't render integers yet, since it is a primitive type.
-            Ok(quote!())
+    }
+
+    /// Render the full type for any.
+    fn render_any(
+        &mut self,
+        name: &str,
+        any: &openapiv3::AnySchema,
+        data: &openapiv3::SchemaData,
+    ) -> Result<proc_macro2::TokenStream> {
+        // The GitHub API is sometimes missing `type: object`.
+        // See: https://github.com/github/rest-api-description/issues/1354
+        // If we have properties, we can assume this is an object.
+        if !any.properties.is_empty() {
+            return self.render_object(
+                name,
+                &openapiv3::ObjectType {
+                    properties: any.properties.clone(),
+                    required: any.required.clone(),
+                    additional_properties: any.additional_properties.clone(),
+                    min_properties: any.min_properties,
+                    max_properties: any.max_properties,
+                },
+                data,
+            );
         }
-        openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
-            render_object(name, o, &schema.schema_data, spec)
+
+        anyhow::bail!("could not parse any: {} => {:?}", name, any);
+    }
+
+    /// Render the full type for an object.
+    fn render_object(
+        &mut self,
+        name: &str,
+        o: &openapiv3::ObjectType,
+        data: &openapiv3::SchemaData,
+    ) -> Result<proc_macro2::TokenStream> {
+        if let Some(min_properties) = o.min_properties {
+            log::warn!(
+                "min properties not supported for objects: {} => {:?}",
+                name,
+                min_properties
+            );
         }
-        openapiv3::SchemaKind::Type(openapiv3::Type::Array(a)) => {
-            // We don't render arrays, since it is a combination of another type.
-            // Let's ensure the items are a reference, otherwise we should render it.
-            if let Some(openapiv3::ReferenceOr::Item(s)) = &a.items {
-                // We need to render the item.
-                return render_schema(name, s, spec);
+
+        if let Some(max_properties) = o.max_properties {
+            log::warn!(
+                "max properties not supported for objects: {} => {:?}",
+                name,
+                max_properties
+            );
+        }
+
+        let description = if let Some(d) = &data.description {
+            quote!(#[doc = #d])
+        } else {
+            quote!()
+        };
+
+        // Get the proper name version of the name of the object.
+        let struct_name = get_type_name(name, data)?;
+
+        // If the object has no properties, but has additional_properties, just use that
+        // for the type.
+        if o.properties.is_empty() {
+            if let Some(additional_properties) = &o.additional_properties {
+                match additional_properties {
+                    openapiv3::AdditionalProperties::Any(_any) => {
+                        // The GitHub API has additional properties that are not actually
+                        // properties, but are instead literally empty.
+                        // This shows up as `any == true || any == false` in the spec.
+                        // We should just ignore these.
+                    }
+                    openapiv3::AdditionalProperties::Schema(schema) => {
+                        let rendered = self.render_schema(name, schema.item()?)?;
+                        return Ok(rendered);
+                    }
+                }
+            }
+        }
+
+        // Any additional types we should render.
+        let mut additional_types = quote!();
+
+        let mut values = quote!();
+        for (k, v) in &o.properties {
+            let prop = clean_property_name(k);
+
+            // Get the schema for the property.
+            let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
+                let s = &**i;
+                s.clone()
+            } else {
+                v.get_schema_from_reference(&self.spec, true)?
+            };
+
+            let prop_desc = if let Some(d) = &inner_schema.schema_data.description {
+                quote!(#[doc = #d])
+            } else {
+                quote!()
+            };
+
+            // Get the type name for the schema.
+            let mut type_name = if v.should_render(&self.spec)? {
+                let t = proper_name(&format!("{} {}", struct_name, prop));
+                // Render the schema.
+                let rendered = self.render_schema(&t, &inner_schema)?;
+                additional_types = quote! {
+                    #additional_types
+
+                    #rendered
+                };
+
+                t.parse().map_err(|e| anyhow::anyhow!("{}", e))?
+            } else if let openapiv3::ReferenceOr::Item(i) = v {
+                get_type_name_for_schema(&prop, i, &self.spec, true)?
+            } else {
+                get_type_name_from_reference(&v.reference()?, &self.spec, true)?
+            };
+
+            // Check if this type is required.
+            if !o.required.contains(k) && !type_name.is_option()? {
+                // Make the type optional.
+                type_name = quote!(Option<#type_name>);
+            }
+            let prop_ident = format_ident!("{}", prop);
+
+            let prop_value = quote!(
+                pub #prop_ident: #type_name,
+            );
+
+            let mut serde_props = Vec::<proc_macro2::TokenStream>::new();
+
+            if &prop != k {
+                serde_props.push(quote!(
+                    rename = #k
+                ));
             }
 
+            if type_name.is_option()? {
+                serde_props.push(quote!(default));
+                serde_props.push(quote!(skip_serializing_if = "Option::is_none"));
+            }
+
+            let serde_full = if serde_props.is_empty() {
+                quote!()
+            } else {
+                quote!(#[serde(#(#serde_props),*)])
+            };
+
+            values = quote!(
+                #values
+
+                #prop_desc
+                #serde_full
+                #prop_value
+            );
+        }
+
+        // Implement pagination for this type if we should.
+        let mut pagination = quote!();
+        let pagination_properties = PaginationProperties::from_object(o, &self.spec)?;
+        if pagination_properties.can_paginate() {
+            let page_item = pagination_properties.item_type(true)?;
+            let item_ident = pagination_properties.item_ident()?;
+            let next_page_str = pagination_properties.next_page_str()?;
+            let next_page_ident = format_ident!("{}", next_page_str);
+
+            pagination = quote!(
+                impl crate::types::paginate::Pagination for #struct_name {
+                    type Item = #page_item;
+
+                    fn has_more_pages(&self) -> bool {
+                        self.next_page.is_some()
+                    }
+
+                    fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+                        let mut req = req.try_clone().ok_or_else(|| crate::types::error::Error::InvalidRequest(format!("failed to clone request: {:?}", req)))?;
+                        req.url_mut().query_pairs_mut()
+                            .append_pair(#next_page_str, self.#next_page_ident.as_deref().unwrap_or(""));
+
+                        Ok(req)
+                    }
+
+                    fn items(&self) -> Vec<Self::Item> {
+                        self.#item_ident.clone()
+                    }
+                }
+            );
+        }
+
+        let length: proc_macro2::TokenStream = o
+            .properties
+            .len()
+            .to_string()
+            .parse()
+            .map_err(|err| anyhow::anyhow!("{}", err))?;
+        // Let's implement the tabled trait for the object.
+        let mut headers = Vec::new();
+        let mut fields = Vec::new();
+        for (k, v) in &o.properties {
+            let prop = clean_property_name(k);
+            let prop_ident = format_ident!("{}", prop);
+            headers.push(quote!(#prop.to_string()));
+
+            // Get the schema for the property.
+            let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
+                let s = &**i;
+                s.clone()
+            } else {
+                v.get_schema_from_reference(&self.spec, true)?
+            };
+
+            // Get the type name for the schema.
+            let type_name = get_type_name_for_schema(&prop, &inner_schema, &self.spec, true)?;
+            // Check if this type is required.
+            if o.required.contains(k) && type_name.is_string()? {
+                fields.push(quote!(
+                    self.#prop_ident.clone()
+                ));
+            } else if !o.required.contains(k)
+                && type_name.rendered()? != "phone_number::PhoneNumber"
+            {
+                fields.push(quote!(
+                    if let Some(#prop_ident) = &self.#prop_ident {
+                        format!("{:?}", #prop_ident)
+                    } else {
+                        String::new()
+                    }
+                ));
+            } else if type_name.rendered()? == "PhoneNumber" {
+                fields.push(quote!(
+                    self.#prop_ident.to_string()
+                ));
+            } else {
+                fields.push(quote!(format!("{:?}", self.#prop_ident)));
+            }
+        }
+
+        let tabled = quote! {
+            impl tabled::Tabled for #struct_name {
+                const LENGTH: usize = #length;
+
+                fn fields(&self) -> Vec<String> {
+                    vec![
+                        #(#fields),*
+                    ]
+                }
+                fn headers() -> Vec<String> {
+                    vec![
+                        #(#headers),*
+                    ]
+                }
+            }
+        };
+
+        let rendered = quote! {
+            #additional_types
+
+            #description
+            #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema)]
+            pub struct #struct_name {
+                #values
+            }
+
+            impl std::fmt::Display for #struct_name {
+                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+                    write!(f, "{}", serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?)
+                }
+            }
+
+            #pagination
+
+            #tabled
+        };
+
+        // Add the type to the list of types, if it doesn't already exist.
+        if !self.types.contains_key(&struct_name.to_string()) {
+            self.types.insert(
+                struct_name.to_string(),
+                openapiv3::Schema {
+                    schema_data: data.clone(),
+                    schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(o.clone())),
+                },
+            );
+
+            Ok(rendered)
+        } else {
+            Ok(quote!(#additional_types))
+        }
+    }
+
+    /// Render a string type.
+    fn render_string_type(
+        &mut self,
+        name: &str,
+        s: &openapiv3::StringType,
+        data: &openapiv3::SchemaData,
+    ) -> Result<proc_macro2::TokenStream> {
+        if !s.enumeration.is_empty() {
+            return self.render_enum(name, s, data);
+        }
+
+        if let Some(ref max_length) = s.max_length {
+            log::warn!(
+                "XXX max_length not supported here yet: {} => {:?}",
+                name,
+                max_length
+            );
+        }
+
+        if let Some(ref min_length) = s.min_length {
+            log::warn!(
+                "XXX min_length not supported here yet: {} => {:?}",
+                name,
+                min_length
+            );
+        }
+
+        // We don't render primitives yet.
+        Ok(quote!())
+    }
+
+    /// Render the full type for an enum.
+    fn render_enum(
+        &mut self,
+        name: &str,
+        s: &openapiv3::StringType,
+        data: &openapiv3::SchemaData,
+    ) -> Result<proc_macro2::TokenStream> {
+        if s.enumeration.is_empty() {
+            anyhow::bail!("Cannot render empty string enumeration: {}", name);
+        }
+
+        let description = if let Some(d) = &data.description {
+            quote!(#[doc = #d])
+        } else {
+            quote!()
+        };
+
+        // Get the proper name version of the name of the enum.
+        let enum_name = get_type_name(name, data)?;
+
+        let mut values = quote!();
+        for e in &s.enumeration {
+            if e.is_none() {
+                // GitHub will sometimes put in a null value.
+                // But it's fine because they also mark it as null.
+                // Just in case tho let's ensure it's marked as nullable.
+                if !data.nullable {
+                    anyhow::bail!("enum `{}` is not nullable, but it has a null value", name);
+                }
+
+                // We can continue early.
+                continue;
+            }
+
+            let e = e.as_ref().unwrap().to_string();
+
+            let e_name = format_ident!("{}", proper_name(&e));
+            let mut e_value = quote!(
+                #e_name,
+            );
+            if proper_name(&e) != e {
+                e_value = quote!(
+                    #[serde(rename = #e)]
+                    #[display(#e)]
+                    #e_value
+                );
+            }
+
+            values = quote!(
+                #values
+
+                #e_value
+            );
+        }
+
+        // If the data for the enum has a default value, implement default for the enum.
+        let default = if let Some(default) = &data.default {
+            let default = default.to_string();
+            let default = format_ident!("{}", proper_name(&default));
+            quote!(
+                impl std::default::Default for #enum_name {
+                    fn default() -> Self {
+                        #default
+                    }
+                }
+            )
+        } else if s.enumeration.len() == 1 {
+            let default = s.enumeration[0].as_ref().unwrap().to_string();
+            let default = format_ident!("{}", proper_name(&default));
+            quote!(
+                impl std::default::Default for #enum_name {
+                    fn default() -> Self {
+                        #enum_name::#default
+                    }
+                }
+            )
+        } else {
+            quote!()
+        };
+
+        let rendered = quote! {
+            #description
+            #[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Hash, Debug, Clone, schemars::JsonSchema, tabled::Tabled, clap::ValueEnum, parse_display::FromStr, parse_display::Display)]
+            pub enum #enum_name {
+                #values
+            }
+
+            #default
+        };
+
+        // Add the type to the list of types, if it doesn't already exist.
+        if !self.types.contains_key(&enum_name.to_string()) {
+            self.types.insert(
+                enum_name.to_string(),
+                openapiv3::Schema {
+                    schema_data: data.clone(),
+                    schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::String(s.clone())),
+                },
+            );
+
+            Ok(rendered)
+        } else {
             Ok(quote!())
         }
-        openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => {
-            // We don't render booleans yet, since it is a primitive type.
-            Ok(quote!())
+    }
+
+    /// Render the full type for a response.
+    fn render_response(
+        &mut self,
+        name: &str,
+        response: &openapiv3::Response,
+    ) -> Result<proc_macro2::TokenStream> {
+        let mut responses = quote!();
+
+        for (content_name, content) in &response.content {
+            if let Some(openapiv3::ReferenceOr::Item(i)) = &content.schema {
+                // If the schema is a reference we don't care, since we would have already rendered
+                // that reference.
+                let rendered = self.render_schema(&format!("{}_{}", name, content_name), i)?;
+                responses = quote!(
+                    #responses
+
+                    #rendered
+                );
+            }
         }
-        openapiv3::SchemaKind::OneOf { one_of } => {
-            render_one_of(name, one_of, &schema.schema_data, spec)
+
+        Ok(responses)
+    }
+
+    /// Render the full type for a request body.
+    fn render_request_body(
+        &mut self,
+        name: &str,
+        request_body: &openapiv3::RequestBody,
+    ) -> Result<proc_macro2::TokenStream> {
+        let mut request_bodies = quote!();
+
+        for (content_name, content) in &request_body.content {
+            if let Some(openapiv3::ReferenceOr::Item(i)) = &content.schema {
+                // If the schema is a reference we don't care, since we would have already rendered
+                // that reference.
+                let rendered = self.render_schema(&format!("{}_{}", name, content_name), i)?;
+                request_bodies = quote!(
+                    #request_bodies
+
+                    #rendered
+                );
+            }
         }
-        openapiv3::SchemaKind::AllOf { all_of } => {
-            render_all_of(name, all_of, &schema.schema_data, spec)
-        }
-        openapiv3::SchemaKind::AnyOf { any_of } => {
-            render_any_of(name, any_of, &schema.schema_data, spec)
-        }
-        openapiv3::SchemaKind::Not { not } => {
-            anyhow::bail!("XXX not not supported yet: {} => {:?}", name, not);
-        }
-        openapiv3::SchemaKind::Any(any) => render_any(name, any, &schema.schema_data, spec),
+
+        Ok(request_bodies)
     }
 }
 
@@ -210,36 +873,6 @@ pub fn get_type_name_for_schema(
     } else {
         Ok(t)
     }
-}
-
-/// Render a string type.
-fn render_string_type(
-    name: &str,
-    s: &openapiv3::StringType,
-    data: &openapiv3::SchemaData,
-) -> Result<proc_macro2::TokenStream> {
-    if !s.enumeration.is_empty() {
-        return render_enum(name, s, data);
-    }
-
-    if let Some(ref max_length) = s.max_length {
-        log::warn!(
-            "XXX max_length not supported here yet: {} => {:?}",
-            name,
-            max_length
-        );
-    }
-
-    if let Some(ref min_length) = s.min_length {
-        log::warn!(
-            "XXX min_length not supported here yet: {} => {:?}",
-            name,
-            min_length
-        );
-    }
-
-    // We don't render primitives yet.
-    Ok(quote!())
 }
 
 /// Get the type name for a string type.
@@ -548,159 +1181,6 @@ fn get_type_name_for_array(
     };
 
     Ok(quote!(Vec<#t>))
-}
-
-/// All of validates the value against all the subschemas.
-fn render_all_of(
-    name: &str,
-    all_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
-    data: &openapiv3::SchemaData,
-    spec: &openapiv3::OpenAPI,
-) -> Result<proc_macro2::TokenStream> {
-    // If it's an all of with length 1, just use the type name.
-    if all_ofs.len() == 1 {
-        let first = all_ofs[0].item()?;
-        // Return the all_of type.
-        return render_schema(name, first, spec);
-    }
-
-    // The all of needs to be an object with all the values.
-    // We want to iterate over each of the subschemas and combine all of the types.
-    // We assume all of the subschemas are objects.
-    let mut properties: IndexMap<String, openapiv3::ReferenceOr<Box<openapiv3::Schema>>> =
-        IndexMap::new();
-    let mut required: Vec<String> = Vec::new();
-    for all_of in all_ofs {
-        // Get the schema for this all of.
-        let schema = all_of.get_schema_from_reference(spec, true)?;
-
-        // Ensure the type is an object.
-        if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
-            for (k, v) in o.properties.iter() {
-                properties.insert(k.clone(), v.clone());
-            }
-            required.extend(o.required.iter().cloned());
-        } else {
-            // We got something that is not an object.
-            // Therefore we need to render this as a one of instead.
-            // Since it includes primitive types, we need to render this as a one of.
-            return render_one_of(name, all_ofs, data, spec);
-        }
-    }
-
-    // Let's render the object.
-    render_object(
-        name,
-        &openapiv3::ObjectType {
-            properties,
-            required,
-            ..Default::default()
-        },
-        data,
-        spec,
-    )
-}
-
-/// Any of validates the value against any (one or more) of the subschemas.
-fn render_any_of(
-    name: &str,
-    any_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
-    data: &openapiv3::SchemaData,
-    spec: &openapiv3::OpenAPI,
-) -> Result<proc_macro2::TokenStream> {
-    // If it's an any of with length 1, just use the type name.
-    if any_ofs.len() == 1 {
-        let first = any_ofs[0].item()?;
-        // Return the any_of type.
-        return render_schema(name, first, spec);
-    }
-
-    // The any of needs to be an object with optional values since it can be any (one or more) of multiple types.
-    // We want to iterate over each of the subschemas and combine all of the types.
-    // We assume all of the subschemas are objects.
-    let mut properties: IndexMap<String, openapiv3::ReferenceOr<Box<openapiv3::Schema>>> =
-        IndexMap::new();
-    for any_of in any_ofs {
-        // Get the schema for this any of.
-        let schema = any_of.get_schema_from_reference(spec, true)?;
-
-        // Ensure the type is an object.
-        if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
-            for (k, v) in o.properties.iter() {
-                properties.insert(k.clone(), v.clone());
-            }
-        } else {
-            // We got something that is not an object.
-            // Therefore we need to render this as a one of instead.
-            // Since it includes primitive types, we need to render this as a one of.
-            return render_one_of(name, any_ofs, data, spec);
-        }
-    }
-
-    // Let's render the object.
-    render_object(
-        name,
-        &openapiv3::ObjectType {
-            properties,
-            ..Default::default()
-        },
-        data,
-        spec,
-    )
-}
-
-/// Render the full type for a one of.
-fn render_one_of(
-    name: &str,
-    one_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
-    data: &openapiv3::SchemaData,
-    spec: &openapiv3::OpenAPI,
-) -> Result<proc_macro2::TokenStream> {
-    let description = if let Some(d) = &data.description {
-        quote!(#[doc = #d])
-    } else {
-        quote!()
-    };
-
-    // Get the proper name version of the type.
-    let one_of_name = get_type_name(name, data)?;
-
-    // Check if this this a one_of with a single item.
-    if one_ofs.len() == 1 {
-        let first = one_ofs[0].item()?;
-        // Return the one_of type.
-        return render_schema(name, first, spec);
-    }
-
-    let tag_result = get_one_of_tag(one_ofs, spec)?;
-
-    let mut serde_options = Vec::new();
-    // Add our tag if we have one.
-    if let Some(tag) = &tag_result.tag {
-        serde_options.push(quote!(tag = #tag))
-    }
-    if let Some(content) = &tag_result.content {
-        serde_options.push(quote!(content = #content))
-    }
-
-    let serde_options = if serde_options.is_empty() {
-        quote!()
-    } else {
-        quote!(#[serde(#(#serde_options),*)] )
-    };
-
-    let (_, values) = get_one_of_values(name, one_ofs, spec, &tag_result)?;
-
-    let rendered = quote! {
-        #description
-        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema, tabled::Tabled)]
-        #serde_options
-        pub enum #one_of_name {
-            #values
-        }
-    };
-
-    Ok(rendered)
 }
 
 // Render the internal enum type for an object.
@@ -1014,313 +1494,6 @@ fn get_one_of_values(
     Ok((values, rendered_value))
 }
 
-/// Render the full type for any.
-fn render_any(
-    name: &str,
-    any: &openapiv3::AnySchema,
-    data: &openapiv3::SchemaData,
-    spec: &openapiv3::OpenAPI,
-) -> Result<proc_macro2::TokenStream> {
-    // The GitHub API is sometimes missing `type: object`.
-    // See: https://github.com/github/rest-api-description/issues/1354
-    // If we have properties, we can assume this is an object.
-    if !any.properties.is_empty() {
-        return render_object(
-            name,
-            &openapiv3::ObjectType {
-                properties: any.properties.clone(),
-                required: any.required.clone(),
-                additional_properties: any.additional_properties.clone(),
-                min_properties: any.min_properties,
-                max_properties: any.max_properties,
-            },
-            data,
-            spec,
-        );
-    }
-
-    anyhow::bail!("could not parse any: {} => {:?}", name, any);
-}
-
-/// Render the full type for an object.
-fn render_object(
-    name: &str,
-    o: &openapiv3::ObjectType,
-    data: &openapiv3::SchemaData,
-    spec: &openapiv3::OpenAPI,
-) -> Result<proc_macro2::TokenStream> {
-    if let Some(min_properties) = o.min_properties {
-        log::warn!(
-            "min properties not supported for objects: {} => {:?}",
-            name,
-            min_properties
-        );
-    }
-
-    if let Some(max_properties) = o.max_properties {
-        log::warn!(
-            "max properties not supported for objects: {} => {:?}",
-            name,
-            max_properties
-        );
-    }
-
-    let description = if let Some(d) = &data.description {
-        quote!(#[doc = #d])
-    } else {
-        quote!()
-    };
-
-    // Get the proper name version of the name of the object.
-    let struct_name = get_type_name(name, data)?;
-
-    // If the object has no properties, but has additional_properties, just use that
-    // for the type.
-    if o.properties.is_empty() {
-        if let Some(additional_properties) = &o.additional_properties {
-            match additional_properties {
-                openapiv3::AdditionalProperties::Any(_any) => {
-                    // The GitHub API has additional properties that are not actually
-                    // properties, but are instead literally empty.
-                    // This shows up as `any == true || any == false` in the spec.
-                    // We should just ignore these.
-                }
-                openapiv3::AdditionalProperties::Schema(schema) => {
-                    let rendered = render_schema(name, schema.item()?, spec)?;
-                    return Ok(rendered);
-                }
-            }
-        }
-    }
-
-    let mut values = quote!();
-    for (k, v) in &o.properties {
-        let prop = clean_property_name(k);
-
-        // Get the schema for the property.
-        let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
-            let s = &**i;
-            s.clone()
-        } else {
-            v.get_schema_from_reference(spec, true)?
-        };
-
-        let prop_desc = if let Some(d) = &inner_schema.schema_data.description {
-            quote!(#[doc = #d])
-        } else {
-            quote!()
-        };
-
-        // Get the type name for the schema.
-        let mut type_name = if let openapiv3::ReferenceOr::Item(i) = v {
-            get_type_name_for_schema(&prop, i, spec, true)?
-        } else {
-            get_type_name_from_reference(&v.reference()?, spec, true)?
-        };
-
-        // Check if this type is required.
-        if !o.required.contains(k) && !type_name.is_option()? {
-            // Make the type optional.
-            type_name = quote!(Option<#type_name>);
-        }
-        let prop_ident = format_ident!("{}", prop);
-
-        let prop_value = quote!(
-            pub #prop_ident: #type_name,
-        );
-
-        let mut serde_props = Vec::<proc_macro2::TokenStream>::new();
-
-        if &prop != k {
-            serde_props.push(quote!(
-                rename = #k
-            ));
-        }
-
-        if type_name.is_option()? {
-            serde_props.push(quote!(default));
-            serde_props.push(quote!(skip_serializing_if = "Option::is_none"));
-        }
-
-        let serde_full = if serde_props.is_empty() {
-            quote!()
-        } else {
-            quote!(#[serde(#(#serde_props),*)])
-        };
-
-        values = quote!(
-            #values
-
-            #prop_desc
-            #serde_full
-            #prop_value
-        );
-    }
-
-    // Implement pagination for this type if we should.
-    let mut pagination = quote!();
-    let pagination_properties = PaginationProperties::from_object(o, spec)?;
-    if pagination_properties.can_paginate() {
-        let page_item = pagination_properties.item_type(true)?;
-        let item_ident = pagination_properties.item_ident()?;
-        let next_page_str = pagination_properties.next_page_str()?;
-        let next_page_ident = format_ident!("{}", next_page_str);
-
-        pagination = quote!(
-            impl crate::types::paginate::Pagination for #struct_name {
-                type Item = #page_item;
-
-                fn has_more_pages(&self) -> bool {
-                    self.next_page.is_some()
-                }
-
-                fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-                    let mut req = req.try_clone().ok_or_else(|| crate::types::error::Error::InvalidRequest(format!("failed to clone request: {:?}", req)))?;
-                    req.url_mut().query_pairs_mut()
-                        .append_pair(#next_page_str, self.#next_page_ident.as_deref().unwrap_or(""));
-
-                    Ok(req)
-                }
-
-                fn items(&self) -> Vec<Self::Item> {
-                    self.#item_ident.clone()
-                }
-            }
-        );
-    }
-
-    let length: proc_macro2::TokenStream = o
-        .properties
-        .len()
-        .to_string()
-        .parse()
-        .map_err(|err| anyhow::anyhow!("{}", err))?;
-    // Let's implement the tabled trait for the object.
-    let mut headers = Vec::new();
-    let mut fields = Vec::new();
-    for (k, v) in &o.properties {
-        let prop = clean_property_name(k);
-        let prop_ident = format_ident!("{}", prop);
-        headers.push(quote!(#prop.to_string()));
-
-        // Get the schema for the property.
-        let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
-            let s = &**i;
-            s.clone()
-        } else {
-            v.get_schema_from_reference(spec, true)?
-        };
-
-        // Get the type name for the schema.
-        let type_name = get_type_name_for_schema(&prop, &inner_schema, spec, true)?;
-        // Check if this type is required.
-        if o.required.contains(k) && type_name.is_string()? {
-            fields.push(quote!(
-                self.#prop_ident.clone()
-            ));
-        } else if !o.required.contains(k) && type_name.rendered()? != "phone_number::PhoneNumber" {
-            fields.push(quote!(
-                if let Some(#prop_ident) = &self.#prop_ident {
-                    format!("{:?}", #prop_ident)
-                } else {
-                    String::new()
-                }
-            ));
-        } else if type_name.rendered()? == "PhoneNumber" {
-            fields.push(quote!(
-                self.#prop_ident.to_string()
-            ));
-        } else {
-            fields.push(quote!(format!("{:?}", self.#prop_ident)));
-        }
-    }
-
-    let tabled = quote! {
-        impl tabled::Tabled for #struct_name {
-            const LENGTH: usize = #length;
-
-            fn fields(&self) -> Vec<String> {
-                vec![
-                    #(#fields),*
-                ]
-            }
-            fn headers() -> Vec<String> {
-                vec![
-                    #(#headers),*
-                ]
-            }
-        }
-    };
-
-    let rendered = quote! {
-        #description
-        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema)]
-        pub struct #struct_name {
-            #values
-        }
-
-        impl std::fmt::Display for #struct_name {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-                write!(f, "{}", serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?)
-            }
-        }
-
-        #pagination
-
-        #tabled
-    };
-
-    Ok(rendered)
-}
-
-/// Render the full type for a response.
-fn render_response(
-    name: &str,
-    response: &openapiv3::Response,
-    spec: &openapiv3::OpenAPI,
-) -> Result<proc_macro2::TokenStream> {
-    let mut responses = quote!();
-
-    for (content_name, content) in &response.content {
-        if let Some(openapiv3::ReferenceOr::Item(i)) = &content.schema {
-            // If the schema is a reference we don't care, since we would have already rendered
-            // that reference.
-            let rendered = render_schema(&format!("{}_{}", name, content_name), i, spec)?;
-            responses = quote!(
-                #responses
-
-                #rendered
-            );
-        }
-    }
-
-    Ok(responses)
-}
-
-/// Render the full type for a request body.
-fn render_request_body(
-    name: &str,
-    request_body: &openapiv3::RequestBody,
-    spec: &openapiv3::OpenAPI,
-) -> Result<proc_macro2::TokenStream> {
-    let mut request_bodies = quote!();
-
-    for (content_name, content) in &request_body.content {
-        if let Some(openapiv3::ReferenceOr::Item(i)) = &content.schema {
-            // If the schema is a reference we don't care, since we would have already rendered
-            // that reference.
-            let rendered = render_schema(&format!("{}_{}", name, content_name), i, spec)?;
-            request_bodies = quote!(
-                #request_bodies
-
-                #rendered
-            );
-        }
-    }
-
-    Ok(request_bodies)
-}
-
 /// Clean a property name for an object so we can use it in rust.
 pub fn clean_property_name(s: &str) -> String {
     let mut prop = s.trim().to_string();
@@ -1361,98 +1534,6 @@ pub fn clean_property_name(s: &str) -> String {
     }
 
     prop
-}
-
-/// Render the full type for an enum.
-fn render_enum(
-    name: &str,
-    s: &openapiv3::StringType,
-    data: &openapiv3::SchemaData,
-) -> Result<proc_macro2::TokenStream> {
-    if s.enumeration.is_empty() {
-        anyhow::bail!("Cannot render empty string enumeration: {}", name);
-    }
-
-    let description = if let Some(d) = &data.description {
-        quote!(#[doc = #d])
-    } else {
-        quote!()
-    };
-
-    // Get the proper name version of the name of the enum.
-    let enum_name = get_type_name(name, data)?;
-
-    let mut values = quote!();
-    for e in &s.enumeration {
-        if e.is_none() {
-            // GitHub will sometimes put in a null value.
-            // But it's fine because they also mark it as null.
-            // Just in case tho let's ensure it's marked as nullable.
-            if !data.nullable {
-                anyhow::bail!("enum `{}` is not nullable, but it has a null value", name);
-            }
-
-            // We can continue early.
-            continue;
-        }
-
-        let e = e.as_ref().unwrap().to_string();
-
-        let e_name = format_ident!("{}", proper_name(&e));
-        let mut e_value = quote!(
-            #e_name,
-        );
-        if proper_name(&e) != e {
-            e_value = quote!(
-                #[serde(rename = #e)]
-                #[display(#e)]
-                #e_value
-            );
-        }
-
-        values = quote!(
-            #values
-
-            #e_value
-        );
-    }
-
-    // If the data for the enum has a default value, implement default for the enum.
-    let default = if let Some(default) = &data.default {
-        let default = default.to_string();
-        let default = format_ident!("{}", proper_name(&default));
-        quote!(
-            impl std::default::Default for #enum_name {
-                fn default() -> Self {
-                    #default
-                }
-            }
-        )
-    } else if s.enumeration.len() == 1 {
-        let default = s.enumeration[0].as_ref().unwrap().to_string();
-        let default = format_ident!("{}", proper_name(&default));
-        quote!(
-            impl std::default::Default for #enum_name {
-                fn default() -> Self {
-                    #enum_name::#default
-                }
-            }
-        )
-    } else {
-        quote!()
-    };
-
-    let rendered = quote! {
-        #description
-        #[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Hash, Debug, Clone, schemars::JsonSchema, tabled::Tabled, clap::ValueEnum, parse_display::FromStr, parse_display::Display)]
-        pub enum #enum_name {
-            #values
-        }
-
-        #default
-    };
-
-    Ok(rendered)
 }
 
 /// Return a proper rust name for a string.
@@ -1841,78 +1922,16 @@ mod test {
 
     #[test]
     fn test_schema_parsing_with_refs() {
-        let schema = r##"{
-        "description": "A route defines a rule that governs where traffic should be sent based on its destination.",
-        "type": "object",
-        "properties": {
-          "description": {
-            "description": "human-readable free-form text about a resource",
-            "type": "string"
-          },
-          "destination": {
-            "$ref": "#/components/schemas/RouteDestination"
-          },
-          "id": {
-            "description": "unique, immutable, system-controlled identifier for each resource",
-            "type": "string",
-            "format": "uuid"
-          },
-          "kind": {
-            "description": "Describes the kind of router. Set at creation. `read-only`",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RouterRouteKind"
-              }
-            ]
-          },
-          "name": {
-            "description": "unique, mutable, user-controlled identifier for each resource",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Name"
-              }
-            ]
-          },
-          "target": {
-            "$ref": "#/components/schemas/RouteTarget"
-          },
-          "time_created": {
-            "description": "timestamp when this resource was created",
-            "type": "string",
-            "format": "date-time"
-          },
-          "time_modified": {
-            "description": "timestamp when this resource was last modified",
-            "type": "string",
-            "format": "date-time"
-          },
-          "vpc_router_id": {
-            "description": "The VPC Router to which the route belongs.",
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "required": [
-          "description",
-          "destination",
-          "id",
-          "kind",
-          "name",
-          "target",
-          "time_created",
-          "time_modified",
-          "vpc_router_id"
-        ]
-      }"##;
+        let schema = include_str!("../../tests/types/input/RouterRoute.json");
 
         let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
 
-        let result = super::render_schema(
-            "RouterRoute",
-            &schema,
-            &crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
-        )
-        .unwrap();
+        let mut type_space = super::TypeSpace {
+            types: indexmap::map::IndexMap::new(),
+            spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
+        };
+
+        let result = type_space.render_schema("RouterRoute", &schema).unwrap();
 
         expectorate::assert_contents(
             "tests/types/oxide.router-route.rs.gen",
@@ -1945,12 +1964,12 @@ mod test {
 
         let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
 
-        let result = super::render_schema(
-            "IpNet",
-            &schema,
-            &crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
-        )
-        .unwrap();
+        let mut type_space = super::TypeSpace {
+            types: indexmap::map::IndexMap::new(),
+            spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
+        };
+
+        let result = type_space.render_schema("IpNet", &schema).unwrap();
 
         expectorate::assert_contents(
             "tests/types/oxide.ip-net.rs.gen",
@@ -1960,116 +1979,18 @@ mod test {
 
     #[test]
     fn test_schema_parsing_one_of_with_tag_content() {
-        let schema = r##"{
-        "description": "A `VpcFirewallRuleTarget` is used to specify the set of [`Instance`]s to which a firewall rule applies.",
-        "oneOf": [
-          {
-            "description": "The rule applies to all instances in the VPC",
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "vpc"
-                ]
-              },
-              "value": {
-                "$ref": "#/components/schemas/Name"
-              }
-            },
-            "required": [
-              "type",
-              "value"
-            ]
-          },
-          {
-            "description": "The rule applies to all instances in the VPC Subnet",
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "subnet"
-                ]
-              },
-              "value": {
-                "$ref": "#/components/schemas/Name"
-              }
-            },
-            "required": [
-              "type",
-              "value"
-            ]
-          },
-          {
-            "description": "The rule applies to this specific instance",
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "instance"
-                ]
-              },
-              "value": {
-                "$ref": "#/components/schemas/Name"
-              }
-            },
-            "required": [
-              "type",
-              "value"
-            ]
-          },
-          {
-            "description": "The rule applies to a specific IP address",
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "ip"
-                ]
-              },
-              "value": {
-                "type": "string",
-                "format": "ip"
-              }
-            },
-            "required": [
-              "type",
-              "value"
-            ]
-          },
-          {
-            "description": "The rule applies to a specific IP subnet",
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "ip_net"
-                ]
-              },
-              "value": {
-                "$ref": "#/components/schemas/IpNet"
-              }
-            },
-            "required": [
-              "type",
-              "value"
-            ]
-          }
-        ]
-      }"##;
+        let schema = include_str!("../../tests/types/input/VpcFirewallRuleTarget.json");
 
         let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
 
-        let result = super::render_schema(
-            "VpcFirewallRuleTarget",
-            &schema,
-            &crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
-        )
-        .unwrap();
+        let mut type_space = super::TypeSpace {
+            types: indexmap::map::IndexMap::new(),
+            spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
+        };
+
+        let result = type_space
+            .render_schema("VpcFirewallRuleTarget", &schema)
+            .unwrap();
 
         expectorate::assert_contents(
             "tests/types/oxide.vpc-filewall-rule-target.rs.gen",
@@ -2079,385 +2000,61 @@ mod test {
 
     #[test]
     fn test_schema_parsing_one_of_with_tag_no_content() {
+        let schema = include_str!("../../tests/types/input/AsyncApiCallOutput.json");
+
+        let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
+
+        let mut type_space = super::TypeSpace {
+            types: indexmap::map::IndexMap::new(),
+            spec: crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
+        };
+
+        let result = type_space
+            .render_schema("AsyncApiCallOutput", &schema)
+            .unwrap();
+
+        expectorate::assert_contents(
+            "tests/types/kittycad.async-api-call-output.rs.gen",
+            &super::get_text_fmt(&result).unwrap(),
+        );
+    }
+
+    #[test]
+    fn test_schema_parsing_one_of_enum_needs_gen() {
         let schema = r##"{
-        "description": "The output from the async API call.",
         "oneOf": [
           {
-            "description": "A file conversion.",
+            "type": "object",
             "properties": {
-              "completed_at": {
-                "description": "The time and date the file conversion was completed.",
-                "format": "date-time",
-                "nullable": true,
-                "title": "DateTime",
-                "type": "string"
-              },
-              "created_at": {
-                "description": "The time and date the file conversion was created.",
-                "format": "date-time",
-                "title": "DateTime",
-                "type": "string"
-              },
-              "error": {
-                "description": "The error the function returned, if any.",
-                "nullable": true,
-                "type": "string"
-              },
-              "id": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Uuid"
-                  }
-                ],
-                "description": "The unique identifier of the file conversion.\n\nThis is the same as the API call ID."
-              },
-              "output": {
-                "description": "The converted file, if completed, base64 encoded.",
-                "format": "byte",
-                "nullable": true,
-                "title": "String",
-                "type": "string"
-              },
-              "output_format": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/FileOutputFormat"
-                  }
-                ],
-                "description": "The output format of the file conversion."
-              },
-              "src_format": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/FileSourceFormat"
-                  }
-                ],
-                "description": "The source format of the file conversion."
-              },
-              "started_at": {
-                "description": "The time and date the file conversion was started.",
-                "format": "date-time",
-                "nullable": true,
-                "title": "DateTime",
-                "type": "string"
-              },
-              "status": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/ApiCallStatus"
-                  }
-                ],
-                "description": "The status of the file conversion."
-              },
               "type": {
+                "type": "string",
                 "enum": [
-                  "FileConversion"
-                ],
-                "type": "string"
+                  "sha256"
+                ]
               },
-              "updated_at": {
-                "description": "The time and date the file conversion was last updated.",
-                "format": "date-time",
-                "title": "DateTime",
-                "type": "string"
-              },
-              "user_id": {
-                "description": "The user ID of the user who created the file conversion.",
+              "value": {
                 "type": "string"
               }
             },
             "required": [
-              "created_at",
-              "id",
-              "output_format",
-              "src_format",
-              "status",
               "type",
-              "updated_at"
-            ],
-            "type": "object"
-          },
-          {
-            "description": "A file mass.",
-            "properties": {
-              "completed_at": {
-                "description": "The time and date the mass was completed.",
-                "format": "date-time",
-                "nullable": true,
-                "title": "DateTime",
-                "type": "string"
-              },
-              "created_at": {
-                "description": "The time and date the mass was created.",
-                "format": "date-time",
-                "title": "DateTime",
-                "type": "string"
-              },
-              "error": {
-                "description": "The error the function returned, if any.",
-                "nullable": true,
-                "type": "string"
-              },
-              "id": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Uuid"
-                  }
-                ],
-                "description": "The unique identifier of the mass request.\n\nThis is the same as the API call ID."
-              },
-              "mass": {
-                "description": "The resulting mass.",
-                "format": "double",
-                "nullable": true,
-                "type": "number"
-              },
-              "material_density": {
-                "default": 0.0,
-                "description": "The material density as denoted by the user.",
-                "format": "float",
-                "type": "number"
-              },
-              "src_format": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/FileSourceFormat"
-                  }
-                ],
-                "description": "The source format of the file."
-              },
-              "started_at": {
-                "description": "The time and date the mass was started.",
-                "format": "date-time",
-                "nullable": true,
-                "title": "DateTime",
-                "type": "string"
-              },
-              "status": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/ApiCallStatus"
-                  }
-                ],
-                "description": "The status of the mass."
-              },
-              "type": {
-                "enum": [
-                  "FileMass"
-                ],
-                "type": "string"
-              },
-              "updated_at": {
-                "description": "The time and date the mass was last updated.",
-                "format": "date-time",
-                "title": "DateTime",
-                "type": "string"
-              },
-              "user_id": {
-                "description": "The user ID of the user who created the mass.",
-                "type": "string"
-              }
-            },
-            "required": [
-              "created_at",
-              "id",
-              "src_format",
-              "status",
-              "type",
-              "updated_at"
-            ],
-            "type": "object"
-          },
-          {
-            "description": "A file volume.",
-            "properties": {
-              "completed_at": {
-                "description": "The time and date the volume was completed.",
-                "format": "date-time",
-                "nullable": true,
-                "title": "DateTime",
-                "type": "string"
-              },
-              "created_at": {
-                "description": "The time and date the volume was created.",
-                "format": "date-time",
-                "title": "DateTime",
-                "type": "string"
-              },
-              "error": {
-                "description": "The error the function returned, if any.",
-                "nullable": true,
-                "type": "string"
-              },
-              "id": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Uuid"
-                  }
-                ],
-                "description": "The unique identifier of the volume request.\n\nThis is the same as the API call ID."
-              },
-              "src_format": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/FileSourceFormat"
-                  }
-                ],
-                "description": "The source format of the file."
-              },
-              "started_at": {
-                "description": "The time and date the volume was started.",
-                "format": "date-time",
-                "nullable": true,
-                "title": "DateTime",
-                "type": "string"
-              },
-              "status": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/ApiCallStatus"
-                  }
-                ],
-                "description": "The status of the volume."
-              },
-              "type": {
-                "enum": [
-                  "FileVolume"
-                ],
-                "type": "string"
-              },
-              "updated_at": {
-                "description": "The time and date the volume was last updated.",
-                "format": "date-time",
-                "title": "DateTime",
-                "type": "string"
-              },
-              "user_id": {
-                "description": "The user ID of the user who created the volume.",
-                "type": "string"
-              },
-              "volume": {
-                "description": "The resulting volume.",
-                "format": "double",
-                "nullable": true,
-                "type": "number"
-              }
-            },
-            "required": [
-              "created_at",
-              "id",
-              "src_format",
-              "status",
-              "type",
-              "updated_at"
-            ],
-            "type": "object"
-          },
-          {
-            "description": "A file density.",
-            "properties": {
-              "completed_at": {
-                "description": "The time and date the density was completed.",
-                "format": "date-time",
-                "nullable": true,
-                "title": "DateTime",
-                "type": "string"
-              },
-              "created_at": {
-                "description": "The time and date the density was created.",
-                "format": "date-time",
-                "title": "DateTime",
-                "type": "string"
-              },
-              "density": {
-                "description": "The resulting density.",
-                "format": "double",
-                "nullable": true,
-                "type": "number"
-              },
-              "error": {
-                "description": "The error the function returned, if any.",
-                "nullable": true,
-                "type": "string"
-              },
-              "id": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Uuid"
-                  }
-                ],
-                "description": "The unique identifier of the density request.\n\nThis is the same as the API call ID."
-              },
-              "material_mass": {
-                "default": 0.0,
-                "description": "The material mass as denoted by the user.",
-                "format": "float",
-                "type": "number"
-              },
-              "src_format": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/FileSourceFormat"
-                  }
-                ],
-                "description": "The source format of the file."
-              },
-              "started_at": {
-                "description": "The time and date the density was started.",
-                "format": "date-time",
-                "nullable": true,
-                "title": "DateTime",
-                "type": "string"
-              },
-              "status": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/ApiCallStatus"
-                  }
-                ],
-                "description": "The status of the density."
-              },
-              "type": {
-                "enum": [
-                  "FileDensity"
-                ],
-                "type": "string"
-              },
-              "updated_at": {
-                "description": "The time and date the density was last updated.",
-                "format": "date-time",
-                "title": "DateTime",
-                "type": "string"
-              },
-              "user_id": {
-                "description": "The user ID of the user who created the density.",
-                "type": "string"
-              }
-            },
-            "required": [
-              "created_at",
-              "id",
-              "src_format",
-              "status",
-              "type",
-              "updated_at"
-            ],
-            "type": "object"
+              "value"
+            ]
           }
         ]
         }"##;
 
         let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
 
-        let result = super::render_schema(
-            "AsyncApiCallOutput",
-            &schema,
-            &crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
-        )
-        .unwrap();
+        let mut type_space = super::TypeSpace {
+            types: indexmap::map::IndexMap::new(),
+            spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
+        };
+
+        let result = type_space.render_schema("Digest", &schema).unwrap();
 
         expectorate::assert_contents(
-            "tests/types/kittycad.async-api-call-output.rs.gen",
+            "tests/types/oxide.digest.rs.gen",
             &super::get_text_fmt(&result).unwrap(),
         );
     }

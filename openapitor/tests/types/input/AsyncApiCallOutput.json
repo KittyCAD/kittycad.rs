@@ -1,0 +1,368 @@
+
+{
+  "description": "The output from the async API call.",
+  "oneOf": [
+    {
+      "description": "A file conversion.",
+      "properties": {
+        "completed_at": {
+          "description": "The time and date the file conversion was completed.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "The time and date the file conversion was created.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "error": {
+          "description": "The error the function returned, if any.",
+          "nullable": true,
+          "type": "string"
+        },
+        "id": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          ],
+          "description": "The unique identifier of the file conversion.\n\nThis is the same as the API call ID."
+        },
+        "output": {
+          "description": "The converted file, if completed, base64 encoded.",
+          "format": "byte",
+          "nullable": true,
+          "title": "String",
+          "type": "string"
+        },
+        "output_format": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/FileOutputFormat"
+            }
+          ],
+          "description": "The output format of the file conversion."
+        },
+        "src_format": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/FileSourceFormat"
+            }
+          ],
+          "description": "The source format of the file conversion."
+        },
+        "started_at": {
+          "description": "The time and date the file conversion was started.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/ApiCallStatus"
+            }
+          ],
+          "description": "The status of the file conversion."
+        },
+        "type": {
+          "enum": [
+            "FileConversion"
+          ],
+          "type": "string"
+        },
+        "updated_at": {
+          "description": "The time and date the file conversion was last updated.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "user_id": {
+          "description": "The user ID of the user who created the file conversion.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "created_at",
+        "id",
+        "output_format",
+        "src_format",
+        "status",
+        "type",
+        "updated_at"
+      ],
+      "type": "object"
+    },
+    {
+      "description": "A file mass.",
+      "properties": {
+        "completed_at": {
+          "description": "The time and date the mass was completed.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "The time and date the mass was created.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "error": {
+          "description": "The error the function returned, if any.",
+          "nullable": true,
+          "type": "string"
+        },
+        "id": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          ],
+          "description": "The unique identifier of the mass request.\n\nThis is the same as the API call ID."
+        },
+        "mass": {
+          "description": "The resulting mass.",
+          "format": "double",
+          "nullable": true,
+          "type": "number"
+        },
+        "material_density": {
+          "default": 0.0,
+          "description": "The material density as denoted by the user.",
+          "format": "float",
+          "type": "number"
+        },
+        "src_format": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/FileSourceFormat"
+            }
+          ],
+          "description": "The source format of the file."
+        },
+        "started_at": {
+          "description": "The time and date the mass was started.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/ApiCallStatus"
+            }
+          ],
+          "description": "The status of the mass."
+        },
+        "type": {
+          "enum": [
+            "FileMass"
+          ],
+          "type": "string"
+        },
+        "updated_at": {
+          "description": "The time and date the mass was last updated.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "user_id": {
+          "description": "The user ID of the user who created the mass.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "created_at",
+        "id",
+        "src_format",
+        "status",
+        "type",
+        "updated_at"
+      ],
+      "type": "object"
+    },
+    {
+      "description": "A file volume.",
+      "properties": {
+        "completed_at": {
+          "description": "The time and date the volume was completed.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "The time and date the volume was created.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "error": {
+          "description": "The error the function returned, if any.",
+          "nullable": true,
+          "type": "string"
+        },
+        "id": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          ],
+          "description": "The unique identifier of the volume request.\n\nThis is the same as the API call ID."
+        },
+        "src_format": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/FileSourceFormat"
+            }
+          ],
+          "description": "The source format of the file."
+        },
+        "started_at": {
+          "description": "The time and date the volume was started.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/ApiCallStatus"
+            }
+          ],
+          "description": "The status of the volume."
+        },
+        "type": {
+          "enum": [
+            "FileVolume"
+          ],
+          "type": "string"
+        },
+        "updated_at": {
+          "description": "The time and date the volume was last updated.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "user_id": {
+          "description": "The user ID of the user who created the volume.",
+          "type": "string"
+        },
+        "volume": {
+          "description": "The resulting volume.",
+          "format": "double",
+          "nullable": true,
+          "type": "number"
+        }
+      },
+      "required": [
+        "created_at",
+        "id",
+        "src_format",
+        "status",
+        "type",
+        "updated_at"
+      ],
+      "type": "object"
+    },
+    {
+      "description": "A file density.",
+      "properties": {
+        "completed_at": {
+          "description": "The time and date the density was completed.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "The time and date the density was created.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "density": {
+          "description": "The resulting density.",
+          "format": "double",
+          "nullable": true,
+          "type": "number"
+        },
+        "error": {
+          "description": "The error the function returned, if any.",
+          "nullable": true,
+          "type": "string"
+        },
+        "id": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          ],
+          "description": "The unique identifier of the density request.\n\nThis is the same as the API call ID."
+        },
+        "material_mass": {
+          "default": 0.0,
+          "description": "The material mass as denoted by the user.",
+          "format": "float",
+          "type": "number"
+        },
+        "src_format": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/FileSourceFormat"
+            }
+          ],
+          "description": "The source format of the file."
+        },
+        "started_at": {
+          "description": "The time and date the density was started.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/ApiCallStatus"
+            }
+          ],
+          "description": "The status of the density."
+        },
+        "type": {
+          "enum": [
+            "FileDensity"
+          ],
+          "type": "string"
+        },
+        "updated_at": {
+          "description": "The time and date the density was last updated.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "user_id": {
+          "description": "The user ID of the user who created the density.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "created_at",
+        "id",
+        "src_format",
+        "status",
+        "type",
+        "updated_at"
+      ],
+      "type": "object"
+    }
+  ]
+}

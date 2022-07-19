@@ -1,0 +1,63 @@
+{
+  "description": "A route defines a rule that governs where traffic should be sent based on its destination.",
+  "type": "object",
+  "properties": {
+    "description": {
+      "description": "human-readable free-form text about a resource",
+      "type": "string"
+    },
+    "destination": {
+      "$ref": "#/components/schemas/RouteDestination"
+    },
+    "id": {
+      "description": "unique, immutable, system-controlled identifier for each resource",
+      "type": "string",
+      "format": "uuid"
+    },
+    "kind": {
+      "description": "Describes the kind of router. Set at creation. `read-only`",
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/RouterRouteKind"
+        }
+      ]
+    },
+    "name": {
+      "description": "unique, mutable, user-controlled identifier for each resource",
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/Name"
+        }
+      ]
+    },
+    "target": {
+      "$ref": "#/components/schemas/RouteTarget"
+    },
+    "time_created": {
+      "description": "timestamp when this resource was created",
+      "type": "string",
+      "format": "date-time"
+    },
+    "time_modified": {
+      "description": "timestamp when this resource was last modified",
+      "type": "string",
+      "format": "date-time"
+    },
+    "vpc_router_id": {
+      "description": "The VPC Router to which the route belongs.",
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "required": [
+    "description",
+    "destination",
+    "id",
+    "kind",
+    "name",
+    "target",
+    "time_created",
+    "time_modified",
+    "vpc_router_id"
+  ]
+}

@@ -202,11 +202,14 @@ pub trait ReferenceOrExt<T> {
     /// Get the item for the ReferenceOr.
     /// This returns an error if the ReferenceOr is a Reference.
     fn item(&self) -> Result<&T>;
+
     /// Recurse the schemas.
     fn recurse(&self, spec: &openapiv3::OpenAPI) -> Result<openapiv3::Schema>;
+
     /// Get the reference for the ReferenceOr.
     /// This returns an error if the ReferenceOr is an item.
     fn reference(&self) -> Result<String>;
+
     /// Get the schema from the ReferenceOr.
     /// This will recurse any references and get the underlying schemas for those.
     fn get_schema_from_reference(
@@ -214,8 +217,13 @@ pub trait ReferenceOrExt<T> {
         spec: &openapiv3::OpenAPI,
         recursive: bool,
     ) -> Result<openapiv3::Schema>;
+
     /// Get the type from a ReferenceOr.
     fn expand(&self, spec: &openapiv3::OpenAPI) -> Result<T>;
+
+    /// Returns if the schema is a type that should be rendered.
+    /// For example, an enum that is not a reference, an object that is not a reference.
+    fn should_render(&self, spec: &openapiv3::OpenAPI) -> Result<bool>;
 }
 
 impl<T: SchemaExt + Clone + std::fmt::Debug> ReferenceOrExt<T> for openapiv3::ReferenceOr<T> {
@@ -285,6 +293,28 @@ impl<T: SchemaExt + Clone + std::fmt::Debug> ReferenceOrExt<T> for openapiv3::Re
                 let ref_or = T::get_reference(reference, spec)?;
                 ref_or.expand(spec)
             }
+        }
+    }
+
+    fn should_render(&self, spec: &openapiv3::OpenAPI) -> Result<bool> {
+        match self {
+            openapiv3::ReferenceOr::Item(i) => {
+                // Check if the type is an enum.
+                match &i.recurse(spec)?.schema_kind {
+                    openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
+                        if !s.enumeration.is_empty() {
+                            Ok(true)
+                        } else {
+                            Ok(false)
+                        }
+                    }
+                    openapiv3::SchemaKind::Type(openapiv3::Type::Object(_)) => {
+                        return Ok(true);
+                    }
+                    _ => Ok(false),
+                }
+            }
+            openapiv3::ReferenceOr::Reference { reference: _ } => Ok(false),
         }
     }
 }

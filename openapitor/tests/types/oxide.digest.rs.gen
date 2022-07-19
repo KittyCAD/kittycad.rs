@@ -1,0 +1,55 @@
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum DigestType {
+    #[serde(rename = "sha256")]
+    #[display("sha256")]
+    Sha256,
+}
+
+impl std::default::Default for DigestType {
+    fn default() -> Self {
+        DigestType::Sha256
+    }
+}
+
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Digest {
+    #[serde(rename = "type")]
+    pub type_: DigestType,
+    pub value: String,
+}
+
+impl std::fmt::Display for Digest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for Digest {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.type_), self.value.clone()]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["type_".to_string(), "value".to_string()]
+    }
+}
