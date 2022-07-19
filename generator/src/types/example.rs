@@ -414,7 +414,7 @@ pub fn generate_example_rust_from_schema(
 
                 let example = generate_example_rust_from_schema(&inner_name, &inner_schema, spec)?;
 
-                let k_ident = format_ident!("{}", crate::types::clean_property_name(&k));
+                let k_ident = format_ident!("{}", crate::types::clean_property_name(k));
 
                 // Check if this type is required.
                 if !o.required.contains(k)

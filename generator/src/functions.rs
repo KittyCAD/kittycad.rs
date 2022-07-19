@@ -92,7 +92,7 @@ pub fn generate_files(
             // repetitive.
             let rust_doc_example_code_fn = &example_code_fn[example_code_fn
                 .find("use ")
-                .unwrap_or(example_code_fn.find("async fn example_").unwrap_or(0))
+                .unwrap_or_else(|| example_code_fn.find("async fn example_").unwrap_or(0))
                 ..example_code_fn.len()];
 
             // Add our example code to our docs.
@@ -500,7 +500,7 @@ fn get_example_args(
                 crate::types::get_type_name_from_reference(&schema.reference()?, spec, true)?
             }
             openapiv3::ReferenceOr::Item(s) => {
-                crate::types::get_type_name_for_schema("", &s, spec, true)?
+                crate::types::get_type_name_for_schema("", s, spec, true)?
             }
         };
 
