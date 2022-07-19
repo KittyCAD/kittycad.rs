@@ -81,6 +81,7 @@ async fn test_kittycad_generation(ctx: &mut TestContext) {
 
 #[test_context(TestContext)]
 #[tokio::test]
+#[ignore]
 async fn test_github_generation(ctx: &mut TestContext) {
     let opts = crate::Opts {
         debug: true,
@@ -100,6 +101,41 @@ async fn test_github_generation(ctx: &mut TestContext) {
 
     // Move our test file to our output directory.
     let test_file = include_str!("../tests/library/github.tests.rs");
+    // Write our temporary file.
+    let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
+    std::fs::write(&test_file_path, test_file).unwrap();
+
+    // Generate the library.
+    crate::generate(&spec, &opts).await.unwrap();
+
+    // Run tests.
+    run_cargo_test(&opts).await.unwrap();
+}
+
+#[test_context(TestContext)]
+#[tokio::test]
+async fn test_oxide_generation(ctx: &mut TestContext) {
+    let opts = crate::Opts {
+        debug: true,
+        json: false,
+        input: ctx.tmp_dir.clone(),
+        output: ctx.tmp_dir.clone(),
+        base_url: "https://api.oxide.computer".parse().unwrap(),
+        name: "oxide".to_string(),
+        version: "1.0.0".to_string(),
+        description: "Oxide builds computers.".to_string(),
+        spec_url: Some(
+            "https://raw.githubusercontent.com/oxidecomputer/omicron/main/openapi/nexus.json"
+                .to_string(),
+        ),
+        repo_name: Some("oxide/oxide.rs".to_string()),
+    };
+
+    // Load our spec.
+    let spec = crate::load_json_spec(include_str!("../tests/oxide.json")).unwrap();
+
+    // Move our test file to our output directory.
+    let test_file = include_str!("../tests/library/oxide.tests.rs");
     // Write our temporary file.
     let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
     std::fs::write(&test_file_path, test_file).unwrap();
