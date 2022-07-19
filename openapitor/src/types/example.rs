@@ -23,7 +23,7 @@ pub fn generate_example_json_from_schema(
                 // We have an enum type.
                 // Return a random value from the enum.
                 // Remove any null values from the array.
-                let values = s.enumeration.iter().cloned().collect::<Vec<_>>();
+                let values = s.enumeration.to_vec();
                 // Remove null values from the array.
                 let values = values
                     .into_iter()

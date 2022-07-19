@@ -303,6 +303,7 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
 
             use crate::Client;
 
+            #[derive(Clone, Debug)]
             pub struct #proper_tag_name_ident {
                 pub client: Client,
             }

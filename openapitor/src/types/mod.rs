@@ -718,7 +718,7 @@ fn render_enum_object_internal(
         }
         // Get the type name for the schema.
         let mut type_name = if let openapiv3::ReferenceOr::Item(i) = v {
-            get_type_name_for_schema(k, &i, spec, true)?
+            get_type_name_for_schema(k, i, spec, true)?
         } else {
             get_type_name_from_reference(&v.reference()?, spec, true)?
         };
@@ -908,7 +908,7 @@ fn get_one_of_values(
                     }
                 } else {
                     // Render this object.
-                    let content_name = render_enum_object_internal(&tag_name, &o, spec, tag)?;
+                    let content_name = render_enum_object_internal(&tag_name, o, spec, tag)?;
                     // Get the type name for this value.
                     values.insert(p.to_string(), one_of.clone());
 
@@ -954,7 +954,7 @@ fn get_one_of_values(
             let rendered_type = get_type_name_for_schema(name, &one_of.expand(spec)?, spec, true)?;
 
             let n = if let Some(title) = &one_of.expand(spec)?.schema_data.title {
-                let p = proper_name(&title);
+                let p = proper_name(title);
                 p.parse().map_err(|e| anyhow::anyhow!("{}", e))?
             } else {
                 rendered_type.clone()
@@ -1075,7 +1075,7 @@ fn render_object(
 
         // Get the type name for the schema.
         let mut type_name = if let openapiv3::ReferenceOr::Item(i) = v {
-            get_type_name_for_schema(&prop, &i, spec, true)?
+            get_type_name_for_schema(&prop, i, spec, true)?
         } else {
             get_type_name_from_reference(&v.reference()?, spec, true)?
         };
@@ -1448,10 +1448,10 @@ pub fn proper_name(s: &str) -> String {
             // If it is, we want to add an underscore to the front of the string.
             s.replace(first_char, &num.cardinal())
         } else {
-            s.to_string()
+            s
         }
     } else {
-        s.to_string()
+        s
     };
 
     inflector::cases::pascalcase::to_pascal_case(&s)

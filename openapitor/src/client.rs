@@ -20,7 +20,7 @@ static APP_USER_AGENT: &str = concat!(
 );
 
 /// Entrypoint for interacting with the API client.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Client {
     token: String,
     base_url: String,
@@ -37,7 +37,7 @@ impl Client {
         token: T,
     ) -> Self
     where
-        T: ToString,
+        T: ToString + std::fmt::Debug,
     {
         let client = reqwest::Client::builder()
             .user_agent(APP_USER_AGENT)
@@ -60,7 +60,7 @@ impl Client {
     #[tracing::instrument]
     pub fn set_base_url<H>(&mut self, base_url: H)
     where
-        H: Into<String> + std::fmt::Display,
+        H: Into<String> + std::fmt::Display + std::fmt::Debug,
     {
         self.base_url = base_url.to_string().trim_end_matches('/').to_string();
     }

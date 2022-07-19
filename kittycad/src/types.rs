@@ -4,12 +4,10 @@ pub mod base64 {
     #![doc = " Base64 data that encodes to url safe base64, but can decode from multiple"]
     #![doc = " base64 implementations to account for various clients and libraries. Compatible"]
     #![doc = " with serde and JsonSchema."]
-    use std::{convert::TryFrom, fmt};
-
-    use serde::{
-        de::{Error, Unexpected, Visitor},
-        Deserialize, Deserializer, Serialize, Serializer,
-    };
+    use serde::de::{Error, Unexpected, Visitor};
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+    use std::convert::TryFrom;
+    use std::fmt;
     static ALLOWED_DECODING_FORMATS: &[data_encoding::Encoding] = &[
         data_encoding::BASE64,
         data_encoding::BASE64URL,
@@ -121,9 +119,8 @@ pub mod base64 {
 
     #[cfg(test)]
     mod tests {
-        use std::convert::TryFrom;
-
         use super::Base64Data;
+        use std::convert::TryFrom;
         #[test]
         fn test_base64_try_from() {
             assert!(Base64Data::try_from("aGVsbG8=").is_ok());
@@ -152,11 +149,9 @@ pub mod paginate {
 }
 
 pub mod phone_number {
-    #![doc = " A library to implement phone numbers for our database and JSON serialization and \
-              deserialization."]
-    use std::str::FromStr;
-
+    #![doc = " A library to implement phone numbers for our database and JSON serialization and deserialization."]
     use schemars::JsonSchema;
+    use std::str::FromStr;
     #[doc = " A phone number."]
     #[derive(Debug, Default, Clone, PartialEq, Hash, Eq)]
     pub struct PhoneNumber(pub Option<phonenumber::PhoneNumber>);
@@ -254,9 +249,8 @@ pub mod phone_number {
 
     #[cfg(test)]
     mod test {
-        use pretty_assertions::assert_eq;
-
         use super::PhoneNumber;
+        use pretty_assertions::assert_eq;
         #[test]
         fn test_parse_phone_number() {
             let mut phone = "+1-555-555-5555";
@@ -662,8 +656,7 @@ pub struct ApiCallWithPrice {
     #[doc = "The request query params sent by the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub request_query_params: Option<String>,
-    #[doc = "The response body returned by the API call. We do not store this information if it \
-             is above a certain size."]
+    #[doc = "The response body returned by the API call. We do not store this information if it is above a certain size."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub response_body: Option<String>,
     #[doc = "The date and time the API call started billing."]
@@ -888,8 +881,7 @@ pub struct ApiToken {
     #[doc = "The unique identifier for the API token."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
-    #[doc = "If the token is valid. We never delete API tokens, but we can mark them as invalid. \
-             We save them for ever to preserve the history of the API token."]
+    #[doc = "If the token is valid. We never delete API tokens, but we can mark them as invalid. We save them for ever to preserve the history of the API token."]
     pub is_valid: bool,
     #[doc = "The API token itself."]
     pub token: uuid::Uuid,
@@ -1366,8 +1358,7 @@ impl tabled::Tabled for CacheMetadata {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CardDetails {
-    #[doc = "Card brand.\n\nCan be `amex`, `diners`, `discover`, `jcb`, `mastercard`, `unionpay`, \
-             `visa`, or `unknown`."]
+    #[doc = "Card brand.\n\nCan be `amex`, `diners`, `discover`, `jcb`, `mastercard`, `unionpay`, `visa`, or `unknown`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub brand: Option<String>,
     #[doc = "Checks on Card address and CVC if provided."]
@@ -1632,8 +1623,7 @@ impl tabled::Tabled for CodeOutput {
     }
 }
 
-#[doc = "Commit holds the Git-commit (SHA1) that a binary was built from, as reported in the \
-         version-string of external tools, such as `containerd`, or `runC`."]
+#[doc = "Commit holds the Git-commit (SHA1) that a binary was built from, as reported in the version-string of external tools, such as `containerd`, or `runC`."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -1678,8 +1668,7 @@ impl tabled::Tabled for Commit {
     }
 }
 
-#[doc = "Metadata about a pub-sub connection.\n\nThis is mostly used for internal purposes and \
-         debugging."]
+#[doc = "Metadata about a pub-sub connection.\n\nThis is mostly used for internal purposes and debugging."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -2096,8 +2085,7 @@ impl tabled::Tabled for Connection {
     }
 }
 
-#[doc = "Supported set of sort modes for scanning by created_at only.\n\nCurrently, we only \
-         support scanning in ascending order."]
+#[doc = "Supported set of sort modes for scanning by created_at only.\n\nCurrently, we only support scanning in ascending order."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -2564,24 +2552,14 @@ pub struct Customer {
     #[doc = "The customer's address."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub address: Option<Address>,
-    #[doc = "Current balance, if any, being stored on the customer in the payments service.\n\nIf \
-             negative, the customer has credit to apply to their next invoice. If positive, the \
-             customer has an amount owed that will be added to their next invoice. The balance \
-             does not refer to any unpaid invoices; it solely takes into account amounts that \
-             have yet to be successfully applied to any invoice. This balance is only taken into \
-             account as invoices are finalized."]
+    #[doc = "Current balance, if any, being stored on the customer in the payments service.\n\nIf negative, the customer has credit to apply to their next invoice. If positive, the customer has an amount owed that will be added to their next invoice. The balance does not refer to any unpaid invoices; it solely takes into account amounts that have yet to be successfully applied to any invoice. This balance is only taken into account as invoices are finalized."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub balance: Option<f64>,
     #[doc = "Time at which the object was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "Three-letter ISO code for the currency the customer can be charged in for recurring \
-             billing purposes."]
+    #[doc = "Three-letter ISO code for the currency the customer can be charged in for recurring billing purposes."]
     pub currency: Currency,
-    #[doc = "When the customer's latest invoice is billed by charging automatically, `delinquent` \
-             is `true` if the invoice's latest charge failed.\n\nWhen the customer's latest \
-             invoice is billed by sending an invoice, `delinquent` is `true` if the invoice isn't \
-             paid by its due date.  If an invoice is marked uncollectible by dunning, \
-             `delinquent` doesn't get reset to `false`."]
+    #[doc = "When the customer's latest invoice is billed by charging automatically, `delinquent` is `true` if the invoice's latest charge failed.\n\nWhen the customer's latest invoice is billed by sending an invoice, `delinquent` is `true` if the invoice isn't paid by its due date.  If an invoice is marked uncollectible by dunning, `delinquent` doesn't get reset to `false`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub delinquent: Option<bool>,
     #[doc = "The customer's email address."]
@@ -2681,27 +2659,13 @@ pub struct CustomerBalance {
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The unique identifier for the balance."]
     pub id: uuid::Uuid,
-    #[doc = "The monthy credits remaining in the balance. This gets re-upped every month, but if \
-             the credits are not used for a month they do not carry over to the next month. It is \
-             a stable amount granted to the user per month."]
+    #[doc = "The monthy credits remaining in the balance. This gets re-upped every month, but if the credits are not used for a month they do not carry over to the next month. It is a stable amount granted to the user per month."]
     pub monthly_credits_remaining: f64,
-    #[doc = "The amount of pre-pay cash remaining in the balance. This number goes down as the \
-             user uses their pre-paid credits. The reason we track this amount is if a user ever \
-             wants to withdraw their pre-pay cash, we can use this amount to determine how much \
-             to give them. Say a user has $100 in pre-paid cash, their bill is worth, $50 after \
-             subtracting any other credits (like monthly etc.) Their bill is $50, their pre-pay \
-             cash remaining will be subtracted by 50 to pay the bill and their \
-             `pre_pay_credits_remaining` will be subtracted by 50 to pay the bill. This way if \
-             they want to withdraw money after, they can only withdraw $50 since that is the \
-             amount of cash they have remaining."]
+    #[doc = "The amount of pre-pay cash remaining in the balance. This number goes down as the user uses their pre-paid credits. The reason we track this amount is if a user ever wants to withdraw their pre-pay cash, we can use this amount to determine how much to give them. Say a user has $100 in pre-paid cash, their bill is worth, $50 after subtracting any other credits (like monthly etc.) Their bill is $50, their pre-pay cash remaining will be subtracted by 50 to pay the bill and their `pre_pay_credits_remaining` will be subtracted by 50 to pay the bill. This way if they want to withdraw money after, they can only withdraw $50 since that is the amount of cash they have remaining."]
     pub pre_pay_cash_remaining: f64,
-    #[doc = "The amount of credits remaining in the balance. This is typically the amount of cash \
-             * some multiplier they get for pre-paying their account. This number lowers every \
-             time a bill is paid with the balance. This number increases every time a user adds \
-             funds to their balance. This may be through a subscription or a one off payment."]
+    #[doc = "The amount of credits remaining in the balance. This is typically the amount of cash * some multiplier they get for pre-paying their account. This number lowers every time a bill is paid with the balance. This number increases every time a user adds funds to their balance. This may be through a subscription or a one off payment."]
     pub pre_pay_credits_remaining: f64,
-    #[doc = "This includes any outstanding, draft, or open invoices and any pending invoice \
-             items. This does not include any credits the user has on their account."]
+    #[doc = "This includes any outstanding, draft, or open invoices and any pending invoice items. This does not include any credits the user has on their account."]
     pub total_due: f64,
     #[doc = "The date and time the balance was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
@@ -2825,8 +2789,7 @@ impl tabled::Tabled for DeviceAuthRequestForm {
     }
 }
 
-#[doc = "The request parameters to verify the `user_code` for the OAuth 2.0 Device Authorization \
-         Grant."]
+#[doc = "The request parameters to verify the `user_code` for the OAuth 2.0 Device Authorization Grant."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -2880,18 +2843,10 @@ pub struct DockerSystemInfo {
     #[doc = "The version of the cgroup."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cgroup_version: Option<SystemInfoCgroupVersionEnum>,
-    #[doc = "The network endpoint that the Engine advertises for the purpose of node discovery. \
-             ClusterAdvertise is a `host:port` combination on which the daemon is reachable by \
-             other hosts.\n\n**Deprecated**: This field is only propagated when using standalone \
-             Swarm mode, and overlay networking using an external k/v store. Overlay networks \
-             with Swarm mode enabled use the built-in raft store, and this field will be empty."]
+    #[doc = "The network endpoint that the Engine advertises for the purpose of node discovery. ClusterAdvertise is a `host:port` combination on which the daemon is reachable by other hosts.\n\n**Deprecated**: This field is only propagated when using standalone Swarm mode, and overlay networking using an external k/v store. Overlay networks with Swarm mode enabled use the built-in raft store, and this field will be empty."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cluster_advertise: Option<String>,
-    #[doc = "URL of the distributed storage backend.   The storage backend is used for multihost \
-             networking (to store network and endpoint information) and by the node discovery \
-             mechanism.\n\n**Deprecated**: This field is only propagated when using standalone \
-             Swarm mode, and overlay networking using an external k/v store. Overlay networks \
-             with Swarm mode enabled use the built-in raft store, and this field will be empty."]
+    #[doc = "URL of the distributed storage backend.   The storage backend is used for multihost networking (to store network and endpoint information) and by the node discovery mechanism.\n\n**Deprecated**: This field is only propagated when using standalone Swarm mode, and overlay networking using an external k/v store. Overlay networks with Swarm mode enabled use the built-in raft store, and this field will be empty."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cluster_store: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2923,27 +2878,19 @@ pub struct DockerSystemInfo {
     #[doc = "Indicates if the daemon is running in debug-mode / with debug-level logging enabled."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub debug: Option<bool>,
-    #[doc = "List of custom default address pools for local networks, which can be specified in \
-             the daemon.json file or dockerd option.  Example: a Base \\\"10.10.0.0/16\\\" with \
-             Size 24 will define the set of 256 10.10.[0-255].0/24 address pools."]
+    #[doc = "List of custom default address pools for local networks, which can be specified in the daemon.json file or dockerd option.  Example: a Base \\\"10.10.0.0/16\\\" with Size 24 will define the set of 256 10.10.[0-255].0/24 address pools."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub default_address_pools: Option<Vec<SystemInfoDefaultAddressPools>>,
-    #[doc = "Name of the default OCI runtime that is used when starting containers.  The default \
-             can be overridden per-container at create time."]
+    #[doc = "Name of the default OCI runtime that is used when starting containers.  The default can be overridden per-container at create time."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub default_runtime: Option<String>,
-    #[doc = "Root directory of persistent Docker state.  Defaults to `/var/lib/docker` on Linux, \
-             and `C:\\\\ProgramData\\\\docker` on Windows."]
+    #[doc = "Root directory of persistent Docker state.  Defaults to `/var/lib/docker` on Linux, and `C:\\\\ProgramData\\\\docker` on Windows."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub docker_root_dir: Option<String>,
     #[doc = "Name of the storage driver in use."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub driver: Option<String>,
-    #[doc = "Information specific to the storage driver, provided as \\\"label\\\" / \
-             \\\"value\\\" pairs.  This information is provided by the storage driver, and \
-             formatted in a way consistent with the output of `docker info` on the command \
-             line.\n\n**Note**: The information returned in this field, including the formatting \
-             of values and labels, should not be considered stable, and may change without notice."]
+    #[doc = "Information specific to the storage driver, provided as \\\"label\\\" / \\\"value\\\" pairs.  This information is provided by the storage driver, and formatted in a way consistent with the output of `docker info` on the command line.\n\n**Note**: The information returned in this field, including the formatting of values and labels, should not be considered stable, and may change without notice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub driver_status: Option<Vec<Vec<String>>>,
     #[doc = "Indicates if experimental features are enabled on the daemon."]
@@ -2955,20 +2902,16 @@ pub struct DockerSystemInfo {
     #[doc = "HTTPS-proxy configured for the daemon. This value is obtained from the [`HTTPS_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable. Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL are masked in the API response.  Containers do not automatically inherit this configuration."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub https_proxy: Option<String>,
-    #[doc = "Unique identifier of the daemon.\n\n**Note**: The format of the ID itself is not \
-             part of the API, and should not be considered stable."]
+    #[doc = "Unique identifier of the daemon.\n\n**Note**: The format of the ID itself is not part of the API, and should not be considered stable."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
-    #[doc = "Total number of images on the host. Both _tagged_ and _untagged_ (dangling) images \
-             are counted."]
+    #[doc = "Total number of images on the host. Both _tagged_ and _untagged_ (dangling) images are counted."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub images: Option<i64>,
-    #[doc = "Address / URL of the index server that is used for image search, and as a default \
-             for user authentication for Docker Hub and Docker Cloud."]
+    #[doc = "Address / URL of the index server that is used for image search, and as a default for user authentication for Docker Hub and Docker Cloud."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub index_server_address: Option<String>,
-    #[doc = "Name and, optional, path of the `docker-init` binary.  If the path is omitted, the \
-             daemon searches the host's `$PATH` for the binary and uses the first result."]
+    #[doc = "Name and, optional, path of the `docker-init` binary.  If the path is omitted, the daemon searches the host's `$PATH` for the binary and uses the first result."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub init_binary: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2980,37 +2923,22 @@ pub struct DockerSystemInfo {
         skip_serializing_if = "Option::is_none"
     )]
     pub ipv_4_forwarding: Option<bool>,
-    #[doc = "Represents the isolation technology to use as a default for containers. The \
-             supported values are platform-specific.  If no isolation value is specified on \
-             daemon start, on Windows client, the default is `hyperv`, and on Windows server, the \
-             default is `process`.  This option is currently not used on other platforms."]
+    #[doc = "Represents the isolation technology to use as a default for containers. The supported values are platform-specific.  If no isolation value is specified on daemon start, on Windows client, the default is `hyperv`, and on Windows server, the default is `process`.  This option is currently not used on other platforms."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub isolation: Option<SystemInfoIsolationEnum>,
-    #[doc = "Indicates if the host has kernel memory limit support enabled.\n\n**Deprecated**: \
-             This field is deprecated as the kernel 5.4 deprecated `kmem.limit_in_bytes`."]
+    #[doc = "Indicates if the host has kernel memory limit support enabled.\n\n**Deprecated**: This field is deprecated as the kernel 5.4 deprecated `kmem.limit_in_bytes`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kernel_memory: Option<bool>,
-    #[doc = "Indicates if the host has kernel memory TCP limit support enabled.  Kernel memory \
-             TCP limits are not supported when using cgroups v2, which does not support the \
-             corresponding `memory.kmem.tcp.limit_in_bytes` cgroup."]
+    #[doc = "Indicates if the host has kernel memory TCP limit support enabled.  Kernel memory TCP limits are not supported when using cgroups v2, which does not support the corresponding `memory.kmem.tcp.limit_in_bytes` cgroup."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kernel_memory_tcp: Option<bool>,
-    #[doc = "Kernel version of the host.  On Linux, this information obtained from `uname`. On \
-             Windows this information is queried from the \
-             <kbd>HKEY_LOCAL_MACHINE\\\\\\\\SOFTWARE\\\\\\\\Microsoft\\\\\\\\Windows \
-             NT\\\\\\\\CurrentVersion\\\\\\\\</kbd> registry value, for example _\\\"10.0 14393 \
-             (14393.1198.amd64fre.rs1_release_sec.170427-1353)\\\"_."]
+    #[doc = "Kernel version of the host.  On Linux, this information obtained from `uname`. On Windows this information is queried from the <kbd>HKEY_LOCAL_MACHINE\\\\\\\\SOFTWARE\\\\\\\\Microsoft\\\\\\\\Windows NT\\\\\\\\CurrentVersion\\\\\\\\</kbd> registry value, for example _\\\"10.0 14393 (14393.1198.amd64fre.rs1_release_sec.170427-1353)\\\"_."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kernel_version: Option<String>,
-    #[doc = "User-defined labels (key/value metadata) as set on the daemon.\n\n**Note**: When \
-             part of a Swarm, nodes can both have _daemon_ labels, set through the daemon \
-             configuration, and _node_ labels, set from a manager node in the Swarm. Node labels \
-             are not included in this field. Node labels can be retrieved using the `/nodes/(id)` \
-             endpoint on a manager node in the Swarm."]
+    #[doc = "User-defined labels (key/value metadata) as set on the daemon.\n\n**Note**: When part of a Swarm, nodes can both have _daemon_ labels, set through the daemon configuration, and _node_ labels, set from a manager node in the Swarm. Node labels are not included in this field. Node labels can be retrieved using the `/nodes/(id)` endpoint on a manager node in the Swarm."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub labels: Option<Vec<String>>,
-    #[doc = "Indicates if live restore is enabled.  If enabled, containers are kept running when \
-             the daemon is shutdown or upon daemon start if running containers are detected."]
+    #[doc = "Indicates if live restore is enabled.  If enabled, containers are kept running when the daemon is shutdown or upon daemon start if running containers are detected."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub live_restore_enabled: Option<bool>,
     #[doc = "The logging driver to use as a default for new containers."]
@@ -3025,16 +2953,13 @@ pub struct DockerSystemInfo {
     #[doc = "Number of event listeners subscribed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub n_events_listener: Option<i64>,
-    #[doc = "The total number of file Descriptors in use by the daemon process.  This information \
-             is only returned if debug-mode is enabled."]
+    #[doc = "The total number of file Descriptors in use by the daemon process.  This information is only returned if debug-mode is enabled."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub n_fd: Option<i64>,
     #[doc = "Hostname of the host."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
-    #[doc = "The number of logical CPUs usable by the daemon.  The number of available CPUs is \
-             checked by querying the operating system when the daemon starts. Changes to \
-             operating system CPU allocation after the daemon is started are not reflected."]
+    #[doc = "The number of logical CPUs usable by the daemon.  The number of available CPUs is checked by querying the operating system when the daemon starts. Changes to operating system CPU allocation after the daemon is started are not reflected."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ncpu: Option<i64>,
     #[doc = "Comma-separated list of domain extensions for which no proxy should be used. This value is obtained from the [`NO_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable.  Containers do not automatically inherit this configuration."]
@@ -3043,16 +2968,13 @@ pub struct DockerSystemInfo {
     #[doc = "Indicates if OOM killer disable is supported on the host."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub oom_kill_disable: Option<bool>,
-    #[doc = "Name of the host's operating system, for example: \\\"Ubuntu 16.04.2 LTS\\\" or \
-             \\\"Windows Server 2016 Datacenter\\\""]
+    #[doc = "Name of the host's operating system, for example: \\\"Ubuntu 16.04.2 LTS\\\" or \\\"Windows Server 2016 Datacenter\\\""]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub operating_system: Option<String>,
     #[doc = "Generic type of the operating system of the host, as returned by the Go runtime (`GOOS`).  Currently returned values are \\\"linux\\\" and \\\"windows\\\". A full list of possible values can be found in the [Go documentation](https://golang.org/doc/install/source#environment)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub os_type: Option<String>,
-    #[doc = "Version of the host's operating system\n\n**Note**: The information returned in this \
-             field, including its very existence, and the formatting of values, should not be \
-             considered stable, and may change without notice."]
+    #[doc = "Version of the host's operating system\n\n**Note**: The information returned in this field, including its very existence, and the formatting of values, should not be considered stable, and may change without notice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub os_version: Option<String>,
     #[doc = "Indicates if the host kernel has PID limit support enabled."]
@@ -3060,9 +2982,7 @@ pub struct DockerSystemInfo {
     pub pids_limit: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub plugins: Option<PluginsInfo>,
-    #[doc = "Reports a summary of the product license on the daemon.  If a commercial license has \
-             been applied to the daemon, information such as number of nodes, and expiration are \
-             included."]
+    #[doc = "Reports a summary of the product license on the daemon.  If a commercial license has been applied to the daemon, information such as number of nodes, and expiration are included."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub product_license: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3071,10 +2991,7 @@ pub struct DockerSystemInfo {
     pub runc_commit: Option<Commit>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub runtimes: Option<std::collections::HashMap<String, Runtime>>,
-    #[doc = "List of security features that are enabled on the daemon, such as apparmor, seccomp, \
-             SELinux, user-namespaces (userns), and rootless.  Additional configuration options \
-             for each security feature may be present, and are included as a comma-separated list \
-             of key/value pairs."]
+    #[doc = "List of security features that are enabled on the daemon, such as apparmor, seccomp, SELinux, user-namespaces (userns), and rootless.  Additional configuration options for each security feature may be present, and are included as a comma-separated list of key/value pairs."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub security_options: Option<Vec<String>>,
     #[doc = "Version string of the daemon. **Note**: the [standalone Swarm API](https://docs.docker.com/swarm/swarm-api/) returns the Swarm version instead of the daemon  version, for example `swarm/1.2.8`."]
@@ -3083,13 +3000,10 @@ pub struct DockerSystemInfo {
     #[doc = "Indicates if the host has memory swap limit support enabled."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub swap_limit: Option<bool>,
-    #[doc = "The  number of goroutines that currently exist.  This information is only returned \
-             if debug-mode is enabled."]
+    #[doc = "The  number of goroutines that currently exist.  This information is only returned if debug-mode is enabled."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub system_time: Option<String>,
-    #[doc = "List of warnings / informational messages about missing features, or issues related \
-             to the daemon configuration.  These messages can be printed by the client as \
-             information to the user."]
+    #[doc = "List of warnings / informational messages about missing features, or issues related to the daemon configuration.  These messages can be printed by the client as information to the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub warnings: Option<Vec<String>>,
 }
@@ -3517,8 +3431,7 @@ impl tabled::Tabled for EmailAuthenticationForm {
     }
 }
 
-#[doc = "Metadata about our currently running server.\n\nThis is mostly used for internal purposes \
-         and debugging."]
+#[doc = "Metadata about our currently running server.\n\nThis is mostly used for internal purposes and debugging."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -3643,8 +3556,7 @@ impl tabled::Tabled for Error {
     }
 }
 
-#[doc = "Metadata about our currently running server.\n\nThis is mostly used for internal purposes \
-         and debugging."]
+#[doc = "Metadata about our currently running server.\n\nThis is mostly used for internal purposes and debugging."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -3686,9 +3598,7 @@ impl tabled::Tabled for ExecutorMetadata {
     }
 }
 
-#[doc = "Extended user information.\n\nThis is mostly used for internal purposes. It returns a \
-         mapping of the user's information, including that of our third party services we use for \
-         users: MailChimp, Stripe, and Zendesk."]
+#[doc = "Extended user information.\n\nThis is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Zendesk."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -3724,9 +3634,7 @@ pub struct ExtendedUser {
     #[doc = "The user's MailChimp ID. This is mostly used for internal mapping."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mailchimp_id: Option<String>,
-    #[doc = "The name of the user. This is auto populated at first from the authentication \
-             provider (if there was a name). It can be updated by the user by updating their \
-             `first_name` and `last_name` fields."]
+    #[doc = "The name of the user. This is auto populated at first from the authentication provider (if there was a name). It can be updated by the user by updating their `first_name` and `last_name` fields."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[doc = "The user's phone number."]
@@ -4288,8 +4196,7 @@ pub enum FileSourceFormat {
     Fbx,
 }
 
-#[doc = "Metadata about our file system.\n\nThis is mostly used for internal purposes and \
-         debugging."]
+#[doc = "Metadata about our file system.\n\nThis is mostly used for internal purposes and debugging."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -4503,13 +4410,7 @@ pub struct IndexInfo {
     #[doc = "Indicates whether this is an official registry (i.e., Docker Hub / docker.io)"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub official: Option<bool>,
-    #[doc = "Indicates if the registry is part of the list of insecure registries.  If `false`, \
-             the registry is insecure. Insecure registries accept un-encrypted (HTTP) and/or \
-             untrusted (HTTPS with certificates from unknown CAs) communication.\n\n**Warning**: \
-             Insecure registries can be useful when running a local registry. However, because \
-             its use creates security vulnerabilities it should ONLY be enabled for testing \
-             purposes. For increased security, users should add their CA to their system's list \
-             of trusted CAs instead of enabling this option."]
+    #[doc = "Indicates if the registry is part of the list of insecure registries.  If `false`, the registry is insecure. Insecure registries accept un-encrypted (HTTP) and/or untrusted (HTTPS with certificates from unknown CAs) communication.\n\n**Warning**: Insecure registries can be useful when running a local registry. However, because its use creates security vulnerabilities it should ONLY be enabled for testing purposes. For increased security, users should add their CA to their system's list of trusted CAs instead of enabling this option."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub secure: Option<bool>,
 }
@@ -4566,12 +4467,7 @@ impl tabled::Tabled for IndexInfo {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Invoice {
-    #[doc = "Final amount due at this time for this invoice.\n\nIf the invoice's total is smaller \
-             than the minimum charge amount, for example, or if there is account credit that can \
-             be applied to the invoice, the `amount_due` may be 0. If there is a positive \
-             `starting_balance` for the invoice (the customer owes money), the `amount_due` will \
-             also take that into account. The charge that gets generated for the invoice will be \
-             for the amount specified in `amount_due`."]
+    #[doc = "Final amount due at this time for this invoice.\n\nIf the invoice's total is smaller than the minimum charge amount, for example, or if there is account credit that can be applied to the invoice, the `amount_due` may be 0. If there is a positive `starting_balance` for the invoice (the customer owes money), the `amount_due` will also take that into account. The charge that gets generated for the invoice will be for the amount specified in `amount_due`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub amount_due: Option<f64>,
     #[doc = "The amount, in USD, that was paid."]
@@ -4580,29 +4476,20 @@ pub struct Invoice {
     #[doc = "The amount remaining, in USD, that is due."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub amount_remaining: Option<f64>,
-    #[doc = "Number of payment attempts made for this invoice, from the perspective of the \
-             payment retry schedule.\n\nAny payment attempt counts as the first attempt, and \
-             subsequently only automatic retries increment the attempt count. In other words, \
-             manual payment attempts after the first attempt do not affect the retry schedule."]
+    #[doc = "Number of payment attempts made for this invoice, from the perspective of the payment retry schedule.\n\nAny payment attempt counts as the first attempt, and subsequently only automatic retries increment the attempt count. In other words, manual payment attempts after the first attempt do not affect the retry schedule."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub attempt_count: Option<u64>,
-    #[doc = "Whether an attempt has been made to pay the invoice.\n\nAn invoice is not attempted \
-             until 1 hour after the `invoice.created` webhook, for example, so you might not want \
-             to display that invoice as unpaid to your users."]
+    #[doc = "Whether an attempt has been made to pay the invoice.\n\nAn invoice is not attempted until 1 hour after the `invoice.created` webhook, for example, so you might not want to display that invoice as unpaid to your users."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub attempted: Option<bool>,
     #[doc = "Time at which the object was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), \
-             in lowercase."]
+    #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase."]
     pub currency: Currency,
-    #[doc = "The email address for the customer. Until the invoice is finalized, this field will \
-             equal customer.email. Once the invoice is finalized, this field will no longer be \
-             updated."]
+    #[doc = "The email address for the customer. Until the invoice is finalized, this field will equal customer.email. Once the invoice is finalized, this field will no longer be updated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub customer_email: Option<String>,
-    #[doc = "Customer ID. The unique identifier for the customer this invoice belongs to. This is \
-             the customer ID in the payments service, not our database customer ID."]
+    #[doc = "Customer ID. The unique identifier for the customer this invoice belongs to. This is the customer ID in the payments service, not our database customer ID."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub customer_id: Option<String>,
     #[doc = "Default payment method."]
@@ -4614,20 +4501,16 @@ pub struct Invoice {
     #[doc = "Unique identifier for the object."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
-    #[doc = "The individual line items that make up the invoice.\n\n`lines` is sorted as follows: \
-             invoice items in reverse chronological order, followed by the subscription, if any."]
+    #[doc = "The individual line items that make up the invoice.\n\n`lines` is sorted as follows: invoice items in reverse chronological order, followed by the subscription, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub lines: Option<Vec<InvoiceLineItem>>,
     #[doc = "Set of key-value pairs."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub metadata: Option<std::collections::HashMap<String, String>>,
-    #[doc = "A unique, identifying string that appears on emails sent to the customer for this \
-             invoice."]
+    #[doc = "A unique, identifying string that appears on emails sent to the customer for this invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub number: Option<String>,
-    #[doc = "Whether payment was successfully collected for this invoice.\n\nAn invoice can be \
-             paid (most commonly) with a charge or with credit from the customer's account \
-             balance."]
+    #[doc = "Whether payment was successfully collected for this invoice.\n\nAn invoice can be paid (most commonly) with a charge or with credit from the customer's account balance."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub paid: Option<bool>,
     #[doc = "The link to download the PDF for the invoice."]
@@ -4642,19 +4525,16 @@ pub struct Invoice {
     #[doc = "The status of the invoice, one of `draft`, `open`, `paid`, `uncollectible`, or `void`.\n\n[Learn more](https://stripe.com/docs/billing/invoices/workflow#workflow-overview)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status: Option<InvoiceStatus>,
-    #[doc = "Total of all subscriptions, invoice items, and prorations on the invoice before any \
-             invoice level discount or tax is applied.\n\nItem discounts are already incorporated."]
+    #[doc = "Total of all subscriptions, invoice items, and prorations on the invoice before any invoice level discount or tax is applied.\n\nItem discounts are already incorporated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub subtotal: Option<f64>,
-    #[doc = "The amount of tax on this invoice.\n\nThis is the sum of all the tax amounts on this \
-             invoice."]
+    #[doc = "The amount of tax on this invoice.\n\nThis is the sum of all the tax amounts on this invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tax: Option<f64>,
     #[doc = "Total after discounts and taxes."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total: Option<f64>,
-    #[doc = "The URL for the hosted invoice page, which allows customers to view and pay an \
-             invoice."]
+    #[doc = "The URL for the hosted invoice page, which allows customers to view and pay an invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub url: Option<url::Url>,
 }
@@ -4826,8 +4706,7 @@ pub struct InvoiceLineItem {
     #[doc = "The amount, in USD."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub amount: Option<f64>,
-    #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), \
-             in lowercase."]
+    #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase."]
     pub currency: Currency,
     #[doc = "The description."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -4838,8 +4717,7 @@ pub struct InvoiceLineItem {
     #[doc = "The ID of the invoice item associated with this line item if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub invoice_item: Option<String>,
-    #[doc = "Set of [key-value pairs](https://stripe.com/docs/api/metadata) that you can attach \
-             to an object.\n\nSet of key-value pairs."]
+    #[doc = "Set of [key-value pairs](https://stripe.com/docs/api/metadata) that you can attach to an object.\n\nSet of key-value pairs."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub metadata: Option<std::collections::HashMap<String, String>>,
 }
@@ -5331,8 +5209,7 @@ impl tabled::Tabled for MetaClusterInfo {
     }
 }
 
-#[doc = "Metadata about our currently running server.\n\nThis is mostly used for internal purposes \
-         and debugging."]
+#[doc = "Metadata about our currently running server.\n\nThis is mostly used for internal purposes and debugging."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -5443,14 +5320,10 @@ pub enum Method {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Oauth2ClientInfo {
-    #[doc = "Value used for [CSRF](https://tools.ietf.org/html/rfc6749#section-10.12) protection \
-             via the `state` parameter."]
+    #[doc = "Value used for [CSRF](https://tools.ietf.org/html/rfc6749#section-10.12) protection via the `state` parameter."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub csrf_token: Option<String>,
-    #[doc = "Code Verifier used for [PKCE]((https://tools.ietf.org/html/rfc7636)) protection via \
-             the `code_verifier` parameter. The value must have a minimum length of 43 characters \
-             and a maximum length of 128 characters.  Each character must be ASCII alphanumeric \
-             or one of the characters \"-\" / \".\" / \"_\" / \"~\"."]
+    #[doc = "Code Verifier used for [PKCE]((https://tools.ietf.org/html/rfc7636)) protection via the `code_verifier` parameter. The value must have a minimum length of 43 characters and a maximum length of 128 characters.  Each character must be ASCII alphanumeric or one of the characters \"-\" / \".\" / \"_\" / \"~\"."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pkce_code_verifier: Option<String>,
     #[doc = "The URL for consent."]
@@ -5531,8 +5404,7 @@ impl std::default::Default for Oauth2GrantType {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct OutputFile {
-    #[doc = "The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for \
-             JSON."]
+    #[doc = "The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for JSON."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub contents: Option<String>,
     #[doc = "The name of the file."]
@@ -5577,10 +5449,7 @@ impl tabled::Tabled for OutputFile {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PaymentIntent {
-    #[doc = "The client secret is used for client-side retrieval using a publishable key. The \
-             client secret can be used to complete payment setup from your frontend. It should \
-             not be stored, logged, or exposed to anyone other than the customer. Make sure that \
-             you have TLS enabled on any page that includes the client secret."]
+    #[doc = "The client secret is used for client-side retrieval using a publishable key. The client secret can be used to complete payment setup from your frontend. It should not be stored, logged, or exposed to anyone other than the customer. Make sure that you have TLS enabled on any page that includes the client secret."]
     pub client_secret: String,
 }
 
@@ -5612,8 +5481,7 @@ impl tabled::Tabled for PaymentIntent {
 pub struct PaymentMethod {
     #[doc = "The billing info for the payment method."]
     pub billing_info: BillingInfo,
-    #[doc = "The card, if it is one. For our purposes, this is the only type of payment method \
-             that we support."]
+    #[doc = "The card, if it is one. For our purposes, this is the only type of payment method that we support."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub card: Option<CardDetails>,
     #[doc = "Time at which the object was created."]
@@ -5681,20 +5549,17 @@ impl tabled::Tabled for PaymentMethod {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PaymentMethodCardChecks {
-    #[doc = "If a address line1 was provided, results of the check, one of `pass`, `fail`, \
-             `unavailable`, or `unchecked`."]
+    #[doc = "If a address line1 was provided, results of the check, one of `pass`, `fail`, `unavailable`, or `unchecked`."]
     #[serde(
         rename = "address_line1_check",
         default,
         skip_serializing_if = "Option::is_none"
     )]
     pub address_line_1_check: Option<String>,
-    #[doc = "If a address postal code was provided, results of the check, one of `pass`, `fail`, \
-             `unavailable`, or `unchecked`."]
+    #[doc = "If a address postal code was provided, results of the check, one of `pass`, `fail`, `unavailable`, or `unchecked`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub address_postal_code_check: Option<String>,
-    #[doc = "If a CVC was provided, results of the check, one of `pass`, `fail`, `unavailable`, \
-             or `unchecked`."]
+    #[doc = "If a CVC was provided, results of the check, one of `pass`, `fail`, `unavailable`, or `unchecked`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cvc_check: Option<String>,
 }
@@ -5767,9 +5632,7 @@ impl std::default::Default for PaymentMethodType {
     }
 }
 
-#[doc = "Available plugins per type.\n\n**Note**: Only unmanaged (V1) plugins are included in this \
-         list. V1 plugins are \\\"lazily\\\" loaded, and are not returned in this list if there is \
-         no resource using the plugin."]
+#[doc = "Available plugins per type.\n\n**Note**: Only unmanaged (V1) plugins are included in this list. V1 plugins are \\\"lazily\\\" loaded, and are not returned in this list if there is no resource using the plugin."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -5873,18 +5736,7 @@ pub struct RegistryServiceConfig {
     #[doc = "List of IP ranges to which nondistributable artifacts can be pushed, using the CIDR syntax [RFC 4632](https://tools.ietf.org/html/4632).  Some images (for example, Windows base images) contain artifacts whose distribution is restricted by license. When these images are pushed to a registry, restricted artifacts are not included.  This configuration override this behavior, and enables the daemon to push nondistributable artifacts to all registries whose resolved IP address is within the subnet described by the CIDR syntax.  This option is useful when pushing images containing nondistributable artifacts to a registry on an air-gapped network so hosts on that network can pull the images without connecting to another server.\n\n**Warning**: Nondistributable artifacts typically have restrictions on how and where they can be distributed and shared. Only use this feature to push artifacts to private registries and ensure that you are in compliance with any terms that cover redistributing nondistributable artifacts."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allow_nondistributable_artifacts_cid_rs: Option<Vec<String>>,
-    #[doc = "List of registry hostnames to which nondistributable artifacts can be pushed, using \
-             the format `<hostname>[:<port>]` or `<IP address>[:<port>]`.  Some images (for \
-             example, Windows base images) contain artifacts whose distribution is restricted by \
-             license. When these images are pushed to a registry, restricted artifacts are not \
-             included.  This configuration override this behavior for the specified registries.  \
-             This option is useful when pushing images containing nondistributable artifacts to a \
-             registry on an air-gapped network so hosts on that network can pull the images \
-             without connecting to another server.\n\n**Warning**: Nondistributable artifacts \
-             typically have restrictions on how and where they can be distributed and shared. \
-             Only use this feature to push artifacts to private registries and ensure that you \
-             are in compliance with any terms that cover redistributing nondistributable \
-             artifacts."]
+    #[doc = "List of registry hostnames to which nondistributable artifacts can be pushed, using the format `<hostname>[:<port>]` or `<IP address>[:<port>]`.  Some images (for example, Windows base images) contain artifacts whose distribution is restricted by license. When these images are pushed to a registry, restricted artifacts are not included.  This configuration override this behavior for the specified registries.  This option is useful when pushing images containing nondistributable artifacts to a registry on an air-gapped network so hosts on that network can pull the images without connecting to another server.\n\n**Warning**: Nondistributable artifacts typically have restrictions on how and where they can be distributed and shared. Only use this feature to push artifacts to private registries and ensure that you are in compliance with any terms that cover redistributing nondistributable artifacts."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allow_nondistributable_artifacts_hostnames: Option<Vec<String>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -5954,15 +5806,12 @@ impl tabled::Tabled for RegistryServiceConfig {
     }
 }
 
-#[doc = "Runtime describes an [OCI compliant](https://github.com/opencontainers/runtime-spec) \
-         runtime.  The runtime is invoked by the daemon via the `containerd` daemon. OCI runtimes \
-         act as an interface to the Linux kernel namespaces, cgroups, and SELinux."]
+#[doc = "Runtime describes an [OCI compliant](https://github.com/opencontainers/runtime-spec) runtime.  The runtime is invoked by the daemon via the `containerd` daemon. OCI runtimes act as an interface to the Linux kernel namespaces, cgroups, and SELinux."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Runtime {
-    #[doc = "Name and, optional, path, of the OCI executable binary.  If the path is omitted, the \
-             daemon searches the host's `$PATH` for the binary and uses the first result."]
+    #[doc = "Name and, optional, path, of the OCI executable binary.  If the path is omitted, the daemon searches the host's `$PATH` for the binary and uses the first result."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub path: Option<String>,
     #[doc = "List of command-line arguments to pass to the runtime when invoked."]
@@ -6484,9 +6333,7 @@ pub struct User {
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,
-    #[doc = "The name of the user. This is auto populated at first from the authentication \
-             provider (if there was a name). It can be updated by the user by updating their \
-             `first_name` and `last_name` fields."]
+    #[doc = "The name of the user. This is auto populated at first from the authentication provider (if there was a name). It can be updated by the user by updating their `first_name` and `last_name` fields."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[doc = "The user's phone number."]
@@ -6648,8 +6495,7 @@ impl tabled::Tabled for UserResultsPage {
     }
 }
 
-#[doc = "A verification token for a user.\n\nThis is typically used to verify a user's email \
-         address."]
+#[doc = "A verification token for a user.\n\nThis is typically used to verify a user's email address."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -6658,12 +6504,10 @@ pub struct VerificationToken {
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The date and time the verification token expires."]
     pub expires: chrono::DateTime<chrono::Utc>,
-    #[doc = "The token used for verification. This is used as the id for the table since it is \
-             unique per record."]
+    #[doc = "The token used for verification. This is used as the id for the table since it is unique per record."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
-    #[doc = "The identifier for the user. This is typically the user's email address since that \
-             is what we are verifying."]
+    #[doc = "The identifier for the user. This is typically the user's email address since that is what we are verifying."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub identifier: Option<String>,
     #[doc = "The date and time the verification token was last updated."]
