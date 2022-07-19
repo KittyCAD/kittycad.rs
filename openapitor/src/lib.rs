@@ -566,3 +566,28 @@ async fn run_cargo_clippy(opts: &Opts) -> Result<()> {
 
     Ok(())
 }
+
+#[cfg(test)]
+async fn run_cargo_test(opts: &Opts) -> Result<()> {
+    log::info!("Running `cargo test`...");
+
+    // Shell out and run cargo clippy on the output directory.
+    let output = if opts.output.display().to_string() == "." {
+        "".to_string()
+    } else {
+        opts.output.display().to_string()
+    };
+
+    let mut cmd = tokio::process::Command::new("cargo");
+    cmd.args(["test"]).current_dir(output);
+
+    let output = cmd.output().await?;
+    if !output.status.success() {
+        anyhow::bail!(
+            "cargo test failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    Ok(())
+}

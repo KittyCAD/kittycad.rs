@@ -115,11 +115,9 @@ pub fn render_schema(
         openapiv3::SchemaKind::Type(openapiv3::Type::Array(a)) => {
             // We don't render arrays, since it is a combination of another type.
             // Let's ensure the items are a reference, otherwise we should render it.
-            if let Some(items) = &a.items {
-                if let openapiv3::ReferenceOr::Item(s) = items {
-                    // We need to render the item.
-                    return render_schema(name, s, spec);
-                }
+            if let Some(openapiv3::ReferenceOr::Item(s)) = &a.items {
+                // We need to render the item.
+                return render_schema(name, s, spec);
             }
 
             Ok(quote!())
@@ -775,7 +773,7 @@ fn render_one_of(
             let rendered_type = match &schema.schema_kind {
                 openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
                     if tag_name.is_empty() {
-                        get_type_name_for_schema(&name, &schema, spec, true)?
+                        get_type_name_for_schema(name, &schema, spec, true)?
                     } else {
                         // Check if we have a component schema already for this type.
                         // In some cases the tag name is the same as the type name.
@@ -860,8 +858,8 @@ fn render_any(
                 properties: any.properties.clone(),
                 required: any.required.clone(),
                 additional_properties: any.additional_properties.clone(),
-                min_properties: any.min_properties.clone(),
-                max_properties: any.max_properties.clone(),
+                min_properties: any.min_properties,
+                max_properties: any.max_properties,
             },
             data,
             spec,
