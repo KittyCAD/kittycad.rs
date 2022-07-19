@@ -852,7 +852,7 @@ fn get_one_of_values(
                         quote!(#ident)
                     }
                 }
-                _ => get_type_name_for_schema(name, &schema, spec, true)?,
+                _ => get_type_name_for_schema(name, &one_of.expand(spec)?, spec, true)?,
             };
 
             if !tag_name.is_empty() {
