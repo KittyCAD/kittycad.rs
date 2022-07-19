@@ -329,7 +329,9 @@ pub fn generate_example_rust_from_schema(
                         quote!("some-password".to_string())
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Byte) => {
-                        quote!("some-base64-encoded-string".to_string())
+                        quote!(crate::types::base64::Base64Data::from_str(
+                            "some-base64-encoded-string"
+                        )?)
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Binary) => {
                         quote!(bytes::Bytes::from("some-string"))
@@ -472,7 +474,11 @@ pub fn generate_example_rust_from_schema(
             // Make sure we have a reference for our type.
             if let Some(ref s) = a.items {
                 let items = s.get_schema_from_reference(spec, true)?;
-                let item_example = generate_example_rust_from_schema(name, &items, spec)?;
+                let item_example = generate_example_rust_from_schema(
+                    name.trim_start_matches("Vec").trim_end_matches('>'),
+                    &items,
+                    spec,
+                )?;
                 quote!(vec![#item_example])
             } else {
                 // We have no items.

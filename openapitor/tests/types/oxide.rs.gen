@@ -2541,7 +2541,7 @@ pub struct NetworkInterface {
     #[doc = "The Instance to which the interface belongs."]
     pub instance_id: uuid::Uuid,
     #[doc = "The IP address assigned to this interface."]
-    pub ip: std::net::Ipv4Addr,
+    pub ip: std::net::IpAddr,
     #[doc = "The MAC address assigned to this interface."]
     pub mac: String,
     #[doc = "unique, mutable, user-controlled identifier for each resource"]
@@ -2611,7 +2611,7 @@ pub struct NetworkInterfaceCreate {
     pub description: String,
     #[doc = "The IP address for the interface. One will be auto-assigned if not provided."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub ip: Option<std::net::Ipv4Addr>,
+    pub ip: Option<std::net::IpAddr>,
     #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
     pub name: String,
     #[doc = "The VPC Subnet in which to create the interface."]
@@ -3576,7 +3576,7 @@ impl tabled::Tabled for RoleResultsPage {
 #[serde(tag = "type", content = "value")]
 pub enum RouteDestination {
     #[serde(rename = "ip")]
-    Ip(std::net::Ipv4Addr),
+    Ip(std::net::IpAddr),
     #[serde(rename = "ip_net")]
     IpNet(IpNet),
     #[serde(rename = "vpc")]
@@ -3598,7 +3598,7 @@ pub enum RouteDestination {
 #[serde(tag = "type", content = "value")]
 pub enum RouteTarget {
     #[serde(rename = "ip")]
-    Ip(std::net::Ipv4Addr),
+    Ip(std::net::IpAddr),
     #[serde(rename = "vpc")]
     Vpc(String),
     #[serde(rename = "subnet")]
@@ -5571,7 +5571,7 @@ pub enum VpcFirewallRuleHostFilter {
     #[serde(rename = "instance")]
     Instance(String),
     #[serde(rename = "ip")]
-    Ip(std::net::Ipv4Addr),
+    Ip(std::net::IpAddr),
     #[serde(rename = "ip_net")]
     IpNet(IpNet),
 }
@@ -5645,7 +5645,7 @@ pub enum VpcFirewallRuleTarget {
     #[serde(rename = "instance")]
     Instance(String),
     #[serde(rename = "ip")]
-    Ip(std::net::Ipv4Addr),
+    Ip(std::net::IpAddr),
     #[serde(rename = "ip_net")]
     IpNet(IpNet),
 }
