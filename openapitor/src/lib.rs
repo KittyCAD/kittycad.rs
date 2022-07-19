@@ -353,7 +353,7 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
         &serde_json::to_value(modified_spec)?,
     );
     // Save our patch file.
-    let mut patch_file = std::env::current_dir()?;
+    let mut patch_file = opts.output.clone();
     patch_file.push(format!("{}.rs.patch.json", opts.name));
     crate::save(&patch_file, &serde_json::to_string_pretty(&patch)?)?;
     log::info!("Patch file has been saved to {}", patch_file.display());
