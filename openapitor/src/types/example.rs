@@ -305,7 +305,8 @@ pub fn generate_example_rust_from_schema(
     Ok(match &schema.schema_kind {
         openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
             if !s.enumeration.is_empty() {
-                let name_ident = crate::types::get_type_name_for_schema(name, schema, spec, false)?;
+                let name_ident = crate::types::get_type_name_for_schema(name, schema, spec, false)?
+                    .strip_option()?;
                 // Get a random item from the enum.
                 let random_value = generate_example_json_from_schema(schema, spec)?.to_string();
                 let random_value = random_value.trim_start_matches('"').trim_end_matches('"');
@@ -390,7 +391,45 @@ pub fn generate_example_rust_from_schema(
             quote!(4 as #t)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
-            let object_name = crate::types::get_type_name_for_schema(name, schema, spec, false)?;
+            let object_name = crate::types::get_type_name_for_schema(name, schema, spec, false)?
+                .strip_option()?;
+
+            // If the object has no properties, but has additional_properties, just use that
+            // for the type.
+            if o.properties.is_empty() {
+                if let Some(additional_properties) = &o.additional_properties {
+                    match additional_properties {
+                        openapiv3::AdditionalProperties::Any(_any) => {
+                            // The GitHub API has additional properties that are not actually
+                            // properties, but are instead literally empty.
+                            // This shows up as `any == true || any == false` in the spec.
+                            // We should just ignore these.
+                        }
+                        openapiv3::AdditionalProperties::Schema(schema) => {
+                            let t = if let Ok(reference) = schema.reference() {
+                                generate_example_rust_from_schema(
+                                    &reference,
+                                    &schema.expand(spec)?,
+                                    spec,
+                                )?
+                            } else {
+                                generate_example_rust_from_schema(
+                                    name,
+                                    &schema.expand(spec)?,
+                                    spec,
+                                )?
+                            };
+
+                            // The additional properties is a HashMap of the key to the value.
+                            // Where the key is a string.
+                            return Ok(quote!(std::collections::HashMap::from([(
+                                "some-key".to_string(),
+                                #t
+                            )])));
+                        }
+                    }
+                }
+            }
 
             // Generate a random object.
             let mut args = Vec::new();

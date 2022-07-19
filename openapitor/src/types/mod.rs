@@ -1218,6 +1218,7 @@ pub fn clean_property_name(s: &str) -> String {
         || prop == "enum"
         || prop == "const"
         || prop == "use"
+        || prop == "async"
     {
         prop = format!("{}_", prop);
     } else if prop == "$ref" || prop == "$type" {
@@ -1338,9 +1339,27 @@ pub fn proper_name(s: &str) -> String {
     // 1 => One
     // 2 => Two
     // 100 => OneHundred
+    // 2FaDisabled => TwoFaDisabled
     // etc.
     let s = if let Ok(num) = s.parse::<i32>() {
         num.cardinal()
+    } else {
+        s.to_string()
+    };
+
+    // Check if just the first character is a number.
+    // Get the first character of the string.
+    let first_char = s.chars().next().unwrap();
+    let s = if let Ok(num) = first_char.to_string().parse::<i32>() {
+        if s.len() == 1 {
+            num.cardinal()
+        } else if !s.chars().nth(1).unwrap().is_numeric() {
+            // Make sure the second character is not a number.
+            // If it is, we want to add an underscore to the front of the string.
+            s.replace(first_char, &num.cardinal())
+        } else {
+            s.to_string()
+        }
     } else {
         s.to_string()
     };
@@ -1665,6 +1684,7 @@ mod test {
         assert_eq!(super::proper_name("1"), "One");
         assert_eq!(super::proper_name("2"), "Two");
         assert_eq!(super::proper_name("100"), "OneHundred");
+        assert_eq!(super::proper_name("2FaDisabled"), "TwoFaDisabled");
     }
 
     #[test]
