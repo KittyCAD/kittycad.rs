@@ -65,11 +65,6 @@ async fn test_create_file_volume() {
 
     assert_eq!(result.src_format, crate::types::FileSourceFormat::Obj);
     assert_eq!(result.status, crate::types::ApiCallStatus::Completed);
-
-    expectorate::assert_contents(
-        "tests/tabled_object.txt",
-        &tabled::Table::new(vec![result]).to_string(),
-    );
 }
 
 #[tokio::test]
