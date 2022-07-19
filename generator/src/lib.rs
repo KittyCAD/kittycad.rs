@@ -317,6 +317,9 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
         crate::save(tagrs, &crate::types::get_text_fmt(&output)?)?;
     }
 
+    // Run fmt in our output directory.
+    run_cargo_fmt(opts).await?;
+
     // Run clippy in our output directory.
     run_cargo_clippy(opts).await?;
 
@@ -506,6 +509,30 @@ rustdoc-args = ["--cfg", "docsrs"]
 "#,
         opts.name, opts.description, opts.version, opts.name, repo_info,
     )
+}
+
+async fn run_cargo_fmt(opts: &Opts) -> Result<()> {
+    log::info!("Running `cargo fmt`...");
+
+    // Shell out and run cargo clippy on the output directory.
+    let output = if opts.output.display().to_string() == "." {
+        "".to_string()
+    } else {
+        opts.output.display().to_string()
+    };
+
+    let mut cmd = tokio::process::Command::new("cargo");
+    cmd.args(["fmt"]).current_dir(output);
+
+    let output = cmd.output().await?;
+    if !output.status.success() {
+        anyhow::bail!(
+            "cargo fmt failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    Ok(())
 }
 
 async fn run_cargo_clippy(opts: &Opts) -> Result<()> {

@@ -29,7 +29,6 @@ kittycad: target/debug/generator
 		--spec-url "https://api.kittycad.io" \
 		--base-url "https://api.kittycad.io" \
 		--repo-name "KittyCAD/kittycad.rs" $(EXTRA_ARGS)
-	cargo fmt -p kittycad
 
 .PHONY: tag
 tag: ## Create a new git tag to prepare to build a release.
