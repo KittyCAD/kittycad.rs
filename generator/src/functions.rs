@@ -358,7 +358,7 @@ fn remove_stutters(whole: &str, s: &str) -> String {
         whole = whole.replace(&format!("_{}_", s), "_");
     }
 
-    whole.to_string()
+    whole
 }
 
 struct RequestOrResponse {
