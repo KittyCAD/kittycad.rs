@@ -91,9 +91,9 @@ impl Oauth2 {
              in a full user agent (e.g., a browser). If the user is not logged in, we redirect \
              them to the login page and use the `callback_url` parameter to get them to the UI \
              verification form upon logging in. If they are logged in, we redirect them to the UI \
-             verification form on the website.\n\n```rust,no_run\nasync fn \
-             example_oauth2_device_auth_verify() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    \
+             verification form on the website.\n\n**Parameters:**\n\n- `user_code: &'astr`: The \
+             user code. (required)\n\n```rust,no_run\nasync fn example_oauth2_device_auth_verify() \
+             -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
              client.oauth2().device_auth_verify(\"some-string\").await?;\n    Ok(())\n}\n```"]
     pub async fn device_auth_verify<'a>(
         &'a self,
@@ -116,7 +116,16 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Listen for callbacks for the OAuth 2.0 provider.\n\n```rust,no_run\nasync fn example_oauth2_listen_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .listen_provider_callback(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Google,\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Listen for callbacks for the OAuth 2.0 provider.\n\n**Parameters:**\n\n- `code: \
+             Option<String>`: The authorization code.\n- `provider: \
+             crate::types::AccountProvider`: The provider. (required)\n- `state: Option<String>`: \
+             The state that we had passed in through the user consent \
+             URL.\n\n```rust,no_run\nasync fn example_oauth2_listen_provider_callback() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
+             client\n        .oauth2()\n        .listen_provider_callback(\n            \
+             Some(\"some-string\".to_string()),\n            \
+             kittycad::types::AccountProvider::Github,\n            \
+             Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n```"]
     pub async fn listen_provider_callback<'a>(
         &'a self,
         code: Option<String>,
@@ -152,7 +161,16 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Get the consent URL and other information for the OAuth 2.0 provider.\n\n```rust,no_run\nasync fn example_oauth2_listen_provider_consent() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo = client\n        .oauth2()\n        .listen_provider_consent(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Google,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get the consent URL and other information for the OAuth 2.0 \
+             provider.\n\n**Parameters:**\n\n- `callback_url: Option<String>`: The URL to redirect \
+             back to after we have authenticated.\n- `provider: crate::types::AccountProvider`: \
+             The provider. (required)\n\n```rust,no_run\nasync fn \
+             example_oauth2_listen_provider_consent() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo \
+             = client\n        .oauth2()\n        .listen_provider_consent(\n            \
+             Some(\"some-string\".to_string()),\n            \
+             kittycad::types::AccountProvider::Github,\n        )\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn listen_provider_consent<'a>(
         &'a self,
         callback_url: Option<String>,

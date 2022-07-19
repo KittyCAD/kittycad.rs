@@ -13,7 +13,8 @@ impl Sessions {
 
     #[doc = "Get a session for your user.\n\nThis endpoint requires authentication by any KittyCAD \
              user. It returns details of the requested API token for the \
-             user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             user.\n\n**Parameters:**\n\n- `token: uuid::Uuid`: The API token. \
+             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
              example_sessions_get_for_user() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::Session = \
              client\n        .sessions()\n        .get_for_user(uuid::Uuid::from_str(\n            \

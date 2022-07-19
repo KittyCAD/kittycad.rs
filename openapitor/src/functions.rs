@@ -46,7 +46,7 @@ pub fn generate_files(
                 })?);
 
             // Get the docs.
-            let docs = generate_docs(name, method, op)?;
+            let docs = generate_docs(name, method, op, spec)?;
 
             // Get the function name.
             let fn_name = get_fn_name(name, method, &tag, op)?;
@@ -280,7 +280,12 @@ pub fn generate_files(
 }
 
 /// Generate the docs for the given operation.
-fn generate_docs(name: &str, method: &http::Method, op: &openapiv3::Operation) -> Result<String> {
+fn generate_docs(
+    name: &str,
+    method: &http::Method,
+    op: &openapiv3::Operation,
+    spec: &openapiv3::OpenAPI,
+) -> Result<String> {
     let mut docs = if let Some(summary) = &op.summary {
         summary.to_string()
     } else {
@@ -292,7 +297,36 @@ fn generate_docs(name: &str, method: &http::Method, op: &openapiv3::Operation) -
         docs.push_str(description);
     }
 
-    // TODO: document the params.
+    // Document the params.
+    let mut params = get_path_params_schema(op, spec)?;
+    params.append(&mut get_query_params_schema(op, spec)?);
+
+    let params_types = get_args(op, spec)?;
+
+    if !params.is_empty() {
+        docs.push_str("\n\n**Parameters:**\n");
+    }
+    for (name, (_schema, parameter_data)) in params {
+        // Get the type of the param.
+        let param_type = params_types.get(&name).ok_or_else(|| {
+            // This should not happen since both call the same functions.
+            anyhow::anyhow!(
+                "Could not find type for param `{}` in operation `{}`",
+                name,
+                name
+            )
+        })?;
+        let mut param_docs = format!("- `{}: {}`", name, param_type.rendered()?);
+        if let Some(description) = &parameter_data.description {
+            param_docs.push_str(": ");
+            param_docs.push_str(description);
+        }
+        if parameter_data.required {
+            param_docs.push_str(" (required)");
+        }
+        docs.push('\n');
+        docs.push_str(&param_docs);
+    }
 
     if op.deprecated {
         docs.push_str("\n\n");
@@ -413,12 +447,12 @@ fn get_args(
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
-    let query_params = get_query_params(op, spec)?;
     let path_params = get_path_params(op, spec)?;
+    let query_params = get_query_params(op, spec)?;
 
-    Ok(query_params
+    Ok(path_params
         .into_iter()
-        .chain(path_params.into_iter())
+        .chain(query_params.into_iter())
         .collect())
 }
 
@@ -508,8 +542,8 @@ fn get_example_args(
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
-    let mut params = get_query_params_schema(op, spec)?;
-    params.append(&mut get_path_params_schema(op, spec)?);
+    let mut params = get_path_params_schema(op, spec)?;
+    params.append(&mut get_query_params_schema(op, spec)?);
 
     let mut new_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
 
@@ -925,7 +959,7 @@ fn generate_example_code_fn(
     opts: &crate::Opts,
 ) -> Result<String> {
     // Get the docs.
-    let docs = generate_docs(name, method, op)?;
+    let docs = generate_docs(name, method, op, spec)?;
     let docs = docs.replace('\n', "\n/// ");
 
     // Get the function name.
