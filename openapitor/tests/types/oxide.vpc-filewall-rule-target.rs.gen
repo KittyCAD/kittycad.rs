@@ -17,7 +17,7 @@ pub enum VpcFirewallRuleTarget {
     #[serde(rename = "instance")]
     Instance(String),
     #[serde(rename = "ip")]
-    Ip(std::net::Ipv4Addr),
+    Ip(std::net::IpAddr),
     #[serde(rename = "ip_net")]
     IpNet(IpNet),
 }
