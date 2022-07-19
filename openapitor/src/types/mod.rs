@@ -11,6 +11,7 @@ pub mod random;
 use std::str::FromStr;
 
 use anyhow::Result;
+use indexmap::map::IndexMap;
 use numeral::Cardinal;
 
 use crate::types::exts::{
@@ -124,8 +125,8 @@ pub fn render_schema(
         openapiv3::SchemaKind::AllOf { all_of: _ } => {
             anyhow::bail!("XXX all of not supported yet");
         }
-        openapiv3::SchemaKind::AnyOf { any_of: _ } => {
-            anyhow::bail!("XXX any of not supported yet");
+        openapiv3::SchemaKind::AnyOf { any_of } => {
+            render_any_of(name, any_of, &schema.schema_data, spec)
         }
         openapiv3::SchemaKind::Not { not: _ } => {
             anyhow::bail!("XXX not not supported yet");
@@ -510,6 +511,44 @@ fn get_type_name_for_array(
     Ok(quote!(Vec<#t>))
 }
 
+/// Any of means validates the value against any (one or more) of the subschemas.
+fn render_any_of(
+    name: &str,
+    any_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
+    data: &openapiv3::SchemaData,
+    spec: &openapiv3::OpenAPI,
+) -> Result<proc_macro2::TokenStream> {
+    // The any of needs to be an object with optional values since it can be any (one or more) of multiple types.
+    // We want to iterate over each of the subschemas and combine all of the types.
+    // We assume all of the subschemas are objects.
+    let mut properties: IndexMap<String, openapiv3::ReferenceOr<Box<openapiv3::Schema>>> =
+        IndexMap::new();
+    for any_of in any_ofs {
+        // Get the schema for this OneOf.
+        let schema = any_of.get_schema_from_reference(spec, true)?;
+
+        // Ensure the type is an object.
+        if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
+            for (k, v) in o.properties.iter() {
+                properties.insert(k.clone(), v.clone());
+            }
+        } else {
+            anyhow::bail!("any_of in `{}` is not an object: `{:?}`", name, schema);
+        }
+    }
+
+    // Let's render the object.
+    render_object(
+        name,
+        &openapiv3::ObjectType {
+            properties,
+            ..Default::default()
+        },
+        data,
+        spec,
+    )
+}
+
 /// Render the full type for a one of.
 fn render_one_of(
     name: &str,
@@ -525,6 +564,13 @@ fn render_one_of(
 
     // Get the proper name version of the type.
     let one_of_name = get_type_name(name, data)?;
+
+    // Check if this this a one_of with a single item.
+    if one_of.len() == 1 {
+        let first = one_of[0].item()?;
+        // Return the one_of type.
+        return render_schema(name, first, spec);
+    }
 
     // Any additional types we might need for rendering this type.
     let mut additional_types = quote!();
@@ -643,26 +689,28 @@ fn render_one_of(
             let rendered_type = match &schema.schema_kind {
                 openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
                     if tag_name.is_empty() {
-                        anyhow::bail!("no tag name for one of `{:?}`", schema);
-                    }
+                        get_type_name_for_schema(&name, &schema, spec, true)?
+                    } else {
+                        // Check if we have a component schema already for this type.
+                        // In some cases the tag name is the same as the type name.
+                        // And it is a an enum of 1 and that corresponds to the schema type.
+                        if let Some(components) = &spec.components {
+                            if !components.schemas.contains_key(&tag_name) {
+                                // Ensure we have a type for this type.
+                                let obj = render_object(&tag_name, o, &schema.schema_data, spec)?;
+                                additional_types = quote!(
+                                    #additional_types
 
-                    // Check if we have a component schema already for this type.
-                    if let Some(components) = &spec.components {
-                        if !components.schemas.contains_key(&tag_name) {
-                            // Ensure we have a type for this type.
-                            let obj = render_object(&tag_name, o, &schema.schema_data, spec)?;
-                            additional_types = quote!(
-                                #additional_types
-
-                                #obj
-                            );
+                                    #obj
+                                );
+                            }
+                            // TODO: ensure the types are equal with the exception of the tag.
                         }
-                        // TODO: ensure the types are equal with the exception of the tag.
-                    }
 
-                    // Return the type name.
-                    let ident = format_ident!("{}", proper_name(&tag_name));
-                    quote!(#ident)
+                        // Return the type name.
+                        let ident = format_ident!("{}", proper_name(&tag_name));
+                        quote!(#ident)
+                    }
                 }
                 _ => get_type_name_for_schema("", &schema, spec, true)?,
             };
@@ -682,7 +730,9 @@ fn render_one_of(
                     )
                 }
             } else {
-                anyhow::bail!("no tag name for one of `{:?}`", schema);
+                quote!(
+                    #rendered_type(#rendered_type),
+                )
             }
         };
 
@@ -800,11 +850,17 @@ fn render_object(
             serde_props.push(quote!(skip_serializing_if = "Option::is_none"));
         }
 
+        let serde_full = if serde_props.is_empty() {
+            quote!()
+        } else {
+            quote!(#[serde(#(#serde_props),*)])
+        };
+
         values = quote!(
             #values
 
             #prop_desc
-            #[serde(#(#serde_props),*)]
+            #serde_full
             #prop_value
         );
     }
@@ -1416,8 +1472,6 @@ mod test {
     }
 
     #[test]
-    // TODO: also make these work but not a priority.
-    #[ignore]
     fn test_generate_github_types() {
         let result = super::generate_types(
             &crate::load_json_spec(include_str!("../../tests/api.github.com.json")).unwrap(),
@@ -1431,5 +1485,14 @@ mod test {
         assert_eq!(super::proper_name("1"), "One");
         assert_eq!(super::proper_name("2"), "Two");
         assert_eq!(super::proper_name("100"), "OneHundred");
+    }
+
+    #[test]
+    fn test_proper_name_kebab() {
+        assert_eq!(super::proper_name("kebab-case"), "KebabCase");
+        assert_eq!(
+            super::proper_name("webhook-config-insecure-ssl"),
+            "WebhookConfigInsecureSsl"
+        );
     }
 }

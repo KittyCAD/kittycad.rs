@@ -169,7 +169,7 @@ impl Oauth2 {
              kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo \
              = client\n        .oauth2()\n        .listen_provider_consent(\n            \
              Some(\"some-string\".to_string()),\n            \
-             kittycad::types::AccountProvider::Github,\n        )\n        .await?;\n    \
+             kittycad::types::AccountProvider::Google,\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     pub async fn listen_provider_consent<'a>(
         &'a self,

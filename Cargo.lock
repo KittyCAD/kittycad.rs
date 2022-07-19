@@ -1125,6 +1125,7 @@ dependencies = [
  "format_serde_error",
  "futures-util",
  "http",
+ "indexmap",
  "json-patch",
  "log",
  "numeral",
