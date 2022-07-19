@@ -199,9 +199,13 @@ pub fn get_type_name_for_schema(
                 }
             }
         }
-        openapiv3::SchemaKind::AnyOf { any_of: _ } => {
-            anyhow::bail!("XXX any of not supported yet");
-        }
+        openapiv3::SchemaKind::AnyOf { _any_of } => get_type_name_for_object(
+            name,
+            &openapiv3::ObjectType::default(),
+            &schema.schema_data,
+            spec,
+            in_crate,
+        )?,
         openapiv3::SchemaKind::Not { not: _ } => {
             anyhow::bail!("XXX not not supported yet");
         }
