@@ -91,7 +91,7 @@ pub fn generate_files(
             // For the rust docs example code we want to trim the doc string since it is
             // repetitive.
             let rust_doc_example_code_fn = &example_code_fn[example_code_fn
-                .find("use std::")
+                .find("\nuse ")
                 .unwrap_or_else(|| example_code_fn.find("async fn example_").unwrap_or(0))
                 ..example_code_fn.len()];
 
