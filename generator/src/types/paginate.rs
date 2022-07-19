@@ -11,7 +11,7 @@ pub trait Pagination {
     fn has_more_pages(&self) -> bool;
 
     /// Modify a request to get the next page.
-    fn next_page(
+    fn next_page<T>(
         &self,
         req: reqwest::Request,
     ) -> Result<reqwest::Request, crate::types::error::Error>;

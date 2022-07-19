@@ -142,7 +142,7 @@ pub mod paginate {
         #[doc = " Returns true if the response has more pages."]
         fn has_more_pages(&self) -> bool;
         #[doc = " Modify a request to get the next page."]
-        fn next_page(
+        fn next_page<T>(
             &self,
             req: reqwest::Request,
         ) -> Result<reqwest::Request, crate::types::error::Error>;
@@ -321,7 +321,7 @@ pub mod error {
         #[doc = " An expected error response."]
         InvalidResponsePayload {
             #[doc = " The error."]
-            error: reqwest::Error,
+            error: Error,
             #[doc = " The full response."]
             response: reqwest::Response,
         },
@@ -394,7 +394,6 @@ pub mod error {
             match self {
                 Error::CommunicationError(e) => Some(e),
                 Error::SerdeError { error, status: _ } => Some(error),
-                Error::InvalidResponsePayload { error, response: _ } => Some(error),
                 _ => None,
             }
         }
@@ -445,10 +444,8 @@ pub struct Address {
     #[tabled(skip)]
     pub country: Option<String>,
     #[doc = "The time and date the address was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The unique identifier of the address."]
-    #[serde()]
     pub id: uuid::Uuid,
     #[doc = "The state component."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -463,7 +460,6 @@ pub struct Address {
     #[tabled(skip)]
     pub street_2: Option<String>,
     #[doc = "The time and date the address was last updated."]
-    #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID that this address belongs to."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -496,9 +492,7 @@ impl std::fmt::Display for Address {
     tabled :: Tabled,
 )]
 pub struct ApiCallQueryGroup {
-    #[serde()]
     pub count: i64,
-    #[serde()]
     pub query: String,
 }
 
@@ -589,7 +583,6 @@ pub struct ApiCallWithPrice {
     #[tabled(skip)]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The date and time the API call was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The duration of the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -604,14 +597,12 @@ pub struct ApiCallWithPrice {
     #[tabled(skip)]
     pub endpoint: Option<String>,
     #[doc = "The unique identifier for the API call."]
-    #[serde()]
     pub id: uuid::Uuid,
     #[doc = "The ip address of the origin."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub ip_address: Option<std::net::Ipv4Addr>,
     #[doc = "The HTTP method requsted by the API call."]
-    #[serde()]
     pub method: Method,
     #[doc = "The number of minutes the API call was billed for."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -651,13 +642,10 @@ pub struct ApiCallWithPrice {
     #[tabled(skip)]
     pub stripe_invoice_item_id: Option<String>,
     #[doc = "The API token that made the API call."]
-    #[serde()]
     pub token: uuid::Uuid,
     #[doc = "The date and time the API call was last updated."]
-    #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user agent of the request."]
-    #[serde()]
     pub user_agent: String,
     #[doc = "The ID of the user that made the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -687,7 +675,6 @@ impl std::fmt::Display for ApiCallWithPrice {
 )]
 pub struct ApiCallWithPriceResultsPage {
     #[doc = "list of items on this page of results"]
-    #[serde()]
     #[tabled(skip)]
     pub items: Vec<ApiCallWithPrice>,
     #[doc = "token used to fetch the next page of results (if any)"]
@@ -745,7 +732,6 @@ impl crate::types::paginate::Pagination for ApiCallWithPriceResultsPage {
 )]
 pub struct ApiToken {
     #[doc = "The date and time the API token was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The unique identifier for the API token."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -753,13 +739,10 @@ pub struct ApiToken {
     pub id: Option<String>,
     #[doc = "If the token is valid. We never delete API tokens, but we can mark them as invalid. \
              We save them for ever to preserve the history of the API token."]
-    #[serde()]
     pub is_valid: bool,
     #[doc = "The API token itself."]
-    #[serde()]
     pub token: uuid::Uuid,
     #[doc = "The date and time the API token was last updated."]
-    #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The ID of the user that owns the API token."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -789,7 +772,6 @@ impl std::fmt::Display for ApiToken {
 )]
 pub struct ApiTokenResultsPage {
     #[doc = "list of items on this page of results"]
-    #[serde()]
     #[tabled(skip)]
     pub items: Vec<ApiToken>,
     #[doc = "token used to fetch the next page of results (if any)"]
@@ -851,14 +833,12 @@ pub struct AsyncApiCall {
     #[tabled(skip)]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the async API call was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub error: Option<String>,
     #[doc = "The unique identifier of the async API call.\n\nThis is the same as the API call ID."]
-    #[serde()]
     pub id: uuid::Uuid,
     #[doc = "The JSON input for the API call. These are determined by the endpoint that is run."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -873,13 +853,11 @@ pub struct AsyncApiCall {
     #[tabled(skip)]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the async API call."]
-    #[serde()]
     pub status: ApiCallStatus,
     #[doc = "The type of async API call."]
     #[serde(rename = "type")]
     pub type_: AsyncApiCallType,
     #[doc = "The time and date the async API call was last updated."]
-    #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the async API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -931,7 +909,6 @@ pub enum AsyncApiCallOutput {
 )]
 pub struct AsyncApiCallResultsPage {
     #[doc = "list of items on this page of results"]
-    #[serde()]
     #[tabled(skip)]
     pub items: Vec<AsyncApiCall>,
     #[doc = "token used to fetch the next page of results (if any)"]
@@ -1045,7 +1022,6 @@ impl std::fmt::Display for BillingInfo {
 )]
 pub struct CacheMetadata {
     #[doc = "If the cache returned an ok response from ping."]
-    #[serde()]
     pub ok: bool,
 }
 
@@ -1277,7 +1253,6 @@ pub struct Connection {
     #[tabled(skip)]
     pub cluster: Option<Cluster>,
     #[doc = "The time the configuration was loaded."]
-    #[serde()]
     pub config_load_time: chrono::DateTime<chrono::Utc>,
     #[doc = "The number of connections to the server."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1307,7 +1282,6 @@ pub struct Connection {
     #[tabled(skip)]
     pub gomaxprocs: Option<i64>,
     #[doc = "The host of the server."]
-    #[serde()]
     pub host: std::net::Ipv4Addr,
     #[doc = "The http base path of the server."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1321,7 +1295,6 @@ pub struct Connection {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub http_port: Option<i64>,
-    #[serde()]
     #[tabled(skip)]
     pub http_req_stats: std::collections::HashMap<String, i64>,
     #[doc = "The https port of the server."]
@@ -1369,7 +1342,6 @@ pub struct Connection {
     #[tabled(skip)]
     pub mem: Option<i64>,
     #[doc = "The time now."]
-    #[serde()]
     pub now: chrono::DateTime<chrono::Utc>,
     #[doc = "The count of outbound bytes for the server."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1416,7 +1388,6 @@ pub struct Connection {
     #[tabled(skip)]
     pub slow_consumers: Option<i64>,
     #[doc = "When the server was started."]
-    #[serde()]
     pub start: chrono::DateTime<chrono::Utc>,
     #[doc = "The number of subscriptions for the server."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1943,11 +1914,9 @@ pub struct Customer {
     #[tabled(skip)]
     pub balance: Option<f64>,
     #[doc = "Time at which the object was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "Three-letter ISO code for the currency the customer can be charged in for recurring \
              billing purposes."]
-    #[serde()]
     pub currency: Currency,
     #[doc = "When the customer's latest invoice is billed by charging automatically, `delinquent` \
              is `true` if the invoice's latest charge failed.\n\nWhen the customer's latest \
@@ -2000,15 +1969,12 @@ impl std::fmt::Display for Customer {
 )]
 pub struct CustomerBalance {
     #[doc = "The date and time the balance was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The unique identifier for the balance."]
-    #[serde()]
     pub id: uuid::Uuid,
     #[doc = "The monthy credits remaining in the balance. This gets re-upped every month, but if \
              the credits are not used for a month they do not carry over to the next month. It is \
              a stable amount granted to the user per month."]
-    #[serde()]
     pub monthly_credits_remaining: f64,
     #[doc = "The amount of pre-pay cash remaining in the balance. This number goes down as the \
              user uses their pre-paid credits. The reason we track this amount is if a user ever \
@@ -2019,20 +1985,16 @@ pub struct CustomerBalance {
              `pre_pay_credits_remaining` will be subtracted by 50 to pay the bill. This way if \
              they want to withdraw money after, they can only withdraw $50 since that is the \
              amount of cash they have remaining."]
-    #[serde()]
     pub pre_pay_cash_remaining: f64,
     #[doc = "The amount of credits remaining in the balance. This is typically the amount of cash \
              * some multiplier they get for pre-paying their account. This number lowers every \
              time a bill is paid with the balance. This number increases every time a user adds \
              funds to their balance. This may be through a subscription or a one off payment."]
-    #[serde()]
     pub pre_pay_credits_remaining: f64,
     #[doc = "This includes any outstanding, draft, or open invoices and any pending invoice \
              items. This does not include any credits the user has on their account."]
-    #[serde()]
     pub total_due: f64,
     #[doc = "The date and time the balance was last updated."]
-    #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID the balance belongs to."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2062,13 +2024,10 @@ impl std::fmt::Display for CustomerBalance {
 )]
 pub struct DeviceAccessTokenRequestForm {
     #[doc = "The client ID."]
-    #[serde()]
     pub client_id: uuid::Uuid,
     #[doc = "The device code."]
-    #[serde()]
     pub device_code: uuid::Uuid,
     #[doc = "The grant type."]
-    #[serde()]
     pub grant_type: Oauth2GrantType,
 }
 
@@ -2094,7 +2053,6 @@ impl std::fmt::Display for DeviceAccessTokenRequestForm {
 )]
 pub struct DeviceAuthRequestForm {
     #[doc = "The client ID."]
-    #[serde()]
     pub client_id: uuid::Uuid,
 }
 
@@ -2121,7 +2079,6 @@ impl std::fmt::Display for DeviceAuthRequestForm {
 )]
 pub struct DeviceAuthVerifyParams {
     #[doc = "The user code."]
-    #[serde()]
     pub user_code: String,
 }
 
@@ -2465,7 +2422,6 @@ pub struct EmailAuthenticationForm {
     #[tabled(skip)]
     pub callback_url: Option<url::Url>,
     #[doc = "The user's email."]
-    #[serde()]
     pub email: String,
 }
 
@@ -2492,22 +2448,16 @@ impl std::fmt::Display for EmailAuthenticationForm {
 )]
 pub struct EngineMetadata {
     #[doc = "If any async job is currently running."]
-    #[serde()]
     pub async_jobs_running: bool,
     #[doc = "Metadata about our cache."]
-    #[serde()]
     pub cache: CacheMetadata,
     #[doc = "The environment we are running in."]
-    #[serde()]
     pub environment: Environment,
     #[doc = "Metadata about our file system."]
-    #[serde()]
     pub fs: FileSystemMetadata,
     #[doc = "The git hash of the server."]
-    #[serde()]
     pub git_hash: String,
     #[doc = "Metadata about our pub-sub connection."]
-    #[serde()]
     pub pubsub: Connection,
 }
 
@@ -2557,14 +2507,13 @@ pub enum Environment {
     Clone,
     schemars :: JsonSchema,
     tabled :: Tabled,
+    thiserror :: Error,
 )]
 pub struct Error {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub error_code: Option<String>,
-    #[serde()]
     pub message: String,
-    #[serde()]
     pub request_id: String,
 }
 
@@ -2591,13 +2540,10 @@ impl std::fmt::Display for Error {
 )]
 pub struct ExecutorMetadata {
     #[doc = "Information about the docker daemon."]
-    #[serde()]
     pub docker_info: DockerSystemInfo,
     #[doc = "The environment we are running in."]
-    #[serde()]
     pub environment: Environment,
     #[doc = "The git hash of the server."]
-    #[serde()]
     pub git_hash: String,
 }
 
@@ -2629,7 +2575,6 @@ pub struct ExtendedUser {
     #[tabled(skip)]
     pub company: Option<String>,
     #[doc = "The date and time the user was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user's Discord handle."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2656,7 +2601,6 @@ pub struct ExtendedUser {
     #[tabled(skip)]
     pub id: Option<String>,
     #[doc = "The image avatar for the user. This is a URL."]
-    #[serde()]
     pub image: url::Url,
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2680,7 +2624,6 @@ pub struct ExtendedUser {
     #[tabled(skip)]
     pub stripe_id: Option<String>,
     #[doc = "The date and time the user was last updated."]
-    #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user's Zendesk ID. This is mostly used for internal mapping."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2710,7 +2653,6 @@ impl std::fmt::Display for ExtendedUser {
 )]
 pub struct ExtendedUserResultsPage {
     #[doc = "list of items on this page of results"]
-    #[serde()]
     #[tabled(skip)]
     pub items: Vec<ExtendedUser>,
     #[doc = "token used to fetch the next page of results (if any)"]
@@ -2772,34 +2714,28 @@ pub struct FileConversion {
     #[tabled(skip)]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the file conversion was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub error: Option<String>,
     #[doc = "The unique identifier of the file conversion.\n\nThis is the same as the API call ID."]
-    #[serde()]
     pub id: uuid::Uuid,
     #[doc = "The converted file, if completed, base64 encoded."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub output: Option<base64::Base64Data>,
     #[doc = "The output format of the file conversion."]
-    #[serde()]
     pub output_format: FileOutputFormat,
     #[doc = "The source format of the file conversion."]
-    #[serde()]
     pub src_format: FileSourceFormat,
     #[doc = "The time and date the file conversion was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the file conversion."]
-    #[serde()]
     pub status: ApiCallStatus,
     #[doc = "The time and date the file conversion was last updated."]
-    #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the file conversion."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2833,7 +2769,6 @@ pub struct FileDensity {
     #[tabled(skip)]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the density was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The resulting density."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2844,24 +2779,20 @@ pub struct FileDensity {
     #[tabled(skip)]
     pub error: Option<String>,
     #[doc = "The unique identifier of the density request.\n\nThis is the same as the API call ID."]
-    #[serde()]
     pub id: uuid::Uuid,
     #[doc = "The material mass as denoted by the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub material_mass: Option<f64>,
     #[doc = "The source format of the file."]
-    #[serde()]
     pub src_format: FileSourceFormat,
     #[doc = "The time and date the density was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the density."]
-    #[serde()]
     pub status: ApiCallStatus,
     #[doc = "The time and date the density was last updated."]
-    #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the density."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2895,14 +2826,12 @@ pub struct FileMass {
     #[tabled(skip)]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the mass was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub error: Option<String>,
     #[doc = "The unique identifier of the mass request.\n\nThis is the same as the API call ID."]
-    #[serde()]
     pub id: uuid::Uuid,
     #[doc = "The resulting mass."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2913,17 +2842,14 @@ pub struct FileMass {
     #[tabled(skip)]
     pub material_density: Option<f64>,
     #[doc = "The source format of the file."]
-    #[serde()]
     pub src_format: FileSourceFormat,
     #[doc = "The time and date the mass was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the mass."]
-    #[serde()]
     pub status: ApiCallStatus,
     #[doc = "The time and date the mass was last updated."]
-    #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the mass."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3023,7 +2949,6 @@ pub enum FileSourceFormat {
 )]
 pub struct FileSystemMetadata {
     #[doc = "If the file system passed a sanity check."]
-    #[serde()]
     pub ok: bool,
 }
 
@@ -3053,27 +2978,22 @@ pub struct FileVolume {
     #[tabled(skip)]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the volume was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub error: Option<String>,
     #[doc = "The unique identifier of the volume request.\n\nThis is the same as the API call ID."]
-    #[serde()]
     pub id: uuid::Uuid,
     #[doc = "The source format of the file."]
-    #[serde()]
     pub src_format: FileSourceFormat,
     #[doc = "The time and date the volume was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the volume."]
-    #[serde()]
     pub status: ApiCallStatus,
     #[doc = "The time and date the volume was last updated."]
-    #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the volume."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3225,11 +3145,9 @@ pub struct Invoice {
     #[tabled(skip)]
     pub attempted: Option<bool>,
     #[doc = "Time at which the object was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), \
              in lowercase."]
-    #[serde()]
     pub currency: Currency,
     #[doc = "The email address for the customer. Until the invoice is finalized, this field will \
              equal customer.email. Once the invoice is finalized, this field will no longer be \
@@ -3338,7 +3256,6 @@ pub struct InvoiceLineItem {
     pub amount: Option<f64>,
     #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), \
              in lowercase."]
-    #[serde()]
     pub currency: Currency,
     #[doc = "The description."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3652,25 +3569,18 @@ impl std::fmt::Display for MetaClusterInfo {
 )]
 pub struct Metadata {
     #[doc = "Metadata about our cache."]
-    #[serde()]
     pub cache: CacheMetadata,
     #[doc = "Metadata about our engine API connection."]
-    #[serde()]
     pub engine: EngineMetadata,
     #[doc = "The environment we are running in."]
-    #[serde()]
     pub environment: Environment,
     #[doc = "Metadata about our executor API connection."]
-    #[serde()]
     pub executor: ExecutorMetadata,
     #[doc = "Metadata about our file system."]
-    #[serde()]
     pub fs: FileSystemMetadata,
     #[doc = "The git hash of the server."]
-    #[serde()]
     pub git_hash: String,
     #[doc = "Metadata about our pub-sub connection."]
-    #[serde()]
     pub pubsub: Connection,
 }
 
@@ -3845,7 +3755,6 @@ pub struct PaymentIntent {
              client secret can be used to complete payment setup from your frontend. It should \
              not be stored, logged, or exposed to anyone other than the customer. Make sure that \
              you have TLS enabled on any page that includes the client secret."]
-    #[serde()]
     pub client_secret: String,
 }
 
@@ -3871,7 +3780,6 @@ impl std::fmt::Display for PaymentIntent {
 )]
 pub struct PaymentMethod {
     #[doc = "The billing info for the payment method."]
-    #[serde()]
     pub billing_info: BillingInfo,
     #[doc = "The card, if it is one. For our purposes, this is the only type of payment method \
              that we support."]
@@ -3879,7 +3787,6 @@ pub struct PaymentMethod {
     #[tabled(skip)]
     pub card: Option<CardDetails>,
     #[doc = "Time at which the object was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "Unique identifier for the object."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -4026,7 +3933,6 @@ impl std::fmt::Display for PluginsInfo {
 )]
 pub struct Pong {
     #[doc = "The pong response."]
-    #[serde()]
     pub message: String,
 }
 
@@ -4139,20 +4045,16 @@ impl std::fmt::Display for Runtime {
 )]
 pub struct Session {
     #[doc = "The date and time the session was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The date and time the session expires."]
-    #[serde()]
     pub expires: chrono::DateTime<chrono::Utc>,
     #[doc = "The unique identifier for the session."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub id: Option<String>,
     #[doc = "The session token."]
-    #[serde()]
     pub session_token: uuid::Uuid,
     #[doc = "The date and time the session was last updated."]
-    #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user that the session belongs to."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -4300,14 +4202,12 @@ pub struct UnitConversion {
     #[tabled(skip)]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the unit conversion was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub error: Option<String>,
     #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
-    #[serde()]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -4318,20 +4218,16 @@ pub struct UnitConversion {
     #[tabled(skip)]
     pub output: Option<f64>,
     #[doc = "The output format of the unit conversion."]
-    #[serde()]
     pub output_format: UnitMetricFormat,
     #[doc = "The source format of the unit conversion."]
-    #[serde()]
     pub src_format: UnitMetricFormat,
     #[doc = "The time and date the unit conversion was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[tabled(skip)]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the unit conversion."]
-    #[serde()]
     pub status: ApiCallStatus,
     #[doc = "The time and date the unit conversion was last updated."]
-    #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the unit conversion."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -4480,7 +4376,6 @@ pub struct User {
     #[tabled(skip)]
     pub company: Option<String>,
     #[doc = "The date and time the user was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user's Discord handle."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -4507,7 +4402,6 @@ pub struct User {
     #[tabled(skip)]
     pub id: Option<String>,
     #[doc = "The image avatar for the user. This is a URL."]
-    #[serde()]
     pub image: url::Url,
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -4523,7 +4417,6 @@ pub struct User {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub phone: phone_number::PhoneNumber,
     #[doc = "The date and time the user was last updated."]
-    #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
@@ -4549,7 +4442,6 @@ impl std::fmt::Display for User {
 )]
 pub struct UserResultsPage {
     #[doc = "list of items on this page of results"]
-    #[serde()]
     #[tabled(skip)]
     pub items: Vec<User>,
     #[doc = "token used to fetch the next page of results (if any)"]
@@ -4608,10 +4500,8 @@ impl crate::types::paginate::Pagination for UserResultsPage {
 )]
 pub struct VerificationToken {
     #[doc = "The date and time the verification token was created."]
-    #[serde()]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The date and time the verification token expires."]
-    #[serde()]
     pub expires: chrono::DateTime<chrono::Utc>,
     #[doc = "The token used for verification. This is used as the id for the table since it is \
              unique per record."]
@@ -4624,7 +4514,6 @@ pub struct VerificationToken {
     #[tabled(skip)]
     pub identifier: Option<String>,
     #[doc = "The date and time the verification token was last updated."]
-    #[serde()]
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
