@@ -125,14 +125,14 @@ impl Oauth2 {
              Option<String>`: The authorization code.\n- `provider: \
              crate::types::AccountProvider`: The provider. (required)\n- `state: Option<String>`: \
              The state that we had passed in through the user consent \
-             URL.\n\n```rust,no_run\nasync fn example_oauth2_listen_oauth_2_provider_callback() -> \
+             URL.\n\n```rust,no_run\nasync fn example_oauth2_oauth_2_provider_callback() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
-             client\n        .oauth2()\n        .listen_oauth_2_provider_callback(\n            \
+             client\n        .oauth2()\n        .oauth_2_provider_callback(\n            \
              Some(\"some-string\".to_string()),\n            \
              kittycad::types::AccountProvider::Github,\n            \
              Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
-    pub async fn listen_oauth_2_provider_callback<'a>(
+    pub async fn oauth_2_provider_callback<'a>(
         &'a self,
         code: Option<String>,
         provider: crate::types::AccountProvider,
@@ -167,9 +167,18 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Get the consent URL and other information for the OAuth 2.0 provider.\n\n**Parameters:**\n\n- `callback_url: Option<String>`: The URL to redirect back to after we have authenticated.\n- `provider: crate::types::AccountProvider`: The provider. (required)\n\n```rust,no_run\nasync fn example_oauth2_listen_oauth_2_provider_consent() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo = client\n        .oauth2()\n        .listen_oauth_2_provider_consent(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Google,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get the consent URL and other information for the OAuth 2.0 \
+             provider.\n\n**Parameters:**\n\n- `callback_url: Option<String>`: The URL to redirect \
+             back to after we have authenticated.\n- `provider: crate::types::AccountProvider`: \
+             The provider. (required)\n\n```rust,no_run\nasync fn \
+             example_oauth2_oauth_2_provider_consent() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo \
+             = client\n        .oauth2()\n        .oauth_2_provider_consent(\n            \
+             Some(\"some-string\".to_string()),\n            \
+             kittycad::types::AccountProvider::Google,\n        )\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
-    pub async fn listen_oauth_2_provider_consent<'a>(
+    pub async fn oauth_2_provider_consent<'a>(
         &'a self,
         callback_url: Option<String>,
         provider: crate::types::AccountProvider,
