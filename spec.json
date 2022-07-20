@@ -343,6 +343,16 @@
         ],
         "type": "object"
       },
+      "AppClientInfo": {
+        "description": "Information about a third party app client.",
+        "properties": {
+          "url": {
+            "description": "The URL for consent.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "AsyncApiCall": {
         "description": "An async API call.",
         "properties": {
@@ -4208,6 +4218,133 @@
         ]
       }
     },
+    "/apps/github/callback": {
+      "get": {
+        "description": "This is different than OAuth 2.0 authentication for users. This endpoint grants access for KittyCAD to access user's repos.\nThe user doesn't need KittyCAD OAuth authorization for this endpoint, this is purely for the GitHub permissions to access repos.",
+        "operationId": "apps_github_callback",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Listen for callbacks to GitHub app authentication.",
+        "tags": [
+          "apps",
+          "hidden"
+        ]
+      }
+    },
+    "/apps/github/consent": {
+      "get": {
+        "description": "This is different than OAuth 2.0 authentication for users. This endpoint grants access for KittyCAD to access user's repos.\nThe user doesn't need KittyCAD OAuth authorization for this endpoint, this is purely for the GitHub permissions to access repos.",
+        "operationId": "apps_github_consent",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppClientInfo"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Get the consent URL for GitHub app authentication.",
+        "tags": [
+          "apps",
+          "hidden"
+        ]
+      }
+    },
     "/async/operations": {
       "get": {
         "description": "For async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\nThis endpoint requires authentication by a KittyCAD employee.",
@@ -4442,7 +4579,7 @@
         ]
       },
       "post": {
-        "operationId": "listen_auth_email",
+        "operationId": "auth_email",
         "requestBody": {
           "content": {
             "application/json": {
@@ -4513,7 +4650,7 @@
     },
     "/auth/email/callback": {
       "get": {
-        "operationId": "listen_auth_email_callback",
+        "operationId": "auth_email_callback",
         "parameters": [
           {
             "description": "The URL to redirect back to after we have authenticated.",
@@ -5465,7 +5602,7 @@
     },
     "/oauth2/provider/{provider}/callback": {
       "get": {
-        "operationId": "listen_oauth2_provider_callback",
+        "operationId": "oauth2_provider_callback",
         "parameters": [
           {
             "description": "The provider.",
@@ -5558,7 +5695,7 @@
     },
     "/oauth2/provider/{provider}/consent": {
       "get": {
-        "operationId": "listen_oauth2_provider_consent",
+        "operationId": "oauth2_provider_consent",
         "parameters": [
           {
             "description": "The provider.",
@@ -7938,6 +8075,13 @@
         "url": "https://docs.kittycad.io/api/api-tokens"
       },
       "name": "api-tokens"
+    },
+    {
+      "description": "Endpoints for third party app grant flows.",
+      "externalDocs": {
+        "url": "https://docs.kittycad.io/api/apps"
+      },
+      "name": "apps"
     },
     {
       "description": "Beta API endpoints. We will not charge for these endpoints while they are in beta.",

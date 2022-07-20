@@ -644,7 +644,7 @@ pub struct ApiCallWithPrice {
     pub id: uuid::Uuid,
     #[doc = "The ip address of the origin."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub ip_address: Option<std::net::Ipv4Addr>,
+    pub ip_address: Option<std::net::IpAddr>,
     #[doc = "The HTTP method requsted by the API call."]
     pub method: Method,
     #[doc = "The number of minutes the API call was billed for."]
@@ -1007,6 +1007,41 @@ impl tabled::Tabled for ApiTokenResultsPage {
 
     fn headers() -> Vec<String> {
         vec!["items".to_string(), "next_page".to_string()]
+    }
+}
+
+#[doc = "Information about a third party app client."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AppClientInfo {
+    #[doc = "The URL for consent."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+}
+
+impl std::fmt::Display for AppClientInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for AppClientInfo {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<String> {
+        vec![if let Some(url) = &self.url {
+            format!("{:?}", url)
+        } else {
+            String::new()
+        }]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["url".to_string()]
     }
 }
 
@@ -1424,7 +1459,7 @@ impl tabled::Tabled for CardDetails {
 pub struct Cluster {
     #[doc = "The IP address of the cluster."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub addr: Option<std::net::Ipv4Addr>,
+    pub addr: Option<std::net::IpAddr>,
     #[doc = "The auth timeout of the cluster."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub auth_timeout: Option<i64>,
@@ -1666,7 +1701,7 @@ pub struct Connection {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub gomaxprocs: Option<i64>,
     #[doc = "The host of the server."]
-    pub host: std::net::Ipv4Addr,
+    pub host: std::net::IpAddr,
     #[doc = "The http base path of the server."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub http_base_path: Option<String>,

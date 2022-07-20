@@ -705,12 +705,8 @@ pub fn generate_example_rust_from_schema(
         openapiv3::SchemaKind::Not { not: _ } => {
             anyhow::bail!("XXX not not supported yet");
         }
-        openapiv3::SchemaKind::Any(any) => {
-            if name == "serde_json::Value" {
-                quote!(serde_json::Value::String("some-string".to_string()))
-            } else {
-                anyhow::bail!("XXX any supported yet: {} => {:?}", name, any);
-            }
+        openapiv3::SchemaKind::Any(_any) => {
+            quote!(serde_json::Value::String("some-string".to_string()))
         }
     })
 }

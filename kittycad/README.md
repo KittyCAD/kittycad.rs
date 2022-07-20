@@ -39,7 +39,7 @@ kittycad = "0.1.9"
 Typical use will require intializing a `Client`. This requires
 a user agent string and set of credentials.
 
-```
+```rust,no_run
 use kittycad::Client;
 
 let client = Client::new(
@@ -54,7 +54,7 @@ the client in the environment:
 
 And then you can create a client from the environment.
 
-```
+```rust,no_run
 use kittycad::Client;
 
 let client = Client::new_from_env();

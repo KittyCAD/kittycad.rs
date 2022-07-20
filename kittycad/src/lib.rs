@@ -37,7 +37,7 @@
 //! Typical use will require intializing a `Client`. This requires
 //! a user agent string and set of credentials.
 //!
-//! ```
+//! ```rust,no_run
 //! use kittycad::Client;
 //!
 //! let client = Client::new(String::from("api-key"));
@@ -50,7 +50,7 @@
 //!
 //! And then you can create a client from the environment.
 //!
-//! ```
+//! ```rust,no_run
 //! use kittycad::Client;
 //!
 //! let client = Client::new_from_env();
@@ -68,6 +68,10 @@ pub mod api_calls;
 ///
 /// FROM: <https://docs.kittycad.io/api/api-tokens>
 pub mod api_tokens;
+/// Endpoints for third party app grant flows.
+///
+/// FROM: <https://docs.kittycad.io/api/apps>
+pub mod apps;
 /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
 ///
 /// FROM: <https://docs.kittycad.io/api/file>
@@ -206,6 +210,13 @@ impl Client {
     /// FROM: <https://docs.kittycad.io/api/api-tokens>
     pub fn api_tokens(&self) -> api_tokens::ApiTokens {
         api_tokens::ApiTokens::new(self.clone())
+    }
+
+    /// Endpoints for third party app grant flows.
+    ///
+    /// FROM: <https://docs.kittycad.io/api/apps>
+    pub fn apps(&self) -> apps::Apps {
+        apps::Apps::new(self.clone())
     }
 
     /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
