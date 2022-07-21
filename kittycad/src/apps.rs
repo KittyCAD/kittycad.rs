@@ -71,4 +71,25 @@ impl Apps {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
         }
     }
+
+    #[doc = "Listen for GitHub webhooks.\n\nThese come from the GitHub app.\n\n```rust,no_run\nasync fn example_apps_github_webhook() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .apps()\n        .github_webhook(&bytes::Bytes::from(\"some-string\"))\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn github_webhook<'a>(
+        &'a self,
+        body: &bytes::Bytes,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            &format!("{}/{}", self.client.base_url, "apps/github/webhook"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.body(body.clone());
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
+        }
+    }
 }
