@@ -4,7 +4,7 @@
     "path": "/info/x-rust",
     "value": {
       "client": "// Authenticate via an API token.\nlet client = kittycad::Client::new(\"$TOKEN\");\n\n// - OR -\n\n// Authenticate with your token and host parsed from the environment variables:\n// `KITTYCAD_API_TOKEN`.\nlet client = kittycad::Client::new_from_env();",
-      "install": "[dependencies]\nkittycad = \"0.1.9\""
+      "install": "[dependencies]\nkittycad = \"0.1.10\""
     }
   },
   {
@@ -27,7 +27,7 @@
     "op": "add",
     "path": "/paths/~1api-call-metrics/get/x-rust",
     "value": {
-      "example": "/// Get API call metrics.\n/// \n/// This endpoint requires authentication by a KittyCAD employee. The API calls are grouped by the parameter passed.\n/// \n/// **Parameters:**\n/// \n/// - `group_by: crate::types::ApiCallQueryGroupBy`: What field to group the metrics by. (required)\nasync fn example_api_calls_get_metrics() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::ApiCallQueryGroup> = client\n        .api_calls()\n        .get_metrics(kittycad::types::ApiCallQueryGroupBy::IpAddress)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get API call metrics.\n/// \n/// This endpoint requires authentication by a KittyCAD employee. The API calls are grouped by the parameter passed.\n/// \n/// **Parameters:**\n/// \n/// - `group_by: crate::types::ApiCallQueryGroupBy`: What field to group the metrics by. (required)\nasync fn example_api_calls_get_metrics() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::ApiCallQueryGroup> = client\n        .api_calls()\n        .get_metrics(kittycad::types::ApiCallQueryGroupBy::Origin)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.get_metrics"
     }
   },
@@ -65,9 +65,17 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1apps~1github~1webhook/post/x-rust",
+    "value": {
+      "example": "/// Listen for GitHub webhooks.\n/// \n/// These come from the GitHub app.\nasync fn example_apps_github_webhook() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .apps()\n        .github_webhook(&bytes::Bytes::from(\"some-string\"))\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/apps/struct.Apps.html#method.github_webhook"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1async~1operations/get/x-rust",
     "value": {
-      "example": "/// List async operations.\n/// \n/// For async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\n/// This endpoint requires authentication by a KittyCAD employee.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\n/// - `status: Option<crate::types::ApiCallStatus>`: The status to filter by.\nasync fn example_api_calls_list_async_operations() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallResultsPage = client\n        .api_calls()\n        .list_async_operations(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n            Some(kittycad::types::ApiCallStatus::Uploaded),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_calls_list_async_operations_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_calls = client.api_calls();\n    let mut stream = api_calls.list_async_operations_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n        Some(kittycad::types::ApiCallStatus::Uploaded),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "example": "/// List async operations.\n/// \n/// For async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\n/// This endpoint requires authentication by a KittyCAD employee.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\n/// - `status: Option<crate::types::ApiCallStatus>`: The status to filter by.\nasync fn example_api_calls_list_async_operations() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallResultsPage = client\n        .api_calls()\n        .list_async_operations(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n            Some(kittycad::types::ApiCallStatus::Completed),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_calls_list_async_operations_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_calls = client.api_calls();\n    let mut stream = api_calls.list_async_operations_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        Some(kittycad::types::ApiCallStatus::Completed),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.list_async_operations"
     }
   },
@@ -99,7 +107,7 @@
     "op": "add",
     "path": "/paths/~1file~1conversion~1{src_format}~1{output_format}/post/x-rust",
     "value": {
-      "example": "/// Convert CAD file.\n/// \n/// Convert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\n/// If the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::FileOutputFormat`: The format the file should be converted to. (required)\n/// - `src_format: crate::types::FileSourceFormat`: The format of the file to convert. (required)\nasync fn example_file_create_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileConversion = client\n        .file()\n        .create_conversion(\n            kittycad::types::FileOutputFormat::Stl,\n            kittycad::types::FileSourceFormat::Dae,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Convert CAD file.\n/// \n/// Convert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\n/// If the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::FileOutputFormat`: The format the file should be converted to. (required)\n/// - `src_format: crate::types::FileSourceFormat`: The format of the file to convert. (required)\nasync fn example_file_create_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileConversion = client\n        .file()\n        .create_conversion(\n            kittycad::types::FileOutputFormat::Obj,\n            kittycad::types::FileSourceFormat::Dae,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_conversion"
     }
   },
@@ -115,7 +123,7 @@
     "op": "add",
     "path": "/paths/~1file~1density/post/x-rust",
     "value": {
-      "example": "/// Get CAD file density.\n/// \n/// Get the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `material_mass: f64`: The material mass. (required)\n/// - `src_format: crate::types::FileSourceFormat`: The format of the file. (required)\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Step,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get CAD file density.\n/// \n/// Get the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `material_mass: f64`: The material mass. (required)\n/// - `src_format: crate::types::FileSourceFormat`: The format of the file. (required)\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_density"
     }
   },
@@ -131,7 +139,7 @@
     "op": "add",
     "path": "/paths/~1file~1mass/post/x-rust",
     "value": {
-      "example": "/// Get CAD file mass.\n/// \n/// Get the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `material_density: f64`: The material density. (required)\n/// - `src_format: crate::types::FileSourceFormat`: The format of the file. (required)\nasync fn example_file_create_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileMass = client\n        .file()\n        .create_mass(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Obj,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get CAD file mass.\n/// \n/// Get the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `material_density: f64`: The material density. (required)\n/// - `src_format: crate::types::FileSourceFormat`: The format of the file. (required)\nasync fn example_file_create_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileMass = client\n        .file()\n        .create_mass(\n            3.14 as f64,\n            kittycad::types::FileSourceFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_mass"
     }
   },
@@ -187,7 +195,7 @@
     "op": "add",
     "path": "/paths/~1oauth2~1provider~1{provider}~1callback/get/x-rust",
     "value": {
-      "example": "/// Listen for callbacks for the OAuth 2.0 provider.\n/// \n/// **Parameters:**\n/// \n/// - `code: Option<String>`: The authorization code.\n/// - `provider: crate::types::AccountProvider`: The provider. (required)\n/// - `state: Option<String>`: The state that we had passed in through the user consent URL.\nasync fn example_oauth2_oauth_2_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .oauth_2_provider_callback(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Github,\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n",
+      "example": "/// Listen for callbacks for the OAuth 2.0 provider.\n/// \n/// **Parameters:**\n/// \n/// - `code: Option<String>`: The authorization code.\n/// - `provider: crate::types::AccountProvider`: The provider. (required)\n/// - `state: Option<String>`: The state that we had passed in through the user consent URL.\nasync fn example_oauth2_oauth_2_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .oauth_2_provider_callback(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Google,\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.oauth_2_provider_callback"
     }
   },
@@ -195,7 +203,7 @@
     "op": "add",
     "path": "/paths/~1oauth2~1provider~1{provider}~1consent/get/x-rust",
     "value": {
-      "example": "/// Get the consent URL and other information for the OAuth 2.0 provider.\n/// \n/// **Parameters:**\n/// \n/// - `callback_url: Option<String>`: The URL to redirect back to after we have authenticated.\n/// - `provider: crate::types::AccountProvider`: The provider. (required)\nasync fn example_oauth2_oauth_2_provider_consent() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo = client\n        .oauth2()\n        .oauth_2_provider_consent(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Google,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get the consent URL and other information for the OAuth 2.0 provider.\n/// \n/// **Parameters:**\n/// \n/// - `callback_url: Option<String>`: The URL to redirect back to after we have authenticated.\n/// - `provider: crate::types::AccountProvider`: The provider. (required)\nasync fn example_oauth2_oauth_2_provider_consent() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo = client\n        .oauth2()\n        .oauth_2_provider_consent(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Github,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.oauth_2_provider_consent"
     }
   },
@@ -209,10 +217,210 @@
   },
   {
     "op": "add",
-    "path": "/paths/~1unit~1conversion~1{src_format}~1{output_format}/post/x-rust",
+    "path": "/paths/~1unit~1conversion~1acceleration~1{src_format}~1{output_format}/get/x-rust",
     "value": {
-      "example": "/// Convert units.\n/// \n/// Convert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitMetricFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitMetricFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_create_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitConversion = client\n        .unit()\n        .create_conversion(\n            kittycad::types::UnitMetricFormat::Peta,\n            kittycad::types::UnitMetricFormat::Nano,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.create_conversion"
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitAccelerationFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitAccelerationFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_acceleration_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitAccelerationConversion = client\n        .unit()\n        .get_acceleration_conversion(\n            kittycad::types::UnitAccelerationFormat::MetersPerSecondSquared,\n            kittycad::types::UnitAccelerationFormat::StandardGravity,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_acceleration_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1angle~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitAngleFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitAngleFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_angle_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitAngleConversion = client\n        .unit()\n        .get_angle_conversion(\n            kittycad::types::UnitAngleFormat::Arcsecond,\n            kittycad::types::UnitAngleFormat::Arcsecond,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_angle_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1angular-velocity~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitAngularVelocityFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitAngularVelocityFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_angular_velocity_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitAngularVelocityConversion = client\n        .unit()\n        .get_angular_velocity_conversion(\n            kittycad::types::UnitAngularVelocityFormat::RadiansPerSecond,\n            kittycad::types::UnitAngularVelocityFormat::DegreesPerSecond,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_angular_velocity_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1area~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitAreaFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitAreaFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_area_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitAreaConversion = client\n        .unit()\n        .get_area_conversion(\n            kittycad::types::UnitAreaFormat::SquareMile,\n            kittycad::types::UnitAreaFormat::Hectare,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_area_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1charge~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitChargeFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitChargeFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_charge_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitChargeConversion = client\n        .unit()\n        .get_charge_conversion(\n            kittycad::types::UnitChargeFormat::AmpereHour,\n            kittycad::types::UnitChargeFormat::Coulomb,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_charge_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1concentration~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitConcentrationFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitConcentrationFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_concentration_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitConcentrationConversion = client\n        .unit()\n        .get_concentration_conversion(\n            kittycad::types::UnitConcentrationFormat::Percent,\n            kittycad::types::UnitConcentrationFormat::Percent,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_concentration_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1data-transfer-rate~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitDataTransferRateFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitDataTransferRateFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_data_transfer_rate_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitDataTransferRateConversion = client\n        .unit()\n        .get_data_transfer_rate_conversion(\n            kittycad::types::UnitDataTransferRateFormat::BytesPerSecond,\n            kittycad::types::UnitDataTransferRateFormat::BytesPerSecond,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_data_transfer_rate_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1data~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitDataFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitDataFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_data_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitDataConversion = client\n        .unit()\n        .get_data_conversion(\n            kittycad::types::UnitDataFormat::Exabyte,\n            kittycad::types::UnitDataFormat::Bit,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_data_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1density~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitDensityFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitDensityFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_density_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitDensityConversion = client\n        .unit()\n        .get_density_conversion(\n            kittycad::types::UnitDensityFormat::GramsPerMilliliter,\n            kittycad::types::UnitDensityFormat::KilogramsPerLiter,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_density_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1energy~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitEnergyFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitEnergyFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_energy_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitEnergyConversion = client\n        .unit()\n        .get_energy_conversion(\n            kittycad::types::UnitEnergyFormat::BritishThermalUnit59,\n            kittycad::types::UnitEnergyFormat::BritishThermalUnitIso,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_energy_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1force~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitForceFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitForceFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_force_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitForceConversion = client\n        .unit()\n        .get_force_conversion(\n            kittycad::types::UnitForceFormat::Dyne,\n            kittycad::types::UnitForceFormat::Newton,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_force_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1illuminance~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitIlluminanceFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitIlluminanceFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_illuminance_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitIlluminanceConversion = client\n        .unit()\n        .get_illuminance_conversion(\n            kittycad::types::UnitIlluminanceFormat::Footcandle,\n            kittycad::types::UnitIlluminanceFormat::Phot,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_illuminance_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1length~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitLengthFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitLengthFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_length_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitLengthConversion = client\n        .unit()\n        .get_length_conversion(\n            kittycad::types::UnitLengthFormat::Furlong,\n            kittycad::types::UnitLengthFormat::Furlong,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_length_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1magnetic-field-strength~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitMagneticFieldStrengthFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitMagneticFieldStrengthFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_magnetic_field_strength_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitMagneticFieldStrengthConversion = client\n        .unit()\n        .get_magnetic_field_strength_conversion(\n            kittycad::types::UnitMagneticFieldStrengthFormat::Gauss,\n            kittycad::types::UnitMagneticFieldStrengthFormat::Gauss,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_magnetic_field_strength_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1magnetic-flux~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitMagneticFluxFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitMagneticFluxFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_magnetic_flux_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitMagneticFluxConversion = client\n        .unit()\n        .get_magnetic_flux_conversion(\n            kittycad::types::UnitMagneticFluxFormat::Maxwell,\n            kittycad::types::UnitMagneticFluxFormat::Weber,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_magnetic_flux_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1mass~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitMassFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitMassFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_mass_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitMassConversion = client\n        .unit()\n        .get_mass_conversion(\n            kittycad::types::UnitMassFormat::Ounce,\n            kittycad::types::UnitMassFormat::Slug,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_mass_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1metric~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitMetricFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitMetricFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_metric_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitMetricConversion = client\n        .unit()\n        .get_metric_conversion(\n            kittycad::types::UnitMetricFormat::Exa,\n            kittycad::types::UnitMetricFormat::Femto,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_metric_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1power~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitPowerFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitPowerFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_power_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitPowerConversion = client\n        .unit()\n        .get_power_conversion(\n            kittycad::types::UnitPowerFormat::Milliwatt,\n            kittycad::types::UnitPowerFormat::Horsepower,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_power_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1pressure~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitPressureFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitPressureFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_pressure_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitPressureConversion = client\n        .unit()\n        .get_pressure_conversion(\n            kittycad::types::UnitPressureFormat::Pascal,\n            kittycad::types::UnitPressureFormat::Atmosphere,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_pressure_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1radiation~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitRadiationFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitRadiationFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_radiation_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitRadiationConversion = client\n        .unit()\n        .get_radiation_conversion(\n            kittycad::types::UnitRadiationFormat::Sievert,\n            kittycad::types::UnitRadiationFormat::Rad,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_radiation_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1solid-angle~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitSolidAngleFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitSolidAngleFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_solid_angle_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitSolidAngleConversion = client\n        .unit()\n        .get_solid_angle_conversion(\n            kittycad::types::UnitSolidAngleFormat::Steradian,\n            kittycad::types::UnitSolidAngleFormat::Spat,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_solid_angle_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1temperature~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitTemperatureFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitTemperatureFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_temperature_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitTemperatureConversion = client\n        .unit()\n        .get_temperature_conversion(\n            kittycad::types::UnitTemperatureFormat::Reaumur,\n            kittycad::types::UnitTemperatureFormat::Reaumur,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_temperature_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1time~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitTimeFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitTimeFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_time_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitTimeConversion = client\n        .unit()\n        .get_time_conversion(\n            kittycad::types::UnitTimeFormat::GregorianYear,\n            kittycad::types::UnitTimeFormat::Hour,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_time_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1velocity~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitVelocityFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitVelocityFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_velocity_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitVelocityConversion = client\n        .unit()\n        .get_velocity_conversion(\n            kittycad::types::UnitVelocityFormat::Knot,\n            kittycad::types::UnitVelocityFormat::Knot,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_velocity_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1voltage~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitVoltageFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitVoltageFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_voltage_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitVoltageConversion = client\n        .unit()\n        .get_voltage_conversion(\n            kittycad::types::UnitVoltageFormat::Statvolt,\n            kittycad::types::UnitVoltageFormat::Abvolt,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_voltage_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1unit~1conversion~1volume~1{src_format}~1{output_format}/get/x-rust",
+    "value": {
+      "example": "/// Convert units.\n/// \n/// Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::UnitVolumeFormat`: The output format of the unit. (required)\n/// - `src_format: crate::types::UnitVolumeFormat`: The source format of the unit. (required)\n/// - `value: f64`: The initial value. (required)\nasync fn example_unit_get_volume_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitVolumeConversion = client\n        .unit()\n        .get_volume_conversion(\n            kittycad::types::UnitVolumeFormat::CubicYard,\n            kittycad::types::UnitVolumeFormat::CubicMeter,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/unit/struct.Unit.html#method.get_volume_conversion"
     }
   },
   {
@@ -395,7 +603,7 @@
     "op": "add",
     "path": "/paths/~1users-extended/get/x-rust",
     "value": {
-      "example": "/// List users with extended information.\n/// \n/// This endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_users_list_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUserResultsPage = client\n        .users()\n        .list_extended(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "example": "/// List users with extended information.\n/// \n/// This endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_users_list_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUserResultsPage = client\n        .users()\n        .list_extended(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.list_extended"
     }
   },
@@ -419,7 +627,7 @@
     "op": "add",
     "path": "/paths/~1users~1{id}~1api-calls/get/x-rust",
     "value": {
-      "example": "/// List API calls for a user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\n/// Alternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\n/// If the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\n/// The API calls are returned in order of creation, with the most recently created API calls first.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The user ID. (required)\n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_api_calls_list_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .list_for_user(\n            \"some-string\",\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_calls_list_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_calls = client.api_calls();\n    let mut stream = api_calls.list_for_user_stream(\n        \"some-string\",\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "example": "/// List API calls for a user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\n/// Alternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\n/// If the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\n/// The API calls are returned in order of creation, with the most recently created API calls first.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The user ID. (required)\n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_api_calls_list_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .list_for_user(\n            \"some-string\",\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_calls_list_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_calls = client.api_calls();\n    let mut stream = api_calls.list_for_user_stream(\n        \"some-string\",\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.list_for_user"
     }
   }
