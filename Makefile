@@ -29,6 +29,7 @@ kittycad: target/debug/openapitor
 		--spec-url "https://api.kittycad.io" \
 		--base-url "https://api.kittycad.io" \
 		--repo-name "KittyCAD/kittycad.rs" $(EXTRA_ARGS)
+	mv -f $(CURDIR)/kittycad/kittycad.rs.patch.json $(CURDIR)
 
 .PHONY: tag
 tag: ## Create a new git tag to prepare to build a release.
