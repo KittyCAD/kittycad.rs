@@ -552,7 +552,7 @@ pub fn generate_example_rust_from_schema(
                                 spec,
                             )?
                             .to_string();
-                            println!("{}", example);
+
                             let rendered = example
                                 .trim_start_matches("crate::types::")
                                 .trim_start_matches("crate :: types ::");

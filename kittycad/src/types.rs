@@ -6186,7 +6186,2284 @@ pub enum SystemInfoIsolationEnum {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct UnitConversion {
+pub struct UnitAccelerationConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitAccelerationFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitAccelerationFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitAccelerationConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitAccelerationConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of metric unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitAccelerationFormat {
+    #[serde(rename = "meters_per_second_squared")]
+    #[display("meters_per_second_squared")]
+    MetersPerSecondSquared,
+    #[serde(rename = "feet_per_second_squared")]
+    #[display("feet_per_second_squared")]
+    FeetPerSecondSquared,
+    #[serde(rename = "standard_gravity")]
+    #[display("standard_gravity")]
+    StandardGravity,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitAngleConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitAngleFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitAngleFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitAngleConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitAngleConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of angle formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitAngleFormat {
+    #[serde(rename = "radian")]
+    #[display("radian")]
+    Radian,
+    #[serde(rename = "degree")]
+    #[display("degree")]
+    Degree,
+    #[serde(rename = "arcminute")]
+    #[display("arcminute")]
+    Arcminute,
+    #[serde(rename = "arcsecond")]
+    #[display("arcsecond")]
+    Arcsecond,
+    #[serde(rename = "milliarcsecond")]
+    #[display("milliarcsecond")]
+    Milliarcsecond,
+    #[serde(rename = "turn")]
+    #[display("turn")]
+    Turn,
+    #[serde(rename = "gradian")]
+    #[display("gradian")]
+    Gradian,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitAngularVelocityConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitAngularVelocityFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitAngularVelocityFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitAngularVelocityConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitAngularVelocityConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of angular velocity unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitAngularVelocityFormat {
+    #[serde(rename = "radians_per_second")]
+    #[display("radians_per_second")]
+    RadiansPerSecond,
+    #[serde(rename = "degrees_per_second")]
+    #[display("degrees_per_second")]
+    DegreesPerSecond,
+    #[serde(rename = "revolutions_per_minute")]
+    #[display("revolutions_per_minute")]
+    RevolutionsPerMinute,
+    #[serde(rename = "milliarcseconds_per_year")]
+    #[display("milliarcseconds_per_year")]
+    MilliarcsecondsPerYear,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitAreaConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitAreaFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitAreaFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitAreaConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitAreaConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of area unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitAreaFormat {
+    #[serde(rename = "square_meter")]
+    #[display("square_meter")]
+    SquareMeter,
+    #[serde(rename = "square_foot")]
+    #[display("square_foot")]
+    SquareFoot,
+    #[serde(rename = "square_inch")]
+    #[display("square_inch")]
+    SquareInch,
+    #[serde(rename = "square_mile")]
+    #[display("square_mile")]
+    SquareMile,
+    #[serde(rename = "square_kilometer")]
+    #[display("square_kilometer")]
+    SquareKilometer,
+    #[serde(rename = "hectare")]
+    #[display("hectare")]
+    Hectare,
+    #[serde(rename = "acre")]
+    #[display("acre")]
+    Acre,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitChargeConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitChargeFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitChargeFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitChargeConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitChargeConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of charge unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitChargeFormat {
+    #[serde(rename = "coulomb")]
+    #[display("coulomb")]
+    Coulomb,
+    #[serde(rename = "ampere_hour")]
+    #[display("ampere_hour")]
+    AmpereHour,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitConcentrationConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitConcentrationFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitConcentrationFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitConcentrationConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitConcentrationConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of concentration unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitConcentrationFormat {
+    #[serde(rename = "parts_per_million")]
+    #[display("parts_per_million")]
+    PartsPerMillion,
+    #[serde(rename = "parts_per_billion")]
+    #[display("parts_per_billion")]
+    PartsPerBillion,
+    #[serde(rename = "parts_per_trillion")]
+    #[display("parts_per_trillion")]
+    PartsPerTrillion,
+    #[serde(rename = "percent")]
+    #[display("percent")]
+    Percent,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitDataConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitDataFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitDataFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitDataConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitDataConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of data unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitDataFormat {
+    #[serde(rename = "byte")]
+    #[display("byte")]
+    Byte,
+    #[serde(rename = "exabyte")]
+    #[display("exabyte")]
+    Exabyte,
+    #[serde(rename = "bit")]
+    #[display("bit")]
+    Bit,
+    #[serde(rename = "exabit")]
+    #[display("exabit")]
+    Exabit,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitDataTransferRateConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitDataTransferRateFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitDataTransferRateFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitDataTransferRateConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitDataTransferRateConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of data transfer unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitDataTransferRateFormat {
+    #[serde(rename = "bytes_per_second")]
+    #[display("bytes_per_second")]
+    BytesPerSecond,
+    #[serde(rename = "exabytes_per_second")]
+    #[display("exabytes_per_second")]
+    ExabytesPerSecond,
+    #[serde(rename = "bits_per_second")]
+    #[display("bits_per_second")]
+    BitsPerSecond,
+    #[serde(rename = "exabits_per_second")]
+    #[display("exabits_per_second")]
+    ExabitsPerSecond,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitDensityConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitDensityFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitDensityFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitDensityConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitDensityConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of density unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitDensityFormat {
+    #[serde(rename = "kilograms_per_cubic_meter")]
+    #[display("kilograms_per_cubic_meter")]
+    KilogramsPerCubicMeter,
+    #[serde(rename = "grams_per_milliliter")]
+    #[display("grams_per_milliliter")]
+    GramsPerMilliliter,
+    #[serde(rename = "kilograms_per_liter")]
+    #[display("kilograms_per_liter")]
+    KilogramsPerLiter,
+    #[serde(rename = "ounces_per_cubic_foot")]
+    #[display("ounces_per_cubic_foot")]
+    OuncesPerCubicFoot,
+    #[serde(rename = "ounces_per_cubic_inch")]
+    #[display("ounces_per_cubic_inch")]
+    OuncesPerCubicInch,
+    #[serde(rename = "ounces_per_gallon")]
+    #[display("ounces_per_gallon")]
+    OuncesPerGallon,
+    #[serde(rename = "pounds_per_cubic_foot")]
+    #[display("pounds_per_cubic_foot")]
+    PoundsPerCubicFoot,
+    #[serde(rename = "pounds_per_cubic_inch")]
+    #[display("pounds_per_cubic_inch")]
+    PoundsPerCubicInch,
+    #[serde(rename = "pounds_per_gallon")]
+    #[display("pounds_per_gallon")]
+    PoundsPerGallon,
+    #[serde(rename = "slugs_per_cubic_foot")]
+    #[display("slugs_per_cubic_foot")]
+    SlugsPerCubicFoot,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitEnergyConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitEnergyFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitEnergyFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitEnergyConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitEnergyConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of energy unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitEnergyFormat {
+    #[serde(rename = "joule")]
+    #[display("joule")]
+    Joule,
+    #[serde(rename = "calorie")]
+    #[display("calorie")]
+    Calorie,
+    #[serde(rename = "british_thermal_unit")]
+    #[display("british_thermal_unit")]
+    BritishThermalUnit,
+    #[serde(rename = "british_thermal_unit_iso")]
+    #[display("british_thermal_unit_iso")]
+    BritishThermalUnitIso,
+    #[serde(rename = "british_thermal_unit59")]
+    #[display("british_thermal_unit59")]
+    BritishThermalUnit59,
+    #[serde(rename = "foot_pound")]
+    #[display("foot_pound")]
+    FootPound,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitForceConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitForceFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitForceFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitForceConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitForceConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of force unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitForceFormat {
+    #[serde(rename = "newton")]
+    #[display("newton")]
+    Newton,
+    #[serde(rename = "pound")]
+    #[display("pound")]
+    Pound,
+    #[serde(rename = "dyne")]
+    #[display("dyne")]
+    Dyne,
+    #[serde(rename = "kilopound")]
+    #[display("kilopound")]
+    Kilopound,
+    #[serde(rename = "poundal")]
+    #[display("poundal")]
+    Poundal,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitIlluminanceConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitIlluminanceFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitIlluminanceFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitIlluminanceConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitIlluminanceConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of illuminance unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitIlluminanceFormat {
+    #[serde(rename = "lux")]
+    #[display("lux")]
+    Lux,
+    #[serde(rename = "footcandle")]
+    #[display("footcandle")]
+    Footcandle,
+    #[serde(rename = "lumens_per_square_inch")]
+    #[display("lumens_per_square_inch")]
+    LumensPerSquareInch,
+    #[serde(rename = "phot")]
+    #[display("phot")]
+    Phot,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitLengthConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitLengthFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitLengthFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitLengthConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitLengthConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of length unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitLengthFormat {
+    #[serde(rename = "meter")]
+    #[display("meter")]
+    Meter,
+    #[serde(rename = "foot")]
+    #[display("foot")]
+    Foot,
+    #[serde(rename = "inch")]
+    #[display("inch")]
+    Inch,
+    #[serde(rename = "mile")]
+    #[display("mile")]
+    Mile,
+    #[serde(rename = "nautical_mile")]
+    #[display("nautical_mile")]
+    NauticalMile,
+    #[serde(rename = "astronomical_unit")]
+    #[display("astronomical_unit")]
+    AstronomicalUnit,
+    #[serde(rename = "cubit")]
+    #[display("cubit")]
+    Cubit,
+    #[serde(rename = "fathom")]
+    #[display("fathom")]
+    Fathom,
+    #[serde(rename = "chain")]
+    #[display("chain")]
+    Chain,
+    #[serde(rename = "furlong")]
+    #[display("furlong")]
+    Furlong,
+    #[serde(rename = "hand")]
+    #[display("hand")]
+    Hand,
+    #[serde(rename = "league")]
+    #[display("league")]
+    League,
+    #[serde(rename = "nautical_league")]
+    #[display("nautical_league")]
+    NauticalLeague,
+    #[serde(rename = "yard")]
+    #[display("yard")]
+    Yard,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitMagneticFieldStrengthConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitMagneticFieldStrengthFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitMagneticFieldStrengthFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitMagneticFieldStrengthConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitMagneticFieldStrengthConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of magnetic field strength unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitMagneticFieldStrengthFormat {
+    #[serde(rename = "tesla")]
+    #[display("tesla")]
+    Tesla,
+    #[serde(rename = "gauss")]
+    #[display("gauss")]
+    Gauss,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitMagneticFluxConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitMagneticFluxFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitMagneticFluxFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitMagneticFluxConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitMagneticFluxConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of magnetic flux unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitMagneticFluxFormat {
+    #[serde(rename = "weber")]
+    #[display("weber")]
+    Weber,
+    #[serde(rename = "maxwell")]
+    #[display("maxwell")]
+    Maxwell,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitMassConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitMassFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitMassFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitMassConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitMassConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of mass unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitMassFormat {
+    #[serde(rename = "gram")]
+    #[display("gram")]
+    Gram,
+    #[serde(rename = "metric_ton")]
+    #[display("metric_ton")]
+    MetricTon,
+    #[serde(rename = "pound")]
+    #[display("pound")]
+    Pound,
+    #[serde(rename = "long_ton")]
+    #[display("long_ton")]
+    LongTon,
+    #[serde(rename = "short_ton")]
+    #[display("short_ton")]
+    ShortTon,
+    #[serde(rename = "stone")]
+    #[display("stone")]
+    Stone,
+    #[serde(rename = "ounce")]
+    #[display("ounce")]
+    Ounce,
+    #[serde(rename = "carat")]
+    #[display("carat")]
+    Carat,
+    #[serde(rename = "slug")]
+    #[display("slug")]
+    Slug,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitMetricConversion {
     #[doc = "The time and date the unit conversion was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -6219,7 +8496,7 @@ pub struct UnitConversion {
     pub user_id: Option<String>,
 }
 
-impl std::fmt::Display for UnitConversion {
+impl std::fmt::Display for UnitMetricConversion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -6229,7 +8506,7 @@ impl std::fmt::Display for UnitConversion {
     }
 }
 
-impl tabled::Tabled for UnitConversion {
+impl tabled::Tabled for UnitMetricConversion {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<String> {
         vec![
@@ -6357,6 +8634,1266 @@ pub enum UnitMetricFormat {
     #[serde(rename = "exa")]
     #[display("exa")]
     Exa,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitPowerConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitPowerFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitPowerFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitPowerConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitPowerConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of power unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitPowerFormat {
+    #[serde(rename = "watt")]
+    #[display("watt")]
+    Watt,
+    #[serde(rename = "horsepower")]
+    #[display("horsepower")]
+    Horsepower,
+    #[serde(rename = "milliwatt")]
+    #[display("milliwatt")]
+    Milliwatt,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitPressureConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitPressureFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitPressureFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitPressureConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitPressureConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of pressure unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitPressureFormat {
+    #[serde(rename = "pascal")]
+    #[display("pascal")]
+    Pascal,
+    #[serde(rename = "bar")]
+    #[display("bar")]
+    Bar,
+    #[serde(rename = "mbar")]
+    #[display("mbar")]
+    Mbar,
+    #[serde(rename = "atmosphere")]
+    #[display("atmosphere")]
+    Atmosphere,
+    #[serde(rename = "pounds_per_square_inch")]
+    #[display("pounds_per_square_inch")]
+    PoundsPerSquareInch,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitRadiationConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitRadiationFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitRadiationFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitRadiationConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitRadiationConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of radiation unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitRadiationFormat {
+    #[serde(rename = "gray")]
+    #[display("gray")]
+    Gray,
+    #[serde(rename = "sievert")]
+    #[display("sievert")]
+    Sievert,
+    #[serde(rename = "rad")]
+    #[display("rad")]
+    Rad,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitSolidAngleConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitSolidAngleFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitSolidAngleFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitSolidAngleConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitSolidAngleConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of solid angle unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitSolidAngleFormat {
+    #[serde(rename = "steradian")]
+    #[display("steradian")]
+    Steradian,
+    #[serde(rename = "degree_squared")]
+    #[display("degree_squared")]
+    DegreeSquared,
+    #[serde(rename = "spat")]
+    #[display("spat")]
+    Spat,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitTemperatureConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitTemperatureFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitTemperatureFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitTemperatureConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitTemperatureConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of temperature unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitTemperatureFormat {
+    #[serde(rename = "kelvin")]
+    #[display("kelvin")]
+    Kelvin,
+    #[serde(rename = "celsius")]
+    #[display("celsius")]
+    Celsius,
+    #[serde(rename = "fahrenheit")]
+    #[display("fahrenheit")]
+    Fahrenheit,
+    #[serde(rename = "reaumur")]
+    #[display("reaumur")]
+    Reaumur,
+    #[serde(rename = "rankine")]
+    #[display("rankine")]
+    Rankine,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitTimeConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitTimeFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitTimeFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitTimeConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitTimeConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of time unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitTimeFormat {
+    #[serde(rename = "second")]
+    #[display("second")]
+    Second,
+    #[serde(rename = "minute")]
+    #[display("minute")]
+    Minute,
+    #[serde(rename = "hour")]
+    #[display("hour")]
+    Hour,
+    #[serde(rename = "day")]
+    #[display("day")]
+    Day,
+    #[serde(rename = "week")]
+    #[display("week")]
+    Week,
+    #[serde(rename = "year")]
+    #[display("year")]
+    Year,
+    #[serde(rename = "julian_year")]
+    #[display("julian_year")]
+    JulianYear,
+    #[serde(rename = "gregorian_year")]
+    #[display("gregorian_year")]
+    GregorianYear,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitVelocityConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitVelocityFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitVelocityFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitVelocityConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitVelocityConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of velocity unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitVelocityFormat {
+    #[serde(rename = "meters_per_second")]
+    #[display("meters_per_second")]
+    MetersPerSecond,
+    #[serde(rename = "feet_per_second")]
+    #[display("feet_per_second")]
+    FeetPerSecond,
+    #[serde(rename = "miles_per_hour")]
+    #[display("miles_per_hour")]
+    MilesPerHour,
+    #[serde(rename = "kilometers_per_hour")]
+    #[display("kilometers_per_hour")]
+    KilometersPerHour,
+    #[serde(rename = "knot")]
+    #[display("knot")]
+    Knot,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitVoltageConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitVoltageFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitVoltageFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitVoltageConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitVoltageConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of voltage unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitVoltageFormat {
+    #[serde(rename = "volt")]
+    #[display("volt")]
+    Volt,
+    #[serde(rename = "statvolt")]
+    #[display("statvolt")]
+    Statvolt,
+    #[serde(rename = "abvolt")]
+    #[display("abvolt")]
+    Abvolt,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitVolumeConversion {
+    #[doc = "The time and date the unit conversion was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the unit conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitVolumeFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitVolumeFormat,
+    #[doc = "The time and date the unit conversion was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the unit conversion."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the unit conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the unit conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitVolumeConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitVolumeConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of volume unit formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitVolumeFormat {
+    #[serde(rename = "cubic_meter")]
+    #[display("cubic_meter")]
+    CubicMeter,
+    #[serde(rename = "cubic_millimeter")]
+    #[display("cubic_millimeter")]
+    CubicMillimeter,
+    #[serde(rename = "cubic_kilometer")]
+    #[display("cubic_kilometer")]
+    CubicKilometer,
+    #[serde(rename = "liter")]
+    #[display("liter")]
+    Liter,
+    #[serde(rename = "cubic_foot")]
+    #[display("cubic_foot")]
+    CubicFoot,
+    #[serde(rename = "cubic_yard")]
+    #[display("cubic_yard")]
+    CubicYard,
+    #[serde(rename = "cubic_mile")]
+    #[display("cubic_mile")]
+    CubicMile,
 }
 
 #[doc = "The user-modifiable parts of a User."]

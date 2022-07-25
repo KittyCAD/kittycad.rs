@@ -496,7 +496,7 @@ serde = {{ version = "1", features = ["derive"] }}
 serde_json = "1"
 serde_with = "1"
 serde_urlencoded = "^0.7"
-tabled = {{ version = "0.7.0", features = ["color"] }}
+tabled = {{ version = "0.8.0", features = ["color"] }}
 thiserror = "1"
 tracing = "^0.1"
 url = {{ version = "2", features = ["serde"] }}
