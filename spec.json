@@ -3545,7 +3545,1678 @@
         ],
         "type": "string"
       },
-      "UnitConversion": {
+      "UnitAccelerationConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitAccelerationFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitAccelerationFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitAccelerationFormat": {
+        "description": "The valid types of metric unit formats.",
+        "enum": [
+          "meters_per_second_squared",
+          "feet_per_second_squared",
+          "standard_gravity"
+        ],
+        "type": "string"
+      },
+      "UnitAngleConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitAngleFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitAngleFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitAngleFormat": {
+        "description": "The valid types of angle formats.",
+        "enum": [
+          "radian",
+          "degree",
+          "arcminute",
+          "arcsecond",
+          "milliarcsecond",
+          "turn",
+          "gradian"
+        ],
+        "type": "string"
+      },
+      "UnitAngularVelocityConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitAngularVelocityFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitAngularVelocityFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitAngularVelocityFormat": {
+        "description": "The valid types of angular velocity unit formats.",
+        "enum": [
+          "radians_per_second",
+          "degrees_per_second",
+          "revolutions_per_minute",
+          "milliarcseconds_per_year"
+        ],
+        "type": "string"
+      },
+      "UnitAreaConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitAreaFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitAreaFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitAreaFormat": {
+        "description": "The valid types of area unit formats.",
+        "enum": [
+          "square_meter",
+          "square_foot",
+          "square_inch",
+          "square_mile",
+          "square_kilometer",
+          "hectare",
+          "acre"
+        ],
+        "type": "string"
+      },
+      "UnitChargeConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitChargeFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitChargeFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitChargeFormat": {
+        "description": "The valid types of charge unit formats.",
+        "enum": [
+          "coulomb",
+          "ampere_hour"
+        ],
+        "type": "string"
+      },
+      "UnitConcentrationConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitConcentrationFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitConcentrationFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitConcentrationFormat": {
+        "description": "The valid types of concentration unit formats.",
+        "enum": [
+          "parts_per_million",
+          "parts_per_billion",
+          "parts_per_trillion",
+          "percent"
+        ],
+        "type": "string"
+      },
+      "UnitDataConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitDataFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitDataFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitDataFormat": {
+        "description": "The valid types of data unit formats.",
+        "enum": [
+          "byte",
+          "exabyte",
+          "bit",
+          "exabit"
+        ],
+        "type": "string"
+      },
+      "UnitDataTransferRateConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitDataTransferRateFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitDataTransferRateFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitDataTransferRateFormat": {
+        "description": "The valid types of data transfer unit formats.",
+        "enum": [
+          "bytes_per_second",
+          "exabytes_per_second",
+          "bits_per_second",
+          "exabits_per_second"
+        ],
+        "type": "string"
+      },
+      "UnitDensityConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitDensityFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitDensityFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitDensityFormat": {
+        "description": "The valid types of density unit formats.",
+        "enum": [
+          "kilograms_per_cubic_meter",
+          "grams_per_milliliter",
+          "kilograms_per_liter",
+          "ounces_per_cubic_foot",
+          "ounces_per_cubic_inch",
+          "ounces_per_gallon",
+          "pounds_per_cubic_foot",
+          "pounds_per_cubic_inch",
+          "pounds_per_gallon",
+          "slugs_per_cubic_foot"
+        ],
+        "type": "string"
+      },
+      "UnitEnergyConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitEnergyFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitEnergyFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitEnergyFormat": {
+        "description": "The valid types of energy unit formats.",
+        "enum": [
+          "joule",
+          "calorie",
+          "british_thermal_unit",
+          "british_thermal_unit_iso",
+          "british_thermal_unit59",
+          "foot_pound"
+        ],
+        "type": "string"
+      },
+      "UnitForceConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitForceFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitForceFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitForceFormat": {
+        "description": "The valid types of force unit formats.",
+        "enum": [
+          "newton",
+          "pound",
+          "dyne",
+          "kilopound",
+          "poundal"
+        ],
+        "type": "string"
+      },
+      "UnitIlluminanceConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitIlluminanceFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitIlluminanceFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitIlluminanceFormat": {
+        "description": "The valid types of illuminance unit formats.",
+        "enum": [
+          "lux",
+          "footcandle",
+          "lumens_per_square_inch",
+          "phot"
+        ],
+        "type": "string"
+      },
+      "UnitLengthConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitLengthFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitLengthFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitLengthFormat": {
+        "description": "The valid types of length unit formats.",
+        "enum": [
+          "meter",
+          "foot",
+          "inch",
+          "mile",
+          "nautical_mile",
+          "astronomical_unit",
+          "cubit",
+          "fathom",
+          "chain",
+          "furlong",
+          "hand",
+          "league",
+          "nautical_league",
+          "yard"
+        ],
+        "type": "string"
+      },
+      "UnitMagneticFieldStrengthConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitMagneticFieldStrengthFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitMagneticFieldStrengthFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitMagneticFieldStrengthFormat": {
+        "description": "The valid types of magnetic field strength unit formats.",
+        "enum": [
+          "tesla",
+          "gauss"
+        ],
+        "type": "string"
+      },
+      "UnitMagneticFluxConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitMagneticFluxFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitMagneticFluxFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitMagneticFluxFormat": {
+        "description": "The valid types of magnetic flux unit formats.",
+        "enum": [
+          "weber",
+          "maxwell"
+        ],
+        "type": "string"
+      },
+      "UnitMassConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitMassFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitMassFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitMassFormat": {
+        "description": "The valid types of mass unit formats.",
+        "enum": [
+          "gram",
+          "metric_ton",
+          "pound",
+          "long_ton",
+          "short_ton",
+          "stone",
+          "ounce",
+          "carat",
+          "slug"
+        ],
+        "type": "string"
+      },
+      "UnitMetricConversion": {
         "description": "A unit conversion.",
         "properties": {
           "completed_at": {
@@ -3658,6 +5329,939 @@
           "tera",
           "peta",
           "exa"
+        ],
+        "type": "string"
+      },
+      "UnitPowerConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitPowerFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitPowerFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitPowerFormat": {
+        "description": "The valid types of power unit formats.",
+        "enum": [
+          "watt",
+          "horsepower",
+          "milliwatt"
+        ],
+        "type": "string"
+      },
+      "UnitPressureConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitPressureFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitPressureFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitPressureFormat": {
+        "description": "The valid types of pressure unit formats.",
+        "enum": [
+          "pascal",
+          "bar",
+          "mbar",
+          "atmosphere",
+          "pounds_per_square_inch"
+        ],
+        "type": "string"
+      },
+      "UnitRadiationConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitRadiationFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitRadiationFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitRadiationFormat": {
+        "description": "The valid types of radiation unit formats.",
+        "enum": [
+          "gray",
+          "sievert",
+          "rad"
+        ],
+        "type": "string"
+      },
+      "UnitSolidAngleConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitSolidAngleFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitSolidAngleFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitSolidAngleFormat": {
+        "description": "The valid types of solid angle unit formats.",
+        "enum": [
+          "steradian",
+          "degree_squared",
+          "spat"
+        ],
+        "type": "string"
+      },
+      "UnitTemperatureConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitTemperatureFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitTemperatureFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitTemperatureFormat": {
+        "description": "The valid types of temperature unit formats.",
+        "enum": [
+          "kelvin",
+          "celsius",
+          "fahrenheit",
+          "reaumur",
+          "rankine"
+        ],
+        "type": "string"
+      },
+      "UnitTimeConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitTimeFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitTimeFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitTimeFormat": {
+        "description": "The valid types of time unit formats.",
+        "enum": [
+          "second",
+          "minute",
+          "hour",
+          "day",
+          "week",
+          "year",
+          "julian_year",
+          "gregorian_year"
+        ],
+        "type": "string"
+      },
+      "UnitVelocityConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitVelocityFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitVelocityFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitVelocityFormat": {
+        "description": "The valid types of velocity unit formats.",
+        "enum": [
+          "meters_per_second",
+          "feet_per_second",
+          "miles_per_hour",
+          "kilometers_per_hour",
+          "knot"
+        ],
+        "type": "string"
+      },
+      "UnitVoltageConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitVoltageFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitVoltageFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitVoltageFormat": {
+        "description": "The valid types of voltage unit formats.",
+        "enum": [
+          "volt",
+          "statvolt",
+          "abvolt"
+        ],
+        "type": "string"
+      },
+      "UnitVolumeConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitVolumeFormat"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitVolumeFormat"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "UnitVolumeFormat": {
+        "description": "The valid types of volume unit formats.",
+        "enum": [
+          "cubic_meter",
+          "cubic_millimeter",
+          "cubic_kilometer",
+          "liter",
+          "cubic_foot",
+          "cubic_yard",
+          "cubic_mile"
         ],
         "type": "string"
       },
@@ -4339,6 +6943,73 @@
           }
         },
         "summary": "Get the consent URL for GitHub app authentication.",
+        "tags": [
+          "apps",
+          "hidden"
+        ]
+      }
+    },
+    "/apps/github/webhook": {
+      "post": {
+        "description": "These come from the GitHub app.",
+        "operationId": "apps_github_webhook",
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "format": "binary",
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Listen for GitHub webhooks.",
         "tags": [
           "apps",
           "hidden"
@@ -5838,10 +8509,1546 @@
         ]
       }
     },
-    "/unit/conversion/{src_format}/{output_format}": {
-      "post": {
-        "description": "Convert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
-        "operationId": "create_unit_conversion",
+    "/unit/conversion/acceleration/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_acceleration_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitAccelerationFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitAccelerationFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitAccelerationConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/angle/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_angle_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitAngleFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitAngleFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitAngleConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/angular-velocity/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_angular_velocity_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitAngularVelocityFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitAngularVelocityFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitAngularVelocityConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/area/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_area_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitAreaFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitAreaFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitAreaConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/charge/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_charge_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitChargeFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitChargeFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitChargeConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/concentration/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_concentration_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitConcentrationFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitConcentrationFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitConcentrationConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/data-transfer-rate/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_data_transfer_rate_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitDataTransferRateFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitDataTransferRateFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitDataTransferRateConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/data/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_data_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitDataFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitDataFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitDataConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/density/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_density_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitDensityFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitDensityFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitDensityConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/energy/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_energy_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitEnergyFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitEnergyFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitEnergyConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/force/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_force_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitForceFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitForceFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitForceConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/illuminance/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_illuminance_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitIlluminanceFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitIlluminanceFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitIlluminanceConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/length/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_length_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitLengthFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitLengthFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitLengthConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/magnetic-field-strength/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_magnetic_field_strength_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitMagneticFieldStrengthFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitMagneticFieldStrengthFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitMagneticFieldStrengthConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/magnetic-flux/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_magnetic_flux_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitMagneticFluxFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitMagneticFluxFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitMagneticFluxConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/mass/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_mass_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitMassFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitMassFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitMassConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/metric/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_metric_unit_conversion",
         "parameters": [
           {
             "description": "The output format of the unit.",
@@ -5876,15 +10083,879 @@
           }
         ],
         "responses": {
-          "201": {
+          "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UnitConversion"
+                  "$ref": "#/components/schemas/UnitMetricConversion"
                 }
               }
             },
-            "description": "successful creation",
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/power/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_power_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitPowerFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitPowerFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitPowerConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/pressure/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_pressure_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitPressureFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitPressureFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitPressureConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/radiation/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_radiation_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitRadiationFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitRadiationFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitRadiationConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/solid-angle/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_solid_angle_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitSolidAngleFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitSolidAngleFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitSolidAngleConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/temperature/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_temperature_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitTemperatureFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitTemperatureFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitTemperatureConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/time/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_time_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitTimeFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitTimeFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitTimeConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/velocity/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_velocity_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitVelocityFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitVelocityFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitVelocityConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/voltage/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_voltage_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitVoltageFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitVoltageFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitVoltageConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/volume/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_volume_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitVolumeFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitVolumeFormat"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitVolumeConversion"
+                }
+              }
+            },
+            "description": "successful operation",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
