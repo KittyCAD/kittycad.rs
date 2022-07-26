@@ -8701,7 +8701,7 @@
     },
     "/unit/conversion/acceleration/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert an acceleration unit value to another acceleration unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_acceleration_unit_conversion",
         "parameters": [
           {
@@ -8788,7 +8788,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert acceleration units.",
         "tags": [
           "unit",
           "beta"
@@ -8797,7 +8797,7 @@
     },
     "/unit/conversion/angle/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert an angle unit value to another angle unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_angle_unit_conversion",
         "parameters": [
           {
@@ -8884,7 +8884,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert angle units.",
         "tags": [
           "unit",
           "beta"
@@ -8893,7 +8893,7 @@
     },
     "/unit/conversion/angular-velocity/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert an angular velocity unit value to another angular velocity unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_angular_velocity_unit_conversion",
         "parameters": [
           {
@@ -8980,7 +8980,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert angular velocity units.",
         "tags": [
           "unit",
           "beta"
@@ -8989,7 +8989,7 @@
     },
     "/unit/conversion/area/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert an area unit value to another area unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_area_unit_conversion",
         "parameters": [
           {
@@ -9076,7 +9076,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert area units.",
         "tags": [
           "unit",
           "beta"
@@ -9085,7 +9085,7 @@
     },
     "/unit/conversion/charge/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a charge unit value to another charge unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_charge_unit_conversion",
         "parameters": [
           {
@@ -9172,7 +9172,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert charge units.",
         "tags": [
           "unit",
           "beta"
@@ -9181,7 +9181,7 @@
     },
     "/unit/conversion/concentration/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a concentration unit value to another concentration unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_concentration_unit_conversion",
         "parameters": [
           {
@@ -9268,7 +9268,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert concentration units.",
         "tags": [
           "unit",
           "beta"
@@ -9277,7 +9277,7 @@
     },
     "/unit/conversion/data-transfer-rate/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a data transfer rate unit value to another data transfer rate unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_data_transfer_rate_unit_conversion",
         "parameters": [
           {
@@ -9364,7 +9364,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert data transfer rate units.",
         "tags": [
           "unit",
           "beta"
@@ -9373,7 +9373,7 @@
     },
     "/unit/conversion/data/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a data unit value to another data unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_data_unit_conversion",
         "parameters": [
           {
@@ -9460,7 +9460,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert data units.",
         "tags": [
           "unit",
           "beta"
@@ -9469,7 +9469,7 @@
     },
     "/unit/conversion/density/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a density unit value to another density unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_density_unit_conversion",
         "parameters": [
           {
@@ -9556,7 +9556,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert density units.",
         "tags": [
           "unit",
           "beta"
@@ -9565,7 +9565,7 @@
     },
     "/unit/conversion/energy/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a energy unit value to another energy unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_energy_unit_conversion",
         "parameters": [
           {
@@ -9652,7 +9652,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert energy units.",
         "tags": [
           "unit",
           "beta"
@@ -9661,7 +9661,7 @@
     },
     "/unit/conversion/force/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a force unit value to another force unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_force_unit_conversion",
         "parameters": [
           {
@@ -9748,7 +9748,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert force units.",
         "tags": [
           "unit",
           "beta"
@@ -9757,7 +9757,7 @@
     },
     "/unit/conversion/illuminance/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a illuminance unit value to another illuminance unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_illuminance_unit_conversion",
         "parameters": [
           {
@@ -9844,7 +9844,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert illuminance units.",
         "tags": [
           "unit",
           "beta"
@@ -9853,7 +9853,7 @@
     },
     "/unit/conversion/length/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a length unit value to another length unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_length_unit_conversion",
         "parameters": [
           {
@@ -9940,7 +9940,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert length units.",
         "tags": [
           "unit",
           "beta"
@@ -9949,7 +9949,7 @@
     },
     "/unit/conversion/magnetic-field-strength/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a magnetic field strength unit value to another magnetic field strength unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_magnetic_field_strength_unit_conversion",
         "parameters": [
           {
@@ -10036,7 +10036,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert magnetic field strength units.",
         "tags": [
           "unit",
           "beta"
@@ -10045,7 +10045,7 @@
     },
     "/unit/conversion/magnetic-flux/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a magnetic flux unit value to another magnetic flux unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_magnetic_flux_unit_conversion",
         "parameters": [
           {
@@ -10132,7 +10132,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert magnetic flux units.",
         "tags": [
           "unit",
           "beta"
@@ -10141,7 +10141,7 @@
     },
     "/unit/conversion/mass/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a mass unit value to another mass unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_mass_unit_conversion",
         "parameters": [
           {
@@ -10228,7 +10228,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert mass units.",
         "tags": [
           "unit",
           "beta"
@@ -10237,7 +10237,7 @@
     },
     "/unit/conversion/metric/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_metric_unit_conversion",
         "parameters": [
           {
@@ -10324,7 +10324,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert metric units.",
         "tags": [
           "unit",
           "beta"
@@ -10333,7 +10333,7 @@
     },
     "/unit/conversion/power/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a power unit value to another power unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_power_unit_conversion",
         "parameters": [
           {
@@ -10420,7 +10420,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert power units.",
         "tags": [
           "unit",
           "beta"
@@ -10429,7 +10429,7 @@
     },
     "/unit/conversion/pressure/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a pressure unit value to another pressure unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_pressure_unit_conversion",
         "parameters": [
           {
@@ -10516,7 +10516,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert pressure units.",
         "tags": [
           "unit",
           "beta"
@@ -10525,7 +10525,7 @@
     },
     "/unit/conversion/radiation/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a radiation unit value to another radiation unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_radiation_unit_conversion",
         "parameters": [
           {
@@ -10612,7 +10612,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert radiation units.",
         "tags": [
           "unit",
           "beta"
@@ -10621,7 +10621,7 @@
     },
     "/unit/conversion/solid-angle/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a solid angle unit value to another solid angle unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_solid_angle_unit_conversion",
         "parameters": [
           {
@@ -10708,7 +10708,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert solid angle units.",
         "tags": [
           "unit",
           "beta"
@@ -10717,7 +10717,7 @@
     },
     "/unit/conversion/temperature/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a temperature unit value to another temperature unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_temperature_unit_conversion",
         "parameters": [
           {
@@ -10804,7 +10804,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert temperature units.",
         "tags": [
           "unit",
           "beta"
@@ -10813,7 +10813,7 @@
     },
     "/unit/conversion/time/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a time unit value to another time unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_time_unit_conversion",
         "parameters": [
           {
@@ -10900,7 +10900,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert time units.",
         "tags": [
           "unit",
           "beta"
@@ -10909,7 +10909,7 @@
     },
     "/unit/conversion/velocity/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a velocity unit value to another velocity unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_velocity_unit_conversion",
         "parameters": [
           {
@@ -10996,7 +10996,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert velocity units.",
         "tags": [
           "unit",
           "beta"
@@ -11005,7 +11005,7 @@
     },
     "/unit/conversion/voltage/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a voltage unit value to another voltage unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_voltage_unit_conversion",
         "parameters": [
           {
@@ -11092,7 +11092,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert voltage units.",
         "tags": [
           "unit",
           "beta"
@@ -11101,7 +11101,7 @@
     },
     "/unit/conversion/volume/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "description": "Convert a volume unit value to another volume unit value. This is a nice endpoint to use for helper functions.",
         "operationId": "get_volume_unit_conversion",
         "parameters": [
           {
@@ -11188,7 +11188,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert units.",
+        "summary": "Convert volume units.",
         "tags": [
           "unit",
           "beta"
