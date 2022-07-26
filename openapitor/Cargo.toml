@@ -37,7 +37,7 @@ slog-scope = "^4.4.0"
 slog-stdlog = "^4.1.1"
 slog-term = "^2.9.0"
 thiserror = "1"
-tokio = { version = "1.20.0", features = ["full"] }
+tokio = { version = "1.20.1", features = ["full"] }
 url = { version = "^2.2.2", features = ["serde"] }
 uuid = { version = "1", features = ["serde", "v4"] }
 
