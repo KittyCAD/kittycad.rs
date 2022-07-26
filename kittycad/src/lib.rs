@@ -72,6 +72,10 @@ pub mod api_tokens;
 ///
 /// FROM: <https://docs.kittycad.io/api/apps>
 pub mod apps;
+/// Constants. These are helpful as helpers.
+///
+/// FROM: <https://docs.kittycad.io/api/constant>
+pub mod constant;
 /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
 ///
 /// FROM: <https://docs.kittycad.io/api/file>
@@ -217,6 +221,13 @@ impl Client {
     /// FROM: <https://docs.kittycad.io/api/apps>
     pub fn apps(&self) -> apps::Apps {
         apps::Apps::new(self.clone())
+    }
+
+    /// Constants. These are helpful as helpers.
+    ///
+    /// FROM: <https://docs.kittycad.io/api/constant>
+    pub fn constant(&self) -> constant::Constant {
+        constant::Constant::new(self.clone())
     }
 
     /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.

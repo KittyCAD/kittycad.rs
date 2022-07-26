@@ -5755,6 +5755,213 @@ impl std::default::Default for PaymentMethodType {
     }
 }
 
+#[doc = "A physics constant."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PhysicsConstant {
+    #[doc = "The time and date the constant was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The constant we are returning."]
+    pub constant: PhysicsConstantName,
+    #[doc = "The time and date the constant was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the constant request.\n\nThis is the same as the API call \
+             ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The time and date the constant was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the constant."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the constant was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the constant."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+    #[doc = "The resulting value of the constant."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub value: Option<f64>,
+}
+
+impl std::fmt::Display for PhysicsConstant {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for PhysicsConstant {
+    const LENGTH: usize = 10;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.constant),
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+            if let Some(value) = &self.value {
+                format!("{:?}", value)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "constant".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+            "value".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of phys constant names."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum PhysicsConstantName {
+    #[serde(rename = "pi")]
+    #[display("pi")]
+    Pi,
+    #[serde(rename = "c")]
+    #[display("c")]
+    C,
+    #[serde(rename = "speed_of_light")]
+    #[display("speed_of_light")]
+    SpeedOfLight,
+    G,
+    #[serde(rename = "newtonian_graviation")]
+    #[display("newtonian_graviation")]
+    NewtonianGraviation,
+    #[serde(rename = "h")]
+    #[display("h")]
+    H,
+    #[serde(rename = "plank_const")]
+    #[display("plank_const")]
+    PlankConst,
+    #[serde(rename = "mu_0")]
+    #[display("mu_0")]
+    Mu0,
+    #[serde(rename = "vacuum_permeability")]
+    #[display("vacuum_permeability")]
+    VacuumPermeability,
+    #[serde(rename = "E_0")]
+    #[display("E_0")]
+    E0,
+    #[serde(rename = "vacuum_permitivity")]
+    #[display("vacuum_permitivity")]
+    VacuumPermitivity,
+    #[serde(rename = "Z_0")]
+    #[display("Z_0")]
+    Z0,
+    #[serde(rename = "vacuum_impedance")]
+    #[display("vacuum_impedance")]
+    VacuumImpedance,
+    #[serde(rename = "k_e")]
+    #[display("k_e")]
+    KE,
+    #[serde(rename = "coulomb_const")]
+    #[display("coulomb_const")]
+    CoulombConst,
+    #[serde(rename = "e")]
+    #[display("e")]
+    E,
+    #[serde(rename = "elementary_charge")]
+    #[display("elementary_charge")]
+    ElementaryCharge,
+    #[serde(rename = "m_e")]
+    #[display("m_e")]
+    ME,
+    #[serde(rename = "electron_mass")]
+    #[display("electron_mass")]
+    ElectronMass,
+    #[serde(rename = "m_p")]
+    #[display("m_p")]
+    MP,
+    #[serde(rename = "proton_mass")]
+    #[display("proton_mass")]
+    ProtonMass,
+    #[serde(rename = "mu_B")]
+    #[display("mu_B")]
+    MuB,
+    #[serde(rename = "bohr_magneton")]
+    #[display("bohr_magneton")]
+    BohrMagneton,
+    #[serde(rename = "NA")]
+    #[display("NA")]
+    Na,
+    #[serde(rename = "avogadro_num")]
+    #[display("avogadro_num")]
+    AvogadroNum,
+    R,
+    #[serde(rename = "molar_gas_const")]
+    #[display("molar_gas_const")]
+    MolarGasConst,
+    #[serde(rename = "K_B")]
+    #[display("K_B")]
+    KB,
+    #[serde(rename = "boltzmann_const")]
+    #[display("boltzmann_const")]
+    BoltzmannConst,
+    F,
+    #[serde(rename = "faraday_const")]
+    #[display("faraday_const")]
+    FaradayConst,
+    #[serde(rename = "sigma")]
+    #[display("sigma")]
+    Sigma,
+    #[serde(rename = "stefan_boltzmann_const")]
+    #[display("stefan_boltzmann_const")]
+    StefanBoltzmannConst,
+}
+
 #[doc = "Available plugins per type.\n\n**Note**: Only unmanaged (V1) plugins are included in this \
          list. V1 plugins are \\\"lazily\\\" loaded, and are not returned in this list if there is \
          no resource using the plugin."]

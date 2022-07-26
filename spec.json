@@ -3352,6 +3352,123 @@
         ],
         "type": "string"
       },
+      "PhysicsConstant": {
+        "description": "A physics constant.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the constant was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "constant": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PhysicsConstantName"
+              }
+            ],
+            "description": "The constant we are returning."
+          },
+          "created_at": {
+            "description": "The time and date the constant was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the constant request.\n\nThis is the same as the API call ID."
+          },
+          "started_at": {
+            "description": "The time and date the constant was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the constant."
+          },
+          "updated_at": {
+            "description": "The time and date the constant was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the constant.",
+            "type": "string"
+          },
+          "value": {
+            "description": "The resulting value of the constant.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          }
+        },
+        "required": [
+          "constant",
+          "created_at",
+          "id",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "PhysicsConstantName": {
+        "description": "The valid types of phys constant names.",
+        "enum": [
+          "pi",
+          "c",
+          "speed_of_light",
+          "G",
+          "newtonian_graviation",
+          "h",
+          "plank_const",
+          "mu_0",
+          "vacuum_permeability",
+          "E_0",
+          "vacuum_permitivity",
+          "Z_0",
+          "vacuum_impedance",
+          "k_e",
+          "coulomb_const",
+          "e",
+          "elementary_charge",
+          "m_e",
+          "electron_mass",
+          "m_p",
+          "proton_mass",
+          "mu_B",
+          "bohr_magneton",
+          "NA",
+          "avogadro_num",
+          "R",
+          "molar_gas_const",
+          "K_B",
+          "boltzmann_const",
+          "F",
+          "faraday_const",
+          "sigma",
+          "stefan_boltzmann_const"
+        ],
+        "type": "string"
+      },
       "PluginsInfo": {
         "description": "Available plugins per type.\n\n**Note**: Only unmanaged (V1) plugins are included in this list. V1 plugins are \\\"lazily\\\" loaded, and are not returned in this list if there is no resource using the plugin.",
         "properties": {
@@ -7412,6 +7529,79 @@
         "summary": "Listen for callbacks for email verification for users.",
         "tags": [
           "hidden"
+        ]
+      }
+    },
+    "/constant/physics/{constant}": {
+      "get": {
+        "operationId": "get_physics_constant",
+        "parameters": [
+          {
+            "description": "The constant to get.",
+            "in": "path",
+            "name": "constant",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PhysicsConstantName"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhysicsConstant"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Get a physics constant.",
+        "tags": [
+          "constant"
         ]
       }
     },
@@ -13160,6 +13350,13 @@
         "url": "https://docs.kittycad.io/api/beta"
       },
       "name": "beta"
+    },
+    {
+      "description": "Constants. These are helpful as helpers.",
+      "externalDocs": {
+        "url": "https://docs.kittycad.io/api/constant"
+      },
+      "name": "constant"
     },
     {
       "description": "CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.",
