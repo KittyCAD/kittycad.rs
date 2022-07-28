@@ -419,111 +419,6 @@ pub enum AccountProvider {
     Github,
 }
 
-#[doc = "An address."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Address {
-    #[doc = "The city component."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
-    #[doc = "The country component."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub country: Option<String>,
-    #[doc = "The time and date the address was created."]
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The unique identifier of the address."]
-    pub id: uuid::Uuid,
-    #[doc = "The state component."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub state: Option<String>,
-    #[doc = "The first street component."]
-    #[serde(rename = "street1", default, skip_serializing_if = "Option::is_none")]
-    pub street_1: Option<String>,
-    #[doc = "The second street component."]
-    #[serde(rename = "street2", default, skip_serializing_if = "Option::is_none")]
-    pub street_2: Option<String>,
-    #[doc = "The time and date the address was last updated."]
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID that this address belongs to."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
-    #[doc = "The zip component."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
-}
-
-impl std::fmt::Display for Address {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Address {
-    const LENGTH: usize = 10;
-    fn fields(&self) -> Vec<String> {
-        vec![
-            if let Some(city) = &self.city {
-                format!("{:?}", city)
-            } else {
-                String::new()
-            },
-            if let Some(country) = &self.country {
-                format!("{:?}", country)
-            } else {
-                String::new()
-            },
-            format!("{:?}", self.created_at),
-            format!("{:?}", self.id),
-            if let Some(state) = &self.state {
-                format!("{:?}", state)
-            } else {
-                String::new()
-            },
-            if let Some(street_1) = &self.street_1 {
-                format!("{:?}", street_1)
-            } else {
-                String::new()
-            },
-            if let Some(street_2) = &self.street_2 {
-                format!("{:?}", street_2)
-            } else {
-                String::new()
-            },
-            format!("{:?}", self.updated_at),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
-            } else {
-                String::new()
-            },
-            if let Some(zip) = &self.zip {
-                format!("{:?}", zip)
-            } else {
-                String::new()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<String> {
-        vec![
-            "city".to_string(),
-            "country".to_string(),
-            "created_at".to_string(),
-            "id".to_string(),
-            "state".to_string(),
-            "street_1".to_string(),
-            "street_2".to_string(),
-            "updated_at".to_string(),
-            "user_id".to_string(),
-            "zip".to_string(),
-        ]
-    }
-}
-
 #[doc = "A response for a query on the API call table that is grouped by something."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -1265,7 +1160,7 @@ pub enum AsyncApiCallType {
 pub struct BillingInfo {
     #[doc = "The address of the customer."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub address: Option<Address>,
+    pub address: Option<NewAddress>,
     #[doc = "The name of the customer."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -2539,7 +2434,7 @@ pub enum Currency {
 pub struct Customer {
     #[doc = "The customer's address."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub address: Option<Address>,
+    pub address: Option<NewAddress>,
     #[doc = "Current balance, if any, being stored on the customer in the payments service.\n\nIf negative, the customer has credit to apply to their next invoice. If positive, the customer has an amount owed that will be added to their next invoice. The balance does not refer to any unpaid invoices; it solely takes into account amounts that have yet to be successfully applied to any invoice. This balance is only taken into account as invoices are finalized."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub balance: Option<f64>,
@@ -5301,6 +5196,99 @@ pub enum Method {
     #[serde(rename = "EXTENSION")]
     #[display("EXTENSION")]
     Extension,
+}
+
+#[doc = "The struct that is used to create a new record. This is automatically generated and has all the same fields as the main struct only it is missing the `id`."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct NewAddress {
+    #[doc = "The city component."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub city: Option<String>,
+    #[doc = "The country component."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub country: Option<String>,
+    #[doc = "The state component."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub state: Option<String>,
+    #[doc = "The first street component."]
+    #[serde(rename = "street1", default, skip_serializing_if = "Option::is_none")]
+    pub street_1: Option<String>,
+    #[doc = "The second street component."]
+    #[serde(rename = "street2", default, skip_serializing_if = "Option::is_none")]
+    pub street_2: Option<String>,
+    #[doc = "The user ID that this address belongs to."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+    #[doc = "The zip component."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub zip: Option<String>,
+}
+
+impl std::fmt::Display for NewAddress {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for NewAddress {
+    const LENGTH: usize = 7;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(city) = &self.city {
+                format!("{:?}", city)
+            } else {
+                String::new()
+            },
+            if let Some(country) = &self.country {
+                format!("{:?}", country)
+            } else {
+                String::new()
+            },
+            if let Some(state) = &self.state {
+                format!("{:?}", state)
+            } else {
+                String::new()
+            },
+            if let Some(street_1) = &self.street_1 {
+                format!("{:?}", street_1)
+            } else {
+                String::new()
+            },
+            if let Some(street_2) = &self.street_2 {
+                format!("{:?}", street_2)
+            } else {
+                String::new()
+            },
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+            if let Some(zip) = &self.zip {
+                format!("{:?}", zip)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "city".to_string(),
+            "country".to_string(),
+            "state".to_string(),
+            "street_1".to_string(),
+            "street_2".to_string(),
+            "user_id".to_string(),
+            "zip".to_string(),
+        ]
+    }
 }
 
 #[doc = "Information about an OAuth 2.0 client."]

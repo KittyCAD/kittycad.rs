@@ -21,65 +21,6 @@
         ],
         "type": "string"
       },
-      "Address": {
-        "description": "An address.",
-        "properties": {
-          "city": {
-            "description": "The city component.",
-            "type": "string"
-          },
-          "country": {
-            "description": "The country component.",
-            "type": "string"
-          },
-          "created_at": {
-            "description": "The time and date the address was created.",
-            "format": "date-time",
-            "title": "DateTime",
-            "type": "string"
-          },
-          "id": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ],
-            "description": "The unique identifier of the address."
-          },
-          "state": {
-            "description": "The state component.",
-            "type": "string"
-          },
-          "street1": {
-            "description": "The first street component.",
-            "type": "string"
-          },
-          "street2": {
-            "description": "The second street component.",
-            "type": "string"
-          },
-          "updated_at": {
-            "description": "The time and date the address was last updated.",
-            "format": "date-time",
-            "title": "DateTime",
-            "type": "string"
-          },
-          "user_id": {
-            "description": "The user ID that this address belongs to.",
-            "type": "string"
-          },
-          "zip": {
-            "description": "The zip component.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "created_at",
-          "id",
-          "updated_at"
-        ],
-        "type": "object"
-      },
       "ApiCallQueryGroup": {
         "description": "A response for a query on the API call table that is grouped by something.",
         "properties": {
@@ -841,7 +782,7 @@
           "address": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/Address"
+                "$ref": "#/components/schemas/NewAddress"
               }
             ],
             "description": "The address of the customer.",
@@ -1499,7 +1440,7 @@
           "address": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/Address"
+                "$ref": "#/components/schemas/NewAddress"
               }
             ],
             "description": "The customer's address.",
@@ -3218,6 +3159,40 @@
           "EXTENSION"
         ],
         "type": "string"
+      },
+      "NewAddress": {
+        "description": "The struct that is used to create a new record. This is automatically generated and has all the same fields as the main struct only it is missing the `id`.",
+        "properties": {
+          "city": {
+            "description": "The city component.",
+            "type": "string"
+          },
+          "country": {
+            "description": "The country component.",
+            "type": "string"
+          },
+          "state": {
+            "description": "The state component.",
+            "type": "string"
+          },
+          "street1": {
+            "description": "The first street component.",
+            "type": "string"
+          },
+          "street2": {
+            "description": "The second street component.",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID that this address belongs to.",
+            "type": "string"
+          },
+          "zip": {
+            "description": "The zip component.",
+            "type": "string"
+          }
+        },
+        "type": "object"
       },
       "OAuth2ClientInfo": {
         "description": "Information about an OAuth 2.0 client.",

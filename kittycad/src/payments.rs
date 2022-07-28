@@ -43,7 +43,24 @@ impl Payments {
         }
     }
 
-    #[doc = "Update payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It updates the payment information for the authenticated user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_payments_update_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = client\n        .payments()\n        .update_information_for_user(&kittycad::types::BillingInfo {\n            address: Some(kittycad::types::Address {\n                city: Some(\"some-string\".to_string()),\n                country: Some(\"some-string\".to_string()),\n                created_at: chrono::Utc::now(),\n                id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                state: Some(\"some-string\".to_string()),\n                street_1: Some(\"some-string\".to_string()),\n                street_2: Some(\"some-string\".to_string()),\n                updated_at: chrono::Utc::now(),\n                user_id: Some(\"some-string\".to_string()),\n                zip: Some(\"some-string\".to_string()),\n            }),\n            name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update payment info for your user.\n\nThis includes billing address, phone, and \
+             name.\nThis endpoint requires authentication by any KittyCAD user. It updates the \
+             payment information for the authenticated user.\n\n```rust,no_run\nuse \
+             std::str::FromStr;\nasync fn example_payments_update_information_for_user() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::Customer = client\n        .payments()\n        \
+             .update_information_for_user(&kittycad::types::BillingInfo {\n            address: \
+             Some(kittycad::types::NewAddress {\n                city: \
+             Some(\"some-string\".to_string()),\n                country: \
+             Some(\"some-string\".to_string()),\n                state: \
+             Some(\"some-string\".to_string()),\n                street_1: \
+             Some(\"some-string\".to_string()),\n                street_2: \
+             Some(\"some-string\".to_string()),\n                user_id: \
+             Some(\"some-string\".to_string()),\n                zip: \
+             Some(\"some-string\".to_string()),\n            }),\n            name: \
+             Some(\"some-string\".to_string()),\n            phone: \
+             kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        \
+             })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_information_for_user<'a>(
         &'a self,
@@ -70,7 +87,24 @@ impl Payments {
         }
     }
 
-    #[doc = "Create payment info for your user.\n\nThis includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It creates the payment information for the authenticated user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_payments_create_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = client\n        .payments()\n        .create_information_for_user(&kittycad::types::BillingInfo {\n            address: Some(kittycad::types::Address {\n                city: Some(\"some-string\".to_string()),\n                country: Some(\"some-string\".to_string()),\n                created_at: chrono::Utc::now(),\n                id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                state: Some(\"some-string\".to_string()),\n                street_1: Some(\"some-string\".to_string()),\n                street_2: Some(\"some-string\".to_string()),\n                updated_at: chrono::Utc::now(),\n                user_id: Some(\"some-string\".to_string()),\n                zip: Some(\"some-string\".to_string()),\n            }),\n            name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create payment info for your user.\n\nThis includes billing address, phone, and \
+             name.\nThis endpoint requires authentication by any KittyCAD user. It creates the \
+             payment information for the authenticated user.\n\n```rust,no_run\nuse \
+             std::str::FromStr;\nasync fn example_payments_create_information_for_user() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::Customer = client\n        .payments()\n        \
+             .create_information_for_user(&kittycad::types::BillingInfo {\n            address: \
+             Some(kittycad::types::NewAddress {\n                city: \
+             Some(\"some-string\".to_string()),\n                country: \
+             Some(\"some-string\".to_string()),\n                state: \
+             Some(\"some-string\".to_string()),\n                street_1: \
+             Some(\"some-string\".to_string()),\n                street_2: \
+             Some(\"some-string\".to_string()),\n                user_id: \
+             Some(\"some-string\".to_string()),\n                zip: \
+             Some(\"some-string\".to_string()),\n            }),\n            name: \
+             Some(\"some-string\".to_string()),\n            phone: \
+             kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        \
+             })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_information_for_user<'a>(
         &'a self,
