@@ -118,7 +118,7 @@ impl SchemaExt for openapiv3::RequestBody {
     }
 
     fn clean_reference_name(s: &str) -> String {
-        s.trim_start_matches("#/components/request_bodies/")
+        s.trim_start_matches("#/components/requestBodies/")
             .to_string()
     }
 
