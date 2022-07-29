@@ -710,7 +710,7 @@ impl TypeSpace {
             quote!(
                 impl std::default::Default for #enum_name {
                     fn default() -> Self {
-                        #default
+                        #enum_name::#default
                     }
                 }
             )
