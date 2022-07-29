@@ -41,6 +41,11 @@ pub fn load_json_spec(s: &str) -> Result<openapiv3::OpenAPI> {
     serde_json::from_str(s).map_err(|e| anyhow::anyhow!(e))
 }
 
+/// Parse an OpenAPI v3 spec YAML string as an OpenAPI struct.
+pub fn load_yaml_spec(s: &str) -> Result<openapiv3::OpenAPI> {
+    serde_yaml::from_str(s).map_err(|e| anyhow::anyhow!(e))
+}
+
 /// Parse a file as an OpenAPI spec.
 pub async fn load_api<P>(p: P) -> Result<openapiv3::OpenAPI>
 where
@@ -51,7 +56,7 @@ where
     let contents = fs::read_to_string(p).await?;
     if let Some(ext) = p.extension() {
         if ext == std::ffi::OsStr::new("yaml") || ext == std::ffi::OsStr::new("yml") {
-            return Ok(serde_yaml::from_str(&contents)?);
+            return load_yaml_spec(&contents);
         }
     }
 

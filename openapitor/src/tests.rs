@@ -147,6 +147,39 @@ async fn test_oxide_generation(ctx: &mut TestContext) {
     run_cargo_test(&opts).await.unwrap();
 }
 
+#[test_context(TestContext)]
+#[tokio::test]
+#[ignore]
+async fn test_gusto_generation(ctx: &mut TestContext) {
+    let opts = crate::Opts {
+        debug: true,
+        json: false,
+        input: ctx.tmp_dir.clone(),
+        output: ctx.tmp_dir.clone(),
+        base_url: "https://api.gusto.com".parse().unwrap(),
+        name: "gusto-api".to_string(),
+        version: "1.0.0".to_string(),
+        description: "HR crap!".to_string(),
+        spec_url: Some("".to_string()),
+        repo_name: Some("kittycad/octorust.rs".to_string()),
+    };
+
+    // Load our spec.
+    let spec = crate::load_yaml_spec(include_str!("../tests/gusto.v1.yaml")).unwrap();
+
+    // Move our test file to our output directory.
+    let test_file = include_str!("../tests/library/gusto.tests.rs");
+    // Write our temporary file.
+    let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
+    std::fs::write(&test_file_path, test_file).unwrap();
+
+    // Generate the library.
+    crate::generate(&spec, &opts).await.unwrap();
+
+    // Run tests.
+    run_cargo_test(&opts).await.unwrap();
+}
+
 async fn run_cargo_test(opts: &crate::Opts) -> Result<()> {
     log::info!("Running `cargo test`...");
 
