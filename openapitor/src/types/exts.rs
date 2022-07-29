@@ -539,7 +539,7 @@ impl OperationExt for openapiv3::Operation {
         // Remove any stutters with the tag name.
         name = remove_stutters(&name, &tag);
         // Remove any stutters with the singular tag name.
-        name = remove_stutters(&name, &singular(&tag)).replace("_v_1_", "");
+        name = remove_stutters(&name, &singular(&tag)).replace("_v_1_", "_");
 
         Ok(name)
     }
