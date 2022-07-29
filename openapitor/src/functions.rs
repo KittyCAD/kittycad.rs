@@ -755,10 +755,21 @@ fn get_query_params(
                 false,
             )?,
             openapiv3::ReferenceOr::Item(ref s) => {
-                let t_name =
+                let mut t_name =
                     crate::types::get_type_name_for_schema(&name, &s, &type_space.spec, false)?;
                 // Check if we should render the schema.
                 if schema.should_render()? {
+                    // Check if we already have a type with this name.
+                    if !type_space.types.contains_key(&t_name.rendered()?) {
+                        // Update the name of the type.
+                        t_name = crate::types::get_type_name_for_schema(
+                            &format!("{} {}", op.get_fn_name()?, name),
+                            &s,
+                            &type_space.spec,
+                            false,
+                        )?;
+                    }
+
                     type_space.render_schema(&t_name.rendered()?, &s)?;
                 }
 
