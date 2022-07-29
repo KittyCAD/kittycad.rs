@@ -1239,10 +1239,15 @@ fn generate_example_client_env(opts: &crate::Opts) -> String {
 /// usage inside the crate.
 fn fmt_external_example_code(t: &proc_macro2::TokenStream, opts: &crate::Opts) -> Result<String> {
     let rendered = crate::types::get_text_fmt(t)?;
-    Ok(rendered.replace(
-        "crate::types::",
-        &format!("{}::types::", opts.code_package_name()),
-    ))
+    Ok(rendered
+        .replace(
+            "crate::types::",
+            &format!("{}::types::", opts.code_package_name()),
+        )
+        .replace(
+            "crate :: types :: ",
+            &format!("{}::types::", opts.code_package_name()),
+        ))
 }
 
 #[cfg(test)]
