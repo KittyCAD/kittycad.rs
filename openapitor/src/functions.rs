@@ -8,13 +8,13 @@ use std::{
 use anyhow::Result;
 
 use crate::types::exts::{
-    ParameterSchemaOrContentExt, ReferenceOrExt, SchemaRenderExt, StatusCodeExt, TokenStreamExt,
+    OperationExt, ParameterSchemaOrContentExt, ReferenceOrExt, SchemaRenderExt, StatusCodeExt,
+    TokenStreamExt,
 };
 
 /// Generate functions for each path operation.
 pub fn generate_files(
     type_space: &mut crate::types::TypeSpace,
-    spec: &openapiv3::OpenAPI,
     opts: &crate::Opts,
 ) -> Result<(
     BTreeMap<String, proc_macro2::TokenStream>,
@@ -23,9 +23,9 @@ pub fn generate_files(
     let mut tag_files: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
 
     // Make a spec we can modify for the docs.
-    let mut new_spec = spec.clone();
+    let mut new_spec = type_space.spec.clone();
 
-    for (name, path) in spec.paths.iter() {
+    for (name, path) in type_space.clone().spec.paths.iter() {
         let op = path.item()?;
 
         let mut new_path = op.clone();
@@ -41,21 +41,18 @@ pub fn generate_files(
                 return Ok(());
             };
 
-            let tag =
-                crate::clean_tag_name(op.tags.first().ok_or_else(|| {
-                    anyhow::anyhow!("operation `{}` `{}` has no tags", name, method)
-                })?);
+            let tag = op.get_tag()?;
 
             // Get the docs.
-            let docs = generate_docs(type_space, name, method, op, spec)?;
+            let docs = generate_docs(type_space, name, method, op)?;
 
             // Get the function name.
-            let fn_name = get_fn_name(name, method, &tag, op)?;
+            let fn_name = op.get_fn_name()?;
             let fn_name_ident = format_ident!("{}", fn_name);
 
             // Get the response for the function.
             let response_type =
-                if let Some(response) = get_response_type(type_space, name, method, op, spec)? {
+                if let Some(response) = get_response_type(type_space, name, method, op)? {
                     let t = response.type_name;
                     quote!(#t)
                 } else {
@@ -64,7 +61,7 @@ pub fn generate_files(
                 };
 
             // Get the function args.
-            let raw_args = get_args(type_space, op, spec)?;
+            let raw_args = get_args(type_space, op)?;
             // Make sure if we have args, we start with a comma.
             let args = if raw_args.is_empty() {
                 quote!()
@@ -77,21 +74,20 @@ pub fn generate_files(
             };
 
             // Get the request body for the function if there is one.
-            let request_body =
-                if let Some(rb) = get_request_body(type_space, name, method, op, spec)? {
-                    let t = rb.type_name;
-                    // We add the comma at the front, so it works.
-                    quote!(, body: &#t)
-                } else {
-                    // We don't have a request body, so we'll return nothing.
-                    quote!()
-                };
+            let request_body = if let Some(rb) = get_request_body(type_space, name, method, op)? {
+                let t = rb.type_name;
+                // We add the comma at the front, so it works.
+                quote!(, body: &#t)
+            } else {
+                // We don't have a request body, so we'll return nothing.
+                quote!()
+            };
 
             // Get the function body.
-            let function_body = get_function_body(type_space, name, method, op, spec, false)?;
+            let function_body = get_function_body(type_space, name, method, op, false)?;
 
             let example_code_fn =
-                generate_example_code_fn(type_space, name, method, &tag, op, spec, opts)?;
+                generate_example_code_fn(type_space, name, method, &tag, op, opts)?;
             // For the rust docs example code we want to trim the doc string since it is
             // repetitive.
             let rust_doc_example_code_fn = &example_code_fn[example_code_fn
@@ -143,7 +139,8 @@ pub fn generate_files(
             );
 
             // Let's check if this function can be paginated.
-            let pagination_properties = get_pagination_properties(name, method, op, spec)?;
+            let pagination_properties =
+                get_pagination_properties(name, method, op, &type_space.spec)?;
             if pagination_properties.can_paginate() {
                 // If we can paginate we should generate a paginated stream function.
                 let stream_fn_name_ident = format_ident!("{}_stream", fn_name);
@@ -192,7 +189,7 @@ pub fn generate_files(
                 };
 
                 let paginated_function_body =
-                    get_function_body(type_space, name, method, op, spec, true)?;
+                    get_function_body(type_space, name, method, op, true)?;
 
                 let item_type = pagination_properties.item_type(false)?;
 
@@ -292,7 +289,6 @@ fn generate_docs(
     name: &str,
     method: &http::Method,
     op: &openapiv3::Operation,
-    spec: &openapiv3::OpenAPI,
 ) -> Result<String> {
     let mut docs = if let Some(summary) = &op.summary {
         summary.to_string()
@@ -306,10 +302,10 @@ fn generate_docs(
     }
 
     // Document the params.
-    let mut params = get_path_params_schema(op, spec)?;
-    params.append(&mut get_query_params_schema(op, spec)?);
+    let mut params = get_path_params_schema(op, &type_space.spec)?;
+    params.append(&mut get_query_params_schema(op, &type_space.spec)?);
 
-    let params_types = get_args(type_space, op, spec)?;
+    let params_types = get_args(type_space, op)?;
 
     if !params.is_empty() {
         docs.push_str("\n\n**Parameters:**\n");
@@ -361,55 +357,6 @@ fn generate_docs(
     Ok(docs)
 }
 
-/// Return the function name for the operation.
-fn get_fn_name(
-    name: &str,
-    method: &http::Method,
-    tag: &str,
-    op: &openapiv3::Operation,
-) -> Result<String> {
-    let mut name = op
-        .operation_id
-        .as_ref()
-        .ok_or_else(|| anyhow::anyhow!("operation `{}` `{}` has no operation_id", name, method))?
-        .to_string();
-
-    // Convert to snake case.
-    name = inflector::cases::snakecase::to_snake_case(&name);
-
-    // Remove any stutters with the tag name.
-    name = remove_stutters(&name, tag);
-    // Remove any stutters with the singular tag name.
-    name = remove_stutters(&name, &singular(tag));
-
-    Ok(name)
-}
-
-/// Return the singular version of a string (if it plural).
-fn singular(s: &str) -> String {
-    if let Some(b) = s.strip_suffix('s') {
-        return b.to_string();
-    }
-
-    s.to_string()
-}
-
-/// Remove any stutters with a string.
-fn remove_stutters(whole: &str, s: &str) -> String {
-    let mut whole = whole.to_string();
-    if whole.starts_with(&format!("{}_", s)) {
-        whole = whole.trim_start_matches(&format!("{}_", s)).to_string();
-    }
-    if whole.ends_with(&format!("_{}", s)) {
-        whole = whole.trim_end_matches(&format!("_{}", s)).to_string();
-    }
-    if whole.contains(&format!("_{}_", s)) {
-        whole = whole.replace(&format!("_{}_", s), "_");
-    }
-
-    whole
-}
-
 struct RequestOrResponse {
     media_type: String,
     type_name: proc_macro2::TokenStream,
@@ -421,14 +368,13 @@ fn get_response_type(
     name: &str,
     method: &http::Method,
     op: &openapiv3::Operation,
-    spec: &openapiv3::OpenAPI,
 ) -> Result<Option<RequestOrResponse>> {
     for (status_code, response) in &op.responses.responses {
         // We only care if the response is a success since this is for the function
         // to return upon success.
         if status_code.is_success() {
             // Then let's get the type for the response.
-            let response = response.expand(spec)?;
+            let response = response.expand(&type_space.spec)?;
 
             // Iterate over all the media types and return the first response.
             for (media_type, content) in &response.content {
@@ -437,7 +383,7 @@ fn get_response_type(
                         openapiv3::ReferenceOr::Reference { .. } => {
                             crate::types::get_type_name_from_reference(
                                 &s.reference()?,
-                                spec,
+                                &type_space.spec,
                                 false,
                             )?
                         }
@@ -445,7 +391,7 @@ fn get_response_type(
                             let on_the_fly_type = crate::types::get_type_name_for_schema(
                                 &generate_name_for_fn_schema(name, method, s, op, "Response"),
                                 s,
-                                spec,
+                                &type_space.spec,
                                 false,
                             )?;
 
@@ -494,10 +440,9 @@ fn generate_name_for_fn_schema(
 fn get_args(
     type_space: &mut crate::types::TypeSpace,
     op: &openapiv3::Operation,
-    spec: &openapiv3::OpenAPI,
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
-    let path_params = get_path_params(type_space, op, spec)?;
-    let query_params = get_query_params(type_space, op, spec)?;
+    let path_params = get_path_params(type_space, op)?;
+    let query_params = get_query_params(type_space, op)?;
 
     Ok(path_params
         .into_iter()
@@ -511,24 +456,27 @@ fn get_request_body(
     name: &str,
     method: &http::Method,
     op: &openapiv3::Operation,
-    spec: &openapiv3::OpenAPI,
 ) -> Result<Option<RequestOrResponse>> {
     if let Some(request_body) = &op.request_body {
         // Then let's get the type for the response.
-        let request_body = request_body.expand(spec)?;
+        let request_body = request_body.expand(&type_space.spec)?;
 
         // Iterate over all the media types and return the first request.
         for (media_type, content) in &request_body.content {
             if let Some(s) = &content.schema {
                 let t = match s {
                     openapiv3::ReferenceOr::Reference { .. } => {
-                        crate::types::get_type_name_from_reference(&s.reference()?, spec, false)?
+                        crate::types::get_type_name_from_reference(
+                            &s.reference()?,
+                            &type_space.spec,
+                            false,
+                        )?
                     }
                     openapiv3::ReferenceOr::Item(s) => {
                         let fly_request = crate::types::get_type_name_for_schema(
                             &generate_name_for_fn_schema(name, method, s, op, "Request Body"),
                             s,
-                            spec,
+                            &type_space.spec,
                             false,
                         )?;
 
@@ -695,22 +643,35 @@ fn get_path_params_schema(
 fn get_path_params(
     type_space: &mut crate::types::TypeSpace,
     op: &openapiv3::Operation,
-    spec: &openapiv3::OpenAPI,
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
-    let params = get_path_params_schema(op, spec)?;
+    let params = get_path_params_schema(op, &type_space.spec)?;
 
     let mut path_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
 
     for (name, (schema, parameter_data)) in params {
         // Get the type for the parameter.
         let mut t = match schema {
-            openapiv3::ReferenceOr::Reference { .. } => {
-                crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
-            }
+            openapiv3::ReferenceOr::Reference { .. } => crate::types::get_type_name_from_reference(
+                &schema.reference()?,
+                &type_space.spec,
+                false,
+            )?,
             openapiv3::ReferenceOr::Item(ref s) => {
-                let t_name = crate::types::get_type_name_for_schema(&name, &s, spec, false)?;
+                let mut t_name =
+                    crate::types::get_type_name_for_schema(&name, &s, &type_space.spec, false)?;
                 // Check if we should render the schema.
                 if schema.should_render()? {
+                    // Check if we already have a type with this name.
+                    if !type_space.types.contains_key(&t_name.rendered()?) {
+                        // Update the name of the type.
+                        t_name = crate::types::get_type_name_for_schema(
+                            &format!("{} {}", op.get_fn_name()?, name),
+                            &s,
+                            &type_space.spec,
+                            false,
+                        )?;
+                    }
+
                     type_space.render_schema(&t_name.rendered()?, &s)?;
                 }
 
@@ -780,20 +741,22 @@ fn get_query_params_schema(
 fn get_query_params(
     type_space: &mut crate::types::TypeSpace,
     op: &openapiv3::Operation,
-    spec: &openapiv3::OpenAPI,
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
-    let params = get_query_params_schema(op, spec)?;
+    let params = get_query_params_schema(op, &type_space.spec)?;
 
     let mut query_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
 
     for (name, (schema, parameter_data)) in params {
         // Get the type for the parameter.
         let mut t = match schema {
-            openapiv3::ReferenceOr::Reference { .. } => {
-                crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
-            }
+            openapiv3::ReferenceOr::Reference { .. } => crate::types::get_type_name_from_reference(
+                &schema.reference()?,
+                &type_space.spec,
+                false,
+            )?,
             openapiv3::ReferenceOr::Item(ref s) => {
-                let t_name = crate::types::get_type_name_for_schema(&name, &s, spec, false)?;
+                let t_name =
+                    crate::types::get_type_name_for_schema(&name, &s, &type_space.spec, false)?;
                 // Check if we should render the schema.
                 if schema.should_render()? {
                     type_space.render_schema(&t_name.rendered()?, &s)?;
@@ -821,14 +784,13 @@ fn get_function_body(
     name: &str,
     method: &http::Method,
     op: &openapiv3::Operation,
-    spec: &openapiv3::OpenAPI,
     paginated: bool,
 ) -> Result<proc_macro2::TokenStream> {
     let path = name.trim_start_matches('/');
     let method_ident = format_ident!("{}", method.to_string());
 
     // Let's get the path parameters.
-    let path_params = get_path_params(type_space, op, spec)?;
+    let path_params = get_path_params(type_space, op)?;
     let clean_url = if !path_params.is_empty() {
         let mut clean_string = quote!();
         for (name, t) in &path_params {
@@ -852,7 +814,7 @@ fn get_function_body(
     };
 
     // Let's get the query parameters.
-    let query_params = get_query_params(type_space, op, spec)?;
+    let query_params = get_query_params(type_space, op)?;
     let query_params_code = if !query_params.is_empty() && !paginated {
         let mut array = Vec::new();
         for (name, t) in &query_params {
@@ -896,50 +858,49 @@ fn get_function_body(
     };
 
     // Get if there is a request body.
-    let request_body =
-        if let Some(request_body) = get_request_body(type_space, name, method, op, spec)? {
-            match request_body.media_type.as_str() {
-                "application/json" => {
-                    quote! {
-                        // Add the json body.
-                        req = req.json(body);
-                    }
+    let request_body = if let Some(request_body) = get_request_body(type_space, name, method, op)? {
+        match request_body.media_type.as_str() {
+            "application/json" => {
+                quote! {
+                    // Add the json body.
+                    req = req.json(body);
                 }
-                "application/x-www-form-urlencoded" => {
-                    quote! {
-                        // Add the form body.
-                        req = req.form(body);
-                    }
+            }
+            "application/x-www-form-urlencoded" => {
+                quote! {
+                    // Add the form body.
+                    req = req.form(body);
                 }
-                "application/octet-stream" => {
+            }
+            "application/octet-stream" => {
+                quote! {
+                    // Add the raw body.
+                    req = req.body(body.clone());
+                }
+            }
+            _ => {
+                if request_body.type_name.is_string()? {
                     quote! {
                         // Add the raw body.
                         req = req.body(body.clone());
                     }
-                }
-                _ => {
-                    if request_body.type_name.is_string()? {
-                        quote! {
-                            // Add the raw body.
-                            req = req.body(body.clone());
-                        }
-                    } else {
-                        anyhow::bail!(
-                            "unsupported media type for request body: {}",
-                            request_body.media_type
-                        );
-                    }
+                } else {
+                    anyhow::bail!(
+                        "unsupported media type for request body: {}",
+                        request_body.media_type
+                    );
                 }
             }
-        } else {
-            // Do nothing.
-            quote!()
-        };
+        }
+    } else {
+        // Do nothing.
+        quote!()
+    };
 
     // TODO: we should add the headers.
 
     // Get the response if there is one.
-    let response = if let Some(response) = get_response_type(type_space, name, method, op, spec)? {
+    let response = if let Some(response) = get_response_type(type_space, name, method, op)? {
         match response.media_type.as_str() {
             "application/json" => {
                 quote! {
@@ -1078,15 +1039,14 @@ fn generate_example_code_fn(
     method: &http::Method,
     tag: &str,
     op: &openapiv3::Operation,
-    spec: &openapiv3::OpenAPI,
     opts: &crate::Opts,
 ) -> Result<String> {
     // Get the docs.
-    let docs = generate_docs(type_space, name, method, op, spec)?;
+    let docs = generate_docs(type_space, name, method, op)?;
     let docs = docs.replace('\n', "\n/// ");
 
     // Get the function name.
-    let fn_name = get_fn_name(name, method, tag, op)?;
+    let fn_name = op.get_fn_name()?;
     let fn_name_ident = format_ident!("{}", fn_name);
     let example_fn_name_ident = format_ident!("example_{}_{}", tag, fn_name);
 
@@ -1094,14 +1054,14 @@ fn generate_example_code_fn(
 
     let mut function_start = quote!();
     let mut print_result = quote!();
-    if let Some(response) = get_response_type(type_space, name, method, op, spec)? {
+    if let Some(response) = get_response_type(type_space, name, method, op)? {
         let t = response.type_name;
         function_start = quote!(let result: #t = );
         print_result = quote!(println!("{:?}", result););
     }
 
     // Get the function args.
-    let raw_args = get_example_args(op, spec)?;
+    let raw_args = get_example_args(op, &type_space.spec)?;
     let args = if raw_args.is_empty() {
         quote!()
     } else {
@@ -1110,14 +1070,15 @@ fn generate_example_code_fn(
     };
 
     // Get the request body for the function if there is one.
-    let request_body = if let Some(rb) = get_request_body_example(name, method, op, spec)? {
-        let t = rb.type_name;
-        // We add the comma at the front, so it works.
-        quote!(&#t)
-    } else {
-        // We don't have a request body, so we'll return nothing.
-        quote!()
-    };
+    let request_body =
+        if let Some(rb) = get_request_body_example(name, method, op, &type_space.spec)? {
+            let t = rb.type_name;
+            // We add the comma at the front, so it works.
+            quote!(&#t)
+        } else {
+            // We don't have a request body, so we'll return nothing.
+            quote!()
+        };
 
     let mut imports = quote!();
     if args.rendered()?.contains("::from_str(") || request_body.rendered()?.contains("::from_str(")
@@ -1146,7 +1107,7 @@ fn generate_example_code_fn(
     );
 
     // Let's check if this function can be paginated.
-    let pagination_properties = get_pagination_properties(name, method, op, spec)?;
+    let pagination_properties = get_pagination_properties(name, method, op, &type_space.spec)?;
     if pagination_properties.can_paginate() {
         // We need to generate the stream function as well.
         let stream_fn_name_ident = format_ident!("{}_stream", fn_name);
@@ -1261,61 +1222,51 @@ fn fmt_external_example_code(t: &proc_macro2::TokenStream, opts: &crate::Opts) -
 mod tests {
     use pretty_assertions::assert_eq;
 
+    use crate::types::exts::OperationExt;
+
     #[test]
     fn test_fn_name() {
         // Test remove stutters.
         assert_eq!(
-            super::get_fn_name(
-                "/foo/bar",
-                &http::Method::GET,
-                "things",
-                &openapiv3::Operation {
-                    operation_id: Some("getThings".to_string()),
-                    ..Default::default()
-                }
-            )
+            openapiv3::Operation {
+                operation_id: Some("getThings".to_string()),
+                tags: vec!["things".to_string()],
+                ..Default::default()
+            }
+            .get_fn_name()
             .unwrap(),
             "get"
         );
 
         assert_eq!(
-            super::get_fn_name(
-                "/foo/bar",
-                &http::Method::GET,
-                "things",
-                &openapiv3::Operation {
-                    operation_id: Some("getThingsFromZoo".to_string()),
-                    ..Default::default()
-                }
-            )
+            openapiv3::Operation {
+                operation_id: Some("getThingsFromZoo".to_string()),
+                tags: vec!["things".to_string()],
+                ..Default::default()
+            }
+            .get_fn_name()
             .unwrap(),
             "get_from_zoo"
         );
 
         assert_eq!(
-            super::get_fn_name(
-                "/foo/bar",
-                &http::Method::GET,
-                "things",
-                &openapiv3::Operation {
-                    operation_id: Some("ThingFromZoo".to_string()),
-                    ..Default::default()
-                }
-            )
+            openapiv3::Operation {
+                operation_id: Some("ThingFromZoo".to_string()),
+                tags: vec!["things".to_string()],
+                ..Default::default()
+            }
+            .get_fn_name()
             .unwrap(),
             "from_zoo"
         );
 
         assert_eq!(
-            super::get_fn_name(
-                "/foo/bar",
-                &http::Method::GET,
-                "things",
-                &openapiv3::Operation {
-                    operation_id: Some("meta/info".to_string()),
-                    ..Default::default()
-                }
-            )
+            openapiv3::Operation {
+                operation_id: Some("meta/info".to_string()),
+                tags: vec!["things".to_string()],
+                ..Default::default()
+            }
+            .get_fn_name()
             .unwrap(),
             "meta_info"
         );

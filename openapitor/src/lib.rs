@@ -287,7 +287,7 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     let mut type_space = crate::types::generate_types(spec)?;
 
     // Create the Rust source files for each of the tags functions.
-    let (files, modified_spec) = crate::functions::generate_files(&mut type_space, spec, opts)?;
+    let (files, modified_spec) = crate::functions::generate_files(&mut type_space, opts)?;
     // We have a map of our files, let's write to them.
     for (f, content) in files {
         let mut tagrs = src.clone();

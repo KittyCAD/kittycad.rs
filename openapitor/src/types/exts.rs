@@ -490,3 +490,71 @@ impl SchemaRenderExt for openapiv3::ReferenceOr<Box<openapiv3::Schema>> {
         }
     }
 }
+
+/// A trait for `Operation`s.
+pub trait OperationExt {
+    /// Returns what the function name should be for the operation.
+    fn get_fn_name(&self) -> Result<String>;
+    /// Get the function name as an ident.
+    fn get_fn_name_ident(&self) -> Result<proc_macro2::Ident>;
+    /// Get the first tag for the operation.
+    fn get_tag(&self) -> Result<String>;
+}
+
+impl OperationExt for openapiv3::Operation {
+    fn get_tag(&self) -> Result<String> {
+        Ok(crate::clean_tag_name(self.tags.first().ok_or_else(
+            || anyhow::anyhow!("operation  has no tags: {:?}", self),
+        )?))
+    }
+
+    fn get_fn_name(&self) -> Result<String> {
+        let tag = self.get_tag()?;
+
+        let mut name = self
+            .operation_id
+            .as_ref()
+            .ok_or_else(|| anyhow::anyhow!("operation has no operation_id: {:?}", self))?
+            .to_string();
+
+        // Convert to snake case.
+        name = inflector::cases::snakecase::to_snake_case(&name);
+
+        // Remove any stutters with the tag name.
+        name = remove_stutters(&name, &tag);
+        // Remove any stutters with the singular tag name.
+        name = remove_stutters(&name, &singular(&tag));
+
+        Ok(name)
+    }
+
+    fn get_fn_name_ident(&self) -> Result<proc_macro2::Ident> {
+        let fn_name = self.get_fn_name()?;
+        Ok(format_ident!("{}", fn_name))
+    }
+}
+
+/// Remove any stutters with a string.
+fn remove_stutters(whole: &str, s: &str) -> String {
+    let mut whole = whole.to_string();
+    if whole.starts_with(&format!("{}_", s)) {
+        whole = whole.trim_start_matches(&format!("{}_", s)).to_string();
+    }
+    if whole.ends_with(&format!("_{}", s)) {
+        whole = whole.trim_end_matches(&format!("_{}", s)).to_string();
+    }
+    if whole.contains(&format!("_{}_", s)) {
+        whole = whole.replace(&format!("_{}_", s), "_");
+    }
+
+    whole
+}
+
+/// Return the singular version of a string (if it plural).
+fn singular(s: &str) -> String {
+    if let Some(b) = s.strip_suffix('s') {
+        return b.to_string();
+    }
+
+    s.to_string()
+}

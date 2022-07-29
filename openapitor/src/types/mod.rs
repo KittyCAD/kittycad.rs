@@ -97,14 +97,40 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<TypeSpace> {
 }
 
 impl TypeSpace {
-    /// Add to our rendered types.
-    pub fn add_to_rendered(&mut self, t: &proc_macro2::TokenStream) {
-        let r = &self.rendered;
-        self.rendered = quote! {
-            #r
+    /// Pretty render the type space.
+    pub fn render(&self) -> Result<String> {
+        get_text_fmt(&self.rendered)
+    }
 
-            #t
-        };
+    /// Add to our rendered types.
+    pub fn add_to_rendered(
+        &mut self,
+        t: &proc_macro2::TokenStream,
+        (name, s): (String, openapiv3::Schema),
+    ) -> Result<()> {
+        if let Some(item) = self.types.get(&name) {
+            // We have a schema with the name already.
+            // Let's check if it's the same.
+            if &s != item {
+                // We have a problem they are not the same.
+                anyhow::bail!(
+                    "The schema {} is already defined with a different schema\nnew: {:?}\nold: {:?}",
+                    name,
+                    s,
+                    item
+                );
+            }
+        } else {
+            // The item does not exist let's add it.
+            self.types.insert(name, s);
+            let r = &self.rendered;
+            self.rendered = quote! {
+                #r
+
+                #t
+            };
+        }
+        Ok(())
     }
 
     /// Render a schema into a Rust type.
@@ -309,8 +335,9 @@ impl TypeSpace {
         };
 
         // Add the type to our type space.
-        if !self.types.contains_key(&one_of_name.to_string()) {
-            self.types.insert(
+        self.add_to_rendered(
+            &rendered,
+            (
                 one_of_name.to_string(),
                 openapiv3::Schema {
                     schema_data: data.clone(),
@@ -318,10 +345,8 @@ impl TypeSpace {
                         one_of: one_ofs.clone(),
                     },
                 },
-            );
-
-            self.add_to_rendered(&rendered);
-        }
+            ),
+        )?;
 
         Ok(())
     }
@@ -434,7 +459,16 @@ impl TypeSpace {
                 let t = if self.types.contains_key(&proper_name(&prop)) {
                     proper_name(&format!("{} {}", struct_name, prop))
                 } else {
-                    proper_name(&prop)
+                    // Make sure there isn't an existing reference with this name.
+                    if let Some(components) = &self.spec.components {
+                        if components.schemas.contains_key(&proper_name(&prop)) {
+                            proper_name(&format!("{} {}", struct_name, prop))
+                        } else {
+                            prop.to_string()
+                        }
+                    } else {
+                        proper_name(&prop)
+                    }
                 };
 
                 // Render the schema.
@@ -602,17 +636,16 @@ impl TypeSpace {
         };
 
         // Add the type to the list of types, if it doesn't already exist.
-        if !self.types.contains_key(&struct_name.to_string()) {
-            self.types.insert(
+        self.add_to_rendered(
+            &rendered,
+            (
                 struct_name.to_string(),
                 openapiv3::Schema {
                     schema_data: data.clone(),
                     schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(o.clone())),
                 },
-            );
-
-            self.add_to_rendered(&rendered);
-        }
+            ),
+        )?;
 
         Ok(())
     }
@@ -739,17 +772,16 @@ impl TypeSpace {
         };
 
         // Add the type to the list of types, if it doesn't already exist.
-        if !self.types.contains_key(&enum_name.to_string()) {
-            self.types.insert(
+        self.add_to_rendered(
+            &rendered,
+            (
                 enum_name.to_string(),
                 openapiv3::Schema {
                     schema_data: data.clone(),
                     schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::String(s.clone())),
                 },
-            );
-
-            self.add_to_rendered(&rendered);
-        }
+            ),
+        )?;
 
         Ok(())
     }
@@ -1555,6 +1587,8 @@ pub fn proper_name(s: &str) -> String {
 
     inflector::cases::pascalcase::to_pascal_case(&s)
         .trim_start_matches("CrateTypes")
+        .trim_start_matches("VecCrateTypes")
+        .trim_start_matches("OptionCrateTypes")
         .replace("V1", "")
         .to_string()
 }
@@ -1859,7 +1893,7 @@ mod test {
             &crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
         )
         .unwrap();
-        expectorate::assert_contents("tests/types/kittycad.rs.gen", &result);
+        expectorate::assert_contents("tests/types/kittycad.rs.gen", &result.render().unwrap());
     }
 
     #[test]
@@ -1869,7 +1903,7 @@ mod test {
             &crate::load_json_spec(include_str!("../../tests/api.github.com.json")).unwrap(),
         )
         .unwrap();
-        expectorate::assert_contents("tests/types/github.rs.gen", &result);
+        expectorate::assert_contents("tests/types/github.rs.gen", &result.render().unwrap());
     }
 
     #[test]
@@ -1878,7 +1912,7 @@ mod test {
             &crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
         )
         .unwrap();
-        expectorate::assert_contents("tests/types/oxide.rs.gen", &result);
+        expectorate::assert_contents("tests/types/oxide.rs.gen", &result.render().unwrap());
     }
 
     #[test]
@@ -1913,13 +1947,14 @@ mod test {
         let mut type_space = super::TypeSpace {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
+            rendered: quote!(),
         };
 
-        let result = type_space.render_schema("RouterRoute", &schema).unwrap();
+        type_space.render_schema("RouterRoute", &schema).unwrap();
 
         expectorate::assert_contents(
             "tests/types/oxide.router-route.rs.gen",
-            &super::get_text_fmt(&result).unwrap(),
+            &super::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
 
@@ -1951,13 +1986,14 @@ mod test {
         let mut type_space = super::TypeSpace {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
+            rendered: quote!(),
         };
 
-        let result = type_space.render_schema("IpNet", &schema).unwrap();
+        type_space.render_schema("IpNet", &schema).unwrap();
 
         expectorate::assert_contents(
             "tests/types/oxide.ip-net.rs.gen",
-            &super::get_text_fmt(&result).unwrap(),
+            &super::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
 
@@ -1970,15 +2006,16 @@ mod test {
         let mut type_space = super::TypeSpace {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
+            rendered: quote!(),
         };
 
-        let result = type_space
+        type_space
             .render_schema("VpcFirewallRuleTarget", &schema)
             .unwrap();
 
         expectorate::assert_contents(
             "tests/types/oxide.vpc-filewall-rule-target.rs.gen",
-            &super::get_text_fmt(&result).unwrap(),
+            &super::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
 
@@ -1991,15 +2028,16 @@ mod test {
         let mut type_space = super::TypeSpace {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
+            rendered: quote!(),
         };
 
-        let result = type_space
+        type_space
             .render_schema("AsyncApiCallOutput", &schema)
             .unwrap();
 
         expectorate::assert_contents(
             "tests/types/kittycad.async-api-call-output.rs.gen",
-            &super::get_text_fmt(&result).unwrap(),
+            &super::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
 
@@ -2033,13 +2071,14 @@ mod test {
         let mut type_space = super::TypeSpace {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
+            rendered: quote!(),
         };
 
-        let result = type_space.render_schema("Digest", &schema).unwrap();
+        type_space.render_schema("Digest", &schema).unwrap();
 
         expectorate::assert_contents(
             "tests/types/oxide.digest.rs.gen",
-            &super::get_text_fmt(&result).unwrap(),
+            &super::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
 }
