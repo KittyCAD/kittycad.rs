@@ -834,7 +834,11 @@ fn get_function_body(
 
             let type_text = crate::types::get_text(t)?;
 
-            if !t.is_option()? {
+            if t.is_vec()? {
+                array.push(quote! {
+                   query_params.push((#name, #name_ident.join(",")));
+                })
+            } else if !t.is_option()? {
                 if type_text == "String" {
                     array.push(quote! {
                        query_params.push((#name, #name_ident));
@@ -851,11 +855,19 @@ fn get_function_body(
                     }
                 })
             } else {
-                array.push(quote! {
-                    if let Some(p) = #name_ident {
-                        query_params.push((#name, format!("{}", p)));
-                    }
-                })
+                if t.is_vec()? {
+                    array.push(quote! {
+                        if let Some(p) = #name_ident {
+                            query_params.push((#name, format!("{}", p.join(","))));
+                        }
+                    })
+                } else {
+                    array.push(quote! {
+                        if let Some(p) = #name_ident {
+                            query_params.push((#name, format!("{}", p)));
+                        }
+                    })
+                }
             }
         }
 

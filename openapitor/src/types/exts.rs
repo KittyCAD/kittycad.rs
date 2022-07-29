@@ -358,6 +358,9 @@ impl StatusCodeExt for openapiv3::StatusCode {
 
 /// A trait for utility functions on token streams.
 pub trait TokenStreamExt {
+    /// Return `true` if the token stream is a Vec.
+    fn is_vec(&self) -> Result<bool>;
+
     /// Return `true` if the token stream is already an option.
     fn is_option(&self) -> Result<bool>;
 
@@ -381,6 +384,11 @@ pub trait TokenStreamExt {
 }
 
 impl TokenStreamExt for proc_macro2::TokenStream {
+    fn is_vec(&self) -> Result<bool> {
+        let rendered = self.rendered()?;
+        Ok(rendered.starts_with("Vec<"))
+    }
+
     fn is_option(&self) -> Result<bool> {
         let rendered = self.rendered()?;
         // The phone number type is also a nested option.
