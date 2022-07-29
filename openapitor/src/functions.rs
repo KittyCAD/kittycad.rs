@@ -8,7 +8,7 @@ use std::{
 use anyhow::Result;
 
 use crate::types::exts::{
-    ParameterSchemaOrContentExt, ReferenceOrExt, StatusCodeExt, TokenStreamExt,
+    ParameterSchemaOrContentExt, ReferenceOrExt, SchemaRenderExt, StatusCodeExt, TokenStreamExt,
 };
 
 /// Generate functions for each path operation.
@@ -47,7 +47,7 @@ pub fn generate_files(
                 })?);
 
             // Get the docs.
-            let docs = generate_docs(name, method, op, spec)?;
+            let docs = generate_docs(type_space, name, method, op, spec)?;
 
             // Get the function name.
             let fn_name = get_fn_name(name, method, &tag, op)?;
@@ -64,7 +64,7 @@ pub fn generate_files(
                 };
 
             // Get the function args.
-            let raw_args = get_args(op, spec)?;
+            let raw_args = get_args(type_space, op, spec)?;
             // Make sure if we have args, we start with a comma.
             let args = if raw_args.is_empty() {
                 quote!()
@@ -288,6 +288,7 @@ pub fn generate_files(
 
 /// Generate the docs for the given operation.
 fn generate_docs(
+    type_space: &mut crate::types::TypeSpace,
     name: &str,
     method: &http::Method,
     op: &openapiv3::Operation,
@@ -308,7 +309,7 @@ fn generate_docs(
     let mut params = get_path_params_schema(op, spec)?;
     params.append(&mut get_query_params_schema(op, spec)?);
 
-    let params_types = get_args(op, spec)?;
+    let params_types = get_args(type_space, op, spec)?;
 
     if !params.is_empty() {
         docs.push_str("\n\n**Parameters:**\n");
@@ -491,11 +492,12 @@ fn generate_name_for_fn_schema(
 
 /// Return the function arguments for the operation.
 fn get_args(
+    type_space: &mut crate::types::TypeSpace,
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
-    let path_params = get_path_params(op, spec)?;
-    let query_params = get_query_params(op, spec)?;
+    let path_params = get_path_params(type_space, op, spec)?;
+    let query_params = get_query_params(type_space, op, spec)?;
 
     Ok(path_params
         .into_iter()
@@ -691,6 +693,7 @@ fn get_path_params_schema(
 
 /// Return the path params for the operation.
 fn get_path_params(
+    type_space: &mut crate::types::TypeSpace,
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
@@ -704,8 +707,14 @@ fn get_path_params(
             openapiv3::ReferenceOr::Reference { .. } => {
                 crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
             }
-            openapiv3::ReferenceOr::Item(s) => {
-                crate::types::get_type_name_for_schema(&name, &s, spec, false)?
+            openapiv3::ReferenceOr::Item(ref s) => {
+                let t_name = crate::types::get_type_name_for_schema(&name, &s, spec, false)?;
+                // Check if we should render the schema.
+                if schema.should_render()? {
+                    type_space.render_schema(&t_name.rendered()?, &s)?;
+                }
+
+                t_name
             }
         };
 
@@ -769,6 +778,7 @@ fn get_query_params_schema(
 
 /// Return the query params for the operation.
 fn get_query_params(
+    type_space: &mut crate::types::TypeSpace,
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
@@ -782,8 +792,14 @@ fn get_query_params(
             openapiv3::ReferenceOr::Reference { .. } => {
                 crate::types::get_type_name_from_reference(&schema.reference()?, spec, false)?
             }
-            openapiv3::ReferenceOr::Item(s) => {
-                crate::types::get_type_name_for_schema(&name, &s, spec, false)?
+            openapiv3::ReferenceOr::Item(ref s) => {
+                let t_name = crate::types::get_type_name_for_schema(&name, &s, spec, false)?;
+                // Check if we should render the schema.
+                if schema.should_render()? {
+                    type_space.render_schema(&t_name.rendered()?, &s)?;
+                }
+
+                t_name
             }
         };
 
@@ -812,7 +828,7 @@ fn get_function_body(
     let method_ident = format_ident!("{}", method.to_string());
 
     // Let's get the path parameters.
-    let path_params = get_path_params(op, spec)?;
+    let path_params = get_path_params(type_space, op, spec)?;
     let clean_url = if !path_params.is_empty() {
         let mut clean_string = quote!();
         for (name, t) in &path_params {
@@ -836,7 +852,7 @@ fn get_function_body(
     };
 
     // Let's get the query parameters.
-    let query_params = get_query_params(op, spec)?;
+    let query_params = get_query_params(type_space, op, spec)?;
     let query_params_code = if !query_params.is_empty() && !paginated {
         let mut array = Vec::new();
         for (name, t) in &query_params {
@@ -1066,7 +1082,7 @@ fn generate_example_code_fn(
     opts: &crate::Opts,
 ) -> Result<String> {
     // Get the docs.
-    let docs = generate_docs(name, method, op, spec)?;
+    let docs = generate_docs(type_space, name, method, op, spec)?;
     let docs = docs.replace('\n', "\n/// ");
 
     // Get the function name.
