@@ -451,6 +451,8 @@ impl SchemaRenderExt for openapiv3::ReferenceOr<openapiv3::Schema> {
                         }
                     }
                     openapiv3::SchemaKind::Type(openapiv3::Type::Object(_)) => Ok(true),
+                    // If it is an array, we might need to render the inner type.
+                    openapiv3::SchemaKind::Type(openapiv3::Type::Array(_)) => Ok(true),
                     _ => Ok(false),
                 }
             }
@@ -479,6 +481,8 @@ impl SchemaRenderExt for openapiv3::ReferenceOr<Box<openapiv3::Schema>> {
                             Ok(true)
                         }
                     }
+                    // If it is an array, we might need to render the inner type.
+                    openapiv3::SchemaKind::Type(openapiv3::Type::Array(_)) => Ok(true),
                     _ => Ok(false),
                 }
             }

@@ -20,16 +20,18 @@ use crate::types::exts::{
 };
 
 /// Our collection of all our parsed types.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct TypeSpace {
     /// Our types.
     pub types: IndexMap<String, openapiv3::Schema>,
     /// Our spec.
     pub spec: openapiv3::OpenAPI,
+    /// The rendered type space.
+    pub rendered: proc_macro2::TokenStream,
 }
 
 /// Generate Rust types from an OpenAPI v3 spec.
-pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
+pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<TypeSpace> {
     // Include the base64 data type for byte data.
     let base64_mod = get_base64_mod()?;
 
@@ -43,24 +45,24 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
     let error_mod = get_error_mod()?;
 
     // Let's start with the components if there are any.
-    let mut rendered = quote!(
-        //! This module contains the generated types for the library.
-
-        use tabled::Tabled;
-
-        #base64_mod
-
-        #paginate_mod
-
-        #phone_number_mod
-
-        #error_mod
-    );
 
     // Create our new type space.
     let mut type_space = TypeSpace {
         types: IndexMap::new(),
         spec: spec.clone(),
+        rendered: quote!(
+            //! This module contains the generated types for the library.
+
+            use tabled::Tabled;
+
+            #base64_mod
+
+            #paginate_mod
+
+            #phone_number_mod
+
+            #error_mod
+        ),
     };
 
     if let Some(components) = &spec.components {
@@ -69,13 +71,7 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
             // Let's get the schema from the reference.
             let schema = schema.get_schema_from_reference(spec, true)?;
             // Let's handle all the kinds of schemas.
-            let t = type_space.render_schema(name, &schema)?;
-            // Add it to our rendered types.
-            rendered = quote! {
-                #rendered
-
-                #t
-            };
+            type_space.render_schema(name, &schema)?;
         }
         // Parse the parameters.
         for (name, parameter) in &components.parameters {
@@ -83,13 +79,7 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
             // Let's get the schema from the reference.
             let schema = schema.get_schema_from_reference(spec, true)?;
             // Let's handle all the kinds of schemas.
-            let t = type_space.render_schema(name, &schema)?;
-            // Add it to our rendered types.
-            rendered = quote! {
-                #rendered
-
-                #t
-            };
+            type_space.render_schema(name, &schema)?;
         }
 
         // Parse the responses.
@@ -103,28 +93,34 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<String> {
         }
     }
 
-    get_text_fmt(&rendered)
+    Ok(type_space)
 }
 
 impl TypeSpace {
+    /// Add to our rendered types.
+    pub fn add_to_rendered(&mut self, t: &proc_macro2::TokenStream) {
+        let r = &self.rendered;
+        self.rendered = quote! {
+            #r
+
+            #t
+        };
+    }
+
     /// Render a schema into a Rust type.
     /// This generates the Rust type.
-    pub fn render_schema(
-        &mut self,
-        name: &str,
-        schema: &openapiv3::Schema,
-    ) -> Result<proc_macro2::TokenStream> {
+    pub fn render_schema(&mut self, name: &str, schema: &openapiv3::Schema) -> Result<()> {
         match &schema.schema_kind {
             openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
                 self.render_string_type(name, s, &schema.schema_data)
             }
             openapiv3::SchemaKind::Type(openapiv3::Type::Number(_n)) => {
                 // We don't render numbers yet, since it is a primitive type.
-                Ok(quote!())
+                Ok(())
             }
             openapiv3::SchemaKind::Type(openapiv3::Type::Integer(_i)) => {
                 // We don't render integers yet, since it is a primitive type.
-                Ok(quote!())
+                Ok(())
             }
             openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
                 self.render_object(name, o, &schema.schema_data)
@@ -137,11 +133,11 @@ impl TypeSpace {
                     return self.render_schema(name, s);
                 }
 
-                Ok(quote!())
+                Ok(())
             }
             openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => {
                 // We don't render booleans yet, since it is a primitive type.
-                Ok(quote!())
+                Ok(())
             }
             openapiv3::SchemaKind::OneOf { one_of } => {
                 self.render_one_of(name, one_of, &schema.schema_data)
@@ -165,7 +161,7 @@ impl TypeSpace {
         name: &str,
         all_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
         data: &openapiv3::SchemaData,
-    ) -> Result<proc_macro2::TokenStream> {
+    ) -> Result<()> {
         // If it's an all of with length 1, just use the type name.
         if all_ofs.len() == 1 {
             let first = if let openapiv3::ReferenceOr::Item(i) = &all_ofs[0] {
@@ -220,7 +216,7 @@ impl TypeSpace {
         name: &str,
         any_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
         data: &openapiv3::SchemaData,
-    ) -> Result<proc_macro2::TokenStream> {
+    ) -> Result<()> {
         // If it's an any of with length 1, just use the type name.
         if any_ofs.len() == 1 {
             let first = any_ofs[0].item()?;
@@ -267,7 +263,7 @@ impl TypeSpace {
         name: &str,
         one_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
         data: &openapiv3::SchemaData,
-    ) -> Result<proc_macro2::TokenStream> {
+    ) -> Result<()> {
         let description = if let Some(d) = &data.description {
             quote!(#[doc = #d])
         } else {
@@ -323,10 +319,11 @@ impl TypeSpace {
                     },
                 },
             );
-            Ok(rendered)
-        } else {
-            Ok(quote!())
+
+            self.add_to_rendered(&rendered);
         }
+
+        Ok(())
     }
 
     /// Render the full type for any.
@@ -335,7 +332,7 @@ impl TypeSpace {
         name: &str,
         any: &openapiv3::AnySchema,
         data: &openapiv3::SchemaData,
-    ) -> Result<proc_macro2::TokenStream> {
+    ) -> Result<()> {
         // The GitHub API is sometimes missing `type: object`.
         // See: https://github.com/github/rest-api-description/issues/1354
         // If we have properties, we can assume this is an object.
@@ -362,7 +359,7 @@ impl TypeSpace {
         name: &str,
         o: &openapiv3::ObjectType,
         data: &openapiv3::SchemaData,
-    ) -> Result<proc_macro2::TokenStream> {
+    ) -> Result<()> {
         if let Some(min_properties) = o.min_properties {
             log::warn!(
                 "min properties not supported for objects: {} => {:?}",
@@ -406,15 +403,12 @@ impl TypeSpace {
                         Err(_) => {
                             // We have a reference, ignore this, since it is a reference we don't
                             // need to render it.
-                            return Ok(quote!());
+                            return Ok(());
                         }
                     },
                 }
             }
         }
-
-        // Any additional types we should render.
-        let mut additional_types = quote!();
 
         let mut values = quote!();
         for (k, v) in &o.properties {
@@ -436,16 +430,17 @@ impl TypeSpace {
 
             // Get the type name for the schema.
             let mut type_name = if v.should_render()? {
-                let t = proper_name(&format!("{} {}", struct_name, prop));
-                // Render the schema.
-                let rendered = self.render_schema(&t, &inner_schema)?;
-                additional_types = quote! {
-                    #additional_types
-
-                    #rendered
+                // Check if the name for the property is already taken.
+                let t = if self.types.contains_key(&proper_name(&prop)) {
+                    proper_name(&format!("{} {}", struct_name, prop))
+                } else {
+                    proper_name(&prop)
                 };
 
-                t.parse().map_err(|e| anyhow::anyhow!("{}", e))?
+                // Render the schema.
+                self.render_schema(&t, &inner_schema)?;
+
+                get_type_name_for_schema(&t, &inner_schema, &self.spec, true)?
             } else if let openapiv3::ReferenceOr::Item(i) = v {
                 get_type_name_for_schema(&prop, i, &self.spec, true)?
             } else {
@@ -589,8 +584,6 @@ impl TypeSpace {
         };
 
         let rendered = quote! {
-            #additional_types
-
             #description
             #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema)]
             pub struct #struct_name {
@@ -618,10 +611,10 @@ impl TypeSpace {
                 },
             );
 
-            Ok(rendered)
-        } else {
-            Ok(quote!(#additional_types))
+            self.add_to_rendered(&rendered);
         }
+
+        Ok(())
     }
 
     /// Render a string type.
@@ -630,7 +623,7 @@ impl TypeSpace {
         name: &str,
         s: &openapiv3::StringType,
         data: &openapiv3::SchemaData,
-    ) -> Result<proc_macro2::TokenStream> {
+    ) -> Result<()> {
         if !s.enumeration.is_empty() {
             return self.render_enum(name, s, data);
         }
@@ -652,7 +645,7 @@ impl TypeSpace {
         }
 
         // We don't render primitives yet.
-        Ok(quote!())
+        Ok(())
     }
 
     /// Render the full type for an enum.
@@ -661,7 +654,7 @@ impl TypeSpace {
         name: &str,
         s: &openapiv3::StringType,
         data: &openapiv3::SchemaData,
-    ) -> Result<proc_macro2::TokenStream> {
+    ) -> Result<()> {
         if s.enumeration.is_empty() {
             anyhow::bail!("Cannot render empty string enumeration: {}", name);
         }
@@ -755,34 +748,23 @@ impl TypeSpace {
                 },
             );
 
-            Ok(rendered)
-        } else {
-            Ok(quote!())
+            self.add_to_rendered(&rendered);
         }
+
+        Ok(())
     }
 
     /// Render the full type for a response.
-    fn render_response(
-        &mut self,
-        name: &str,
-        response: &openapiv3::Response,
-    ) -> Result<proc_macro2::TokenStream> {
-        let mut responses = quote!();
-
+    fn render_response(&mut self, name: &str, response: &openapiv3::Response) -> Result<()> {
         for (content_name, content) in &response.content {
             if let Some(openapiv3::ReferenceOr::Item(i)) = &content.schema {
                 // If the schema is a reference we don't care, since we would have already rendered
                 // that reference.
-                let rendered = self.render_schema(&format!("{}_{}", name, content_name), i)?;
-                responses = quote!(
-                    #responses
-
-                    #rendered
-                );
+                self.render_schema(&format!("{}_{}", name, content_name), i)?;
             }
         }
 
-        Ok(responses)
+        Ok(())
     }
 
     /// Render the full type for a request body.
@@ -790,23 +772,16 @@ impl TypeSpace {
         &mut self,
         name: &str,
         request_body: &openapiv3::RequestBody,
-    ) -> Result<proc_macro2::TokenStream> {
-        let mut request_bodies = quote!();
-
+    ) -> Result<()> {
         for (content_name, content) in &request_body.content {
             if let Some(openapiv3::ReferenceOr::Item(i)) = &content.schema {
                 // If the schema is a reference we don't care, since we would have already rendered
                 // that reference.
-                let rendered = self.render_schema(&format!("{}_{}", name, content_name), i)?;
-                request_bodies = quote!(
-                    #request_bodies
-
-                    #rendered
-                );
+                self.render_schema(&format!("{}_{}", name, content_name), i)?;
             }
         }
 
-        Ok(request_bodies)
+        Ok(())
     }
 }
 
@@ -1579,6 +1554,9 @@ pub fn proper_name(s: &str) -> String {
     };
 
     inflector::cases::pascalcase::to_pascal_case(&s)
+        .trim_start_matches("CrateTypes")
+        .replace("V1", "")
+        .to_string()
 }
 
 /// Return the name for a type based on a name if passed or the title of the schema data.

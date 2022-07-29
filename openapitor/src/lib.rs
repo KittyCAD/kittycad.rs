@@ -284,13 +284,10 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     crate::save(librs, lib.as_str())?;
 
     // Create the Rust source types file containing the generated types.
-    let types = crate::types::generate_types(spec)?;
-    let mut typesrs = src.clone();
-    typesrs.push("types.rs");
-    crate::save(typesrs, types.as_str())?;
+    let mut type_space = crate::types::generate_types(spec)?;
 
     // Create the Rust source files for each of the tags functions.
-    let (files, modified_spec) = crate::functions::generate_files(spec, opts)?;
+    let (files, modified_spec) = crate::functions::generate_files(&mut type_space, spec, opts)?;
     // We have a map of our files, let's write to them.
     for (f, content) in files {
         let mut tagrs = src.clone();
@@ -320,6 +317,15 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
         // TODO: make fmt
         crate::save(tagrs, &crate::types::get_text_fmt(&output)?)?;
     }
+
+    // Save the types, now that we've run the functions.
+    //, )
+    let mut typesrs = src.clone();
+    typesrs.push("types.rs");
+    crate::save(
+        typesrs,
+        crate::types::get_text_fmt(&type_space.rendered)?.as_str(),
+    )?;
 
     // Run fmt in our output directory.
     run_cargo_fmt(opts).await?;

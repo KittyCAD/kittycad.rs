@@ -13,6 +13,7 @@ use crate::types::exts::{
 
 /// Generate functions for each path operation.
 pub fn generate_files(
+    type_space: &mut crate::types::TypeSpace,
     spec: &openapiv3::OpenAPI,
     opts: &crate::Opts,
 ) -> Result<(
@@ -53,13 +54,14 @@ pub fn generate_files(
             let fn_name_ident = format_ident!("{}", fn_name);
 
             // Get the response for the function.
-            let response_type = if let Some(response) = get_response_type(name, method, op, spec)? {
-                let t = response.type_name;
-                quote!(#t)
-            } else {
-                // We don't have a response, so we'll return `()`.
-                quote!(())
-            };
+            let response_type =
+                if let Some(response) = get_response_type(type_space, name, method, op, spec)? {
+                    let t = response.type_name;
+                    quote!(#t)
+                } else {
+                    // We don't have a response, so we'll return `()`.
+                    quote!(())
+                };
 
             // Get the function args.
             let raw_args = get_args(op, spec)?;
@@ -75,19 +77,21 @@ pub fn generate_files(
             };
 
             // Get the request body for the function if there is one.
-            let request_body = if let Some(rb) = get_request_body(name, method, op, spec)? {
-                let t = rb.type_name;
-                // We add the comma at the front, so it works.
-                quote!(, body: &#t)
-            } else {
-                // We don't have a request body, so we'll return nothing.
-                quote!()
-            };
+            let request_body =
+                if let Some(rb) = get_request_body(type_space, name, method, op, spec)? {
+                    let t = rb.type_name;
+                    // We add the comma at the front, so it works.
+                    quote!(, body: &#t)
+                } else {
+                    // We don't have a request body, so we'll return nothing.
+                    quote!()
+                };
 
             // Get the function body.
-            let function_body = get_function_body(name, method, op, spec, false)?;
+            let function_body = get_function_body(type_space, name, method, op, spec, false)?;
 
-            let example_code_fn = generate_example_code_fn(name, method, &tag, op, spec, opts)?;
+            let example_code_fn =
+                generate_example_code_fn(type_space, name, method, &tag, op, spec, opts)?;
             // For the rust docs example code we want to trim the doc string since it is
             // repetitive.
             let rust_doc_example_code_fn = &example_code_fn[example_code_fn
@@ -187,7 +191,8 @@ pub fn generate_files(
                     quote!(,body)
                 };
 
-                let paginated_function_body = get_function_body(name, method, op, spec, true)?;
+                let paginated_function_body =
+                    get_function_body(type_space, name, method, op, spec, true)?;
 
                 let item_type = pagination_properties.item_type(false)?;
 
@@ -411,6 +416,7 @@ struct RequestOrResponse {
 
 /// Return the response type for the operation.
 fn get_response_type(
+    type_space: &mut crate::types::TypeSpace,
     name: &str,
     method: &http::Method,
     op: &openapiv3::Operation,
@@ -434,12 +440,19 @@ fn get_response_type(
                                 false,
                             )?
                         }
-                        openapiv3::ReferenceOr::Item(s) => crate::types::get_type_name_for_schema(
-                            &generate_name_for_fn_schema(name, method, s, op, "Response"),
-                            s,
-                            spec,
-                            false,
-                        )?,
+                        openapiv3::ReferenceOr::Item(s) => {
+                            let on_the_fly_type = crate::types::get_type_name_for_schema(
+                                &generate_name_for_fn_schema(name, method, s, op, "Response"),
+                                s,
+                                spec,
+                                false,
+                            )?;
+
+                            // Make sure we generate the object.
+                            type_space.render_schema(&on_the_fly_type.to_string(), s)?;
+
+                            on_the_fly_type
+                        }
                     };
 
                     // Return early since we found the type.
@@ -492,6 +505,7 @@ fn get_args(
 
 /// Return the request body type for the operation.
 fn get_request_body(
+    type_space: &mut crate::types::TypeSpace,
     name: &str,
     method: &http::Method,
     op: &openapiv3::Operation,
@@ -508,12 +522,19 @@ fn get_request_body(
                     openapiv3::ReferenceOr::Reference { .. } => {
                         crate::types::get_type_name_from_reference(&s.reference()?, spec, false)?
                     }
-                    openapiv3::ReferenceOr::Item(s) => crate::types::get_type_name_for_schema(
-                        &generate_name_for_fn_schema(name, method, s, op, "Request Body"),
-                        s,
-                        spec,
-                        false,
-                    )?,
+                    openapiv3::ReferenceOr::Item(s) => {
+                        let fly_request = crate::types::get_type_name_for_schema(
+                            &generate_name_for_fn_schema(name, method, s, op, "Request Body"),
+                            s,
+                            spec,
+                            false,
+                        )?;
+
+                        // Make sure we generate the object.
+                        type_space.render_schema(&fly_request.to_string(), s)?;
+
+                        fly_request
+                    }
                 };
 
                 // Return early since we found the type.
@@ -780,6 +801,7 @@ fn get_query_params(
 
 /// Return the function body for the operation.
 fn get_function_body(
+    type_space: &mut crate::types::TypeSpace,
     name: &str,
     method: &http::Method,
     op: &openapiv3::Operation,
@@ -858,49 +880,50 @@ fn get_function_body(
     };
 
     // Get if there is a request body.
-    let request_body = if let Some(request_body) = get_request_body(name, method, op, spec)? {
-        match request_body.media_type.as_str() {
-            "application/json" => {
-                quote! {
-                    // Add the json body.
-                    req = req.json(body);
+    let request_body =
+        if let Some(request_body) = get_request_body(type_space, name, method, op, spec)? {
+            match request_body.media_type.as_str() {
+                "application/json" => {
+                    quote! {
+                        // Add the json body.
+                        req = req.json(body);
+                    }
                 }
-            }
-            "application/x-www-form-urlencoded" => {
-                quote! {
-                    // Add the form body.
-                    req = req.form(body);
+                "application/x-www-form-urlencoded" => {
+                    quote! {
+                        // Add the form body.
+                        req = req.form(body);
+                    }
                 }
-            }
-            "application/octet-stream" => {
-                quote! {
-                    // Add the raw body.
-                    req = req.body(body.clone());
-                }
-            }
-            _ => {
-                if request_body.type_name.is_string()? {
+                "application/octet-stream" => {
                     quote! {
                         // Add the raw body.
                         req = req.body(body.clone());
                     }
-                } else {
-                    anyhow::bail!(
-                        "unsupported media type for request body: {}",
-                        request_body.media_type
-                    );
+                }
+                _ => {
+                    if request_body.type_name.is_string()? {
+                        quote! {
+                            // Add the raw body.
+                            req = req.body(body.clone());
+                        }
+                    } else {
+                        anyhow::bail!(
+                            "unsupported media type for request body: {}",
+                            request_body.media_type
+                        );
+                    }
                 }
             }
-        }
-    } else {
-        // Do nothing.
-        quote!()
-    };
+        } else {
+            // Do nothing.
+            quote!()
+        };
 
     // TODO: we should add the headers.
 
     // Get the response if there is one.
-    let response = if let Some(response) = get_response_type(name, method, op, spec)? {
+    let response = if let Some(response) = get_response_type(type_space, name, method, op, spec)? {
         match response.media_type.as_str() {
             "application/json" => {
                 quote! {
@@ -1034,6 +1057,7 @@ fn add_fn_to_tag(
 
 /// Generate example code for afunction.
 fn generate_example_code_fn(
+    type_space: &mut crate::types::TypeSpace,
     name: &str,
     method: &http::Method,
     tag: &str,
@@ -1054,7 +1078,7 @@ fn generate_example_code_fn(
 
     let mut function_start = quote!();
     let mut print_result = quote!();
-    if let Some(response) = get_response_type(name, method, op, spec)? {
+    if let Some(response) = get_response_type(type_space, name, method, op, spec)? {
         let t = response.type_name;
         function_start = quote!(let result: #t = );
         print_result = quote!(println!("{:?}", result););
