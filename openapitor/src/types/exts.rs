@@ -361,6 +361,9 @@ pub trait TokenStreamExt {
     /// Return `true` if the token stream is a Vec.
     fn is_vec(&self) -> Result<bool>;
 
+    /// Return `true` if the token stream is an Option wrapping a Vec.
+    fn is_option_vec(&self) -> Result<bool>;
+
     /// Return `true` if the token stream is already an option.
     fn is_option(&self) -> Result<bool>;
 
@@ -387,6 +390,11 @@ impl TokenStreamExt for proc_macro2::TokenStream {
     fn is_vec(&self) -> Result<bool> {
         let rendered = self.rendered()?;
         Ok(rendered.starts_with("Vec<"))
+    }
+
+    fn is_option_vec(&self) -> Result<bool> {
+        let rendered = self.rendered()?;
+        Ok(rendered.starts_with("Option<Vec<"))
     }
 
     fn is_option(&self) -> Result<bool> {

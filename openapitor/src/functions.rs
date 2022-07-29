@@ -836,7 +836,7 @@ fn get_function_body(
 
             if t.is_vec()? {
                 array.push(quote! {
-                   query_params.push((#name, #name_ident.join(",")));
+                   query_params.push((#name, itertools::join(#name_ident, ",")));
                 })
             } else if !t.is_option()? {
                 if type_text == "String" {
@@ -855,10 +855,10 @@ fn get_function_body(
                     }
                 })
             } else {
-                if t.is_vec()? {
+                if t.is_option_vec()? {
                     array.push(quote! {
                         if let Some(p) = #name_ident {
-                            query_params.push((#name, format!("{}", p.join(","))));
+                            query_params.push((#name, itertools::join(p, ",")));
                         }
                     })
                 } else {

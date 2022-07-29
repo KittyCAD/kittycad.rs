@@ -491,6 +491,7 @@ format_serde_error = "^0.3.0"
 futures = "0.3.21"
 http = "^0.2.8"
 hyperx = "1"
+itertools = "^0.10.3"
 log = {{ version = "^0.4", features = ["serde"] }}
 mime = "0.3"
 parse-display = "^0.5"
