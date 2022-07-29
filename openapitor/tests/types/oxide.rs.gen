@@ -579,15 +579,15 @@ impl tabled::Tabled for DeviceAuthVerify {
     parse_display :: FromStr,
     parse_display :: Display,
 )]
-pub enum DigestType {
+pub enum Type {
     #[serde(rename = "sha256")]
     #[display("sha256")]
     Sha256,
 }
 
-impl std::default::Default for DigestType {
+impl std::default::Default for Type {
     fn default() -> Self {
-        DigestType::Sha256
+        Type::Sha256
     }
 }
 
@@ -596,7 +596,7 @@ impl std::default::Default for DigestType {
 )]
 pub struct Digest {
     #[serde(rename = "type")]
-    pub type_: DigestType,
+    pub type_: Type,
     pub value: String,
 }
 
