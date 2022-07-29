@@ -226,13 +226,7 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     /*
      * Generate our documentation for the library.
      */
-    let docs = crate::template::generate_docs(
-        spec,
-        &inflector::cases::snakecase::to_snake_case(&opts.name),
-        &opts.description,
-        &opts.version,
-        &opts.spec_url,
-    )?;
+    let docs = crate::template::generate_docs(spec, opts)?;
     let mut readme = opts.output.clone();
     readme.push("README.md");
     crate::save(
@@ -442,6 +436,17 @@ impl Opts {
         let level_drain = slog::LevelFilter(drain, level).fuse();
         let async_drain = slog_async::Async::new(level_drain).build().fuse();
         slog::Logger::root(async_drain, slog::o!())
+    }
+
+    /// Get the name of the package.
+    /// This is the not the name used in code.
+    pub fn package_name(&self) -> String {
+        inflector::cases::kebabcase::to_kebab_case(&self.name)
+    }
+
+    /// Get the name of the package as it is used in code.
+    pub fn code_package_name(&self) -> String {
+        inflector::cases::snakecase::to_snake_case(&self.name)
     }
 }
 

@@ -3,14 +3,9 @@
 use std::fmt::Write as _;
 
 use anyhow::Result;
-use inflector::cases::{kebabcase::to_kebab_case, screamingsnakecase::to_screaming_snake_case};
+use inflector::cases::screamingsnakecase::to_screaming_snake_case;
 
-fn generate_docs_openapi_info(
-    spec: &openapiv3::OpenAPI,
-    spec_link: &Option<String>,
-    package_name: &str,
-    description: &str,
-) -> Result<String> {
+fn generate_docs_openapi_info(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> Result<String> {
     let mut desc = String::new();
     if let Some(d) = &spec.info.description {
         desc = d.replace('\n', "\n//! ");
@@ -104,7 +99,7 @@ fn generate_docs_openapi_info(
 
     let api_version = format!("based on API spec version `{}`", spec.info.version);
 
-    let spec_link_blurb = if let Some(link) = spec_link {
+    let spec_link_blurb = if let Some(link) = &opts.spec_url {
         format!("This client is generated from the [OpenAPI specs]({}) {}. This way it will remain up to date as features are added.", link, api_version)
     } else {
         "".to_string()
@@ -131,9 +126,9 @@ fn generate_docs_openapi_info(
 //! The documentation for the crate is generated
 //! along with the code to make this library easy to use.
 //! "#,
-        description,
-        to_kebab_case(package_name),
-        to_kebab_case(package_name),
+        opts.description,
+        opts.package_name(),
+        opts.package_name(),
         desc,
         tos,
         contact,
@@ -143,14 +138,8 @@ fn generate_docs_openapi_info(
 }
 
 /// Generate the main docs for our client library.
-pub fn generate_docs(
-    spec: &openapiv3::OpenAPI,
-    name: &str,
-    description: &str,
-    version: &str,
-    spec_link: &Option<String>,
-) -> Result<String> {
-    let info = generate_docs_openapi_info(spec, spec_link, name, description)?;
+pub fn generate_docs(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> Result<String> {
+    let info = generate_docs_openapi_info(spec, opts)?;
     Ok(format!(
         r#"{}
 //!
@@ -188,11 +177,11 @@ pub fn generate_docs(
 //! ```
 //!"#,
         info,
-        name.replace('_', "-").to_lowercase(),
-        version,
-        name,
-        get_token_env_variable(name),
-        name,
+        opts.package_name(),
+        opts.version,
+        opts.code_package_name(),
+        get_token_env_variable(&opts.name),
+        opts.code_package_name(),
     ))
 }
 

@@ -658,7 +658,7 @@ fn get_path_params(
             )?,
             openapiv3::ReferenceOr::Item(ref s) => {
                 let mut t_name =
-                    crate::types::get_type_name_for_schema(&name, &s, &type_space.spec, false)?;
+                    crate::types::get_type_name_for_schema(&name, s, &type_space.spec, false)?;
                 // Check if we should render the schema.
                 if schema.should_render()? {
                     // Check if we already have a type with this name.
@@ -666,13 +666,13 @@ fn get_path_params(
                         // Update the name of the type.
                         t_name = crate::types::get_type_name_for_schema(
                             &format!("{} {}", op.get_fn_name()?, name),
-                            &s,
+                            s,
                             &type_space.spec,
                             false,
                         )?;
                     }
 
-                    type_space.render_schema(&t_name.rendered()?, &s)?;
+                    type_space.render_schema(&t_name.rendered()?, s)?;
                 }
 
                 t_name
@@ -756,7 +756,7 @@ fn get_query_params(
             )?,
             openapiv3::ReferenceOr::Item(ref s) => {
                 let mut t_name =
-                    crate::types::get_type_name_for_schema(&name, &s, &type_space.spec, false)?;
+                    crate::types::get_type_name_for_schema(&name, s, &type_space.spec, false)?;
                 // Check if we should render the schema.
                 if schema.should_render()? {
                     // Check if we already have a type with this name.
@@ -764,13 +764,13 @@ fn get_query_params(
                         // Update the name of the type.
                         t_name = crate::types::get_type_name_for_schema(
                             &format!("{} {}", op.get_fn_name()?, name),
-                            &s,
+                            s,
                             &type_space.spec,
                             false,
                         )?;
                     }
 
-                    type_space.render_schema(&t_name.rendered()?, &s)?;
+                    type_space.render_schema(&t_name.rendered()?, s)?;
                 }
 
                 t_name
@@ -854,20 +854,18 @@ fn get_function_body(
                         query_params.push((#name, p));
                     }
                 })
+            } else if t.is_option_vec()? {
+                array.push(quote! {
+                    if let Some(p) = #name_ident {
+                        query_params.push((#name, itertools::join(p, ",")));
+                    }
+                })
             } else {
-                if t.is_option_vec()? {
-                    array.push(quote! {
-                        if let Some(p) = #name_ident {
-                            query_params.push((#name, itertools::join(p, ",")));
-                        }
-                    })
-                } else {
-                    array.push(quote! {
-                        if let Some(p) = #name_ident {
-                            query_params.push((#name, format!("{}", p)));
-                        }
-                    })
-                }
+                array.push(quote! {
+                    if let Some(p) = #name_ident {
+                        query_params.push((#name, format!("{}", p)));
+                    }
+                })
             }
         }
 
@@ -1231,14 +1229,20 @@ let client = {}::Client::new("$TOKEN");
 
 /// Generate the env example client code.
 fn generate_example_client_env(opts: &crate::Opts) -> String {
-    format!(r#"let client = {}::Client::new_from_env();"#, opts.name)
+    format!(
+        r#"let client = {}::Client::new_from_env();"#,
+        opts.code_package_name()
+    )
 }
 
 /// This is a helper function that formats and fixes code for external usage, not
 /// usage inside the crate.
 fn fmt_external_example_code(t: &proc_macro2::TokenStream, opts: &crate::Opts) -> Result<String> {
     let rendered = crate::types::get_text_fmt(t)?;
-    Ok(rendered.replace("crate::types::", &format!("{}::types::", opts.name)))
+    Ok(rendered.replace(
+        "crate::types::",
+        &format!("{}::types::", opts.code_package_name()),
+    ))
 }
 
 #[cfg(test)]

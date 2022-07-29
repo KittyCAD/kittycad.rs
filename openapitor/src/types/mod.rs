@@ -375,7 +375,9 @@ impl TypeSpace {
             );
         }
 
-        anyhow::bail!("could not parse any: {} => {:?}", name, any);
+        // This is a serde_json::Value.
+        // We don't need to render it.
+        Ok(())
     }
 
     /// Render the full type for an object.
@@ -1590,7 +1592,6 @@ pub fn proper_name(s: &str) -> String {
         .trim_start_matches("VecCrateTypes")
         .trim_start_matches("OptionCrateTypes")
         .replace("V1", "")
-        .to_string()
 }
 
 /// Return the name for a type based on a name if passed or the title of the schema data.
