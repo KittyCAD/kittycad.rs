@@ -156,7 +156,7 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
     a("");
 
     // Print the client template.
-    a(&crate::client::generate_client(&opts));
+    a(&crate::client::generate_client(opts));
 
     a("");
 

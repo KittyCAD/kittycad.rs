@@ -1098,6 +1098,7 @@ dependencies = [
  "rand",
  "regex",
  "reqwest",
+ "reqwest-middleware",
  "rustfmt-wrapper",
  "schemars",
  "serde",

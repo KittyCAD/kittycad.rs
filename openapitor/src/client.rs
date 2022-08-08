@@ -3,15 +3,20 @@
 /// Generate the base of the API client.
 pub fn generate_client(opts: &crate::Opts) -> String {
     if let Some(token_endpoint) = &opts.token_endpoint {
+        // Ensure we also have a user consent endpoint.
+        if opts.user_consent_endpoint.is_none() {
+            panic!("user_consent_endpoint is required if token_endpoint is provided");
+        }
+
         return CLIENT_FUNCTIONS_OAUTH_TOKEN
             .replace(
                 "ENV_VARIABLE_PREFIX",
                 &crate::template::get_env_variable_prefix(&opts.name),
             )
-            .replace("TOKEN_ENDPOINT", &token_endpoint.to_string())
+            .replace("TOKEN_ENDPOINT", token_endpoint.as_ref())
             .replace(
                 "USER_CONSENT_ENDPOINT",
-                &opts.user_consent_endpoint.as_ref().unwrap().to_string(),
+                opts.user_consent_endpoint.as_ref().unwrap().as_ref(),
             )
             .replace("BASE_URL", opts.base_url.to_string().trim_end_matches('/'));
     }
@@ -75,7 +80,7 @@ impl Client {
                     token: token.to_string(),
                     base_url: "BASE_URL".to_string(),
 
-                    client: c,
+                    client,
                 }
             }
             Err(e) => panic!("creating reqwest client failed: {:?}", e),
@@ -109,7 +114,7 @@ impl Client {
         method: reqwest::Method,
         uri: &str,
         body: Option<reqwest::Body>,
-    ) -> anyhow::Result<reqwest::RequestBuilder>
+    ) -> anyhow::Result<reqwest_middleware::RequestBuilder>
     {
         let u = if uri.starts_with("https://") || uri.starts_with("http://") {
             uri.to_string()
@@ -469,7 +474,7 @@ impl Client {
         method: reqwest::Method,
         uri: &str,
         body: Option<reqwest::Body>,
-    ) -> anyhow::Result<reqwest::RequestBuilder>
+    ) -> anyhow::Result<reqwest_middleware::RequestBuilder>
     {
         if self.auto_refresh {
             let expired = self.is_expired().await;

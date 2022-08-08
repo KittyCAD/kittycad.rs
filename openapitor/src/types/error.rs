@@ -6,7 +6,10 @@ pub enum Error {
     InvalidRequest(String),
 
     /// A server error either due to the data, or with the connection.
-    CommunicationError(reqwest::Error),
+    CommunicationError(reqwest_middleware::Error),
+
+    /// A request error, caused when building the request.
+    RequestError(reqwest::Error),
 
     /// An expected response whose deserialization failed.
     SerdeError {
@@ -19,7 +22,7 @@ pub enum Error {
     /// An expected error response.
     InvalidResponsePayload {
         /// The error.
-        error: reqwest::Error,
+        error: reqwest_middleware::Error,
         /// The full response.
         response: reqwest::Response,
     },
@@ -34,7 +37,9 @@ impl Error {
     pub fn status(&self) -> Option<reqwest::StatusCode> {
         match self {
             Error::InvalidRequest(_) => None,
-            Error::CommunicationError(e) => e.status(),
+            Error::RequestError(e) => e.status(),
+            Error::CommunicationError(reqwest_middleware::Error::Reqwest(e)) => e.status(),
+            Error::CommunicationError(reqwest_middleware::Error::Middleware(_)) => None,
             Error::SerdeError { error: _, status } => Some(*status),
             Error::InvalidResponsePayload { error: _, response } => Some(response.status()),
             Error::UnexpectedResponse(r) => Some(r.status()),
@@ -50,9 +55,15 @@ impl Error {
     }
 }
 
+impl From<reqwest_middleware::Error> for Error {
+    fn from(e: reqwest_middleware::Error) -> Self {
+        Self::CommunicationError(e)
+    }
+}
+
 impl From<reqwest::Error> for Error {
     fn from(e: reqwest::Error) -> Self {
-        Self::CommunicationError(e)
+        Self::RequestError(e)
     }
 }
 
@@ -64,6 +75,9 @@ impl std::fmt::Display for Error {
             }
             Error::CommunicationError(e) => {
                 write!(f, "Communication Error: {}", e)
+            }
+            Error::RequestError(e) => {
+                write!(f, "Request Error: {}", e)
             }
             Error::SerdeError { error, status: _ } => {
                 write!(f, "Serde Error: {}", error)

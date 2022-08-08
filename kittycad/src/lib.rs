@@ -156,7 +156,7 @@ impl Client {
                     token: token.to_string(),
                     base_url: "https://api.kittycad.io".to_string(),
 
-                    client: c,
+                    client,
                 }
             }
             Err(e) => panic!("creating reqwest client failed: {:?}", e),
@@ -187,7 +187,7 @@ impl Client {
         method: reqwest::Method,
         uri: &str,
         body: Option<reqwest::Body>,
-    ) -> anyhow::Result<reqwest::RequestBuilder> {
+    ) -> anyhow::Result<reqwest_middleware::RequestBuilder> {
         let u = if uri.starts_with("https://") || uri.starts_with("http://") {
             uri.to_string()
         } else {

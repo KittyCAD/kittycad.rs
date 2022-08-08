@@ -12,13 +12,7 @@ impl Constant {
         Self { client }
     }
 
-    #[doc = "Get a physics constant.\n\n**Parameters:**\n\n- `constant: \
-             crate::types::PhysicsConstantName`: The constant to get. \
-             (required)\n\n```rust,no_run\nasync fn example_constant_get_physics() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::PhysicsConstant = client\n        .constant()\n        \
-             .get_physics(kittycad::types::PhysicsConstantName::PlankConst)\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get a physics constant.\n\n**Parameters:**\n\n- `constant: crate::types::PhysicsConstantName`: The constant to get. (required)\n\n```rust,no_run\nasync fn example_constant_get_physics() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PhysicsConstant = client\n        .constant()\n        .get_physics(kittycad::types::PhysicsConstantName::SpeedOfLight)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_physics<'a>(
         &'a self,
@@ -42,7 +36,6 @@ impl Constant {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

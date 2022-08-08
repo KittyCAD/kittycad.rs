@@ -110,7 +110,7 @@ impl Oauth2 {
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = Vec::new();
-        query_params.push(("user_code", format!("{}", user_code)));
+        query_params.push(("user_code", user_code.to_string()));
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -129,7 +129,7 @@ impl Oauth2 {
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
              client\n        .oauth2()\n        .oauth_2_provider_callback(\n            \
              Some(\"some-string\".to_string()),\n            \
-             kittycad::types::AccountProvider::Google,\n            \
+             kittycad::types::AccountProvider::Github,\n            \
              Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn oauth_2_provider_callback<'a>(
@@ -208,7 +208,6 @@ impl Oauth2 {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
