@@ -149,7 +149,7 @@ impl Client {
 "#;
 
 const CLIENT_FUNCTIONS_OAUTH_TOKEN: &str = r#"
-use std::{env, sync::Arc, convert::TryInto, opts::Add, time::{Duration, Instant}};
+use std::{env, sync::Arc, convert::TryInto, ops::Add, time::{Duration, Instant}};
 
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -180,14 +180,12 @@ pub struct AccessToken {
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
     )]
     pub token_type: String,
 
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
     )]
     pub access_token: String,
     #[serde(default)]
@@ -196,7 +194,6 @@ pub struct AccessToken {
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
     )]
     pub refresh_token: String,
     #[serde(default, alias = "x_refresh_token_expires_in")]
@@ -205,7 +202,6 @@ pub struct AccessToken {
     #[serde(
         default,
         skip_serializing_if = "String::is_empty",
-        deserialize_with = "crate::utils::deserialize_null_string::deserialize"
     )]
     pub scope: String,
 }
@@ -235,11 +231,11 @@ impl Client {
         refresh_token: Q,
     ) -> Self
     where
-        I: ToString,
-        K: ToString,
-        R: ToString,
-        T: ToString,
-        Q: ToString,
+        I: ToString + std::fmt::Debug,
+        K: ToString + std::fmt::Debug,
+        R: ToString + std::fmt::Debug,
+        T: ToString + std::fmt::Debug,
+        Q: ToString + std::fmt::Debug,
     {
         // Retry up to 3 times with increasing intervals between attempts.
         let retry_policy =
@@ -264,7 +260,7 @@ impl Client {
                     client_id: client_id.to_string(),
                     client_secret: client_secret.to_string(),
                     redirect_uri: redirect_uri.to_string(),
-                    token: Arc::new(RwLock::new(InnerToken {
+                    token: Arc::new(tokio::sync::RwLock::new(InnerToken {
                         access_token: token.to_string(),
                         refresh_token: refresh_token.to_string(),
                         expires_at: None,
@@ -288,6 +284,7 @@ impl Client {
     }
 
     /// Enables or disables the automatic refreshing of access tokens upon expiration
+    #[tracing::instrument]
     pub fn set_auto_access_token_refresh(&mut self, enabled: bool) -> &mut Self {
         self.auto_refresh = enabled;
         self
@@ -298,6 +295,7 @@ impl Client {
     /// also enabled. `None` may be passed in if the expiration is unknown. In this case
     /// automatic refreshes will be attempted when encountering an UNAUTHENTICATED status
     /// code on a response.
+    #[tracing::instrument]
     pub async fn set_expires_at(&self, expires_at: Option<Instant>) -> &Self {
         self.token.write().await.expires_at = expires_at;
         self
@@ -305,12 +303,14 @@ impl Client {
 
     /// Gets the `Instant` at which the access token used by this client is set to expire
     /// if one is known
+    #[tracing::instrument]
     pub async fn expires_at(&self) -> Option<Instant> {
         self.token.read().await.expires_at
     }
 
     /// Sets the number of seconds in which the current access token should be considered
     /// expired
+    #[tracing::instrument]
     pub async fn set_expires_in(&self, expires_in: i64) -> &Self {
         self.token.write().await.expires_at = Self::compute_expires_at(expires_in);
         self
@@ -318,6 +318,7 @@ impl Client {
 
     /// Gets the number of seconds from now in which the current access token will be
     /// considered expired if one is known
+    #[tracing::instrument]
     pub async fn expires_in(&self) -> Option<Duration> {
         self.token
             .read()
@@ -328,6 +329,7 @@ impl Client {
 
     /// Determines if the access token currently stored in the client is expired. If the
     /// expiration can not be determined, None is returned
+    #[tracing::instrument]
     pub async fn is_expired(&self) -> Option<bool> {
         self.token
             .read()
@@ -336,6 +338,7 @@ impl Client {
             .map(|expiration| expiration <= Instant::now())
     }
 
+    #[tracing::instrument]
     fn compute_expires_at(expires_in: i64) -> Option<Instant> {
         let seconds_valid = expires_in
             .try_into()
@@ -354,8 +357,8 @@ impl Client {
     #[tracing::instrument]
     pub fn new_from_env<T, R>(token: T, refresh_token: R) -> Self
     where
-        T: ToString,
-        R: ToString,
+        T: ToString + std::fmt::Debug,
+        R: ToString + std::fmt::Debug,
     {
         let client_id = env::var("ENV_VARIABLE_PREFIX_CLIENT_ID").expect("must set ENV_VARIABLE_PREFIX_CLIENT_ID");
         let client_secret = env::var("ENV_VARIABLE_PREFIX_CLIENT_SECRET").expect("must set ENV_VARIABLE_PREFIX_CLIENT_SECRET");
@@ -384,12 +387,12 @@ impl Client {
 
     /// Refresh an access token from a refresh token. Client must have a refresh token
     /// for this to work.
-    pub async fn refresh_access_token(&self) -> Result<AccessToken> {
+    pub async fn refresh_access_token(&self) -> anyhow::Result<AccessToken> {
         let response = {
             let refresh_token = &self.token.read().await.refresh_token;
 
             if refresh_token.is_empty() {
-                anyhow!("refresh token cannot be empty");
+                anyhow::bail!("refresh token cannot be empty");
             }
 
             let mut headers = reqwest::header::HeaderMap::new();
@@ -431,7 +434,7 @@ impl Client {
 
     /// Get an access token from the code returned by the URL paramter sent to the
     /// redirect URL.
-    pub async fn get_access_token(&mut self, code: &str, state: &str) -> Result<AccessToken> {
+    pub async fn get_access_token(&mut self, code: &str, state: &str) -> anyhow::Result<AccessToken> {
         let mut headers = reqwest::header::HeaderMap::new();
         headers.append(
             reqwest::header::ACCEPT,

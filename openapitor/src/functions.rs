@@ -84,7 +84,7 @@ pub fn generate_files(
             };
 
             // Get the function body.
-            let function_body = get_function_body(type_space, name, method, op, false)?;
+            let function_body = get_function_body(type_space, name, method, op, false, opts)?;
 
             let example_code_fn =
                 generate_example_code_fn(type_space, name, method, &tag, op, opts)?;
@@ -189,7 +189,7 @@ pub fn generate_files(
                 };
 
                 let paginated_function_body =
-                    get_function_body(type_space, name, method, op, true)?;
+                    get_function_body(type_space, name, method, op, true, opts)?;
 
                 let item_type = pagination_properties.item_type(false)?;
 
@@ -796,6 +796,7 @@ fn get_function_body(
     method: &http::Method,
     op: &openapiv3::Operation,
     paginated: bool,
+    opts: &crate::Opts,
 ) -> Result<proc_macro2::TokenStream> {
     let path = name.trim_start_matches('/');
     let method_ident = format_ident!("{}", method.to_string());
@@ -991,6 +992,12 @@ fn get_function_body(
         )
     };
 
+    let bearer_auth = if opts.token_endpoint.is_some() {
+        quote!(req = req.bearer_auth(&self.client.token.read().await.access_token);)
+    } else {
+        quote!(req = req.bearer_auth(&self.client.token);)
+    };
+
     Ok(quote! {
         let mut req = self.client.client.request(
             http::Method::#method_ident,
@@ -998,7 +1005,7 @@ fn get_function_body(
         );
 
         // Add in our authentication.
-        req = req.bearer_auth(&self.client.token);
+        #bearer_auth
 
         #query_params_code
 
