@@ -122,7 +122,7 @@ pub struct Client {
     token: String,
     base_url: String,
 
-    client: reqwest::Client,
+    client: reqwest_middleware::ClientWithMiddleware,
 }
 
 impl Client {
@@ -134,17 +134,31 @@ impl Client {
     where
         T: ToString + std::fmt::Debug,
     {
+        // Retry up to 3 times with increasing intervals between attempts.
+        let retry_policy =
+            reqwest_retry::policies::ExponentialBackoff::builder().build_with_max_retries(3);
         let client = reqwest::Client::builder()
             .user_agent(APP_USER_AGENT)
             .build();
-
         match client {
-            Ok(c) => Client {
-                token: token.to_string(),
-                base_url: "https://api.kittycad.io".to_string(),
+            Ok(c) => {
+                let client = reqwest_middleware::ClientBuilder::new(c)
+                    // Trace HTTP requests. See the tracing crate to make use of these traces.
+                    .with(reqwest_tracing::TracingMiddleware)
+                    // Retry failed requests.
+                    .with(reqwest_conditional_middleware::ConditionalMiddleware::new(
+                        reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
+                        |req: &reqwest::Request| req.try_clone().is_some(),
+                    ))
+                    .build();
 
-                client: c,
-            },
+                Client {
+                    token: token.to_string(),
+                    base_url: "https://api.kittycad.io".to_string(),
+
+                    client: c,
+                }
+            }
             Err(e) => panic!("creating reqwest client failed: {:?}", e),
         }
     }

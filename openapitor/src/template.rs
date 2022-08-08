@@ -166,7 +166,7 @@ pub fn generate_docs(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> Result<St
 //! Alternatively, the library can search for most of the variables required for
 //! the client in the environment:
 //!
-//! - `{}`
+//! - `{}_API_TOKEN`
 //!
 //! And then you can create a client from the environment.
 //!
@@ -180,12 +180,12 @@ pub fn generate_docs(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> Result<St
         opts.package_name(),
         opts.version,
         opts.code_package_name(),
-        get_token_env_variable(&opts.name),
+        get_env_variable_prefix(&opts.name),
         opts.code_package_name(),
     ))
 }
 
-/// Get the name of the environment variable for the API token.
-pub fn get_token_env_variable(name: &str) -> String {
-    format!("{}_API_TOKEN", to_screaming_snake_case(name))
+/// Get the prefix of the environment variables.
+pub fn get_env_variable_prefix(name: &str) -> String {
+    to_screaming_snake_case(name)
 }

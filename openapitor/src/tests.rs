@@ -161,7 +161,7 @@ async fn test_gusto_generation(ctx: &mut TestContext) {
         version: "1.0.0".to_string(),
         description: "HR crap!".to_string(),
         spec_url: Some("".to_string()),
-        repo_name: Some("kittycad/octorust.rs".to_string()),
+        repo_name: Some("kittycad/gusto.rs".to_string()),
     };
 
     // Load our spec.

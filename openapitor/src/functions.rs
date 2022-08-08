@@ -1219,10 +1219,10 @@ let client = {}::Client::new("$TOKEN");
 // - OR -
 
 // Authenticate with your token and host parsed from the environment variables:
-// `{}`.
+// `{}_API_TOKEN`.
 {}"#,
         opts.name,
-        crate::template::get_token_env_variable(&opts.name),
+        crate::template::get_env_variable_prefix(&opts.name),
         generate_example_client_env(opts),
     )
 }

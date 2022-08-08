@@ -156,7 +156,7 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
     a("");
 
     // Print the client template.
-    a(&crate::client::generate_client(&opts.name, &opts.base_url));
+    a(&crate::client::generate_client(&opts));
 
     a("");
 
@@ -412,6 +412,14 @@ pub struct Opts {
     /// The repo name, formatted like `{owner}/{name}`, if hosted on GitHub.
     #[clap(short, long)]
     pub repo_name: Option<String>,
+
+    /// The token endpoint, if this client uses OAuth 2.0.
+    #[clap(long)]
+    pub token_endpoint: Option<url::Url>,
+
+    /// The user consent endpoint, if this client uses OAuth 2.0.
+    #[clap(long)]
+    pub user_consent_endpoint: Option<url::Url>,
 }
 
 impl Opts {
@@ -508,6 +516,10 @@ parse-display = "^0.5"
 percent-encoding = "2.1"
 phonenumber = "^0.3.1"
 reqwest = {{ version = "0.11", default-features = false, features = ["json", "multipart", "rustls-tls"] }}
+reqwest-conditional-middleware = "0.1.0"
+reqwest-middleware = "0.1.5"
+reqwest-retry = "0.1.4"
+reqwest-tracing = {{ version = "0.2.1", features = ["opentelemetry_0_17"] }}
 schemars = {{ version = "0.8", features = ["bytes", "chrono", "url", "uuid1"] }}
 serde = {{ version = "1", features = ["derive"] }}
 serde_json = "1"
