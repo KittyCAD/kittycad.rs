@@ -32,7 +32,8 @@ pub fn generate_files(
 
         let mut gen = |name: &str,
                        method: &http::Method,
-                       op: Option<&openapiv3::Operation>|
+                       op: Option<&openapiv3::Operation>,
+                       global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>|
          -> Result<()> {
             // Ensure we have an operation for this path and method, otherwise return early.
             let op = if let Some(op) = op {
@@ -44,7 +45,7 @@ pub fn generate_files(
             let tag = op.get_tag()?;
 
             // Get the docs.
-            let docs = generate_docs(type_space, name, method, op)?;
+            let docs = generate_docs(type_space, name, method, op, global_params)?;
 
             // Get the function name.
             let fn_name = op.get_fn_name()?;
@@ -61,7 +62,7 @@ pub fn generate_files(
                 };
 
             // Get the function args.
-            let raw_args = get_args(type_space, op)?;
+            let raw_args = get_args(type_space, op, global_params)?;
             // Make sure if we have args, we start with a comma.
             let args = if raw_args.is_empty() {
                 quote!()
@@ -84,10 +85,11 @@ pub fn generate_files(
             };
 
             // Get the function body.
-            let function_body = get_function_body(type_space, name, method, op, false, opts)?;
+            let function_body =
+                get_function_body(type_space, name, method, op, false, opts, global_params)?;
 
             let example_code_fn =
-                generate_example_code_fn(type_space, name, method, &tag, op, opts)?;
+                generate_example_code_fn(type_space, name, method, &tag, op, opts, global_params)?;
             // For the rust docs example code we want to trim the doc string since it is
             // repetitive.
             let rust_doc_example_code_fn = &example_code_fn[example_code_fn
@@ -189,7 +191,7 @@ pub fn generate_files(
                 };
 
                 let paginated_function_body =
-                    get_function_body(type_space, name, method, op, true, opts)?;
+                    get_function_body(type_space, name, method, op, true, opts, global_params)?;
 
                 let item_type = pagination_properties.item_type(false)?;
 
@@ -271,13 +273,48 @@ pub fn generate_files(
             Ok(())
         };
 
-        gen(name.as_str(), &http::Method::GET, op.get.as_ref())?;
-        gen(name.as_str(), &http::Method::PUT, op.put.as_ref())?;
-        gen(name.as_str(), &http::Method::POST, op.post.as_ref())?;
-        gen(name.as_str(), &http::Method::DELETE, op.delete.as_ref())?;
-        gen(name.as_str(), &http::Method::HEAD, op.head.as_ref())?;
-        gen(name.as_str(), &http::Method::PATCH, op.patch.as_ref())?;
-        gen(name.as_str(), &http::Method::TRACE, op.trace.as_ref())?;
+        gen(
+            name.as_str(),
+            &http::Method::GET,
+            op.get.as_ref(),
+            &op.parameters,
+        )?;
+        gen(
+            name.as_str(),
+            &http::Method::PUT,
+            op.put.as_ref(),
+            &op.parameters,
+        )?;
+        gen(
+            name.as_str(),
+            &http::Method::POST,
+            op.post.as_ref(),
+            &op.parameters,
+        )?;
+        gen(
+            name.as_str(),
+            &http::Method::DELETE,
+            op.delete.as_ref(),
+            &op.parameters,
+        )?;
+        gen(
+            name.as_str(),
+            &http::Method::HEAD,
+            op.head.as_ref(),
+            &op.parameters,
+        )?;
+        gen(
+            name.as_str(),
+            &http::Method::PATCH,
+            op.patch.as_ref(),
+            &op.parameters,
+        )?;
+        gen(
+            name.as_str(),
+            &http::Method::TRACE,
+            op.trace.as_ref(),
+            &op.parameters,
+        )?;
     }
 
     Ok((tag_files, new_spec))
@@ -289,6 +326,7 @@ fn generate_docs(
     name: &str,
     method: &http::Method,
     op: &openapiv3::Operation,
+    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
 ) -> Result<String> {
     let mut docs = if let Some(summary) = &op.summary {
         summary.to_string()
@@ -302,10 +340,14 @@ fn generate_docs(
     }
 
     // Document the params.
-    let mut params = get_path_params_schema(op, &type_space.spec)?;
-    params.append(&mut get_query_params_schema(op, &type_space.spec)?);
+    let mut params = get_path_params_schema(op, &type_space.spec, global_params)?;
+    params.append(&mut get_query_params_schema(
+        op,
+        &type_space.spec,
+        global_params,
+    )?);
 
-    let params_types = get_args(type_space, op)?;
+    let params_types = get_args(type_space, op, global_params)?;
 
     if !params.is_empty() {
         docs.push_str("\n\n**Parameters:**\n");
@@ -440,9 +482,10 @@ fn generate_name_for_fn_schema(
 fn get_args(
     type_space: &mut crate::types::TypeSpace,
     op: &openapiv3::Operation,
+    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
-    let path_params = get_path_params(type_space, op)?;
-    let query_params = get_query_params(type_space, op)?;
+    let path_params = get_path_params(type_space, op, global_params)?;
+    let query_params = get_query_params(type_space, op, global_params)?;
 
     Ok(path_params
         .into_iter()
@@ -557,9 +600,10 @@ fn get_request_body_example(
 fn get_example_args(
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
+    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
-    let mut params = get_path_params_schema(op, spec)?;
-    params.append(&mut get_query_params_schema(op, spec)?);
+    let mut params = get_path_params_schema(op, spec, global_params)?;
+    params.append(&mut get_query_params_schema(op, spec, global_params)?);
 
     let mut new_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
 
@@ -598,6 +642,7 @@ fn get_example_args(
 fn get_path_params_schema(
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
+    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
 ) -> Result<
     BTreeMap<
         String,
@@ -616,8 +661,13 @@ fn get_path_params_schema(
         ),
     > = Default::default();
 
+    let mut parameters = op.parameters.clone();
+    let mut global_params = global_params.clone();
+    // Add in our global_params.
+    parameters.append(&mut global_params);
+
     // Let's get the arguments for the function.
-    for parameter in &op.parameters {
+    for parameter in &parameters {
         // Get the parameter.
         let parameter = parameter.expand(spec)?;
 
@@ -643,8 +693,9 @@ fn get_path_params_schema(
 fn get_path_params(
     type_space: &mut crate::types::TypeSpace,
     op: &openapiv3::Operation,
+    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
-    let params = get_path_params_schema(op, &type_space.spec)?;
+    let params = get_path_params_schema(op, &type_space.spec, global_params)?;
 
     let mut path_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
 
@@ -695,6 +746,7 @@ fn get_path_params(
 fn get_query_params_schema(
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
+    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
 ) -> Result<
     BTreeMap<
         String,
@@ -712,8 +764,14 @@ fn get_query_params_schema(
             openapiv3::ParameterData,
         ),
     > = Default::default();
+
+    let mut parameters = op.parameters.clone();
+    let mut global_params = global_params.clone();
+    // Add in our global_params.
+    parameters.append(&mut global_params);
+
     // Let's get the arguments for the function.
-    for parameter in &op.parameters {
+    for parameter in &parameters {
         // Get the parameter.
         let parameter = parameter.expand(spec)?;
 
@@ -741,8 +799,9 @@ fn get_query_params_schema(
 fn get_query_params(
     type_space: &mut crate::types::TypeSpace,
     op: &openapiv3::Operation,
+    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
-    let params = get_query_params_schema(op, &type_space.spec)?;
+    let params = get_query_params_schema(op, &type_space.spec, global_params)?;
 
     let mut query_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
 
@@ -797,12 +856,13 @@ fn get_function_body(
     op: &openapiv3::Operation,
     paginated: bool,
     opts: &crate::Opts,
+    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
 ) -> Result<proc_macro2::TokenStream> {
     let path = name.trim_start_matches('/');
     let method_ident = format_ident!("{}", method.to_string());
 
     // Let's get the path parameters.
-    let path_params = get_path_params(type_space, op)?;
+    let path_params = get_path_params(type_space, op, global_params)?;
     let clean_url = if !path_params.is_empty() {
         let mut clean_string = quote!();
         for (name, t) in &path_params {
@@ -826,7 +886,7 @@ fn get_function_body(
     };
 
     // Let's get the query parameters.
-    let query_params = get_query_params(type_space, op)?;
+    let query_params = get_query_params(type_space, op, global_params)?;
     let query_params_code = if !query_params.is_empty() && !paginated {
         let mut array = Vec::new();
         for (name, t) in &query_params {
@@ -1068,9 +1128,10 @@ fn generate_example_code_fn(
     tag: &str,
     op: &openapiv3::Operation,
     opts: &crate::Opts,
+    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
 ) -> Result<String> {
     // Get the docs.
-    let docs = generate_docs(type_space, name, method, op)?;
+    let docs = generate_docs(type_space, name, method, op, global_params)?;
     let docs = docs.replace('\n', "\n/// ");
 
     // Get the function name.
@@ -1089,7 +1150,7 @@ fn generate_example_code_fn(
     }
 
     // Get the function args.
-    let raw_args = get_example_args(op, &type_space.spec)?;
+    let raw_args = get_example_args(op, &type_space.spec, global_params)?;
     let args = if raw_args.is_empty() {
         quote!()
     } else {
