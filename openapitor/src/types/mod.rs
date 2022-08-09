@@ -181,6 +181,7 @@ impl TypeSpace {
         }
     }
 
+    #[allow(clippy::type_complexity)]
     fn get_all_of_properties(
         &mut self,
         name: &str,
@@ -354,7 +355,7 @@ impl TypeSpace {
             quote!(#[serde(#(#serde_options),*)] )
         };
 
-        let (_, values) = get_one_of_values(name, one_ofs, &self.spec, &tag_result)?;
+        let (_, values) = self.get_one_of_values(name, one_ofs, &tag_result, true)?;
 
         let rendered = quote! {
             #description
@@ -392,7 +393,7 @@ impl TypeSpace {
         // The GitHub API is sometimes missing `type: object`.
         // See: https://github.com/github/rest-api-description/issues/1354
         // If we have properties, we can assume this is an object.
-        if !any.properties.is_empty() || !any.additional_properties.is_some() {
+        if !any.properties.is_empty() || any.additional_properties.is_some() {
             return self.render_object(
                 name,
                 &openapiv3::ObjectType {
@@ -858,6 +859,191 @@ impl TypeSpace {
 
         Ok(())
     }
+
+    fn get_one_of_values(
+        &mut self,
+        name: &str,
+        one_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
+        tag_result: &TagContent,
+        should_render: bool,
+    ) -> Result<(
+        BTreeMap<String, openapiv3::ReferenceOr<openapiv3::Schema>>,
+        proc_macro2::TokenStream,
+    )> {
+        let mut values: BTreeMap<String, openapiv3::ReferenceOr<openapiv3::Schema>> =
+            Default::default();
+        let mut rendered_value = quote!();
+        let mut name = name.to_string();
+
+        // If we have a tag and/or content this is pretty simple.
+        if let Some(tag) = &tag_result.tag {
+            for one_of in one_ofs {
+                // Get the schema for this OneOf.
+                let schema = one_of.get_schema_from_reference(&self.spec, true)?;
+                if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind
+                {
+                    // Get the value of this tag.
+                    let tag_schema = match o.properties.get(tag) {
+                        Some(v) => v,
+                        None => {
+                            anyhow::bail!(
+                                "no property `{}` in object, even through we thought we had a tag",
+                                tag
+                            );
+                        }
+                    };
+
+                    // Get the single value from the enum.
+                    let inner_schema = if let openapiv3::ReferenceOr::Item(i) = tag_schema {
+                        let s = &**i;
+                        s.clone()
+                    } else {
+                        tag_schema.get_schema_from_reference(&self.spec, true)?
+                    };
+
+                    let tag_name = if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
+                        inner_schema.schema_kind
+                    {
+                        if s.enumeration.len() == 1 {
+                            s.enumeration[0]
+                                .as_ref()
+                                .map(|s| s.to_string())
+                                .unwrap_or_default()
+                        } else {
+                            anyhow::bail!("enumeration for tag `{}` is not a single value", tag);
+                        }
+                    } else {
+                        anyhow::bail!("enumeration for tag `{}` is not a string", tag);
+                    };
+                    let p = proper_name(&tag_name);
+                    let n = format_ident!("{}", p);
+
+                    if let Some(content) = &tag_result.content {
+                        // Get the value of the content.
+                        let content_schema = match o.properties.get(content) {
+                            Some(v) => v,
+                            None => {
+                                anyhow::bail!(
+                            "no property `{}` in object, even through we thought we had content",
+                            content
+                        );
+                            }
+                        };
+
+                        // Get the single value from the enum.
+                        let content_name = if let openapiv3::ReferenceOr::Item(i) = content_schema {
+                            let s = &**i;
+                            get_type_name_for_schema(&name, s, &self.spec, true)?
+                        } else {
+                            get_type_name_from_reference(
+                                &content_schema.reference()?,
+                                &self.spec,
+                                true,
+                            )?
+                        };
+
+                        // Get the type name for this value.
+                        values.insert(p.to_string(), one_of.clone());
+
+                        if p != tag_name {
+                            // Rename serde to the correct tag name.
+                            rendered_value = quote!(
+                                #rendered_value
+
+                                #[serde(rename = #tag_name)]
+                                #n(#content_name),
+                            );
+                        } else {
+                            rendered_value = quote!(
+                                #rendered_value
+
+                                #n(#content_name),
+                            );
+                        }
+                    } else {
+                        // Render this object.
+                        let content_name =
+                            render_enum_object_internal(&tag_name, o, &self.spec, tag)?;
+                        // Get the type name for this value.
+                        values.insert(p.to_string(), one_of.clone());
+
+                        if p != tag_name {
+                            // Rename serde to the correct tag name.
+                            rendered_value = quote!(
+                                #rendered_value
+
+                                #[serde(rename = #tag_name)]
+                                #content_name,
+                            );
+                        } else {
+                            rendered_value = quote!(
+                                #rendered_value
+
+                                #content_name,
+                            );
+                        }
+                    }
+                }
+            }
+
+            // We can return early here, we handled the tagged types.
+            return Ok((values, rendered_value));
+        }
+
+        // Handle the untagged types.
+
+        for one_of in one_ofs {
+            if one_of.should_render()? && should_render {
+                // Render the schema.
+                name = format!("{}_OneOf", name);
+                self.render_schema(&name, &one_of.item()?.clone())?;
+            }
+
+            // If we have a tag use the value of that property for the enum.
+            let o_type = if let openapiv3::ReferenceOr::Reference { .. } = one_of {
+                // If the one of is a reference just use the reference.
+                let reference = proper_name(&one_of.reference()?);
+                let reference_name = format_ident!("{}", reference);
+
+                values.insert(reference.to_string(), one_of.clone());
+                quote!(
+                    #reference_name(#reference_name),
+                )
+            } else {
+                // We don't have a reference, we have an item.
+                // We need to expand the item.
+                let rendered_type =
+                    get_type_name_for_schema(&name, &one_of.expand(&self.spec)?, &self.spec, true)?;
+
+                let n = if let Some(title) = &one_of.expand(&self.spec)?.schema_data.title {
+                    let p = proper_name(title);
+                    p.parse().map_err(|e| anyhow::anyhow!("{}", e))?
+                } else {
+                    let t = inflector::cases::classcase::to_class_case(
+                        &rendered_type.strip_option()?.strip_vec()?.rendered()?,
+                    );
+                    let t = format_ident!("{}", t);
+                    quote!(#t)
+                };
+
+                let rendered = n.rendered()?;
+
+                values.insert(rendered, one_of.clone());
+
+                quote!(
+                    #n(#rendered_type),
+                )
+            };
+
+            rendered_value = quote!(
+                #rendered_value
+
+                #o_type
+            );
+        }
+
+        Ok((values, rendered_value))
+    }
 }
 
 /// Return the type name for a schema.
@@ -921,7 +1107,7 @@ pub fn get_type_name_for_schema(
             anyhow::bail!("XXX not not supported yet");
         }
         openapiv3::SchemaKind::Any(any) => {
-            if !any.properties.is_empty() || !any.additional_properties.is_some() {
+            if !any.properties.is_empty() || any.additional_properties.is_some() {
                 // This is likely an object but they did not denote it as such.
                 // Effing horrible specs.
                 let obj = openapiv3::Schema {
@@ -1404,169 +1590,6 @@ fn get_one_of_tag(
     }
 
     Ok(result)
-}
-
-fn get_one_of_values(
-    name: &str,
-    one_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
-    spec: &openapiv3::OpenAPI,
-    tag_result: &TagContent,
-) -> Result<(
-    BTreeMap<String, openapiv3::ReferenceOr<openapiv3::Schema>>,
-    proc_macro2::TokenStream,
-)> {
-    let mut values: BTreeMap<String, openapiv3::ReferenceOr<openapiv3::Schema>> =
-        Default::default();
-    let mut rendered_value = quote!();
-
-    // If we have a tag and/or content this is pretty simple.
-    if let Some(tag) = &tag_result.tag {
-        for one_of in one_ofs {
-            // Get the schema for this OneOf.
-            let schema = one_of.get_schema_from_reference(spec, true)?;
-            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
-                // Get the value of this tag.
-                let tag_schema = match o.properties.get(tag) {
-                    Some(v) => v,
-                    None => {
-                        anyhow::bail!(
-                            "no property `{}` in object, even through we thought we had a tag",
-                            tag
-                        );
-                    }
-                };
-
-                // Get the single value from the enum.
-                let inner_schema = if let openapiv3::ReferenceOr::Item(i) = tag_schema {
-                    let s = &**i;
-                    s.clone()
-                } else {
-                    tag_schema.get_schema_from_reference(spec, true)?
-                };
-
-                let tag_name = if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
-                    inner_schema.schema_kind
-                {
-                    if s.enumeration.len() == 1 {
-                        s.enumeration[0]
-                            .as_ref()
-                            .map(|s| s.to_string())
-                            .unwrap_or_default()
-                    } else {
-                        anyhow::bail!("enumeration for tag `{}` is not a single value", tag);
-                    }
-                } else {
-                    anyhow::bail!("enumeration for tag `{}` is not a string", tag);
-                };
-                let p = proper_name(&tag_name);
-                let n = format_ident!("{}", p);
-
-                if let Some(content) = &tag_result.content {
-                    // Get the value of the content.
-                    let content_schema = match o.properties.get(content) {
-                        Some(v) => v,
-                        None => {
-                            anyhow::bail!(
-                            "no property `{}` in object, even through we thought we had content",
-                            content
-                        );
-                        }
-                    };
-
-                    // Get the single value from the enum.
-                    let content_name = if let openapiv3::ReferenceOr::Item(i) = content_schema {
-                        let s = &**i;
-                        get_type_name_for_schema(name, s, spec, true)?
-                    } else {
-                        get_type_name_from_reference(&content_schema.reference()?, spec, true)?
-                    };
-
-                    // Get the type name for this value.
-                    values.insert(p.to_string(), one_of.clone());
-
-                    if p != tag_name {
-                        // Rename serde to the correct tag name.
-                        rendered_value = quote!(
-                            #rendered_value
-
-                            #[serde(rename = #tag_name)]
-                            #n(#content_name),
-                        );
-                    } else {
-                        rendered_value = quote!(
-                            #rendered_value
-
-                            #n(#content_name),
-                        );
-                    }
-                } else {
-                    // Render this object.
-                    let content_name = render_enum_object_internal(&tag_name, o, spec, tag)?;
-                    // Get the type name for this value.
-                    values.insert(p.to_string(), one_of.clone());
-
-                    if p != tag_name {
-                        // Rename serde to the correct tag name.
-                        rendered_value = quote!(
-                            #rendered_value
-
-                            #[serde(rename = #tag_name)]
-                            #content_name,
-                        );
-                    } else {
-                        rendered_value = quote!(
-                            #rendered_value
-
-                            #content_name,
-                        );
-                    }
-                }
-            }
-        }
-
-        // We can return early here, we handled the tagged types.
-        return Ok((values, rendered_value));
-    }
-
-    // Handle the untagged types.
-
-    for one_of in one_ofs {
-        // If we have a tag use the value of that property for the enum.
-        let o_type = if let openapiv3::ReferenceOr::Reference { .. } = one_of {
-            // If the one of is a reference just use the reference.
-            let reference = proper_name(&one_of.reference()?);
-            let reference_name = format_ident!("{}", reference);
-
-            values.insert(reference.to_string(), one_of.clone());
-            quote!(
-                #reference_name(#reference_name),
-            )
-        } else {
-            // We don't have a reference, we have an item.
-            // We need to expand the item.
-            let rendered_type = get_type_name_for_schema(name, &one_of.expand(spec)?, spec, true)?;
-
-            let n = if let Some(title) = &one_of.expand(spec)?.schema_data.title {
-                let p = proper_name(title);
-                p.parse().map_err(|e| anyhow::anyhow!("{}", e))?
-            } else {
-                rendered_type.clone()
-            };
-            values.insert(n.rendered()?, one_of.clone());
-
-            quote!(
-                #n(#rendered_type),
-            )
-        };
-
-        rendered_value = quote!(
-            #rendered_value
-
-            #o_type
-        );
-    }
-
-    Ok((values, rendered_value))
 }
 
 /// Clean a property name for an object so we can use it in rust.

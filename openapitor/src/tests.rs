@@ -155,6 +155,40 @@ async fn test_oxide_generation(ctx: &mut TestContext) {
 
 #[test_context(TestContext)]
 #[tokio::test]
+async fn test_front_generation(ctx: &mut TestContext) {
+    let opts = crate::Opts {
+        debug: true,
+        json: false,
+        input: ctx.tmp_dir.clone(),
+        output: ctx.tmp_dir.clone(),
+        base_url: "https://api.front.com".parse().unwrap(),
+        name: "front-api".to_string(),
+        version: "1.0.0".to_string(),
+        description: "CRM crap!".to_string(),
+        spec_url: Some("".to_string()),
+        repo_name: Some("kittycad/front.rs".to_string()),
+        token_endpoint: None,
+        user_consent_endpoint: None,
+    };
+
+    // Load our spec.
+    let spec = crate::load_json_spec(include_str!("../tests/front.json")).unwrap();
+
+    // Move our test file to our output directory.
+    let test_file = include_str!("../tests/library/front.tests.rs");
+    // Write our temporary file.
+    let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
+    std::fs::write(&test_file_path, test_file).unwrap();
+
+    // Generate the library.
+    crate::generate(&spec, &opts).await.unwrap();
+
+    // Run tests.
+    run_cargo_test(&opts).await.unwrap();
+}
+
+#[test_context(TestContext)]
+#[tokio::test]
 async fn test_gusto_generation(ctx: &mut TestContext) {
     let opts = crate::Opts {
         debug: true,

@@ -503,7 +503,7 @@ impl SchemaRenderExt for openapiv3::ReferenceOr<Box<openapiv3::Schema>> {
                     // If it is a OneOf, we might need to render the inner types.
                     openapiv3::SchemaKind::OneOf { one_of: _ } => Ok(true),
                     openapiv3::SchemaKind::Any(any) => {
-                        if !any.properties.is_empty() || !any.additional_properties.is_some() {
+                        if !any.properties.is_empty() || any.additional_properties.is_some() {
                             Ok(true)
                         } else {
                             Ok(false)

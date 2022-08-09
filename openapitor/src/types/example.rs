@@ -535,8 +535,8 @@ pub fn generate_example_rust_from_schema(
                     crate::types::get_type_name_for_schema(name, schema, &type_space.spec, false)?;
 
                 let tag_result = crate::types::get_one_of_tag(one_of, &type_space.spec)?;
-                let (values, _) =
-                    crate::types::get_one_of_values(name, one_of, &type_space.spec, &tag_result)?;
+                let mut ts = type_space.clone();
+                let (values, _) = ts.get_one_of_values(name, one_of, &tag_result, false)?;
 
                 if let Some((k, v)) = values.into_iter().next() {
                     let enum_name: proc_macro2::TokenStream =
