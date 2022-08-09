@@ -826,8 +826,21 @@ fn get_query_params(
                     crate::types::get_type_name_for_schema(&name, s, &type_space.spec, false)?;
                 // Check if we should render the schema.
                 if schema.should_render()? {
+                    let mut r = t_name.rendered()?.replace("crate::types::", "");
+                    if t_name.is_vec()? {
+                        r = r
+                            .trim_start_matches("Vec<")
+                            .trim_end_matches(">")
+                            .to_string();
+                    } else if t_name.is_option_vec()? {
+                        r = r
+                            .trim_start_matches("Option<Vec<")
+                            .trim_end_matches(">>")
+                            .to_string();
+                    }
+
                     // Check if we already have a type with this name.
-                    if let Some(rendered) = type_space.types.get(&t_name.rendered()?) {
+                    if let Some(rendered) = type_space.types.get(&r) {
                         if rendered != s {
                             // Update the name of the type.
                             t_name = crate::types::get_type_name_for_schema(
