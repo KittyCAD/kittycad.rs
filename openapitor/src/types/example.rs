@@ -440,9 +440,12 @@ pub fn generate_example_rust_from_schema(
                     openapiv3::ReferenceOr::Reference { .. } => {
                         crate::types::get_type_name_from_reference(&v.reference()?, spec, true)?
                     }
-                    openapiv3::ReferenceOr::Item(s) => {
-                        crate::types::get_type_name_for_schema(name, s, spec, true)?
-                    }
+                    openapiv3::ReferenceOr::Item(s) => crate::types::get_type_name_for_schema(
+                        &format!("{} {}", name, k),
+                        s,
+                        spec,
+                        true,
+                    )?,
                 };
 
                 let inner_name_rendered = inner_name.strip_option()?.rendered()?;
@@ -713,6 +716,8 @@ pub fn generate_example_rust_from_schema(
 
 #[cfg(test)]
 mod test {
+    use pretty_assertions::assert_eq;
+
     use crate::types::exts::{ReferenceOrExt, TokenStreamExt};
 
     #[test]
@@ -807,5 +812,38 @@ mod test {
 
         // Make sure it's not a double quoted string.
         assert!(!result.rendered().unwrap().ends_with("\"\""));
+    }
+
+    #[test]
+    fn test_generate_example_rust_inline_enum() {
+        let spec: openapiv3::OpenAPI = Default::default();
+        // Lets get a specific schema.
+        let schema = openapiv3::Schema {
+            schema_data: Default::default(),
+            schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(
+                openapiv3::ObjectType {
+                    properties: indexmap::IndexMap::from([(
+                        "thing".to_string(),
+                        openapiv3::ReferenceOr::Item(Box::new(openapiv3::Schema {
+                            schema_data: Default::default(),
+                            schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::String(
+                                openapiv3::StringType {
+                                    enumeration: vec![Some("other".to_string())],
+                                    ..Default::default()
+                                },
+                            )),
+                        })),
+                    )]),
+                    ..Default::default()
+                },
+            )),
+        };
+        let result = super::generate_example_rust_from_schema("MyType", &schema, &spec).unwrap();
+
+        // Make sure it's not a double quoted string.
+        assert_eq!(
+            result.rendered().unwrap(),
+            "crate::types::MyType{thing:Some(crate::types::MyTypeThing::Other)}"
+        );
     }
 }
