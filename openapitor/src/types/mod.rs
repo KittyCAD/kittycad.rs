@@ -458,8 +458,23 @@ impl TypeSpace {
             // Get the type name for the schema.
             let mut type_name = if v.should_render()? {
                 // Check if the name for the property is already taken.
-                let t = if self.types.contains_key(&proper_name(&prop)) {
-                    proper_name(&format!("{} {}", struct_name, prop))
+                let t = if let Some(rendered) = self.types.get(&proper_name(&prop)) {
+                    if rendered.schema_kind != inner_schema.schema_kind
+                        || rendered.schema_data != inner_schema.schema_data
+                    {
+                        proper_name(&format!("{} {}", struct_name, prop))
+                    } else {
+                        // Make sure there isn't an existing reference with this name.
+                        if let Some(components) = &self.spec.components {
+                            if components.schemas.contains_key(&proper_name(&prop)) {
+                                proper_name(&format!("{} {}", struct_name, prop))
+                            } else {
+                                prop.to_string()
+                            }
+                        } else {
+                            proper_name(&prop)
+                        }
+                    }
                 } else {
                     // Make sure there isn't an existing reference with this name.
                     if let Some(components) = &self.spec.components {
