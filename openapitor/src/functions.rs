@@ -336,7 +336,7 @@ fn generate_docs(
 
     if let Some(description) = &op.description {
         docs.push_str("\n\n");
-        docs.push_str(description);
+        docs.push_str(&description.replace("```", "```ignore"));
     }
 
     // Document the params.
