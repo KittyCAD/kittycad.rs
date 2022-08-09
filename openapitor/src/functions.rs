@@ -547,14 +547,14 @@ fn get_request_body(
 
 /// Return the request body type example for the operation.
 fn get_request_body_example(
+    type_space: &crate::types::TypeSpace,
     name: &str,
     method: &http::Method,
     op: &openapiv3::Operation,
-    spec: &openapiv3::OpenAPI,
 ) -> Result<Option<RequestOrResponse>> {
     if let Some(request_body) = &op.request_body {
         // Then let's get the type for the response.
-        let request_body = request_body.expand(spec)?;
+        let request_body = request_body.expand(&type_space.spec)?;
 
         // Iterate over all the media types and return the first request.
         for (media_type, content) in &request_body.content {
@@ -563,20 +563,20 @@ fn get_request_body_example(
                     openapiv3::ReferenceOr::Reference { .. } => {
                         let name = crate::types::get_type_name_from_reference(
                             &s.reference()?,
-                            spec,
+                            &type_space.spec,
                             true,
                         )?;
                         crate::types::example::generate_example_rust_from_schema(
+                            type_space,
                             &name.rendered()?,
-                            &s.expand(spec)?,
-                            spec,
+                            &s.expand(&type_space.spec)?,
                         )?
                     }
                     openapiv3::ReferenceOr::Item(s) => {
                         crate::types::example::generate_example_rust_from_schema(
+                            type_space,
                             &generate_name_for_fn_schema(name, method, s, op, "Request Body"),
                             s,
-                            spec,
                         )?
                     }
                 };
@@ -598,31 +598,37 @@ fn get_request_body_example(
 
 /// Return the function arguments for the operation.
 fn get_example_args(
+    type_space: &crate::types::TypeSpace,
     op: &openapiv3::Operation,
-    spec: &openapiv3::OpenAPI,
     global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
-    let mut params = get_path_params_schema(op, spec, global_params)?;
-    params.append(&mut get_query_params_schema(op, spec, global_params)?);
+    let mut params = get_path_params_schema(op, &type_space.spec, global_params)?;
+    params.append(&mut get_query_params_schema(
+        op,
+        &type_space.spec,
+        global_params,
+    )?);
 
     let mut new_params: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
 
     for (name, (schema, parameter_data)) in params {
         // Get the type for the parameter.
         let t = match &schema {
-            openapiv3::ReferenceOr::Reference { .. } => {
-                crate::types::get_type_name_from_reference(&schema.reference()?, spec, true)?
-            }
+            openapiv3::ReferenceOr::Reference { .. } => crate::types::get_type_name_from_reference(
+                &schema.reference()?,
+                &type_space.spec,
+                true,
+            )?,
             openapiv3::ReferenceOr::Item(s) => {
-                crate::types::get_type_name_for_schema(&name, s, spec, true)?
+                crate::types::get_type_name_for_schema(&name, s, &type_space.spec, true)?
             }
         };
 
         // Let's get the example rust code for the schema.
         let mut example = crate::types::example::generate_example_rust_from_schema(
+            type_space,
             &t.rendered()?,
-            &schema.expand(spec)?,
-            spec,
+            &schema.expand(&type_space.spec)?,
         )?;
 
         if !parameter_data.required {
@@ -1150,7 +1156,7 @@ fn generate_example_code_fn(
     }
 
     // Get the function args.
-    let raw_args = get_example_args(op, &type_space.spec, global_params)?;
+    let raw_args = get_example_args(type_space, op, global_params)?;
     let args = if raw_args.is_empty() {
         quote!()
     } else {
@@ -1159,15 +1165,14 @@ fn generate_example_code_fn(
     };
 
     // Get the request body for the function if there is one.
-    let request_body =
-        if let Some(rb) = get_request_body_example(name, method, op, &type_space.spec)? {
-            let t = rb.type_name;
-            // We add the comma at the front, so it works.
-            quote!(&#t)
-        } else {
-            // We don't have a request body, so we'll return nothing.
-            quote!()
-        };
+    let request_body = if let Some(rb) = get_request_body_example(type_space, name, method, op)? {
+        let t = rb.type_name;
+        // We add the comma at the front, so it works.
+        quote!(&#t)
+    } else {
+        // We don't have a request body, so we'll return nothing.
+        quote!()
+    };
 
     let mut imports = quote!();
     if args.rendered()?.contains("::from_str(") || request_body.rendered()?.contains("::from_str(")
