@@ -181,6 +181,44 @@ impl TypeSpace {
         }
     }
 
+    fn get_all_of_properties(
+        &mut self,
+        name: &str,
+        all_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
+    ) -> Result<(
+        IndexMap<String, openapiv3::ReferenceOr<Box<openapiv3::Schema>>>,
+        Vec<String>,
+    )> {
+        let mut properties: IndexMap<String, openapiv3::ReferenceOr<Box<openapiv3::Schema>>> =
+            IndexMap::new();
+        let mut required: Vec<String> = Vec::new();
+        for all_of in all_ofs {
+            // Get the schema for this all of.
+            let schema = all_of.get_schema_from_reference(&self.spec, true)?;
+
+            // Ensure the type is an object.
+            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
+                for (k, v) in o.properties.iter() {
+                    properties.insert(k.clone(), v.clone());
+                }
+                required.extend(o.required.iter().cloned());
+            } else if let openapiv3::SchemaKind::AllOf { all_of } = &schema.schema_kind {
+                // Recurse.
+                let (p, r) = self.get_all_of_properties(name, all_of)?;
+                properties.extend(p);
+                required.extend(r);
+            } else {
+                anyhow::bail!(
+                    "The all of {} is not an object, it is a {:?}",
+                    name,
+                    schema.schema_kind
+                );
+            }
+        }
+
+        Ok((properties, required))
+    }
+
     /// All of validates the value against all the subschemas.
     fn render_all_of(
         &mut self,
@@ -203,26 +241,19 @@ impl TypeSpace {
         // The all of needs to be an object with all the values.
         // We want to iterate over each of the subschemas and combine all of the types.
         // We assume all of the subschemas are objects.
-        let mut properties: IndexMap<String, openapiv3::ReferenceOr<Box<openapiv3::Schema>>> =
-            IndexMap::new();
-        let mut required: Vec<String> = Vec::new();
-        for all_of in all_ofs {
-            // Get the schema for this all of.
-            let schema = all_of.get_schema_from_reference(&self.spec, true)?;
-
-            // Ensure the type is an object.
-            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
-                for (k, v) in o.properties.iter() {
-                    properties.insert(k.clone(), v.clone());
+        let (properties, required) = match self.get_all_of_properties(name, all_ofs) {
+            Ok(p) => p,
+            Err(err) => {
+                if err.to_string().contains("not an object") {
+                    // We got something that is not an object.
+                    // Therefore we need to render this as a one of instead.
+                    // Since it includes primitive types, we need to render this as a one of.
+                    return self.render_one_of(name, all_ofs, data);
                 }
-                required.extend(o.required.iter().cloned());
-            } else {
-                // We got something that is not an object.
-                // Therefore we need to render this as a one of instead.
-                // Since it includes primitive types, we need to render this as a one of.
-                return self.render_one_of(name, all_ofs, data);
+
+                return Err(err);
             }
-        }
+        };
 
         // Let's render the object.
         self.render_object(
@@ -361,7 +392,7 @@ impl TypeSpace {
         // The GitHub API is sometimes missing `type: object`.
         // See: https://github.com/github/rest-api-description/issues/1354
         // If we have properties, we can assume this is an object.
-        if !any.properties.is_empty() {
+        if !any.properties.is_empty() || !any.additional_properties.is_some() {
             return self.render_object(
                 name,
                 &openapiv3::ObjectType {
@@ -889,7 +920,27 @@ pub fn get_type_name_for_schema(
         openapiv3::SchemaKind::Not { not: _ } => {
             anyhow::bail!("XXX not not supported yet");
         }
-        openapiv3::SchemaKind::Any(_any) => quote!(serde_json::Value),
+        openapiv3::SchemaKind::Any(any) => {
+            if !any.properties.is_empty() || !any.additional_properties.is_some() {
+                // This is likely an object but they did not denote it as such.
+                // Effing horrible specs.
+                let obj = openapiv3::Schema {
+                    schema_data: schema.schema_data.clone(),
+                    schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(
+                        openapiv3::ObjectType {
+                            properties: any.properties.clone(),
+                            required: any.required.clone(),
+                            additional_properties: any.additional_properties.clone(),
+                            min_properties: any.min_properties,
+                            max_properties: any.max_properties,
+                        },
+                    )),
+                };
+                return get_type_name_for_schema(name, &obj, spec, in_crate);
+            }
+            log::warn!("got any schema kind `{}`: {:?}", name, any);
+            quote!(serde_json::Value)
+        }
     };
 
     if schema.schema_data.nullable && !t.is_option()? {
@@ -1529,6 +1580,10 @@ pub fn clean_property_name(s: &str) -> String {
     } else if prop == "-1" {
         // Account for any weird types.
         prop = "minus_one".to_string()
+    } else if prop == "_links" {
+        // Account for any weird types.
+        // For the front API this makes sure there is not another "links" type in the object.
+        prop = "underscore_links".to_string()
     }
 
     prop = inflector::cases::snakecase::to_snake_case(&prop);

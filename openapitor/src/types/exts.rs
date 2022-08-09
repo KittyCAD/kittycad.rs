@@ -470,20 +470,8 @@ impl SchemaRenderExt for openapiv3::ReferenceOr<openapiv3::Schema> {
     fn should_render(&self) -> Result<bool> {
         match self {
             openapiv3::ReferenceOr::Item(i) => {
-                // Check if the type is an enum.
-                match &i.schema_kind {
-                    openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
-                        if !s.enumeration.is_empty() {
-                            Ok(true)
-                        } else {
-                            Ok(false)
-                        }
-                    }
-                    openapiv3::SchemaKind::Type(openapiv3::Type::Object(_)) => Ok(true),
-                    // If it is an array, we might need to render the inner type.
-                    openapiv3::SchemaKind::Type(openapiv3::Type::Array(_)) => Ok(true),
-                    _ => Ok(false),
-                }
+                let boxed = openapiv3::ReferenceOr::Item(Box::new(i.clone()));
+                boxed.should_render()
             }
             openapiv3::ReferenceOr::Reference { reference: _ } => Ok(false),
         }
@@ -512,6 +500,15 @@ impl SchemaRenderExt for openapiv3::ReferenceOr<Box<openapiv3::Schema>> {
                     }
                     // If it is an array, we might need to render the inner type.
                     openapiv3::SchemaKind::Type(openapiv3::Type::Array(_)) => Ok(true),
+                    // If it is a OneOf, we might need to render the inner types.
+                    openapiv3::SchemaKind::OneOf { one_of: _ } => Ok(true),
+                    openapiv3::SchemaKind::Any(any) => {
+                        if !any.properties.is_empty() || !any.additional_properties.is_some() {
+                            Ok(true)
+                        } else {
+                            Ok(false)
+                        }
+                    }
                     _ => Ok(false),
                 }
             }
