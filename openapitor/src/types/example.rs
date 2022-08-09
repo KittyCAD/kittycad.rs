@@ -455,7 +455,10 @@ pub fn generate_example_rust_from_schema(
                         // Check if we should render the schema.
                         if v.should_render()? {
                             // Check if we already have a type with this name.
-                            if let Some(rendered) = type_space.types.get(&t_name.rendered()?) {
+                            if let Some(rendered) = type_space
+                                .types
+                                .get(&t_name.strip_option()?.strip_vec()?.rendered()?)
+                            {
                                 if rendered.schema_kind != s.schema_kind
                                     || rendered.schema_data != s.schema_data
                                 {
