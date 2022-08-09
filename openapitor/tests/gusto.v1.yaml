@@ -75,6 +75,7 @@ paths:
                   type: string
                 date_of_birth:
                   type: string
+                  format: date
                 email:
                   type: string
                 ssn:
@@ -193,6 +194,7 @@ paths:
                   type: string
                 date_of_birth:
                   type: string
+                  format: date
                 email:
                   type: string
                 ssn:
@@ -257,6 +259,7 @@ paths:
                   type: number
                 hire_date:
                   type: string
+                  format: date
               required:
                 - version
             examples:
@@ -317,6 +320,7 @@ paths:
                   type: number
                 hire_date:
                   type: string
+                  format: date
             examples:
               Example:
                 value:
@@ -557,6 +561,7 @@ paths:
                   description: The current version of the object. See the versioning guide for information on how to use this field.
                 start_date:
                   type: string
+                  format: date
                   description: |
                     The day when the contractor will start working for the company.
                   example: '2020-01-11'
@@ -658,6 +663,7 @@ paths:
                   type: string
                   description: The contractor’s last_name. This attribute is optional for “Individual” contractors and will be ignored for “Business” contractors.
                 start_date:
+                  format: date
                   type: string
                   example: '2020-10-10'
                   description: The day when the contractor will start working for the company.
@@ -718,12 +724,14 @@ paths:
       parameters:
         - schema:
             type: string
+            format: date
             example: '2020-01-01'
           in: query
           name: start_date
           description: The time period for which to retrieve contractor payments
         - schema:
             type: string
+            format: date
             example: '2020-12-31'
           in: query
           name: end_date
@@ -956,6 +964,7 @@ paths:
                     - Owner
                 effective_date:
                   type: string
+                  format: date
                   description: 'The effective date for this compensation. For the first compensation, this defaults to the job''s hire date.'
               required:
                 - rate
@@ -1006,7 +1015,7 @@ paths:
                   default: true
                   description: Whether or not this garnishment is currently active.
                 amount:
-                  type: string
+                  type: number
                   format: float
                   readOnly: false
                   description: 'The amount of the garnishment. Either a percentage or a fixed dollar amount. Represented as a float, e.g. "8.00".'
@@ -1029,13 +1038,13 @@ paths:
                   default: false
                   description: Whether the garnishment should recur indefinitely.
                 annual_maximum:
+                  type: number
                   format: float
                   readOnly: false
                   default: null
                   description: 'The maximum deduction per annum. A null value indicates no maximum. Represented as a float, e.g. "200.00".'
-                  type: string
                 pay_period_maximum:
-                  type: string
+                  type: number
                   format: float
                   default: null
                   description: 'The maximum deduction per pay period. A null value indicates no maximum. Represented as a float, e.g. "16.00".'
@@ -1093,7 +1102,7 @@ paths:
                   default: true
                   description: Whether or not this garnishment is currently active.
                 amount:
-                  type: string
+                  type: number
                   format: float
                   readOnly: false
                   description: 'The amount of the garnishment. Either a percentage or a fixed dollar amount. Represented as a float, e.g. "8.00".'
@@ -1120,9 +1129,9 @@ paths:
                   readOnly: false
                   default: null
                   description: 'The maximum deduction per annum. A null value indicates no maximum. Represented as a float, e.g. "200.00".'
-                  type: string
+                  type: number
                 pay_period_maximum:
-                  type: string
+                  type: number
                   format: float
                   default: null
                   description: 'The maximum deduction per pay period. A null value indicates no maximum. Represented as a float, e.g. "16.00".'
@@ -1182,6 +1191,7 @@ paths:
               properties:
                 effective_date:
                   type: string
+                  format: date
                   description: The employee's last day of work.
                 run_termination_payroll:
                   type: boolean
@@ -1229,12 +1239,14 @@ paths:
         - schema:
             type: string
             example: '"2019-05-01"'
+            format: date
           in: query
           name: start_date
           description: Filter time off requests where the request start date is equal to or after this parameter
         - schema:
             type: string
             example: '"2019-08-31"'
+            format: date
           in: query
           name: end_date
           description: Filter time off requests where the request end date is equal to or after this parameter
@@ -2098,10 +2110,12 @@ paths:
         - schema:
             type: string
             example: '2020-01-01'
+            format: date
           in: query
           name: start_date
         - schema:
             type: string
+            format: date
             example: '2020-01-31'
           in: query
           name: end_date
@@ -2152,11 +2166,13 @@ paths:
           description: Include the requested attribute in the employee_compensations attribute in the response
         - schema:
             type: string
+            format: date
           in: query
           name: start_date
           description: Return payrolls whose pay period is after the start date
         - schema:
             type: string
+            format: date
           in: query
           name: end_date
           description: Return payrolls whose pay period is before the end date
@@ -2187,8 +2203,10 @@ paths:
                     - Correction
                 start_date:
                   type: string
+                  format: date
                 end_date:
                   type: string
+                  format: date
                 employee_ids:
                   type: array
                   items:
@@ -2352,12 +2370,14 @@ paths:
         description: The ID or UUID of the company
       - schema:
           type: string
+          format: date
         name: pay_period_start_date
         in: path
         required: true
         description: The start_date of the pay period for the payroll
       - schema:
           type: string
+          format: date
         name: pay_period_end_date
         in: path
         required: true
@@ -2910,9 +2930,11 @@ paths:
                   nullable: true
                 date_of_birth:
                   type: string
+                  format: date
                   nullable: true
                 start_date:
                   type: string
+                  format: date
                   nullable: true
               required:
                 - first_name
@@ -3014,9 +3036,11 @@ paths:
                   nullable: true
                 date_of_birth:
                   type: string
+                  format: date
                   nullable: true
                 start_date:
                   type: string
+                  format: date
                   nullable: true
             examples:
               Example:
@@ -3586,6 +3610,7 @@ components:
             $ref: '#/components/schemas/Employee-Custom-Field'
         date_of_birth:
           type: string
+          format: date
           nullable: true
           readOnly: true
         has_ssn:
@@ -3688,7 +3713,8 @@ components:
           description: The unit the PTO type is accrued in.
           readOnly: true
         accrual_rate:
-          type: string
+          type: number
+          format: float
           description: The number of accrual units accrued per accrual period.
           readOnly: true
         accrual_period:
@@ -3755,7 +3781,7 @@ components:
           default: true
           description: Whether or not this garnishment is currently active.
         amount:
-          type: string
+          type: number
           format: float
           readOnly: false
           description: 'The amount of the garnishment. Either a percentage or a fixed dollar amount. Represented as a float, e.g. "8.00".'
@@ -3783,10 +3809,10 @@ components:
           readOnly: false
           default: null
           description: 'The maximum deduction per annum. A null value indicates no maximum. Represented as a float, e.g. "200.00".'
-          type: string
+          type: number
           nullable: true
         pay_period_maximum:
-          type: string
+          type: number
           nullable: true
           format: float
           default: null
@@ -3820,6 +3846,7 @@ components:
           readOnly: true
         effective_date:
           type: string
+          format: date
           readOnly: false
           description: The employee's last day of work.
         run_termination_payroll:
@@ -3876,6 +3903,7 @@ components:
             - Owner
         effective_date:
           type: string
+          format: date
           readOnly: false
           description: 'The effective date for this compensation. For the first compensation, this defaults to the job''s hire date.'
       x-examples:
@@ -3940,6 +3968,7 @@ components:
               description: Whether the location of the job is active.
         hire_date:
           type: string
+          format: date
           readOnly: false
           description: The date when the employee was hired for the job.
         title:
@@ -4601,6 +4630,7 @@ components:
             - pending
             - approved
             - denied
+            - consumed
           readOnly: true
         employee_note:
           type: string
@@ -4628,7 +4658,7 @@ components:
           description: ''
           properties:
             id:
-              type: string
+              type: number
               description: The ID of the employee the time off request is for.
               readOnly: true
             full_name:
@@ -4642,7 +4672,7 @@ components:
           description: ''
           properties:
             id:
-              type: string
+              type: number
               description: The ID of the employee who initiated the time off request.
               readOnly: true
             full_name:
@@ -4656,7 +4686,7 @@ components:
           description: This value will be null if the request has not been approved.
           properties:
             id:
-              type: string
+              type: number
               description: The ID of the employee who approved the time off request.
               readOnly: true
             full_name:
@@ -5085,11 +5115,12 @@ components:
       properties:
         start_date:
           type: string
+          format: date
           description: 'The start date, inclusive, of the pay period.'
           readOnly: true
         end_date:
           type: string
-          minLength: 1
+          format: date
           description: 'The end date, inclusive, of the pay period.'
         pay_schedule_id:
           type: number
@@ -5285,10 +5316,12 @@ components:
           properties:
             start_date:
               type: string
+              format: date
               description: 'The start date, inclusive, of the pay period.'
               readOnly: true
             end_date:
               type: string
+              format: date
               description: 'The start date, inclusive, of the pay period.'
               readOnly: true
             pay_schedule_id:
@@ -5648,9 +5681,11 @@ components:
           type: string
           nullable: true
         start_date:
+          format: date
           type: string
           nullable: true
         date_of_birth:
+          format: date
           type: string
           nullable: true
     Federal-Tax-Details:
