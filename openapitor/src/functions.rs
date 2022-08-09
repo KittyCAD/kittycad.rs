@@ -33,7 +33,7 @@ pub fn generate_files(
         let mut gen = |name: &str,
                        method: &http::Method,
                        op: Option<&openapiv3::Operation>,
-                       global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>|
+                       global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>]|
          -> Result<()> {
             // Ensure we have an operation for this path and method, otherwise return early.
             let op = if let Some(op) = op {
@@ -326,7 +326,7 @@ fn generate_docs(
     name: &str,
     method: &http::Method,
     op: &openapiv3::Operation,
-    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
+    global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
 ) -> Result<String> {
     let mut docs = if let Some(summary) = &op.summary {
         summary.to_string()
@@ -482,7 +482,7 @@ fn generate_name_for_fn_schema(
 fn get_args(
     type_space: &mut crate::types::TypeSpace,
     op: &openapiv3::Operation,
-    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
+    global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
     let path_params = get_path_params(type_space, op, global_params)?;
     let query_params = get_query_params(type_space, op, global_params)?;
@@ -600,7 +600,7 @@ fn get_request_body_example(
 fn get_example_args(
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
-    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
+    global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
     let mut params = get_path_params_schema(op, spec, global_params)?;
     params.append(&mut get_query_params_schema(op, spec, global_params)?);
@@ -642,7 +642,7 @@ fn get_example_args(
 fn get_path_params_schema(
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
-    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
+    global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
 ) -> Result<
     BTreeMap<
         String,
@@ -662,7 +662,7 @@ fn get_path_params_schema(
     > = Default::default();
 
     let mut parameters = op.parameters.clone();
-    let mut global_params = global_params.clone();
+    let mut global_params = global_params.to_vec();
     // Add in our global_params.
     parameters.append(&mut global_params);
 
@@ -693,7 +693,7 @@ fn get_path_params_schema(
 fn get_path_params(
     type_space: &mut crate::types::TypeSpace,
     op: &openapiv3::Operation,
-    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
+    global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
     let params = get_path_params_schema(op, &type_space.spec, global_params)?;
 
@@ -746,7 +746,7 @@ fn get_path_params(
 fn get_query_params_schema(
     op: &openapiv3::Operation,
     spec: &openapiv3::OpenAPI,
-    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
+    global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
 ) -> Result<
     BTreeMap<
         String,
@@ -766,7 +766,7 @@ fn get_query_params_schema(
     > = Default::default();
 
     let mut parameters = op.parameters.clone();
-    let mut global_params = global_params.clone();
+    let mut global_params = global_params.to_vec();
     // Add in our global_params.
     parameters.append(&mut global_params);
 
@@ -799,7 +799,7 @@ fn get_query_params_schema(
 fn get_query_params(
     type_space: &mut crate::types::TypeSpace,
     op: &openapiv3::Operation,
-    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
+    global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
 ) -> Result<BTreeMap<String, proc_macro2::TokenStream>> {
     let params = get_query_params_schema(op, &type_space.spec, global_params)?;
 
@@ -856,7 +856,7 @@ fn get_function_body(
     op: &openapiv3::Operation,
     paginated: bool,
     opts: &crate::Opts,
-    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
+    global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
 ) -> Result<proc_macro2::TokenStream> {
     let path = name.trim_start_matches('/');
     let method_ident = format_ident!("{}", method.to_string());
@@ -1128,7 +1128,7 @@ fn generate_example_code_fn(
     tag: &str,
     op: &openapiv3::Operation,
     opts: &crate::Opts,
-    global_params: &Vec<openapiv3::ReferenceOr<openapiv3::Parameter>>,
+    global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
 ) -> Result<String> {
     // Get the docs.
     let docs = generate_docs(type_space, name, method, op, global_params)?;
@@ -1280,8 +1280,9 @@ fn generate_example_code_fn(
 
 /// Generate the example client code.
 pub fn generate_example_client(opts: &crate::Opts) -> String {
-    format!(
-        r#"// Authenticate via an API token.
+    if opts.token_endpoint.is_none() {
+        return format!(
+            r#"// Authenticate via an API token.
 let client = {}::Client::new("$TOKEN");
 
 // - OR -
@@ -1289,16 +1290,48 @@ let client = {}::Client::new("$TOKEN");
 // Authenticate with your token and host parsed from the environment variables:
 // `{}_API_TOKEN`.
 {}"#,
+            opts.name,
+            crate::template::get_env_variable_prefix(&opts.name),
+            generate_example_client_env(opts),
+        );
+    }
+
+    format!(
+        r#"// Authenticate.
+let client = {}::Client::new(
+     String::from("client-id"),
+     String::from("client-secret"),
+     String::from("redirect-uri"),
+     String::from("token"),
+     String::from("refresh-token"),
+);
+
+// - OR -
+
+// Authenticate with your credentials parsed from the environment variables:
+// - `{}_CLIENT_ID`
+// - `{}_CLIENT_SECRET`
+// - `{}_REDIRECT_URI`
+{}"#,
         opts.name,
         crate::template::get_env_variable_prefix(&opts.name),
+        generate_example_client_env(opts),
+        generate_example_client_env(opts),
         generate_example_client_env(opts),
     )
 }
 
 /// Generate the env example client code.
 fn generate_example_client_env(opts: &crate::Opts) -> String {
+    if opts.token_endpoint.is_none() {
+        return format!(
+            r#"let client = {}::Client::new_from_env();"#,
+            opts.code_package_name()
+        );
+    }
+
     format!(
-        r#"let client = {}::Client::new_from_env();"#,
+        r#"let client = {}::Client::new_from_env(String::from("token"), String::from("refresh-token"));"#,
         opts.code_package_name()
     )
 }

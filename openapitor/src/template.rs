@@ -140,6 +140,60 @@ fn generate_docs_openapi_info(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> 
 /// Generate the main docs for our client library.
 pub fn generate_docs(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> Result<String> {
     let info = generate_docs_openapi_info(spec, opts)?;
+    if opts.token_endpoint.is_some() {
+        return Ok(format!(
+            r#"{}
+//!
+//! To install the library, add the following to your `Cargo.toml` file.
+//!
+//! ```toml
+//! [dependencies]
+//! {} = "{}"
+//! ```
+//!
+//! ## Basic example
+//!
+//! Typical use will require intializing a `Client`. This requires
+//! a user agent string and set of credentials.
+//!
+//! ```rust,no_run
+//! use {}::Client;
+//!
+//! let client = Client::new(
+//!     String::from("client-id"),
+//!     String::from("client-secret"),
+//!     String::from("redirect-uri"),
+//!     String::from("token"),
+//!     String::from("refresh-token"),
+//! );
+//! ```
+//!
+//! Alternatively, the library can search for most of the variables required for
+//! the client in the environment:
+//!
+//! - `{}_CLIENT_ID`
+//! - `{}_CLIENT_SECRET`
+//! - `{}_REDIRECT_URI`
+//!
+//! And then you can create a client from the environment.
+//!
+//! ```rust,no_run
+//! use {}::Client;
+//!
+//! let client = Client::new_from_env(String::from("token"), String::from("refresh-token"));
+//! ```
+//!"#,
+            info,
+            opts.package_name(),
+            opts.version,
+            opts.code_package_name(),
+            get_env_variable_prefix(&opts.name),
+            get_env_variable_prefix(&opts.name),
+            get_env_variable_prefix(&opts.name),
+            opts.code_package_name(),
+        ));
+    }
+
     Ok(format!(
         r#"{}
 //!
@@ -188,4 +242,6 @@ pub fn generate_docs(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> Result<St
 /// Get the prefix of the environment variables.
 pub fn get_env_variable_prefix(name: &str) -> String {
     to_screaming_snake_case(name)
+        .trim_end_matches("_API")
+        .to_string()
 }
