@@ -458,38 +458,33 @@ impl TypeSpace {
             // Get the type name for the schema.
             let mut type_name = if v.should_render()? {
                 // Check if the name for the property is already taken.
-                let t = if let Some(rendered) = self.types.get(&proper_name(&prop)) {
-                    if rendered.schema_kind != inner_schema.schema_kind
-                        || rendered.schema_data != inner_schema.schema_data
-                    {
+                // Make sure there isn't an existing reference with this name.
+                let mut t = if let Some(components) = &self.spec.components {
+                    if components.schemas.contains_key(&proper_name(&prop)) {
                         proper_name(&format!("{} {}", struct_name, prop))
-                    } else {
-                        // Make sure there isn't an existing reference with this name.
-                        if let Some(components) = &self.spec.components {
-                            if components.schemas.contains_key(&proper_name(&prop)) {
-                                proper_name(&format!("{} {}", struct_name, prop))
-                            } else {
-                                prop.to_string()
-                            }
-                        } else {
-                            proper_name(&prop)
-                        }
-                    }
-                } else {
-                    // Make sure there isn't an existing reference with this name.
-                    if let Some(components) = &self.spec.components {
-                        if components.schemas.contains_key(&proper_name(&prop)) {
-                            proper_name(&format!("{} {}", struct_name, prop))
-                        } else {
-                            prop.to_string()
-                        }
                     } else {
                         proper_name(&prop)
                     }
+                } else {
+                    proper_name(&prop)
                 };
 
-                // Render the schema.
-                self.render_schema(&t, &inner_schema)?;
+                let mut should_render = true;
+
+                if let Some(rendered) = self.types.get(&t) {
+                    if rendered.schema_kind != inner_schema.schema_kind
+                        || rendered.schema_data != inner_schema.schema_data
+                    {
+                        t = proper_name(&format!("{} {}", struct_name, prop));
+                    } else {
+                        should_render = false;
+                    }
+                }
+
+                if should_render {
+                    // Render the schema.
+                    self.render_schema(&t, &inner_schema)?;
+                }
 
                 get_type_name_for_schema(&t, &inner_schema, &self.spec, true)?
             } else if let openapiv3::ReferenceOr::Item(i) = v {
