@@ -620,7 +620,28 @@ fn get_example_args(
                 true,
             )?,
             openapiv3::ReferenceOr::Item(s) => {
-                crate::types::get_type_name_for_schema(&name, s, &type_space.spec, true)?
+                let mut t_name =
+                    crate::types::get_type_name_for_schema(&name, s, &type_space.spec, true)?;
+                // Check if we should render the schema.
+                if schema.should_render()? {
+                    // Check if we already have a type with this name.
+                    if let Some(rendered) = type_space
+                        .types
+                        .get(&t_name.strip_option()?.strip_vec()?.rendered()?)
+                    {
+                        if rendered != s {
+                            // Update the name of the type.
+                            t_name = crate::types::get_type_name_for_schema(
+                                &format!("{} {}", op.get_fn_name()?, name),
+                                s,
+                                &type_space.spec,
+                                true,
+                            )?;
+                        }
+                    }
+                }
+
+                t_name
             }
         };
 
