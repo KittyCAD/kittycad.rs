@@ -8,7 +8,7 @@ description = "An OpenAPI client generator."
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
 chrono = { version = "0.4", features = ["serde"] }
-clap = { version = "^3.2.15", features = ["cargo", "derive", "env", "unicode"] }
+clap = { version = "^3.2.16", features = ["cargo", "derive", "env", "unicode"] }
 data-encoding = "^2.3.2"
 http = "^0.2.8"
 format_serde_error = "^0.3.0"
@@ -30,7 +30,7 @@ rustfmt-wrapper = "^0.2"
 schemars = { version = "0.8", features = ["bigdecimal", "chrono", "url", "uuid1"] }
 serde = { version = "1", features = [ "derive" ]}
 serde_json = "1"
-serde_yaml = "^0.8.26"
+serde_yaml = "^0.9.4"
 slog = "^2.7.0"
 slog-async = "^2.7.0"
 slog-json = "^2.6.1"
