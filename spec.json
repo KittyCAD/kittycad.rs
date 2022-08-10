@@ -108,6 +108,11 @@
             "title": "String",
             "type": "string"
           },
+          "litterbox": {
+            "description": "If the API call was spawned from the litterbox or not.",
+            "nullable": true,
+            "type": "boolean"
+          },
           "method": {
             "allOf": [
               {
@@ -4981,7 +4986,10 @@
       "UnitLengthFormat": {
         "description": "The valid types of length unit formats.",
         "enum": [
+          "millimeter",
+          "centimeter",
           "meter",
+          "kilomter",
           "foot",
           "inch",
           "mile",
@@ -5297,6 +5305,7 @@
         "description": "The valid types of mass unit formats.",
         "enum": [
           "gram",
+          "kilogram",
           "metric_ton",
           "pound",
           "long_ton",
@@ -5308,7 +5317,30 @@
         ],
         "type": "string"
       },
-      "UnitMetricConversion": {
+      "UnitMetricPower": {
+        "description": "The valid types of metric unit formats.",
+        "enum": [
+          "atto",
+          "femto",
+          "pico",
+          "nano",
+          "micro",
+          "milli",
+          "centi",
+          "deci",
+          "metric_unit",
+          "deca",
+          "hecto",
+          "kilo",
+          "mega",
+          "giga",
+          "tera",
+          "peta",
+          "exa"
+        ],
+        "type": "string"
+      },
+      "UnitMetricPowerConversion": {
         "description": "A unit conversion.",
         "properties": {
           "completed_at": {
@@ -5352,7 +5384,7 @@
           "output_format": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/UnitMetricFormat"
+                "$ref": "#/components/schemas/UnitMetricPower"
               }
             ],
             "description": "The output format of the unit conversion."
@@ -5360,7 +5392,7 @@
           "src_format": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/UnitMetricFormat"
+                "$ref": "#/components/schemas/UnitMetricPower"
               }
             ],
             "description": "The source format of the unit conversion."
@@ -5401,28 +5433,191 @@
         ],
         "type": "object"
       },
-      "UnitMetricFormat": {
-        "description": "The valid types of metric unit formats.",
-        "enum": [
-          "atto",
-          "femto",
-          "pico",
-          "nano",
-          "micro",
-          "milli",
-          "centi",
-          "deci",
-          "metric_unit",
-          "deca",
-          "hecto",
-          "kilo",
-          "mega",
-          "giga",
-          "tera",
-          "peta",
-          "exa"
+      "UnitMetricPowerCubedConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitMetricPower"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitMetricPower"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
         ],
-        "type": "string"
+        "type": "object"
+      },
+      "UnitMetricPowerSquaredConversion": {
+        "description": "A unit conversion.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the unit conversion was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the unit conversion was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."
+          },
+          "input": {
+            "default": 0.0,
+            "description": "The input value.",
+            "format": "float",
+            "type": "number"
+          },
+          "output": {
+            "description": "The resulting value.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "output_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitMetricPower"
+              }
+            ],
+            "description": "The output format of the unit conversion."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitMetricPower"
+              }
+            ],
+            "description": "The source format of the unit conversion."
+          },
+          "started_at": {
+            "description": "The time and date the unit conversion was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the unit conversion."
+          },
+          "updated_at": {
+            "description": "The time and date the unit conversion was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the unit conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_format",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
       },
       "UnitPowerConversion": {
         "description": "A unit conversion.",
@@ -6347,8 +6542,9 @@
       "UnitVolumeFormat": {
         "description": "The valid types of volume unit formats.",
         "enum": [
-          "cubic_meter",
           "cubic_millimeter",
+          "cubic_centimeter",
+          "cubic_meter",
           "cubic_kilometer",
           "liter",
           "cubic_foot",
@@ -10210,10 +10406,10 @@
         ]
       }
     },
-    "/unit/conversion/metric/{src_format}/{output_format}": {
+    "/unit/conversion/metric/cubed/{src_format}/{output_format}": {
       "get": {
-        "description": "Convert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
-        "operationId": "get_metric_unit_conversion",
+        "description": "Convert a metric cubed unit value to another metric cubed unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_metric_power_cubed_unit_conversion",
         "parameters": [
           {
             "description": "The output format of the unit.",
@@ -10221,7 +10417,7 @@
             "name": "output_format",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/UnitMetricFormat"
+              "$ref": "#/components/schemas/UnitMetricPower"
             },
             "style": "simple"
           },
@@ -10231,7 +10427,7 @@
             "name": "src_format",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/UnitMetricFormat"
+              "$ref": "#/components/schemas/UnitMetricPower"
             },
             "style": "simple"
           },
@@ -10252,7 +10448,103 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UnitMetricConversion"
+                  "$ref": "#/components/schemas/UnitMetricPowerCubedConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert metric cubed units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/metric/power/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a metric unit value to another metric unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_metric_power_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitMetricPower"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitMetricPower"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitMetricPowerConversion"
                 }
               }
             },
@@ -10300,6 +10592,102 @@
           }
         },
         "summary": "Convert metric units.",
+        "tags": [
+          "unit",
+          "beta"
+        ]
+      }
+    },
+    "/unit/conversion/metric/squared/{src_format}/{output_format}": {
+      "get": {
+        "description": "Convert a metric squared unit value to another metric squared unit value. This is a nice endpoint to use for helper functions.",
+        "operationId": "get_metric_power_squared_unit_conversion",
+        "parameters": [
+          {
+            "description": "The output format of the unit.",
+            "in": "path",
+            "name": "output_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitMetricPower"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The source format of the unit.",
+            "in": "path",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UnitMetricPower"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The initial value.",
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitMetricPowerSquaredConversion"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Convert metric squared units.",
         "tags": [
           "unit",
           "beta"
