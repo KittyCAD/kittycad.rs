@@ -116,7 +116,7 @@ async fn test_stream() {
 
     let limit = 2;
     let api_calls = client.api_calls();
-    let mut stream = api_calls.list_stream(Some(limit), None);
+    let mut stream = api_calls.user_list_stream(Some(limit), None);
 
     let mut ids: Vec<String> = Default::default();
     loop {
