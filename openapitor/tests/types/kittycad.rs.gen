@@ -1081,9 +1081,11 @@ impl tabled::Tabled for AsyncApiCall {
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
     FileConversion(FileConversion),
+    FileCenterOfMass(FileCenterOfMass),
     FileMass(FileMass),
     FileVolume(FileVolume),
     FileDensity(FileDensity),
+    FileSurfaceArea(FileSurfaceArea),
 }
 
 #[doc = "A single page of results"]
@@ -1171,8 +1173,10 @@ impl tabled::Tabled for AsyncApiCallResultsPage {
 pub enum AsyncApiCallType {
     FileConversion,
     FileVolume,
+    FileCenterOfMass,
     FileMass,
     FileDensity,
+    FileSurfaceArea,
 }
 
 #[doc = "The billing information for payments."]
@@ -3725,6 +3729,110 @@ impl tabled::Tabled for ExtendedUserResultsPage {
     }
 }
 
+#[doc = "A file center of mass result."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FileCenterOfMass {
+    #[doc = "The resulting center of mass."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub center_of_mass: Option<Vec<f64>>,
+    #[doc = "The time and date the mass was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the mass was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the center of mass request.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The material density as denoted by the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub material_density: Option<f64>,
+    #[doc = "The source format of the file."]
+    pub src_format: FileSourceFormat,
+    #[doc = "The time and date the mass was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the mass."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the mass was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the mass."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for FileCenterOfMass {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for FileCenterOfMass {
+    const LENGTH: usize = 11;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(center_of_mass) = &self.center_of_mass {
+                format!("{:?}", center_of_mass)
+            } else {
+                String::new()
+            },
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(material_density) = &self.material_density {
+                format!("{:?}", material_density)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "center_of_mass".to_string(),
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "material_density".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
 #[doc = "A file conversion."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4099,6 +4207,101 @@ pub enum FileSourceFormat {
     #[serde(rename = "fbx")]
     #[display("fbx")]
     Fbx,
+}
+
+#[doc = "A file surface area result."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FileSurfaceArea {
+    #[doc = "The time and date the density was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the density was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the density request.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The source format of the file."]
+    pub src_format: FileSourceFormat,
+    #[doc = "The time and date the density was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the density."]
+    pub status: ApiCallStatus,
+    #[doc = "The resulting surface area."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub surface_area: Option<f64>,
+    #[doc = "The time and date the density was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the density."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for FileSurfaceArea {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for FileSurfaceArea {
+    const LENGTH: usize = 10;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            if let Some(surface_area) = &self.surface_area {
+                format!("{:?}", surface_area)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "surface_area".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
 }
 
 #[doc = "Metadata about our file system.\n\nThis is mostly used for internal purposes and debugging."]
