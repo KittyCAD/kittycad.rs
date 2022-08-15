@@ -440,7 +440,7 @@ pub enum AccountProvider {
 
 #[doc = "A response for a query on the API call table that is grouped by something."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ApiCallQueryGroup {
     pub count: i64,
@@ -797,7 +797,7 @@ impl tabled::Tabled for ApiCallWithPriceResultsPage {
 
 #[doc = "An API token.\n\nThese are used to authenticate users with Bearer authentication."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ApiToken {
     #[doc = "The date and time the API token was created."]
@@ -862,7 +862,7 @@ impl tabled::Tabled for ApiToken {
 
 #[doc = "A single page of results"]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ApiTokenResultsPage {
     #[doc = "list of items on this page of results"]
@@ -929,7 +929,7 @@ impl tabled::Tabled for ApiTokenResultsPage {
 
 #[doc = "Information about a third party app client."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AppClientInfo {
     #[doc = "The URL for consent."]
@@ -964,7 +964,7 @@ impl tabled::Tabled for AppClientInfo {
 
 #[doc = "An async API call."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AsyncApiCall {
     #[doc = "The time and date the async API call was completed."]
@@ -1089,14 +1089,16 @@ impl tabled::Tabled for AsyncApiCall {
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
     FileConversion(FileConversion),
+    FileCenterOfMass(FileCenterOfMass),
     FileMass(FileMass),
     FileVolume(FileVolume),
     FileDensity(FileDensity),
+    FileSurfaceArea(FileSurfaceArea),
 }
 
 #[doc = "A single page of results"]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AsyncApiCallResultsPage {
     #[doc = "list of items on this page of results"]
@@ -1179,13 +1181,15 @@ impl tabled::Tabled for AsyncApiCallResultsPage {
 pub enum AsyncApiCallType {
     FileConversion,
     FileVolume,
+    FileCenterOfMass,
     FileMass,
     FileDensity,
+    FileSurfaceArea,
 }
 
 #[doc = "The billing information for payments."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct BillingInfo {
     #[doc = "The address of the customer."]
@@ -1238,7 +1242,7 @@ impl tabled::Tabled for BillingInfo {
 
 #[doc = "Metadata about our cache.\n\nThis is mostly used for internal purposes and debugging."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CacheMetadata {
     #[doc = "If the cache returned an ok response from ping."]
@@ -1268,7 +1272,7 @@ impl tabled::Tabled for CacheMetadata {
 
 #[doc = "The card details of a payment method."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CardDetails {
     #[doc = "Card brand.\n\nCan be `amex`, `diners`, `discover`, `jcb`, `mastercard`, `unionpay`, \
@@ -1371,7 +1375,7 @@ impl tabled::Tabled for CardDetails {
 
 #[doc = "Cluster information."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Cluster {
     #[doc = "The IP address of the cluster."]
@@ -1482,7 +1486,7 @@ pub enum CodeLanguage {
 
 #[doc = "Output of the code being executed."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CodeOutput {
     #[doc = "The contents of the files requested if they were passed."]
@@ -1540,7 +1544,7 @@ impl tabled::Tabled for CodeOutput {
 #[doc = "Commit holds the Git-commit (SHA1) that a binary was built from, as reported in the \
          version-string of external tools, such as `containerd`, or `runC`."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Commit {
     #[doc = "Commit ID of external tool expected by dockerd as set at build time."]
@@ -2660,7 +2664,7 @@ impl tabled::Tabled for CustomerBalance {
 
 #[doc = "The form for a device access token request."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct DeviceAccessTokenRequestForm {
     #[doc = "The client ID."]
@@ -2702,7 +2706,7 @@ impl tabled::Tabled for DeviceAccessTokenRequestForm {
 
 #[doc = "The request parameters for the OAuth 2.0 Device Authorization Grant flow."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct DeviceAuthRequestForm {
     #[doc = "The client ID."]
@@ -2733,7 +2737,7 @@ impl tabled::Tabled for DeviceAuthRequestForm {
 #[doc = "The request parameters to verify the `user_code` for the OAuth 2.0 Device Authorization \
          Grant."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct DeviceAuthVerifyParams {
     #[doc = "The user code."]
@@ -3384,7 +3388,7 @@ impl tabled::Tabled for DockerSystemInfo {
 
 #[doc = "The body of the form for email authentication."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct EmailAuthenticationForm {
     #[doc = "The URL to redirect back to after we have authenticated."]
@@ -3506,7 +3510,7 @@ pub enum Environment {
 
 #[doc = "Error information from a response."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Error {
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3595,7 +3599,7 @@ impl tabled::Tabled for ExecutorMetadata {
          mapping of the user's information, including that of our third party services we use for \
          users: MailChimp, Stripe, and Zendesk."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ExtendedUser {
     #[doc = "The user's company."]
@@ -3752,7 +3756,7 @@ impl tabled::Tabled for ExtendedUser {
 
 #[doc = "A single page of results"]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ExtendedUserResultsPage {
     #[doc = "list of items on this page of results"]
@@ -3817,9 +3821,114 @@ impl tabled::Tabled for ExtendedUserResultsPage {
     }
 }
 
-#[doc = "A file conversion."]
+#[doc = "A file center of mass result."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FileCenterOfMass {
+    #[doc = "The resulting center of mass."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub center_of_mass: Option<Vec<f64>>,
+    #[doc = "The time and date the mass was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the mass was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the center of mass request.\n\nThis is the same as the API \
+             call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The material density as denoted by the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub material_density: Option<f64>,
+    #[doc = "The source format of the file."]
+    pub src_format: FileSourceFormat,
+    #[doc = "The time and date the mass was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the mass."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the mass was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the mass."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for FileCenterOfMass {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for FileCenterOfMass {
+    const LENGTH: usize = 11;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(center_of_mass) = &self.center_of_mass {
+                format!("{:?}", center_of_mass)
+            } else {
+                String::new()
+            },
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(material_density) = &self.material_density {
+                format!("{:?}", material_density)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "center_of_mass".to_string(),
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "material_density".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "A file conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FileConversion {
     #[doc = "The time and date the file conversion was completed."]
@@ -4193,10 +4302,105 @@ pub enum FileSourceFormat {
     Fbx,
 }
 
+#[doc = "A file surface area result."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FileSurfaceArea {
+    #[doc = "The time and date the density was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the density was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the density request.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The source format of the file."]
+    pub src_format: FileSourceFormat,
+    #[doc = "The time and date the density was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the density."]
+    pub status: ApiCallStatus,
+    #[doc = "The resulting surface area."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub surface_area: Option<f64>,
+    #[doc = "The time and date the density was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the density."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for FileSurfaceArea {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for FileSurfaceArea {
+    const LENGTH: usize = 10;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            if let Some(surface_area) = &self.surface_area {
+                format!("{:?}", surface_area)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "surface_area".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
 #[doc = "Metadata about our file system.\n\nThis is mostly used for internal purposes and \
          debugging."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FileSystemMetadata {
     #[doc = "If the file system passed a sanity check."]
@@ -4321,7 +4525,7 @@ impl tabled::Tabled for FileVolume {
 
 #[doc = "Gateway information."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Gateway {
     #[doc = "The auth timeout of the gateway."]
@@ -4396,7 +4600,7 @@ impl tabled::Tabled for Gateway {
 
 #[doc = "IndexInfo contains information about a registry."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct IndexInfo {
     #[doc = "List of mirrors, expressed as URIs."]
@@ -4899,7 +5103,7 @@ impl tabled::Tabled for Jetstream {
 
 #[doc = "Jetstream API statistics."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct JetstreamApiStats {
     #[doc = "The number of errors."]
@@ -4956,7 +5160,7 @@ impl tabled::Tabled for JetstreamApiStats {
 
 #[doc = "Jetstream configuration."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct JetstreamConfig {
     #[doc = "The domain."]
@@ -5022,7 +5226,7 @@ impl tabled::Tabled for JetstreamConfig {
 
 #[doc = "Jetstream statistics."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct JetstreamStats {
     #[doc = "The number of accounts."]
@@ -5115,7 +5319,7 @@ impl tabled::Tabled for JetstreamStats {
 
 #[doc = "Leaf node information."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct LeafNode {
     #[doc = "The auth timeout of the leaf node."]
@@ -5181,7 +5385,7 @@ impl tabled::Tabled for LeafNode {
 
 #[doc = "Jetstream statistics."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct MetaClusterInfo {
     #[doc = "The size of the cluster."]
@@ -5346,7 +5550,7 @@ pub enum Method {
 #[doc = "The struct that is used to create a new record. This is automatically generated and has \
          all the same fields as the main struct only it is missing the `id`."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct NewAddress {
     #[doc = "The city component."]
@@ -5439,7 +5643,7 @@ impl tabled::Tabled for NewAddress {
 
 #[doc = "Information about an OAuth 2.0 client."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Oauth2ClientInfo {
     #[doc = "Value used for [CSRF](https://tools.ietf.org/html/rfc6749#section-10.12) protection \
@@ -5527,7 +5731,7 @@ impl std::default::Default for Oauth2GrantType {
 
 #[doc = "Output file contents."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct OutputFile {
     #[doc = "The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for \
@@ -5573,7 +5777,7 @@ impl tabled::Tabled for OutputFile {
 
 #[doc = "A payment intent response."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PaymentIntent {
     #[doc = "The client secret is used for client-side retrieval using a publishable key. The \
@@ -5677,7 +5881,7 @@ impl tabled::Tabled for PaymentMethod {
 
 #[doc = "Card checks."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PaymentMethodCardChecks {
     #[doc = "If a address line1 was provided, results of the check, one of `pass`, `fail`, \
@@ -5977,7 +6181,7 @@ pub enum PhysicsConstantName {
          list. V1 plugins are \\\"lazily\\\" loaded, and are not returned in this list if there is \
          no resource using the plugin."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PluginsInfo {
     #[doc = "Names of available authorization plugins."]
@@ -6043,7 +6247,7 @@ impl tabled::Tabled for PluginsInfo {
 
 #[doc = "The response from the `/ping` endpoint."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Pong {
     #[doc = "The pong response."]
@@ -6073,7 +6277,7 @@ impl tabled::Tabled for Pong {
 
 #[doc = "RegistryServiceConfig stores daemon registry services configuration."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct RegistryServiceConfig {
     #[doc = "List of IP ranges to which nondistributable artifacts can be pushed, using the CIDR syntax [RFC 4632](https://tools.ietf.org/html/4632).  Some images (for example, Windows base images) contain artifacts whose distribution is restricted by license. When these images are pushed to a registry, restricted artifacts are not included.  This configuration override this behavior, and enables the daemon to push nondistributable artifacts to all registries whose resolved IP address is within the subnet described by the CIDR syntax.  This option is useful when pushing images containing nondistributable artifacts to a registry on an air-gapped network so hosts on that network can pull the images without connecting to another server.\n\n**Warning**: Nondistributable artifacts typically have restrictions on how and where they can be distributed and shared. Only use this feature to push artifacts to private registries and ensure that you are in compliance with any terms that cover redistributing nondistributable artifacts."]
@@ -6164,7 +6368,7 @@ impl tabled::Tabled for RegistryServiceConfig {
          runtime.  The runtime is invoked by the daemon via the `containerd` daemon. OCI runtimes \
          act as an interface to the Linux kernel namespaces, cgroups, and SELinux."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Runtime {
     #[doc = "Name and, optional, path, of the OCI executable binary.  If the path is omitted, the \
@@ -6210,7 +6414,7 @@ impl tabled::Tabled for Runtime {
 
 #[doc = "An authentication session.\n\nFor our UIs, these are automatically created by Next.js."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Session {
     #[doc = "The date and time the session was created."]
@@ -6328,7 +6532,7 @@ pub enum SystemInfoCgroupVersionEnum {
 }
 
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct SystemInfoDefaultAddressPools {
     #[doc = "The network address in CIDR format"]
@@ -10347,7 +10551,7 @@ pub enum UnitVolumeFormat {
 
 #[doc = "The user-modifiable parts of a User."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UpdateUser {
     #[doc = "The user's company."]
@@ -10427,7 +10631,7 @@ impl tabled::Tabled for UpdateUser {
 
 #[doc = "A user."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct User {
     #[doc = "The user's company."]
@@ -10557,7 +10761,7 @@ impl tabled::Tabled for User {
 
 #[doc = "A single page of results"]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UserResultsPage {
     #[doc = "list of items on this page of results"]
@@ -10625,7 +10829,7 @@ impl tabled::Tabled for UserResultsPage {
 #[doc = "A verification token for a user.\n\nThis is typically used to verify a user's email \
          address."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct VerificationToken {
     #[doc = "The date and time the verification token was created."]

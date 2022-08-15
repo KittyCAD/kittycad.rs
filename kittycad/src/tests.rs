@@ -133,7 +133,7 @@ async fn test_stream() {
             Ok(None) => {
                 break;
             }
-            Err(err) => std::panic::panic_any(err),
+            Err(err) => panic!("{}", err),
         }
     }
 }
