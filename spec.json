@@ -482,6 +482,100 @@
             "type": "object"
           },
           {
+            "description": "File center of mass.",
+            "properties": {
+              "center_of_mass": {
+                "description": "The resulting center of mass.",
+                "items": {
+                  "format": "double",
+                  "type": "number"
+                },
+                "nullable": true,
+                "type": "array"
+              },
+              "completed_at": {
+                "description": "The time and date the mass was completed.",
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
+              },
+              "created_at": {
+                "description": "The time and date the mass was created.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
+              },
+              "error": {
+                "description": "The error the function returned, if any.",
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ],
+                "description": "The unique identifier of the center of mass request.\n\nThis is the same as the API call ID."
+              },
+              "material_density": {
+                "default": 0.0,
+                "description": "The material density as denoted by the user.",
+                "format": "float",
+                "type": "number"
+              },
+              "src_format": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FileSourceFormat"
+                  }
+                ],
+                "description": "The source format of the file."
+              },
+              "started_at": {
+                "description": "The time and date the mass was started.",
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
+              },
+              "status": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApiCallStatus"
+                  }
+                ],
+                "description": "The status of the mass."
+              },
+              "type": {
+                "enum": [
+                  "FileCenterOfMass"
+                ],
+                "type": "string"
+              },
+              "updated_at": {
+                "description": "The time and date the mass was last updated.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
+              },
+              "user_id": {
+                "description": "The user ID of the user who created the mass.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "created_at",
+              "id",
+              "src_format",
+              "status",
+              "type",
+              "updated_at"
+            ],
+            "type": "object"
+          },
+          {
             "description": "A file mass.",
             "properties": {
               "completed_at": {
@@ -747,6 +841,91 @@
               "updated_at"
             ],
             "type": "object"
+          },
+          {
+            "description": "A file surface area.",
+            "properties": {
+              "completed_at": {
+                "description": "The time and date the density was completed.",
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
+              },
+              "created_at": {
+                "description": "The time and date the density was created.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
+              },
+              "error": {
+                "description": "The error the function returned, if any.",
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ],
+                "description": "The unique identifier of the density request.\n\nThis is the same as the API call ID."
+              },
+              "src_format": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FileSourceFormat"
+                  }
+                ],
+                "description": "The source format of the file."
+              },
+              "started_at": {
+                "description": "The time and date the density was started.",
+                "format": "date-time",
+                "nullable": true,
+                "title": "DateTime",
+                "type": "string"
+              },
+              "status": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApiCallStatus"
+                  }
+                ],
+                "description": "The status of the density."
+              },
+              "surface_area": {
+                "description": "The resulting surface area.",
+                "format": "double",
+                "nullable": true,
+                "type": "number"
+              },
+              "type": {
+                "enum": [
+                  "FileSurfaceArea"
+                ],
+                "type": "string"
+              },
+              "updated_at": {
+                "description": "The time and date the density was last updated.",
+                "format": "date-time",
+                "title": "DateTime",
+                "type": "string"
+              },
+              "user_id": {
+                "description": "The user ID of the user who created the density.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "created_at",
+              "id",
+              "src_format",
+              "status",
+              "type",
+              "updated_at"
+            ],
+            "type": "object"
           }
         ]
       },
@@ -776,8 +955,10 @@
         "enum": [
           "FileConversion",
           "FileVolume",
+          "FileCenterOfMass",
           "FileMass",
-          "FileDensity"
+          "FileDensity",
+          "FileSurfaceArea"
         ],
         "type": "string"
       },
@@ -2231,6 +2412,93 @@
         ],
         "type": "object"
       },
+      "FileCenterOfMass": {
+        "description": "A file center of mass result.",
+        "properties": {
+          "center_of_mass": {
+            "description": "The resulting center of mass.",
+            "items": {
+              "format": "double",
+              "type": "number"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "completed_at": {
+            "description": "The time and date the mass was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the mass was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the center of mass request.\n\nThis is the same as the API call ID."
+          },
+          "material_density": {
+            "default": 0.0,
+            "description": "The material density as denoted by the user.",
+            "format": "float",
+            "type": "number"
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FileSourceFormat"
+              }
+            ],
+            "description": "The source format of the file."
+          },
+          "started_at": {
+            "description": "The time and date the mass was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the mass."
+          },
+          "updated_at": {
+            "description": "The time and date the mass was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the mass.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      },
       "FileConversion": {
         "description": "A file conversion.",
         "properties": {
@@ -2509,6 +2777,84 @@
           "fbx"
         ],
         "type": "string"
+      },
+      "FileSurfaceArea": {
+        "description": "A file surface area result.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the density was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the density was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the density request.\n\nThis is the same as the API call ID."
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FileSourceFormat"
+              }
+            ],
+            "description": "The source format of the file."
+          },
+          "started_at": {
+            "description": "The time and date the density was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the density."
+          },
+          "surface_area": {
+            "description": "The resulting surface area.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "updated_at": {
+            "description": "The time and date the density was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the density.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
       },
       "FileSystemMetadata": {
         "description": "Metadata about our file system.\n\nThis is mostly used for internal purposes and debugging.",
@@ -7776,6 +8122,103 @@
         ]
       }
     },
+    "/file/center-of-mass": {
+      "post": {
+        "description": "Get the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "operationId": "create_file_center_of_mass",
+        "parameters": [
+          {
+            "description": "The material density.",
+            "in": "query",
+            "name": "material_density",
+            "required": true,
+            "schema": {
+              "format": "float",
+              "type": "number"
+            },
+            "style": "form"
+          },
+          {
+            "description": "The format of the file.",
+            "in": "query",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FileSourceFormat"
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "format": "binary",
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileCenterOfMass"
+                }
+              }
+            },
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Get CAD file center of mass.",
+        "tags": [
+          "file",
+          "beta"
+        ]
+      }
+    },
     "/file/conversion/{src_format}/{output_format}": {
       "post": {
         "description": "Convert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\nIf the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
@@ -8228,6 +8671,92 @@
           }
         },
         "summary": "Get CAD file mass.",
+        "tags": [
+          "file",
+          "beta"
+        ]
+      }
+    },
+    "/file/surface-area": {
+      "post": {
+        "description": "Get the surface area of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "operationId": "create_file_surface_area",
+        "parameters": [
+          {
+            "description": "The format of the file.",
+            "in": "query",
+            "name": "src_format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FileSourceFormat"
+            },
+            "style": "form"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "format": "binary",
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileSurfaceArea"
+                }
+              }
+            },
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Get CAD file surface area.",
         "tags": [
           "file",
           "beta"
