@@ -126,11 +126,31 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
         get_tags(name.as_str(), "TRACE", op.trace.as_ref())?;
     }
 
+    // Combine our tags with our tags from the paths, because some APIs do not add the
+    // tags to the top level tags components.
+    let mut tags = spec.tags.clone();
+    for tag in &tags_with_paths {
+        if !spec
+            .tags
+            .iter()
+            .map(|t| t.name.to_string())
+            .any(|x| x == *tag)
+        {
+            // Add this tag to our list of tags.
+            tags.push(openapiv3::Tag {
+                name: tag.to_string(),
+                description: Default::default(),
+                external_docs: Default::default(),
+                extensions: Default::default(),
+            })
+        }
+    }
+
     /*
      * Import the module for each tag.
      * Tags are how functions are grouped.
      */
-    for tag in spec.tags.iter() {
+    for tag in tags.iter() {
         if !tags_with_paths.contains(&tag.name) {
             // Continue if this tag has no paths.
             continue;
@@ -164,7 +184,7 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
      * Generate a function for each tag.
      * Tags are how functions are grouped.
      */
-    for tag in spec.tags.iter() {
+    for tag in tags.iter() {
         if !tags_with_paths.contains(&tag.name) {
             // Continue if this tag has no paths.
             continue;

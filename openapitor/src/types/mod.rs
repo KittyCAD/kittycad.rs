@@ -1512,7 +1512,7 @@ fn render_enum_object_internal(
 }
 
 /// A holder for our tag and content for enums.
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct TagContent {
     tag: Option<String>,
     content: Option<String>,

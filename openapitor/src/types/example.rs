@@ -51,7 +51,7 @@ pub fn generate_example_json_from_schema(
                 // Generate a random string.
                 let mut s = String::new();
                 for _ in 0..rng.gen_range(min_length..max_length) {
-                    s.push(rng.gen_range(b'a'..b'z') as char);
+                    s.push(rng.gen_range(b'a'..=b'z') as char);
                 }
                 return Ok(serde_json::Value::String(s));
             }
@@ -69,7 +69,7 @@ pub fn generate_example_json_from_schema(
                     // Return a random password.
                     let mut password = String::new();
                     for _ in 0..rng.gen_range(8..16) {
-                        password.push(rng.gen_range(b'a'..b'z') as char);
+                        password.push(rng.gen_range(b'a'..=b'z') as char);
                     }
                     serde_json::Value::String(password)
                 }
