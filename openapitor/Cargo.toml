@@ -1,6 +1,6 @@
 [package]
 name = "openapitor"
-version = "0.0.4"
+version = "0.0.5"
 edition = "2018"
 license = "MPL-2.0"
 description = "An OpenAPI client generator."

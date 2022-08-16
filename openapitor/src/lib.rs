@@ -130,11 +130,11 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
     // tags to the top level tags components.
     let mut tags = spec.tags.clone();
     for tag in &tags_with_paths {
-        if !spec
-            .tags
+        // Make sure we don't add it twice or that we don't already have it.
+        if !tags
             .iter()
             .map(|t| t.name.to_string())
-            .any(|x| x == *tag)
+            .any(|x| clean_tag_name(&x) == clean_tag_name(tag))
         {
             // Add this tag to our list of tags.
             tags.push(openapiv3::Tag {
