@@ -139,6 +139,8 @@ impl Client {
             reqwest_retry::policies::ExponentialBackoff::builder().build_with_max_retries(3);
         let client = reqwest::Client::builder()
             .user_agent(APP_USER_AGENT)
+            .timeout(std::time::Duration::from_secs(60))
+            .connect_timeout(std::time::Duration::from_secs(60))
             .build();
         match client {
             Ok(c) => {

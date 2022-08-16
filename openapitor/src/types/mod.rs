@@ -112,12 +112,14 @@ impl TypeSpace {
             // We have a schema with the name already.
             // Let's check if it's the same.
             if &s != item {
-                // We have a problem they are not the same.
+                // Get the diff of the schemas.
+                let new = serde_json::to_string(&s)?;
+                let old = serde_json::to_string(&item)?;
                 anyhow::bail!(
-                    "The schema {} is already defined with a different schema\nnew: {:?}\nold: {:?}",
+                    "Schema {} has changed.\n\nnew: {}\n\nold: {}",
                     name,
-                    s,
-                    item
+                    new,
+                    old
                 );
             }
         } else {
@@ -501,6 +503,14 @@ impl TypeSpace {
                     proper_name(&prop)
                 };
 
+                // Check if the name is already taken.
+                if let Some(rendered) = self.types.get(&t) {
+                    if *rendered != inner_schema {
+                        // The name is already taken, so we need to make a new name.
+                        t = proper_name(&format!("{} {}", struct_name, prop));
+                    }
+                }
+
                 let mut should_render = true;
 
                 if let Some(rendered) = self.types.get(&t) {
@@ -807,7 +817,7 @@ impl TypeSpace {
 
         let rendered = quote! {
             #description
-            #[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Hash, Debug, Clone, schemars::JsonSchema, tabled::Tabled, clap::ValueEnum, parse_display::FromStr, parse_display::Display)]
+            #[derive(serde::Serialize, serde::Deserialize, PartialEq, Hash, Debug, Clone, schemars::JsonSchema, tabled::Tabled, clap::ValueEnum, parse_display::FromStr, parse_display::Display)]
             pub enum #enum_name {
                 #values
             }
@@ -910,7 +920,11 @@ impl TypeSpace {
                                 .map(|s| s.to_string())
                                 .unwrap_or_default()
                         } else {
-                            anyhow::bail!("enumeration for tag `{}` is not a single value", tag);
+                            anyhow::bail!(
+                                "enumeration for tag `{}` is not a single value: {:?}",
+                                tag,
+                                one_of
+                            );
                         }
                     } else {
                         anyhow::bail!("enumeration for tag `{}` is not a string", tag);
@@ -1542,10 +1556,24 @@ fn get_one_of_tag(
                 if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
                     inner_schema.schema_kind
                 {
-                    if s.enumeration.len() == 1 {
+                    if s.enumeration.len() == 1
+                        && (result.tag.is_none() || result.tag == Some(k.to_string()))
+                    {
                         result.tag = Some(k.to_string());
+                    } else if result.tag == Some(k.to_string()) {
+                        // The enum must be of length 1 for this to work.
+                        // We thought it was but it isn't.
+                        result.tag = None;
+                        // We can't do anything with this.
+                        return Ok(result);
                     }
                 }
+            }
+
+            if result.tag.is_none() {
+                // We couldn't find a tag.
+                // We can't do anything with this.
+                return Ok(result);
             }
         }
     }
@@ -1656,6 +1684,30 @@ pub fn proper_name(s: &str) -> String {
         num.cardinal()
     } else {
         s.to_string()
+    };
+
+    // Fixes for MailChimp, probably a better way to do this.
+    // They have enums like:
+    // 18-24
+    // 55+
+    let s = if s == "18-24" {
+        "EighteenToTwentyFour".to_string()
+    } else if s == "25-34" {
+        "TwentyFiveToThirtyFour".to_string()
+    } else if s == "35-44" {
+        "ThirtyFiveToFourtyFour".to_string()
+    } else if s == "45-54" {
+        "FourtyFiveToFiftyFour".to_string()
+    } else if s == "35-54" {
+        "ThirtyFiveToFiftyFour".to_string()
+    } else if s == "55-64" {
+        "FiftyFiveToSixtyFour".to_string()
+    } else if s == "55+" {
+        "FiftyFivePlus".to_string()
+    } else if s == "65+" {
+        "SixtyFivePlus".to_string()
+    } else {
+        s
     };
 
     // Check if just the first character is a number.

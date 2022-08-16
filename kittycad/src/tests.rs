@@ -27,30 +27,6 @@ async fn test_create_file_conversion() {
 }
 
 #[tokio::test]
-async fn test_create_file_conversion_with_base64_helper() {
-    let client = test_client();
-    let body = include_bytes!("../../assets/in_obj.obj");
-
-    let conversion = client
-        .file()
-        .create_conversion(
-            crate::types::FileOutputFormat::Step,
-            crate::types::FileSourceFormat::Obj,
-            &body.to_vec().into(),
-        )
-        .await
-        .unwrap();
-
-    assert!(conversion.output.is_some());
-    if let Some(output) = conversion.output {
-        assert!(!output.is_empty());
-    }
-
-    assert_eq!(conversion.src_format, crate::types::FileSourceFormat::Obj);
-    assert_eq!(conversion.status, crate::types::ApiCallStatus::Completed);
-}
-
-#[tokio::test]
 async fn test_create_file_volume() {
     let client = test_client();
     let body = include_bytes!("../../assets/in_obj.obj");

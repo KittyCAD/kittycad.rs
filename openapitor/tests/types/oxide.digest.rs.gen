@@ -2,7 +2,6 @@
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
-    Eq,
     Hash,
     Debug,
     Clone,

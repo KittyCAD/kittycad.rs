@@ -418,8 +418,7 @@ pub mod error {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -472,8 +471,7 @@ impl tabled::Tabled for ApiCallQueryGroup {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -508,8 +506,7 @@ pub enum ApiCallQueryGroupBy {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -1098,7 +1095,7 @@ pub enum AsyncApiCallOutput {
 
 #[doc = "A single page of results"]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AsyncApiCallResultsPage {
     #[doc = "list of items on this page of results"]
@@ -1167,8 +1164,7 @@ impl tabled::Tabled for AsyncApiCallResultsPage {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -1461,8 +1457,7 @@ impl tabled::Tabled for Cluster {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -2010,8 +2005,7 @@ impl tabled::Tabled for Connection {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -2034,8 +2028,7 @@ pub enum CreatedAtSortMode {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -3485,8 +3478,7 @@ impl tabled::Tabled for EngineMetadata {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -4237,8 +4229,7 @@ impl tabled::Tabled for FileMass {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -4273,8 +4264,7 @@ pub enum FileOutputFormat {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -5012,8 +5002,7 @@ impl tabled::Tabled for InvoiceLineItem {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -5503,8 +5492,7 @@ impl tabled::Tabled for Metadata {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -5706,8 +5694,7 @@ impl tabled::Tabled for Oauth2ClientInfo {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -5947,8 +5934,7 @@ impl tabled::Tabled for PaymentMethodCardChecks {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -6070,8 +6056,7 @@ impl tabled::Tabled for PhysicsConstant {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -6479,8 +6464,7 @@ impl tabled::Tabled for Session {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -6508,8 +6492,7 @@ pub enum SystemInfoCgroupDriverEnum {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -6578,8 +6561,7 @@ impl tabled::Tabled for SystemInfoDefaultAddressPools {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -6716,8 +6698,7 @@ impl tabled::Tabled for UnitAccelerationConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -6851,8 +6832,7 @@ impl tabled::Tabled for UnitAngleConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -6998,8 +6978,7 @@ impl tabled::Tabled for UnitAngularVelocityConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -7136,8 +7115,7 @@ impl tabled::Tabled for UnitAreaConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -7283,8 +7261,7 @@ impl tabled::Tabled for UnitChargeConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -7415,8 +7392,7 @@ impl tabled::Tabled for UnitConcentrationConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -7553,8 +7529,7 @@ impl tabled::Tabled for UnitDataConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -7691,8 +7666,7 @@ impl tabled::Tabled for UnitDataTransferRateConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -7829,8 +7803,7 @@ impl tabled::Tabled for UnitDensityConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -7985,8 +7958,7 @@ impl tabled::Tabled for UnitEnergyConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -8129,8 +8101,7 @@ impl tabled::Tabled for UnitForceConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -8270,8 +8241,7 @@ impl tabled::Tabled for UnitIlluminanceConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -8408,8 +8378,7 @@ impl tabled::Tabled for UnitLengthConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -8585,8 +8554,7 @@ impl tabled::Tabled for UnitMagneticFieldStrengthConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -8717,8 +8685,7 @@ impl tabled::Tabled for UnitMagneticFluxConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -8849,8 +8816,7 @@ impl tabled::Tabled for UnitMassConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -8897,8 +8863,7 @@ pub enum UnitMassFormat {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -9398,8 +9363,7 @@ impl tabled::Tabled for UnitPowerConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -9533,8 +9497,7 @@ impl tabled::Tabled for UnitPressureConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -9674,8 +9637,7 @@ impl tabled::Tabled for UnitRadiationConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -9809,8 +9771,7 @@ impl tabled::Tabled for UnitSolidAngleConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -9944,8 +9905,7 @@ impl tabled::Tabled for UnitTemperatureConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -10085,8 +10045,7 @@ impl tabled::Tabled for UnitTimeConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -10235,8 +10194,7 @@ impl tabled::Tabled for UnitVelocityConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -10376,8 +10334,7 @@ impl tabled::Tabled for UnitVoltageConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
@@ -10511,8 +10468,7 @@ impl tabled::Tabled for UnitVolumeConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq,
-    Eq,
+    PartialEq, Eq,
     Hash,
     Debug,
     Clone,
