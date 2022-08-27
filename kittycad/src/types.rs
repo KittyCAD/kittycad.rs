@@ -3618,7 +3618,8 @@ pub struct ExtendedUser {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     #[doc = "The image avatar for the user. This is a URL."]
-    pub image: url::Url,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub image: Option<url::Url>,
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,
@@ -3693,7 +3694,11 @@ impl tabled::Tabled for ExtendedUser {
             } else {
                 String::new()
             },
-            format!("{:?}", self.image),
+            if let Some(image) = & self.image {
+                format!("{:?}", image)
+            } else {
+                String::new()
+            },
             if let Some(last_name) = &self.last_name {
                 format!("{:?}", last_name)
             } else {
@@ -10614,7 +10619,8 @@ pub struct User {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     #[doc = "The image avatar for the user. This is a URL."]
-    pub image: url::Url,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub image: Option<url::Url>,
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,
@@ -10680,7 +10686,11 @@ impl tabled::Tabled for User {
             } else {
                 String::new()
             },
-            format!("{:?}", self.image),
+            if let Some(image) = & self.image {
+                format!("{:?}", image)
+            } else {
+                String::new()
+            },
             if let Some(last_name) = &self.last_name {
                 format!("{:?}", last_name)
             } else {
