@@ -3618,8 +3618,7 @@ pub struct ExtendedUser {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     #[doc = "The image avatar for the user. This is a URL."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub image: Option<url::Url>,
+    pub image: url::Url,
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,

@@ -2344,7 +2344,6 @@
           "image": {
             "description": "The image avatar for the user. This is a URL.",
             "format": "uri",
-            "nullable": true,
             "title": "String",
             "type": "string"
           },
