@@ -1199,7 +1199,7 @@ fn get_type_name_for_string(
             "ipv4" => quote!(std::net::Ipv4Addr),
             "ipv6" => quote!(std::net::Ipv6Addr),
             "ip" => quote!(std::net::IpAddr),
-            "uri" => quote!(url::Url),
+            "uri" => quote!(Option<url::Url>),
             "uri-template" => quote!(String),
             "url" => quote!(url::Url),
             "email" => quote!(String),
