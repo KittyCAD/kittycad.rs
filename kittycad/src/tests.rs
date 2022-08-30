@@ -37,7 +37,7 @@ async fn test_create_file_volume() {
         .await
         .unwrap();
 
-    assert_eq!(result.volume, Some(48.800293));
+    assert_eq!(result.volume, Some(53.601147));
 
     assert_eq!(result.src_format, crate::types::FileSourceFormat::Obj);
     assert_eq!(result.status, crate::types::ApiCallStatus::Completed);
