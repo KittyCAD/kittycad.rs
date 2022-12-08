@@ -159,7 +159,7 @@ impl Random for chrono::NaiveTime {
         let hour = rng.gen_range(0..24);
         let minute = rng.gen_range(0..60);
         let second = rng.gen_range(0..60);
-        Ok(chrono::NaiveTime::from_hms(hour, minute, second))
+        Ok(chrono::NaiveTime::from_hms_opt(hour, minute, second).unwrap())
     }
 }
 
@@ -170,7 +170,7 @@ impl Random for chrono::NaiveDate {
         let year = rng.gen_range(1900..2100);
         let month = rng.gen_range(1..13);
         let day = rng.gen_range(1..28);
-        Ok(chrono::NaiveDate::from_ymd(year, month, day))
+        Ok(chrono::NaiveDate::from_ymd_opt(year, month, day).unwrap())
     }
 }
 
@@ -188,17 +188,19 @@ impl Random for chrono::DateTime<chrono::Utc> {
         // Generate a random date and time.
         let mut rng = rand::thread_rng();
         Ok(chrono::Utc
-            .ymd(
+            .ymd_opt(
                 rng.gen_range(1900..2100),
                 rng.gen_range(1..13),
                 rng.gen_range(1..28),
             )
-            .and_hms_milli(
+            .unwrap()
+            .and_hms_milli_opt(
                 rng.gen_range(0..24),
                 rng.gen_range(0..60),
                 rng.gen_range(0..60),
                 rng.gen_range(0..1_000),
-            ))
+            )
+            .unwrap())
     }
 }
 

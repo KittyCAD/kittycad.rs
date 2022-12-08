@@ -92,6 +92,12 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
     a("pub mod types;");
     a("#[doc(hidden)]");
 
+    // If we have any options that would require us to generate a utils file
+    // we need include it in the client.
+    if opts.needs_utils_file() {
+        a("pub mod utils;");
+    }
+
     // First get the tags for all the paths, then later we can ignore tags that
     // have no paths.
     let mut tags_with_paths = Vec::<String>::new();
@@ -302,8 +308,14 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     librs.push("lib.rs");
     crate::save(librs, lib.as_str())?;
 
+    if let Some(utils) = crate::template::generate_utils(opts) {
+        let mut utilsrs = src.clone();
+        utilsrs.push("utils.rs");
+        crate::save(utilsrs, utils.as_str())?;
+    }
+
     // Create the Rust source types file containing the generated types.
-    let mut type_space = crate::types::generate_types(spec)?;
+    let mut type_space = crate::types::generate_types(spec, opts.clone())?;
 
     // Create the Rust source files for each of the tags functions.
     let (files, modified_spec) = crate::functions::generate_files(&mut type_space, opts)?;
@@ -440,6 +452,10 @@ pub struct Opts {
     /// The user consent endpoint, if this client uses OAuth 2.0.
     #[clap(long)]
     pub user_consent_endpoint: Option<url::Url>,
+
+    /// The date-time format for the API, defaults to Rust rfc3339 parser
+    #[clap(long)]
+    pub date_time_format: Option<String>,
 }
 
 impl Opts {
@@ -480,6 +496,11 @@ impl Opts {
     /// Get the name of the package as it is used in code.
     pub fn code_package_name(&self) -> String {
         inflector::cases::snakecase::to_snake_case(&self.name)
+    }
+
+    /// Get whether these options require a utils.rs file to be generated.
+    pub fn needs_utils_file(&self) -> bool {
+        self.date_time_format.is_some()
     }
 }
 

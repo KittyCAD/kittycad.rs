@@ -28,10 +28,12 @@ pub struct TypeSpace {
     pub spec: openapiv3::OpenAPI,
     /// The rendered type space.
     pub rendered: proc_macro2::TokenStream,
+    /// The options given to the generator
+    pub opts: crate::Opts,
 }
 
 /// Generate Rust types from an OpenAPI v3 spec.
-pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<TypeSpace> {
+pub fn generate_types(spec: &openapiv3::OpenAPI, opts: crate::Opts) -> Result<TypeSpace> {
     // Include the base64 data type for byte data.
     let base64_mod = get_base64_mod()?;
 
@@ -63,6 +65,7 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<TypeSpace> {
 
             #error_mod
         ),
+        opts,
     };
 
     if let Some(components) = &spec.components {
@@ -557,6 +560,30 @@ impl TypeSpace {
             if type_name.is_option()? {
                 serde_props.push(quote!(default));
                 serde_props.push(quote!(skip_serializing_if = "Option::is_none"));
+            }
+
+            // If we have a custom date format  and this is a datetime we need to override deserialize_with
+            if self.opts.date_time_format.is_some() {
+                if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
+                    inner_schema.schema_kind
+                {
+                    if s.format
+                        == openapiv3::VariantOrUnknownOrEmpty::Item(
+                            openapiv3::StringFormat::DateTime,
+                        )
+                    {
+                        if type_name.is_option()? {
+                            serde_props.push(quote!(
+                                deserialize_with =
+                                    "crate::utils::nullable_date_time_format::deserialize"
+                            ));
+                        } else {
+                            serde_props.push(quote!(
+                                deserialize_with = "crate::utils::date_time_format::deserialize"
+                            ));
+                        }
+                    }
+                }
             }
 
             let serde_full = if serde_props.is_empty() {
