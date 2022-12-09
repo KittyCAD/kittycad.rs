@@ -504,6 +504,26 @@ impl Opts {
     }
 }
 
+impl Default for Opts {
+    fn default() -> Self {
+        Self {
+            debug: Default::default(),
+            json: Default::default(),
+            input: Default::default(),
+            output: Default::default(),
+            base_url: url::Url::parse("http://example.com").unwrap(),
+            name: Default::default(),
+            version: Default::default(),
+            description: Default::default(),
+            spec_url: Default::default(),
+            repo_name: Default::default(),
+            token_endpoint: Default::default(),
+            user_consent_endpoint: Default::default(),
+            date_time_format: Default::default(),
+        }
+    }
+}
+
 /// Return a list of the persistent modules.
 /// These are modules we do not nuke at generation time.
 fn persistent_modules() -> Vec<String> {

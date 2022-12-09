@@ -2059,6 +2059,7 @@ mod test {
     fn test_generate_kittycad_types() {
         let result = super::generate_types(
             &crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
+            Default::default(),
         )
         .unwrap();
         expectorate::assert_contents("tests/types/kittycad.rs.gen", &result.render().unwrap());
@@ -2069,6 +2070,7 @@ mod test {
     fn test_generate_github_types() {
         let result = super::generate_types(
             &crate::load_json_spec(include_str!("../../tests/api.github.com.json")).unwrap(),
+            Default::default(),
         )
         .unwrap();
         expectorate::assert_contents("tests/types/github.rs.gen", &result.render().unwrap());
@@ -2078,6 +2080,7 @@ mod test {
     fn test_generate_oxide_types() {
         let result = super::generate_types(
             &crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
+            Default::default(),
         )
         .unwrap();
         expectorate::assert_contents("tests/types/oxide.rs.gen", &result.render().unwrap());
@@ -2116,6 +2119,7 @@ mod test {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
             rendered: quote!(),
+            opts: Default::default(),
         };
 
         type_space.render_schema("RouterRoute", &schema).unwrap();
@@ -2155,6 +2159,7 @@ mod test {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
             rendered: quote!(),
+            opts: Default::default(),
         };
 
         type_space.render_schema("IpNet", &schema).unwrap();
@@ -2175,6 +2180,7 @@ mod test {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
             rendered: quote!(),
+            opts: Default::default(),
         };
 
         type_space
@@ -2197,6 +2203,7 @@ mod test {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
             rendered: quote!(),
+            opts: Default::default(),
         };
 
         type_space
@@ -2240,6 +2247,7 @@ mod test {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
             rendered: quote!(),
+            opts: Default::default(),
         };
 
         type_space.render_schema("Digest", &schema).unwrap();
