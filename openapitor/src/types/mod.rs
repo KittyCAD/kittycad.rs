@@ -2257,4 +2257,31 @@ mod test {
             &super::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
+
+    #[test]
+    fn test_render_object_with_custom_date_format() {
+        let schema = include_str!("../../tests/types/input/FileDensity.json");
+
+        let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
+
+        let opts = crate::Opts {
+            date_time_format: Some("%Y-%m-%dT%H:%M:%S".to_string()),
+            ..Default::default()
+        };
+        let mut type_space = super::TypeSpace {
+            types: indexmap::map::IndexMap::new(),
+            spec: crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
+            rendered: quote!(),
+            opts,
+        };
+
+        type_space
+            .render_schema("FileConversion", &schema)
+            .unwrap();
+
+        expectorate::assert_contents(
+            "tests/types/kittycad.file-density-date-time-override-output.rs.gen",
+            &super::get_text_fmt(&type_space.rendered).unwrap(),
+        );
+    }
 }

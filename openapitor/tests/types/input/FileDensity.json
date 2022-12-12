@@ -1,0 +1,84 @@
+      {
+        "description": "A file density result.",
+        "properties": {
+          "completed_at": {
+            "description": "The time and date the density was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "The time and date the density was created.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "density": {
+            "description": "The resulting density.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "error": {
+            "description": "The error the function returned, if any.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ],
+            "description": "The unique identifier of the density request.\n\nThis is the same as the API call ID."
+          },
+          "material_mass": {
+            "default": 0.0,
+            "description": "The material mass as denoted by the user.",
+            "format": "float",
+            "type": "number"
+          },
+          "src_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FileSourceFormat"
+              }
+            ],
+            "description": "The source format of the file."
+          },
+          "started_at": {
+            "description": "The time and date the density was started.",
+            "format": "date-time",
+            "nullable": true,
+            "title": "DateTime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ],
+            "description": "The status of the density."
+          },
+          "updated_at": {
+            "description": "The time and date the density was last updated.",
+            "format": "date-time",
+            "title": "DateTime",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the density.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "src_format",
+          "status",
+          "updated_at"
+        ],
+        "type": "object"
+      }

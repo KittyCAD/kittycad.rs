@@ -1,0 +1,113 @@
+#[doc = "A file density result."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FileConversion {
+    #[doc = "The time and date the density was completed."]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::utils::nullable_date_time_format::deserialize"
+    )]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the density was created."]
+    #[serde(deserialize_with = "crate::utils::date_time_format::deserialize")]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The resulting density."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub density: Option<f64>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the density request.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The material mass as denoted by the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub material_mass: Option<f64>,
+    #[doc = "The source format of the file."]
+    pub src_format: FileSourceFormat,
+    #[doc = "The time and date the density was started."]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::utils::nullable_date_time_format::deserialize"
+    )]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the density."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the density was last updated."]
+    #[serde(deserialize_with = "crate::utils::date_time_format::deserialize")]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the density."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for FileConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for FileConversion {
+    const LENGTH: usize = 11;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(density) = &self.density {
+                format!("{:?}", density)
+            } else {
+                String::new()
+            },
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(material_mass) = &self.material_mass {
+                format!("{:?}", material_mass)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "density".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "material_mass".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
