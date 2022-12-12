@@ -28,10 +28,12 @@ pub struct TypeSpace {
     pub spec: openapiv3::OpenAPI,
     /// The rendered type space.
     pub rendered: proc_macro2::TokenStream,
+    /// The options given to the generator
+    pub opts: crate::Opts,
 }
 
 /// Generate Rust types from an OpenAPI v3 spec.
-pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<TypeSpace> {
+pub fn generate_types(spec: &openapiv3::OpenAPI, opts: crate::Opts) -> Result<TypeSpace> {
     // Include the base64 data type for byte data.
     let base64_mod = get_base64_mod()?;
 
@@ -63,6 +65,7 @@ pub fn generate_types(spec: &openapiv3::OpenAPI) -> Result<TypeSpace> {
 
             #error_mod
         ),
+        opts,
     };
 
     if let Some(components) = &spec.components {
@@ -557,6 +560,30 @@ impl TypeSpace {
             if type_name.is_option()? {
                 serde_props.push(quote!(default));
                 serde_props.push(quote!(skip_serializing_if = "Option::is_none"));
+            }
+
+            // If we have a custom date format  and this is a datetime we need to override deserialize_with
+            if self.opts.date_time_format.is_some() {
+                if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
+                    inner_schema.schema_kind
+                {
+                    if s.format
+                        == openapiv3::VariantOrUnknownOrEmpty::Item(
+                            openapiv3::StringFormat::DateTime,
+                        )
+                    {
+                        if type_name.is_option()? {
+                            serde_props.push(quote!(
+                                deserialize_with =
+                                    "crate::utils::nullable_date_time_format::deserialize"
+                            ));
+                        } else {
+                            serde_props.push(quote!(
+                                deserialize_with = "crate::utils::date_time_format::deserialize"
+                            ));
+                        }
+                    }
+                }
             }
 
             let serde_full = if serde_props.is_empty() {
@@ -2032,6 +2059,7 @@ mod test {
     fn test_generate_kittycad_types() {
         let result = super::generate_types(
             &crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
+            Default::default(),
         )
         .unwrap();
         expectorate::assert_contents("tests/types/kittycad.rs.gen", &result.render().unwrap());
@@ -2042,6 +2070,7 @@ mod test {
     fn test_generate_github_types() {
         let result = super::generate_types(
             &crate::load_json_spec(include_str!("../../tests/api.github.com.json")).unwrap(),
+            Default::default(),
         )
         .unwrap();
         expectorate::assert_contents("tests/types/github.rs.gen", &result.render().unwrap());
@@ -2051,6 +2080,7 @@ mod test {
     fn test_generate_oxide_types() {
         let result = super::generate_types(
             &crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
+            Default::default(),
         )
         .unwrap();
         expectorate::assert_contents("tests/types/oxide.rs.gen", &result.render().unwrap());
@@ -2089,6 +2119,7 @@ mod test {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
             rendered: quote!(),
+            opts: Default::default(),
         };
 
         type_space.render_schema("RouterRoute", &schema).unwrap();
@@ -2128,6 +2159,7 @@ mod test {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
             rendered: quote!(),
+            opts: Default::default(),
         };
 
         type_space.render_schema("IpNet", &schema).unwrap();
@@ -2148,6 +2180,7 @@ mod test {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
             rendered: quote!(),
+            opts: Default::default(),
         };
 
         type_space
@@ -2170,6 +2203,7 @@ mod test {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
             rendered: quote!(),
+            opts: Default::default(),
         };
 
         type_space
@@ -2213,12 +2247,40 @@ mod test {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
             rendered: quote!(),
+            opts: Default::default(),
         };
 
         type_space.render_schema("Digest", &schema).unwrap();
 
         expectorate::assert_contents(
             "tests/types/oxide.digest.rs.gen",
+            &super::get_text_fmt(&type_space.rendered).unwrap(),
+        );
+    }
+
+    #[test]
+    fn test_render_object_with_custom_date_format() {
+        let schema = include_str!("../../tests/types/input/FileDensity.json");
+
+        let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
+
+        let opts = crate::Opts {
+            date_time_format: Some("%Y-%m-%dT%H:%M:%S".to_string()),
+            ..Default::default()
+        };
+        let mut type_space = super::TypeSpace {
+            types: indexmap::map::IndexMap::new(),
+            spec: crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
+            rendered: quote!(),
+            opts,
+        };
+
+        type_space
+            .render_schema("FileConversion", &schema)
+            .unwrap();
+
+        expectorate::assert_contents(
+            "tests/types/kittycad.file-density-date-time-override-output.rs.gen",
             &super::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
