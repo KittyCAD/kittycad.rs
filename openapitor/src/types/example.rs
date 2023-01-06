@@ -94,7 +94,7 @@ pub fn generate_example_json_from_schema(
                     "ipv4" => serde_json::Value::String(std::net::Ipv4Addr::random()?.to_string()),
                     "ipv6" => serde_json::Value::String(std::net::Ipv6Addr::random()?.to_string()),
                     "ip" => serde_json::Value::String(std::net::IpAddr::random()?.to_string()),
-                    "uri" => serde_json::Value::String(url::Url::random()?.to_string()),
+                    "uri" => serde_json::Value::String("https://example.com".to_string()),
                     "uri-template" => {
                         // Return a random URI template.
                         let mut uri = String::new();
@@ -104,7 +104,7 @@ pub fn generate_example_json_from_schema(
                         uri.pop();
                         serde_json::Value::String(uri)
                     }
-                    "url" => serde_json::Value::String(url::Url::random()?.to_string()),
+                    "url" => serde_json::Value::String("https://example.com".to_string()),
                     "email" => serde_json::Value::String("email@example.com".to_string()),
                     "phone" => serde_json::Value::String(
                         crate::types::phone_number::PhoneNumber::random()?.to_string(),
@@ -350,11 +350,11 @@ pub fn generate_example_rust_from_schema(
                         "ip" => {
                             quote!(std::net::IpAddr::from_str("2001:db8:8:4::2")?)
                         }
-                        "uri" => quote!(url::Url::from_str("https://example.com/foo/bar")?),
+                        "uri" => quote!("https://example.com/foo/bar".to_string()),
                         "uri-template" => {
-                            quote!("http://example.com/{folder}/{file}.json")
+                            quote!("http://example.com/{folder}/{file}.json".to_string())
                         }
-                        "url" => quote!(url::Url::from_str("https://example.com/foo/bar")?),
+                        "url" => quote!("https://example.com/foo/bar".to_string()),
                         "email" => {
                             quote!("email@example.com".to_string())
                         }
