@@ -39,11 +39,11 @@ impl Hidden {
         }
     }
 
-    #[doc = "Listen for callbacks for email verification for users.\n\n**Parameters:**\n\n- `callback_url: Option<url::Url>`: The URL to redirect back to after we have authenticated.\n- `email: &'astr`: The user's email. (required)\n- `token: &'astr`: The verification token. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_hidden_auth_email_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .auth_email_callback(\n            Some(url::Url::from_str(\"https://example.com/foo/bar\")?),\n            \"email@example.com\",\n            \"some-string\",\n        )\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Listen for callbacks for email verification for users.\n\n**Parameters:**\n\n- `callback_url: Option<String>`: The URL to redirect back to after we have authenticated.\n- `email: &'astr`: The user's email. (required)\n- `token: &'astr`: The verification token. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_hidden_auth_email_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .auth_email_callback(\n            Some(url::Url::from_str(\"https://example.com/foo/bar\")?),\n            \"email@example.com\",\n            \"some-string\",\n        )\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn auth_email_callback<'a>(
         &'a self,
-        callback_url: Option<url::Url>,
+        callback_url: Option<String>,
         email: &'a str,
         token: &'a str,
     ) -> Result<(), crate::types::error::Error> {
@@ -54,7 +54,7 @@ impl Hidden {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = Vec::new();
         if let Some(p) = callback_url {
-            query_params.push(("callback_url", format!("{}", p)));
+            query_params.push(("callback_url", p));
         }
 
         query_params.push(("email", email.to_string()));

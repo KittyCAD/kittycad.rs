@@ -3386,7 +3386,7 @@ impl tabled::Tabled for DockerSystemInfo {
 pub struct EmailAuthenticationForm {
     #[doc = "The URL to redirect back to after we have authenticated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub callback_url: Option<url::Url>,
+    pub callback_url: Option<String>,
     #[doc = "The user's email."]
     pub email: String,
 }
@@ -3618,8 +3618,7 @@ pub struct ExtendedUser {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     #[doc = "The image avatar for the user. This is a URL."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub image: Option<url::Url>,
+    pub image: String,
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,
@@ -3694,7 +3693,7 @@ impl tabled::Tabled for ExtendedUser {
             } else {
                 String::new()
             },
-            format!("{:?}", self.image),
+            self.image.clone(),
             if let Some(last_name) = &self.last_name {
                 format!("{:?}", last_name)
             } else {
@@ -4732,7 +4731,7 @@ pub struct Invoice {
     pub paid: Option<bool>,
     #[doc = "The link to download the PDF for the invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pdf: Option<url::Url>,
+    pub pdf: Option<String>,
     #[doc = "This is the transaction number that appears on email receipts sent for this invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub receipt_number: Option<String>,
@@ -4756,7 +4755,7 @@ pub struct Invoice {
     #[doc = "The URL for the hosted invoice page, which allows customers to view and pay an \
              invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub url: Option<url::Url>,
+    pub url: Option<String>,
 }
 
 impl std::fmt::Display for Invoice {
@@ -10615,8 +10614,7 @@ pub struct User {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     #[doc = "The image avatar for the user. This is a URL."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub image: Option<url::Url>,
+    pub image: String,
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,
@@ -10682,7 +10680,7 @@ impl tabled::Tabled for User {
             } else {
                 String::new()
             },
-            format!("{:?}", self.image),
+            self.image.clone(),
             if let Some(last_name) = &self.last_name {
                 format!("{:?}", last_name)
             } else {
