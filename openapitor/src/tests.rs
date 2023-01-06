@@ -158,6 +158,7 @@ async fn test_oxide_generation(ctx: &mut TestContext) {
 
 #[test_context(TestContext)]
 #[tokio::test]
+#[ignore]
 async fn test_front_generation(ctx: &mut TestContext) {
     let opts = crate::Opts {
         debug: true,

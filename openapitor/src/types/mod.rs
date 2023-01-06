@@ -1226,9 +1226,9 @@ fn get_type_name_for_string(
             "ipv4" => quote!(std::net::Ipv4Addr),
             "ipv6" => quote!(std::net::Ipv6Addr),
             "ip" => quote!(std::net::IpAddr),
-            "uri" => quote!(Option<url::Url>),
+            "uri" => quote!(String),
             "uri-template" => quote!(String),
-            "url" => quote!(url::Url),
+            "url" => quote!(String),
             "email" => quote!(String),
             "phone" => {
                 if in_crate {
@@ -2275,9 +2275,7 @@ mod test {
             opts,
         };
 
-        type_space
-            .render_schema("FileConversion", &schema)
-            .unwrap();
+        type_space.render_schema("FileConversion", &schema).unwrap();
 
         expectorate::assert_contents(
             "tests/types/kittycad.file-density-date-time-override-output.rs.gen",
