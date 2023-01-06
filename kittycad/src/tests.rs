@@ -8,13 +8,13 @@ fn test_client() -> crate::Client {
 #[tokio::test]
 async fn test_create_file_conversion() {
     let client = test_client();
-    let body = include_bytes!("../../assets/in_obj.obj");
+    let body = include_bytes!("../../assets/in_step.stp");
 
     let conversion = client
         .file()
         .create_conversion(
-            crate::types::FileOutputFormat::Step,
-            crate::types::FileSourceFormat::Obj,
+            crate::types::FileOutputFormat::Stl,
+            crate::types::FileSourceFormat::Step,
             &body.to_vec().into(),
         )
         .await
@@ -22,7 +22,7 @@ async fn test_create_file_conversion() {
 
     assert!(conversion.output.is_some());
 
-    assert_eq!(conversion.src_format, crate::types::FileSourceFormat::Obj);
+    assert_eq!(conversion.src_format, crate::types::FileSourceFormat::Step);
     assert_eq!(conversion.status, crate::types::ApiCallStatus::Completed);
 }
 
