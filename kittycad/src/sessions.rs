@@ -28,7 +28,7 @@ impl Sessions {
     ) -> Result<crate::types::Session, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "user/session/{token}".replace("{token}", &format!("{}", token))

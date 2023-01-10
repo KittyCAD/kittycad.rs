@@ -207,14 +207,9 @@ pub mod phone_number {
             let s = if !s.trim().starts_with('+') {
                 format!("+1{}", s)
                     .replace('-', "")
-                    .replace('(', "")
-                    .replace(')', "")
-                    .replace(' ', "")
+                    .replace(['(', ')', ' '], "")
             } else {
-                s.replace('-', "")
-                    .replace('(', "")
-                    .replace(')', "")
-                    .replace(' ', "")
+                s.replace(['-', '(', ')', ' '], "")
             };
             Ok(PhoneNumber(Some(phonenumber::parse(None, &s).map_err(
                 |e| anyhow::anyhow!("invalid phone number `{}`: {}", s, e),
@@ -418,7 +413,7 @@ pub mod error {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -439,7 +434,7 @@ pub enum AccountProvider {
 
 #[doc = "A response for a query on the API call table that is grouped by something."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ApiCallQueryGroup {
     pub count: i64,
@@ -471,7 +466,7 @@ impl tabled::Tabled for ApiCallQueryGroup {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -506,7 +501,7 @@ pub enum ApiCallQueryGroupBy {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -794,7 +789,7 @@ impl tabled::Tabled for ApiCallWithPriceResultsPage {
 
 #[doc = "An API token.\n\nThese are used to authenticate users with Bearer authentication."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ApiToken {
     #[doc = "The date and time the API token was created."]
@@ -859,7 +854,7 @@ impl tabled::Tabled for ApiToken {
 
 #[doc = "A single page of results"]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ApiTokenResultsPage {
     #[doc = "list of items on this page of results"]
@@ -926,7 +921,7 @@ impl tabled::Tabled for ApiTokenResultsPage {
 
 #[doc = "Information about a third party app client."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AppClientInfo {
     #[doc = "The URL for consent."]
@@ -961,7 +956,7 @@ impl tabled::Tabled for AppClientInfo {
 
 #[doc = "An async API call."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AsyncApiCall {
     #[doc = "The time and date the async API call was completed."]
@@ -1164,7 +1159,7 @@ impl tabled::Tabled for AsyncApiCallResultsPage {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -1185,7 +1180,7 @@ pub enum AsyncApiCallType {
 
 #[doc = "The billing information for payments."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct BillingInfo {
     #[doc = "The address of the customer."]
@@ -1238,7 +1233,7 @@ impl tabled::Tabled for BillingInfo {
 
 #[doc = "Metadata about our cache.\n\nThis is mostly used for internal purposes and debugging."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CacheMetadata {
     #[doc = "If the cache returned an ok response from ping."]
@@ -1268,7 +1263,7 @@ impl tabled::Tabled for CacheMetadata {
 
 #[doc = "The card details of a payment method."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CardDetails {
     #[doc = "Card brand.\n\nCan be `amex`, `diners`, `discover`, `jcb`, `mastercard`, `unionpay`, \
@@ -1371,7 +1366,7 @@ impl tabled::Tabled for CardDetails {
 
 #[doc = "Cluster information."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Cluster {
     #[doc = "The IP address of the cluster."]
@@ -1457,7 +1452,7 @@ impl tabled::Tabled for Cluster {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -1481,7 +1476,7 @@ pub enum CodeLanguage {
 
 #[doc = "Output of the code being executed."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CodeOutput {
     #[doc = "The contents of the files requested if they were passed."]
@@ -1539,7 +1534,7 @@ impl tabled::Tabled for CodeOutput {
 #[doc = "Commit holds the Git-commit (SHA1) that a binary was built from, as reported in the \
          version-string of external tools, such as `containerd`, or `runC`."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Commit {
     #[doc = "Commit ID of external tool expected by dockerd as set at build time."]
@@ -2005,7 +2000,7 @@ impl tabled::Tabled for Connection {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -2028,7 +2023,7 @@ pub enum CreatedAtSortMode {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -2657,7 +2652,7 @@ impl tabled::Tabled for CustomerBalance {
 
 #[doc = "The form for a device access token request."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct DeviceAccessTokenRequestForm {
     #[doc = "The client ID."]
@@ -2699,7 +2694,7 @@ impl tabled::Tabled for DeviceAccessTokenRequestForm {
 
 #[doc = "The request parameters for the OAuth 2.0 Device Authorization Grant flow."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct DeviceAuthRequestForm {
     #[doc = "The client ID."]
@@ -2730,7 +2725,7 @@ impl tabled::Tabled for DeviceAuthRequestForm {
 #[doc = "The request parameters to verify the `user_code` for the OAuth 2.0 Device Authorization \
          Grant."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct DeviceAuthVerifyParams {
     #[doc = "The user code."]
@@ -3381,7 +3376,7 @@ impl tabled::Tabled for DockerSystemInfo {
 
 #[doc = "The body of the form for email authentication."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct EmailAuthenticationForm {
     #[doc = "The URL to redirect back to after we have authenticated."]
@@ -3478,7 +3473,7 @@ impl tabled::Tabled for EngineMetadata {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -3502,7 +3497,7 @@ pub enum Environment {
 
 #[doc = "Error information from a response."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Error {
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3591,7 +3586,7 @@ impl tabled::Tabled for ExecutorMetadata {
          mapping of the user's information, including that of our third party services we use for \
          users: MailChimp, Stripe, and Zendesk."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ExtendedUser {
     #[doc = "The user's company."]
@@ -3748,7 +3743,7 @@ impl tabled::Tabled for ExtendedUser {
 
 #[doc = "A single page of results"]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ExtendedUserResultsPage {
     #[doc = "list of items on this page of results"]
@@ -3920,7 +3915,7 @@ impl tabled::Tabled for FileCenterOfMass {
 
 #[doc = "A file conversion."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FileConversion {
     #[doc = "The time and date the file conversion was completed."]
@@ -4229,7 +4224,7 @@ impl tabled::Tabled for FileMass {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -4264,7 +4259,7 @@ pub enum FileOutputFormat {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -4390,7 +4385,7 @@ impl tabled::Tabled for FileSurfaceArea {
 #[doc = "Metadata about our file system.\n\nThis is mostly used for internal purposes and \
          debugging."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FileSystemMetadata {
     #[doc = "If the file system passed a sanity check."]
@@ -4515,7 +4510,7 @@ impl tabled::Tabled for FileVolume {
 
 #[doc = "Gateway information."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Gateway {
     #[doc = "The auth timeout of the gateway."]
@@ -4590,7 +4585,7 @@ impl tabled::Tabled for Gateway {
 
 #[doc = "IndexInfo contains information about a registry."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct IndexInfo {
     #[doc = "List of mirrors, expressed as URIs."]
@@ -5002,7 +4997,7 @@ impl tabled::Tabled for InvoiceLineItem {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -5092,7 +5087,7 @@ impl tabled::Tabled for Jetstream {
 
 #[doc = "Jetstream API statistics."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct JetstreamApiStats {
     #[doc = "The number of errors."]
@@ -5149,7 +5144,7 @@ impl tabled::Tabled for JetstreamApiStats {
 
 #[doc = "Jetstream configuration."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct JetstreamConfig {
     #[doc = "The domain."]
@@ -5215,7 +5210,7 @@ impl tabled::Tabled for JetstreamConfig {
 
 #[doc = "Jetstream statistics."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct JetstreamStats {
     #[doc = "The number of accounts."]
@@ -5308,7 +5303,7 @@ impl tabled::Tabled for JetstreamStats {
 
 #[doc = "Leaf node information."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct LeafNode {
     #[doc = "The auth timeout of the leaf node."]
@@ -5374,7 +5369,7 @@ impl tabled::Tabled for LeafNode {
 
 #[doc = "Jetstream statistics."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct MetaClusterInfo {
     #[doc = "The size of the cluster."]
@@ -5492,7 +5487,7 @@ impl tabled::Tabled for Metadata {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -5538,7 +5533,7 @@ pub enum Method {
 #[doc = "The struct that is used to create a new record. This is automatically generated and has \
          all the same fields as the main struct only it is missing the `id`."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct NewAddress {
     #[doc = "The city component."]
@@ -5631,7 +5626,7 @@ impl tabled::Tabled for NewAddress {
 
 #[doc = "Information about an OAuth 2.0 client."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Oauth2ClientInfo {
     #[doc = "Value used for [CSRF](https://tools.ietf.org/html/rfc6749#section-10.12) protection \
@@ -5694,7 +5689,7 @@ impl tabled::Tabled for Oauth2ClientInfo {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -5718,7 +5713,7 @@ impl std::default::Default for Oauth2GrantType {
 
 #[doc = "Output file contents."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct OutputFile {
     #[doc = "The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for \
@@ -5764,7 +5759,7 @@ impl tabled::Tabled for OutputFile {
 
 #[doc = "A payment intent response."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PaymentIntent {
     #[doc = "The client secret is used for client-side retrieval using a publishable key. The \
@@ -5868,7 +5863,7 @@ impl tabled::Tabled for PaymentMethod {
 
 #[doc = "Card checks."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PaymentMethodCardChecks {
     #[doc = "If a address line1 was provided, results of the check, one of `pass`, `fail`, \
@@ -5934,7 +5929,7 @@ impl tabled::Tabled for PaymentMethodCardChecks {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -6056,7 +6051,7 @@ impl tabled::Tabled for PhysicsConstant {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -6166,7 +6161,7 @@ pub enum PhysicsConstantName {
          list. V1 plugins are \\\"lazily\\\" loaded, and are not returned in this list if there is \
          no resource using the plugin."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PluginsInfo {
     #[doc = "Names of available authorization plugins."]
@@ -6232,7 +6227,7 @@ impl tabled::Tabled for PluginsInfo {
 
 #[doc = "The response from the `/ping` endpoint."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Pong {
     #[doc = "The pong response."]
@@ -6262,7 +6257,7 @@ impl tabled::Tabled for Pong {
 
 #[doc = "RegistryServiceConfig stores daemon registry services configuration."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct RegistryServiceConfig {
     #[doc = "List of IP ranges to which nondistributable artifacts can be pushed, using the CIDR syntax [RFC 4632](https://tools.ietf.org/html/4632).  Some images (for example, Windows base images) contain artifacts whose distribution is restricted by license. When these images are pushed to a registry, restricted artifacts are not included.  This configuration override this behavior, and enables the daemon to push nondistributable artifacts to all registries whose resolved IP address is within the subnet described by the CIDR syntax.  This option is useful when pushing images containing nondistributable artifacts to a registry on an air-gapped network so hosts on that network can pull the images without connecting to another server.\n\n**Warning**: Nondistributable artifacts typically have restrictions on how and where they can be distributed and shared. Only use this feature to push artifacts to private registries and ensure that you are in compliance with any terms that cover redistributing nondistributable artifacts."]
@@ -6353,7 +6348,7 @@ impl tabled::Tabled for RegistryServiceConfig {
          runtime.  The runtime is invoked by the daemon via the `containerd` daemon. OCI runtimes \
          act as an interface to the Linux kernel namespaces, cgroups, and SELinux."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Runtime {
     #[doc = "Name and, optional, path, of the OCI executable binary.  If the path is omitted, the \
@@ -6399,7 +6394,7 @@ impl tabled::Tabled for Runtime {
 
 #[doc = "An authentication session.\n\nFor our UIs, these are automatically created by Next.js."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Session {
     #[doc = "The date and time the session was created."]
@@ -6464,7 +6459,7 @@ impl tabled::Tabled for Session {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -6492,7 +6487,7 @@ pub enum SystemInfoCgroupDriverEnum {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -6515,7 +6510,7 @@ pub enum SystemInfoCgroupVersionEnum {
 }
 
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct SystemInfoDefaultAddressPools {
     #[doc = "The network address in CIDR format"]
@@ -6561,7 +6556,7 @@ impl tabled::Tabled for SystemInfoDefaultAddressPools {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -6698,7 +6693,7 @@ impl tabled::Tabled for UnitAccelerationConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -6832,7 +6827,7 @@ impl tabled::Tabled for UnitAngleConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -6978,7 +6973,7 @@ impl tabled::Tabled for UnitAngularVelocityConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -7115,7 +7110,7 @@ impl tabled::Tabled for UnitAreaConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -7261,7 +7256,7 @@ impl tabled::Tabled for UnitChargeConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -7392,7 +7387,7 @@ impl tabled::Tabled for UnitConcentrationConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -7529,7 +7524,7 @@ impl tabled::Tabled for UnitDataConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -7666,7 +7661,7 @@ impl tabled::Tabled for UnitDataTransferRateConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -7803,7 +7798,7 @@ impl tabled::Tabled for UnitDensityConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -7958,7 +7953,7 @@ impl tabled::Tabled for UnitEnergyConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -8101,7 +8096,7 @@ impl tabled::Tabled for UnitForceConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -8241,7 +8236,7 @@ impl tabled::Tabled for UnitIlluminanceConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -8378,7 +8373,7 @@ impl tabled::Tabled for UnitLengthConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -8554,7 +8549,7 @@ impl tabled::Tabled for UnitMagneticFieldStrengthConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -8685,7 +8680,7 @@ impl tabled::Tabled for UnitMagneticFluxConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -8816,7 +8811,7 @@ impl tabled::Tabled for UnitMassConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -8863,7 +8858,7 @@ pub enum UnitMassFormat {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -9363,7 +9358,7 @@ impl tabled::Tabled for UnitPowerConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -9497,7 +9492,7 @@ impl tabled::Tabled for UnitPressureConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -9637,7 +9632,7 @@ impl tabled::Tabled for UnitRadiationConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -9771,7 +9766,7 @@ impl tabled::Tabled for UnitSolidAngleConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -9905,7 +9900,7 @@ impl tabled::Tabled for UnitTemperatureConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -10045,7 +10040,7 @@ impl tabled::Tabled for UnitTimeConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -10194,7 +10189,7 @@ impl tabled::Tabled for UnitVelocityConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -10334,7 +10329,7 @@ impl tabled::Tabled for UnitVoltageConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -10468,7 +10463,7 @@ impl tabled::Tabled for UnitVolumeConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -10507,7 +10502,7 @@ pub enum UnitVolumeFormat {
 
 #[doc = "The user-modifiable parts of a User."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UpdateUser {
     #[doc = "The user's company."]
@@ -10587,7 +10582,7 @@ impl tabled::Tabled for UpdateUser {
 
 #[doc = "A user."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct User {
     #[doc = "The user's company."]
@@ -10717,7 +10712,7 @@ impl tabled::Tabled for User {
 
 #[doc = "A single page of results"]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UserResultsPage {
     #[doc = "list of items on this page of results"]
@@ -10785,7 +10780,7 @@ impl tabled::Tabled for UserResultsPage {
 #[doc = "A verification token for a user.\n\nThis is typically used to verify a user's email \
          address."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct VerificationToken {
     #[doc = "The date and time the verification token was created."]

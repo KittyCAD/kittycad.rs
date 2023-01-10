@@ -22,7 +22,7 @@ impl ApiTokens {
     ) -> Result<crate::types::ApiTokenResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user/api-tokens"),
+            format!("{}/{}", self.client.base_url, "user/api-tokens"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = Vec::new();
@@ -75,7 +75,7 @@ impl ApiTokens {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
-                                    &format!("{}/{}", self.client.base_url, "user/api-tokens"),
+                                    format!("{}/{}", self.client.base_url, "user/api-tokens"),
                                 );
                                 req = req.bearer_auth(&self.client.token);
                                 let mut request = req.build()?;
@@ -122,7 +122,7 @@ impl ApiTokens {
     ) -> Result<crate::types::ApiToken, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!("{}/{}", self.client.base_url, "user/api-tokens"),
+            format!("{}/{}", self.client.base_url, "user/api-tokens"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -148,7 +148,7 @@ impl ApiTokens {
     ) -> Result<crate::types::ApiToken, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "user/api-tokens/{token}".replace("{token}", &format!("{}", token))
@@ -188,7 +188,7 @@ impl ApiTokens {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "user/api-tokens/{token}".replace("{token}", &format!("{}", token))
