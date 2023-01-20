@@ -109,8 +109,7 @@ impl Oauth2 {
             &format!("{}/{}", self.client.base_url, "oauth2/device/verify"),
         );
         req = req.bearer_auth(&self.client.token);
-        let mut query_params = Vec::new();
-        query_params.push(("user_code", user_code.to_string()));
+        let query_params = vec![("user_code", user_code.to_string())];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -148,7 +147,7 @@ impl Oauth2 {
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let mut query_params = Vec::new();
+        let mut query_params = vec![];
         if let Some(p) = code {
             query_params.push(("code", p));
         }
@@ -193,7 +192,7 @@ impl Oauth2 {
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let mut query_params = Vec::new();
+        let mut query_params = vec![];
         if let Some(p) = callback_url {
             query_params.push(("callback_url", p));
         }

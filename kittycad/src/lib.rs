@@ -60,6 +60,10 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 #[doc(hidden)]
+/// AI uses machine learning to generate 3D meshes.
+///
+/// FROM: <https://docs.kittycad.io/api/ai>
+pub mod ai;
 /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
 ///
 /// FROM: <https://docs.kittycad.io/api/api-calls>
@@ -216,6 +220,13 @@ impl Client {
         }
 
         Ok(req)
+    }
+
+    /// AI uses machine learning to generate 3D meshes.
+    ///
+    /// FROM: <https://docs.kittycad.io/api/ai>
+    pub fn ai(&self) -> ai::Ai {
+        ai::Ai::new(self.clone())
     }
 
     /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.

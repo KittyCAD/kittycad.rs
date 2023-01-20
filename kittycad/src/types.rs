@@ -1086,7 +1086,10 @@ impl tabled::Tabled for AsyncApiCall {
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
     FileConversion(FileConversion),
+    File2DVectorConversion(File2DVectorConversion),
+    File3DConversion(File3DConversion),
     FileCenterOfMass(FileCenterOfMass),
+    FileCenterOfMassWithUniformDensity(FileCenterOfMassWithUniformDensity),
     FileMass(FileMass),
     FileVolume(FileVolume),
     FileDensity(FileDensity),
@@ -1176,8 +1179,11 @@ impl tabled::Tabled for AsyncApiCallResultsPage {
 )]
 pub enum AsyncApiCallType {
     FileConversion,
+    File2DVectorConversion,
+    File3DConversion,
     FileVolume,
     FileCenterOfMass,
+    FileCenterOfMassWithUniformDensity,
     FileMass,
     FileDensity,
     FileSurfaceArea,
@@ -1376,7 +1382,7 @@ impl tabled::Tabled for CardDetails {
 pub struct Cluster {
     #[doc = "The IP address of the cluster."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub addr: Option<std::net::IpAddr>,
+    pub addr: Option<String>,
     #[doc = "The auth timeout of the cluster."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub auth_timeout: Option<i64>,
@@ -3589,7 +3595,7 @@ impl tabled::Tabled for ExecutorMetadata {
 
 #[doc = "Extended user information.\n\nThis is mostly used for internal purposes. It returns a \
          mapping of the user's information, including that of our third party services we use for \
-         users: MailChimp, Stripe, and Zendesk."]
+         users: MailChimp, Stripe, and Front"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -3611,6 +3617,9 @@ pub struct ExtendedUser {
     #[doc = "The user's first name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub first_name: Option<String>,
+    #[doc = "The user's Front ID. This is mostly used for internal mapping."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub front_id: Option<String>,
     #[doc = "The user's GitHub handle."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub github: Option<String>,
@@ -3638,9 +3647,6 @@ pub struct ExtendedUser {
     pub stripe_id: Option<String>,
     #[doc = "The date and time the user was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user's Zendesk ID. This is mostly used for internal mapping."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub zendesk_id: Option<String>,
 }
 
 impl std::fmt::Display for ExtendedUser {
@@ -3683,6 +3689,11 @@ impl tabled::Tabled for ExtendedUser {
             } else {
                 String::new()
             },
+            if let Some(front_id) = &self.front_id {
+                format!("{:?}", front_id)
+            } else {
+                String::new()
+            },
             if let Some(github) = &self.github {
                 format!("{:?}", github)
             } else {
@@ -3716,11 +3727,6 @@ impl tabled::Tabled for ExtendedUser {
                 String::new()
             },
             format!("{:?}", self.updated_at),
-            if let Some(zendesk_id) = &self.zendesk_id {
-                format!("{:?}", zendesk_id)
-            } else {
-                String::new()
-            },
         ]
     }
 
@@ -3732,6 +3738,7 @@ impl tabled::Tabled for ExtendedUser {
             "email".to_string(),
             "email_verified".to_string(),
             "first_name".to_string(),
+            "front_id".to_string(),
             "github".to_string(),
             "id".to_string(),
             "image".to_string(),
@@ -3741,7 +3748,6 @@ impl tabled::Tabled for ExtendedUser {
             "phone".to_string(),
             "stripe_id".to_string(),
             "updated_at".to_string(),
-            "zendesk_id".to_string(),
         ]
     }
 }
@@ -3813,6 +3819,346 @@ impl tabled::Tabled for ExtendedUserResultsPage {
     }
 }
 
+#[doc = "A 2D Vector file conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct File2DVectorConversion {
+    #[doc = "The time and date the API call was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the API call was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The converted file, if completed, base64 encoded."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<base64::Base64Data>,
+    #[doc = "The output format of the file conversion."]
+    pub output_format: File2DVectorExportFormat,
+    #[doc = "The source format of the file conversion."]
+    pub src_format: File2DVectorImportFormat,
+    #[doc = "The time and date the API call was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the API call."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the API call was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for File2DVectorConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for File2DVectorConversion {
+    const LENGTH: usize = 11;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of Vector output file formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq, Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum File2DVectorExportFormat {
+    #[serde(rename = "dxf")]
+    #[display("dxf")]
+    Dxf,
+    #[serde(rename = "json")]
+    #[display("json")]
+    Json,
+    #[serde(rename = "png")]
+    #[display("png")]
+    Png,
+    #[serde(rename = "ps")]
+    #[display("ps")]
+    Ps,
+    #[serde(rename = "svg")]
+    #[display("svg")]
+    Svg,
+}
+
+#[doc = "The valid types of Vector source file formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq, Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum File2DVectorImportFormat {
+    #[serde(rename = "dxf")]
+    #[display("dxf")]
+    Dxf,
+    #[serde(rename = "svg")]
+    #[display("svg")]
+    Svg,
+}
+
+#[doc = "A 3D file conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct File3DConversion {
+    #[doc = "The time and date the API call was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the API call was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The converted file, if completed, base64 encoded."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<base64::Base64Data>,
+    #[doc = "The output format of the file conversion."]
+    pub output_format: File3DExportFormat,
+    #[doc = "The source format of the file conversion."]
+    pub src_format: File3DImportFormat,
+    #[doc = "The time and date the API call was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the API call."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the API call was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for File3DConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for File3DConversion {
+    const LENGTH: usize = 11;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of 3d output file formats, can include formats that use suplimentary \
+         files. For example, the OBJ format can use a MTL file."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq, Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum File3DExportFormat {
+    #[serde(rename = "dae")]
+    #[display("dae")]
+    Dae,
+    #[serde(rename = "fbx")]
+    #[display("fbx")]
+    Fbx,
+    #[serde(rename = "fbxb")]
+    #[display("fbxb")]
+    Fbxb,
+    #[serde(rename = "obj")]
+    #[display("obj")]
+    Obj,
+    #[serde(rename = "obj_nomtl")]
+    #[display("obj_nomtl")]
+    ObjNomtl,
+    #[serde(rename = "ply")]
+    #[display("ply")]
+    Ply,
+    #[serde(rename = "step")]
+    #[display("step")]
+    Step,
+    #[serde(rename = "stl")]
+    #[display("stl")]
+    Stl,
+}
+
+#[doc = "The valid types of 3d source file formats, can include formats that use suplimentary \
+         files. For example, the OBJ format can use a MTL file."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq, Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum File3DImportFormat {
+    #[serde(rename = "dae")]
+    #[display("dae")]
+    Dae,
+    #[serde(rename = "dxf")]
+    #[display("dxf")]
+    Dxf,
+    #[serde(rename = "fbx")]
+    #[display("fbx")]
+    Fbx,
+    #[serde(rename = "obj_zip")]
+    #[display("obj_zip")]
+    ObjZip,
+    #[serde(rename = "obj")]
+    #[display("obj")]
+    Obj,
+    #[serde(rename = "obj_nomtl")]
+    #[display("obj_nomtl")]
+    ObjNomtl,
+    #[serde(rename = "ply")]
+    #[display("ply")]
+    Ply,
+    #[serde(rename = "step")]
+    #[display("step")]
+    Step,
+    #[serde(rename = "stl")]
+    #[display("stl")]
+    Stl,
+}
+
 #[doc = "A file center of mass result."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -3821,30 +4167,29 @@ pub struct FileCenterOfMass {
     #[doc = "The resulting center of mass."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub center_of_mass: Option<Vec<f64>>,
-    #[doc = "The time and date the mass was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the mass was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the center of mass request.\n\nThis is the same as the API \
-             call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The material density as denoted by the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub material_density: Option<f64>,
     #[doc = "The source format of the file."]
-    pub src_format: FileSourceFormat,
-    #[doc = "The time and date the mass was started."]
+    pub src_format: File3DImportFormat,
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the mass."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the mass was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the mass."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -3918,36 +4263,131 @@ impl tabled::Tabled for FileCenterOfMass {
     }
 }
 
+#[doc = "A file center of mass result."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FileCenterOfMassWithUniformDensity {
+    #[doc = "The resulting center of mass."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub center_of_mass: Option<Vec<f64>>,
+    #[doc = "The time and date the API call was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the API call was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The source format of the file."]
+    pub src_format: File3DImportFormat,
+    #[doc = "The time and date the API call was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the API call."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the API call was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for FileCenterOfMassWithUniformDensity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for FileCenterOfMassWithUniformDensity {
+    const LENGTH: usize = 10;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(center_of_mass) = &self.center_of_mass {
+                format!("{:?}", center_of_mass)
+            } else {
+                String::new()
+            },
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "center_of_mass".to_string(),
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
 #[doc = "A file conversion."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FileConversion {
-    #[doc = "The time and date the file conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the file conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the file conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The converted file, if completed, base64 encoded."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub output: Option<base64::Base64Data>,
     #[doc = "The output format of the file conversion."]
-    pub output_format: FileOutputFormat,
+    pub output_format: FileExportFormat,
     #[doc = "The source format of the file conversion."]
-    pub src_format: FileSourceFormat,
-    #[doc = "The time and date the file conversion was started."]
+    pub src_format: FileImportFormat,
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the file conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the file conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the file conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -4022,10 +4462,10 @@ impl tabled::Tabled for FileConversion {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FileDensity {
-    #[doc = "The time and date the density was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the density was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The resulting density."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -4033,21 +4473,21 @@ pub struct FileDensity {
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the density request.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The material mass as denoted by the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub material_mass: Option<f64>,
     #[doc = "The source format of the file."]
-    pub src_format: FileSourceFormat,
-    #[doc = "The time and date the density was started."]
+    pub src_format: File3DImportFormat,
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the density."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the density was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the density."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -4121,20 +4561,117 @@ impl tabled::Tabled for FileDensity {
     }
 }
 
+#[doc = "The valid types of output file formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq, Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum FileExportFormat {
+    #[serde(rename = "dae")]
+    #[display("dae")]
+    Dae,
+    #[serde(rename = "dxf")]
+    #[display("dxf")]
+    Dxf,
+    #[serde(rename = "fbx")]
+    #[display("fbx")]
+    Fbx,
+    #[serde(rename = "fbxb")]
+    #[display("fbxb")]
+    Fbxb,
+    #[serde(rename = "json")]
+    #[display("json")]
+    Json,
+    #[serde(rename = "obj")]
+    #[display("obj")]
+    Obj,
+    #[serde(rename = "obj_nomtl")]
+    #[display("obj_nomtl")]
+    ObjNomtl,
+    #[serde(rename = "ply")]
+    #[display("ply")]
+    Ply,
+    #[serde(rename = "step")]
+    #[display("step")]
+    Step,
+    #[serde(rename = "stl")]
+    #[display("stl")]
+    Stl,
+    #[serde(rename = "svg")]
+    #[display("svg")]
+    Svg,
+}
+
+#[doc = "The valid types of source file formats."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq, Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum FileImportFormat {
+    #[serde(rename = "dae")]
+    #[display("dae")]
+    Dae,
+    #[serde(rename = "dxf")]
+    #[display("dxf")]
+    Dxf,
+    #[serde(rename = "fbx")]
+    #[display("fbx")]
+    Fbx,
+    #[serde(rename = "obj_zip")]
+    #[display("obj_zip")]
+    ObjZip,
+    #[serde(rename = "obj")]
+    #[display("obj")]
+    Obj,
+    #[serde(rename = "obj_nomtl")]
+    #[display("obj_nomtl")]
+    ObjNomtl,
+    #[serde(rename = "ply")]
+    #[display("ply")]
+    Ply,
+    #[serde(rename = "step")]
+    #[display("step")]
+    Step,
+    #[serde(rename = "stl")]
+    #[display("stl")]
+    Stl,
+    #[serde(rename = "svg")]
+    #[display("svg")]
+    Svg,
+}
+
 #[doc = "A file mass result."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FileMass {
-    #[doc = "The time and date the mass was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the mass was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the mass request.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The resulting mass."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -4143,15 +4680,15 @@ pub struct FileMass {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub material_density: Option<f64>,
     #[doc = "The source format of the file."]
-    pub src_format: FileSourceFormat,
-    #[doc = "The time and date the mass was started."]
+    pub src_format: File3DImportFormat,
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the mass."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the mass was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the mass."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -4225,101 +4762,34 @@ impl tabled::Tabled for FileMass {
     }
 }
 
-#[doc = "The valid types of output file formats."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq, Eq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-pub enum FileOutputFormat {
-    #[serde(rename = "stl")]
-    #[display("stl")]
-    Stl,
-    #[serde(rename = "obj")]
-    #[display("obj")]
-    Obj,
-    #[serde(rename = "dae")]
-    #[display("dae")]
-    Dae,
-    #[serde(rename = "step")]
-    #[display("step")]
-    Step,
-    #[serde(rename = "fbx")]
-    #[display("fbx")]
-    Fbx,
-    #[serde(rename = "fbxb")]
-    #[display("fbxb")]
-    Fbxb,
-}
-
-#[doc = "The valid types of source file formats."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq, Eq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-pub enum FileSourceFormat {
-    #[serde(rename = "stl")]
-    #[display("stl")]
-    Stl,
-    #[serde(rename = "obj")]
-    #[display("obj")]
-    Obj,
-    #[serde(rename = "dae")]
-    #[display("dae")]
-    Dae,
-    #[serde(rename = "step")]
-    #[display("step")]
-    Step,
-    #[serde(rename = "fbx")]
-    #[display("fbx")]
-    Fbx,
-}
-
 #[doc = "A file surface area result."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FileSurfaceArea {
-    #[doc = "The time and date the density was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the density was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the density request.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The source format of the file."]
-    pub src_format: FileSourceFormat,
-    #[doc = "The time and date the density was started."]
+    pub src_format: File3DImportFormat,
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the density."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
     #[doc = "The resulting surface area."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub surface_area: Option<f64>,
-    #[doc = "The time and date the density was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the density."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -4423,26 +4893,26 @@ impl tabled::Tabled for FileSystemMetadata {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FileVolume {
-    #[doc = "The time and date the volume was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the volume was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the volume request.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The source format of the file."]
-    pub src_format: FileSourceFormat,
-    #[doc = "The time and date the volume was started."]
+    pub src_format: File3DImportFormat,
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the volume."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the volume was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the volume."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
     #[doc = "The resulting volume."]
@@ -4586,6 +5056,29 @@ impl tabled::Tabled for Gateway {
             "tls_timeout".to_string(),
         ]
     }
+}
+
+#[doc = "An enumeration."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq, Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum ImageType {
+    #[serde(rename = "png")]
+    #[display("png")]
+    Png,
+    #[serde(rename = "jpg")]
+    #[display("jpg")]
+    Jpg,
 }
 
 #[doc = "IndexInfo contains information about a registry."]
@@ -5372,6 +5865,34 @@ impl tabled::Tabled for LeafNode {
     }
 }
 
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Mesh {
+    pub mesh: String,
+}
+
+impl std::fmt::Display for Mesh {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for Mesh {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<String> {
+        vec![self.mesh.clone()]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["mesh".to_string()]
+    }
+}
+
 #[doc = "Jetstream statistics."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
@@ -5447,6 +5968,8 @@ pub struct Metadata {
     pub fs: FileSystemMetadata,
     #[doc = "The git hash of the server."]
     pub git_hash: String,
+    #[doc = "Metadata about our point-e instance."]
+    pub point_e: PointEMetadata,
     #[doc = "Metadata about our pub-sub connection."]
     pub pubsub: Connection,
 }
@@ -5462,7 +5985,7 @@ impl std::fmt::Display for Metadata {
 }
 
 impl tabled::Tabled for Metadata {
-    const LENGTH: usize = 7;
+    const LENGTH: usize = 8;
     fn fields(&self) -> Vec<String> {
         vec![
             format!("{:?}", self.cache),
@@ -5471,6 +5994,7 @@ impl tabled::Tabled for Metadata {
             format!("{:?}", self.executor),
             format!("{:?}", self.fs),
             self.git_hash.clone(),
+            format!("{:?}", self.point_e),
             format!("{:?}", self.pubsub),
         ]
     }
@@ -5483,6 +6007,7 @@ impl tabled::Tabled for Metadata {
             "executor".to_string(),
             "fs".to_string(),
             "git_hash".to_string(),
+            "point_e".to_string(),
             "pubsub".to_string(),
         ]
     }
@@ -5713,6 +6238,66 @@ pub enum Oauth2GrantType {
 impl std::default::Default for Oauth2GrantType {
     fn default() -> Self {
         Oauth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode
+    }
+}
+
+#[doc = "Onboarding details"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Onboarding {
+    #[doc = "When the user first called an endpoint from their machine (i.e. not a litterbox \
+             execution)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_call_from_their_machine_date: Option<String>,
+    #[doc = "When the user first used the litterbox"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_litterbox_execute_date: Option<String>,
+    #[doc = "When the user created their first token"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_token_date: Option<String>,
+}
+
+impl std::fmt::Display for Onboarding {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for Onboarding {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(first_call_from_their_machine_date) =
+                &self.first_call_from_their_machine_date
+            {
+                format!("{:?}", first_call_from_their_machine_date)
+            } else {
+                String::new()
+            },
+            if let Some(first_litterbox_execute_date) = &self.first_litterbox_execute_date {
+                format!("{:?}", first_litterbox_execute_date)
+            } else {
+                String::new()
+            },
+            if let Some(first_token_date) = &self.first_token_date {
+                format!("{:?}", first_token_date)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "first_call_from_their_machine_date".to_string(),
+            "first_litterbox_execute_date".to_string(),
+            "first_token_date".to_string(),
+        ]
     }
 }
 
@@ -5961,27 +6546,26 @@ impl std::default::Default for PaymentMethodType {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PhysicsConstant {
-    #[doc = "The time and date the constant was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The constant we are returning."]
     pub constant: PhysicsConstantName,
-    #[doc = "The time and date the constant was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the constant request.\n\nThis is the same as the API call \
-             ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
-    #[doc = "The time and date the constant was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the constant."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the constant was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the constant."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
     #[doc = "The resulting value of the constant."]
@@ -6077,15 +6661,15 @@ pub enum PhysicsConstantName {
     #[display("speed_of_light")]
     SpeedOfLight,
     G,
-    #[serde(rename = "newtonian_graviation")]
-    #[display("newtonian_graviation")]
-    NewtonianGraviation,
+    #[serde(rename = "newtonian_gravitation")]
+    #[display("newtonian_gravitation")]
+    NewtonianGravitation,
     #[serde(rename = "h")]
     #[display("h")]
     H,
-    #[serde(rename = "plank_const")]
-    #[display("plank_const")]
-    PlankConst,
+    #[serde(rename = "planck_const")]
+    #[display("planck_const")]
+    PlanckConst,
     #[serde(rename = "mu_0")]
     #[display("mu_0")]
     Mu0,
@@ -6227,6 +6811,37 @@ impl tabled::Tabled for PluginsInfo {
             "network".to_string(),
             "volume".to_string(),
         ]
+    }
+}
+
+#[doc = "Metadata about our point-e instance.\n\nThis is mostly used for internal purposes and \
+         debugging."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PointEMetadata {
+    #[doc = "If the point-e service returned an ok response from ping."]
+    pub ok: bool,
+}
+
+impl std::fmt::Display for PointEMetadata {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for PointEMetadata {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.ok)]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["ok".to_string()]
     }
 }
 
@@ -6591,15 +7206,15 @@ pub enum SystemInfoIsolationEnum {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitAccelerationConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -6611,14 +7226,14 @@ pub struct UnitAccelerationConversion {
     pub output_format: UnitAccelerationFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitAccelerationFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -6694,7 +7309,7 @@ impl tabled::Tabled for UnitAccelerationConversion {
     }
 }
 
-#[doc = "The valid types of metric unit formats."]
+#[doc = "The valid types of acceleration unit formats."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -6725,15 +7340,15 @@ pub enum UnitAccelerationFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitAngleConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -6745,14 +7360,14 @@ pub struct UnitAngleConversion {
     pub output_format: UnitAngleFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitAngleFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -6871,15 +7486,15 @@ pub enum UnitAngleFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitAngularVelocityConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -6891,14 +7506,14 @@ pub struct UnitAngularVelocityConversion {
     pub output_format: UnitAngularVelocityFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitAngularVelocityFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -7008,15 +7623,15 @@ pub enum UnitAngularVelocityFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitAreaConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -7028,14 +7643,14 @@ pub struct UnitAreaConversion {
     pub output_format: UnitAreaFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitAreaFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -7154,15 +7769,15 @@ pub enum UnitAreaFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitChargeConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -7174,14 +7789,14 @@ pub struct UnitChargeConversion {
     pub output_format: UnitChargeFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitChargeFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -7285,15 +7900,15 @@ pub enum UnitChargeFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitConcentrationConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -7305,14 +7920,14 @@ pub struct UnitConcentrationConversion {
     pub output_format: UnitConcentrationFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitConcentrationFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -7422,15 +8037,15 @@ pub enum UnitConcentrationFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitDataConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -7442,14 +8057,14 @@ pub struct UnitDataConversion {
     pub output_format: UnitDataFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitDataFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -7559,15 +8174,15 @@ pub enum UnitDataFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitDataTransferRateConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -7579,14 +8194,14 @@ pub struct UnitDataTransferRateConversion {
     pub output_format: UnitDataTransferRateFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitDataTransferRateFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -7696,15 +8311,15 @@ pub enum UnitDataTransferRateFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitDensityConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -7716,14 +8331,14 @@ pub struct UnitDensityConversion {
     pub output_format: UnitDensityFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitDensityFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -7851,15 +8466,15 @@ pub enum UnitDensityFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitEnergyConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -7871,14 +8486,14 @@ pub struct UnitEnergyConversion {
     pub output_format: UnitEnergyFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitEnergyFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -7975,6 +8590,12 @@ pub enum UnitEnergyFormat {
     #[serde(rename = "calorie")]
     #[display("calorie")]
     Calorie,
+    #[serde(rename = "kilowatt_hour")]
+    #[display("kilowatt_hour")]
+    KilowattHour,
+    #[serde(rename = "watt_hour")]
+    #[display("watt_hour")]
+    WattHour,
     #[serde(rename = "british_thermal_unit")]
     #[display("british_thermal_unit")]
     BritishThermalUnit,
@@ -7984,6 +8605,9 @@ pub enum UnitEnergyFormat {
     #[serde(rename = "british_thermal_unit59")]
     #[display("british_thermal_unit59")]
     BritishThermalUnit59,
+    #[serde(rename = "therm")]
+    #[display("therm")]
+    Therm,
     #[serde(rename = "foot_pound")]
     #[display("foot_pound")]
     FootPound,
@@ -7994,15 +8618,15 @@ pub enum UnitEnergyFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitForceConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -8014,14 +8638,14 @@ pub struct UnitForceConversion {
     pub output_format: UnitForceFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitForceFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -8121,9 +8745,9 @@ pub enum UnitForceFormat {
     #[serde(rename = "dyne")]
     #[display("dyne")]
     Dyne,
-    #[serde(rename = "kilopound")]
-    #[display("kilopound")]
-    Kilopound,
+    #[serde(rename = "kilopond")]
+    #[display("kilopond")]
+    Kilopond,
     #[serde(rename = "poundal")]
     #[display("poundal")]
     Poundal,
@@ -8134,15 +8758,15 @@ pub enum UnitForceFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitIlluminanceConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -8154,14 +8778,14 @@ pub struct UnitIlluminanceConversion {
     pub output_format: UnitIlluminanceFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitIlluminanceFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -8271,15 +8895,15 @@ pub enum UnitIlluminanceFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitLengthConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -8291,14 +8915,14 @@ pub struct UnitLengthConversion {
     pub output_format: UnitLengthFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitLengthFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -8389,21 +9013,24 @@ impl tabled::Tabled for UnitLengthConversion {
     parse_display :: Display,
 )]
 pub enum UnitLengthFormat {
+    #[serde(rename = "meter")]
+    #[display("meter")]
+    Meter,
     #[serde(rename = "millimeter")]
     #[display("millimeter")]
     Millimeter,
     #[serde(rename = "centimeter")]
     #[display("centimeter")]
     Centimeter,
-    #[serde(rename = "meter")]
-    #[display("meter")]
-    Meter,
-    #[serde(rename = "kilomter")]
-    #[display("kilomter")]
-    Kilomter,
+    #[serde(rename = "kilometer")]
+    #[display("kilometer")]
+    Kilometer,
     #[serde(rename = "foot")]
     #[display("foot")]
     Foot,
+    #[serde(rename = "mil")]
+    #[display("mil")]
+    Mil,
     #[serde(rename = "inch")]
     #[display("inch")]
     Inch,
@@ -8416,6 +9043,15 @@ pub enum UnitLengthFormat {
     #[serde(rename = "astronomical_unit")]
     #[display("astronomical_unit")]
     AstronomicalUnit,
+    #[serde(rename = "lightyear")]
+    #[display("lightyear")]
+    Lightyear,
+    #[serde(rename = "parsec")]
+    #[display("parsec")]
+    Parsec,
+    #[serde(rename = "angstrom")]
+    #[display("angstrom")]
+    Angstrom,
     #[serde(rename = "cubit")]
     #[display("cubit")]
     Cubit,
@@ -8447,15 +9083,15 @@ pub enum UnitLengthFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitMagneticFieldStrengthConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -8467,14 +9103,14 @@ pub struct UnitMagneticFieldStrengthConversion {
     pub output_format: UnitMagneticFieldStrengthFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitMagneticFieldStrengthFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -8578,15 +9214,15 @@ pub enum UnitMagneticFieldStrengthFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitMagneticFluxConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -8598,14 +9234,14 @@ pub struct UnitMagneticFluxConversion {
     pub output_format: UnitMagneticFluxFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitMagneticFluxFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -8709,15 +9345,15 @@ pub enum UnitMagneticFluxFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitMassConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -8729,14 +9365,14 @@ pub struct UnitMassConversion {
     pub output_format: UnitMassFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitMassFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -8898,9 +9534,9 @@ pub enum UnitMetricPower {
     #[serde(rename = "deci")]
     #[display("deci")]
     Deci,
-    #[serde(rename = "metric_unit")]
-    #[display("metric_unit")]
-    MetricUnit,
+    #[serde(rename = "unit")]
+    #[display("unit")]
+    Unit,
     #[serde(rename = "deca")]
     #[display("deca")]
     Deca,
@@ -8932,15 +9568,15 @@ pub enum UnitMetricPower {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitMetricPowerConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -8952,14 +9588,14 @@ pub struct UnitMetricPowerConversion {
     pub output_format: UnitMetricPower,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitMetricPower,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -9040,15 +9676,15 @@ impl tabled::Tabled for UnitMetricPowerConversion {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitMetricPowerCubedConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -9060,14 +9696,14 @@ pub struct UnitMetricPowerCubedConversion {
     pub output_format: UnitMetricPower,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitMetricPower,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -9148,15 +9784,15 @@ impl tabled::Tabled for UnitMetricPowerCubedConversion {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitMetricPowerSquaredConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -9168,14 +9804,14 @@ pub struct UnitMetricPowerSquaredConversion {
     pub output_format: UnitMetricPower,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitMetricPower,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -9256,15 +9892,15 @@ impl tabled::Tabled for UnitMetricPowerSquaredConversion {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitPowerConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -9276,14 +9912,14 @@ pub struct UnitPowerConversion {
     pub output_format: UnitPowerFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitPowerFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -9390,15 +10026,15 @@ pub enum UnitPowerFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitPressureConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -9410,14 +10046,14 @@ pub struct UnitPressureConversion {
     pub output_format: UnitPressureFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitPressureFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -9530,15 +10166,15 @@ pub enum UnitPressureFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitRadiationConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -9550,14 +10186,14 @@ pub struct UnitRadiationConversion {
     pub output_format: UnitRadiationFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitRadiationFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -9633,7 +10269,8 @@ impl tabled::Tabled for UnitRadiationConversion {
     }
 }
 
-#[doc = "The valid types of radiation unit formats."]
+#[doc = "The valid types of radiation unit formats. These describe the radiation energy absorbed \
+         by a mass or material and/or how it affects the relative damage to the human body."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -9663,16 +10300,151 @@ pub enum UnitRadiationFormat {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct UnitSolidAngleConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+pub struct UnitRadioactivityConversion {
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The input value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<f64>,
+    #[doc = "The resulting value."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<f64>,
+    #[doc = "The output format of the unit conversion."]
+    pub output_format: UnitRadioactivityFormat,
+    #[doc = "The source format of the unit conversion."]
+    pub src_format: UnitRadioactivityFormat,
+    #[doc = "The time and date the API call was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the API call."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the API call was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
+}
+
+impl std::fmt::Display for UnitRadioactivityConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for UnitRadioactivityConversion {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.created_at),
+            if let Some(error) = &self.error {
+                format!("{:?}", error)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.id),
+            if let Some(input) = &self.input {
+                format!("{:?}", input)
+            } else {
+                String::new()
+            },
+            if let Some(output) = &self.output {
+                format!("{:?}", output)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.output_format),
+            format!("{:?}", self.src_format),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at)
+            } else {
+                String::new()
+            },
+            format!("{:?}", self.status),
+            format!("{:?}", self.updated_at),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "completed_at".to_string(),
+            "created_at".to_string(),
+            "error".to_string(),
+            "id".to_string(),
+            "input".to_string(),
+            "output".to_string(),
+            "output_format".to_string(),
+            "src_format".to_string(),
+            "started_at".to_string(),
+            "status".to_string(),
+            "updated_at".to_string(),
+            "user_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "The valid types of radioactivity unit formats. These describe the amount of radiation \
+         emitted by a radioactive material."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq, Eq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum UnitRadioactivityFormat {
+    #[serde(rename = "becquerel")]
+    #[display("becquerel")]
+    Becquerel,
+    #[serde(rename = "curie")]
+    #[display("curie")]
+    Curie,
+    #[serde(rename = "rutherford")]
+    #[display("rutherford")]
+    Rutherford,
+}
+
+#[doc = "A unit conversion."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UnitSolidAngleConversion {
+    #[doc = "The time and date the API call was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the API call was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -9684,14 +10456,14 @@ pub struct UnitSolidAngleConversion {
     pub output_format: UnitSolidAngleFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitSolidAngleFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -9798,15 +10570,15 @@ pub enum UnitSolidAngleFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitTemperatureConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -9818,14 +10590,14 @@ pub struct UnitTemperatureConversion {
     pub output_format: UnitTemperatureFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitTemperatureFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -9938,15 +10710,15 @@ pub enum UnitTemperatureFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitTimeConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -9958,14 +10730,14 @@ pub struct UnitTimeConversion {
     pub output_format: UnitTimeFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitTimeFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -10087,15 +10859,15 @@ pub enum UnitTimeFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitVelocityConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -10107,14 +10879,14 @@ pub struct UnitVelocityConversion {
     pub output_format: UnitVelocityFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitVelocityFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -10227,15 +10999,15 @@ pub enum UnitVelocityFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitVoltageConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -10247,14 +11019,14 @@ pub struct UnitVoltageConversion {
     pub output_format: UnitVoltageFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitVoltageFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -10361,15 +11133,15 @@ pub enum UnitVoltageFormat {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UnitVolumeConversion {
-    #[doc = "The time and date the unit conversion was completed."]
+    #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the unit conversion was created."]
+    #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the unit conversion.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The input value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -10381,14 +11153,14 @@ pub struct UnitVolumeConversion {
     pub output_format: UnitVolumeFormat,
     #[doc = "The source format of the unit conversion."]
     pub src_format: UnitVolumeFormat,
-    #[doc = "The time and date the unit conversion was started."]
+    #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the unit conversion."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the unit conversion was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the unit conversion."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -10479,21 +11251,24 @@ impl tabled::Tabled for UnitVolumeConversion {
     parse_display :: Display,
 )]
 pub enum UnitVolumeFormat {
-    #[serde(rename = "cubic_millimeter")]
-    #[display("cubic_millimeter")]
-    CubicMillimeter,
-    #[serde(rename = "cubic_centimeter")]
-    #[display("cubic_centimeter")]
-    CubicCentimeter,
     #[serde(rename = "cubic_meter")]
     #[display("cubic_meter")]
     CubicMeter,
+    #[serde(rename = "cubic_centimeter")]
+    #[display("cubic_centimeter")]
+    CubicCentimeter,
+    #[serde(rename = "cubic_millimeter")]
+    #[display("cubic_millimeter")]
+    CubicMillimeter,
     #[serde(rename = "cubic_kilometer")]
     #[display("cubic_kilometer")]
     CubicKilometer,
     #[serde(rename = "liter")]
     #[display("liter")]
     Liter,
+    #[serde(rename = "cubic_inch")]
+    #[display("cubic_inch")]
+    CubicInch,
     #[serde(rename = "cubic_foot")]
     #[display("cubic_foot")]
     CubicFoot,
@@ -10503,6 +11278,69 @@ pub enum UnitVolumeFormat {
     #[serde(rename = "cubic_mile")]
     #[display("cubic_mile")]
     CubicMile,
+    #[serde(rename = "gallon")]
+    #[display("gallon")]
+    Gallon,
+    #[serde(rename = "quart")]
+    #[display("quart")]
+    Quart,
+    #[serde(rename = "pint")]
+    #[display("pint")]
+    Pint,
+    #[serde(rename = "cup")]
+    #[display("cup")]
+    Cup,
+    #[serde(rename = "fluid_ounce")]
+    #[display("fluid_ounce")]
+    FluidOunce,
+    #[serde(rename = "barrel")]
+    #[display("barrel")]
+    Barrel,
+    #[serde(rename = "bushel")]
+    #[display("bushel")]
+    Bushel,
+    #[serde(rename = "cord")]
+    #[display("cord")]
+    Cord,
+    #[serde(rename = "cubic_fathom")]
+    #[display("cubic_fathom")]
+    CubicFathom,
+    #[serde(rename = "tablespoon")]
+    #[display("tablespoon")]
+    Tablespoon,
+    #[serde(rename = "teaspoon")]
+    #[display("teaspoon")]
+    Teaspoon,
+    #[serde(rename = "pinch")]
+    #[display("pinch")]
+    Pinch,
+    #[serde(rename = "dash")]
+    #[display("dash")]
+    Dash,
+    #[serde(rename = "drop")]
+    #[display("drop")]
+    Drop,
+    #[serde(rename = "fifth")]
+    #[display("fifth")]
+    Fifth,
+    #[serde(rename = "dram")]
+    #[display("dram")]
+    Dram,
+    #[serde(rename = "gill")]
+    #[display("gill")]
+    Gill,
+    #[serde(rename = "peck")]
+    #[display("peck")]
+    Peck,
+    #[serde(rename = "sack")]
+    #[display("sack")]
+    Sack,
+    #[serde(rename = "shot")]
+    #[display("shot")]
+    Shot,
+    #[serde(rename = "strike")]
+    #[display("strike")]
+    Strike,
 }
 
 #[doc = "The user-modifiable parts of a User."]

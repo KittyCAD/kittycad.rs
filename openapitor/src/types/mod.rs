@@ -965,9 +965,10 @@ impl TypeSpace {
                             Some(v) => v,
                             None => {
                                 anyhow::bail!(
-                            "no property `{}` in object, even through we thought we had content",
-                            content
-                        );
+                                    "no property `{}` in object, even through we thought we had \
+                                     content",
+                                    content
+                                );
                             }
                         };
 
