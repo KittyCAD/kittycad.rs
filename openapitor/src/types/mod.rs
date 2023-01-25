@@ -1733,6 +1733,8 @@ pub fn proper_name(s: &str) -> String {
         "FiftyFivePlus".to_string()
     } else if s == "65+" {
         "SixtyFivePlus".to_string()
+    } else if s == "-" {
+        "Dash".to_string()
     } else {
         s
     };
