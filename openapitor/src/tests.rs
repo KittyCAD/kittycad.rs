@@ -33,7 +33,6 @@ impl AsyncTestContext for TestContext {
 
 #[test_context(TestContext)]
 #[tokio::test]
-#[ignore]
 async fn test_kittycad_generation(ctx: &mut TestContext) {
     let opts = crate::Opts {
         debug: true,

@@ -205,16 +205,11 @@ pub mod phone_number {
                 return Ok(PhoneNumber(None));
             }
             let s = if !s.trim().starts_with('+') {
-                format!("+1{}", s)
+                format!("+1{s}")
                     .replace('-', "")
-                    .replace('(', "")
-                    .replace(')', "")
-                    .replace(' ', "")
+                    .replace(['(', ')', ' '], "")
             } else {
-                s.replace('-', "")
-                    .replace('(', "")
-                    .replace(')', "")
-                    .replace(' ', "")
+                s.replace(['-', '(', ')', ' '], "")
             };
             Ok(PhoneNumber(Some(phonenumber::parse(None, &s).map_err(
                 |e| anyhow::anyhow!("invalid phone number `{}`: {}", s, e),
@@ -232,7 +227,7 @@ pub mod phone_number {
             } else {
                 String::new()
             };
-            write!(f, "{}", s)
+            write!(f, "{s}")
         }
     }
 
@@ -261,40 +256,40 @@ pub mod phone_number {
         fn test_parse_phone_number() {
             let mut phone = "+1-555-555-5555";
             let mut phone_parsed: PhoneNumber =
-                serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+                serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             let mut expected = PhoneNumber(Some(phonenumber::parse(None, phone).unwrap()));
             assert_eq!(phone_parsed, expected);
             let mut expected_str = "+1 555-555-5555";
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
             phone = "555-555-5555";
-            phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+            phone_parsed = serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             assert_eq!(phone_parsed, expected);
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
             phone = "+1 555-555-5555";
-            phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+            phone_parsed = serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             assert_eq!(phone_parsed, expected);
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
             phone = "5555555555";
-            phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+            phone_parsed = serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             assert_eq!(phone_parsed, expected);
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
             phone = "(510) 864-1234";
-            phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+            phone_parsed = serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             expected = PhoneNumber(Some(phonenumber::parse(None, "+15108641234").unwrap()));
             assert_eq!(phone_parsed, expected);
             expected_str = "+1 510-864-1234";
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
             phone = "(510)8641234";
-            phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+            phone_parsed = serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             assert_eq!(phone_parsed, expected);
             expected_str = "+1 510-864-1234";
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
             phone = "";
-            phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+            phone_parsed = serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             assert_eq!(phone_parsed, PhoneNumber(None));
             assert_eq!("", serde_json::json!(phone_parsed));
             phone = "+49 30  1234 1234";
-            phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+            phone_parsed = serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             expected = PhoneNumber(Some(phonenumber::parse(None, phone).unwrap()));
             assert_eq!(phone_parsed, expected);
             expected_str = "+49 30 12341234";
@@ -371,22 +366,22 @@ pub mod error {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Error::InvalidRequest(s) => {
-                    write!(f, "Invalid Request: {}", s)
+                    write!(f, "Invalid Request: {s}")
                 }
                 Error::CommunicationError(e) => {
-                    write!(f, "Communication Error: {}", e)
+                    write!(f, "Communication Error: {e}")
                 }
                 Error::RequestError(e) => {
-                    write!(f, "Request Error: {}", e)
+                    write!(f, "Request Error: {e}")
                 }
                 Error::SerdeError { error, status: _ } => {
-                    write!(f, "Serde Error: {}", error)
+                    write!(f, "Serde Error: {error}")
                 }
                 Error::InvalidResponsePayload { error, response: _ } => {
-                    write!(f, "Invalid Response Payload: {}", error)
+                    write!(f, "Invalid Response Payload: {error}")
                 }
                 Error::UnexpectedResponse(r) => {
-                    write!(f, "Unexpected Response: {:?}", r)
+                    write!(f, "Unexpected Response: {r:?}")
                 }
             }
         }
@@ -418,7 +413,7 @@ pub mod error {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -439,7 +434,7 @@ pub enum AccountProvider {
 
 #[doc = "A response for a query on the API call table that is grouped by something."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ApiCallQueryGroup {
     pub count: i64,
@@ -471,7 +466,7 @@ impl tabled::Tabled for ApiCallQueryGroup {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -506,7 +501,7 @@ pub enum ApiCallQueryGroupBy {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -609,80 +604,80 @@ impl tabled::Tabled for ApiCallWithPrice {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(duration) = &self.duration {
-                format!("{:?}", duration)
+                format!("{duration:?}")
             } else {
                 String::new()
             },
             if let Some(email) = &self.email {
-                format!("{:?}", email)
+                format!("{email:?}")
             } else {
                 String::new()
             },
             if let Some(endpoint) = &self.endpoint {
-                format!("{:?}", endpoint)
+                format!("{endpoint:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(ip_address) = &self.ip_address {
-                format!("{:?}", ip_address)
+                format!("{ip_address:?}")
             } else {
                 String::new()
             },
             if let Some(litterbox) = &self.litterbox {
-                format!("{:?}", litterbox)
+                format!("{litterbox:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.method),
             if let Some(minutes) = &self.minutes {
-                format!("{:?}", minutes)
+                format!("{minutes:?}")
             } else {
                 String::new()
             },
             if let Some(origin) = &self.origin {
-                format!("{:?}", origin)
+                format!("{origin:?}")
             } else {
                 String::new()
             },
             if let Some(price) = &self.price {
-                format!("{:?}", price)
+                format!("{price:?}")
             } else {
                 String::new()
             },
             if let Some(request_body) = &self.request_body {
-                format!("{:?}", request_body)
+                format!("{request_body:?}")
             } else {
                 String::new()
             },
             if let Some(request_query_params) = &self.request_query_params {
-                format!("{:?}", request_query_params)
+                format!("{request_query_params:?}")
             } else {
                 String::new()
             },
             if let Some(response_body) = &self.response_body {
-                format!("{:?}", response_body)
+                format!("{response_body:?}")
             } else {
                 String::new()
             },
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             if let Some(status_code) = &self.status_code {
-                format!("{:?}", status_code)
+                format!("{status_code:?}")
             } else {
                 String::new()
             },
             if let Some(stripe_invoice_item_id) = &self.stripe_invoice_item_id {
-                format!("{:?}", stripe_invoice_item_id)
+                format!("{stripe_invoice_item_id:?}")
             } else {
                 String::new()
             },
@@ -690,7 +685,7 @@ impl tabled::Tabled for ApiCallWithPrice {
             format!("{:?}", self.updated_at),
             self.user_agent.clone(),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -759,8 +754,7 @@ impl crate::types::paginate::Pagination for ApiCallWithPriceResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -780,7 +774,7 @@ impl tabled::Tabled for ApiCallWithPriceResultsPage {
         vec![
             format!("{:?}", self.items),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{next_page:?}")
             } else {
                 String::new()
             },
@@ -794,7 +788,7 @@ impl tabled::Tabled for ApiCallWithPriceResultsPage {
 
 #[doc = "An API token.\n\nThese are used to authenticate users with Bearer authentication."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ApiToken {
     #[doc = "The date and time the API token was created."]
@@ -830,7 +824,7 @@ impl tabled::Tabled for ApiToken {
         vec![
             format!("{:?}", self.created_at),
             if let Some(id) = &self.id {
-                format!("{:?}", id)
+                format!("{id:?}")
             } else {
                 String::new()
             },
@@ -838,7 +832,7 @@ impl tabled::Tabled for ApiToken {
             format!("{:?}", self.token),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -859,7 +853,7 @@ impl tabled::Tabled for ApiToken {
 
 #[doc = "A single page of results"]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ApiTokenResultsPage {
     #[doc = "list of items on this page of results"]
@@ -891,8 +885,7 @@ impl crate::types::paginate::Pagination for ApiTokenResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -912,7 +905,7 @@ impl tabled::Tabled for ApiTokenResultsPage {
         vec![
             format!("{:?}", self.items),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{next_page:?}")
             } else {
                 String::new()
             },
@@ -926,7 +919,7 @@ impl tabled::Tabled for ApiTokenResultsPage {
 
 #[doc = "Information about a third party app client."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AppClientInfo {
     #[doc = "The URL for consent."]
@@ -948,7 +941,7 @@ impl tabled::Tabled for AppClientInfo {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<String> {
         vec![if let Some(url) = &self.url {
-            format!("{:?}", url)
+            format!("{url:?}")
         } else {
             String::new()
         }]
@@ -961,7 +954,7 @@ impl tabled::Tabled for AppClientInfo {
 
 #[doc = "An async API call."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AsyncApiCall {
     #[doc = "The time and date the async API call was completed."]
@@ -1013,29 +1006,29 @@ impl tabled::Tabled for AsyncApiCall {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
@@ -1043,12 +1036,12 @@ impl tabled::Tabled for AsyncApiCall {
             format!("{:?}", self.type_),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
             if let Some(worker) = &self.worker {
-                format!("{:?}", worker)
+                format!("{worker:?}")
             } else {
                 String::new()
             },
@@ -1089,7 +1082,6 @@ pub enum AsyncApiCallOutput {
     File2DVectorConversion(File2DVectorConversion),
     File3DConversion(File3DConversion),
     FileCenterOfMass(FileCenterOfMass),
-    FileCenterOfMassWithUniformDensity(FileCenterOfMassWithUniformDensity),
     FileMass(FileMass),
     FileVolume(FileVolume),
     FileDensity(FileDensity),
@@ -1130,8 +1122,7 @@ impl crate::types::paginate::Pagination for AsyncApiCallResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -1151,7 +1142,7 @@ impl tabled::Tabled for AsyncApiCallResultsPage {
         vec![
             format!("{:?}", self.items),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{next_page:?}")
             } else {
                 String::new()
             },
@@ -1167,7 +1158,7 @@ impl tabled::Tabled for AsyncApiCallResultsPage {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -1183,7 +1174,6 @@ pub enum AsyncApiCallType {
     File3DConversion,
     FileVolume,
     FileCenterOfMass,
-    FileCenterOfMassWithUniformDensity,
     FileMass,
     FileDensity,
     FileSurfaceArea,
@@ -1191,7 +1181,7 @@ pub enum AsyncApiCallType {
 
 #[doc = "The billing information for payments."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct BillingInfo {
     #[doc = "The address of the customer."]
@@ -1220,12 +1210,12 @@ impl tabled::Tabled for BillingInfo {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(address) = &self.address {
-                format!("{:?}", address)
+                format!("{address:?}")
             } else {
                 String::new()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{name:?}")
             } else {
                 String::new()
             },
@@ -1244,7 +1234,7 @@ impl tabled::Tabled for BillingInfo {
 
 #[doc = "Metadata about our cache.\n\nThis is mostly used for internal purposes and debugging."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CacheMetadata {
     #[doc = "If the cache returned an ok response from ping."]
@@ -1274,7 +1264,7 @@ impl tabled::Tabled for CacheMetadata {
 
 #[doc = "The card details of a payment method."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CardDetails {
     #[doc = "Card brand.\n\nCan be `amex`, `diners`, `discover`, `jcb`, `mastercard`, `unionpay`, \
@@ -1319,42 +1309,42 @@ impl tabled::Tabled for CardDetails {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(brand) = &self.brand {
-                format!("{:?}", brand)
+                format!("{brand:?}")
             } else {
                 String::new()
             },
             if let Some(checks) = &self.checks {
-                format!("{:?}", checks)
+                format!("{checks:?}")
             } else {
                 String::new()
             },
             if let Some(country) = &self.country {
-                format!("{:?}", country)
+                format!("{country:?}")
             } else {
                 String::new()
             },
             if let Some(exp_month) = &self.exp_month {
-                format!("{:?}", exp_month)
+                format!("{exp_month:?}")
             } else {
                 String::new()
             },
             if let Some(exp_year) = &self.exp_year {
-                format!("{:?}", exp_year)
+                format!("{exp_year:?}")
             } else {
                 String::new()
             },
             if let Some(fingerprint) = &self.fingerprint {
-                format!("{:?}", fingerprint)
+                format!("{fingerprint:?}")
             } else {
                 String::new()
             },
             if let Some(funding) = &self.funding {
-                format!("{:?}", funding)
+                format!("{funding:?}")
             } else {
                 String::new()
             },
             if let Some(last_4) = &self.last_4 {
-                format!("{:?}", last_4)
+                format!("{last_4:?}")
             } else {
                 String::new()
             },
@@ -1377,7 +1367,7 @@ impl tabled::Tabled for CardDetails {
 
 #[doc = "Cluster information."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Cluster {
     #[doc = "The IP address of the cluster."]
@@ -1415,32 +1405,32 @@ impl tabled::Tabled for Cluster {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(addr) = &self.addr {
-                format!("{:?}", addr)
+                format!("{addr:?}")
             } else {
                 String::new()
             },
             if let Some(auth_timeout) = &self.auth_timeout {
-                format!("{:?}", auth_timeout)
+                format!("{auth_timeout:?}")
             } else {
                 String::new()
             },
             if let Some(cluster_port) = &self.cluster_port {
-                format!("{:?}", cluster_port)
+                format!("{cluster_port:?}")
             } else {
                 String::new()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{name:?}")
             } else {
                 String::new()
             },
             if let Some(tls_timeout) = &self.tls_timeout {
-                format!("{:?}", tls_timeout)
+                format!("{tls_timeout:?}")
             } else {
                 String::new()
             },
             if let Some(urls) = &self.urls {
-                format!("{:?}", urls)
+                format!("{urls:?}")
             } else {
                 String::new()
             },
@@ -1463,7 +1453,7 @@ impl tabled::Tabled for Cluster {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -1487,7 +1477,7 @@ pub enum CodeLanguage {
 
 #[doc = "Output of the code being executed."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CodeOutput {
     #[doc = "The contents of the files requested if they were passed."]
@@ -1516,17 +1506,17 @@ impl tabled::Tabled for CodeOutput {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(output_files) = &self.output_files {
-                format!("{:?}", output_files)
+                format!("{output_files:?}")
             } else {
                 String::new()
             },
             if let Some(stderr) = &self.stderr {
-                format!("{:?}", stderr)
+                format!("{stderr:?}")
             } else {
                 String::new()
             },
             if let Some(stdout) = &self.stdout {
-                format!("{:?}", stdout)
+                format!("{stdout:?}")
             } else {
                 String::new()
             },
@@ -1545,7 +1535,7 @@ impl tabled::Tabled for CodeOutput {
 #[doc = "Commit holds the Git-commit (SHA1) that a binary was built from, as reported in the \
          version-string of external tools, such as `containerd`, or `runC`."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Commit {
     #[doc = "Commit ID of external tool expected by dockerd as set at build time."]
@@ -1571,12 +1561,12 @@ impl tabled::Tabled for Commit {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(expected) = &self.expected {
-                format!("{:?}", expected)
+                format!("{expected:?}")
             } else {
                 String::new()
             },
             if let Some(id) = &self.id {
-                format!("{:?}", id)
+                format!("{id:?}")
             } else {
                 String::new()
             },
@@ -1742,212 +1732,212 @@ impl tabled::Tabled for Connection {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(auth_timeout) = &self.auth_timeout {
-                format!("{:?}", auth_timeout)
+                format!("{auth_timeout:?}")
             } else {
                 String::new()
             },
             if let Some(cluster) = &self.cluster {
-                format!("{:?}", cluster)
+                format!("{cluster:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.config_load_time),
             if let Some(connections) = &self.connections {
-                format!("{:?}", connections)
+                format!("{connections:?}")
             } else {
                 String::new()
             },
             if let Some(cores) = &self.cores {
-                format!("{:?}", cores)
+                format!("{cores:?}")
             } else {
                 String::new()
             },
             if let Some(cpu) = &self.cpu {
-                format!("{:?}", cpu)
+                format!("{cpu:?}")
             } else {
                 String::new()
             },
             if let Some(gateway) = &self.gateway {
-                format!("{:?}", gateway)
+                format!("{gateway:?}")
             } else {
                 String::new()
             },
             if let Some(git_commit) = &self.git_commit {
-                format!("{:?}", git_commit)
+                format!("{git_commit:?}")
             } else {
                 String::new()
             },
             if let Some(go) = &self.go {
-                format!("{:?}", go)
+                format!("{go:?}")
             } else {
                 String::new()
             },
             if let Some(gomaxprocs) = &self.gomaxprocs {
-                format!("{:?}", gomaxprocs)
+                format!("{gomaxprocs:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.host),
             if let Some(http_base_path) = &self.http_base_path {
-                format!("{:?}", http_base_path)
+                format!("{http_base_path:?}")
             } else {
                 String::new()
             },
             if let Some(http_host) = &self.http_host {
-                format!("{:?}", http_host)
+                format!("{http_host:?}")
             } else {
                 String::new()
             },
             if let Some(http_port) = &self.http_port {
-                format!("{:?}", http_port)
+                format!("{http_port:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.http_req_stats),
             if let Some(https_port) = &self.https_port {
-                format!("{:?}", https_port)
+                format!("{https_port:?}")
             } else {
                 String::new()
             },
             if let Some(in_bytes) = &self.in_bytes {
-                format!("{:?}", in_bytes)
+                format!("{in_bytes:?}")
             } else {
                 String::new()
             },
             if let Some(in_msgs) = &self.in_msgs {
-                format!("{:?}", in_msgs)
+                format!("{in_msgs:?}")
             } else {
                 String::new()
             },
             if let Some(jetstream) = &self.jetstream {
-                format!("{:?}", jetstream)
+                format!("{jetstream:?}")
             } else {
                 String::new()
             },
             if let Some(leaf) = &self.leaf {
-                format!("{:?}", leaf)
+                format!("{leaf:?}")
             } else {
                 String::new()
             },
             if let Some(leafnodes) = &self.leafnodes {
-                format!("{:?}", leafnodes)
+                format!("{leafnodes:?}")
             } else {
                 String::new()
             },
             if let Some(max_connections) = &self.max_connections {
-                format!("{:?}", max_connections)
+                format!("{max_connections:?}")
             } else {
                 String::new()
             },
             if let Some(max_control_line) = &self.max_control_line {
-                format!("{:?}", max_control_line)
+                format!("{max_control_line:?}")
             } else {
                 String::new()
             },
             if let Some(max_payload) = &self.max_payload {
-                format!("{:?}", max_payload)
+                format!("{max_payload:?}")
             } else {
                 String::new()
             },
             if let Some(max_pending) = &self.max_pending {
-                format!("{:?}", max_pending)
+                format!("{max_pending:?}")
             } else {
                 String::new()
             },
             if let Some(mem) = &self.mem {
-                format!("{:?}", mem)
+                format!("{mem:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.now),
             if let Some(out_bytes) = &self.out_bytes {
-                format!("{:?}", out_bytes)
+                format!("{out_bytes:?}")
             } else {
                 String::new()
             },
             if let Some(out_msgs) = &self.out_msgs {
-                format!("{:?}", out_msgs)
+                format!("{out_msgs:?}")
             } else {
                 String::new()
             },
             if let Some(ping_interval) = &self.ping_interval {
-                format!("{:?}", ping_interval)
+                format!("{ping_interval:?}")
             } else {
                 String::new()
             },
             if let Some(ping_max) = &self.ping_max {
-                format!("{:?}", ping_max)
+                format!("{ping_max:?}")
             } else {
                 String::new()
             },
             if let Some(port) = &self.port {
-                format!("{:?}", port)
+                format!("{port:?}")
             } else {
                 String::new()
             },
             if let Some(proto) = &self.proto {
-                format!("{:?}", proto)
+                format!("{proto:?}")
             } else {
                 String::new()
             },
             if let Some(remotes) = &self.remotes {
-                format!("{:?}", remotes)
+                format!("{remotes:?}")
             } else {
                 String::new()
             },
             if let Some(routes) = &self.routes {
-                format!("{:?}", routes)
+                format!("{routes:?}")
             } else {
                 String::new()
             },
             if let Some(server_id) = &self.server_id {
-                format!("{:?}", server_id)
+                format!("{server_id:?}")
             } else {
                 String::new()
             },
             if let Some(server_name) = &self.server_name {
-                format!("{:?}", server_name)
+                format!("{server_name:?}")
             } else {
                 String::new()
             },
             if let Some(slow_consumers) = &self.slow_consumers {
-                format!("{:?}", slow_consumers)
+                format!("{slow_consumers:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.start),
             if let Some(subscriptions) = &self.subscriptions {
-                format!("{:?}", subscriptions)
+                format!("{subscriptions:?}")
             } else {
                 String::new()
             },
             if let Some(system_account) = &self.system_account {
-                format!("{:?}", system_account)
+                format!("{system_account:?}")
             } else {
                 String::new()
             },
             if let Some(tls_timeout) = &self.tls_timeout {
-                format!("{:?}", tls_timeout)
+                format!("{tls_timeout:?}")
             } else {
                 String::new()
             },
             if let Some(total_connections) = &self.total_connections {
-                format!("{:?}", total_connections)
+                format!("{total_connections:?}")
             } else {
                 String::new()
             },
             if let Some(uptime) = &self.uptime {
-                format!("{:?}", uptime)
+                format!("{uptime:?}")
             } else {
                 String::new()
             },
             if let Some(version) = &self.version {
-                format!("{:?}", version)
+                format!("{version:?}")
             } else {
                 String::new()
             },
             if let Some(write_deadline) = &self.write_deadline {
-                format!("{:?}", write_deadline)
+                format!("{write_deadline:?}")
             } else {
                 String::new()
             },
@@ -2011,7 +2001,7 @@ impl tabled::Tabled for Connection {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -2034,7 +2024,7 @@ pub enum CreatedAtSortMode {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -2524,39 +2514,39 @@ impl tabled::Tabled for Customer {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(address) = &self.address {
-                format!("{:?}", address)
+                format!("{address:?}")
             } else {
                 String::new()
             },
             if let Some(balance) = &self.balance {
-                format!("{:?}", balance)
+                format!("{balance:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             format!("{:?}", self.currency),
             if let Some(delinquent) = &self.delinquent {
-                format!("{:?}", delinquent)
+                format!("{delinquent:?}")
             } else {
                 String::new()
             },
             if let Some(email) = &self.email {
-                format!("{:?}", email)
+                format!("{email:?}")
             } else {
                 String::new()
             },
             if let Some(id) = &self.id {
-                format!("{:?}", id)
+                format!("{id:?}")
             } else {
                 String::new()
             },
             if let Some(metadata) = &self.metadata {
-                format!("{:?}", metadata)
+                format!("{metadata:?}")
             } else {
                 String::new()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{name:?}")
             } else {
                 String::new()
             },
@@ -2640,7 +2630,7 @@ impl tabled::Tabled for CustomerBalance {
             format!("{:?}", self.total_due),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -2663,7 +2653,7 @@ impl tabled::Tabled for CustomerBalance {
 
 #[doc = "The form for a device access token request."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct DeviceAccessTokenRequestForm {
     #[doc = "The client ID."]
@@ -2705,7 +2695,7 @@ impl tabled::Tabled for DeviceAccessTokenRequestForm {
 
 #[doc = "The request parameters for the OAuth 2.0 Device Authorization Grant flow."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct DeviceAuthRequestForm {
     #[doc = "The client ID."]
@@ -2736,7 +2726,7 @@ impl tabled::Tabled for DeviceAuthRequestForm {
 #[doc = "The request parameters to verify the `user_code` for the OAuth 2.0 Device Authorization \
          Grant."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct DeviceAuthVerifyParams {
     #[doc = "The user code."]
@@ -3017,302 +3007,302 @@ impl tabled::Tabled for DockerSystemInfo {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(architecture) = &self.architecture {
-                format!("{:?}", architecture)
+                format!("{architecture:?}")
             } else {
                 String::new()
             },
             if let Some(bridge_nf_ip_6tables) = &self.bridge_nf_ip_6tables {
-                format!("{:?}", bridge_nf_ip_6tables)
+                format!("{bridge_nf_ip_6tables:?}")
             } else {
                 String::new()
             },
             if let Some(bridge_nf_iptables) = &self.bridge_nf_iptables {
-                format!("{:?}", bridge_nf_iptables)
+                format!("{bridge_nf_iptables:?}")
             } else {
                 String::new()
             },
             if let Some(cgroup_driver) = &self.cgroup_driver {
-                format!("{:?}", cgroup_driver)
+                format!("{cgroup_driver:?}")
             } else {
                 String::new()
             },
             if let Some(cgroup_version) = &self.cgroup_version {
-                format!("{:?}", cgroup_version)
+                format!("{cgroup_version:?}")
             } else {
                 String::new()
             },
             if let Some(cluster_advertise) = &self.cluster_advertise {
-                format!("{:?}", cluster_advertise)
+                format!("{cluster_advertise:?}")
             } else {
                 String::new()
             },
             if let Some(cluster_store) = &self.cluster_store {
-                format!("{:?}", cluster_store)
+                format!("{cluster_store:?}")
             } else {
                 String::new()
             },
             if let Some(containerd_commit) = &self.containerd_commit {
-                format!("{:?}", containerd_commit)
+                format!("{containerd_commit:?}")
             } else {
                 String::new()
             },
             if let Some(containers) = &self.containers {
-                format!("{:?}", containers)
+                format!("{containers:?}")
             } else {
                 String::new()
             },
             if let Some(containers_paused) = &self.containers_paused {
-                format!("{:?}", containers_paused)
+                format!("{containers_paused:?}")
             } else {
                 String::new()
             },
             if let Some(containers_running) = &self.containers_running {
-                format!("{:?}", containers_running)
+                format!("{containers_running:?}")
             } else {
                 String::new()
             },
             if let Some(containers_stopped) = &self.containers_stopped {
-                format!("{:?}", containers_stopped)
+                format!("{containers_stopped:?}")
             } else {
                 String::new()
             },
             if let Some(cpu_cfs_period) = &self.cpu_cfs_period {
-                format!("{:?}", cpu_cfs_period)
+                format!("{cpu_cfs_period:?}")
             } else {
                 String::new()
             },
             if let Some(cpu_cfs_quota) = &self.cpu_cfs_quota {
-                format!("{:?}", cpu_cfs_quota)
+                format!("{cpu_cfs_quota:?}")
             } else {
                 String::new()
             },
             if let Some(cpu_set) = &self.cpu_set {
-                format!("{:?}", cpu_set)
+                format!("{cpu_set:?}")
             } else {
                 String::new()
             },
             if let Some(cpu_shares) = &self.cpu_shares {
-                format!("{:?}", cpu_shares)
+                format!("{cpu_shares:?}")
             } else {
                 String::new()
             },
             if let Some(debug) = &self.debug {
-                format!("{:?}", debug)
+                format!("{debug:?}")
             } else {
                 String::new()
             },
             if let Some(default_address_pools) = &self.default_address_pools {
-                format!("{:?}", default_address_pools)
+                format!("{default_address_pools:?}")
             } else {
                 String::new()
             },
             if let Some(default_runtime) = &self.default_runtime {
-                format!("{:?}", default_runtime)
+                format!("{default_runtime:?}")
             } else {
                 String::new()
             },
             if let Some(docker_root_dir) = &self.docker_root_dir {
-                format!("{:?}", docker_root_dir)
+                format!("{docker_root_dir:?}")
             } else {
                 String::new()
             },
             if let Some(driver) = &self.driver {
-                format!("{:?}", driver)
+                format!("{driver:?}")
             } else {
                 String::new()
             },
             if let Some(driver_status) = &self.driver_status {
-                format!("{:?}", driver_status)
+                format!("{driver_status:?}")
             } else {
                 String::new()
             },
             if let Some(experimental_build) = &self.experimental_build {
-                format!("{:?}", experimental_build)
+                format!("{experimental_build:?}")
             } else {
                 String::new()
             },
             if let Some(http_proxy) = &self.http_proxy {
-                format!("{:?}", http_proxy)
+                format!("{http_proxy:?}")
             } else {
                 String::new()
             },
             if let Some(https_proxy) = &self.https_proxy {
-                format!("{:?}", https_proxy)
+                format!("{https_proxy:?}")
             } else {
                 String::new()
             },
             if let Some(id) = &self.id {
-                format!("{:?}", id)
+                format!("{id:?}")
             } else {
                 String::new()
             },
             if let Some(images) = &self.images {
-                format!("{:?}", images)
+                format!("{images:?}")
             } else {
                 String::new()
             },
             if let Some(index_server_address) = &self.index_server_address {
-                format!("{:?}", index_server_address)
+                format!("{index_server_address:?}")
             } else {
                 String::new()
             },
             if let Some(init_binary) = &self.init_binary {
-                format!("{:?}", init_binary)
+                format!("{init_binary:?}")
             } else {
                 String::new()
             },
             if let Some(init_commit) = &self.init_commit {
-                format!("{:?}", init_commit)
+                format!("{init_commit:?}")
             } else {
                 String::new()
             },
             if let Some(ipv_4_forwarding) = &self.ipv_4_forwarding {
-                format!("{:?}", ipv_4_forwarding)
+                format!("{ipv_4_forwarding:?}")
             } else {
                 String::new()
             },
             if let Some(isolation) = &self.isolation {
-                format!("{:?}", isolation)
+                format!("{isolation:?}")
             } else {
                 String::new()
             },
             if let Some(kernel_memory) = &self.kernel_memory {
-                format!("{:?}", kernel_memory)
+                format!("{kernel_memory:?}")
             } else {
                 String::new()
             },
             if let Some(kernel_memory_tcp) = &self.kernel_memory_tcp {
-                format!("{:?}", kernel_memory_tcp)
+                format!("{kernel_memory_tcp:?}")
             } else {
                 String::new()
             },
             if let Some(kernel_version) = &self.kernel_version {
-                format!("{:?}", kernel_version)
+                format!("{kernel_version:?}")
             } else {
                 String::new()
             },
             if let Some(labels) = &self.labels {
-                format!("{:?}", labels)
+                format!("{labels:?}")
             } else {
                 String::new()
             },
             if let Some(live_restore_enabled) = &self.live_restore_enabled {
-                format!("{:?}", live_restore_enabled)
+                format!("{live_restore_enabled:?}")
             } else {
                 String::new()
             },
             if let Some(logging_driver) = &self.logging_driver {
-                format!("{:?}", logging_driver)
+                format!("{logging_driver:?}")
             } else {
                 String::new()
             },
             if let Some(mem_total) = &self.mem_total {
-                format!("{:?}", mem_total)
+                format!("{mem_total:?}")
             } else {
                 String::new()
             },
             if let Some(memory_limit) = &self.memory_limit {
-                format!("{:?}", memory_limit)
+                format!("{memory_limit:?}")
             } else {
                 String::new()
             },
             if let Some(n_events_listener) = &self.n_events_listener {
-                format!("{:?}", n_events_listener)
+                format!("{n_events_listener:?}")
             } else {
                 String::new()
             },
             if let Some(n_fd) = &self.n_fd {
-                format!("{:?}", n_fd)
+                format!("{n_fd:?}")
             } else {
                 String::new()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{name:?}")
             } else {
                 String::new()
             },
             if let Some(ncpu) = &self.ncpu {
-                format!("{:?}", ncpu)
+                format!("{ncpu:?}")
             } else {
                 String::new()
             },
             if let Some(no_proxy) = &self.no_proxy {
-                format!("{:?}", no_proxy)
+                format!("{no_proxy:?}")
             } else {
                 String::new()
             },
             if let Some(oom_kill_disable) = &self.oom_kill_disable {
-                format!("{:?}", oom_kill_disable)
+                format!("{oom_kill_disable:?}")
             } else {
                 String::new()
             },
             if let Some(operating_system) = &self.operating_system {
-                format!("{:?}", operating_system)
+                format!("{operating_system:?}")
             } else {
                 String::new()
             },
             if let Some(os_type) = &self.os_type {
-                format!("{:?}", os_type)
+                format!("{os_type:?}")
             } else {
                 String::new()
             },
             if let Some(os_version) = &self.os_version {
-                format!("{:?}", os_version)
+                format!("{os_version:?}")
             } else {
                 String::new()
             },
             if let Some(pids_limit) = &self.pids_limit {
-                format!("{:?}", pids_limit)
+                format!("{pids_limit:?}")
             } else {
                 String::new()
             },
             if let Some(plugins) = &self.plugins {
-                format!("{:?}", plugins)
+                format!("{plugins:?}")
             } else {
                 String::new()
             },
             if let Some(product_license) = &self.product_license {
-                format!("{:?}", product_license)
+                format!("{product_license:?}")
             } else {
                 String::new()
             },
             if let Some(registry_config) = &self.registry_config {
-                format!("{:?}", registry_config)
+                format!("{registry_config:?}")
             } else {
                 String::new()
             },
             if let Some(runc_commit) = &self.runc_commit {
-                format!("{:?}", runc_commit)
+                format!("{runc_commit:?}")
             } else {
                 String::new()
             },
             if let Some(runtimes) = &self.runtimes {
-                format!("{:?}", runtimes)
+                format!("{runtimes:?}")
             } else {
                 String::new()
             },
             if let Some(security_options) = &self.security_options {
-                format!("{:?}", security_options)
+                format!("{security_options:?}")
             } else {
                 String::new()
             },
             if let Some(server_version) = &self.server_version {
-                format!("{:?}", server_version)
+                format!("{server_version:?}")
             } else {
                 String::new()
             },
             if let Some(swap_limit) = &self.swap_limit {
-                format!("{:?}", swap_limit)
+                format!("{swap_limit:?}")
             } else {
                 String::new()
             },
             if let Some(system_time) = &self.system_time {
-                format!("{:?}", system_time)
+                format!("{system_time:?}")
             } else {
                 String::new()
             },
             if let Some(warnings) = &self.warnings {
-                format!("{:?}", warnings)
+                format!("{warnings:?}")
             } else {
                 String::new()
             },
@@ -3387,7 +3377,7 @@ impl tabled::Tabled for DockerSystemInfo {
 
 #[doc = "The body of the form for email authentication."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct EmailAuthenticationForm {
     #[doc = "The URL to redirect back to after we have authenticated."]
@@ -3412,7 +3402,7 @@ impl tabled::Tabled for EmailAuthenticationForm {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(callback_url) = &self.callback_url {
-                format!("{:?}", callback_url)
+                format!("{callback_url:?}")
             } else {
                 String::new()
             },
@@ -3484,7 +3474,7 @@ impl tabled::Tabled for EngineMetadata {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -3508,7 +3498,7 @@ pub enum Environment {
 
 #[doc = "Error information from a response."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Error {
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -3532,7 +3522,7 @@ impl tabled::Tabled for Error {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(error_code) = &self.error_code {
-                format!("{:?}", error_code)
+                format!("{error_code:?}")
             } else {
                 String::new()
             },
@@ -3597,7 +3587,7 @@ impl tabled::Tabled for ExecutorMetadata {
          mapping of the user's information, including that of our third party services we use for \
          users: MailChimp, Stripe, and Front"]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ExtendedUser {
     #[doc = "The user's company."]
@@ -3664,65 +3654,65 @@ impl tabled::Tabled for ExtendedUser {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(company) = &self.company {
-                format!("{:?}", company)
+                format!("{company:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(discord) = &self.discord {
-                format!("{:?}", discord)
+                format!("{discord:?}")
             } else {
                 String::new()
             },
             if let Some(email) = &self.email {
-                format!("{:?}", email)
+                format!("{email:?}")
             } else {
                 String::new()
             },
             if let Some(email_verified) = &self.email_verified {
-                format!("{:?}", email_verified)
+                format!("{email_verified:?}")
             } else {
                 String::new()
             },
             if let Some(first_name) = &self.first_name {
-                format!("{:?}", first_name)
+                format!("{first_name:?}")
             } else {
                 String::new()
             },
             if let Some(front_id) = &self.front_id {
-                format!("{:?}", front_id)
+                format!("{front_id:?}")
             } else {
                 String::new()
             },
             if let Some(github) = &self.github {
-                format!("{:?}", github)
+                format!("{github:?}")
             } else {
                 String::new()
             },
             if let Some(id) = &self.id {
-                format!("{:?}", id)
+                format!("{id:?}")
             } else {
                 String::new()
             },
             self.image.clone(),
             if let Some(last_name) = &self.last_name {
-                format!("{:?}", last_name)
+                format!("{last_name:?}")
             } else {
                 String::new()
             },
             if let Some(mailchimp_id) = &self.mailchimp_id {
-                format!("{:?}", mailchimp_id)
+                format!("{mailchimp_id:?}")
             } else {
                 String::new()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{name:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.phone),
             if let Some(stripe_id) = &self.stripe_id {
-                format!("{:?}", stripe_id)
+                format!("{stripe_id:?}")
             } else {
                 String::new()
             },
@@ -3754,7 +3744,7 @@ impl tabled::Tabled for ExtendedUser {
 
 #[doc = "A single page of results"]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ExtendedUserResultsPage {
     #[doc = "list of items on this page of results"]
@@ -3786,8 +3776,7 @@ impl crate::types::paginate::Pagination for ExtendedUserResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -3807,7 +3796,7 @@ impl tabled::Tabled for ExtendedUserResultsPage {
         vec![
             format!("{:?}", self.items),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{next_page:?}")
             } else {
                 String::new()
             },
@@ -3821,7 +3810,7 @@ impl tabled::Tabled for ExtendedUserResultsPage {
 
 #[doc = "A 2D Vector file conversion."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct File2DVectorConversion {
     #[doc = "The time and date the API call was completed."]
@@ -3868,33 +3857,33 @@ impl tabled::Tabled for File2DVectorConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -3922,7 +3911,7 @@ impl tabled::Tabled for File2DVectorConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -3954,7 +3943,7 @@ pub enum File2DVectorExportFormat {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -3975,7 +3964,7 @@ pub enum File2DVectorImportFormat {
 
 #[doc = "A 3D file conversion."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct File3DConversion {
     #[doc = "The time and date the API call was completed."]
@@ -4022,33 +4011,33 @@ impl tabled::Tabled for File3DConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -4077,7 +4066,7 @@ impl tabled::Tabled for File3DConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -4119,7 +4108,7 @@ pub enum File3DExportFormat {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -4177,9 +4166,6 @@ pub struct FileCenterOfMass {
     pub error: Option<String>,
     #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
-    #[doc = "The material density as denoted by the user."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub material_density: Option<f64>,
     #[doc = "The source format of the file."]
     pub src_format: File3DImportFormat,
     #[doc = "The time and date the API call was started."]
@@ -4205,137 +4191,36 @@ impl std::fmt::Display for FileCenterOfMass {
 }
 
 impl tabled::Tabled for FileCenterOfMass {
-    const LENGTH: usize = 11;
-    fn fields(&self) -> Vec<String> {
-        vec![
-            if let Some(center_of_mass) = &self.center_of_mass {
-                format!("{:?}", center_of_mass)
-            } else {
-                String::new()
-            },
-            if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
-            } else {
-                String::new()
-            },
-            format!("{:?}", self.created_at),
-            if let Some(error) = &self.error {
-                format!("{:?}", error)
-            } else {
-                String::new()
-            },
-            format!("{:?}", self.id),
-            if let Some(material_density) = &self.material_density {
-                format!("{:?}", material_density)
-            } else {
-                String::new()
-            },
-            format!("{:?}", self.src_format),
-            if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
-            } else {
-                String::new()
-            },
-            format!("{:?}", self.status),
-            format!("{:?}", self.updated_at),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
-            } else {
-                String::new()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<String> {
-        vec![
-            "center_of_mass".to_string(),
-            "completed_at".to_string(),
-            "created_at".to_string(),
-            "error".to_string(),
-            "id".to_string(),
-            "material_density".to_string(),
-            "src_format".to_string(),
-            "started_at".to_string(),
-            "status".to_string(),
-            "updated_at".to_string(),
-            "user_id".to_string(),
-        ]
-    }
-}
-
-#[doc = "A file center of mass result."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct FileCenterOfMassWithUniformDensity {
-    #[doc = "The resulting center of mass."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub center_of_mass: Option<Vec<f64>>,
-    #[doc = "The time and date the API call was completed."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the API call was created."]
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The error the function returned, if any."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
-    pub id: uuid::Uuid,
-    #[doc = "The source format of the file."]
-    pub src_format: File3DImportFormat,
-    #[doc = "The time and date the API call was started."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the API call."]
-    pub status: ApiCallStatus,
-    #[doc = "The time and date the API call was last updated."]
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
-}
-
-impl std::fmt::Display for FileCenterOfMassWithUniformDensity {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for FileCenterOfMassWithUniformDensity {
     const LENGTH: usize = 10;
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(center_of_mass) = &self.center_of_mass {
-                format!("{:?}", center_of_mass)
+                format!("{center_of_mass:?}")
             } else {
                 String::new()
             },
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -4360,7 +4245,7 @@ impl tabled::Tabled for FileCenterOfMassWithUniformDensity {
 
 #[doc = "A file conversion."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FileConversion {
     #[doc = "The time and date the API call was completed."]
@@ -4407,33 +4292,33 @@ impl tabled::Tabled for FileConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -4507,37 +4392,37 @@ impl tabled::Tabled for FileDensity {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(density) = &self.density {
-                format!("{:?}", density)
+                format!("{density:?}")
             } else {
                 String::new()
             },
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(material_mass) = &self.material_mass {
-                format!("{:?}", material_mass)
+                format!("{material_mass:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -4565,7 +4450,7 @@ impl tabled::Tabled for FileDensity {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -4615,7 +4500,7 @@ pub enum FileExportFormat {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -4708,37 +4593,37 @@ impl tabled::Tabled for FileMass {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(mass) = &self.mass {
-                format!("{:?}", mass)
+                format!("{mass:?}")
             } else {
                 String::new()
             },
             if let Some(material_density) = &self.material_density {
-                format!("{:?}", material_density)
+                format!("{material_density:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -4809,32 +4694,32 @@ impl tabled::Tabled for FileSurfaceArea {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             if let Some(surface_area) = &self.surface_area {
-                format!("{:?}", surface_area)
+                format!("{surface_area:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -4860,7 +4745,7 @@ impl tabled::Tabled for FileSurfaceArea {
 #[doc = "Metadata about our file system.\n\nThis is mostly used for internal purposes and \
          debugging."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FileSystemMetadata {
     #[doc = "If the file system passed a sanity check."]
@@ -4935,32 +4820,32 @@ impl tabled::Tabled for FileVolume {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
             if let Some(volume) = &self.volume {
-                format!("{:?}", volume)
+                format!("{volume:?}")
             } else {
                 String::new()
             },
@@ -4985,7 +4870,7 @@ impl tabled::Tabled for FileVolume {
 
 #[doc = "Gateway information."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Gateway {
     #[doc = "The auth timeout of the gateway."]
@@ -5020,27 +4905,27 @@ impl tabled::Tabled for Gateway {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(auth_timeout) = &self.auth_timeout {
-                format!("{:?}", auth_timeout)
+                format!("{auth_timeout:?}")
             } else {
                 String::new()
             },
             if let Some(host) = &self.host {
-                format!("{:?}", host)
+                format!("{host:?}")
             } else {
                 String::new()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{name:?}")
             } else {
                 String::new()
             },
             if let Some(port) = &self.port {
-                format!("{:?}", port)
+                format!("{port:?}")
             } else {
                 String::new()
             },
             if let Some(tls_timeout) = &self.tls_timeout {
-                format!("{:?}", tls_timeout)
+                format!("{tls_timeout:?}")
             } else {
                 String::new()
             },
@@ -5062,7 +4947,7 @@ impl tabled::Tabled for Gateway {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -5083,7 +4968,7 @@ pub enum ImageType {
 
 #[doc = "IndexInfo contains information about a registry."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct IndexInfo {
     #[doc = "List of mirrors, expressed as URIs."]
@@ -5121,22 +5006,22 @@ impl tabled::Tabled for IndexInfo {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(mirrors) = &self.mirrors {
-                format!("{:?}", mirrors)
+                format!("{mirrors:?}")
             } else {
                 String::new()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{name:?}")
             } else {
                 String::new()
             },
             if let Some(official) = &self.official {
-                format!("{:?}", official)
+                format!("{official:?}")
             } else {
                 String::new()
             },
             if let Some(secure) = &self.secure {
-                format!("{:?}", secure)
+                format!("{secure:?}")
             } else {
                 String::new()
             },
@@ -5266,114 +5151,114 @@ impl tabled::Tabled for Invoice {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(amount_due) = &self.amount_due {
-                format!("{:?}", amount_due)
+                format!("{amount_due:?}")
             } else {
                 String::new()
             },
             if let Some(amount_paid) = &self.amount_paid {
-                format!("{:?}", amount_paid)
+                format!("{amount_paid:?}")
             } else {
                 String::new()
             },
             if let Some(amount_remaining) = &self.amount_remaining {
-                format!("{:?}", amount_remaining)
+                format!("{amount_remaining:?}")
             } else {
                 String::new()
             },
             if let Some(attempt_count) = &self.attempt_count {
-                format!("{:?}", attempt_count)
+                format!("{attempt_count:?}")
             } else {
                 String::new()
             },
             if let Some(attempted) = &self.attempted {
-                format!("{:?}", attempted)
+                format!("{attempted:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             format!("{:?}", self.currency),
             if let Some(customer_email) = &self.customer_email {
-                format!("{:?}", customer_email)
+                format!("{customer_email:?}")
             } else {
                 String::new()
             },
             if let Some(customer_id) = &self.customer_id {
-                format!("{:?}", customer_id)
+                format!("{customer_id:?}")
             } else {
                 String::new()
             },
             if let Some(default_payment_method) = &self.default_payment_method {
-                format!("{:?}", default_payment_method)
+                format!("{default_payment_method:?}")
             } else {
                 String::new()
             },
             if let Some(description) = &self.description {
-                format!("{:?}", description)
+                format!("{description:?}")
             } else {
                 String::new()
             },
             if let Some(id) = &self.id {
-                format!("{:?}", id)
+                format!("{id:?}")
             } else {
                 String::new()
             },
             if let Some(lines) = &self.lines {
-                format!("{:?}", lines)
+                format!("{lines:?}")
             } else {
                 String::new()
             },
             if let Some(metadata) = &self.metadata {
-                format!("{:?}", metadata)
+                format!("{metadata:?}")
             } else {
                 String::new()
             },
             if let Some(number) = &self.number {
-                format!("{:?}", number)
+                format!("{number:?}")
             } else {
                 String::new()
             },
             if let Some(paid) = &self.paid {
-                format!("{:?}", paid)
+                format!("{paid:?}")
             } else {
                 String::new()
             },
             if let Some(pdf) = &self.pdf {
-                format!("{:?}", pdf)
+                format!("{pdf:?}")
             } else {
                 String::new()
             },
             if let Some(receipt_number) = &self.receipt_number {
-                format!("{:?}", receipt_number)
+                format!("{receipt_number:?}")
             } else {
                 String::new()
             },
             if let Some(statement_descriptor) = &self.statement_descriptor {
-                format!("{:?}", statement_descriptor)
+                format!("{statement_descriptor:?}")
             } else {
                 String::new()
             },
             if let Some(status) = &self.status {
-                format!("{:?}", status)
+                format!("{status:?}")
             } else {
                 String::new()
             },
             if let Some(subtotal) = &self.subtotal {
-                format!("{:?}", subtotal)
+                format!("{subtotal:?}")
             } else {
                 String::new()
             },
             if let Some(tax) = &self.tax {
-                format!("{:?}", tax)
+                format!("{tax:?}")
             } else {
                 String::new()
             },
             if let Some(total) = &self.total {
-                format!("{:?}", total)
+                format!("{total:?}")
             } else {
                 String::new()
             },
             if let Some(url) = &self.url {
-                format!("{:?}", url)
+                format!("{url:?}")
             } else {
                 String::new()
             },
@@ -5451,28 +5336,28 @@ impl tabled::Tabled for InvoiceLineItem {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(amount) = &self.amount {
-                format!("{:?}", amount)
+                format!("{amount:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.currency),
             if let Some(description) = &self.description {
-                format!("{:?}", description)
+                format!("{description:?}")
             } else {
                 String::new()
             },
             if let Some(id) = &self.id {
-                format!("{:?}", id)
+                format!("{id:?}")
             } else {
                 String::new()
             },
             if let Some(invoice_item) = &self.invoice_item {
-                format!("{:?}", invoice_item)
+                format!("{invoice_item:?}")
             } else {
                 String::new()
             },
             if let Some(metadata) = &self.metadata {
-                format!("{:?}", metadata)
+                format!("{metadata:?}")
             } else {
                 String::new()
             },
@@ -5495,7 +5380,7 @@ impl tabled::Tabled for InvoiceLineItem {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -5557,17 +5442,17 @@ impl tabled::Tabled for Jetstream {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(config) = &self.config {
-                format!("{:?}", config)
+                format!("{config:?}")
             } else {
                 String::new()
             },
             if let Some(meta) = &self.meta {
-                format!("{:?}", meta)
+                format!("{meta:?}")
             } else {
                 String::new()
             },
             if let Some(stats) = &self.stats {
-                format!("{:?}", stats)
+                format!("{stats:?}")
             } else {
                 String::new()
             },
@@ -5585,7 +5470,7 @@ impl tabled::Tabled for Jetstream {
 
 #[doc = "Jetstream API statistics."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct JetstreamApiStats {
     #[doc = "The number of errors."]
@@ -5614,17 +5499,17 @@ impl tabled::Tabled for JetstreamApiStats {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(errors) = &self.errors {
-                format!("{:?}", errors)
+                format!("{errors:?}")
             } else {
                 String::new()
             },
             if let Some(inflight) = &self.inflight {
-                format!("{:?}", inflight)
+                format!("{inflight:?}")
             } else {
                 String::new()
             },
             if let Some(total) = &self.total {
-                format!("{:?}", total)
+                format!("{total:?}")
             } else {
                 String::new()
             },
@@ -5642,7 +5527,7 @@ impl tabled::Tabled for JetstreamApiStats {
 
 #[doc = "Jetstream configuration."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct JetstreamConfig {
     #[doc = "The domain."]
@@ -5674,22 +5559,22 @@ impl tabled::Tabled for JetstreamConfig {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(domain) = &self.domain {
-                format!("{:?}", domain)
+                format!("{domain:?}")
             } else {
                 String::new()
             },
             if let Some(max_memory) = &self.max_memory {
-                format!("{:?}", max_memory)
+                format!("{max_memory:?}")
             } else {
                 String::new()
             },
             if let Some(max_storage) = &self.max_storage {
-                format!("{:?}", max_storage)
+                format!("{max_storage:?}")
             } else {
                 String::new()
             },
             if let Some(store_dir) = &self.store_dir {
-                format!("{:?}", store_dir)
+                format!("{store_dir:?}")
             } else {
                 String::new()
             },
@@ -5708,7 +5593,7 @@ impl tabled::Tabled for JetstreamConfig {
 
 #[doc = "Jetstream statistics."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct JetstreamStats {
     #[doc = "The number of accounts."]
@@ -5749,37 +5634,37 @@ impl tabled::Tabled for JetstreamStats {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(accounts) = &self.accounts {
-                format!("{:?}", accounts)
+                format!("{accounts:?}")
             } else {
                 String::new()
             },
             if let Some(api) = &self.api {
-                format!("{:?}", api)
+                format!("{api:?}")
             } else {
                 String::new()
             },
             if let Some(ha_assets) = &self.ha_assets {
-                format!("{:?}", ha_assets)
+                format!("{ha_assets:?}")
             } else {
                 String::new()
             },
             if let Some(memory) = &self.memory {
-                format!("{:?}", memory)
+                format!("{memory:?}")
             } else {
                 String::new()
             },
             if let Some(reserved_memory) = &self.reserved_memory {
-                format!("{:?}", reserved_memory)
+                format!("{reserved_memory:?}")
             } else {
                 String::new()
             },
             if let Some(reserved_store) = &self.reserved_store {
-                format!("{:?}", reserved_store)
+                format!("{reserved_store:?}")
             } else {
                 String::new()
             },
             if let Some(store) = &self.store {
-                format!("{:?}", store)
+                format!("{store:?}")
             } else {
                 String::new()
             },
@@ -5801,7 +5686,7 @@ impl tabled::Tabled for JetstreamStats {
 
 #[doc = "Leaf node information."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct LeafNode {
     #[doc = "The auth timeout of the leaf node."]
@@ -5833,22 +5718,22 @@ impl tabled::Tabled for LeafNode {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(auth_timeout) = &self.auth_timeout {
-                format!("{:?}", auth_timeout)
+                format!("{auth_timeout:?}")
             } else {
                 String::new()
             },
             if let Some(host) = &self.host {
-                format!("{:?}", host)
+                format!("{host:?}")
             } else {
                 String::new()
             },
             if let Some(port) = &self.port {
-                format!("{:?}", port)
+                format!("{port:?}")
             } else {
                 String::new()
             },
             if let Some(tls_timeout) = &self.tls_timeout {
-                format!("{:?}", tls_timeout)
+                format!("{tls_timeout:?}")
             } else {
                 String::new()
             },
@@ -5866,7 +5751,7 @@ impl tabled::Tabled for LeafNode {
 }
 
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Mesh {
     pub mesh: String,
@@ -5895,7 +5780,7 @@ impl tabled::Tabled for Mesh {
 
 #[doc = "Jetstream statistics."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct MetaClusterInfo {
     #[doc = "The size of the cluster."]
@@ -5924,17 +5809,17 @@ impl tabled::Tabled for MetaClusterInfo {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(cluster_size) = &self.cluster_size {
-                format!("{:?}", cluster_size)
+                format!("{cluster_size:?}")
             } else {
                 String::new()
             },
             if let Some(leader) = &self.leader {
-                format!("{:?}", leader)
+                format!("{leader:?}")
             } else {
                 String::new()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{name:?}")
             } else {
                 String::new()
             },
@@ -6017,7 +5902,7 @@ impl tabled::Tabled for Metadata {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -6063,7 +5948,7 @@ pub enum Method {
 #[doc = "The struct that is used to create a new record. This is automatically generated and has \
          all the same fields as the main struct only it is missing the `id`."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct NewAddress {
     #[doc = "The city component."]
@@ -6104,37 +5989,37 @@ impl tabled::Tabled for NewAddress {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(city) = &self.city {
-                format!("{:?}", city)
+                format!("{city:?}")
             } else {
                 String::new()
             },
             if let Some(country) = &self.country {
-                format!("{:?}", country)
+                format!("{country:?}")
             } else {
                 String::new()
             },
             if let Some(state) = &self.state {
-                format!("{:?}", state)
+                format!("{state:?}")
             } else {
                 String::new()
             },
             if let Some(street_1) = &self.street_1 {
-                format!("{:?}", street_1)
+                format!("{street_1:?}")
             } else {
                 String::new()
             },
             if let Some(street_2) = &self.street_2 {
-                format!("{:?}", street_2)
+                format!("{street_2:?}")
             } else {
                 String::new()
             },
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
             if let Some(zip) = &self.zip {
-                format!("{:?}", zip)
+                format!("{zip:?}")
             } else {
                 String::new()
             },
@@ -6156,7 +6041,7 @@ impl tabled::Tabled for NewAddress {
 
 #[doc = "Information about an OAuth 2.0 client."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Oauth2ClientInfo {
     #[doc = "Value used for [CSRF](https://tools.ietf.org/html/rfc6749#section-10.12) protection \
@@ -6189,17 +6074,17 @@ impl tabled::Tabled for Oauth2ClientInfo {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(csrf_token) = &self.csrf_token {
-                format!("{:?}", csrf_token)
+                format!("{csrf_token:?}")
             } else {
                 String::new()
             },
             if let Some(pkce_code_verifier) = &self.pkce_code_verifier {
-                format!("{:?}", pkce_code_verifier)
+                format!("{pkce_code_verifier:?}")
             } else {
                 String::new()
             },
             if let Some(url) = &self.url {
-                format!("{:?}", url)
+                format!("{url:?}")
             } else {
                 String::new()
             },
@@ -6219,7 +6104,7 @@ impl tabled::Tabled for Oauth2ClientInfo {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -6243,7 +6128,7 @@ impl std::default::Default for Oauth2GrantType {
 
 #[doc = "Onboarding details"]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Onboarding {
     #[doc = "When the user first called an endpoint from their machine (i.e. not a litterbox \
@@ -6275,17 +6160,17 @@ impl tabled::Tabled for Onboarding {
             if let Some(first_call_from_their_machine_date) =
                 &self.first_call_from_their_machine_date
             {
-                format!("{:?}", first_call_from_their_machine_date)
+                format!("{first_call_from_their_machine_date:?}")
             } else {
                 String::new()
             },
             if let Some(first_litterbox_execute_date) = &self.first_litterbox_execute_date {
-                format!("{:?}", first_litterbox_execute_date)
+                format!("{first_litterbox_execute_date:?}")
             } else {
                 String::new()
             },
             if let Some(first_token_date) = &self.first_token_date {
-                format!("{:?}", first_token_date)
+                format!("{first_token_date:?}")
             } else {
                 String::new()
             },
@@ -6303,7 +6188,7 @@ impl tabled::Tabled for Onboarding {
 
 #[doc = "Output file contents."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct OutputFile {
     #[doc = "The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for \
@@ -6330,12 +6215,12 @@ impl tabled::Tabled for OutputFile {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(contents) = &self.contents {
-                format!("{:?}", contents)
+                format!("{contents:?}")
             } else {
                 String::new()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{name:?}")
             } else {
                 String::new()
             },
@@ -6349,7 +6234,7 @@ impl tabled::Tabled for OutputFile {
 
 #[doc = "A payment intent response."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PaymentIntent {
     #[doc = "The client secret is used for client-side retrieval using a publishable key. The \
@@ -6420,18 +6305,18 @@ impl tabled::Tabled for PaymentMethod {
         vec![
             format!("{:?}", self.billing_info),
             if let Some(card) = &self.card {
-                format!("{:?}", card)
+                format!("{card:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(id) = &self.id {
-                format!("{:?}", id)
+                format!("{id:?}")
             } else {
                 String::new()
             },
             if let Some(metadata) = &self.metadata {
-                format!("{:?}", metadata)
+                format!("{metadata:?}")
             } else {
                 String::new()
             },
@@ -6453,7 +6338,7 @@ impl tabled::Tabled for PaymentMethod {
 
 #[doc = "Card checks."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PaymentMethodCardChecks {
     #[doc = "If a address line1 was provided, results of the check, one of `pass`, `fail`, \
@@ -6489,17 +6374,17 @@ impl tabled::Tabled for PaymentMethodCardChecks {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(address_line_1_check) = &self.address_line_1_check {
-                format!("{:?}", address_line_1_check)
+                format!("{address_line_1_check:?}")
             } else {
                 String::new()
             },
             if let Some(address_postal_code_check) = &self.address_postal_code_check {
-                format!("{:?}", address_postal_code_check)
+                format!("{address_postal_code_check:?}")
             } else {
                 String::new()
             },
             if let Some(cvc_check) = &self.cvc_check {
-                format!("{:?}", cvc_check)
+                format!("{cvc_check:?}")
             } else {
                 String::new()
             },
@@ -6519,7 +6404,7 @@ impl tabled::Tabled for PaymentMethodCardChecks {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -6588,32 +6473,32 @@ impl tabled::Tabled for PhysicsConstant {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.constant),
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
             if let Some(value) = &self.value {
-                format!("{:?}", value)
+                format!("{value:?}")
             } else {
                 String::new()
             },
@@ -6640,7 +6525,7 @@ impl tabled::Tabled for PhysicsConstant {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -6750,7 +6635,7 @@ pub enum PhysicsConstantName {
          list. V1 plugins are \\\"lazily\\\" loaded, and are not returned in this list if there is \
          no resource using the plugin."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PluginsInfo {
     #[doc = "Names of available authorization plugins."]
@@ -6782,22 +6667,22 @@ impl tabled::Tabled for PluginsInfo {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(authorization) = &self.authorization {
-                format!("{:?}", authorization)
+                format!("{authorization:?}")
             } else {
                 String::new()
             },
             if let Some(log) = &self.log {
-                format!("{:?}", log)
+                format!("{log:?}")
             } else {
                 String::new()
             },
             if let Some(network) = &self.network {
-                format!("{:?}", network)
+                format!("{network:?}")
             } else {
                 String::new()
             },
             if let Some(volume) = &self.volume {
-                format!("{:?}", volume)
+                format!("{volume:?}")
             } else {
                 String::new()
             },
@@ -6817,7 +6702,7 @@ impl tabled::Tabled for PluginsInfo {
 #[doc = "Metadata about our point-e instance.\n\nThis is mostly used for internal purposes and \
          debugging."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PointEMetadata {
     #[doc = "If the point-e service returned an ok response from ping."]
@@ -6847,7 +6732,7 @@ impl tabled::Tabled for PointEMetadata {
 
 #[doc = "The response from the `/ping` endpoint."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Pong {
     #[doc = "The pong response."]
@@ -6877,7 +6762,7 @@ impl tabled::Tabled for Pong {
 
 #[doc = "RegistryServiceConfig stores daemon registry services configuration."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct RegistryServiceConfig {
     #[doc = "List of IP ranges to which nondistributable artifacts can be pushed, using the CIDR syntax [RFC 4632](https://tools.ietf.org/html/4632).  Some images (for example, Windows base images) contain artifacts whose distribution is restricted by license. When these images are pushed to a registry, restricted artifacts are not included.  This configuration override this behavior, and enables the daemon to push nondistributable artifacts to all registries whose resolved IP address is within the subnet described by the CIDR syntax.  This option is useful when pushing images containing nondistributable artifacts to a registry on an air-gapped network so hosts on that network can pull the images without connecting to another server.\n\n**Warning**: Nondistributable artifacts typically have restrictions on how and where they can be distributed and shared. Only use this feature to push artifacts to private registries and ensure that you are in compliance with any terms that cover redistributing nondistributable artifacts."]
@@ -6924,29 +6809,29 @@ impl tabled::Tabled for RegistryServiceConfig {
             if let Some(allow_nondistributable_artifacts_cid_rs) =
                 &self.allow_nondistributable_artifacts_cid_rs
             {
-                format!("{:?}", allow_nondistributable_artifacts_cid_rs)
+                format!("{allow_nondistributable_artifacts_cid_rs:?}")
             } else {
                 String::new()
             },
             if let Some(allow_nondistributable_artifacts_hostnames) =
                 &self.allow_nondistributable_artifacts_hostnames
             {
-                format!("{:?}", allow_nondistributable_artifacts_hostnames)
+                format!("{allow_nondistributable_artifacts_hostnames:?}")
             } else {
                 String::new()
             },
             if let Some(index_configs) = &self.index_configs {
-                format!("{:?}", index_configs)
+                format!("{index_configs:?}")
             } else {
                 String::new()
             },
             if let Some(insecure_registry_cid_rs) = &self.insecure_registry_cid_rs {
-                format!("{:?}", insecure_registry_cid_rs)
+                format!("{insecure_registry_cid_rs:?}")
             } else {
                 String::new()
             },
             if let Some(mirrors) = &self.mirrors {
-                format!("{:?}", mirrors)
+                format!("{mirrors:?}")
             } else {
                 String::new()
             },
@@ -6968,7 +6853,7 @@ impl tabled::Tabled for RegistryServiceConfig {
          runtime.  The runtime is invoked by the daemon via the `containerd` daemon. OCI runtimes \
          act as an interface to the Linux kernel namespaces, cgroups, and SELinux."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Runtime {
     #[doc = "Name and, optional, path, of the OCI executable binary.  If the path is omitted, the \
@@ -6995,12 +6880,12 @@ impl tabled::Tabled for Runtime {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(path) = &self.path {
-                format!("{:?}", path)
+                format!("{path:?}")
             } else {
                 String::new()
             },
             if let Some(runtime_args) = &self.runtime_args {
-                format!("{:?}", runtime_args)
+                format!("{runtime_args:?}")
             } else {
                 String::new()
             },
@@ -7014,7 +6899,7 @@ impl tabled::Tabled for Runtime {
 
 #[doc = "An authentication session.\n\nFor our UIs, these are automatically created by Next.js."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Session {
     #[doc = "The date and time the session was created."]
@@ -7050,14 +6935,14 @@ impl tabled::Tabled for Session {
             format!("{:?}", self.created_at),
             format!("{:?}", self.expires),
             if let Some(id) = &self.id {
-                format!("{:?}", id)
+                format!("{id:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.session_token),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -7079,7 +6964,7 @@ impl tabled::Tabled for Session {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -7107,7 +6992,7 @@ pub enum SystemInfoCgroupDriverEnum {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -7130,7 +7015,7 @@ pub enum SystemInfoCgroupVersionEnum {
 }
 
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct SystemInfoDefaultAddressPools {
     #[doc = "The network address in CIDR format"]
@@ -7156,12 +7041,12 @@ impl tabled::Tabled for SystemInfoDefaultAddressPools {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(base) = &self.base {
-                format!("{:?}", base)
+                format!("{base:?}")
             } else {
                 String::new()
             },
             if let Some(size) = &self.size {
-                format!("{:?}", size)
+                format!("{size:?}")
             } else {
                 String::new()
             },
@@ -7176,7 +7061,7 @@ impl tabled::Tabled for SystemInfoDefaultAddressPools {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -7253,38 +7138,38 @@ impl tabled::Tabled for UnitAccelerationConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -7313,7 +7198,7 @@ impl tabled::Tabled for UnitAccelerationConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -7387,38 +7272,38 @@ impl tabled::Tabled for UnitAngleConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -7447,7 +7332,7 @@ impl tabled::Tabled for UnitAngleConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -7533,38 +7418,38 @@ impl tabled::Tabled for UnitAngularVelocityConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -7593,7 +7478,7 @@ impl tabled::Tabled for UnitAngularVelocityConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -7670,38 +7555,38 @@ impl tabled::Tabled for UnitAreaConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -7730,7 +7615,7 @@ impl tabled::Tabled for UnitAreaConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -7816,38 +7701,38 @@ impl tabled::Tabled for UnitChargeConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -7876,7 +7761,7 @@ impl tabled::Tabled for UnitChargeConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -7947,38 +7832,38 @@ impl tabled::Tabled for UnitConcentrationConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -8007,7 +7892,7 @@ impl tabled::Tabled for UnitConcentrationConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -8084,38 +7969,38 @@ impl tabled::Tabled for UnitDataConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -8144,7 +8029,7 @@ impl tabled::Tabled for UnitDataConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -8221,38 +8106,38 @@ impl tabled::Tabled for UnitDataTransferRateConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -8281,7 +8166,7 @@ impl tabled::Tabled for UnitDataTransferRateConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -8358,38 +8243,38 @@ impl tabled::Tabled for UnitDensityConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -8418,7 +8303,7 @@ impl tabled::Tabled for UnitDensityConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -8513,38 +8398,38 @@ impl tabled::Tabled for UnitEnergyConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -8573,7 +8458,7 @@ impl tabled::Tabled for UnitEnergyConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -8665,38 +8550,38 @@ impl tabled::Tabled for UnitForceConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -8725,7 +8610,7 @@ impl tabled::Tabled for UnitForceConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -8805,38 +8690,38 @@ impl tabled::Tabled for UnitIlluminanceConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -8865,7 +8750,7 @@ impl tabled::Tabled for UnitIlluminanceConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -8942,38 +8827,38 @@ impl tabled::Tabled for UnitLengthConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -9002,7 +8887,7 @@ impl tabled::Tabled for UnitLengthConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -9130,38 +9015,38 @@ impl tabled::Tabled for UnitMagneticFieldStrengthConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -9190,7 +9075,7 @@ impl tabled::Tabled for UnitMagneticFieldStrengthConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -9261,38 +9146,38 @@ impl tabled::Tabled for UnitMagneticFluxConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -9321,7 +9206,7 @@ impl tabled::Tabled for UnitMagneticFluxConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -9392,38 +9277,38 @@ impl tabled::Tabled for UnitMassConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -9452,7 +9337,7 @@ impl tabled::Tabled for UnitMassConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -9499,7 +9384,7 @@ pub enum UnitMassFormat {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -9615,38 +9500,38 @@ impl tabled::Tabled for UnitMetricPowerConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -9723,38 +9608,38 @@ impl tabled::Tabled for UnitMetricPowerCubedConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -9831,38 +9716,38 @@ impl tabled::Tabled for UnitMetricPowerSquaredConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -9939,38 +9824,38 @@ impl tabled::Tabled for UnitPowerConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -9999,7 +9884,7 @@ impl tabled::Tabled for UnitPowerConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -10073,38 +9958,38 @@ impl tabled::Tabled for UnitPressureConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -10133,7 +10018,7 @@ impl tabled::Tabled for UnitPressureConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -10213,38 +10098,38 @@ impl tabled::Tabled for UnitRadiationConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -10274,7 +10159,7 @@ impl tabled::Tabled for UnitRadiationConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -10348,38 +10233,38 @@ impl tabled::Tabled for UnitRadioactivityConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -10409,7 +10294,7 @@ impl tabled::Tabled for UnitRadioactivityConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -10483,38 +10368,38 @@ impl tabled::Tabled for UnitSolidAngleConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -10543,7 +10428,7 @@ impl tabled::Tabled for UnitSolidAngleConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -10617,38 +10502,38 @@ impl tabled::Tabled for UnitTemperatureConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -10677,7 +10562,7 @@ impl tabled::Tabled for UnitTemperatureConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -10757,38 +10642,38 @@ impl tabled::Tabled for UnitTimeConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -10817,7 +10702,7 @@ impl tabled::Tabled for UnitTimeConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -10906,38 +10791,38 @@ impl tabled::Tabled for UnitVelocityConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -10966,7 +10851,7 @@ impl tabled::Tabled for UnitVelocityConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -11046,38 +10931,38 @@ impl tabled::Tabled for UnitVoltageConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -11106,7 +10991,7 @@ impl tabled::Tabled for UnitVoltageConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -11180,38 +11065,38 @@ impl tabled::Tabled for UnitVolumeConversion {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{completed_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{error:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.id),
             if let Some(input) = &self.input {
-                format!("{:?}", input)
+                format!("{input:?}")
             } else {
                 String::new()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output)
+                format!("{output:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.output_format),
             format!("{:?}", self.src_format),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{started_at:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.status),
             format!("{:?}", self.updated_at),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{user_id:?}")
             } else {
                 String::new()
             },
@@ -11240,7 +11125,7 @@ impl tabled::Tabled for UnitVolumeConversion {
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
-    PartialEq, Eq,
+    PartialEq,
     Hash,
     Debug,
     Clone,
@@ -11345,7 +11230,7 @@ pub enum UnitVolumeFormat {
 
 #[doc = "The user-modifiable parts of a User."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UpdateUser {
     #[doc = "The user's company."]
@@ -11383,27 +11268,27 @@ impl tabled::Tabled for UpdateUser {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(company) = &self.company {
-                format!("{:?}", company)
+                format!("{company:?}")
             } else {
                 String::new()
             },
             if let Some(discord) = &self.discord {
-                format!("{:?}", discord)
+                format!("{discord:?}")
             } else {
                 String::new()
             },
             if let Some(first_name) = &self.first_name {
-                format!("{:?}", first_name)
+                format!("{first_name:?}")
             } else {
                 String::new()
             },
             if let Some(github) = &self.github {
-                format!("{:?}", github)
+                format!("{github:?}")
             } else {
                 String::new()
             },
             if let Some(last_name) = &self.last_name {
-                format!("{:?}", last_name)
+                format!("{last_name:?}")
             } else {
                 String::new()
             },
@@ -11425,7 +11310,7 @@ impl tabled::Tabled for UpdateUser {
 
 #[doc = "A user."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct User {
     #[doc = "The user's company."]
@@ -11483,49 +11368,49 @@ impl tabled::Tabled for User {
     fn fields(&self) -> Vec<String> {
         vec![
             if let Some(company) = &self.company {
-                format!("{:?}", company)
+                format!("{company:?}")
             } else {
                 String::new()
             },
             format!("{:?}", self.created_at),
             if let Some(discord) = &self.discord {
-                format!("{:?}", discord)
+                format!("{discord:?}")
             } else {
                 String::new()
             },
             if let Some(email) = &self.email {
-                format!("{:?}", email)
+                format!("{email:?}")
             } else {
                 String::new()
             },
             if let Some(email_verified) = &self.email_verified {
-                format!("{:?}", email_verified)
+                format!("{email_verified:?}")
             } else {
                 String::new()
             },
             if let Some(first_name) = &self.first_name {
-                format!("{:?}", first_name)
+                format!("{first_name:?}")
             } else {
                 String::new()
             },
             if let Some(github) = &self.github {
-                format!("{:?}", github)
+                format!("{github:?}")
             } else {
                 String::new()
             },
             if let Some(id) = &self.id {
-                format!("{:?}", id)
+                format!("{id:?}")
             } else {
                 String::new()
             },
             self.image.clone(),
             if let Some(last_name) = &self.last_name {
-                format!("{:?}", last_name)
+                format!("{last_name:?}")
             } else {
                 String::new()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{name:?}")
             } else {
                 String::new()
             },
@@ -11555,7 +11440,7 @@ impl tabled::Tabled for User {
 
 #[doc = "A single page of results"]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UserResultsPage {
     #[doc = "list of items on this page of results"]
@@ -11587,8 +11472,7 @@ impl crate::types::paginate::Pagination for UserResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -11608,7 +11492,7 @@ impl tabled::Tabled for UserResultsPage {
         vec![
             format!("{:?}", self.items),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{next_page:?}")
             } else {
                 String::new()
             },
@@ -11623,7 +11507,7 @@ impl tabled::Tabled for UserResultsPage {
 #[doc = "A verification token for a user.\n\nThis is typically used to verify a user's email \
          address."]
 #[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Eq, Debug, Clone, schemars :: JsonSchema,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct VerificationToken {
     #[doc = "The date and time the verification token was created."]
@@ -11659,12 +11543,12 @@ impl tabled::Tabled for VerificationToken {
             format!("{:?}", self.created_at),
             format!("{:?}", self.expires),
             if let Some(id) = &self.id {
-                format!("{:?}", id)
+                format!("{id:?}")
             } else {
                 String::new()
             },
             if let Some(identifier) = &self.identifier {
-                format!("{:?}", identifier)
+                format!("{identifier:?}")
             } else {
                 String::new()
             },

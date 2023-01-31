@@ -27,7 +27,7 @@ impl Apps {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "apps/github/callback"),
+            format!("{}/{}", self.client.base_url, "apps/github/callback"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -54,7 +54,7 @@ impl Apps {
     ) -> Result<crate::types::AppClientInfo, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "apps/github/consent"),
+            format!("{}/{}", self.client.base_url, "apps/github/consent"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -80,7 +80,7 @@ impl Apps {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!("{}/{}", self.client.base_url, "apps/github/webhook"),
+            format!("{}/{}", self.client.base_url, "apps/github/webhook"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.body(body.clone());

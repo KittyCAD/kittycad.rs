@@ -2278,7 +2278,7 @@ mod test {
             opts,
         };
 
-        type_space.render_schema("FileConversion", &schema).unwrap();
+        type_space.render_schema("FileDensity", &schema).unwrap();
 
         expectorate::assert_contents(
             "tests/types/kittycad.file-density-date-time-override-output.rs.gen",
