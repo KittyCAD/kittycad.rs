@@ -26,7 +26,7 @@ impl File {
              kittycad::Client::new_from_env();\n    let result: \
              kittycad::types::File2DVectorConversion = client\n        .file()\n        \
              .create_2d_vector_conversion(\n            \
-             kittycad::types::File2DVectorExportFormat::Json,\n            \
+             kittycad::types::File2DVectorExportFormat::Ps,\n            \
              kittycad::types::File2DVectorImportFormat::Svg,\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
@@ -39,12 +39,12 @@ impl File {
     ) -> Result<crate::types::File2DVectorConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "file/2d/vector/conversion/{src_format}/{output_format}"
-                    .replace("{output_format}", &format!("{}", output_format))
-                    .replace("{src_format}", &format!("{}", src_format))
+                    .replace("{output_format}", &format!("{output_format}"))
+                    .replace("{src_format}", &format!("{src_format}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -77,8 +77,8 @@ impl File {
              example_file_create_3d_conversion() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::File3DConversion \
              = client\n        .file()\n        .create_3d_conversion(\n            \
-             kittycad::types::File3DExportFormat::Obj,\n            \
-             kittycad::types::File3DImportFormat::ObjNomtl,\n            \
+             kittycad::types::File3DExportFormat::Fbx,\n            \
+             kittycad::types::File3DImportFormat::Step,\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
@@ -90,12 +90,12 @@ impl File {
     ) -> Result<crate::types::File3DConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "file/3d/conversion/{src_format}/{output_format}"
-                    .replace("{output_format}", &format!("{}", output_format))
-                    .replace("{src_format}", &format!("{}", src_format))
+                    .replace("{output_format}", &format!("{output_format}"))
+                    .replace("{src_format}", &format!("{src_format}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -128,7 +128,7 @@ impl File {
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::FileCenterOfMass = client\n        .file()\n        \
              .create_center_of_mass(\n            3.14 as f64,\n            \
-             kittycad::types::File3DImportFormat::Step,\n            \
+             kittycad::types::File3DImportFormat::Dxf,\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
@@ -140,46 +140,13 @@ impl File {
     ) -> Result<crate::types::FileCenterOfMass, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!("{}/{}", self.client.base_url, "file/center-of-mass"),
+            format!("{}/{}", self.client.base_url, "file/center-of-mass"),
         );
         req = req.bearer_auth(&self.client.token);
         let query_params = vec![
-            ("material_density", format!("{}", material_density)),
-            ("src_format", format!("{}", src_format)),
+            ("material_density", format!("{material_density}")),
+            ("src_format", format!("{src_format}")),
         ];
-        req = req.query(&query_params);
-        req = req.body(body.clone());
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
-        }
-    }
-
-    #[doc = "Get CAD file center of mass.\n\nGet the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_center_of_mass_with_uniform_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileCenterOfMassWithUniformDensity = client\n        .file()\n        .create_center_of_mass_with_uniform_density(\n            kittycad::types::File3DImportFormat::ObjNomtl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn create_center_of_mass_with_uniform_density<'a>(
-        &'a self,
-        src_format: crate::types::File3DImportFormat,
-        body: &bytes::Bytes,
-    ) -> Result<crate::types::FileCenterOfMassWithUniformDensity, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::POST,
-            &format!(
-                "{}/{}",
-                self.client.base_url, "file/center-of-mass-with-uniform-density"
-            ),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("src_format", format!("{}", src_format))];
         req = req.query(&query_params);
         req = req.body(body.clone());
         let resp = req.send().await?;
@@ -209,8 +176,8 @@ impl File {
              convert. (required)\n\n```rust,no_run\nasync fn example_file_create_conversion() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::FileConversion = client\n        .file()\n        \
-             .create_conversion(\n            kittycad::types::FileExportFormat::Svg,\n            \
-             kittycad::types::FileImportFormat::Ply,\n            \
+             .create_conversion(\n            kittycad::types::FileExportFormat::Fbx,\n            \
+             kittycad::types::FileImportFormat::Dae,\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
@@ -222,12 +189,12 @@ impl File {
     ) -> Result<crate::types::FileConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "file/conversion/{src_format}/{output_format}"
-                    .replace("{output_format}", &format!("{}", output_format))
-                    .replace("{src_format}", &format!("{}", src_format))
+                    .replace("{output_format}", &format!("{output_format}"))
+                    .replace("{src_format}", &format!("{src_format}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -265,7 +232,7 @@ impl File {
     ) -> Result<crate::types::AsyncApiCallOutput, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "file/conversions/{id}".replace("{id}", id)
@@ -287,7 +254,7 @@ impl File {
         }
     }
 
-    #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `material_mass: f64`: The material mass. (required)\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::File3DImportFormat::Fbx,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `material_mass: f64`: The material mass. (required)\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::File3DImportFormat::Obj,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_density<'a>(
         &'a self,
@@ -297,12 +264,12 @@ impl File {
     ) -> Result<crate::types::FileDensity, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!("{}/{}", self.client.base_url, "file/density"),
+            format!("{}/{}", self.client.base_url, "file/density"),
         );
         req = req.bearer_auth(&self.client.token);
         let query_params = vec![
-            ("material_mass", format!("{}", material_mass)),
-            ("src_format", format!("{}", src_format)),
+            ("material_mass", format!("{material_mass}")),
+            ("src_format", format!("{src_format}")),
         ];
         req = req.query(&query_params);
         req = req.body(body.clone());
@@ -321,7 +288,18 @@ impl File {
         }
     }
 
-    #[doc = "Execute a KittyCAD program in a specific language.\n\n**Parameters:**\n\n- `lang: crate::types::CodeLanguage`: The language of the code. (required)\n- `output: Option<String>`: The output file we want to get the contents for (the paths are relative to where in litterbox it is being run). You can denote more than one file with a comma separated list of string paths.\n\n```rust,no_run\nasync fn example_file_create_execution() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CodeOutput = client\n        .file()\n        .create_execution(\n            kittycad::types::CodeLanguage::Go,\n            Some(\"some-string\".to_string()),\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Execute a KittyCAD program in a specific language.\n\n**Parameters:**\n\n- `lang: \
+             crate::types::CodeLanguage`: The language of the code. (required)\n- `output: \
+             Option<String>`: The output file we want to get the contents for (the paths are \
+             relative to where in litterbox it is being run). You can denote more than one file \
+             with a comma separated list of string paths.\n\n```rust,no_run\nasync fn \
+             example_file_create_execution() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::CodeOutput = \
+             client\n        .file()\n        .create_execution(\n            \
+             kittycad::types::CodeLanguage::Python,\n            \
+             Some(\"some-string\".to_string()),\n            \
+             &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_execution<'a>(
         &'a self,
@@ -331,10 +309,10 @@ impl File {
     ) -> Result<crate::types::CodeOutput, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
-                "file/execute/{lang}".replace("{lang}", &format!("{}", lang))
+                "file/execute/{lang}".replace("{lang}", &format!("{lang}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -360,7 +338,7 @@ impl File {
         }
     }
 
-    #[doc = "Get CAD file mass.\n\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `material_density: f64`: The material density. (required)\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileMass = client\n        .file()\n        .create_mass(\n            3.14 as f64,\n            kittycad::types::File3DImportFormat::ObjZip,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get CAD file mass.\n\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `material_density: f64`: The material density. (required)\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileMass = client\n        .file()\n        .create_mass(\n            3.14 as f64,\n            kittycad::types::File3DImportFormat::Dae,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_mass<'a>(
         &'a self,
@@ -370,12 +348,12 @@ impl File {
     ) -> Result<crate::types::FileMass, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!("{}/{}", self.client.base_url, "file/mass"),
+            format!("{}/{}", self.client.base_url, "file/mass"),
         );
         req = req.bearer_auth(&self.client.token);
         let query_params = vec![
-            ("material_density", format!("{}", material_density)),
-            ("src_format", format!("{}", src_format)),
+            ("material_density", format!("{material_density}")),
+            ("src_format", format!("{src_format}")),
         ];
         req = req.query(&query_params);
         req = req.body(body.clone());
@@ -394,7 +372,7 @@ impl File {
         }
     }
 
-    #[doc = "Get CAD file surface area.\n\nGet the surface area of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_surface_area() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileSurfaceArea = client\n        .file()\n        .create_surface_area(\n            kittycad::types::File3DImportFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get CAD file surface area.\n\nGet the surface area of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_surface_area() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileSurfaceArea = client\n        .file()\n        .create_surface_area(\n            kittycad::types::File3DImportFormat::Obj,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_surface_area<'a>(
         &'a self,
@@ -403,10 +381,10 @@ impl File {
     ) -> Result<crate::types::FileSurfaceArea, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!("{}/{}", self.client.base_url, "file/surface-area"),
+            format!("{}/{}", self.client.base_url, "file/surface-area"),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("src_format", format!("{}", src_format))];
+        let query_params = vec![("src_format", format!("{src_format}"))];
         req = req.query(&query_params);
         req = req.body(body.clone());
         let resp = req.send().await?;
@@ -433,7 +411,7 @@ impl File {
              (required)\n\n```rust,no_run\nasync fn example_file_create_volume() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::FileVolume = client\n        .file()\n        \
-             .create_volume(\n            kittycad::types::File3DImportFormat::Step,\n            \
+             .create_volume(\n            kittycad::types::File3DImportFormat::Ply,\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
@@ -444,10 +422,10 @@ impl File {
     ) -> Result<crate::types::FileVolume, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!("{}/{}", self.client.base_url, "file/volume"),
+            format!("{}/{}", self.client.base_url, "file/volume"),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("src_format", format!("{}", src_format))];
+        let query_params = vec![("src_format", format!("{src_format}"))];
         req = req.query(&query_params);
         req = req.body(body.clone());
         let resp = req.send().await?;
@@ -482,7 +460,7 @@ impl File {
     ) -> Result<crate::types::AsyncApiCallOutput, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "user/file/conversions/{id}".replace("{id}", id)

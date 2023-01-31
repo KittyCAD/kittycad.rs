@@ -12,7 +12,7 @@ impl Ai {
         Self { client }
     }
 
-    #[doc = "Generate a 3D model from an image.\n\n**Parameters:**\n\n- `input_format: crate::types::ImageType`: The format of the image being converted. (required)\n- `output_format: crate::types::FileExportFormat`: The format the output file should be converted to. (required)\n\n```rust,no_run\nasync fn example_ai_create_image_to_3d() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Mesh = client\n        .ai()\n        .create_image_to_3d(\n            kittycad::types::ImageType::Jpg,\n            kittycad::types::FileExportFormat::ObjNomtl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Generate a 3D model from an image.\n\n**Parameters:**\n\n- `input_format: crate::types::ImageType`: The format of the image being converted. (required)\n- `output_format: crate::types::FileExportFormat`: The format the output file should be converted to. (required)\n\n```rust,no_run\nasync fn example_ai_create_image_to_3d() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Mesh = client\n        .ai()\n        .create_image_to_3d(\n            kittycad::types::ImageType::Png,\n            kittycad::types::FileExportFormat::Dxf,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_image_to_3d<'a>(
         &'a self,
@@ -22,12 +22,12 @@ impl Ai {
     ) -> Result<crate::types::Mesh, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "ai/image-to-3d/{input_format}/{output_format}"
-                    .replace("{input_format}", &format!("{}", input_format))
-                    .replace("{output_format}", &format!("{}", output_format))
+                    .replace("{input_format}", &format!("{input_format}"))
+                    .replace("{output_format}", &format!("{output_format}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -53,7 +53,7 @@ impl Ai {
              (required)\n\n```rust,no_run\nasync fn example_ai_create_text_to_3d() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::Mesh = client\n        .ai()\n        \
-             .create_text_to_3d(kittycad::types::FileExportFormat::Ply, \"some-string\")\n        \
+             .create_text_to_3d(kittycad::types::FileExportFormat::Svg, \"some-string\")\n        \
              .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_text_to_3d<'a>(
@@ -63,11 +63,11 @@ impl Ai {
     ) -> Result<crate::types::Mesh, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "ai/text-to-3d/{output_format}"
-                    .replace("{output_format}", &format!("{}", output_format))
+                    .replace("{output_format}", &format!("{output_format}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);

@@ -2,15 +2,15 @@
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct FileConversion {
-    #[doc = "The time and date the density was completed."]
+pub struct FileDensity {
+    #[doc = "The time and date the API call was completed."]
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
         deserialize_with = "crate::utils::nullable_date_time_format::deserialize"
     )]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the density was created."]
+    #[doc = "The time and date the API call was created."]
     #[serde(deserialize_with = "crate::utils::date_time_format::deserialize")]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The resulting density."]
@@ -19,31 +19,31 @@ pub struct FileConversion {
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    #[doc = "The unique identifier of the density request.\n\nThis is the same as the API call ID."]
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The material mass as denoted by the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub material_mass: Option<f64>,
     #[doc = "The source format of the file."]
-    pub src_format: FileSourceFormat,
-    #[doc = "The time and date the density was started."]
+    pub src_format: File3DImportFormat,
+    #[doc = "The time and date the API call was started."]
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
         deserialize_with = "crate::utils::nullable_date_time_format::deserialize"
     )]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the density."]
+    #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The time and date the density was last updated."]
+    #[doc = "The time and date the API call was last updated."]
     #[serde(deserialize_with = "crate::utils::date_time_format::deserialize")]
     pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the density."]
+    #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
 
-impl std::fmt::Display for FileConversion {
+impl std::fmt::Display for FileDensity {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -53,7 +53,7 @@ impl std::fmt::Display for FileConversion {
     }
 }
 
-impl tabled::Tabled for FileConversion {
+impl tabled::Tabled for FileDensity {
     const LENGTH: usize = 11;
     fn fields(&self) -> Vec<String> {
         vec![

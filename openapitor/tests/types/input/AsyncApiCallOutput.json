@@ -1,4 +1,3 @@
-
 {
   "description": "The output from the async API call.",
   "oneOf": [
@@ -6,14 +5,14 @@
       "description": "A file conversion.",
       "properties": {
         "completed_at": {
-          "description": "The time and date the file conversion was completed.",
+          "description": "The time and date the API call was completed.",
           "format": "date-time",
           "nullable": true,
           "title": "DateTime",
           "type": "string"
         },
         "created_at": {
-          "description": "The time and date the file conversion was created.",
+          "description": "The time and date the API call was created.",
           "format": "date-time",
           "title": "DateTime",
           "type": "string"
@@ -29,7 +28,7 @@
               "$ref": "#/components/schemas/Uuid"
             }
           ],
-          "description": "The unique identifier of the file conversion.\n\nThis is the same as the API call ID."
+          "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
         },
         "output": {
           "description": "The converted file, if completed, base64 encoded.",
@@ -41,7 +40,7 @@
         "output_format": {
           "allOf": [
             {
-              "$ref": "#/components/schemas/FileOutputFormat"
+              "$ref": "#/components/schemas/FileExportFormat"
             }
           ],
           "description": "The output format of the file conversion."
@@ -49,13 +48,13 @@
         "src_format": {
           "allOf": [
             {
-              "$ref": "#/components/schemas/FileSourceFormat"
+              "$ref": "#/components/schemas/FileImportFormat"
             }
           ],
           "description": "The source format of the file conversion."
         },
         "started_at": {
-          "description": "The time and date the file conversion was started.",
+          "description": "The time and date the API call was started.",
           "format": "date-time",
           "nullable": true,
           "title": "DateTime",
@@ -67,7 +66,7 @@
               "$ref": "#/components/schemas/ApiCallStatus"
             }
           ],
-          "description": "The status of the file conversion."
+          "description": "The status of the API call."
         },
         "type": {
           "enum": [
@@ -76,13 +75,13 @@
           "type": "string"
         },
         "updated_at": {
-          "description": "The time and date the file conversion was last updated.",
+          "description": "The time and date the API call was last updated.",
           "format": "date-time",
           "title": "DateTime",
           "type": "string"
         },
         "user_id": {
-          "description": "The user ID of the user who created the file conversion.",
+          "description": "The user ID of the user who created the API call.",
           "type": "string"
         }
       },
@@ -98,17 +97,17 @@
       "type": "object"
     },
     {
-      "description": "A file mass.",
+      "description": "A 2DVectorfile conversion.",
       "properties": {
         "completed_at": {
-          "description": "The time and date the mass was completed.",
+          "description": "The time and date the API call was completed.",
           "format": "date-time",
           "nullable": true,
           "title": "DateTime",
           "type": "string"
         },
         "created_at": {
-          "description": "The time and date the mass was created.",
+          "description": "The time and date the API call was created.",
           "format": "date-time",
           "title": "DateTime",
           "type": "string"
@@ -124,7 +123,285 @@
               "$ref": "#/components/schemas/Uuid"
             }
           ],
-          "description": "The unique identifier of the mass request.\n\nThis is the same as the API call ID."
+          "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
+        },
+        "output": {
+          "description": "The converted file, if completed, base64 encoded.",
+          "format": "byte",
+          "nullable": true,
+          "title": "String",
+          "type": "string"
+        },
+        "output_format": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/File2DVectorExportFormat"
+            }
+          ],
+          "description": "The output format of the file conversion."
+        },
+        "src_format": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/File2DVectorImportFormat"
+            }
+          ],
+          "description": "The source format of the file conversion."
+        },
+        "started_at": {
+          "description": "The time and date the API call was started.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/ApiCallStatus"
+            }
+          ],
+          "description": "The status of the API call."
+        },
+        "type": {
+          "enum": [
+            "File2DVectorConversion"
+          ],
+          "type": "string"
+        },
+        "updated_at": {
+          "description": "The time and date the API call was last updated.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "user_id": {
+          "description": "The user ID of the user who created the API call.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "created_at",
+        "id",
+        "output_format",
+        "src_format",
+        "status",
+        "type",
+        "updated_at"
+      ],
+      "type": "object"
+    },
+    {
+      "description": "A 3D file conversion.",
+      "properties": {
+        "completed_at": {
+          "description": "The time and date the API call was completed.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "The time and date the API call was created.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "error": {
+          "description": "The error the function returned, if any.",
+          "nullable": true,
+          "type": "string"
+        },
+        "id": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          ],
+          "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
+        },
+        "output": {
+          "description": "The converted file, if completed, base64 encoded.",
+          "format": "byte",
+          "nullable": true,
+          "title": "String",
+          "type": "string"
+        },
+        "output_format": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/File3DExportFormat"
+            }
+          ],
+          "description": "The output format of the file conversion."
+        },
+        "src_format": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/File3DImportFormat"
+            }
+          ],
+          "description": "The source format of the file conversion."
+        },
+        "started_at": {
+          "description": "The time and date the API call was started.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/ApiCallStatus"
+            }
+          ],
+          "description": "The status of the API call."
+        },
+        "type": {
+          "enum": [
+            "File3DConversion"
+          ],
+          "type": "string"
+        },
+        "updated_at": {
+          "description": "The time and date the API call was last updated.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "user_id": {
+          "description": "The user ID of the user who created the API call.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "created_at",
+        "id",
+        "output_format",
+        "src_format",
+        "status",
+        "type",
+        "updated_at"
+      ],
+      "type": "object"
+    },
+    {
+      "description": "File center of mass.",
+      "properties": {
+        "center_of_mass": {
+          "description": "The resulting center of mass.",
+          "items": {
+            "format": "double",
+            "type": "number"
+          },
+          "nullable": true,
+          "type": "array"
+        },
+        "completed_at": {
+          "description": "The time and date the API call was completed.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "The time and date the API call was created.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "error": {
+          "description": "The error the function returned, if any.",
+          "nullable": true,
+          "type": "string"
+        },
+        "id": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          ],
+          "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
+        },
+        "src_format": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/File3DImportFormat"
+            }
+          ],
+          "description": "The source format of the file."
+        },
+        "started_at": {
+          "description": "The time and date the API call was started.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/ApiCallStatus"
+            }
+          ],
+          "description": "The status of the API call."
+        },
+        "type": {
+          "enum": [
+            "FileCenterOfMass"
+          ],
+          "type": "string"
+        },
+        "updated_at": {
+          "description": "The time and date the API call was last updated.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "user_id": {
+          "description": "The user ID of the user who created the API call.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "created_at",
+        "id",
+        "src_format",
+        "status",
+        "type",
+        "updated_at"
+      ],
+      "type": "object"
+    },
+    {
+      "description": "A file mass.",
+      "properties": {
+        "completed_at": {
+          "description": "The time and date the API call was completed.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "The time and date the API call was created.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "error": {
+          "description": "The error the function returned, if any.",
+          "nullable": true,
+          "type": "string"
+        },
+        "id": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          ],
+          "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
         },
         "mass": {
           "description": "The resulting mass.",
@@ -141,13 +418,13 @@
         "src_format": {
           "allOf": [
             {
-              "$ref": "#/components/schemas/FileSourceFormat"
+              "$ref": "#/components/schemas/File3DImportFormat"
             }
           ],
           "description": "The source format of the file."
         },
         "started_at": {
-          "description": "The time and date the mass was started.",
+          "description": "The time and date the API call was started.",
           "format": "date-time",
           "nullable": true,
           "title": "DateTime",
@@ -159,7 +436,7 @@
               "$ref": "#/components/schemas/ApiCallStatus"
             }
           ],
-          "description": "The status of the mass."
+          "description": "The status of the API call."
         },
         "type": {
           "enum": [
@@ -168,13 +445,13 @@
           "type": "string"
         },
         "updated_at": {
-          "description": "The time and date the mass was last updated.",
+          "description": "The time and date the API call was last updated.",
           "format": "date-time",
           "title": "DateTime",
           "type": "string"
         },
         "user_id": {
-          "description": "The user ID of the user who created the mass.",
+          "description": "The user ID of the user who created the API call.",
           "type": "string"
         }
       },
@@ -192,14 +469,14 @@
       "description": "A file volume.",
       "properties": {
         "completed_at": {
-          "description": "The time and date the volume was completed.",
+          "description": "The time and date the API call was completed.",
           "format": "date-time",
           "nullable": true,
           "title": "DateTime",
           "type": "string"
         },
         "created_at": {
-          "description": "The time and date the volume was created.",
+          "description": "The time and date the API call was created.",
           "format": "date-time",
           "title": "DateTime",
           "type": "string"
@@ -215,18 +492,18 @@
               "$ref": "#/components/schemas/Uuid"
             }
           ],
-          "description": "The unique identifier of the volume request.\n\nThis is the same as the API call ID."
+          "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
         },
         "src_format": {
           "allOf": [
             {
-              "$ref": "#/components/schemas/FileSourceFormat"
+              "$ref": "#/components/schemas/File3DImportFormat"
             }
           ],
           "description": "The source format of the file."
         },
         "started_at": {
-          "description": "The time and date the volume was started.",
+          "description": "The time and date the API call was started.",
           "format": "date-time",
           "nullable": true,
           "title": "DateTime",
@@ -238,7 +515,7 @@
               "$ref": "#/components/schemas/ApiCallStatus"
             }
           ],
-          "description": "The status of the volume."
+          "description": "The status of the API call."
         },
         "type": {
           "enum": [
@@ -247,13 +524,13 @@
           "type": "string"
         },
         "updated_at": {
-          "description": "The time and date the volume was last updated.",
+          "description": "The time and date the API call was last updated.",
           "format": "date-time",
           "title": "DateTime",
           "type": "string"
         },
         "user_id": {
-          "description": "The user ID of the user who created the volume.",
+          "description": "The user ID of the user who created the API call.",
           "type": "string"
         },
         "volume": {
@@ -277,14 +554,14 @@
       "description": "A file density.",
       "properties": {
         "completed_at": {
-          "description": "The time and date the density was completed.",
+          "description": "The time and date the API call was completed.",
           "format": "date-time",
           "nullable": true,
           "title": "DateTime",
           "type": "string"
         },
         "created_at": {
-          "description": "The time and date the density was created.",
+          "description": "The time and date the API call was created.",
           "format": "date-time",
           "title": "DateTime",
           "type": "string"
@@ -306,7 +583,7 @@
               "$ref": "#/components/schemas/Uuid"
             }
           ],
-          "description": "The unique identifier of the density request.\n\nThis is the same as the API call ID."
+          "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
         },
         "material_mass": {
           "default": 0.0,
@@ -317,13 +594,13 @@
         "src_format": {
           "allOf": [
             {
-              "$ref": "#/components/schemas/FileSourceFormat"
+              "$ref": "#/components/schemas/File3DImportFormat"
             }
           ],
           "description": "The source format of the file."
         },
         "started_at": {
-          "description": "The time and date the density was started.",
+          "description": "The time and date the API call was started.",
           "format": "date-time",
           "nullable": true,
           "title": "DateTime",
@@ -335,7 +612,7 @@
               "$ref": "#/components/schemas/ApiCallStatus"
             }
           ],
-          "description": "The status of the density."
+          "description": "The status of the API call."
         },
         "type": {
           "enum": [
@@ -344,13 +621,98 @@
           "type": "string"
         },
         "updated_at": {
-          "description": "The time and date the density was last updated.",
+          "description": "The time and date the API call was last updated.",
           "format": "date-time",
           "title": "DateTime",
           "type": "string"
         },
         "user_id": {
-          "description": "The user ID of the user who created the density.",
+          "description": "The user ID of the user who created the API call.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "created_at",
+        "id",
+        "src_format",
+        "status",
+        "type",
+        "updated_at"
+      ],
+      "type": "object"
+    },
+    {
+      "description": "A file surface area.",
+      "properties": {
+        "completed_at": {
+          "description": "The time and date the API call was completed.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "The time and date the API call was created.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "error": {
+          "description": "The error the function returned, if any.",
+          "nullable": true,
+          "type": "string"
+        },
+        "id": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          ],
+          "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
+        },
+        "src_format": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/File3DImportFormat"
+            }
+          ],
+          "description": "The source format of the file."
+        },
+        "started_at": {
+          "description": "The time and date the API call was started.",
+          "format": "date-time",
+          "nullable": true,
+          "title": "DateTime",
+          "type": "string"
+        },
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/ApiCallStatus"
+            }
+          ],
+          "description": "The status of the API call."
+        },
+        "surface_area": {
+          "description": "The resulting surface area.",
+          "format": "double",
+          "nullable": true,
+          "type": "number"
+        },
+        "type": {
+          "enum": [
+            "FileSurfaceArea"
+          ],
+          "type": "string"
+        },
+        "updated_at": {
+          "description": "The time and date the API call was last updated.",
+          "format": "date-time",
+          "title": "DateTime",
+          "type": "string"
+        },
+        "user_id": {
+          "description": "The user ID of the user who created the API call.",
           "type": "string"
         }
       },

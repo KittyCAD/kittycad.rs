@@ -11,7 +11,11 @@
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
     FileConversion(FileConversion),
+    File2DVectorConversion(File2DVectorConversion),
+    File3DConversion(File3DConversion),
+    FileCenterOfMass(FileCenterOfMass),
     FileMass(FileMass),
     FileVolume(FileVolume),
     FileDensity(FileDensity),
+    FileSurfaceArea(FileSurfaceArea),
 }
