@@ -925,7 +925,8 @@ fn get_function_body(
     // Let's get the query parameters.
     let query_params = get_query_params(type_space, op, global_params)?;
     let query_params_code = if !query_params.is_empty() && !paginated {
-        let mut array = Vec::new();
+        let mut required_params = Vec::new();
+        let mut optional_params = Vec::new();
         for (name, t) in &query_params {
             let cleaned_name = crate::types::clean_property_name(name);
             let name_ident = format_ident!("{}", cleaned_name);
@@ -933,33 +934,33 @@ fn get_function_body(
             let type_text = crate::types::get_text(t)?;
 
             if t.is_vec()? {
-                array.push(quote! {
-                   query_params.push((#name, itertools::join(#name_ident, ",")));
+                required_params.push(quote! {
+                   (#name, itertools::join(#name_ident, ","))
                 })
             } else if !t.is_option()? {
                 if type_text == "String" {
-                    array.push(quote! {
-                       query_params.push((#name, #name_ident));
+                    required_params.push(quote! {
+                       (#name, #name_ident)
                     })
                 } else {
-                    array.push(quote! {
-                       query_params.push((#name, format!("{}", #name_ident)));
+                    required_params.push(quote! {
+                       (#name, format!("{}", #name_ident))
                     })
                 }
             } else if type_text == "Option<String>" {
-                array.push(quote! {
+                optional_params.push(quote! {
                     if let Some(p) = #name_ident {
                         query_params.push((#name, p));
                     }
                 })
             } else if t.is_option_vec()? {
-                array.push(quote! {
+                optional_params.push(quote! {
                     if let Some(p) = #name_ident {
                         query_params.push((#name, itertools::join(p, ",")));
                     }
                 })
             } else {
-                array.push(quote! {
+                optional_params.push(quote! {
                     if let Some(p) = #name_ident {
                         query_params.push((#name, format!("{}", p)));
                     }
@@ -967,9 +968,14 @@ fn get_function_body(
             }
         }
 
+        let is_mut = if optional_params.is_empty() {
+            quote!()
+        } else {
+            quote!(mut)
+        };
         quote! {
-            let mut query_params = Vec::new();
-            #(#array)*
+            let #is_mut query_params = vec![ #(#required_params),* ];
+            #(#optional_params)*
             req = req.query(&query_params);
         }
     } else {

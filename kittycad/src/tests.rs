@@ -8,13 +8,13 @@ fn test_client() -> crate::Client {
 #[tokio::test]
 async fn test_create_file_conversion() {
     let client = test_client();
-    let body = include_bytes!("../../assets/in_step.stp");
+    let body = include_bytes!("../../assets/in_obj.obj");
 
     let conversion = client
         .file()
         .create_conversion(
-            crate::types::FileOutputFormat::Stl,
-            crate::types::FileSourceFormat::Step,
+            crate::types::FileExportFormat::Step,
+            crate::types::FileImportFormat::Obj,
             &body.to_vec().into(),
         )
         .await
@@ -22,7 +22,7 @@ async fn test_create_file_conversion() {
 
     assert!(conversion.output.is_some());
 
-    assert_eq!(conversion.src_format, crate::types::FileSourceFormat::Step);
+    assert_eq!(conversion.src_format, crate::types::FileImportFormat::Obj);
     assert_eq!(conversion.status, crate::types::ApiCallStatus::Completed);
 }
 
@@ -33,13 +33,13 @@ async fn test_create_file_volume() {
 
     let result = client
         .file()
-        .create_volume(crate::types::FileSourceFormat::Obj, &body.to_vec().into())
+        .create_volume(crate::types::File3DImportFormat::Obj, &body.to_vec().into())
         .await
         .unwrap();
 
     assert_eq!(result.volume, Some(53.601147));
 
-    assert_eq!(result.src_format, crate::types::FileSourceFormat::Obj);
+    assert_eq!(result.src_format, crate::types::File3DImportFormat::Obj);
     assert_eq!(result.status, crate::types::ApiCallStatus::Completed);
 }
 

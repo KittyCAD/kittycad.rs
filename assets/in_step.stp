@@ -2,7 +2,7 @@ ISO-10303-21;
 HEADER;
 FILE_DESCRIPTION (( 'STEP AP203' ),
     '1' );
-FILE_NAME ('in_test_step_needs_workaround.step'),
+FILE_NAME ('in_test_step_needs_workaround.step',
     '2021-12-30T05:12:11',
     ( 'Administrator' ),
     ( 'Managed by Terraform' ),
