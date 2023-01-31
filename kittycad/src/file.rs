@@ -26,8 +26,8 @@ impl File {
              kittycad::Client::new_from_env();\n    let result: \
              kittycad::types::File2DVectorConversion = client\n        .file()\n        \
              .create_2d_vector_conversion(\n            \
-             kittycad::types::File2DVectorExportFormat::Ps,\n            \
-             kittycad::types::File2DVectorImportFormat::Svg,\n            \
+             kittycad::types::File2DVectorExportFormat::Png,\n            \
+             kittycad::types::File2DVectorImportFormat::Dxf,\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
@@ -77,7 +77,7 @@ impl File {
              example_file_create_3d_conversion() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::File3DConversion \
              = client\n        .file()\n        .create_3d_conversion(\n            \
-             kittycad::types::File3DExportFormat::Fbx,\n            \
+             kittycad::types::File3DExportFormat::Fbxb,\n            \
              kittycad::types::File3DImportFormat::Step,\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
@@ -128,7 +128,7 @@ impl File {
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::FileCenterOfMass = client\n        .file()\n        \
              .create_center_of_mass(\n            3.14 as f64,\n            \
-             kittycad::types::File3DImportFormat::Dxf,\n            \
+             kittycad::types::File3DImportFormat::Ply,\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
@@ -176,8 +176,8 @@ impl File {
              convert. (required)\n\n```rust,no_run\nasync fn example_file_create_conversion() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::FileConversion = client\n        .file()\n        \
-             .create_conversion(\n            kittycad::types::FileExportFormat::Fbx,\n            \
-             kittycad::types::FileImportFormat::Dae,\n            \
+             .create_conversion(\n            kittycad::types::FileExportFormat::Dae,\n            \
+             kittycad::types::FileImportFormat::ObjNomtl,\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
@@ -254,7 +254,7 @@ impl File {
         }
     }
 
-    #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `material_mass: f64`: The material mass. (required)\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::File3DImportFormat::Obj,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `material_mass: f64`: The material mass. (required)\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::File3DImportFormat::Ply,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_density<'a>(
         &'a self,
@@ -288,18 +288,7 @@ impl File {
         }
     }
 
-    #[doc = "Execute a KittyCAD program in a specific language.\n\n**Parameters:**\n\n- `lang: \
-             crate::types::CodeLanguage`: The language of the code. (required)\n- `output: \
-             Option<String>`: The output file we want to get the contents for (the paths are \
-             relative to where in litterbox it is being run). You can denote more than one file \
-             with a comma separated list of string paths.\n\n```rust,no_run\nasync fn \
-             example_file_create_execution() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::CodeOutput = \
-             client\n        .file()\n        .create_execution(\n            \
-             kittycad::types::CodeLanguage::Python,\n            \
-             Some(\"some-string\".to_string()),\n            \
-             &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Execute a KittyCAD program in a specific language.\n\n**Parameters:**\n\n- `lang: crate::types::CodeLanguage`: The language of the code. (required)\n- `output: Option<String>`: The output file we want to get the contents for (the paths are relative to where in litterbox it is being run). You can denote more than one file with a comma separated list of string paths.\n\n```rust,no_run\nasync fn example_file_create_execution() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CodeOutput = client\n        .file()\n        .create_execution(\n            kittycad::types::CodeLanguage::Go,\n            Some(\"some-string\".to_string()),\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_execution<'a>(
         &'a self,
@@ -411,7 +400,7 @@ impl File {
              (required)\n\n```rust,no_run\nasync fn example_file_create_volume() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::FileVolume = client\n        .file()\n        \
-             .create_volume(\n            kittycad::types::File3DImportFormat::Ply,\n            \
+             .create_volume(\n            kittycad::types::File3DImportFormat::Obj,\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
