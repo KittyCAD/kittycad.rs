@@ -9098,20 +9098,9 @@
     },
     "/file/center-of-mass": {
       "post": {
-        "description": "Get the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nDoes the same as the `center_of_mass_with_uniform_density` endpoint; except, this has a redundant `material_density value`. Kept for legacy in this version.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "Get the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_center_of_mass",
         "parameters": [
-          {
-            "description": "The material density.",
-            "in": "query",
-            "name": "material_density",
-            "required": true,
-            "schema": {
-              "format": "float",
-              "type": "number"
-            },
-            "style": "form"
-          },
           {
             "description": "The format of the file.",
             "in": "query",
