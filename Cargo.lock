@@ -890,7 +890,7 @@ dependencies = [
  "pretty_assertions",
  "reqwest",
  "reqwest-conditional-middleware",
- "reqwest-middleware",
+ "reqwest-middleware 0.1.6",
  "reqwest-retry",
  "reqwest-tracing",
  "schemars",
@@ -1157,7 +1157,7 @@ dependencies = [
  "rand",
  "regex",
  "reqwest",
- "reqwest-middleware",
+ "reqwest-middleware 0.1.6",
  "rustfmt-wrapper",
  "schemars",
  "serde",
@@ -1555,7 +1555,7 @@ checksum = "bce134f515eb4c2748bbd928086e7b0aae0d1568daf6c63b51e829aa6f2cf464"
 dependencies = [
  "async-trait",
  "reqwest",
- "reqwest-middleware",
+ "reqwest-middleware 0.1.6",
  "task-local-extensions",
 ]
 
@@ -1576,6 +1576,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "reqwest-middleware"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4a1c03e9011a8c59716ad13115550469e081e2e9892656b0ba6a47c907921894"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "http",
+ "reqwest",
+ "serde",
+ "task-local-extensions",
+ "thiserror",
+]
+
+[[package]]
 name = "reqwest-retry"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1588,7 +1603,7 @@ dependencies = [
  "http",
  "hyper",
  "reqwest",
- "reqwest-middleware",
+ "reqwest-middleware 0.1.6",
  "retry-policies",
  "task-local-extensions",
  "tokio",
@@ -1597,16 +1612,15 @@ dependencies = [
 
 [[package]]
 name = "reqwest-tracing"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e131e50dcd8f24b88ff964404b96ff38ad4217e3ca6963256856952fe76dc8ec"
+checksum = "b739d87a6b2cf4743968ad2b4cef648fbe0204c19999509824425babb2097bce"
 dependencies = [
  "async-trait",
  "opentelemetry",
  "reqwest",
- "reqwest-middleware",
+ "reqwest-middleware 0.2.0",
  "task-local-extensions",
- "tokio",
  "tracing",
  "tracing-opentelemetry",
 ]
