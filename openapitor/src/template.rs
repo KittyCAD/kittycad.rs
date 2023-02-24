@@ -100,7 +100,11 @@ fn generate_docs_openapi_info(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> 
     let api_version = format!("based on API spec version `{}`", spec.info.version);
 
     let spec_link_blurb = if let Some(link) = &opts.spec_url {
-        format!("This client is generated from the [OpenAPI specs]({}) {}. This way it will remain up to date as features are added.", link, api_version)
+        format!(
+            "This client is generated from the [OpenAPI specs]({}) {}. This way it will remain up \
+             to date as features are added.",
+            link, api_version
+        )
     } else {
         "".to_string()
     };
@@ -188,6 +192,55 @@ pub fn generate_docs(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> Result<St
             opts.version,
             opts.code_package_name(),
             get_env_variable_prefix(&opts.name),
+            get_env_variable_prefix(&opts.name),
+            get_env_variable_prefix(&opts.name),
+            opts.code_package_name(),
+        ));
+    }
+
+    if opts.basic_auth {
+        return Ok(format!(
+            r#"{}
+//!
+//! To install the library, add the following to your `Cargo.toml` file.
+//!
+//! ```toml
+//! [dependencies]
+//! {} = "{}"
+//! ```
+//!
+//! ## Basic example
+//!
+//! Typical use will require intializing a `Client`. This requires
+//! a user agent string and set of credentials.
+//!
+//! ```rust,no_run
+//! use {}::Client;
+//!
+//! let client = Client::new(
+//!     String::from("username"),
+//!     String::from("password"),
+//! );
+//! ```
+//!
+//! Alternatively, the library can search for most of the variables required for
+//! the client in the environment:
+//!
+//! - `{}_USERNAME`
+//! - `{}_PASSWORD`
+//!
+//! And then you can create a client from the environment.
+//!
+//! ```rust,no_run
+//! use {}::Client;
+//!
+//! let client = Client::new_from_env();
+//! ```
+//!"#,
+            info,
+            opts.package_name(),
+            opts.version,
+            opts.code_package_name(),
             get_env_variable_prefix(&opts.name),
             get_env_variable_prefix(&opts.name),
             opts.code_package_name(),

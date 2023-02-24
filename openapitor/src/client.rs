@@ -21,6 +21,15 @@ pub fn generate_client(opts: &crate::Opts) -> String {
             .replace("BASE_URL", opts.base_url.to_string().trim_end_matches('/'));
     }
 
+    if opts.basic_auth {
+        return CLIENT_FUNCTIONS_BASIC_AUTH
+            .replace(
+                "ENV_VARIABLE_PREFIX",
+                &crate::template::get_env_variable_prefix(&opts.name),
+            )
+            .replace("BASE_URL", opts.base_url.to_string().trim_end_matches('/'));
+    }
+
     CLIENT_FUNCTIONS_TOKEN
         .replace(
             "ENV_VARIABLE_PREFIX",
@@ -28,6 +37,132 @@ pub fn generate_client(opts: &crate::Opts) -> String {
         )
         .replace("BASE_URL", opts.base_url.to_string().trim_end_matches('/'))
 }
+
+const CLIENT_FUNCTIONS_BASIC_AUTH: &str = r#"
+use std::env;
+
+static APP_USER_AGENT: &str = concat!(
+    env!("CARGO_PKG_NAME"),
+    ".rs/",
+    env!("CARGO_PKG_VERSION"),
+);
+
+/// Entrypoint for interacting with the API client.
+#[derive(Clone, Debug)]
+pub struct Client {
+    username: String,
+    password: String,
+    base_url: String,
+
+    client: reqwest_middleware::ClientWithMiddleware,
+}
+
+impl Client {
+    /// Create a new Client struct. It takes a type that can convert into
+    /// an &str (`String` or `Vec<u8>` for example). As long as the function is
+    /// given a valid API key your requests will work.
+    #[tracing::instrument]
+    pub fn new<T>(
+        username: T,
+        password: T,
+    ) -> Self
+    where
+        T: ToString + std::fmt::Debug,
+    {
+        // Retry up to 3 times with increasing intervals between attempts.
+        let retry_policy =
+            reqwest_retry::policies::ExponentialBackoff::builder().build_with_max_retries(3);
+        let client = reqwest::Client::builder()
+            .user_agent(APP_USER_AGENT)
+            .timeout(std::time::Duration::from_secs(60))
+            .connect_timeout(std::time::Duration::from_secs(60))
+            .build();
+        match client {
+            Ok(c) => {
+                let client = reqwest_middleware::ClientBuilder::new(c)
+                    // Trace HTTP requests. See the tracing crate to make use of these traces.
+                    .with(reqwest_tracing::TracingMiddleware::default())
+                    // Retry failed requests.
+                    .with(reqwest_conditional_middleware::ConditionalMiddleware::new(
+                        reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
+                        |req: &reqwest::Request| req.try_clone().is_some(),
+                    ))
+                    .build();
+
+                Client {
+                    username: username.to_string(),
+                    password: password.to_string(),
+                    base_url: "BASE_URL".to_string(),
+
+                    client,
+                }
+            }
+            Err(e) => panic!("creating reqwest client failed: {:?}", e),
+        }
+    }
+
+    /// Set the base URL for the client to something other than the default: <BASE_URL>.
+    #[tracing::instrument]
+    pub fn set_base_url<H>(&mut self, base_url: H)
+    where
+        H: Into<String> + std::fmt::Display + std::fmt::Debug,
+    {
+        self.base_url = base_url.to_string().trim_end_matches('/').to_string();
+    }
+
+    /// Create a new Client struct from the environment variable: `ENV_VARIABLE_PREFIX_API_TOKEN`.
+    #[tracing::instrument]
+    pub fn new_from_env() -> Self
+    {
+        let username = env::var("ENV_VARIABLE_PREFIX_USERNAME").expect("must set ENV_VARIABLE_PREFIX_USERNAME");
+        let password = env::var("ENV_VARIABLE_PREFIX_PASSWORD").expect("must set ENV_VARIABLE_PREFIX_PASSWORD");
+
+        Client::new(
+            username,
+            password,
+        )
+    }
+
+    /// Create a raw request to our API.
+    #[tracing::instrument]
+    pub async fn request_raw(
+        &self,
+        method: reqwest::Method,
+        uri: &str,
+        body: Option<reqwest::Body>,
+    ) -> anyhow::Result<reqwest_middleware::RequestBuilder>
+    {
+        let u = if uri.starts_with("https://") || uri.starts_with("http://") {
+            uri.to_string()
+        } else {
+            format!("{}/{}", self.base_url, uri.trim_start_matches('/'))
+        };
+
+        let mut req = self.client.request(
+            method,
+            &u,
+        );
+
+        // Add in our authentication.
+        req = req.basic_auth(&self.username, Some(&self.password));
+
+        // Set the default headers.
+        req = req.header(
+            reqwest::header::ACCEPT,
+            reqwest::header::HeaderValue::from_static("application/json"),
+        );
+        req = req.header(
+            reqwest::header::CONTENT_TYPE,
+            reqwest::header::HeaderValue::from_static("application/json"),
+        );
+
+        if let Some(body) = body {
+            req = req.body(body);
+        }
+
+        Ok(req)
+    }
+"#;
 
 const CLIENT_FUNCTIONS_TOKEN: &str = r#"
 use std::env;

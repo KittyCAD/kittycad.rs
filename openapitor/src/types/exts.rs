@@ -529,9 +529,10 @@ pub trait OperationExt {
 
 impl OperationExt for openapiv3::Operation {
     fn get_tag(&self) -> Result<String> {
-        Ok(crate::clean_tag_name(self.tags.first().ok_or_else(
-            || anyhow::anyhow!("operation  has no tags: {:?}", self),
-        )?))
+        match self.tags.first() {
+            Some(tag) => Ok(crate::clean_tag_name(tag)),
+            None => Ok("default".to_string()),
+        }
     }
 
     fn get_fn_name(&self) -> Result<String> {
