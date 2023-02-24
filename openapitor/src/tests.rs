@@ -46,9 +46,7 @@ async fn test_kittycad_generation(ctx: &mut TestContext) {
         description: "KittyCAD is a tool for generating 3D models of cats.".to_string(),
         spec_url: Some("https://api.kittycad.io".to_string()),
         repo_name: Some("kittycad/kittycad.rs".to_string()),
-        token_endpoint: None,
-        user_consent_endpoint: None,
-        date_time_format: None,
+        ..Default::default()
     };
 
     // Load our spec.
@@ -98,9 +96,7 @@ async fn test_github_generation(ctx: &mut TestContext) {
         description: "GitHub is where we push our code and you do too!".to_string(),
         spec_url: Some("https://github.com/github/rest-api-description/raw/main/descriptions/api.github.com/api.github.com.json".to_string()),
         repo_name: Some("kittycad/octorust.rs".to_string()),
-        token_endpoint:None,
-        user_consent_endpoint:None,
-        date_time_format: None,
+        ..Default::default()
     };
 
     // Load our spec.
@@ -136,9 +132,7 @@ async fn test_oxide_generation(ctx: &mut TestContext) {
                 .to_string(),
         ),
         repo_name: Some("oxide/oxide.rs".to_string()),
-        token_endpoint: None,
-        user_consent_endpoint: None,
-        date_time_format: None,
+        ..Default::default()
     };
 
     // Load our spec.
@@ -172,9 +166,7 @@ async fn test_front_generation(ctx: &mut TestContext) {
         description: "CRM crap!".to_string(),
         spec_url: Some("".to_string()),
         repo_name: Some("kittycad/front.rs".to_string()),
-        token_endpoint: None,
-        user_consent_endpoint: None,
-        date_time_format: None,
+        ..Default::default()
     };
 
     // Load our spec.
@@ -209,7 +201,7 @@ async fn test_gusto_generation(ctx: &mut TestContext) {
         repo_name: Some("kittycad/gusto.rs".to_string()),
         token_endpoint: Some("https://api.gusto.com/oauth/token".parse().unwrap()),
         user_consent_endpoint: Some("https://api.gusto.com/oauth/authorize".parse().unwrap()),
-        date_time_format: None,
+        ..Default::default()
     };
 
     // Load our spec.
