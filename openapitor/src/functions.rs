@@ -953,6 +953,12 @@ fn get_function_body(
                         query_params.push((#name, p));
                     }
                 })
+            } else if type_text == "crate::types::phone_number::PhoneNumber" {
+                optional_params.push(quote! {
+                    if let Some(p) = #name_ident.0 {
+                        query_params.push((#name, format!("{p}")));
+                    }
+                })
             } else if t.is_option_vec()? {
                 optional_params.push(quote! {
                     if let Some(p) = #name_ident {
@@ -1097,6 +1103,8 @@ fn get_function_body(
 
     let bearer_auth = if opts.token_endpoint.is_some() {
         quote!(req = req.bearer_auth(&self.client.token.read().await.access_token);)
+    } else if opts.basic_auth {
+        quote!(req = req.basic_auth(&self.client.username, Some(&self.client.password));)
     } else {
         quote!(req = req.bearer_auth(&self.client.token);)
     };

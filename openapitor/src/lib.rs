@@ -100,36 +100,35 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
 
     // First get the tags for all the paths, then later we can ignore tags that
     // have no paths.
+    let default_tag = "default".to_string();
     let mut tags_with_paths = Vec::<String>::new();
-    for (name, path) in spec.paths.iter() {
+    for (_name, path) in spec.paths.iter() {
         let op = path.item()?;
 
-        let mut get_tags =
-            |name: &str, method: &str, op: Option<&openapiv3::Operation>| -> Result<()> {
-                // Ensure we have an operation for this path and method, otherwise return early.
-                let op = if let Some(op) = op {
-                    op
-                } else {
-                    return Ok(());
-                };
-
-                let tag = op.tags.first().ok_or_else(|| {
-                    anyhow::anyhow!("operation `{}` `{}` has no tags", name, method)
-                })?;
-
-                // Add our tag to our vector.
-                tags_with_paths.push(tag.to_string());
-
-                Ok(())
+        let mut get_tags = |op: Option<&openapiv3::Operation>| -> Result<()> {
+            // Ensure we have an operation for this path and method, otherwise return early.
+            let op = if let Some(op) = op {
+                op
+            } else {
+                return Ok(());
             };
 
-        get_tags(name.as_str(), "GET", op.get.as_ref())?;
-        get_tags(name.as_str(), "PUT", op.put.as_ref())?;
-        get_tags(name.as_str(), "POST", op.post.as_ref())?;
-        get_tags(name.as_str(), "DELETE", op.delete.as_ref())?;
-        get_tags(name.as_str(), "HEAD", op.head.as_ref())?;
-        get_tags(name.as_str(), "PATCH", op.patch.as_ref())?;
-        get_tags(name.as_str(), "TRACE", op.trace.as_ref())?;
+            // Some specs don't have tags at all, so just use default for now.
+            let tag = op.tags.first().unwrap_or(&default_tag);
+
+            // Add our tag to our vector.
+            tags_with_paths.push(tag.to_string());
+
+            Ok(())
+        };
+
+        get_tags(op.get.as_ref())?;
+        get_tags(op.put.as_ref())?;
+        get_tags(op.post.as_ref())?;
+        get_tags(op.delete.as_ref())?;
+        get_tags(op.head.as_ref())?;
+        get_tags(op.patch.as_ref())?;
+        get_tags(op.trace.as_ref())?;
     }
 
     // Combine our tags with our tags from the paths, because some APIs do not add the
@@ -456,6 +455,10 @@ pub struct Opts {
     /// The date-time format for the API, defaults to Rust rfc3339 parser
     #[clap(long)]
     pub date_time_format: Option<String>,
+
+    /// Use basic auth for authentication instead of bearer tokens
+    #[clap(long)]
+    pub basic_auth: bool,
 }
 
 impl Opts {
@@ -520,6 +523,7 @@ impl Default for Opts {
             token_endpoint: Default::default(),
             user_consent_endpoint: Default::default(),
             date_time_format: Default::default(),
+            basic_auth: Default::default(),
         }
     }
 }
@@ -623,7 +627,8 @@ async fn run_cargo_fmt(opts: &Opts) -> Result<()> {
         "fmt",
         "--",
         "--config",
-        "format_code_in_doc_comments=true,imports_granularity=Crate,group_imports=StdExternalCrate,format_strings=true,max_width=100",
+        "format_code_in_doc_comments=true,imports_granularity=Crate,\
+         group_imports=StdExternalCrate,format_strings=true,max_width=100",
     ])
     .current_dir(output);
 
