@@ -12,7 +12,13 @@ impl Constant {
         Self { client }
     }
 
-    #[doc = "Get a physics constant.\n\n**Parameters:**\n\n- `constant: crate::types::PhysicsConstantName`: The constant to get. (required)\n\n```rust,no_run\nasync fn example_constant_get_physics() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PhysicsConstant = client\n        .constant()\n        .get_physics(kittycad::types::PhysicsConstantName::ElectronMass)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get a physics constant.\n\n**Parameters:**\n\n- `constant: \
+             crate::types::PhysicsConstantName`: The constant to get. \
+             (required)\n\n```rust,no_run\nasync fn example_constant_get_physics() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::PhysicsConstant = client\n        .constant()\n        \
+             .get_physics(kittycad::types::PhysicsConstantName::Sigma)\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_physics<'a>(
         &'a self,
