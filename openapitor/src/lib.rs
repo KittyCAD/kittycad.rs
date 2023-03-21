@@ -573,7 +573,8 @@ dirs = {{ version = "^4.0.0", optional = true }}
 format_serde_error = "^0.3.0"
 futures = "0.3.26"
 http = "^0.2.8"
-hyperx = "1"
+# hyperx is unnecessarily restrictive, so we use a fork that relaxes those restrictions
+hyperx = {{ git = "https://github.com/chantra/hyperx", rev = "69f17cf858573db42c2baaf0bfead54521de32f9" }}
 itertools = "^0.10.3"
 log = {{ version = "^0.4", features = ["serde"] }}
 mime = "0.3"
