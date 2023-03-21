@@ -567,7 +567,6 @@ async-trait = "^0.1.53"
 bytes = {{ version = "1", features = ["serde"] }}
 clap = {{ version = "^3.2.12", features = ["cargo", "derive", "env", "unicode"] }}
 chrono = {{ version = "0.4", features = ["serde"] }}
-chrono-humanize = "^0.2.1"
 data-encoding = "^2.3.2"
 dirs = {{ version = "^4.0.0", optional = true }}
 format_serde_error = "^0.3.0"
@@ -587,7 +586,6 @@ reqwest-tracing = {{ version = "0.3.0", features = ["opentelemetry_0_17"] }}
 schemars = {{ version = "0.8", features = ["bytes", "chrono", "url", "uuid1"] }}
 serde = {{ version = "1", features = ["derive"] }}
 serde_json = "1"
-serde_with = "2"
 serde_urlencoded = "^0.7"
 tabled = {{ version = "0.8.0", features = ["color"] }}
 thiserror = "1"
