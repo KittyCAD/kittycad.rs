@@ -598,6 +598,7 @@ uuid = {{ version = "1", features = ["serde", "v4"] }}
 expectorate = "1"
 futures-util = "^0.3.26"
 pretty_assertions = "1"
+rand = "0.8"
 tokio = {{ version = "1.20.0", features = ["full"] }}
 
 [package.metadata.docs.rs]
