@@ -19,6 +19,15 @@ use crate::types::exts::{
     TokenStreamExt,
 };
 
+/// Lazily compiled regex macro.
+/// Taken from <https://docs.rs/once_cell/1.17.1/once_cell/index.html#lazily-compiled-regex>
+macro_rules! regex {
+    ($re:literal $(,)?) => {{
+        static RE: once_cell::sync::OnceCell<regex::Regex> = once_cell::sync::OnceCell::new();
+        RE.get_or_init(|| regex::Regex::new($re).unwrap())
+    }};
+}
+
 /// Our collection of all our parsed types.
 #[derive(Debug, Clone)]
 pub struct TypeSpace {
@@ -487,7 +496,9 @@ impl TypeSpace {
             };
 
             let prop_desc = if let Some(d) = &inner_schema.schema_data.description {
-                quote!(#[doc = #d])
+                let leading_spaces = regex!(r#"\n +"#);
+                let d_sanitized = leading_spaces.replace_all(d, "\n");
+                quote!(#[doc = #d_sanitized])
             } else {
                 quote!()
             };
