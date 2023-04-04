@@ -89,7 +89,6 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
 
     // Hopefully there is never a "tag" named after these reserved libs.
     a("pub mod types;");
-    a("#[doc(hidden)]");
 
     // If we have any options that would require us to generate a utils file
     // we need include it in the client.

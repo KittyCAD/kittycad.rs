@@ -302,6 +302,8 @@ pub fn generate_example_rust_from_schema(
     name: &str,
     schema: &openapiv3::Schema,
 ) -> Result<proc_macro2::TokenStream> {
+    // eprintln!("{name}");
+    let log = name == "updateUserAccount Request Body";
     Ok(match &schema.schema_kind {
         openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
             if !s.enumeration.is_empty() {
@@ -397,6 +399,9 @@ pub fn generate_example_rust_from_schema(
             quote!(4 as #t)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
+            if log {
+                eprintln!("It's a Type(Object(...))");
+            }
             let object_name =
                 crate::types::get_type_name_for_schema(name, schema, &type_space.spec, false)?
                     .strip_option()?;
@@ -450,8 +455,16 @@ pub fn generate_example_rust_from_schema(
                         )?
                     }
                     openapiv3::ReferenceOr::Item(s) => {
-                        let mut t_name =
-                            crate::types::get_type_name_for_schema(k, s, &type_space.spec, true)?;
+                        let mut item = s.clone();
+                        let mut t_name = crate::types::get_type_name_for_schema(
+                            k,
+                            &item,
+                            &type_space.spec,
+                            true,
+                        )?;
+                        if log {
+                            eprintln!("{}", t_name);
+                        }
                         // Check if we should render the schema.
                         if v.should_render()? {
                             // Check if we already have a type with this name.
@@ -459,16 +472,47 @@ pub fn generate_example_rust_from_schema(
                                 .types
                                 .get(&t_name.strip_option()?.strip_vec()?.rendered()?)
                             {
-                                if rendered.schema_kind != s.schema_kind
-                                    || rendered.schema_data != s.schema_data
+                                // Since above we are stripping the Vec above, we should also
+                                // strip the Vec when we compare the types.
+                                if let openapiv3::SchemaKind::Type(openapiv3::Type::Array(
+                                    inner_array,
+                                )) = &item.schema_kind
+                                {
+                                    if let Some(inner_array_items) = &inner_array.items {
+                                        if let openapiv3::ReferenceOr::Item(item_schema) =
+                                            inner_array_items
+                                        {
+                                            item = item_schema.clone();
+                                        }
+                                    }
+                                }
+                                if rendered.schema_kind != item.schema_kind
+                                    || rendered.schema_data != item.schema_data
                                 {
                                     // Update the name of the type.
                                     t_name = crate::types::get_type_name_for_schema(
                                         &format!("{} {}", name, k),
-                                        s,
+                                        &s,
                                         &type_space.spec,
                                         true,
                                     )?;
+                                }
+                                if log {
+                                    if rendered.schema_data != item.schema_data {
+                                        eprintln!(
+                                            "Already had a type with that name, but the original schema data had {:?} and we wanted {:?}, so updated name to {}",
+                                            rendered.schema_data,
+                                            item.schema_data,
+                                            t_name
+                                        );
+                                    } else if rendered.schema_kind != item.schema_kind {
+                                        eprintln!(
+                                            "Already had a type with that name, but the original schema kind had {:#?} and we wanted {:#?}, so updated name to {}",
+                                            rendered.schema_kind,
+                                            item.schema_kind,
+                                            t_name
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -478,6 +522,9 @@ pub fn generate_example_rust_from_schema(
                 };
 
                 let inner_name_rendered = inner_name.strip_option()?.rendered()?;
+                if log {
+                    eprintln!("example: {inner_name_rendered}");
+                }
 
                 let inner_schema = v.get_schema_from_reference(&type_space.spec, true)?;
 
@@ -641,42 +688,28 @@ pub fn generate_example_rust_from_schema(
                     all_of_item.get_schema_from_reference(&type_space.spec, true)?;
                 generate_example_rust_from_schema(type_space, name, &all_of_item_schema)?
             } else {
-                // The all of needs to be an object with all the values.
-                // We want to iterate over each of the subschemas and combine all of the types.
-                // We assume all of the subschemas are objects.
-                let mut properties: IndexMap<
-                    String,
-                    openapiv3::ReferenceOr<Box<openapiv3::Schema>>,
-                > = IndexMap::new();
-                let mut required: Vec<String> = Vec::new();
-                for a in all_of {
-                    // Get the schema for this all of.
-                    let schema = a.get_schema_from_reference(&type_space.spec, true)?;
-
-                    // Ensure the type is an object.
-                    if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
-                        &schema.schema_kind
-                    {
-                        for (k, v) in o.properties.iter() {
-                            properties.insert(k.clone(), v.clone());
-                        }
-                        required.extend(o.required.iter().cloned());
-                    } else {
-                        // We got something that is not an object.
-                        // Therefore we need to render this as a one of instead.
-                        // Since it includes primitive types, we need to render this as a one of.
-                        return generate_example_rust_from_schema(
-                            type_space,
-                            name,
-                            &openapiv3::Schema {
-                                schema_data: schema.schema_data.clone(),
-                                schema_kind: openapiv3::SchemaKind::OneOf {
-                                    one_of: all_of.clone(),
+                let (properties, required) = match type_space.get_all_of_properties(name, all_of) {
+                    Ok(p) => p,
+                    Err(err) => {
+                        if err.to_string().contains("not an object") {
+                            // We got something that is not an object.
+                            // Therefore we need to render this as a one of instead.
+                            // Since it includes primitive types, we need to render this as a one of.
+                            return generate_example_rust_from_schema(
+                                type_space,
+                                name,
+                                &openapiv3::Schema {
+                                    schema_data: schema.schema_data.clone(),
+                                    schema_kind: openapiv3::SchemaKind::OneOf {
+                                        one_of: all_of.clone(),
+                                    },
                                 },
-                            },
-                        );
+                            );
+                        }
+
+                        return Err(err);
                     }
-                }
+                };
 
                 generate_example_rust_from_schema(
                     type_space,
@@ -754,7 +787,29 @@ pub fn generate_example_rust_from_schema(
         openapiv3::SchemaKind::Not { not: _ } => {
             anyhow::bail!("XXX not not supported yet");
         }
-        openapiv3::SchemaKind::Any(_any) => {
+        openapiv3::SchemaKind::Any(any) => {
+            if !any.properties.is_empty() {
+                // Let's assume this is an object.
+
+                // Send back through as an object.
+                return generate_example_rust_from_schema(
+                    type_space,
+                    name,
+                    &openapiv3::Schema {
+                        schema_data: schema.schema_data.clone(),
+                        schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(
+                            openapiv3::ObjectType {
+                                properties: any.properties.clone(),
+                                required: any.required.clone(),
+                                additional_properties: any.additional_properties.clone(),
+                                min_properties: any.min_properties,
+                                max_properties: any.max_properties,
+                            },
+                        )),
+                    },
+                );
+            }
+
             quote!(serde_json::Value::String("some-string".to_string()))
         }
     })

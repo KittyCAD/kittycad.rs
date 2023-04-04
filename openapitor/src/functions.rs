@@ -7,9 +7,12 @@ use std::{
 
 use anyhow::Result;
 
-use crate::types::exts::{
-    OperationExt, ParameterSchemaOrContentExt, ReferenceOrExt, SchemaRenderExt, StatusCodeExt,
-    TokenStreamExt,
+use crate::types::{
+    exts::{
+        OperationExt, ParameterSchemaOrContentExt, ReferenceOrExt, SchemaRenderExt, StatusCodeExt,
+        TokenStreamExt,
+    },
+    sanitize_indents,
 };
 
 /// Generate functions for each path operation.
@@ -336,7 +339,8 @@ fn generate_docs(
 
     if let Some(description) = &op.description {
         docs.push_str("\n\n");
-        docs.push_str(&description.replace("```", "```ignore"));
+        let description_sanitized = sanitize_indents(description);
+        docs.push_str(&description_sanitized.replace("```", "```ignore"));
     }
 
     // Document the params.
@@ -369,7 +373,8 @@ fn generate_docs(
         );
         if let Some(description) = &parameter_data.description {
             param_docs.push_str(": ");
-            param_docs.push_str(description);
+            let description_sanitized = sanitize_indents(description);
+            param_docs.push_str(&description_sanitized);
         }
         if parameter_data.required {
             param_docs.push_str(" (required)");
@@ -566,6 +571,13 @@ fn get_request_body_example(
                             &type_space.spec,
                             true,
                         )?;
+                        if name.rendered()? == "UpdateTeammate" {
+                            println!(
+                                "REQUEST BODY EXPANDED name: {} {:?}",
+                                name,
+                                s.expand(&type_space.spec)?
+                            );
+                        }
                         crate::types::example::generate_example_rust_from_schema(
                             type_space,
                             &name.rendered()?,
@@ -652,7 +664,11 @@ fn get_example_args(
             &schema.expand(&type_space.spec)?,
         )?;
 
-        if !parameter_data.required {
+        if !parameter_data.required
+            && !example
+                .rendered()?
+                .starts_with("crate::types::phone_number::PhoneNumber")
+        {
             example = quote!(Some(#example));
         } else if t.is_string()? {
             // Fix the parameter to be a &str, if it is a String.
