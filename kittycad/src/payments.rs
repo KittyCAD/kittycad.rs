@@ -52,7 +52,7 @@ impl Payments {
              .update_information_for_user(&kittycad::types::BillingInfo {\n            address: \
              Some(kittycad::types::NewAddress {\n                city: \
              Some(\"some-string\".to_string()),\n                country: \
-             Some(\"some-string\".to_string()),\n                state: \
+             kittycad::types::CountryCode::Bd,\n                state: \
              Some(\"some-string\".to_string()),\n                street_1: \
              Some(\"some-string\".to_string()),\n                street_2: \
              Some(\"some-string\".to_string()),\n                user_id: \
@@ -96,7 +96,7 @@ impl Payments {
              .create_information_for_user(&kittycad::types::BillingInfo {\n            address: \
              Some(kittycad::types::NewAddress {\n                city: \
              Some(\"some-string\".to_string()),\n                country: \
-             Some(\"some-string\".to_string()),\n                state: \
+             kittycad::types::CountryCode::Bv,\n                state: \
              Some(\"some-string\".to_string()),\n                street_1: \
              Some(\"some-string\".to_string()),\n                street_2: \
              Some(\"some-string\".to_string()),\n                user_id: \
@@ -268,6 +268,32 @@ impl Payments {
                 self.client.base_url,
                 "user/payment/methods/{id}".replace("{id}", id)
             ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
+        }
+    }
+
+    #[doc = "Validate a customer's information is correct and valid for automatic tax.\n\nThis \
+             endpoint requires authentication by any KittyCAD user. It will return an error if the \
+             customer's information is not valid for automatic tax. Otherwise, it will return an \
+             empty successful response.\n\n```rust,no_run\nasync fn \
+             example_payments_validate_customer_tax_information_for_user() -> anyhow::Result<()> \
+             {\n    let client = kittycad::Client::new_from_env();\n    client\n        \
+             .payments()\n        .validate_customer_tax_information_for_user()\n        \
+             .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn validate_customer_tax_information_for_user<'a>(
+        &'a self,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "user/payment/tax"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;

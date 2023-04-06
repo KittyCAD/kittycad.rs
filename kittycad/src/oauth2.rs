@@ -128,7 +128,7 @@ impl Oauth2 {
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
              client\n        .oauth2()\n        .oauth_2_provider_callback(\n            \
              Some(\"some-string\".to_string()),\n            \
-             kittycad::types::AccountProvider::Github,\n            \
+             kittycad::types::AccountProvider::Google,\n            \
              Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn oauth_2_provider_callback<'a>(
@@ -143,7 +143,7 @@ impl Oauth2 {
                 "{}/{}",
                 self.client.base_url,
                 "oauth2/provider/{provider}/callback"
-                    .replace("{provider}", &format!("{provider}"))
+                    .replace("{provider}", &format!("{}", provider))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -188,7 +188,7 @@ impl Oauth2 {
                 "{}/{}",
                 self.client.base_url,
                 "oauth2/provider/{provider}/consent"
-                    .replace("{provider}", &format!("{provider}"))
+                    .replace("{provider}", &format!("{}", provider))
             ),
         );
         req = req.bearer_auth(&self.client.token);

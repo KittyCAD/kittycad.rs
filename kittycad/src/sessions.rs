@@ -31,7 +31,7 @@ impl Sessions {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/session/{token}".replace("{token}", &format!("{token}"))
+                "user/session/{token}".replace("{token}", &format!("{}", token))
             ),
         );
         req = req.bearer_auth(&self.client.token);
