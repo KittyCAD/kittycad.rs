@@ -431,6 +431,281 @@ pub enum AccountProvider {
     Github,
 }
 
+#[doc = "AI plugin api information."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AiPluginApi {
+    #[doc = "If the API is authenticated."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub is_user_authenticated: Option<bool>,
+    #[doc = "The type of API."]
+    #[serde(rename = "type", default, skip_serializing_if = "Option::is_none")]
+    pub type_: Option<AiPluginApiType>,
+    #[doc = "The url to the API's schema."]
+    pub url: String,
+}
+
+impl std::fmt::Display for AiPluginApi {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for AiPluginApi {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(is_user_authenticated) = &self.is_user_authenticated {
+                format!("{:?}", is_user_authenticated)
+            } else {
+                String::new()
+            },
+            if let Some(type_) = &self.type_ {
+                format!("{:?}", type_)
+            } else {
+                String::new()
+            },
+            self.url.clone(),
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "is_user_authenticated".to_string(),
+            "type_".to_string(),
+            "url".to_string(),
+        ]
+    }
+}
+
+#[doc = "AI plugin api type."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum AiPluginApiType {
+    #[serde(rename = "openapi")]
+    #[display("openapi")]
+    Openapi,
+}
+
+impl std::default::Default for AiPluginApiType {
+    fn default() -> Self {
+        AiPluginApiType::Openapi
+    }
+}
+
+#[doc = "AI plugin auth information."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AiPluginAuth {
+    #[doc = "The type of http authorization."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub authorization_type: Option<AiPluginHttpAuthType>,
+    #[doc = "The type of authentication."]
+    #[serde(rename = "type", default, skip_serializing_if = "Option::is_none")]
+    pub type_: Option<AiPluginAuthType>,
+}
+
+impl std::fmt::Display for AiPluginAuth {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for AiPluginAuth {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            if let Some(authorization_type) = &self.authorization_type {
+                format!("{:?}", authorization_type)
+            } else {
+                String::new()
+            },
+            if let Some(type_) = &self.type_ {
+                format!("{:?}", type_)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["authorization_type".to_string(), "type_".to_string()]
+    }
+}
+
+#[doc = "AI plugin auth type."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum AiPluginAuthType {
+    #[serde(rename = "none")]
+    #[display("none")]
+    None,
+    #[serde(rename = "user_http")]
+    #[display("user_http")]
+    UserHttp,
+    #[serde(rename = "service_http")]
+    #[display("service_http")]
+    ServiceHttp,
+    #[serde(rename = "oauth")]
+    #[display("oauth")]
+    Oauth,
+}
+
+#[doc = "AI plugin http auth type."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum AiPluginHttpAuthType {
+    #[serde(rename = "basic")]
+    #[display("basic")]
+    Basic,
+    #[serde(rename = "bearer")]
+    #[display("bearer")]
+    Bearer,
+}
+
+#[doc = "AI plugin manifest.\n\nThis is used for OpenAI's ChatGPT plugins. You can read more about them [here](https://platform.openai.com/docs/plugins/getting-started/plugin-manifest)."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AiPluginManifest {
+    #[doc = "API specification."]
+    pub api: AiPluginApi,
+    #[doc = "Authentication schema."]
+    pub auth: AiPluginAuth,
+    #[doc = "Email contact for safety/moderation reachout, support, and deactivation."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub contact_email: Option<String>,
+    #[doc = "Human-readable description of the plugin."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description_for_human: Option<String>,
+    #[doc = "Description better tailored to the model, such as token context length considerations or keyword usage for improved plugin prompting."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description_for_model: Option<String>,
+    #[doc = "Redirect URL for users to view plugin information."]
+    pub legal_info_url: String,
+    #[doc = "URL used to fetch the plugin's logo."]
+    pub logo_url: String,
+    #[doc = "Human-readable name, such as the full company name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name_for_human: Option<String>,
+    #[doc = "Name the model will used to target the plugin."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name_for_model: Option<String>,
+    #[doc = "Manifest schema version."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub schema_version: Option<String>,
+}
+
+impl std::fmt::Display for AiPluginManifest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for AiPluginManifest {
+    const LENGTH: usize = 10;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            format!("{:?}", self.api),
+            format!("{:?}", self.auth),
+            if let Some(contact_email) = &self.contact_email {
+                format!("{:?}", contact_email)
+            } else {
+                String::new()
+            },
+            if let Some(description_for_human) = &self.description_for_human {
+                format!("{:?}", description_for_human)
+            } else {
+                String::new()
+            },
+            if let Some(description_for_model) = &self.description_for_model {
+                format!("{:?}", description_for_model)
+            } else {
+                String::new()
+            },
+            self.legal_info_url.clone(),
+            self.logo_url.clone(),
+            if let Some(name_for_human) = &self.name_for_human {
+                format!("{:?}", name_for_human)
+            } else {
+                String::new()
+            },
+            if let Some(name_for_model) = &self.name_for_model {
+                format!("{:?}", name_for_model)
+            } else {
+                String::new()
+            },
+            if let Some(schema_version) = &self.schema_version {
+                format!("{:?}", schema_version)
+            } else {
+                String::new()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "api".to_string(),
+            "auth".to_string(),
+            "contact_email".to_string(),
+            "description_for_human".to_string(),
+            "description_for_model".to_string(),
+            "legal_info_url".to_string(),
+            "logo_url".to_string(),
+            "name_for_human".to_string(),
+            "name_for_model".to_string(),
+            "schema_version".to_string(),
+        ]
+    }
+}
+
 #[doc = "A response for a query on the API call table that is grouped by something."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -1993,6 +2268,770 @@ impl tabled::Tabled for Connection {
     }
 }
 
+#[doc = "An enumeration of all ISO-3166 alpha-2 country codes."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum CountryCode {
+    #[serde(rename = "AF")]
+    #[display("AF")]
+    Af,
+    #[serde(rename = "AX")]
+    #[display("AX")]
+    Ax,
+    #[serde(rename = "AL")]
+    #[display("AL")]
+    Al,
+    #[serde(rename = "DZ")]
+    #[display("DZ")]
+    Dz,
+    #[serde(rename = "AS")]
+    #[display("AS")]
+    As,
+    #[serde(rename = "AD")]
+    #[display("AD")]
+    Ad,
+    #[serde(rename = "AO")]
+    #[display("AO")]
+    Ao,
+    #[serde(rename = "AI")]
+    #[display("AI")]
+    Ai,
+    #[serde(rename = "AQ")]
+    #[display("AQ")]
+    Aq,
+    #[serde(rename = "AG")]
+    #[display("AG")]
+    Ag,
+    #[serde(rename = "AR")]
+    #[display("AR")]
+    Ar,
+    #[serde(rename = "AM")]
+    #[display("AM")]
+    Am,
+    #[serde(rename = "AW")]
+    #[display("AW")]
+    Aw,
+    #[serde(rename = "AU")]
+    #[display("AU")]
+    Au,
+    #[serde(rename = "AT")]
+    #[display("AT")]
+    At,
+    #[serde(rename = "AZ")]
+    #[display("AZ")]
+    Az,
+    #[serde(rename = "BS")]
+    #[display("BS")]
+    Bs,
+    #[serde(rename = "BH")]
+    #[display("BH")]
+    Bh,
+    #[serde(rename = "BD")]
+    #[display("BD")]
+    Bd,
+    #[serde(rename = "BB")]
+    #[display("BB")]
+    Bb,
+    #[serde(rename = "BY")]
+    #[display("BY")]
+    By,
+    #[serde(rename = "BE")]
+    #[display("BE")]
+    Be,
+    #[serde(rename = "BZ")]
+    #[display("BZ")]
+    Bz,
+    #[serde(rename = "BJ")]
+    #[display("BJ")]
+    Bj,
+    #[serde(rename = "BM")]
+    #[display("BM")]
+    Bm,
+    #[serde(rename = "BT")]
+    #[display("BT")]
+    Bt,
+    #[serde(rename = "BO")]
+    #[display("BO")]
+    Bo,
+    #[serde(rename = "BQ")]
+    #[display("BQ")]
+    Bq,
+    #[serde(rename = "BA")]
+    #[display("BA")]
+    Ba,
+    #[serde(rename = "BW")]
+    #[display("BW")]
+    Bw,
+    #[serde(rename = "BV")]
+    #[display("BV")]
+    Bv,
+    #[serde(rename = "BR")]
+    #[display("BR")]
+    Br,
+    #[serde(rename = "IO")]
+    #[display("IO")]
+    Io,
+    #[serde(rename = "BN")]
+    #[display("BN")]
+    Bn,
+    #[serde(rename = "BG")]
+    #[display("BG")]
+    Bg,
+    #[serde(rename = "BF")]
+    #[display("BF")]
+    Bf,
+    #[serde(rename = "BI")]
+    #[display("BI")]
+    Bi,
+    #[serde(rename = "CV")]
+    #[display("CV")]
+    Cv,
+    #[serde(rename = "KH")]
+    #[display("KH")]
+    Kh,
+    #[serde(rename = "CM")]
+    #[display("CM")]
+    Cm,
+    #[serde(rename = "CA")]
+    #[display("CA")]
+    Ca,
+    #[serde(rename = "KY")]
+    #[display("KY")]
+    Ky,
+    #[serde(rename = "CF")]
+    #[display("CF")]
+    Cf,
+    #[serde(rename = "TD")]
+    #[display("TD")]
+    Td,
+    #[serde(rename = "CL")]
+    #[display("CL")]
+    Cl,
+    #[serde(rename = "CN")]
+    #[display("CN")]
+    Cn,
+    #[serde(rename = "CX")]
+    #[display("CX")]
+    Cx,
+    #[serde(rename = "CC")]
+    #[display("CC")]
+    Cc,
+    #[serde(rename = "CO")]
+    #[display("CO")]
+    Co,
+    #[serde(rename = "KM")]
+    #[display("KM")]
+    Km,
+    #[serde(rename = "CG")]
+    #[display("CG")]
+    Cg,
+    #[serde(rename = "CD")]
+    #[display("CD")]
+    Cd,
+    #[serde(rename = "CK")]
+    #[display("CK")]
+    Ck,
+    #[serde(rename = "CR")]
+    #[display("CR")]
+    Cr,
+    #[serde(rename = "CI")]
+    #[display("CI")]
+    Ci,
+    #[serde(rename = "HR")]
+    #[display("HR")]
+    Hr,
+    #[serde(rename = "CU")]
+    #[display("CU")]
+    Cu,
+    #[serde(rename = "CW")]
+    #[display("CW")]
+    Cw,
+    #[serde(rename = "CY")]
+    #[display("CY")]
+    Cy,
+    #[serde(rename = "CZ")]
+    #[display("CZ")]
+    Cz,
+    #[serde(rename = "DK")]
+    #[display("DK")]
+    Dk,
+    #[serde(rename = "DJ")]
+    #[display("DJ")]
+    Dj,
+    #[serde(rename = "DM")]
+    #[display("DM")]
+    Dm,
+    #[serde(rename = "DO")]
+    #[display("DO")]
+    Do,
+    #[serde(rename = "EC")]
+    #[display("EC")]
+    Ec,
+    #[serde(rename = "EG")]
+    #[display("EG")]
+    Eg,
+    #[serde(rename = "SV")]
+    #[display("SV")]
+    Sv,
+    #[serde(rename = "GQ")]
+    #[display("GQ")]
+    Gq,
+    #[serde(rename = "ER")]
+    #[display("ER")]
+    Er,
+    #[serde(rename = "EE")]
+    #[display("EE")]
+    Ee,
+    #[serde(rename = "ET")]
+    #[display("ET")]
+    Et,
+    #[serde(rename = "FK")]
+    #[display("FK")]
+    Fk,
+    #[serde(rename = "FO")]
+    #[display("FO")]
+    Fo,
+    #[serde(rename = "FJ")]
+    #[display("FJ")]
+    Fj,
+    #[serde(rename = "FI")]
+    #[display("FI")]
+    Fi,
+    #[serde(rename = "FR")]
+    #[display("FR")]
+    Fr,
+    #[serde(rename = "GF")]
+    #[display("GF")]
+    Gf,
+    #[serde(rename = "PF")]
+    #[display("PF")]
+    Pf,
+    #[serde(rename = "TF")]
+    #[display("TF")]
+    Tf,
+    #[serde(rename = "GA")]
+    #[display("GA")]
+    Ga,
+    #[serde(rename = "GM")]
+    #[display("GM")]
+    Gm,
+    #[serde(rename = "GE")]
+    #[display("GE")]
+    Ge,
+    #[serde(rename = "DE")]
+    #[display("DE")]
+    De,
+    #[serde(rename = "GH")]
+    #[display("GH")]
+    Gh,
+    #[serde(rename = "GI")]
+    #[display("GI")]
+    Gi,
+    #[serde(rename = "GR")]
+    #[display("GR")]
+    Gr,
+    #[serde(rename = "GL")]
+    #[display("GL")]
+    Gl,
+    #[serde(rename = "GD")]
+    #[display("GD")]
+    Gd,
+    #[serde(rename = "GP")]
+    #[display("GP")]
+    Gp,
+    #[serde(rename = "GU")]
+    #[display("GU")]
+    Gu,
+    #[serde(rename = "GT")]
+    #[display("GT")]
+    Gt,
+    #[serde(rename = "GG")]
+    #[display("GG")]
+    Gg,
+    #[serde(rename = "GN")]
+    #[display("GN")]
+    Gn,
+    #[serde(rename = "GW")]
+    #[display("GW")]
+    Gw,
+    #[serde(rename = "GY")]
+    #[display("GY")]
+    Gy,
+    #[serde(rename = "HT")]
+    #[display("HT")]
+    Ht,
+    #[serde(rename = "HM")]
+    #[display("HM")]
+    Hm,
+    #[serde(rename = "VA")]
+    #[display("VA")]
+    Va,
+    #[serde(rename = "HN")]
+    #[display("HN")]
+    Hn,
+    #[serde(rename = "HK")]
+    #[display("HK")]
+    Hk,
+    #[serde(rename = "HU")]
+    #[display("HU")]
+    Hu,
+    #[serde(rename = "IS")]
+    #[display("IS")]
+    Is,
+    #[serde(rename = "IN")]
+    #[display("IN")]
+    In,
+    #[serde(rename = "ID")]
+    #[display("ID")]
+    Id,
+    #[serde(rename = "IR")]
+    #[display("IR")]
+    Ir,
+    #[serde(rename = "IQ")]
+    #[display("IQ")]
+    Iq,
+    #[serde(rename = "IE")]
+    #[display("IE")]
+    Ie,
+    #[serde(rename = "IM")]
+    #[display("IM")]
+    Im,
+    #[serde(rename = "IL")]
+    #[display("IL")]
+    Il,
+    #[serde(rename = "IT")]
+    #[display("IT")]
+    It,
+    #[serde(rename = "JM")]
+    #[display("JM")]
+    Jm,
+    #[serde(rename = "JP")]
+    #[display("JP")]
+    Jp,
+    #[serde(rename = "JE")]
+    #[display("JE")]
+    Je,
+    #[serde(rename = "JO")]
+    #[display("JO")]
+    Jo,
+    #[serde(rename = "KZ")]
+    #[display("KZ")]
+    Kz,
+    #[serde(rename = "KE")]
+    #[display("KE")]
+    Ke,
+    #[serde(rename = "KI")]
+    #[display("KI")]
+    Ki,
+    #[serde(rename = "KP")]
+    #[display("KP")]
+    Kp,
+    #[serde(rename = "KR")]
+    #[display("KR")]
+    Kr,
+    #[serde(rename = "KW")]
+    #[display("KW")]
+    Kw,
+    #[serde(rename = "KG")]
+    #[display("KG")]
+    Kg,
+    #[serde(rename = "LA")]
+    #[display("LA")]
+    La,
+    #[serde(rename = "LV")]
+    #[display("LV")]
+    Lv,
+    #[serde(rename = "LB")]
+    #[display("LB")]
+    Lb,
+    #[serde(rename = "LS")]
+    #[display("LS")]
+    Ls,
+    #[serde(rename = "LR")]
+    #[display("LR")]
+    Lr,
+    #[serde(rename = "LY")]
+    #[display("LY")]
+    Ly,
+    #[serde(rename = "LI")]
+    #[display("LI")]
+    Li,
+    #[serde(rename = "LT")]
+    #[display("LT")]
+    Lt,
+    #[serde(rename = "LU")]
+    #[display("LU")]
+    Lu,
+    #[serde(rename = "MO")]
+    #[display("MO")]
+    Mo,
+    #[serde(rename = "MK")]
+    #[display("MK")]
+    Mk,
+    #[serde(rename = "MG")]
+    #[display("MG")]
+    Mg,
+    #[serde(rename = "MW")]
+    #[display("MW")]
+    Mw,
+    #[serde(rename = "MY")]
+    #[display("MY")]
+    My,
+    #[serde(rename = "MV")]
+    #[display("MV")]
+    Mv,
+    #[serde(rename = "ML")]
+    #[display("ML")]
+    Ml,
+    #[serde(rename = "MT")]
+    #[display("MT")]
+    Mt,
+    #[serde(rename = "MH")]
+    #[display("MH")]
+    Mh,
+    #[serde(rename = "MQ")]
+    #[display("MQ")]
+    Mq,
+    #[serde(rename = "MR")]
+    #[display("MR")]
+    Mr,
+    #[serde(rename = "MU")]
+    #[display("MU")]
+    Mu,
+    #[serde(rename = "YT")]
+    #[display("YT")]
+    Yt,
+    #[serde(rename = "MX")]
+    #[display("MX")]
+    Mx,
+    #[serde(rename = "FM")]
+    #[display("FM")]
+    Fm,
+    #[serde(rename = "MD")]
+    #[display("MD")]
+    Md,
+    #[serde(rename = "MC")]
+    #[display("MC")]
+    Mc,
+    #[serde(rename = "MN")]
+    #[display("MN")]
+    Mn,
+    #[serde(rename = "ME")]
+    #[display("ME")]
+    Me,
+    #[serde(rename = "MS")]
+    #[display("MS")]
+    Ms,
+    #[serde(rename = "MA")]
+    #[display("MA")]
+    Ma,
+    #[serde(rename = "MZ")]
+    #[display("MZ")]
+    Mz,
+    #[serde(rename = "MM")]
+    #[display("MM")]
+    Mm,
+    #[serde(rename = "NA")]
+    #[display("NA")]
+    Na,
+    #[serde(rename = "NR")]
+    #[display("NR")]
+    Nr,
+    #[serde(rename = "NP")]
+    #[display("NP")]
+    Np,
+    #[serde(rename = "NL")]
+    #[display("NL")]
+    Nl,
+    #[serde(rename = "NC")]
+    #[display("NC")]
+    Nc,
+    #[serde(rename = "NZ")]
+    #[display("NZ")]
+    Nz,
+    #[serde(rename = "NI")]
+    #[display("NI")]
+    Ni,
+    #[serde(rename = "NE")]
+    #[display("NE")]
+    Ne,
+    #[serde(rename = "NG")]
+    #[display("NG")]
+    Ng,
+    #[serde(rename = "NU")]
+    #[display("NU")]
+    Nu,
+    #[serde(rename = "NF")]
+    #[display("NF")]
+    Nf,
+    #[serde(rename = "MP")]
+    #[display("MP")]
+    Mp,
+    #[serde(rename = "NO")]
+    #[display("NO")]
+    No,
+    #[serde(rename = "OM")]
+    #[display("OM")]
+    Om,
+    #[serde(rename = "PK")]
+    #[display("PK")]
+    Pk,
+    #[serde(rename = "PW")]
+    #[display("PW")]
+    Pw,
+    #[serde(rename = "PS")]
+    #[display("PS")]
+    Ps,
+    #[serde(rename = "PA")]
+    #[display("PA")]
+    Pa,
+    #[serde(rename = "PG")]
+    #[display("PG")]
+    Pg,
+    #[serde(rename = "PY")]
+    #[display("PY")]
+    Py,
+    #[serde(rename = "PE")]
+    #[display("PE")]
+    Pe,
+    #[serde(rename = "PH")]
+    #[display("PH")]
+    Ph,
+    #[serde(rename = "PN")]
+    #[display("PN")]
+    Pn,
+    #[serde(rename = "PL")]
+    #[display("PL")]
+    Pl,
+    #[serde(rename = "PT")]
+    #[display("PT")]
+    Pt,
+    #[serde(rename = "PR")]
+    #[display("PR")]
+    Pr,
+    #[serde(rename = "QA")]
+    #[display("QA")]
+    Qa,
+    #[serde(rename = "RE")]
+    #[display("RE")]
+    Re,
+    #[serde(rename = "RO")]
+    #[display("RO")]
+    Ro,
+    #[serde(rename = "RU")]
+    #[display("RU")]
+    Ru,
+    #[serde(rename = "RW")]
+    #[display("RW")]
+    Rw,
+    #[serde(rename = "BL")]
+    #[display("BL")]
+    Bl,
+    #[serde(rename = "SH")]
+    #[display("SH")]
+    Sh,
+    #[serde(rename = "KN")]
+    #[display("KN")]
+    Kn,
+    #[serde(rename = "LC")]
+    #[display("LC")]
+    Lc,
+    #[serde(rename = "MF")]
+    #[display("MF")]
+    Mf,
+    #[serde(rename = "PM")]
+    #[display("PM")]
+    Pm,
+    #[serde(rename = "VC")]
+    #[display("VC")]
+    Vc,
+    #[serde(rename = "WS")]
+    #[display("WS")]
+    Ws,
+    #[serde(rename = "SM")]
+    #[display("SM")]
+    Sm,
+    #[serde(rename = "ST")]
+    #[display("ST")]
+    St,
+    #[serde(rename = "SA")]
+    #[display("SA")]
+    Sa,
+    #[serde(rename = "SN")]
+    #[display("SN")]
+    Sn,
+    #[serde(rename = "RS")]
+    #[display("RS")]
+    Rs,
+    #[serde(rename = "SC")]
+    #[display("SC")]
+    Sc,
+    #[serde(rename = "SL")]
+    #[display("SL")]
+    Sl,
+    #[serde(rename = "SG")]
+    #[display("SG")]
+    Sg,
+    #[serde(rename = "SX")]
+    #[display("SX")]
+    Sx,
+    #[serde(rename = "SK")]
+    #[display("SK")]
+    Sk,
+    #[serde(rename = "SI")]
+    #[display("SI")]
+    Si,
+    #[serde(rename = "SB")]
+    #[display("SB")]
+    Sb,
+    #[serde(rename = "SO")]
+    #[display("SO")]
+    So,
+    #[serde(rename = "ZA")]
+    #[display("ZA")]
+    Za,
+    #[serde(rename = "GS")]
+    #[display("GS")]
+    Gs,
+    #[serde(rename = "SS")]
+    #[display("SS")]
+    Ss,
+    #[serde(rename = "ES")]
+    #[display("ES")]
+    Es,
+    #[serde(rename = "LK")]
+    #[display("LK")]
+    Lk,
+    #[serde(rename = "SD")]
+    #[display("SD")]
+    Sd,
+    #[serde(rename = "SR")]
+    #[display("SR")]
+    Sr,
+    #[serde(rename = "SJ")]
+    #[display("SJ")]
+    Sj,
+    #[serde(rename = "SZ")]
+    #[display("SZ")]
+    Sz,
+    #[serde(rename = "SE")]
+    #[display("SE")]
+    Se,
+    #[serde(rename = "CH")]
+    #[display("CH")]
+    Ch,
+    #[serde(rename = "SY")]
+    #[display("SY")]
+    Sy,
+    #[serde(rename = "TW")]
+    #[display("TW")]
+    Tw,
+    #[serde(rename = "TJ")]
+    #[display("TJ")]
+    Tj,
+    #[serde(rename = "TZ")]
+    #[display("TZ")]
+    Tz,
+    #[serde(rename = "TH")]
+    #[display("TH")]
+    Th,
+    #[serde(rename = "TL")]
+    #[display("TL")]
+    Tl,
+    #[serde(rename = "TG")]
+    #[display("TG")]
+    Tg,
+    #[serde(rename = "TK")]
+    #[display("TK")]
+    Tk,
+    #[serde(rename = "TO")]
+    #[display("TO")]
+    To,
+    #[serde(rename = "TT")]
+    #[display("TT")]
+    Tt,
+    #[serde(rename = "TN")]
+    #[display("TN")]
+    Tn,
+    #[serde(rename = "TR")]
+    #[display("TR")]
+    Tr,
+    #[serde(rename = "TM")]
+    #[display("TM")]
+    Tm,
+    #[serde(rename = "TC")]
+    #[display("TC")]
+    Tc,
+    #[serde(rename = "TV")]
+    #[display("TV")]
+    Tv,
+    #[serde(rename = "UG")]
+    #[display("UG")]
+    Ug,
+    #[serde(rename = "UA")]
+    #[display("UA")]
+    Ua,
+    #[serde(rename = "AE")]
+    #[display("AE")]
+    Ae,
+    #[serde(rename = "GB")]
+    #[display("GB")]
+    Gb,
+    #[serde(rename = "US")]
+    #[display("US")]
+    Us,
+    #[serde(rename = "UM")]
+    #[display("UM")]
+    Um,
+    #[serde(rename = "UY")]
+    #[display("UY")]
+    Uy,
+    #[serde(rename = "UZ")]
+    #[display("UZ")]
+    Uz,
+    #[serde(rename = "VU")]
+    #[display("VU")]
+    Vu,
+    #[serde(rename = "VE")]
+    #[display("VE")]
+    Ve,
+    #[serde(rename = "VN")]
+    #[display("VN")]
+    Vn,
+    #[serde(rename = "VG")]
+    #[display("VG")]
+    Vg,
+    #[serde(rename = "VI")]
+    #[display("VI")]
+    Vi,
+    #[serde(rename = "WF")]
+    #[display("WF")]
+    Wf,
+    #[serde(rename = "EH")]
+    #[display("EH")]
+    Eh,
+    #[serde(rename = "YE")]
+    #[display("YE")]
+    Ye,
+    #[serde(rename = "ZM")]
+    #[display("ZM")]
+    Zm,
+    #[serde(rename = "ZW")]
+    #[display("ZW")]
+    Zw,
+}
+
 #[doc = "Supported set of sort modes for scanning by created_at only.\n\nCurrently, we only support scanning in ascending order."]
 #[derive(
     serde :: Serialize,
@@ -2016,7 +3055,7 @@ pub enum CreatedAtSortMode {
     CreatedAtDescending,
 }
 
-#[doc = "Currency is the list of supported currencies.\n\nFor more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>."]
+#[doc = "Currency is the list of supported currencies.\n\nThis comes from the Stripe API docs: For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -2464,7 +3503,8 @@ pub struct Customer {
     #[doc = "Time at which the object was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "Three-letter ISO code for the currency the customer can be charged in for recurring billing purposes."]
-    pub currency: Currency,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub currency: Option<Currency>,
     #[doc = "When the customer's latest invoice is billed by charging automatically, `delinquent` is `true` if the invoice's latest charge failed.\n\nWhen the customer's latest invoice is billed by sending an invoice, `delinquent` is `true` if the invoice isn't paid by its due date.  If an invoice is marked uncollectible by dunning, `delinquent` doesn't get reset to `false`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub delinquent: Option<bool>,
@@ -2510,7 +3550,11 @@ impl tabled::Tabled for Customer {
                 String::new()
             },
             format!("{:?}", self.created_at),
-            format!("{:?}", self.currency),
+            if let Some(currency) = &self.currency {
+                format!("{:?}", currency)
+            } else {
+                String::new()
+            },
             if let Some(delinquent) = &self.delinquent {
                 format!("{:?}", delinquent)
             } else {
@@ -4969,7 +6013,8 @@ pub struct Invoice {
     #[doc = "Time at which the object was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase."]
-    pub currency: Currency,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub currency: Option<Currency>,
     #[doc = "The email address for the customer. Until the invoice is finalized, this field will equal customer.email. Once the invoice is finalized, this field will no longer be updated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub customer_email: Option<String>,
@@ -5063,7 +6108,11 @@ impl tabled::Tabled for Invoice {
                 String::new()
             },
             format!("{:?}", self.created_at),
-            format!("{:?}", self.currency),
+            if let Some(currency) = &self.currency {
+                format!("{:?}", currency)
+            } else {
+                String::new()
+            },
             if let Some(customer_email) = &self.customer_email {
                 format!("{:?}", customer_email)
             } else {
@@ -5191,7 +6240,8 @@ pub struct InvoiceLineItem {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub amount: Option<f64>,
     #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase."]
-    pub currency: Currency,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub currency: Option<Currency>,
     #[doc = "The description."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -5225,7 +6275,11 @@ impl tabled::Tabled for InvoiceLineItem {
             } else {
                 String::new()
             },
-            format!("{:?}", self.currency),
+            if let Some(currency) = &self.currency {
+                format!("{:?}", currency)
+            } else {
+                String::new()
+            },
             if let Some(description) = &self.description {
                 format!("{:?}", description)
             } else {
@@ -5837,9 +6891,8 @@ pub struct NewAddress {
     #[doc = "The city component."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub city: Option<String>,
-    #[doc = "The country component."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub country: Option<String>,
+    #[doc = "The country component. This is a two-letter ISO country code."]
+    pub country: CountryCode,
     #[doc = "The state component."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub state: Option<String>,
@@ -5876,11 +6929,7 @@ impl tabled::Tabled for NewAddress {
             } else {
                 String::new()
             },
-            if let Some(country) = &self.country {
-                format!("{:?}", country)
-            } else {
-                String::new()
-            },
+            format!("{:?}", self.country),
             if let Some(state) = &self.state {
                 format!("{:?}", state)
             } else {

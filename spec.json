@@ -21,6 +21,146 @@
         ],
         "type": "string"
       },
+      "AiPluginApi": {
+        "description": "AI plugin api information.",
+        "properties": {
+          "is_user_authenticated": {
+            "default": false,
+            "description": "If the API is authenticated.",
+            "type": "boolean"
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AiPluginApiType"
+              }
+            ],
+            "default": "openapi",
+            "description": "The type of API."
+          },
+          "url": {
+            "description": "The url to the API's schema.",
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "AiPluginApiType": {
+        "description": "AI plugin api type.",
+        "enum": [
+          "openapi"
+        ],
+        "type": "string"
+      },
+      "AiPluginAuth": {
+        "description": "AI plugin auth information.",
+        "properties": {
+          "authorization_type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AiPluginHttpAuthType"
+              }
+            ],
+            "description": "The type of http authorization.",
+            "nullable": true
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AiPluginAuthType"
+              }
+            ],
+            "default": "none",
+            "description": "The type of authentication."
+          }
+        },
+        "type": "object"
+      },
+      "AiPluginAuthType": {
+        "description": "AI plugin auth type.",
+        "enum": [
+          "none",
+          "user_http",
+          "service_http",
+          "oauth"
+        ],
+        "type": "string"
+      },
+      "AiPluginHttpAuthType": {
+        "description": "AI plugin http auth type.",
+        "enum": [
+          "basic",
+          "bearer"
+        ],
+        "type": "string"
+      },
+      "AiPluginManifest": {
+        "description": "AI plugin manifest.\n\nThis is used for OpenAI's ChatGPT plugins. You can read more about them [here](https://platform.openai.com/docs/plugins/getting-started/plugin-manifest).",
+        "properties": {
+          "api": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AiPluginApi"
+              }
+            ],
+            "description": "API specification."
+          },
+          "auth": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AiPluginAuth"
+              }
+            ],
+            "description": "Authentication schema."
+          },
+          "contact_email": {
+            "description": "Email contact for safety/moderation reachout, support, and deactivation.",
+            "format": "email",
+            "type": "string"
+          },
+          "description_for_human": {
+            "description": "Human-readable description of the plugin.",
+            "type": "string"
+          },
+          "description_for_model": {
+            "description": "Description better tailored to the model, such as token context length considerations or keyword usage for improved plugin prompting.",
+            "type": "string"
+          },
+          "legal_info_url": {
+            "description": "Redirect URL for users to view plugin information.",
+            "format": "uri",
+            "type": "string"
+          },
+          "logo_url": {
+            "description": "URL used to fetch the plugin's logo.",
+            "format": "uri",
+            "type": "string"
+          },
+          "name_for_human": {
+            "description": "Human-readable name, such as the full company name.",
+            "type": "string"
+          },
+          "name_for_model": {
+            "description": "Name the model will used to target the plugin.",
+            "type": "string"
+          },
+          "schema_version": {
+            "description": "Manifest schema version.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "api",
+          "auth",
+          "legal_info_url",
+          "logo_url"
+        ],
+        "type": "object"
+      },
       "ApiCallQueryGroup": {
         "description": "A response for a query on the API call table that is grouped by something.",
         "properties": {
@@ -1652,6 +1792,261 @@
         ],
         "type": "object"
       },
+      "CountryCode": {
+        "description": "An enumeration of all ISO-3166 alpha-2 country codes.",
+        "enum": [
+          "AF",
+          "AX",
+          "AL",
+          "DZ",
+          "AS",
+          "AD",
+          "AO",
+          "AI",
+          "AQ",
+          "AG",
+          "AR",
+          "AM",
+          "AW",
+          "AU",
+          "AT",
+          "AZ",
+          "BS",
+          "BH",
+          "BD",
+          "BB",
+          "BY",
+          "BE",
+          "BZ",
+          "BJ",
+          "BM",
+          "BT",
+          "BO",
+          "BQ",
+          "BA",
+          "BW",
+          "BV",
+          "BR",
+          "IO",
+          "BN",
+          "BG",
+          "BF",
+          "BI",
+          "CV",
+          "KH",
+          "CM",
+          "CA",
+          "KY",
+          "CF",
+          "TD",
+          "CL",
+          "CN",
+          "CX",
+          "CC",
+          "CO",
+          "KM",
+          "CG",
+          "CD",
+          "CK",
+          "CR",
+          "CI",
+          "HR",
+          "CU",
+          "CW",
+          "CY",
+          "CZ",
+          "DK",
+          "DJ",
+          "DM",
+          "DO",
+          "EC",
+          "EG",
+          "SV",
+          "GQ",
+          "ER",
+          "EE",
+          "ET",
+          "FK",
+          "FO",
+          "FJ",
+          "FI",
+          "FR",
+          "GF",
+          "PF",
+          "TF",
+          "GA",
+          "GM",
+          "GE",
+          "DE",
+          "GH",
+          "GI",
+          "GR",
+          "GL",
+          "GD",
+          "GP",
+          "GU",
+          "GT",
+          "GG",
+          "GN",
+          "GW",
+          "GY",
+          "HT",
+          "HM",
+          "VA",
+          "HN",
+          "HK",
+          "HU",
+          "IS",
+          "IN",
+          "ID",
+          "IR",
+          "IQ",
+          "IE",
+          "IM",
+          "IL",
+          "IT",
+          "JM",
+          "JP",
+          "JE",
+          "JO",
+          "KZ",
+          "KE",
+          "KI",
+          "KP",
+          "KR",
+          "KW",
+          "KG",
+          "LA",
+          "LV",
+          "LB",
+          "LS",
+          "LR",
+          "LY",
+          "LI",
+          "LT",
+          "LU",
+          "MO",
+          "MK",
+          "MG",
+          "MW",
+          "MY",
+          "MV",
+          "ML",
+          "MT",
+          "MH",
+          "MQ",
+          "MR",
+          "MU",
+          "YT",
+          "MX",
+          "FM",
+          "MD",
+          "MC",
+          "MN",
+          "ME",
+          "MS",
+          "MA",
+          "MZ",
+          "MM",
+          "NA",
+          "NR",
+          "NP",
+          "NL",
+          "NC",
+          "NZ",
+          "NI",
+          "NE",
+          "NG",
+          "NU",
+          "NF",
+          "MP",
+          "NO",
+          "OM",
+          "PK",
+          "PW",
+          "PS",
+          "PA",
+          "PG",
+          "PY",
+          "PE",
+          "PH",
+          "PN",
+          "PL",
+          "PT",
+          "PR",
+          "QA",
+          "RE",
+          "RO",
+          "RU",
+          "RW",
+          "BL",
+          "SH",
+          "KN",
+          "LC",
+          "MF",
+          "PM",
+          "VC",
+          "WS",
+          "SM",
+          "ST",
+          "SA",
+          "SN",
+          "RS",
+          "SC",
+          "SL",
+          "SG",
+          "SX",
+          "SK",
+          "SI",
+          "SB",
+          "SO",
+          "ZA",
+          "GS",
+          "SS",
+          "ES",
+          "LK",
+          "SD",
+          "SR",
+          "SJ",
+          "SZ",
+          "SE",
+          "CH",
+          "SY",
+          "TW",
+          "TJ",
+          "TZ",
+          "TH",
+          "TL",
+          "TG",
+          "TK",
+          "TO",
+          "TT",
+          "TN",
+          "TR",
+          "TM",
+          "TC",
+          "TV",
+          "UG",
+          "UA",
+          "AE",
+          "GB",
+          "US",
+          "UM",
+          "UY",
+          "UZ",
+          "VU",
+          "VE",
+          "VN",
+          "VG",
+          "VI",
+          "WF",
+          "EH",
+          "YE",
+          "ZM",
+          "ZW"
+        ],
+        "type": "string"
+      },
       "CreatedAtSortMode": {
         "description": "Supported set of sort modes for scanning by created_at only.\n\nCurrently, we only support scanning in ascending order.",
         "enum": [
@@ -1661,7 +2056,7 @@
         "type": "string"
       },
       "Currency": {
-        "description": "Currency is the list of supported currencies.\n\nFor more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.",
+        "description": "Currency is the list of supported currencies.\n\nThis comes from the Stripe API docs: For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.",
         "enum": [
           "aed",
           "afn",
@@ -1835,6 +2230,7 @@
                 "$ref": "#/components/schemas/Currency"
               }
             ],
+            "default": "usd",
             "description": "Three-letter ISO code for the currency the customer can be charged in for recurring billing purposes."
           },
           "delinquent": {
@@ -1872,8 +2268,7 @@
           }
         },
         "required": [
-          "created_at",
-          "currency"
+          "created_at"
         ],
         "type": "object"
       },
@@ -3477,6 +3872,7 @@
                 "$ref": "#/components/schemas/Currency"
               }
             ],
+            "default": "usd",
             "description": "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase."
           },
           "customer_email": {
@@ -3576,8 +3972,7 @@
           }
         },
         "required": [
-          "created_at",
-          "currency"
+          "created_at"
         ],
         "type": "object"
       },
@@ -3597,6 +3992,7 @@
                 "$ref": "#/components/schemas/Currency"
               }
             ],
+            "default": "usd",
             "description": "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase."
           },
           "description": {
@@ -3620,9 +4016,6 @@
             "type": "object"
           }
         },
-        "required": [
-          "currency"
-        ],
         "type": "object"
       },
       "InvoiceStatus": {
@@ -3960,8 +4353,12 @@
             "type": "string"
           },
           "country": {
-            "description": "The country component.",
-            "type": "string"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CountryCode"
+              }
+            ],
+            "description": "The country component. This is a two-letter ISO country code."
           },
           "state": {
             "description": "The state component.",
@@ -3984,6 +4381,9 @@
             "type": "string"
           }
         },
+        "required": [
+          "country"
+        ],
         "type": "object"
       },
       "OAuth2ClientInfo": {
@@ -7741,6 +8141,67 @@
           }
         },
         "summary": "Get OpenAPI schema.",
+        "tags": [
+          "meta"
+        ]
+      }
+    },
+    "/.well-known/ai-plugin.json": {
+      "get": {
+        "operationId": "get_ai_plugin_manifest",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiPluginManifest"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Get AI plugin manifest.",
         "tags": [
           "meta"
         ]
@@ -14873,6 +15334,61 @@
         "summary": "OPTIONS endoint.",
         "tags": [
           "hidden"
+        ]
+      }
+    },
+    "/user/payment/tax": {
+      "get": {
+        "description": "This endpoint requires authentication by any KittyCAD user. It will return an error if the customer's information is not valid for automatic tax. Otherwise, it will return an empty successful response.",
+        "operationId": "validate_customer_tax_information_for_user",
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Validate a customer's information is correct and valid for automatic tax.",
+        "tags": [
+          "payments"
         ]
       }
     },

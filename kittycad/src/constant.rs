@@ -17,7 +17,7 @@ impl Constant {
              (required)\n\n```rust,no_run\nasync fn example_constant_get_physics() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::PhysicsConstant = client\n        .constant()\n        \
-             .get_physics(kittycad::types::PhysicsConstantName::Sigma)\n        .await?;\n    \
+             .get_physics(kittycad::types::PhysicsConstantName::Z0)\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_physics<'a>(
@@ -29,7 +29,7 @@ impl Constant {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "constant/physics/{constant}".replace("{constant}", &format!("{constant}"))
+                "constant/physics/{constant}".replace("{constant}", &format!("{}", constant))
             ),
         );
         req = req.bearer_auth(&self.client.token);
