@@ -12,7 +12,7 @@ impl Ai {
         Self { client }
     }
 
-    #[doc = "Generate a 3D model from an image.\n\n**Parameters:**\n\n- `input_format: crate::types::ImageType`: The format of the image being converted. (required)\n- `output_format: crate::types::FileExportFormat`: The format the output file should be converted to. (required)\n\n```rust,no_run\nasync fn example_ai_create_image_to_3d() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Mesh = client\n        .ai()\n        .create_image_to_3d(\n            kittycad::types::ImageType::Png,\n            kittycad::types::FileExportFormat::Dae,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Generate a 3D model from an image.\n\n**Parameters:**\n\n- `input_format: crate::types::ImageType`: The format of the image being converted. (required)\n- `output_format: crate::types::FileExportFormat`: The format the output file should be converted to. (required)\n\n```rust,no_run\nasync fn example_ai_create_image_to_3d() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Mesh = client\n        .ai()\n        .create_image_to_3d(\n            kittycad::types::ImageType::Png,\n            kittycad::types::FileExportFormat::Step,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_image_to_3d<'a>(
         &'a self,
@@ -53,7 +53,7 @@ impl Ai {
              (required)\n\n```rust,no_run\nasync fn example_ai_create_text_to_3d() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::Mesh = client\n        .ai()\n        \
-             .create_text_to_3d(kittycad::types::FileExportFormat::Fbx, \"some-string\")\n        \
+             .create_text_to_3d(kittycad::types::FileExportFormat::Dae, \"some-string\")\n        \
              .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_text_to_3d<'a>(
