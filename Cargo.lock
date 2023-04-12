@@ -573,8 +573,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4eb1a864a501629691edf6c15a593b7a51eebaa1e8468e9ddc623de7c9b58ec6"
 dependencies = [
  "cfg-if",
+ "js-sys",
  "libc",
  "wasi",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -831,7 +833,7 @@ dependencies = [
  "rand",
  "reqwest",
  "reqwest-conditional-middleware",
- "reqwest-middleware",
+ "reqwest-middleware 0.1.6",
  "reqwest-retry",
  "reqwest-tracing",
  "schemars",
@@ -1074,7 +1076,7 @@ dependencies = [
  "rand",
  "regex",
  "reqwest",
- "reqwest-middleware",
+ "reqwest-middleware 0.1.6",
  "rustfmt-wrapper",
  "schemars",
  "serde",
@@ -1472,7 +1474,7 @@ checksum = "bce134f515eb4c2748bbd928086e7b0aae0d1568daf6c63b51e829aa6f2cf464"
 dependencies = [
  "async-trait",
  "reqwest",
- "reqwest-middleware",
+ "reqwest-middleware 0.1.6",
  "task-local-extensions",
 ]
 
@@ -1493,6 +1495,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "reqwest-middleware"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "99c50db2c7ccd815f976473dd7d0bde296f8c3b77c383acf4fc021cdcf10852b"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "http",
+ "reqwest",
+ "serde",
+ "task-local-extensions",
+ "thiserror",
+]
+
+[[package]]
 name = "reqwest-retry"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1505,7 +1522,7 @@ dependencies = [
  "http",
  "hyper",
  "reqwest",
- "reqwest-middleware",
+ "reqwest-middleware 0.1.6",
  "retry-policies",
  "task-local-extensions",
  "tokio",
@@ -1514,16 +1531,16 @@ dependencies = [
 
 [[package]]
 name = "reqwest-tracing"
-version = "0.3.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e131e50dcd8f24b88ff964404b96ff38ad4217e3ca6963256856952fe76dc8ec"
+checksum = "8a71d77945a1c5ae9604f0504901e77a1e2e71f2932b1cb8103078179ca62ff8"
 dependencies = [
  "async-trait",
+ "getrandom",
  "opentelemetry",
  "reqwest",
- "reqwest-middleware",
+ "reqwest-middleware 0.2.1",
  "task-local-extensions",
- "tokio",
  "tracing",
  "tracing-opentelemetry",
 ]
@@ -1973,11 +1990,11 @@ checksum = "f764005d11ee5f36500a149ace24e00e3da98b0158b3e2d53a7495660d3f4d60"
 
 [[package]]
 name = "task-local-extensions"
-version = "0.1.1"
+version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36794203e10c86e5998179e260869d156e0674f02d5451b4a3fb9fd86d02aaab"
+checksum = "ba323866e5d033818e3240feeb9f7db2c4296674e4d9e16b97b7bf8f490434e8"
 dependencies = [
- "tokio",
+ "pin-utils",
 ]
 
 [[package]]
