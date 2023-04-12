@@ -7,7 +7,7 @@ description = "An OpenAPI client generator."
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-chrono = { version = "0.4", features = ["serde"] }
+chrono = { version = "0.4", features = ["serde"], default-features = false }
 clap = { version = "^3.2.16", features = ["cargo", "derive", "env", "unicode"] }
 data-encoding = "^2.3.2"
 http = "^0.2.8"
