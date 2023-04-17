@@ -4970,9 +4970,6 @@ pub enum File2DVectorExportFormat {
     #[serde(rename = "dxf")]
     #[display("dxf")]
     Dxf,
-    #[serde(rename = "json")]
-    #[display("json")]
-    Json,
     #[serde(rename = "png")]
     #[display("png")]
     Png,
@@ -5038,9 +5035,6 @@ pub enum File3DImportFormat {
     #[serde(rename = "obj")]
     #[display("obj")]
     Obj,
-    #[serde(rename = "obj_nomtl")]
-    #[display("obj_nomtl")]
-    ObjNomtl,
     #[serde(rename = "ply")]
     #[display("ply")]
     Ply,
@@ -5377,15 +5371,9 @@ pub enum FileExportFormat {
     #[serde(rename = "fbxb")]
     #[display("fbxb")]
     Fbxb,
-    #[serde(rename = "json")]
-    #[display("json")]
-    Json,
     #[serde(rename = "obj")]
     #[display("obj")]
     Obj,
-    #[serde(rename = "obj_nomtl")]
-    #[display("obj_nomtl")]
-    ObjNomtl,
     #[serde(rename = "ply")]
     #[display("ply")]
     Ply,
@@ -5430,9 +5418,6 @@ pub enum FileImportFormat {
     #[serde(rename = "obj")]
     #[display("obj")]
     Obj,
-    #[serde(rename = "obj_nomtl")]
-    #[display("obj_nomtl")]
-    ObjNomtl,
     #[serde(rename = "ply")]
     #[display("ply")]
     Ply,

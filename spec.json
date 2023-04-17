@@ -2988,7 +2988,6 @@
         "description": "The valid types of Vector output file formats.",
         "enum": [
           "dxf",
-          "json",
           "png",
           "ps",
           "svg"
@@ -3011,7 +3010,6 @@
           "fbx",
           "obj_zip",
           "obj",
-          "obj_nomtl",
           "ply",
           "step",
           "stl"
@@ -3278,9 +3276,7 @@
           "dxf",
           "fbx",
           "fbxb",
-          "json",
           "obj",
-          "obj_nomtl",
           "ply",
           "step",
           "stl",
@@ -3296,7 +3292,6 @@
           "fbx",
           "obj_zip",
           "obj",
-          "obj_nomtl",
           "ply",
           "step",
           "stl",
