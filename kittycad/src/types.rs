@@ -1356,7 +1356,6 @@ impl tabled::Tabled for AsyncApiCall {
 pub enum AsyncApiCallOutput {
     FileConversion(FileConversion),
     File2DVectorConversion(File2DVectorConversion),
-    File3DConversion(File3DConversion),
     FileCenterOfMass(FileCenterOfMass),
     FileMass(FileMass),
     FileVolume(FileVolume),
@@ -1448,7 +1447,6 @@ impl tabled::Tabled for AsyncApiCallResultsPage {
 pub enum AsyncApiCallType {
     FileConversion,
     File2DVectorConversion,
-    File3DConversion,
     FileVolume,
     FileCenterOfMass,
     FileMass,
@@ -5007,147 +5005,6 @@ pub enum File2DVectorImportFormat {
     #[serde(rename = "svg")]
     #[display("svg")]
     Svg,
-}
-
-#[doc = "A 3D file conversion."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct File3DConversion {
-    #[doc = "The time and date the API call was completed."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the API call was created."]
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The error the function returned, if any."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
-    pub id: uuid::Uuid,
-    #[doc = "The converted file, if completed, base64 encoded."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub output: Option<base64::Base64Data>,
-    #[doc = "The output format of the file conversion."]
-    pub output_format: File3DExportFormat,
-    #[doc = "The source format of the file conversion."]
-    pub src_format: File3DImportFormat,
-    #[doc = "The time and date the API call was started."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the API call."]
-    pub status: ApiCallStatus,
-    #[doc = "The time and date the API call was last updated."]
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
-}
-
-impl std::fmt::Display for File3DConversion {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for File3DConversion {
-    const LENGTH: usize = 11;
-    fn fields(&self) -> Vec<String> {
-        vec![
-            if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
-            } else {
-                String::new()
-            },
-            format!("{:?}", self.created_at),
-            if let Some(error) = &self.error {
-                format!("{:?}", error)
-            } else {
-                String::new()
-            },
-            format!("{:?}", self.id),
-            if let Some(output) = &self.output {
-                format!("{:?}", output)
-            } else {
-                String::new()
-            },
-            format!("{:?}", self.output_format),
-            format!("{:?}", self.src_format),
-            if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
-            } else {
-                String::new()
-            },
-            format!("{:?}", self.status),
-            format!("{:?}", self.updated_at),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
-            } else {
-                String::new()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<String> {
-        vec![
-            "completed_at".to_string(),
-            "created_at".to_string(),
-            "error".to_string(),
-            "id".to_string(),
-            "output".to_string(),
-            "output_format".to_string(),
-            "src_format".to_string(),
-            "started_at".to_string(),
-            "status".to_string(),
-            "updated_at".to_string(),
-            "user_id".to_string(),
-        ]
-    }
-}
-
-#[doc = "The valid types of 3d output file formats, can include formats that use suplimentary \
-         files. For example, the OBJ format can use a MTL file."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-pub enum File3DExportFormat {
-    #[serde(rename = "dae")]
-    #[display("dae")]
-    Dae,
-    #[serde(rename = "fbx")]
-    #[display("fbx")]
-    Fbx,
-    #[serde(rename = "fbxb")]
-    #[display("fbxb")]
-    Fbxb,
-    #[serde(rename = "obj")]
-    #[display("obj")]
-    Obj,
-    #[serde(rename = "obj_nomtl")]
-    #[display("obj_nomtl")]
-    ObjNomtl,
-    #[serde(rename = "ply")]
-    #[display("ply")]
-    Ply,
-    #[serde(rename = "step")]
-    #[display("step")]
-    Step,
-    #[serde(rename = "stl")]
-    #[display("stl")]
-    Stl,
 }
 
 #[doc = "The valid types of 3d source file formats, can include formats that use suplimentary \
