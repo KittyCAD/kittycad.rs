@@ -717,101 +717,6 @@
             "type": "object"
           },
           {
-            "description": "A 3D file conversion.",
-            "properties": {
-              "completed_at": {
-                "description": "The time and date the API call was completed.",
-                "format": "date-time",
-                "nullable": true,
-                "title": "DateTime",
-                "type": "string"
-              },
-              "created_at": {
-                "description": "The time and date the API call was created.",
-                "format": "date-time",
-                "title": "DateTime",
-                "type": "string"
-              },
-              "error": {
-                "description": "The error the function returned, if any.",
-                "nullable": true,
-                "type": "string"
-              },
-              "id": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Uuid"
-                  }
-                ],
-                "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
-              },
-              "output": {
-                "description": "The converted file, if completed, base64 encoded.",
-                "format": "byte",
-                "nullable": true,
-                "title": "String",
-                "type": "string"
-              },
-              "output_format": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/File3DExportFormat"
-                  }
-                ],
-                "description": "The output format of the file conversion."
-              },
-              "src_format": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/File3DImportFormat"
-                  }
-                ],
-                "description": "The source format of the file conversion."
-              },
-              "started_at": {
-                "description": "The time and date the API call was started.",
-                "format": "date-time",
-                "nullable": true,
-                "title": "DateTime",
-                "type": "string"
-              },
-              "status": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/ApiCallStatus"
-                  }
-                ],
-                "description": "The status of the API call."
-              },
-              "type": {
-                "enum": [
-                  "File3DConversion"
-                ],
-                "type": "string"
-              },
-              "updated_at": {
-                "description": "The time and date the API call was last updated.",
-                "format": "date-time",
-                "title": "DateTime",
-                "type": "string"
-              },
-              "user_id": {
-                "description": "The user ID of the user who created the API call.",
-                "type": "string"
-              }
-            },
-            "required": [
-              "created_at",
-              "id",
-              "output_format",
-              "src_format",
-              "status",
-              "type",
-              "updated_at"
-            ],
-            "type": "object"
-          },
-          {
             "description": "File center of mass.",
             "properties": {
               "center_of_mass": {
@@ -1279,7 +1184,6 @@
         "enum": [
           "FileConversion",
           "File2DVectorConversion",
-          "File3DConversion",
           "FileVolume",
           "FileCenterOfMass",
           "FileMass",
@@ -3096,108 +3000,6 @@
         "enum": [
           "dxf",
           "svg"
-        ],
-        "type": "string"
-      },
-      "File3DConversion": {
-        "description": "A 3D file conversion.",
-        "properties": {
-          "completed_at": {
-            "description": "The time and date the API call was completed.",
-            "format": "date-time",
-            "nullable": true,
-            "title": "DateTime",
-            "type": "string"
-          },
-          "created_at": {
-            "description": "The time and date the API call was created.",
-            "format": "date-time",
-            "title": "DateTime",
-            "type": "string"
-          },
-          "error": {
-            "description": "The error the function returned, if any.",
-            "nullable": true,
-            "type": "string"
-          },
-          "id": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ],
-            "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
-          },
-          "output": {
-            "description": "The converted file, if completed, base64 encoded.",
-            "format": "byte",
-            "nullable": true,
-            "title": "String",
-            "type": "string"
-          },
-          "output_format": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/File3DExportFormat"
-              }
-            ],
-            "description": "The output format of the file conversion."
-          },
-          "src_format": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/File3DImportFormat"
-              }
-            ],
-            "description": "The source format of the file conversion."
-          },
-          "started_at": {
-            "description": "The time and date the API call was started.",
-            "format": "date-time",
-            "nullable": true,
-            "title": "DateTime",
-            "type": "string"
-          },
-          "status": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ApiCallStatus"
-              }
-            ],
-            "description": "The status of the API call."
-          },
-          "updated_at": {
-            "description": "The time and date the API call was last updated.",
-            "format": "date-time",
-            "title": "DateTime",
-            "type": "string"
-          },
-          "user_id": {
-            "description": "The user ID of the user who created the API call.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "created_at",
-          "id",
-          "output_format",
-          "src_format",
-          "status",
-          "updated_at"
-        ],
-        "type": "object"
-      },
-      "File3DExportFormat": {
-        "description": "The valid types of 3d output file formats, can include formats that use suplimentary files. For example, the OBJ format can use a MTL file.",
-        "enum": [
-          "dae",
-          "fbx",
-          "fbxb",
-          "obj",
-          "obj_nomtl",
-          "ply",
-          "step",
-          "stl"
         ],
         "type": "string"
       },
@@ -8203,7 +8005,8 @@
         },
         "summary": "Get AI plugin manifest.",
         "tags": [
-          "meta"
+          "meta",
+          "hidden"
         ]
       }
     },
@@ -8272,6 +8075,7 @@
     },
     "/ai/image-to-3d/{input_format}/{output_format}": {
       "post": {
+        "description": "This is an alpha endpoint. It will change in the future. The current output is honestly pretty bad. So if you find this endpoint, you get what you pay for, which currently is nothing. But in the future will be made a lot better.",
         "operationId": "create_image_to_3d",
         "parameters": [
           {
@@ -8368,6 +8172,7 @@
     },
     "/ai/text-to-3d/{output_format}": {
       "post": {
+        "description": "This is an alpha endpoint. It will change in the future. The current output is honestly pretty bad. So if you find this endpoint, you get what you pay for, which currently is nothing. But in the future will be made a lot better.",
         "operationId": "create_text_to_3d",
         "parameters": [
           {
@@ -9363,7 +9168,8 @@
         },
         "summary": "Get a physics constant.",
         "tags": [
-          "constant"
+          "constant",
+          "hidden"
         ]
       }
     },
@@ -9457,101 +9263,6 @@
           }
         },
         "summary": "Convert 2D Vector file.",
-        "tags": [
-          "file"
-        ]
-      }
-    },
-    "/file/3d/conversion/{src_format}/{output_format}": {
-      "post": {
-        "description": "Convert a 3D file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\nIf the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
-        "operationId": "create_file_3d_conversion",
-        "parameters": [
-          {
-            "description": "The format the file should be converted to.",
-            "in": "path",
-            "name": "output_format",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/File3DExportFormat"
-            },
-            "style": "simple"
-          },
-          {
-            "description": "The format of the file to convert.",
-            "in": "path",
-            "name": "src_format",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/File3DImportFormat"
-            },
-            "style": "simple"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/octet-stream": {
-              "schema": {
-                "format": "binary",
-                "type": "string"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/File3DConversion"
-                }
-              }
-            },
-            "description": "successful creation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "summary": "Convert 3D file.",
         "tags": [
           "file"
         ]
@@ -9733,80 +9444,6 @@
           }
         },
         "summary": "Convert CAD file.",
-        "tags": [
-          "file"
-        ]
-      }
-    },
-    "/file/conversions/{id}": {
-      "get": {
-        "description": "Get the status and output of an async file conversion.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.\nIf the user is not authenticated to view the specified file conversion, then it is not returned.\nOnly KittyCAD employees with the proper access can view file conversions for other users.",
-        "operationId": "get_file_conversion",
-        "parameters": [
-          {
-            "description": "The ID of the async operation.",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "style": "simple"
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AsyncApiCallOutput"
-                }
-              }
-            },
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "summary": "Get a file conversion.",
         "tags": [
           "file"
         ]
@@ -10758,6 +10395,67 @@
         "summary": "Get the consent URL and other information for the OAuth 2.0 provider.",
         "tags": [
           "oauth2",
+          "hidden"
+        ]
+      }
+    },
+    "/openai/openapi.json": {
+      "get": {
+        "description": "This is the same as the OpenAPI schema, BUT it has some modifications to make it compatible with OpenAI. For example, descriptions must be < 300 chars.",
+        "operationId": "get_openai_schema",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Get AI plugin OpenAPI schema.",
+        "tags": [
+          "meta",
           "hidden"
         ]
       }
@@ -14438,80 +14136,6 @@
         ]
       }
     },
-    "/user/file/conversions/{id}": {
-      "get": {
-        "description": "Get the status and output of an async file conversion. If completed, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested file conversion for the user.",
-        "operationId": "get_file_conversion_for_user",
-        "parameters": [
-          {
-            "description": "The ID of the async operation.",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "style": "simple"
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AsyncApiCallOutput"
-                }
-              }
-            },
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "summary": "Get a file conversion for your user.",
-        "tags": [
-          "file"
-        ]
-      }
-    },
     "/user/front-hash": {
       "get": {
         "description": "This info is sent to front when initialing the front chat, it prevents impersonations using js hacks in the browser",
@@ -15388,7 +15012,8 @@
         },
         "summary": "Validate a customer's information is correct and valid for automatic tax.",
         "tags": [
-          "payments"
+          "payments",
+          "hidden"
         ]
       }
     },

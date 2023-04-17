@@ -94,6 +94,36 @@ impl Meta {
         }
     }
 
+    #[doc = "Get AI plugin OpenAPI schema.\n\nThis is the same as the OpenAPI schema, BUT it has \
+             some modifications to make it compatible with OpenAI. For example, descriptions must \
+             be < 300 chars.\n\n```rust,no_run\nasync fn example_meta_get_openai_schema() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: serde_json::Value = client.meta().get_openai_schema().await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_openai_schema<'a>(
+        &'a self,
+    ) -> Result<serde_json::Value, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "openai/openapi.json"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
+        }
+    }
+
     #[doc = "Return pong.\n\n```rust,no_run\nasync fn example_meta_ping() -> anyhow::Result<()> \
              {\n    let client = kittycad::Client::new_from_env();\n    let result: \
              kittycad::types::Pong = client.meta().ping().await?;\n    println!(\"{:?}\", \
