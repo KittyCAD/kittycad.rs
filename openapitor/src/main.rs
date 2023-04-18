@@ -1,8 +1,7 @@
 use anyhow::Result;
 use clap::Parser;
 
-#[tokio::main]
-async fn main() -> Result<()> {
+fn main() -> Result<()> {
     // Parse the command line arguments.
     let opts = openapitor::Opts::parse();
 
@@ -14,10 +13,10 @@ async fn main() -> Result<()> {
     slog_stdlog::init()?;
 
     // Let's read the spec from the file.
-    let spec = openapitor::load_api(&opts.input).await?;
+    let spec = openapitor::load_api(&opts.input)?;
 
     // Generate the library.
-    openapitor::generate(&spec, &opts).await?;
+    openapitor::generate(&spec, &opts)?;
 
     Ok(())
 }
