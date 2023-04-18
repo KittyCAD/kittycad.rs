@@ -187,20 +187,18 @@ impl Random for chrono::DateTime<chrono::Utc> {
     fn random() -> Result<Self> {
         // Generate a random date and time.
         let mut rng = rand::thread_rng();
-        Ok(chrono::Utc
-            .ymd_opt(
+        let out = chrono::Utc
+            .with_ymd_and_hms(
                 rng.gen_range(1900..2100),
                 rng.gen_range(1..13),
                 rng.gen_range(1..28),
-            )
-            .unwrap()
-            .and_hms_milli_opt(
                 rng.gen_range(0..24),
                 rng.gen_range(0..60),
                 rng.gen_range(0..60),
-                rng.gen_range(0..1_000),
             )
-            .unwrap())
+            .unwrap()
+            + chrono::Duration::milliseconds(rng.gen_range(0..1_000));
+        Ok(out)
     }
 }
 

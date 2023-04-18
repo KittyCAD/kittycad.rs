@@ -413,11 +413,11 @@ pub struct Opts {
 
     /// The input OpenAPI definition document (JSON | YAML).
     // TODO: We could also load from a URL.
-    #[clap(short, long, parse(from_os_str), required = true)]
+    #[clap(short, long, value_parser, required = true)]
     pub input: std::path::PathBuf,
 
     /// The output directory for our generated client.
-    #[clap(short, long, parse(from_os_str), default_value = ".", required = true)]
+    #[clap(short, long, value_parser, default_value = ".", required = true)]
     pub output: std::path::PathBuf,
 
     /// The base url for the API.
@@ -669,4 +669,10 @@ fn run_cargo_clippy(opts: &Opts) -> Result<()> {
     }
 
     Ok(())
+}
+
+#[test]
+fn verify_cli() {
+    use clap::CommandFactory;
+    Opts::command().debug_assert();
 }
