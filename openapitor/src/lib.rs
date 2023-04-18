@@ -370,7 +370,7 @@ pub fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
         format!(
             "[dependencies]\n{} = \"{}\"",
             opts.name.replace('_', "-").to_lowercase(),
-            opts.version
+            opts.target_version
         ),
     );
     extension.insert(
@@ -401,63 +401,63 @@ pub fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
 
 /// The options for our generator.
 #[derive(Parser, Debug, Clone)]
-#[clap(version = clap::crate_version!(), author = clap::crate_authors!("\n"))]
+#[command(version = clap::crate_version!(), author = clap::crate_authors!("\n"))]
 pub struct Opts {
     /// Print debug info.
-    #[clap(short = 'D', long)]
+    #[arg(short = 'D', long)]
     pub debug: bool,
 
     /// Print logs as json.
-    #[clap(short, long)]
+    #[arg(short, long)]
     pub json: bool,
 
     /// The input OpenAPI definition document (JSON | YAML).
     // TODO: We could also load from a URL.
-    #[clap(short, long, value_parser, required = true)]
+    #[arg(short, long, required = true)]
     pub input: std::path::PathBuf,
 
     /// The output directory for our generated client.
-    #[clap(short, long, value_parser, default_value = ".", required = true)]
+    #[arg(short, long, default_value = ".", required = true)]
     pub output: std::path::PathBuf,
 
     /// The base url for the API.
-    #[clap(short, long, required = true)]
+    #[arg(short, long, required = true)]
     pub base_url: url::Url,
 
     /// The crate name for our generated client.
-    #[clap(short, long, required = true)]
+    #[arg(short, long, required = true)]
     pub name: String,
 
     /// The crate version for our generated client.
-    #[clap(short, long, required = true)]
-    pub version: String,
+    #[arg(short, long, required = true)]
+    pub target_version: String,
 
     /// The crate description for our generated client.
-    #[clap(short, long, required = true)]
+    #[arg(short, long, required = true)]
     pub description: String,
 
     /// The link to a hosted version of the spec.
-    #[clap(short, long)]
+    #[arg(short, long)]
     pub spec_url: Option<String>,
 
     /// The repo name, formatted like `{owner}/{name}`, if hosted on GitHub.
-    #[clap(short, long)]
+    #[arg(short, long)]
     pub repo_name: Option<String>,
 
     /// The token endpoint, if this client uses OAuth 2.0.
-    #[clap(long)]
+    #[arg(long)]
     pub token_endpoint: Option<url::Url>,
 
     /// The user consent endpoint, if this client uses OAuth 2.0.
-    #[clap(long)]
+    #[arg(long)]
     pub user_consent_endpoint: Option<url::Url>,
 
     /// The date-time format for the API, defaults to Rust rfc3339 parser
-    #[clap(long)]
+    #[arg(long)]
     pub date_time_format: Option<String>,
 
     /// Use basic auth for authentication instead of bearer tokens
-    #[clap(long)]
+    #[arg(long)]
     pub basic_auth: bool,
 }
 
@@ -516,7 +516,7 @@ impl Default for Opts {
             output: Default::default(),
             base_url: url::Url::parse("http://example.com").unwrap(),
             name: Default::default(),
-            version: Default::default(),
+            target_version: Default::default(),
             description: Default::default(),
             spec_url: Default::default(),
             repo_name: Default::default(),
@@ -605,7 +605,7 @@ tokio = {{ version = "1.20.0", features = ["full"] }}
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 "#,
-        opts.name, opts.description, opts.version, opts.name, repo_info,
+        opts.name, opts.description, opts.target_version, opts.name, repo_info,
     )
 }
 
