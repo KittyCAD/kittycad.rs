@@ -11,12 +11,11 @@ pub mod types;
 #[macro_use]
 extern crate quote;
 
-use std::{collections::HashMap, io::Write};
+use std::{collections::HashMap, fs, io::Write};
 
 use anyhow::Result;
 use clap::Parser;
 use slog::Drain;
-use tokio::fs;
 
 use crate::types::exts::ReferenceOrExt;
 
@@ -47,13 +46,13 @@ pub fn load_yaml_spec(s: &str) -> Result<openapiv3::OpenAPI> {
 }
 
 /// Parse a file as an OpenAPI spec.
-pub async fn load_api<P>(p: P) -> Result<openapiv3::OpenAPI>
+pub fn load_api<P>(p: P) -> Result<openapiv3::OpenAPI>
 where
     P: AsRef<std::path::Path>,
 {
     let p = p.as_ref();
     // Read the file into a string.
-    let contents = fs::read_to_string(p).await?;
+    let contents = fs::read_to_string(p)?;
     if let Some(ext) = p.extension() {
         if ext == std::ffi::OsStr::new("yaml") || ext == std::ffi::OsStr::new("yml") {
             return load_yaml_spec(&contents);
@@ -240,12 +239,12 @@ fn clean_tag_name(s: &str) -> String {
 }
 
 /// Generate the client library.
-pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
+pub fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     // Generate the client.
     let out = crate::internal_generate(spec, opts)?;
 
     // Create the top-level crate directory:
-    fs::create_dir_all(&opts.output).await?;
+    fs::create_dir_all(&opts.output)?;
 
     // Write the Cargo.toml file:
     let mut toml = opts.output.clone();
@@ -272,14 +271,15 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     // Create the src/ directory.
     let mut src = opts.output.clone();
     src.push("src");
-    fs::create_dir_all(&src).await?;
+    fs::create_dir_all(&src)?;
 
     // Clean up any old files we might have.
     // Walk the src/ directory and delete any files that aren't a persistent module.
-    let mut src_list = fs::read_dir(&src).await?;
-    while let Some(file) = src_list.next_entry().await? {
+    let src_list = fs::read_dir(&src)?;
+    for file in src_list {
+        let file = file?;
         // Return early if it is a directory.
-        if file.file_type().await?.is_dir() {
+        if file.file_type()?.is_dir() {
             continue;
         }
         // Get the file name.
@@ -298,7 +298,7 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
         }
 
         // Delete the file.
-        fs::remove_file(file.path()).await?;
+        fs::remove_file(file.path())?;
     }
 
     // Create the Rust source file containing the generated client.
@@ -358,10 +358,10 @@ pub async fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     )?;
 
     // Run fmt in our output directory.
-    run_cargo_fmt(opts).await?;
+    run_cargo_fmt(opts)?;
 
     // Run clippy in our output directory.
-    run_cargo_clippy(opts).await?;
+    run_cargo_clippy(opts)?;
 
     // Also add our installation information to the modified_spec.
     let mut extension: HashMap<String, String> = HashMap::new();
@@ -566,7 +566,7 @@ anyhow = "1"
 async-trait = "^0.1.53"
 bytes = {{ version = "1", features = ["serde"] }}
 clap = {{ version = "^3.2.12", features = ["cargo", "derive", "env", "unicode"] }}
-chrono = {{ version = "0.4", default-features = false, features = ["serde"] }}
+chrono = {{ version = "0.4", default-features = false, features = ["serde", "std"] }}
 data-encoding = "^2.3.2"
 dirs = {{ version = "^4.0.0", optional = true }}
 format_serde_error = "^0.3.0"
@@ -609,7 +609,7 @@ rustdoc-args = ["--cfg", "docsrs"]
     )
 }
 
-async fn run_cargo_fmt(opts: &Opts) -> Result<()> {
+fn run_cargo_fmt(opts: &Opts) -> Result<()> {
     log::info!("Running `cargo fmt`...");
 
     // Shell out and run cargo clippy on the output directory.
@@ -619,7 +619,7 @@ async fn run_cargo_fmt(opts: &Opts) -> Result<()> {
         opts.output.display().to_string()
     };
 
-    let mut cmd = tokio::process::Command::new("cargo");
+    let mut cmd = std::process::Command::new("cargo");
     cmd.args([
         "+nightly",
         "fmt",
@@ -630,7 +630,7 @@ async fn run_cargo_fmt(opts: &Opts) -> Result<()> {
     ])
     .current_dir(output);
 
-    let output = cmd.output().await?;
+    let output = cmd.output()?;
     if !output.status.success() {
         anyhow::bail!(
             "cargo fmt failed: {}",
@@ -641,7 +641,7 @@ async fn run_cargo_fmt(opts: &Opts) -> Result<()> {
     Ok(())
 }
 
-async fn run_cargo_clippy(opts: &Opts) -> Result<()> {
+fn run_cargo_clippy(opts: &Opts) -> Result<()> {
     log::info!("Running `cargo clippy`...");
 
     // Shell out and run cargo clippy on the output directory.
@@ -651,7 +651,7 @@ async fn run_cargo_clippy(opts: &Opts) -> Result<()> {
         opts.output.display().to_string()
     };
 
-    let mut cmd = tokio::process::Command::new("cargo");
+    let mut cmd = std::process::Command::new("cargo");
     cmd.args([
         "clippy",
         "--fix",
@@ -660,7 +660,7 @@ async fn run_cargo_clippy(opts: &Opts) -> Result<()> {
     ])
     .current_dir(output);
 
-    let output = cmd.output().await?;
+    let output = cmd.output()?;
     if !output.status.success() {
         anyhow::bail!(
             "cargo clippy failed: {}",

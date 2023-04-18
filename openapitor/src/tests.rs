@@ -1,12 +1,12 @@
 use anyhow::Result;
-use test_context::{test_context, AsyncTestContext};
+use test_context::{test_context, TestContext as BlockingTestContext};
 
 struct TestContext {
     tmp_dir: std::path::PathBuf,
 }
 
 impl TestContext {
-    pub async fn new() -> Result<Self> {
+    pub fn new() -> Result<Self> {
         // Create a temporary directory for the test.
         let tmp_dir = std::env::temp_dir();
         let tmp_dir = tmp_dir.join(&format!("openapitor-{}", uuid::Uuid::new_v4()));
@@ -18,13 +18,12 @@ impl TestContext {
     }
 }
 
-#[async_trait::async_trait]
-impl AsyncTestContext for TestContext {
-    async fn setup() -> Self {
-        TestContext::new().await.unwrap()
+impl BlockingTestContext for TestContext {
+    fn setup() -> Self {
+        TestContext::new().unwrap()
     }
 
-    async fn teardown(self) {
+    fn teardown(self) {
         println!("Removing {}", self.tmp_dir.display());
         // Delete the temporary directory.
         std::fs::remove_dir_all(&self.tmp_dir).unwrap();
@@ -32,9 +31,9 @@ impl AsyncTestContext for TestContext {
 }
 
 #[test_context(TestContext)]
-#[tokio::test]
+#[test]
 #[ignore]
-async fn test_kittycad_generation(ctx: &mut TestContext) {
+fn test_kittycad_generation(ctx: &mut TestContext) {
     let opts = crate::Opts {
         debug: true,
         json: false,
@@ -71,20 +70,20 @@ async fn test_kittycad_generation(ctx: &mut TestContext) {
     }
 
     // Generate the library.
-    crate::generate(&spec, &opts).await.unwrap();
+    crate::generate(&spec, &opts).unwrap();
 
     // Make the output tests directory.
     let output_tests_dir = ctx.tmp_dir.join("tests");
     std::fs::create_dir_all(&output_tests_dir).unwrap();
 
     // Run tests.
-    run_cargo_test(&opts).await.unwrap();
+    run_cargo_test(&opts).unwrap();
 }
 
 #[test_context(TestContext)]
-#[tokio::test]
+#[test]
 #[ignore]
-async fn test_github_generation(ctx: &mut TestContext) {
+fn test_github_generation(ctx: &mut TestContext) {
     let opts = crate::Opts {
         debug: true,
         json: false,
@@ -109,15 +108,15 @@ async fn test_github_generation(ctx: &mut TestContext) {
     std::fs::write(&test_file_path, test_file).unwrap();
 
     // Generate the library.
-    crate::generate(&spec, &opts).await.unwrap();
+    crate::generate(&spec, &opts).unwrap();
 
     // Run tests.
-    run_cargo_test(&opts).await.unwrap();
+    run_cargo_test(&opts).unwrap();
 }
 
 #[test_context(TestContext)]
-#[tokio::test]
-async fn test_oxide_generation(ctx: &mut TestContext) {
+#[test]
+fn test_oxide_generation(ctx: &mut TestContext) {
     let opts = crate::Opts {
         debug: true,
         json: false,
@@ -145,16 +144,16 @@ async fn test_oxide_generation(ctx: &mut TestContext) {
     std::fs::write(&test_file_path, test_file).unwrap();
 
     // Generate the library.
-    crate::generate(&spec, &opts).await.unwrap();
+    crate::generate(&spec, &opts).unwrap();
 
     // Run tests.
-    run_cargo_test(&opts).await.unwrap();
+    run_cargo_test(&opts).unwrap();
 }
 
 #[test_context(TestContext)]
-#[tokio::test]
+#[test]
 #[ignore]
-async fn test_front_generation(ctx: &mut TestContext) {
+fn test_front_generation(ctx: &mut TestContext) {
     let opts = crate::Opts {
         debug: true,
         json: false,
@@ -179,15 +178,15 @@ async fn test_front_generation(ctx: &mut TestContext) {
     std::fs::write(&test_file_path, test_file).unwrap();
 
     // Generate the library.
-    crate::generate(&spec, &opts).await.unwrap();
+    crate::generate(&spec, &opts).unwrap();
 
     // Run tests.
-    run_cargo_test(&opts).await.unwrap();
+    run_cargo_test(&opts).unwrap();
 }
 
 #[test_context(TestContext)]
-#[tokio::test]
-async fn test_gusto_generation(ctx: &mut TestContext) {
+#[test]
+fn test_gusto_generation(ctx: &mut TestContext) {
     let opts = crate::Opts {
         debug: true,
         json: false,
@@ -214,15 +213,15 @@ async fn test_gusto_generation(ctx: &mut TestContext) {
     std::fs::write(&test_file_path, test_file).unwrap();
 
     // Generate the library.
-    crate::generate(&spec, &opts).await.unwrap();
+    crate::generate(&spec, &opts).unwrap();
 
     // Run tests.
-    run_cargo_test(&opts).await.unwrap();
+    run_cargo_test(&opts).unwrap();
 }
 
 #[test_context(TestContext)]
-#[tokio::test]
-async fn test_ramp_generation(ctx: &mut TestContext) {
+#[test]
+fn test_ramp_generation(ctx: &mut TestContext) {
     let opts = crate::Opts {
         debug: true,
         json: false,
@@ -253,13 +252,13 @@ async fn test_ramp_generation(ctx: &mut TestContext) {
     std::fs::write(&test_file_path, test_file).unwrap();
 
     // Generate the library.
-    crate::generate(&spec, &opts).await.unwrap();
+    crate::generate(&spec, &opts).unwrap();
 
     // Run tests.
-    run_cargo_test(&opts).await.unwrap();
+    run_cargo_test(&opts).unwrap();
 }
 
-async fn run_cargo_test(opts: &crate::Opts) -> Result<()> {
+fn run_cargo_test(opts: &crate::Opts) -> Result<()> {
     log::info!("Running `cargo test`...");
 
     // Shell out and run cargo clippy on the output directory.
@@ -269,13 +268,13 @@ async fn run_cargo_test(opts: &crate::Opts) -> Result<()> {
         opts.output.display().to_string()
     };
 
-    let mut cmd = tokio::process::Command::new("cargo");
+    let mut cmd = std::process::Command::new("cargo");
     cmd.args(["test"])
         .current_dir(output)
         // So that we can run fresh and not fail.
         .env("EXPECTORATE", "overwrite");
 
-    let output = cmd.output().await?;
+    let output = cmd.output()?;
     if !output.status.success() {
         anyhow::bail!(
             "cargo test failed: {}",

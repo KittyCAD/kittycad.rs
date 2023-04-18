@@ -7,7 +7,7 @@ description = "An OpenAPI client generator."
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-chrono = { version = "0.4", features = ["serde"], default-features = false }
+chrono = { version = "0.4", features = ["serde", "std"], default-features = false }
 clap = { version = "^3.2.16", features = ["cargo", "derive", "env", "unicode"] }
 data-encoding = "^2.3.2"
 http = "^0.2.8"
@@ -38,7 +38,6 @@ slog-scope = "^4.4.0"
 slog-stdlog = "^4.1.1"
 slog-term = "^2.9.0"
 thiserror = "1"
-tokio = { version = "1.20.1", features = ["full"] }
 url = { version = "^2.2.2", features = ["serde"] }
 uuid = { version = "1", features = ["serde", "v4"] }
 once_cell = "1.17.1"

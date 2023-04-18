@@ -1143,7 +1143,6 @@ dependencies = [
  "slog-term",
  "test-context",
  "thiserror",
- "tokio",
  "url",
  "uuid",
 ]
