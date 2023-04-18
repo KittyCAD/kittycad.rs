@@ -2,6 +2,8 @@ use anyhow::Result;
 use clap::Parser;
 
 fn main() -> Result<()> {
+    println!("Starting openapitor version {}", env!("CARGO_PKG_VERSION"));
+
     // Parse the command line arguments.
     let opts = openapitor::Opts::parse();
 

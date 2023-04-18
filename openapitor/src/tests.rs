@@ -26,7 +26,7 @@ impl BlockingTestContext for TestContext {
     fn teardown(self) {
         println!("Removing {}", self.tmp_dir.display());
         // Delete the temporary directory.
-        std::fs::remove_dir_all(&self.tmp_dir).unwrap();
+        // std::fs::remove_dir_all(&self.tmp_dir).unwrap();
     }
 }
 
@@ -152,7 +152,6 @@ fn test_oxide_generation(ctx: &mut TestContext) {
 
 #[test_context(TestContext)]
 #[test]
-#[ignore]
 fn test_front_generation(ctx: &mut TestContext) {
     let opts = crate::Opts {
         debug: true,
@@ -176,6 +175,72 @@ fn test_front_generation(ctx: &mut TestContext) {
     // Write our temporary file.
     let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
     std::fs::write(test_file_path, test_file).unwrap();
+
+    // Generate the library.
+    crate::generate(&spec, &opts).unwrap();
+
+    // Run tests.
+    run_cargo_test(&opts).unwrap();
+}
+
+#[test_context(TestContext)]
+#[test]
+fn test_remote_generation(ctx: &mut TestContext) {
+    let opts = crate::Opts {
+        debug: true,
+        json: false,
+        input: ctx.tmp_dir.clone(),
+        output: ctx.tmp_dir.clone(),
+        base_url: "https://api.remote.com".parse().unwrap(),
+        name: "remote-api".to_string(),
+        target_version: "1.0.0".to_string(),
+        description: "HR crap!".to_string(),
+        spec_url: Some("".to_string()),
+        repo_name: Some("kittycad/remote.rs".to_string()),
+        ..Default::default()
+    };
+
+    // Load our spec.
+    let spec = crate::load_json_spec(include_str!("../tests/remote.json")).unwrap();
+
+    // Move our test file to our output directory.
+    let test_file = include_str!("../tests/library/remote.tests.rs");
+    // Write our temporary file.
+    let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
+    std::fs::write(&test_file_path, test_file).unwrap();
+
+    // Generate the library.
+    crate::generate(&spec, &opts).unwrap();
+
+    // Run tests.
+    run_cargo_test(&opts).unwrap();
+}
+
+#[test_context(TestContext)]
+#[test]
+fn test_twilio_generation(ctx: &mut TestContext) {
+    let opts = crate::Opts {
+        debug: true,
+        json: false,
+        input: ctx.tmp_dir.clone(),
+        output: ctx.tmp_dir.clone(),
+        base_url: "https://api.twilio.com".parse().unwrap(),
+        name: "twilio-api".to_string(),
+        target_version: "1.0.0".to_string(),
+        description: "HR crap!".to_string(),
+        spec_url: Some("".to_string()),
+        repo_name: Some("kittycad/twilio.rs".to_string()),
+        ..Default::default()
+    };
+
+    // Load our spec.
+    let spec = crate::load_json_spec(include_str!("../tests/twilio.json")).unwrap();
+
+    // Move our test file to our output directory.
+    let test_file = include_str!("../tests/library/twilio.tests.rs");
+    // Write our temporary file.
+    let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
+    std::fs::write(&test_file_path, test_file).unwrap();
 
     // Generate the library.
     crate::generate(&spec, &opts).unwrap();
@@ -258,6 +323,41 @@ fn test_ramp_generation(ctx: &mut TestContext) {
     run_cargo_test(&opts).unwrap();
 }
 
+#[test_context(TestContext)]
+#[test]
+fn test_commonroom_generation(ctx: &mut TestContext) {
+    let opts = crate::Opts {
+        debug: true,
+        json: false,
+        input: ctx.tmp_dir.clone(),
+        output: ctx.tmp_dir.clone(),
+        base_url: "https://api.commonroom.io/community/v1".parse().unwrap(),
+        name: "commonroom-api".to_string(),
+        target_version: "1.0.0".to_string(),
+        description: " crap!".to_string(),
+        spec_url: Some("".to_string()),
+        repo_name: Some("kittycad/commonroom.rs".to_string()),
+        token_endpoint: None,
+        user_consent_endpoint: None,
+        ..Default::default()
+    };
+
+    // Load our spec.
+    let spec = crate::load_yaml_spec(include_str!("../tests/commonroom.json")).unwrap();
+
+    // Move our test file to our output directory.
+    let test_file = include_str!("../tests/library/commonroom.tests.rs");
+    // Write our temporary file.
+    let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
+    std::fs::write(&test_file_path, test_file).unwrap();
+
+    // Generate the library.
+    crate::generate(&spec, &opts).unwrap();
+
+    // Run tests.
+    run_cargo_test(&opts).unwrap();
+}
+
 fn run_cargo_test(opts: &crate::Opts) -> Result<()> {
     log::info!("Running `cargo test`...");
 
@@ -269,17 +369,20 @@ fn run_cargo_test(opts: &crate::Opts) -> Result<()> {
     };
 
     let mut cmd = std::process::Command::new("cargo");
-    cmd.args(["test"])
+    cmd.args(["test", "--quiet"])
         .current_dir(output)
         // So that we can run fresh and not fail.
         .env("EXPECTORATE", "overwrite");
 
     let output = cmd.output()?;
     if !output.status.success() {
-        anyhow::bail!(
-            "cargo test failed: {}",
-            String::from_utf8_lossy(&output.stderr)
-        );
+        let stderr = String::from_utf8(output.stderr).unwrap();
+        let stdout = String::from_utf8(output.stdout).unwrap();
+        eprintln!("Stderr:");
+        eprintln!("{stderr}");
+        eprintln!("Stdout:");
+        eprintln!("{stdout}");
+        anyhow::bail!("cargo test failed, see above");
     }
 
     Ok(())

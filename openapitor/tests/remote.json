@@ -1,0 +1,4071 @@
+{
+  "components": {
+    "responses": {},
+    "schemas": {
+      "ContractDetails": {
+        "title": "ContractDetails",
+        "nullable": true,
+        "description": "Contract information. As its properties may vary depending on the country,\n               you must query the [Show form schema](https://gateway.remote.com/eor/v1/docs/openapi.html#tag/Countries/operation/get_show_form_country) endpoint\n            passing the country code and `contract_details` as path parameters."
+      },
+      "EmergencyContactDetails": {
+        "title": "EmergencyContactDetails",
+        "nullable": true,
+        "description": "Emergency contact information. Its properties may vary depending on the country."
+      },
+      "PersonalDetails": {
+        "description": "Personal details information. As its properties may vary depending on the country,\n               you must query the [Show form schema](https://gateway.remote.com/eor/v1/docs/openapi.html#tag/Countries/operation/get_show_form_country) endpoint\n            passing the country code and `personal_details` as path parameters.",
+        "title": "PersonalDetails",
+        "nullable": true
+      },
+      "AddressDetails": {
+        "title": "AddressDetails",
+        "description": "Home address information. As its properties may vary depending on the country,\n               you must query the [Show form schema](https://gateway.remote.com/eor/v1/docs/openapi.html#tag/Countries/operation/get_show_form_country) endpoint\n            passing the country code and `address_details` as path parameters.",
+        "nullable": true
+      },
+      "BillingAddressDetails": {
+        "title": "BillingAddressDetails",
+        "description": "Billing address information. As its properties may vary depending on the country,\n               you must query the [Show form schema](https://gateway.remote.com/eor/v1/docs/openapi.html#tag/Countries/operation/get_show_form_country) endpoint\n            passing the country code and `billing_address_details` as path parameters.",
+        "nullable": true
+      },
+      "AdministrativeDetails": {
+        "title": "AdministrativeDetails",
+        "description": "Administrative information. As its properties may vary depending on the country,\n               you must query the [Show form schema](https://gateway.remote.com/eor/v1/docs/openapi.html#tag/Countries/operation/get_show_form_country) endpoint\n            passing the country code and `administrative_details` as path parameters.",
+        "nullable": true
+      },
+      "BankAccountDetails": {
+        "title": "BankAccountDetails",
+        "description": "Bank account information. As its properties may vary depending on the country,\n               you must query the [Show form schema](https://gateway.remote.com/eor/v1/docs/openapi.html#tag/Countries/operation/get_show_form_country) endpoint\n            passing the country code and `bank_account_details` as path parameters.",
+        "nullable": true
+      },
+      "LocalDetails": {
+        "title": "LocalDetails"
+      },
+      "Validations": {
+        "title": "Validations"
+      },
+      "TaskDescription": {
+        "description": "Description and status of an onboarding task.",
+        "example": {
+          "description": "Information we need for tax purposes.",
+          "status": "completed"
+        },
+        "properties": {
+          "description": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "status": {
+            "description": "The status of the task",
+            "enum": [
+              "completed",
+              "pending"
+            ],
+            "example": "completed",
+            "title": "TaskStatus",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "TaskDescription",
+        "nullable": true,
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "File": {
+        "description": "A supported file",
+        "example": {
+          "id": "9880b711-file-id-ecf8f551bd78",
+          "inserted_at": "2021-11-12T17:19:21",
+          "name": "id.pdf",
+          "sub_type": "personal_id",
+          "type": "id"
+        },
+        "properties": {
+          "id": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "inserted_at": {
+            "format": "date-time",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "name": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "sub_type": {
+            "nullable": true,
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "type": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "id",
+          "inserted_at",
+          "name",
+          "type"
+        ],
+        "title": "File",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "ConflictResponse": {
+        "example": {
+          "message": "Company needs to be in status active to manage employments"
+        },
+        "properties": {
+          "message": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "ConflictResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "TimeoffType": {
+        "enum": [
+          "paid_time_off",
+          "sick_leave",
+          "public_holiday",
+          "unpaid_leave",
+          "extended_leave",
+          "in_lieu_time",
+          "maternity_leave",
+          "paternity_leave",
+          "parental_leave",
+          "bereavement",
+          "military_leave",
+          "other"
+        ],
+        "example": "sick_leave",
+        "title": "TimeoffType",
+        "type": "string",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "PayrollRun": {
+        "example": {
+          "customer_inputs_reviewed": false,
+          "field_for_employment_matching": "nin",
+          "inserted_at": "2022-01-04T14:33:47",
+          "legal_entity": {
+            "address": {
+              "address": "Street 1",
+              "address_line_2": "Flat 7",
+              "city": "San Francisco",
+              "country": {
+                "code": "PRT",
+                "features": [
+                  "employer-onboarding",
+                  "employee-onboarding",
+                  "contract-details"
+                ],
+                "name": "Portugal",
+                "slug": "portugal-ab18d96a-a9fd-42c0-9688-24f963d8bdc1"
+              },
+              "postal_code": "123-456",
+              "slug": "663e0b79-c893-45ff-a1b2-f6dcabc098b5",
+              "state": "CA"
+            },
+            "company": {
+              "name": "",
+              "slug": "663e0b79-c893-45ff-a1b2-f6dcabc098b5"
+            },
+            "is_internal": false,
+            "name": "",
+            "slug": "663e0b79-c893-45ff-a1b2-f6dcabc098b5"
+          },
+          "name": "August payroll for Brazil",
+          "net_pay_extraction_expression": "(.*)",
+          "period_end": "2021-04-30",
+          "period_start": "2021-04-01",
+          "product_type": "eor",
+          "slug": "663e0b79-c893-45ff-a1b2-f6dcabc098b5",
+          "status": "preparing",
+          "type": "main"
+        },
+        "properties": {
+          "creator": {
+            "properties": {
+              "name": {
+                "type": "string",
+                "x-struct": null,
+                "x-validate": null
+              }
+            },
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "customer_inputs_reviewed": {
+            "description": "Indicates if an Employer has completed the Payroll Inputs review flow",
+            "type": "boolean",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "field_for_employment_matching": {
+            "nullable": true,
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "inserted_at": {
+            "type": "date-time",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "last_editor": {
+            "properties": {
+              "name": {
+                "type": "string",
+                "x-struct": null,
+                "x-validate": null
+              }
+            },
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "legal_entity": {
+            "$ref": "#/components/schemas/RemoteEntity"
+          },
+          "mapping_rules": {
+            "type": "array",
+            "items": { "type": "string" },
+            "x-struct": null,
+            "x-validate": null
+          },
+          "name": {
+            "description": "Name of the payroll_run to be displayed for users",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "net_pay_extraction_expression": {
+            "nullable": true,
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "period_end": {
+            "description": "The end date the payroll run is for",
+            "format": "date",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "period_start": {
+            "description": "The start date the payroll run is for",
+            "format": "date",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "product_type": {
+            "description": "Payroll run product type",
+            "enum": [
+              "eor",
+              "global_payroll"
+            ],
+            "example": "eor",
+            "nullable": true,
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "slug": {
+            "$ref": "#/components/schemas/Slug"
+          },
+          "status": {
+            "description": "Status of the payroll",
+            "enum": [
+              "preparing",
+              "processing",
+              "waiting_for_customer_approval",
+              "completed",
+              "finalized",
+              "rejected"
+            ],
+            "example": "preparing",
+            "nullable": false,
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "summarize_automatically": {
+            "type": "boolean",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "type": {
+            "description": "Payroll Run type",
+            "enum": [
+              "main",
+              "one_off",
+              "pro_forma"
+            ],
+            "example": "main",
+            "nullable": true,
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "validations": {
+            "$ref": "#/components/schemas/Validations"
+          }
+        },
+        "required": [
+          "status",
+          "slug",
+          "period_start",
+          "period_end",
+          "legal_entity",
+          "summarize_automatically"
+        ],
+        "title": "PayrollRun",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "Address": {
+        "example": {
+          "address": "Street 1",
+          "address_line_2": "Flat 7",
+          "city": "San Francisco",
+          "country": {
+            "code": "PRT",
+            "features": [
+              "employer-onboarding",
+              "employee-onboarding",
+              "contract-details"
+            ],
+            "name": "Portugal",
+            "slug": "portugal-ab18d96a-a9fd-42c0-9688-24f963d8bdc1"
+          },
+          "postal_code": "123-456",
+          "slug": "663e0b79-c893-45ff-a1b2-f6dcabc098b5",
+          "state": "CA"
+        },
+        "properties": {
+          "address": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "address_line_2": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "city": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "country": {
+            "$ref": "#/components/schemas/AddressCountry"
+          },
+          "local_details": {
+            "$ref": "#/components/schemas/LocalDetails"
+          },
+          "postal_code": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "slug": {
+            "$ref": "#/components/schemas/Slug"
+          },
+          "state": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "Address",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "Employment": {
+        "description": "Complete information of an employment",
+        "example": {
+          "address_details": {
+            "address": "555, 8th Street",
+            "address_line_2": "",
+            "city": "San Francisco",
+            "postal_code": "972727"
+          },
+          "administrative_details": {
+            "id_number": "123.123.123-333",
+            "marital_status": "married",
+            "number_of_dependents": 3,
+            "sin": "33333.2222-1"
+          },
+          "bank_account_details": [
+            {
+              "international_details": {
+                "account_holder": "Smith",
+                "bic_swift": "AACCC",
+                "iban": "PT50123124123441",
+                "ownership_type": "PRIVATE"
+              },
+              "local_details": {
+                "account_holder": "Smith",
+                "bic_swift": "AACCC",
+                "iban": "PT50123124123441",
+                "ownership_type": "PRIVATE"
+              }
+            }
+          ],
+          "billing_address_details": {
+            "address": "555, 8th Street",
+            "city": "San Francisco",
+            "country_code": "USA",
+            "postal_code": "972727",
+            "state": "CA"
+          },
+          "company_id": "e31adae1-company-id-af5fba7dd803",
+          "contract_details": {
+            "available_pto": 33,
+            "benefits": [
+              "no"
+            ],
+            "bonus_details": "every year",
+            "commissions_details": "15% every year",
+            "contract_duration": "Permanent",
+            "eligible_to_work_in_residing_country": "permanent_resident",
+            "experience_level": "Level I - employees who carry out schematic or mechanical work that is to be assessed as simple auxiliary work.",
+            "has_bonus": "yes",
+            "has_commissions": "yes",
+            "has_signing_bonus": "yes",
+            "is_cover_travel_reimbursement": "yes",
+            "probation_length": 3,
+            "role_description": "Manage a quickly growing and business-critical team. Contribute to hiring and retaining product designers; help to shape the team culture.",
+            "signing_bonus_amount": 15000,
+            "supervisor_name": "Batman",
+            "work_address_is_home_address": "yes",
+            "years_of_experience": "2"
+          },
+          "country": {
+            "code": "AUT",
+            "name": "Austria"
+          },
+          "created_at": "2021-11-11T18:44:39",
+          "emergency_contact_details": {
+            "email": "taylor@johnson.com",
+            "name": "Taylor Johnson",
+            "phone_number": "+3519194512312",
+            "relationship": "Best friend"
+          },
+          "files": [],
+          "full_name": "Jane Smith",
+          "id": "20a72f86-employment-id-9e4942a902ff",
+          "job_title": "Engineer",
+          "onboarding_tasks": {
+            "address_details": {
+              "description": "Primary residence.",
+              "status": "completed"
+            },
+            "administrative_details": {
+              "description": "Information we need for tax purposes.",
+              "status": "completed"
+            },
+            "bank_account_details": {
+              "description": "Bank account used for receiving salary payments.",
+              "status": "completed"
+            },
+            "billing_address_details": {
+              "description": "Address associated with the employee's bank account.",
+              "status": "completed"
+            },
+            "contract_details": {
+              "description": "Employee-specific details for their employment agreement.",
+              "status": "completed"
+            },
+            "emergency_contact_details": {
+              "description": "Who should be called in an emergency.",
+              "status": "completed"
+            },
+            "employment_document_details": {
+              "description": "We need some additional documents.",
+              "status": "pending"
+            },
+            "personal_details": {
+              "description": "Personal details, such as name and date of birth.",
+              "status": "completed"
+            },
+            "pricing_plan_details": {
+              "description": "How often Remote will bill employers for management fees.",
+              "status": "completed"
+            }
+          },
+          "personal_details": {
+            "birthdate": "2021-10-23",
+            "mobile_number": "0035191919",
+            "nationality": [
+              "Portugal",
+              "United States"
+            ],
+            "preferred_name": "Stan Lee"
+          },
+          "personal_email": "jane@smith.com",
+          "pricing_plan_details": {
+            "frequency": "annually"
+          },
+          "provisional_start_date": "2021-07-03",
+          "status": "created",
+          "type": "employee",
+          "updated_at": "2021-11-11T18:44:39"
+        },
+        "properties": {
+          "address_details": {
+            "$ref": "#/components/schemas/AddressDetails"
+          },
+          "administrative_details": {
+            "$ref": "#/components/schemas/AdministrativeDetails"
+          },
+          "bank_account_details": {
+            "items": {
+              "description": "List of bank account information. Its properties may vary depending on the country.",
+              "type": "list",
+              "x-struct": null,
+              "x-validate": null
+            },
+            "nullable": true,
+            "type": "array",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "billing_address_details": {
+            "$ref": "#/components/schemas/BillingAddressDetails"
+          },
+          "company_id": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "contract_details": {
+            "$ref": "#/components/schemas/ContractDetails"
+          },
+          "country": {
+            "$ref": "#/components/schemas/Country"
+          },
+          "created_at": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "emergency_contact_details": {
+            "$ref": "#/components/schemas/EmergencyContactDetails"
+          },
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/File"
+            },
+            "type": "array",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "full_name": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "id": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "job_title": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "onboarding_tasks": {
+            "$ref": "#/components/schemas/OnboardingTasks"
+          },
+          "personal_details": {
+            "$ref": "#/components/schemas/PersonalDetails"
+          },
+          "personal_email": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "pricing_plan_details": {
+            "$ref": "#/components/schemas/PricingPlanDetails"
+          },
+          "provisional_start_date": {
+            "format": "date",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "status": {
+            "$ref": "#/components/schemas/EmploymentStatus"
+          },
+          "type": {
+            "enum": [
+              "employee",
+              "contractor"
+            ],
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "address_details",
+          "administrative_details",
+          "bank_account_details",
+          "billing_address_details",
+          "company_id",
+          "contract_details",
+          "country",
+          "created_at",
+          "emergency_contact_details",
+          "files",
+          "full_name",
+          "id",
+          "type",
+          "job_title",
+          "onboarding_tasks",
+          "personal_details",
+          "personal_email",
+          "pricing_plan_details",
+          "status",
+          "updated_at"
+        ],
+        "title": "Employment",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "Slug": {
+        "example": "663e0b79-c893-45ff-a1b2-f6dcabc098b5",
+        "title": "Slug",
+        "type": "string",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "ListEmploymentsResponse": {
+        "description": "Response schema listing many employments",
+        "example": {
+          "current_page": 1,
+          "employments": [
+            {
+              "country": {
+                "code": "AUS",
+                "name": "Australia"
+              },
+              "full_name": "Jane Smith",
+              "id": "add736b8-employment-id-a76ccae2abe8",
+              "job_title": "Engineer",
+              "status": "created"
+            }
+          ],
+          "total_count": 1,
+          "total_pages": 1
+        },
+        "properties": {
+          "data": {
+            "properties": {
+              "current_page": {
+                "description": "The current page among all of the total_pages",
+                "type": "integer",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "employments": {
+                "items": {
+                  "$ref": "#/components/schemas/MinimalEmployment"
+                },
+                "type": "array",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "total_count": {
+                "description": "The total number of records in the result",
+                "type": "integer",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "total_pages": {
+                "description": "The total number of pages the user can go through",
+                "type": "integer",
+                "x-struct": null,
+                "x-validate": null
+              }
+            },
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "ListEmploymentsResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "TimeoffResponse": {
+        "description": "Timeoff response",
+        "example": {
+          "data": {
+            "timeoff": {
+              "document": {
+                "id": "9880b711-file-id-ecf8f551bd78",
+                "inserted_at": "2021-11-12T17:19:21",
+                "name": "id.pdf",
+                "sub_type": "personal_id",
+                "type": "id"
+              },
+              "employment_id": "5e55386e-4f4f-4def-92f4-bdc19a5ce77d",
+              "end_date": "2021-12-21",
+              "id": "0073fcb5-b669-4e4a-b963-2a47744e75a1",
+              "notes": "Some notes",
+              "start_date": "2021-12-20",
+              "status": "approved",
+              "timeoff_days": [
+                {
+                  "day": "2021-12-20",
+                  "hours": 8
+                },
+                {
+                  "day": "2021-12-21",
+                  "hours": 8
+                }
+              ],
+              "timeoff_type": "paid_time_off",
+              "timezone": "Asia/Kolkata"
+            }
+          }
+        },
+        "properties": {
+          "data": {
+            "properties": {
+              "timeoff": {
+                "$ref": "#/components/schemas/Timeoff"
+              }
+            },
+            "required": [
+              "timeoff"
+            ],
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "TimeoffResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "ListTimeoffTypesResponse": {
+        "description": "Time off types response",
+        "properties": {
+          "data": {
+            "properties": {
+              "description": {
+                "nullable": true,
+                "type": "string",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "name": {
+                "$ref": "#/components/schemas/TimeoffType"
+              }
+            },
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "ListTimeoffTypesResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "CreateApprovedTimeoffParams": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateTimeoffParams"
+          },
+          {
+            "properties": {
+              "approved_at": {
+                "$ref": "#/components/schemas/DateTime"
+              },
+              "approver_id": {
+                "nullable": true,
+                "type": "string",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "status": {
+                "enum": [
+                  "approved"
+                ],
+                "type": "string",
+                "x-struct": null,
+                "x-validate": null
+              }
+            },
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          }
+        ],
+        "description": "Approved timeoff creation params",
+        "required": [
+          "status",
+          "approver_id",
+          "approved_at"
+        ],
+        "title": "CreateApprovedTimeoffParams",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "EmploymentBasicParams": {
+        "description": "Description of the required params to create an employment.",
+        "example": {
+          "company_id": "20a72f86-company-id-20a72f86",
+          "country_code": "AUS",
+          "full_name": "Jane Smith",
+          "job_title": "Engineer",
+          "personal_email": "jane@smith.com",
+          "provisional_start_date": "2022-07-10",
+          "type": "employee"
+        },
+        "properties": {
+          "company_id": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "country_code": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "full_name": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "job_title": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "personal_email": {
+            "format": "email",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "provisional_start_date": {
+            "description": "Required for employees, optional for contractors",
+            "format": "date",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "type": {
+            "enum": [
+              "employee",
+              "contractor"
+            ],
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "full_name",
+          "personal_email",
+          "job_title",
+          "country_code",
+          "company_id",
+          "type"
+        ],
+        "title": "EmploymentBasicParams",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "PayrollRunWithLegalEntity": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PayrollRun"
+          },
+          {
+            "properties": {
+              "legal_entity": {
+                "$ref": "#/components/schemas/RemoteEntity"
+              }
+            },
+            "required": [
+              "legal_entity"
+            ],
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          }
+        ],
+        "nullable": true,
+        "title": "PayrollRunWithLegalEntity",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "EmploymentResponse": {
+        "description": "Complete information of an employment",
+        "example": {
+          "data": {
+            "employment": {
+              "address_details": {
+                "address": "555, 8th Street",
+                "address_line_2": "",
+                "city": "San Francisco",
+                "postal_code": "90001"
+              },
+              "administrative_details": {
+                "id_number": "123.123.123-333",
+                "marital_status": "married",
+                "number_of_dependents": 3,
+                "sin": "33333.2222-1"
+              },
+              "bank_account_details": [
+                {
+                  "international_details": {
+                    "account_holder": "Smith",
+                    "bic_swift": "AACCC",
+                    "iban": "PT50123124123441",
+                    "ownership_type": "PRIVATE"
+                  },
+                  "local_details": {
+                    "account_holder": "Smith",
+                    "bic_swift": "AACCC",
+                    "iban": "PT50123124123441",
+                    "ownership_type": "PRIVATE"
+                  }
+                }
+              ],
+              "billing_address_details": {
+                "address": "555, 8th Street",
+                "city": "San Francisco",
+                "country_code": "USA",
+                "postal_code": "972727",
+                "state": "CA"
+              },
+              "company_id": "e31adae1-company-id-af5fba7dd803",
+              "contract_details": {
+                "available_pto": 33,
+                "benefits": [
+                  "no"
+                ],
+                "bonus_details": "every year",
+                "commissions_details": "15% every year",
+                "contract_duration": "Permanent",
+                "eligible_to_work_in_residing_country": "permanent_resident",
+                "experience_level": "Level I - employees who carry out schematic or mechanical work that is to be assessed as simple auxiliary work.",
+                "has_bonus": "yes",
+                "has_commissions": "yes",
+                "has_signing_bonus": "yes",
+                "is_cover_travel_reimbursement": "yes",
+                "probation_length": 3,
+                "role_description": "Manage a quickly growing and business-critical team. Contribute to hiring and retaining product designers; help to shape the team culture.",
+                "signing_bonus_amount": 15000,
+                "supervisor_name": "Batman",
+                "work_address_is_home_address": "yes",
+                "years_of_experience": "2"
+              },
+              "country": {
+                "code": "AUT",
+                "name": "Austria"
+              },
+              "created_at": "2021-11-11T18:44:39",
+              "emergency_contact_details": {
+                "email": "taylor@johnson.com",
+                "name": "Taylor Johnson",
+                "phone_number": "+3519194512312",
+                "relationship": "Best friend"
+              },
+              "files": [],
+              "full_name": "Jane Smith",
+              "id": "20a72f86-employment-id-9e4942a902ff",
+              "job_title": "Engineer",
+              "onboarding_tasks": {
+                "address_details": {
+                  "description": "Primary residence.",
+                  "status": "completed"
+                },
+                "administrative_details": {
+                  "description": "Information we need for tax purposes.",
+                  "status": "completed"
+                },
+                "bank_account_details": {
+                  "description": "Bank account used for receiving salary payments.",
+                  "status": "completed"
+                },
+                "billing_address_details": {
+                  "description": "Address associated with the employee's bank account.",
+                  "status": "completed"
+                },
+                "contract_details": {
+                  "description": "Employee-specific details for their employment agreement.",
+                  "status": "completed"
+                },
+                "emergency_contact_details": {
+                  "description": "Who should be called in an emergency.",
+                  "status": "completed"
+                },
+                "employment_document_details": {
+                  "description": "We need some additional documents.",
+                  "status": "pending"
+                },
+                "personal_details": {
+                  "description": "Personal details, such as name and date of birth.",
+                  "status": "completed"
+                },
+                "pricing_plan_details": {
+                  "description": "How often Remote will bill employers for management fees.",
+                  "status": "completed"
+                }
+              },
+              "personal_details": {
+                "birthdate": "2021-10-23",
+                "mobile_number": "0035191919",
+                "nationality": [
+                  "Portugal",
+                  "United States"
+                ],
+                "preferred_name": "Stan Lee"
+              },
+              "personal_email": "jane@smith.com",
+              "pricing_plan_details": {
+                "frequency": "annually"
+              },
+              "provisional_start_date": "2021-07-03",
+              "status": "created",
+              "type": "employee",
+              "updated_at": "2021-11-11T18:44:39",
+              "user_id": "86c7d7c2-user-id-a76a-3313b6ff2fae"
+            }
+          }
+        },
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/EmploymentData"
+          }
+        },
+        "title": "EmploymentResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "EmploymentData": {
+        "properties": {
+          "employment": {
+            "$ref": "#/components/schemas/Employment"
+          }
+        },
+        "title": "EmploymentData",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "UpdateApprovedTimeoffParams": {
+        "description": "Update timeoff params",
+        "properties": {
+          "approved_at": {
+            "$ref": "#/components/schemas/DateTime"
+          },
+          "approver_id": {
+            "nullable": true,
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "cancel_reason": {
+            "description": "The reason for cancelling a time off. Required when updating to status `cancelled`.",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "document": {
+            "$ref": "#/components/schemas/TimeoffDocumentParams"
+          },
+          "edit_reason": {
+            "description": "The reason for the update. Required when updating the time off data but not changing the status.",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "end_date": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "notes": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "start_date": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "status": {
+            "enum": [
+              "approved",
+              "cancelled"
+            ],
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "timeoff_days": {
+            "items": {
+              "$ref": "#/components/schemas/TimeoffDaysParams"
+            },
+            "type": "array",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "timeoff_type": {
+            "$ref": "#/components/schemas/TimeoffType"
+          },
+          "timezone": {
+            "example": "Etc/UTC",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "edit_reason",
+          "cancel_reason"
+        ],
+        "title": "UpdateApprovedTimeoffParams",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "AddressCountry": {
+        "example": {
+          "code": "PRT",
+          "features": [
+            "employer-onboarding",
+            "employee-onboarding",
+            "contract-details"
+          ],
+          "name": "Portugal",
+          "slug": "portugal-ab18d96a-a9fd-42c0-9688-24f963d8bdc1"
+        },
+        "properties": {
+          "code": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "features": {
+            "type": "array",
+            "items": { "type": "string" },
+            "x-struct": null,
+            "x-validate": null
+          },
+          "name": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "slug": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "slug",
+          "features"
+        ],
+        "title": "AddressCountry",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "EmploymentStatus": {
+        "description": "The status of employment",
+        "enum": [
+          "active",
+          "created",
+          "initiated",
+          "invited",
+          "pending",
+          "review",
+          "archived",
+          "deleted"
+        ],
+        "example": "active",
+        "title": "EmploymentStatus",
+        "type": "string",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "UnprocessableEntityErrorResponse": {
+        "example": {
+          "errors": {
+            "start_date": [
+              "can't be blank"
+            ]
+          }
+        },
+        "properties": {
+          "errors": {
+            "additionalProperties": {
+              "type": "array",
+              "items": { "type": "string" },
+              "x-struct": null,
+              "x-validate": null
+            },
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "errors"
+        ],
+        "title": "UnprocessableEntityErrorResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "TimeoffDay": {
+        "description": "TimeoffDay schema",
+        "example": {
+          "day": "2021-01-01",
+          "hours": 8
+        },
+        "properties": {
+          "day": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "hours": {
+            "type": "integer",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "payroll_run": {
+            "$ref": "#/components/schemas/PayrollRunWithLegalEntity"
+          }
+        },
+        "required": [
+          "day",
+          "hours"
+        ],
+        "title": "TimeoffDay",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "TaskStatus": {
+        "description": "The status of the task",
+        "enum": [
+          "completed",
+          "pending"
+        ],
+        "example": "completed",
+        "title": "TaskStatus",
+        "type": "string",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "HolidaysResponse": {
+        "description": "Holidays response",
+        "example": {
+          "data": [
+            {
+              "day": "2021-01-01",
+              "name": "New Year's Day",
+              "note": "The day after New Year's Eve"
+            }
+          ]
+        },
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/Holiday"
+            },
+            "type": "array",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "HolidaysResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "PricingPlanDetails": {
+        "description": "Selected type of payment.",
+        "example": {
+          "frequency": "annually"
+        },
+        "properties": {
+          "frequency": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "frequency"
+        ],
+        "nullable": true,
+        "title": "PricingPlanDetails",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "Timeoff": {
+        "example": {
+          "document": {
+            "id": "9880b711-file-id-ecf8f551bd78",
+            "inserted_at": "2021-11-12T17:19:21",
+            "name": "id.pdf",
+            "sub_type": "personal_id",
+            "type": "id"
+          },
+          "employment_id": "5e55386e-4f4f-4def-92f4-bdc19a5ce77d",
+          "end_date": "2021-12-21",
+          "id": "0073fcb5-b669-4e4a-b963-2a47744e75a1",
+          "notes": "Some notes",
+          "start_date": "2021-12-20",
+          "status": "approved",
+          "timeoff_days": [
+            {
+              "day": "2021-12-20",
+              "hours": 8
+            },
+            {
+              "day": "2021-12-21",
+              "hours": 8
+            }
+          ],
+          "timeoff_type": "paid_time_off",
+          "timezone": "Asia/Kolkata"
+        },
+        "properties": {
+          "approved_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "approver_id": {
+            "nullable": true,
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "cancel_reason": {
+            "nullable": true,
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "cancelled_at": {
+            "$ref": "#/components/schemas/NullableDateTime"
+          },
+          "document": {
+            "$ref": "#/components/schemas/File"
+          },
+          "employment_id": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "end_date": {
+            "format": "date",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "id": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "notes": {
+            "nullable": true,
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "start_date": {
+            "format": "date",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "cancelled",
+              "declined",
+              "requested",
+              "taken",
+              "cancel_requested"
+            ],
+            "x-struct": null,
+            "x-validate": null
+          },
+          "timeoff_days": {
+            "items": {
+              "$ref": "#/components/schemas/TimeoffDay"
+            },
+            "type": "array",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "timeoff_type": {
+            "$ref": "#/components/schemas/TimeoffType"
+          },
+          "timezone": {
+            "example": "Etc/UTC",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "id",
+          "employment_id",
+          "status",
+          "start_date",
+          "end_date",
+          "timeoff_days",
+          "timeoff_type",
+          "timezone"
+        ],
+        "title": "Timeoff",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "Company Manager": {
+        "example": {
+          "company_id": "0a8s2d1-company-id-2e3f4th",
+          "role": "owner",
+          "user_email": "user@example.com",
+          "user_id": "983088c9-user-id-023fc08b8625",
+          "user_name": "Anne White"
+        },
+        "properties": {
+          "company_id": {
+            "description": "Company ID",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "role": {
+            "description": "Company Manager role.",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "user_email": {
+            "description": "User Email",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "user_id": {
+            "description": "User ID",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "user_name": {
+            "description": "User's name",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "Company Manager",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "TimeoffDocumentParams": {
+        "description": "Timeoff document params",
+        "properties": {
+          "content": {
+            "description": "The binary content of the file encoded with base64",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "name": {
+            "description": "The file name of the document",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "content",
+          "name"
+        ],
+        "title": "TimeoffDocumentParams",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "CompanyManagerParams": {
+        "properties": {
+          "company_id": {
+            "description": "The Company ID. Required if the access token can access multiple companies. Optional otherwise.",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "email": {
+            "description": "The work email of the company manager",
+            "format": "email",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "name": {
+            "description": "The name of the company manager",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "role": {
+            "description": "The role assigned for the new manager. The value should be one of the following:\n\n- `admin`: an Admin can manage most of the resources in remote.\n- `onboarding_manager`: an Onboarding Manager can add, see and manage new hires.\n- `people_manager`: an People Manager can view the employee profiles for the team members they manage and approve and decline time off and expenses for their employees.\n",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "role"
+        ],
+        "title": "CompanyManagerParams",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "NotFoundResponse": {
+        "example": {
+          "message": "{resource} not found"
+        },
+        "properties": {
+          "message": {
+            "pattern": "Not Found",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "NotFoundResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "Country": {
+        "description": "A supported country on Remote",
+        "example": {
+          "code": "PRT",
+          "country_subdivisions": [
+            {
+              "code": "PT-06",
+              "name": "Coimbra",
+              "subdivision_type": "District"
+            },
+            {
+              "code": "PT-11",
+              "name": "Lisboa",
+              "subdivision_type": "District"
+            }
+          ],
+          "name": "Portugal"
+        },
+        "properties": {
+          "code": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "country_subdivisions": {
+            "items": {
+              "$ref": "#/components/schemas/CountrySubdivision"
+            },
+            "nullable": true,
+            "type": "array",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "name": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "code",
+          "name"
+        ],
+        "title": "Country",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "EmploymentFullParams": {
+        "description": "Description of the basic required and onboarding tasks params to create an employment.\nYou do not need to include all onboarding tasks when creating or updating an employment.\n",
+        "example": {
+          "address_details": {
+            "address": "Street Name",
+            "address_line_2": "",
+            "city": "City #1",
+            "postal_code": "90001"
+          },
+          "administrative_details": {
+            "id_number": "123.123.123-333",
+            "marital_status": "married",
+            "number_of_dependents": 3,
+            "sin": "33333.2222-1"
+          },
+          "bank_account_details": {
+            "account_holder": "Smith",
+            "bic_swift": "AACCC",
+            "iban": "PT50123124123441",
+            "ownership_type": "PRIVATE"
+          },
+          "billing_address_details": {
+            "address": "555, 8th Street",
+            "city": "San Francisco",
+            "country_code": "USA",
+            "postal_code": "972727",
+            "state": "CA"
+          },
+          "company_id": "e31adae1-company-id-af5fba7dd803",
+          "contract_details": {
+            "available_pto": 33,
+            "benefits": [
+              "no"
+            ],
+            "bonus_details": "every year",
+            "commissions_details": "15% every year",
+            "contract_duration": "Permanent",
+            "eligible_to_work_in_residing_country": "permanent_resident",
+            "experience_level": "Level I - employees who carry out schematic or mechanical work that is to be assessed as simple auxiliary work.",
+            "has_bonus": "yes",
+            "has_commissions": "yes",
+            "has_signing_bonus": "yes",
+            "is_cover_travel_reimbursement": "yes",
+            "probation_length": 3,
+            "role_description": "Manage a quickly growing and business-critical team. Contribute to hiring and retaining product designers; help to shape the team culture.",
+            "signing_bonus_amount": 15000,
+            "supervisor_name": "Batman",
+            "work_address_is_home_address": "yes",
+            "years_of_experience": "2"
+          },
+          "country_code": "AUS",
+          "emergency_contact_details": {
+            "email": "taylor@johnson.com",
+            "name": "Taylor Johnson",
+            "phone_number": "+3519194512312",
+            "relationship": "Best friend"
+          },
+          "full_name": "Jane Smith",
+          "job_title": "Backend Engineer",
+          "manager": "Taylor Johnson",
+          "personal_details": {
+            "birthdate": "2021-10-23",
+            "mobile_number": "0035191919",
+            "nationality": [
+              "Portugal",
+              "United States"
+            ],
+            "preferred_name": "Stan Lee"
+          },
+          "personal_email": "jane@smith.com",
+          "pricing_plan_details": {
+            "frequency": "annually"
+          },
+          "provisional_start_date": "2021-07-03"
+        },
+        "properties": {
+          "address_details": {
+            "$ref": "#/components/schemas/AddressDetails"
+          },
+          "administrative_details": {
+            "$ref": "#/components/schemas/AdministrativeDetails"
+          },
+          "bank_account_details": {
+            "$ref": "#/components/schemas/BankAccountDetails"
+          },
+          "billing_address_details": {
+            "$ref": "#/components/schemas/BillingAddressDetails"
+          },
+          "company_id": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "contract_details": {
+            "$ref": "#/components/schemas/ContractDetails"
+          },
+          "country": {
+            "$ref": "#/components/schemas/Country"
+          },
+          "emergency_contact_details": {
+            "$ref": "#/components/schemas/EmergencyContactDetails"
+          },
+          "full_name": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "job_title": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "manager_id": {
+            "description": "The user id of the manager, who should have an `admin`, `owner` or `people_manager` role.\nYou can find these users by querying the [Company Managers endpoint](#operation/get_index_company_manager).\n**Update of this field is only available for active employments.**\n",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "personal_details": {
+            "$ref": "#/components/schemas/PersonalDetails"
+          },
+          "personal_email": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "pricing_plan_details": {
+            "$ref": "#/components/schemas/PricingPlanDetails"
+          },
+          "provisional_start_date": {
+            "description": "Required for employees, optional for contractors",
+            "format": "date",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "full_name",
+          "personal_email",
+          "job_title",
+          "country_code",
+          "company_id"
+        ],
+        "title": "EmploymentFullParams",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "MaybeMinimalCompany": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MinimalCompany"
+          }
+        ],
+        "example": {
+          "name": "",
+          "slug": "663e0b79-c893-45ff-a1b2-f6dcabc098b5"
+        },
+        "properties": {
+          "name": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "slug": {
+            "$ref": "#/components/schemas/Slug"
+          }
+        },
+        "nullable": true,
+        "title": "MaybeMinimalCompany",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "CompanyManagersResponse": {
+        "description": "Response schema listing many company_managers",
+        "example": {
+          "company_managers": [
+            {
+              "company_id": "0a8s2d1-company-id-2e3f4th",
+              "role": "owner",
+              "user_email": "user@example.com",
+              "user_id": "983088c9-user-id-023fc08b8625",
+              "user_name": "Anne White"
+            }
+          ],
+          "current_page": 1,
+          "total_count": 1,
+          "total_pages": 1
+        },
+        "properties": {
+          "data": {
+            "properties": {
+              "company_managers": {
+                "items": {
+                  "$ref": "#/components/schemas/Company Manager"
+                },
+                "type": "array",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "current_page": {
+                "description": "The current page among all of the total_pages",
+                "type": "integer",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "total_count": {
+                "description": "The total number of records in the result",
+                "type": "integer",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "total_pages": {
+                "description": "The total number of pages the user can go through",
+                "type": "integer",
+                "x-struct": null,
+                "x-validate": null
+              }
+            },
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "CompanyManagersResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "CountriesResponse": {
+        "description": "List of countries supported by Remote API",
+        "example": {
+          "data": [
+            {
+              "code": "PRT",
+              "name": "Portugal"
+            }
+          ]
+        },
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/Country"
+            },
+            "type": "array",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "CountriesResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "CompanyManagerCreatedResponse": {
+        "example": {
+          "data": {
+            "company_manager": {
+              "company_id": "0a8s2d1-company-id-2e3f4th",
+              "role": "owner",
+              "user_email": "user@example.com",
+              "user_id": "983088c9-user-id-023fc08b8625",
+              "user_name": "Anne White"
+            }
+          }
+        },
+        "properties": {
+          "company_manager": {
+            "$ref": "#/components/schemas/Company Manager"
+          }
+        },
+        "title": "CompanyManagerCreatedResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "NullableDateTime": {
+        "description": "Optional UTC date time in YYYY-MM-DDTHH:mm:ss format",
+        "example": "2021-07-15T18:18:17",
+        "nullable": true,
+        "title": "NullableDateTime",
+        "type": "date-time",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "RemoteEntity": {
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "company": {
+            "$ref": "#/components/schemas/MaybeMinimalCompany"
+          },
+          "is_internal": {
+            "description": "Identifies if the legal entity is owned by Remote",
+            "type": "boolean",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "name": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "slug": {
+            "$ref": "#/components/schemas/Slug"
+          }
+        },
+        "required": [
+          "slug",
+          "name",
+          "address",
+          "company"
+        ],
+        "title": "RemoteEntity",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "CountryFormResponse": {
+        "description": "Object with required and optional fields, its descriptions and suggested presentation",
+        "example": {
+          "additionalProperties": false,
+          "properties": {
+            "address": {
+              "$template": "common/address_details/address.json",
+              "presentation": {
+                "position": 0
+              }
+            },
+            "address_line_2": {
+              "$template": "common/address_details/address_line_2.json",
+              "presentation": {
+                "position": 1
+              }
+            },
+            "city": {
+              "$template": "templates/text_field.json",
+              "description": "Enter your city",
+              "presentation": {
+                "position": 2
+              },
+              "title": "City"
+            },
+            "postal_code": {
+              "$template": "templates/text_field.json",
+              "description": "Enter zip or postal code",
+              "presentation": {
+                "position": 3
+              },
+              "title": "Postal code"
+            }
+          },
+          "required": [
+            "address",
+            "city",
+            "postal_code"
+          ],
+          "type": "object"
+        },
+        "properties": {
+          "data": {
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "CountryFormResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "MinimalCompany": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "slug": {
+            "$ref": "#/components/schemas/Slug"
+          }
+        },
+        "required": [
+          "slug",
+          "name"
+        ],
+        "title": "MinimalCompany",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "UnprocessableEntityResponse": {
+        "example": {
+          "errors": {
+            "some_field": [
+              "is invalid"
+            ]
+          }
+        },
+        "oneOf": [
+          {
+            "properties": {
+              "message": {
+                "type": "string",
+                "x-struct": null,
+                "x-validate": null
+              }
+            },
+            "required": [
+              "message"
+            ],
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          },
+          {
+            "properties": {
+              "errors": {
+                "type": "object",
+                "x-struct": null,
+                "x-validate": null
+              }
+            },
+            "required": [
+              "errors"
+            ],
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          }
+        ],
+        "title": "UnprocessableEntityResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "TooManyRequestsResponse": {
+        "example": {
+          "message": "Too many requests"
+        },
+        "properties": {
+          "message": {
+            "pattern": "Too many requests",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "TooManyRequestsResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "Holiday": {
+        "example": {
+          "day": "2021-01-01",
+          "name": "New Year's Day",
+          "note": "The day after New Year's Eve"
+        },
+        "properties": {
+          "day": {
+            "format": "date",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "name": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "note": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "name",
+          "day"
+        ],
+        "title": "Holiday",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "Date": {
+        "description": "UTC date in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format",
+        "example": "2021-07-01",
+        "format": "date",
+        "title": "Date",
+        "type": "string",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "BadRequestResponse": {
+        "example": {
+          "message": "invalid {resource}"
+        },
+        "properties": {
+          "message": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "BadRequestResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "UnauthorizedResponse": {
+        "example": {
+          "message": "Unauthorized"
+        },
+        "properties": {
+          "message": {
+            "pattern": "Unauthorized",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "UnauthorizedResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "CountrySubdivision": {
+        "description": "A subdivision of a supported country on Remote",
+        "example": {
+          "code": "PT-11",
+          "name": "Lisboa",
+          "subdivision_type": "District"
+        },
+        "properties": {
+          "code": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "name": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "subdivision_type": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CountrySubdivision",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "CreateTimeoffParams": {
+        "description": "Timeoff creation params",
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/TimeoffDocumentParams"
+          },
+          "employment_id": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "end_date": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "notes": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "start_date": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "timeoff_days": {
+            "items": {
+              "$ref": "#/components/schemas/TimeoffDaysParams"
+            },
+            "type": "array",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "timeoff_type": {
+            "$ref": "#/components/schemas/TimeoffType"
+          },
+          "timezone": {
+            "example": "Etc/UTC",
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "required": [
+          "employment_id",
+          "start_date",
+          "end_date",
+          "timeoff_type",
+          "timezone",
+          "timeoff_days"
+        ],
+        "title": "CreateTimeoffParams",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "TimeoffDaysParams": {
+        "description": "Timeoff days params",
+        "properties": {
+          "day": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "hours": {
+            "type": "integer",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "TimeoffDaysParams",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "OnboardingTasks": {
+        "description": "All tasks that need to be completed before marking the employment as ready",
+        "example": {
+          "address_details": {
+            "description": "Primary residence.",
+            "status": "completed"
+          },
+          "administrative_details": {
+            "description": "Information we need for tax purposes.",
+            "status": "completed"
+          },
+          "bank_account_details": {
+            "description": "Bank account used for receiving salary payments.",
+            "status": "completed"
+          },
+          "billing_address_details": {
+            "description": "Address associated with the employee's bank account.",
+            "status": "completed"
+          },
+          "contract_details": {
+            "description": "Employee-specific details for their employment agreement.",
+            "status": "completed"
+          },
+          "emergency_contact_details": {
+            "description": "Who should be called in an emergency.",
+            "status": "completed"
+          },
+          "employment_document_details": {
+            "description": "We need some additional documents.",
+            "status": "pending"
+          },
+          "personal_details": {
+            "description": "Personal details, such as name and date of birth.",
+            "status": "completed"
+          },
+          "pricing_plan_details": {
+            "description": "How often Remote will bill employers for management fees.",
+            "status": "completed"
+          }
+        },
+        "properties": {
+          "address_details": {
+            "$ref": "#/components/schemas/TaskDescription"
+          },
+          "administrative_details": {
+            "$ref": "#/components/schemas/TaskDescription"
+          },
+          "bank_account_details": {
+            "$ref": "#/components/schemas/TaskDescription"
+          },
+          "billing_address_details": {
+            "$ref": "#/components/schemas/TaskDescription"
+          },
+          "contract_details": {
+            "$ref": "#/components/schemas/TaskDescription"
+          },
+          "emergency_contact_details": {
+            "$ref": "#/components/schemas/TaskDescription"
+          },
+          "employment_document_details": {
+            "$ref": "#/components/schemas/TaskDescription"
+          },
+          "personal_details": {
+            "$ref": "#/components/schemas/TaskDescription"
+          },
+          "pricing_plan_details": {
+            "$ref": "#/components/schemas/TaskDescription"
+          }
+        },
+        "required": [
+          "address_details",
+          "administrative_details",
+          "bank_account_details",
+          "billing_address_details",
+          "contract_details",
+          "emergency_contact_details",
+          "employment_document_details",
+          "personal_details",
+          "pricing_plan_details"
+        ],
+        "title": "OnboardingTasks",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "ListTimeoffResponse": {
+        "description": "Response schema listing many timeoffs",
+        "example": {
+          "current_page": 1,
+          "timeoffs": [
+            {
+              "document": {
+                "id": "9880b711-file-id-ecf8f551bd78",
+                "inserted_at": "2021-11-12T17:19:21",
+                "name": "id.pdf",
+                "sub_type": "personal_id",
+                "type": "id"
+              },
+              "employment_id": "5e55386e-4f4f-4def-92f4-bdc19a5ce77d",
+              "end_date": "2021-12-21",
+              "id": "0073fcb5-b669-4e4a-b963-2a47744e75a1",
+              "notes": "Some notes",
+              "start_date": "2021-12-20",
+              "status": "approved",
+              "timeoff_days": [
+                {
+                  "day": "2021-12-20",
+                  "hours": 8
+                },
+                {
+                  "day": "2021-12-21",
+                  "hours": 8
+                }
+              ],
+              "timeoff_type": "paid_time_off",
+              "timezone": "Asia/Kolkata"
+            }
+          ],
+          "total_count": 1,
+          "total_pages": 1
+        },
+        "properties": {
+          "data": {
+            "properties": {
+              "current_page": {
+                "description": "The current page among all of the total_pages",
+                "type": "integer",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "timeoffs": {
+                "items": {
+                  "$ref": "#/components/schemas/Timeoff"
+                },
+                "type": "array",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "total_count": {
+                "description": "The total number of records in the result",
+                "type": "integer",
+                "x-struct": null,
+                "x-validate": null
+              },
+              "total_pages": {
+                "description": "The total number of pages the user can go through",
+                "type": "integer",
+                "x-struct": null,
+                "x-validate": null
+              }
+            },
+            "type": "object",
+            "x-struct": null,
+            "x-validate": null
+          }
+        },
+        "title": "ListTimeoffResponse",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "EmploymentUpdateParams": {
+        "description": "Required params to update an employment in the Sandbox environment.\n\nCurrently only supports setting the Employment Status to `active`.\n",
+        "example": {
+          "status": "active"
+        },
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/EmploymentStatus"
+          }
+        },
+        "title": "EmploymentUpdateParams",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "DateTime": {
+        "description": "UTC date time in YYYY-MM-DDTHH:mm:ss format",
+        "example": "2021-07-15T18:18:17",
+        "title": "DateTime",
+        "type": "date-time",
+        "x-struct": null,
+        "x-validate": null
+      },
+      "MinimalEmployment": {
+        "description": "Minimal information of an employment.",
+        "example": {
+          "country": {
+            "code": "AUS",
+            "name": "Australia"
+          },
+          "full_name": "Jane Smith",
+          "id": "add736b8-employment-id-a76ccae2abe8",
+          "job_title": "Engineer",
+          "status": "created"
+        },
+        "properties": {
+          "country": {
+            "$ref": "#/components/schemas/Country"
+          },
+          "full_name": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "id": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "job_title": {
+            "type": "string",
+            "x-struct": null,
+            "x-validate": null
+          },
+          "status": {
+            "$ref": "#/components/schemas/EmploymentStatus"
+          }
+        },
+        "required": [
+          "country",
+          "full_name",
+          "id",
+          "job_title",
+          "status"
+        ],
+        "title": "MinimalEmployment",
+        "type": "object",
+        "x-struct": null,
+        "x-validate": null
+      }
+    },
+    "securitySchemes": {
+      "Bearer token": {
+        "bearerFormat": "ra_[live|test]_token",
+        "description": "Authenticate using a bearer token.\n\nRemote tokens have two prefixes. Tokens starting with `ra_live_` are meant for production use.\nIt means they only work against the `https://gateway.remote.com/` server.\nTokens starting with `ra_test_` work only in our sandbox environment, which is accessible by `https://gateway.remote-sandbox.com/`.\n",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "Remote API",
+    "version": "0.1.0",
+    "description": "# Authentication\n\n<!-- ReDoc-Inject: <security-definitions> -->"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1/company-managers": {
+      "get": {
+        "callbacks": {},
+        "description": "List all company managers of an integration. If filtered by the company_id param,\nit lists only company managers belonging to the specified company.\n",
+        "operationId": "get_index_company_manager",
+        "parameters": [
+          {
+            "description": "A Company ID to filter the results (only applicable for Integration Partners).",
+            "example": "0a8s2d1-company-id-2e3f4th",
+            "in": "query",
+            "name": "company_id",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          },
+          {
+            "description": "Starts fetching records after the given page",
+            "example": 1,
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "x-struct": null,
+              "x-validate": null
+            }
+          },
+          {
+            "description": "Change the amount of records returned per page, defaults to 20, limited to 100",
+            "example": 30,
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "x-struct": null,
+              "x-validate": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyManagersResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "List Company Managers",
+        "tags": [
+          "Company Managers"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "description": "Create a Company Manager and sends the invitation email for signing in to the Remote Platform.",
+        "operationId": "post_create_company_manager",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyManagerParams"
+              }
+            }
+          },
+          "description": "Company Manager params",
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyManagerCreatedResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntityResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Create and invite a Company Manager",
+        "tags": [
+          "Company Managers"
+        ]
+      }
+    },
+    "/v1/countries": {
+      "get": {
+        "callbacks": {},
+        "description": "Returns a list of all countries that are supported by Remote API alphabetically ordered.",
+        "operationId": "get_supported_country",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountriesResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "List countries",
+        "tags": [
+          "Countries"
+        ]
+      }
+    },
+    "/v1/countries/{country_code}/holidays/{year}": {
+      "get": {
+        "callbacks": {},
+        "description": "List all holidays of a country for a specific year. Optionally, it can be filtered by country subdivision.",
+        "operationId": "get_index_holiday",
+        "parameters": [
+          {
+            "description": "Country code according to ISO 3166-1 3-digit alphabetic codes",
+            "example": "PRT",
+            "in": "path",
+            "name": "country_code",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          },
+          {
+            "description": "Year for the holidays",
+            "example": "2022",
+            "in": "path",
+            "name": "year",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          },
+          {
+            "description": "Country subdivision code according to ISO 3166-2 codes",
+            "example": "PT-10",
+            "in": "query",
+            "name": "country_subdivision_code",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HolidaysResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntityErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "List all holidays of a country",
+        "tags": [
+          "Countries"
+        ]
+      }
+    },
+    "/v1/countries/{country_code}/{form}": {
+      "get": {
+        "callbacks": {},
+        "description": "Returns the json schema of a supported form. Possible form names are:\n\n    - address_details\n    - administrative_details\n    - bank_account_details\n    - billing_address_details\n    - contract_details\n    - emergency_contact_details\n    - employment_document_details\n    - personal_details\n    - pricing_plan_details\n\n    ",
+        "operationId": "get_show_form_country",
+        "parameters": [
+          {
+            "description": "Country code according to ISO 3-digit alphabetic codes",
+            "example": "PRT",
+            "in": "path",
+            "name": "country_code",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          },
+          {
+            "description": "Name of the desired form",
+            "example": "address_details",
+            "in": "path",
+            "name": "form",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryFormResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Show form schema",
+        "tags": [
+          "Countries"
+        ]
+      }
+    },
+    "/v1/employments": {
+      "get": {
+        "callbacks": {},
+        "description": "Lists all employments, except for the deleted ones.\n\nThis endpoint requires and returns country-specific data. The exact required and returned fields will\nvary depending on which country the employment is in. To see the list of parameters for each country,\nsee the **Show form schema** endpoint under the [Countries](#tag/Countries) category.\n\nPlease note that the compliance requirements for each country are subject to change, which will result\nin required and optional parameters being added and deleted without notice.\n\nIf you are using this endpoint to build an integration, make sure you are dynamically collecting or\ndisplaying the latest parameters for each country by querying the _\"Show form schema\"_ endpoint.\n\nFor more information on JSON Schemas, see the **How JSON Schemas work** documentation.\n\nTo learn how you can dynamically generate forms to display in your UI, see the documentation for\nthe [json-schema-form](https://www.notion.so/remotecom/json-schema-form-Documentation-4f390236948b4b2e8b7350ebcd488ca6) tool.\n\n",
+        "operationId": "get_index_employment",
+        "parameters": [
+          {
+            "description": "Company ID",
+            "example": "93t3j-company-id-9suej43",
+            "in": "query",
+            "name": "company_id",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          },
+          {
+            "description": "Starts fetching records after the given page",
+            "example": 1,
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "x-struct": null,
+              "x-validate": null
+            }
+          },
+          {
+            "description": "Change the amount of records returned per page, defaults to 20, limited to 100",
+            "example": 30,
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "x-struct": null,
+              "x-validate": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListEmploymentsResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "List employments",
+        "tags": [
+          "Employments"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "description": "Creates an employment. We support creating employees and contractors.\n\nThis endpoint requires and returns country-specific data. The exact required and returned fields will\nvary depending on which country the employment is in. To see the list of parameters for each country,\nsee the **Show form schema** endpoint under the [Countries](#tag/Countries) category.\n\nPlease note that the compliance requirements for each country are subject to change, which will result\nin required and optional parameters being added and deleted without notice.\n\nIf you are using this endpoint to build an integration, make sure you are dynamically collecting or\ndisplaying the latest parameters for each country by querying the _\"Show form schema\"_ endpoint.\n\nFor more information on JSON Schemas, see the **How JSON Schemas work** documentation.\n\nTo learn how you can dynamically generate forms to display in your UI, see the documentation for\nthe [json-schema-form](https://www.notion.so/remotecom/json-schema-form-Documentation-4f390236948b4b2e8b7350ebcd488ca6) tool.\n\n",
+        "operationId": "post_create_employment",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmploymentBasicParams"
+              }
+            }
+          },
+          "description": "Employment params",
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmploymentResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntityResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Create employment",
+        "tags": [
+          "Employments"
+        ]
+      }
+    },
+    "/v1/employments/{employment_id}": {
+      "get": {
+        "callbacks": {},
+        "description": "Shows all the information of an employment.\n\nThis endpoint requires and returns country-specific data. The exact required and returned fields will\nvary depending on which country the employment is in. To see the list of parameters for each country,\nsee the **Show form schema** endpoint under the [Countries](#tag/Countries) category.\n\nPlease note that the compliance requirements for each country are subject to change, which will result\nin required and optional parameters being added and deleted without notice.\n\nIf you are using this endpoint to build an integration, make sure you are dynamically collecting or\ndisplaying the latest parameters for each country by querying the _\"Show form schema\"_ endpoint.\n\nFor more information on JSON Schemas, see the **How JSON Schemas work** documentation.\n\nTo learn how you can dynamically generate forms to display in your UI, see the documentation for\nthe [json-schema-form](https://www.notion.so/remotecom/json-schema-form-Documentation-4f390236948b4b2e8b7350ebcd488ca6) tool.\n\n",
+        "operationId": "get_show_employment",
+        "parameters": [
+          {
+            "description": "Employment ID",
+            "example": "93t3j-employment-id-9suej43",
+            "in": "path",
+            "name": "employment_id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmploymentResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Show employment",
+        "tags": [
+          "Employments"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "description": "Updates an employment.\n\n**For `created` employments:** You can change all basic params and onboarding tasks or perform a per onboarding task update.\n\n**For `active` employments:** At this stage, it is only allowed to update the manager (`manager_id` field).\n\nThis endpoint requires and returns country-specific data. The exact required and returned fields will\nvary depending on which country the employment is in. To see the list of parameters for each country,\nsee the **Show form schema** endpoint under the [Countries](#tag/Countries) category.\n\nPlease note that the compliance requirements for each country are subject to change, which will result\nin required and optional parameters being added and deleted without notice.\n\nIf you are using this endpoint to build an integration, make sure you are dynamically collecting or\ndisplaying the latest parameters for each country by querying the _\"Show form schema\"_ endpoint.\n\nFor more information on JSON Schemas, see the **How JSON Schemas work** documentation.\n\nTo learn how you can dynamically generate forms to display in your UI, see the documentation for\nthe [json-schema-form](https://www.notion.so/remotecom/json-schema-form-Documentation-4f390236948b4b2e8b7350ebcd488ca6) tool.\n\n\nPlease contact Remote if you need to update contractors via API since it's currently not supported.\n",
+        "operationId": "patch_update_employment",
+        "parameters": [
+          {
+            "description": "Employment ID",
+            "example": "93t3j-employment-id-9suej43",
+            "in": "path",
+            "name": "employment_id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmploymentFullParams"
+              }
+            }
+          },
+          "description": "Employment params",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmploymentResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntityResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Update employment",
+        "tags": [
+          "Employments"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "description": "Updates an employment.\n\n**For `created` employments:** You can change all basic params and onboarding tasks or perform a per onboarding task update.\n\n**For `active` employments:** At this stage, it is only allowed to update the manager (`manager_id` field).\n\nThis endpoint requires and returns country-specific data. The exact required and returned fields will\nvary depending on which country the employment is in. To see the list of parameters for each country,\nsee the **Show form schema** endpoint under the [Countries](#tag/Countries) category.\n\nPlease note that the compliance requirements for each country are subject to change, which will result\nin required and optional parameters being added and deleted without notice.\n\nIf you are using this endpoint to build an integration, make sure you are dynamically collecting or\ndisplaying the latest parameters for each country by querying the _\"Show form schema\"_ endpoint.\n\nFor more information on JSON Schemas, see the **How JSON Schemas work** documentation.\n\nTo learn how you can dynamically generate forms to display in your UI, see the documentation for\nthe [json-schema-form](https://www.notion.so/remotecom/json-schema-form-Documentation-4f390236948b4b2e8b7350ebcd488ca6) tool.\n\n\nPlease contact Remote if you need to update contractors via API since it's currently not supported.\n",
+        "operationId": "patch_update_employment (2)",
+        "parameters": [
+          {
+            "description": "Employment ID",
+            "example": "93t3j-employment-id-9suej43",
+            "in": "path",
+            "name": "employment_id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmploymentFullParams"
+              }
+            }
+          },
+          "description": "Employment params",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmploymentResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntityResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Update employment",
+        "tags": [
+          "Employments"
+        ]
+      }
+    },
+    "/v1/sandbox/employments/{employment_id}": {
+      "patch": {
+        "callbacks": {},
+        "description": "Updates an employment. Use this endpoint to modify employment states for testing\nin the Sandbox environment. This endpoint will respond with a 404 outside of the\nSandbox environment.\n\nFor updating an employment's parameters outside of testing purposes, use [this\nEmployment update endpoint](#operation/patch_update_employment).\n",
+        "operationId": "patch_update_employment (3)",
+        "parameters": [
+          {
+            "description": "Employment ID",
+            "example": "e3ee69d7-1293-4664-92fc-02625dae5247",
+            "in": "path",
+            "name": "employment_id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmploymentUpdateParams"
+              }
+            }
+          },
+          "description": "Employment params",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmploymentResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntityResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Update employment in the Sandbox Environment",
+        "tags": [
+          "Sandbox"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "description": "Updates an employment. Use this endpoint to modify employment states for testing\nin the Sandbox environment. This endpoint will respond with a 404 outside of the\nSandbox environment.\n\nFor updating an employment's parameters outside of testing purposes, use [this\nEmployment update endpoint](#operation/patch_update_employment).\n",
+        "operationId": "patch_update_employment (4)",
+        "parameters": [
+          {
+            "description": "Employment ID",
+            "example": "e3ee69d7-1293-4664-92fc-02625dae5247",
+            "in": "path",
+            "name": "employment_id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmploymentUpdateParams"
+              }
+            }
+          },
+          "description": "Employment params",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmploymentResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntityResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Update employment in the Sandbox Environment",
+        "tags": [
+          "Sandbox"
+        ]
+      }
+    },
+    "/v1/timeoff": {
+      "get": {
+        "callbacks": {},
+        "description": "Lists all Time Off records.",
+        "operationId": "get_index_timeoff",
+        "parameters": [
+          {
+            "description": "Only show time off for a specific employment",
+            "example": "31b8e49b-aa1c-47af-849c-3d0a53e20e0d",
+            "in": "query",
+            "name": "employment_id",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          },
+          {
+            "description": "Filter time off by its type",
+            "example": "sick_leave",
+            "in": "query",
+            "name": "timeoff_type",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/TimeoffType"
+            }
+          },
+          {
+            "description": "Filter time off by its status",
+            "example": "approved",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "enum": [
+                "approved",
+                "cancelled",
+                "declined",
+                "requested",
+                "taken",
+                "cancel_requested"
+              ],
+              "example": "approved",
+              "nullable": false,
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          },
+          {
+            "description": "Sort order",
+            "example": "asc",
+            "in": "query",
+            "name": "order_by",
+            "required": false,
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          },
+          {
+            "description": "Field to sort by",
+            "example": "timeoff_type",
+            "in": "query",
+            "name": "sort_by",
+            "required": false,
+            "schema": {
+              "enum": [
+                "timeoff_type",
+                "status"
+              ],
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          },
+          {
+            "description": "Starts fetching records after the given page",
+            "example": 1,
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "x-struct": null,
+              "x-validate": null
+            }
+          },
+          {
+            "description": "Change the amount of records returned per page, defaults to 20, limited to 100",
+            "example": 30,
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "x-struct": null,
+              "x-validate": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListTimeoffResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntityErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "List Time Off",
+        "tags": [
+          "Time Off"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "description": "Creates a Time Off record",
+        "operationId": "post_create_timeoff",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApprovedTimeoffParams"
+              }
+            }
+          },
+          "description": "Timeoff",
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeoffResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntityErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Create Time Off",
+        "tags": [
+          "Time Off"
+        ]
+      }
+    },
+    "/v1/timeoff/types": {
+      "get": {
+        "callbacks": {},
+        "description": "Lists all time off types that can be used for the `timeoff_type` parameter",
+        "operationId": "get_timeoff_types_timeoff",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListTimeoffTypesResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "List Time Off Types",
+        "tags": [
+          "Time Off"
+        ]
+      }
+    },
+    "/v1/timeoff/{id}": {
+      "get": {
+        "callbacks": {},
+        "description": "Shows a single Time Off record",
+        "operationId": "get_show_timeoff",
+        "parameters": [
+          {
+            "description": "Timeoff ID",
+            "example": "93t3j-timeoff-id-9suej43",
+            "in": "path",
+            "name": "timeoff_id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-struct": null,
+              "x-validate": null
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeoffResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Show Time Off",
+        "tags": [
+          "Time Off"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "description": "Updates a Time Off record. This endpoint can also be used for cancelling a time off.",
+        "operationId": "patch_update_timeoff",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateApprovedTimeoffParams"
+              }
+            }
+          },
+          "description": "UpdateTimeoff",
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeoffResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntityErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Update Time Off",
+        "tags": [
+          "Time Off"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "description": "Updates a Time Off record. This endpoint can also be used for cancelling a time off.",
+        "operationId": "patch_update_timeoff (2)",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateApprovedTimeoffParams"
+              }
+            }
+          },
+          "description": "UpdateTimeoff",
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeoffResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntityErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsResponse"
+                }
+              }
+            },
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Update Time Off",
+        "tags": [
+          "Time Off"
+        ]
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer token": []
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://gateway.remote.com/",
+      "variables": {}
+    },
+    {
+      "url": "https://gateway.remote-sandbox.com/",
+      "variables": {}
+    }
+  ],
+  "tags": []
+}

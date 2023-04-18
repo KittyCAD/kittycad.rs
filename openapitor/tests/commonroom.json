@@ -1,0 +1,1383 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Common Room Community API",
+    "version": "1.0.0",
+    "description": "Common Room Community REST APIs for accessing Community scoped resources.\n<br/><br/>\nTo use the Common Room API, or get started with the Common Room Zapier integration, you will need to create an API token.\nTo create an API token:\n<ol>\n  <li>Navigate to Setting | API tokens\n  <li>Click on “Request Access to API”. Our API is currently in beta, so you need to first apply for access.\n  <li>Once access is granted, return to the Settings | API tokens screen, and you will see a button to create a “New Token”.\n</ol>\n\n# Authentication\n\n<!-- ReDoc-Inject: <security-definitions> -->",
+    "x-logo": {
+      "url": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTgiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCA5OCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzQ5MzJfMjUpIj4KPG1hc2sgaWQ9InBhdGgtMS1pbnNpZGUtMV80OTMyXzI1IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0yOC42NSAxMS43MjgyTDE4LjI3MTcgMS4zNDk4NEMxNi40NzE5IC0wLjQ0OTk0NiAxMy41Mjc5IC0wLjQ0OTk0NiAxMS43MjgxIDEuMzQ5ODRMMS4zNDk4MyAxMS43MjgyQy0wLjQ0OTk0MyAxMy41MjggLTAuNDQ5OTQzIDE2LjQ3MiAxLjM0OTgzIDE4LjI3MThMMTEuNzI4MSAyOC42NTAyQzEzLjUyNzkgMzAuNDQ5OSAxNi40NzM2IDMwLjQ0OTkgMTguMjczMyAyOC42NTAyTDI4LjY1MTYgMTguMjcxOEMzMC40NDk3IDE2LjQ3MiAzMC40NDk3IDEzLjUyOCAyOC42NSAxMS43MjgyWk0xOS4xODI0IDE5LjE4MjVMMTUuMDAwNyAyMy4zNjQyTDYuNjM3MzggMTUuMDAwOEwxNS4wMDA3IDYuNjM3NDNMMTkuMTgyNCAxMC44MTkxTDE1LjAwMDcgMTUuMDAwOEwxOS4xODI0IDE5LjE4MjVaIi8+CjxwYXRoIGQ9Ik05My45MTQ1IDcuMTU3NzRDOTQuMzE4NyA2LjkxOTI1IDk0Ljc5NiA2LjggOTUuMzQ2MyA2LjhDOTYuMjI1MiA2LjggOTYuODg3NyA3LjA3MTYxIDk3LjMzMjMgNy42MTQ4NUM5Ny43NzcgOC4xNTgwOCA5OCA4LjkxMTk4IDk4IDkuODc2NTRWMTQuNTk4N0g5NS45NzYyVjEwLjM4Qzk1Ljk3NjIgOS44MDEwMiA5NS44NTM2IDkuMzgyMzMgOTUuNjA4NCA5LjEyMzk3Qzk1LjM2MzMgOC44NjU2IDk1LjAzMDcgOC43MzU3NiA5NC42MTIxIDguNzM1NzZDOTQuMDMxOSA4LjczNTc2IDkzLjYxNTkgOC45MzU4MiA5My4zNjAzIDkuMzM3MjlDOTMuMTA2IDkuNzM4NzUgOTIuOTc4MiAxMC4yNzkzIDkyLjk3ODIgMTAuOTU5VjE0LjZIOTFWNi45ODI4NEg5Mi42NjY1TDkyLjkxOTUgOC4wNzk5QzkzLjE3NzcgNy43MDM2MiA5My41MDg5IDcuMzk3NTUgOTMuOTE0NSA3LjE1Nzc0WiIvPgo8cGF0aCBkPSJNNzYuNDU0OCA3LjE5NzQyQzc2Ljg1OTggNi45MzM4IDc3LjM3NDQgNi44MDEzMyA3Ny45OTc0IDYuODAxMzNDNzguODY2NiA2LjgwMTMzIDc5LjU1MTUgNy4wODA4NCA4MC4wNTA2IDcuNjM4NTVDODAuNTQ5OCA4LjE5NzU5IDgwLjggOC45NzM4OCA4MC44IDkuOTY4NzVWMTQuNTk4N0g3OC44MjhWMTAuMzgwN0M3OC44MjggOS4yODM4NyA3OC4zODMgOC43MzU0MyA3Ny40OTMxIDguNzM1NDNDNzcuMTk2NCA4LjczNTQzIDc2Ljk0NDkgOC43OTEwNyA3Ni43MzczIDguOTAyMzRDNzYuNTI5NiA5LjAxMzYyIDc2LjM2MTkgOS4xNjg2MSA3Ni4yMzMgOS4zNjczMkM3Ni4xMDQgOS41NjQ3MSA3Ni4wMTExIDkuNzk5MTggNzUuOTUxOCAxMC4wNjgxQzc1Ljg5MjUgMTAuMzM3IDc1Ljg2MjggMTAuNjMzOCA3NS44NjI4IDEwLjk1OTZWMTQuNkg3My45MDYyVjEwLjM4MDdDNzMuOTA2MiA5LjI4Mzg3IDczLjQ1NjEgOC43MzU0MyA3Mi41NTcyIDguNzM1NDNDNzIuMjYwNSA4LjczNTQzIDcyLjAxMTYgOC43OTEwNyA3MS44MDkxIDguOTAyMzRDNzEuNjA2NiA5LjAxMzYyIDcxLjQ0MDIgOS4xNjg2MSA3MS4zMTI1IDkuMzY3MzJDNzEuMTgzNiA5LjU2NDcxIDcxLjA5MzMgOS43OTkxOCA3MS4wMzc4IDEwLjA2ODFDNzAuOTgzNyAxMC4zMzcgNzAuOTU2NiAxMC42MzM4IDcwLjk1NjYgMTAuOTU5NlYxNC42SDY5VjYuOTg0MTRINzAuNjQ4M0w3MC44OTg1IDguMDk1NThDNzEuMTI1NSA3LjcyOTk2IDcxLjQyMjIgNy40MjI2MiA3MS43ODg1IDcuMTczNTdDNzIuMTU0OCA2LjkyNDUyIDcyLjYyODEgNi44IDczLjIxMjMgNi44Qzc0LjMxOSA2LjggNzUuMDg1MSA3LjI3MTYgNzUuNTEwNyA4LjIxNjE0Qzc1LjczMzggNy44MDE1IDc2LjA0OTggNy40NjEwNCA3Ni40NTQ4IDcuMTk3NDJaIi8+CjxwYXRoIGQ9Ik04NS45IDguNzA5NzhDODYuOTk3NiA4LjcwOTc4IDg3Ljg5MDIgOS42MDI0IDg3Ljg5MDIgMTAuN0M4Ny44OTAyIDExLjc5NzYgODYuOTk3NiAxMi42OTAyIDg1LjkgMTIuNjkwMkM4NC44MDI0IDEyLjY5MDIgODMuOTA5OCAxMS43OTc2IDgzLjkwOTggMTAuN0M4My45MDk4IDkuNjAyNCA4NC44MDI0IDguNzA5NzggODUuOSA4LjcwOTc4Wk04NS45IDYuOEM4My43NDYzIDYuOCA4MiA4LjU0NjMxIDgyIDEwLjdDODIgMTIuODUzNyA4My43NDYzIDE0LjYgODUuOSAxNC42Qzg4LjA1MzcgMTQuNiA4OS44IDEyLjg1MzcgODkuOCAxMC43Qzg5LjggOC41NDYzMSA4OC4wNTM3IDYuOCA4NS45IDYuOFoiLz4KPHBhdGggZD0iTTYyLjc4MTYgNy4xOTc0MkM2My4xOTM0IDYuOTMzOCA2My43MTY3IDYuODAxMzMgNjQuMzUwMiA2LjgwMTMzQzY1LjIzNDEgNi44MDEzMyA2NS45MzA1IDcuMDgwODQgNjYuNDM4IDcuNjM4NTVDNjYuOTQ1NiA4LjE5NzU5IDY3LjIgOC45NzM4OCA2Ny4yIDkuOTY4NzVWMTQuNTk4N0g2NS4xOTQ4VjEwLjM4MDdDNjUuMTk0OCA5LjI4Mzg3IDY0Ljc0MjMgOC43MzU0MyA2My44Mzc0IDguNzM1NDNDNjMuNTM1NyA4LjczNTQzIDYzLjI4IDguNzkxMDcgNjMuMDY4OSA4LjkwMjM0QzYyLjg1NzcgOS4wMTM2MiA2Mi42ODcyIDkuMTY4NjEgNjIuNTU2MSA5LjM2NzMyQzYyLjQyNDkgOS41NjQ3MSA2Mi4zMzA1IDkuNzk5MTggNjIuMjcwMiAxMC4wNjgxQzYyLjIwOTggMTAuMzM3IDYyLjE3OTcgMTAuNjMzOCA2Mi4xNzk3IDEwLjk1OTZWMTQuNkg2MC4xOTAyVjEwLjM4MDdDNjAuMTkwMiA5LjI4Mzg3IDU5LjczMjUgOC43MzU0MyA1OC44MTg0IDguNzM1NDNDNTguNTE2NyA4LjczNTQzIDU4LjI2MzYgOC43OTEwNyA1OC4wNTY0IDguOTAyMzRDNTcuODUwNSA5LjAxMzYyIDU3LjY4MTMgOS4xNjg2MSA1Ny41NTE1IDkuMzY3MzJDNTcuNDIwMyA5LjU2NDcxIDU3LjMyNzIgOS43OTkxOCA1Ny4yNzIxIDEwLjA2ODFDNTcuMjE3IDEwLjMzNyA1Ny4xODk1IDEwLjYzMzggNTcuMTg5NSAxMC45NTk2VjE0LjZINTUuMlY2Ljk4NDE0SDU2Ljg3NjFMNTcuMTMwNSA4LjA5NTU4QzU3LjM2MTMgNy43Mjk5NiA1Ny42NjMgNy40MjI2MiA1OC4wMzU0IDcuMTczNTdDNTguNDA3OSA2LjkyNDUyIDU4Ljg4OTIgNi44IDU5LjQ4MzMgNi44QzYwLjYwODUgNi44IDYxLjM4NzUgNy4yNzE2IDYxLjgyMDMgOC4yMTYxNEM2Mi4wNDg1IDcuODAxNSA2Mi4zNjk4IDcuNDYxMDQgNjIuNzgxNiA3LjE5NzQyWiIvPgo8cGF0aCBkPSJNNDQuMzY3OCAxMS41NDk2QzQzLjgwMDggMTIuMTQ3NiA0My4wMTE3IDEyLjUyMDMgNDIuMTM4MyAxMi41MjAzQzQwLjQxNyAxMi41MjAzIDM5LjAxNjIgMTEuMDc1NCAzOS4wMTYyIDkuM0MzOS4wMTYyIDcuNTI0NTUgNDAuNDE3IDYuMDc5NyA0Mi4xMzgzIDYuMDc5N0M0My4wMTE3IDYuMDc5NyA0My44MDA4IDYuNDUyNDMgNDQuMzY3OCA3LjA1MDRMNDUuNiA1LjM4NTU4QzQ0LjY4NyA0LjUyNTUyIDQzLjQ3MjcgNCA0Mi4xMzgzIDRDMzkuMzAxIDQgMzcgNi4zNzIwOSAzNyA5LjNDMzcgMTIuMjI3OSAzOS4yOTk3IDE0LjYgNDIuMTM4MyAxNC42QzQzLjQ3MjcgMTQuNiA0NC42ODcgMTQuMDc0NSA0NS42IDEzLjIxNDRMNDQuMzY3OCAxMS41NDk2WiIvPgo8cGF0aCBkPSJNNTAuMSA4LjcwOTc4QzUxLjE5NzYgOC43MDk3OCA1Mi4wOTAyIDkuNjAyNCA1Mi4wOTAyIDEwLjdDNTIuMDkwMiAxMS43OTc2IDUxLjE5NzYgMTIuNjkwMiA1MC4xIDEyLjY5MDJDNDkuMDAyNCAxMi42OTAyIDQ4LjEwOTggMTEuNzk3NiA0OC4xMDk4IDEwLjdDNDguMTA4NSA5LjYwMjQgNDkuMDAyNCA4LjcwOTc4IDUwLjEgOC43MDk3OFpNNTAuMSA2LjhDNDcuOTQ2MyA2LjggNDYuMiA4LjU0NjMxIDQ2LjIgMTAuN0M0Ni4yIDEyLjg1MzcgNDcuOTQ2MyAxNC42IDUwLjEgMTQuNkM1Mi4yNTM3IDE0LjYgNTQgMTIuODUzNyA1NCAxMC43QzUzLjk5ODcgOC41NDYzMSA1Mi4yNTM3IDYuOCA1MC4xIDYuOFoiLz4KPHBhdGggZD0iTTcxLjk4MyAyMC4zOTc0QzcyLjM5NDggMjAuMTMzOCA3Mi45MTggMjAuMDAxMyA3My41NTE1IDIwLjAwMTNDNzQuNDM1NCAyMC4wMDEzIDc1LjEzMTggMjAuMjgwOCA3NS42MzkzIDIwLjgzODZDNzYuMTQ2OSAyMS4zOTc2IDc2LjQgMjIuMTczOSA3Ni40IDIzLjE2ODhWMjcuNzk4N0g3NC4zOTQ4VjIzLjU4MDdDNzQuMzk0OCAyMi40ODM5IDczLjk0MjMgMjEuOTM1NCA3My4wMzc0IDIxLjkzNTRDNzIuNzM1NyAyMS45MzU0IDcyLjQ4IDIxLjk5MTEgNzIuMjY4OSAyMi4xMDIzQzcyLjA1NzcgMjIuMjEzNiA3MS44ODcyIDIyLjM2ODYgNzEuNzU2MSAyMi41NjczQzcxLjYyNDkgMjIuNzY0NyA3MS41MzA1IDIyLjk5OTIgNzEuNDcwMiAyMy4yNjgxQzcxLjQwOTggMjMuNTM3IDcxLjM3OTcgMjMuODMzOCA3MS4zNzk3IDI0LjE1OTZWMjcuOEg2OS4zOTAyVjIzLjU4MDdDNjkuMzkwMiAyMi40ODM5IDY4LjkzMjUgMjEuOTM1NCA2OC4wMTg0IDIxLjkzNTRDNjcuNzE2NyAyMS45MzU0IDY3LjQ2MzYgMjEuOTkxMSA2Ny4yNTY0IDIyLjEwMjNDNjcuMDUwNSAyMi4yMTM2IDY2Ljg4MTMgMjIuMzY4NiA2Ni43NTE1IDIyLjU2NzNDNjYuNjIwMyAyMi43NjQ3IDY2LjUyNzIgMjIuOTk5MiA2Ni40NzIxIDIzLjI2ODFDNjYuNDE3IDIzLjUzNyA2Ni4zODk1IDIzLjgzMzggNjYuMzg5NSAyNC4xNTk2VjI3LjhINjQuNFYyMC4xODQxSDY2LjA3NjFMNjYuMzMwNSAyMS4yOTU2QzY2LjU2MTMgMjAuOTMgNjYuODYzIDIwLjYyMjYgNjcuMjM1NCAyMC4zNzM2QzY3LjYwNzkgMjAuMTI0NSA2OC4wODkyIDIwIDY4LjY4MzMgMjBDNjkuODA4NSAyMCA3MC41ODc1IDIwLjQ3MTYgNzEuMDIwMyAyMS40MTYxQzcxLjI0OTggMjEuMDAxNSA3MS41NzEyIDIwLjY2MSA3MS45ODMgMjAuMzk3NFoiLz4KPHBhdGggZD0iTTUwLjQgMjEuOTU4N0M1MS41MjU3IDIxLjk1ODcgNTIuNDQxMyAyMi44NzQzIDUyLjQ0MTMgMjRDNTIuNDQxMyAyNS4xMjU3IDUxLjUyNTcgMjYuMDQxMyA1MC40IDI2LjA0MTNDNDkuMjc0MyAyNi4wNDEzIDQ4LjM1ODggMjUuMTI1NyA0OC4zNTg4IDI0QzQ4LjM1ODggMjIuODc0MyA0OS4yNzQzIDIxLjk1ODcgNTAuNCAyMS45NTg3Wk01MC40IDIwQzQ4LjE5MTEgMjAgNDYuNCAyMS43OTExIDQ2LjQgMjRDNDYuNCAyNi4yMDg5IDQ4LjE5MTEgMjggNTAuNCAyOEM1Mi42MDg5IDI4IDU0LjQgMjYuMjA4OSA1NC40IDI0QzU0LjQgMjEuNzkxMSA1Mi42MDg5IDIwIDUwLjQgMjBaIi8+CjxwYXRoIGQ9Ik01OS4zIDIxLjk1ODdDNjAuMzk3NiAyMS45NTg3IDYxLjI5MDIgMjIuODc0MyA2MS4yOTAyIDI0QzYxLjI5MDIgMjUuMTI1NyA2MC4zOTc2IDI2LjA0MTMgNTkuMyAyNi4wNDEzQzU4LjIwMjQgMjYuMDQxMyA1Ny4zMDk4IDI1LjEyNTcgNTcuMzA5OCAyNEM1Ny4zMDk4IDIyLjg3NDMgNTguMjAyNCAyMS45NTg3IDU5LjMgMjEuOTU4N1pNNTkuMyAyMEM1Ny4xNDYzIDIwIDU1LjQgMjEuNzkxMSA1NS40IDI0QzU1LjQgMjYuMjA4OSA1Ny4xNDYzIDI4IDU5LjMgMjhDNjEuNDUzNyAyOCA2My4yIDI2LjIwODkgNjMuMiAyNEM2My4yIDIxLjc5MTEgNjEuNDUzNyAyMCA1OS4zIDIwWiIvPgo8cGF0aCBkPSJNNDYuMiAyNy44TDQzLjY5NzIgMjQuMDE1NUM0NC42MzggMjMuNjA0NSA0NS42MDQ5IDIyLjc1NzUgNDUuNjA0OSAyMC45MTA3QzQ1LjYwNDkgMjAuMzc1OSA0NS41MTI2IDE5Ljg4MDYgNDUuMzI4MSAxOS40MjYyQzQ1LjE0MzUgMTguOTcxNyA0NC44OTAxIDE4LjU4MDUgNDQuNTY2NiAxOC4yNTI1QzQ0LjI0MyAxNy45MjQ1IDQzLjg1NzEgMTcuNjY2MyA0My40MDg3IDE3LjQ4MDZDNDIuOTYwNCAxNy4yOTM1IDQyLjQ2NzkgMTcuMiA0MS45Mjk5IDE3LjJIMzcuNFYyNy44SDM5LjQ5MDlWMjQuNjA0M0g0MS43Mzc2TDQzLjc5NiAyNy44TDQzLjc5NDcgMjcuNzk0N0w0My43MTQxIDI3LjhINDYuMlpNMzkuNDkwOSAxOS4zMTk1SDQxLjkyODZDNDIuNDM2NyAxOS4zMTk1IDQyLjgyNzkgMTkuNDY4MyA0My4xMDA4IDE5Ljc2NkM0My4zNzUgMjAuMDYzNyA0My41MTE0IDIwLjQ0NDQgNDMuNTExNCAyMC45MDk0QzQzLjUxMTQgMjEuMzYzOSA0My4zNzUgMjEuNzM5MyA0My4xMDA4IDIyLjAzN0M0Mi44MjY2IDIyLjMzNDcgNDIuNDM1NCAyMi40ODM1IDQxLjkyODYgMjIuNDgzNUgzOS40OTA5VjE5LjMxOTVaIi8+CjwvbWFzaz4KPHBhdGggZD0iTTI4LjY1IDExLjcyODJMMTguMjcxNyAxLjM0OTg0QzE2LjQ3MTkgLTAuNDQ5OTQ2IDEzLjUyNzkgLTAuNDQ5OTQ2IDExLjcyODEgMS4zNDk4NEwxLjM0OTgzIDExLjcyODJDLTAuNDQ5OTQzIDEzLjUyOCAtMC40NDk5NDMgMTYuNDcyIDEuMzQ5ODMgMTguMjcxOEwxMS43MjgxIDI4LjY1MDJDMTMuNTI3OSAzMC40NDk5IDE2LjQ3MzYgMzAuNDQ5OSAxOC4yNzMzIDI4LjY1MDJMMjguNjUxNiAxOC4yNzE4QzMwLjQ0OTcgMTYuNDcyIDMwLjQ0OTcgMTMuNTI4IDI4LjY1IDExLjcyODJaTTE5LjE4MjQgMTkuMTgyNUwxNS4wMDA3IDIzLjM2NDJMNi42MzczOCAxNS4wMDA4TDE1LjAwMDcgNi42Mzc0M0wxOS4xODI0IDEwLjgxOTFMMTUuMDAwNyAxNS4wMDA4TDE5LjE4MjQgMTkuMTgyNVoiIGZpbGw9ImJsYWNrIi8+CjxwYXRoIGQ9Ik05My45MTQ1IDcuMTU3NzRDOTQuMzE4NyA2LjkxOTI1IDk0Ljc5NiA2LjggOTUuMzQ2MyA2LjhDOTYuMjI1MiA2LjggOTYuODg3NyA3LjA3MTYxIDk3LjMzMjMgNy42MTQ4NUM5Ny43NzcgOC4xNTgwOCA5OCA4LjkxMTk4IDk4IDkuODc2NTRWMTQuNTk4N0g5NS45NzYyVjEwLjM4Qzk1Ljk3NjIgOS44MDEwMiA5NS44NTM2IDkuMzgyMzMgOTUuNjA4NCA5LjEyMzk3Qzk1LjM2MzMgOC44NjU2IDk1LjAzMDcgOC43MzU3NiA5NC42MTIxIDguNzM1NzZDOTQuMDMxOSA4LjczNTc2IDkzLjYxNTkgOC45MzU4MiA5My4zNjAzIDkuMzM3MjlDOTMuMTA2IDkuNzM4NzUgOTIuOTc4MiAxMC4yNzkzIDkyLjk3ODIgMTAuOTU5VjE0LjZIOTFWNi45ODI4NEg5Mi42NjY1TDkyLjkxOTUgOC4wNzk5QzkzLjE3NzcgNy43MDM2MiA5My41MDg5IDcuMzk3NTUgOTMuOTE0NSA3LjE1Nzc0WiIgZmlsbD0iYmxhY2siLz4KPHBhdGggZD0iTTc2LjQ1NDggNy4xOTc0MkM3Ni44NTk4IDYuOTMzOCA3Ny4zNzQ0IDYuODAxMzMgNzcuOTk3NCA2LjgwMTMzQzc4Ljg2NjYgNi44MDEzMyA3OS41NTE1IDcuMDgwODQgODAuMDUwNiA3LjYzODU1QzgwLjU0OTggOC4xOTc1OSA4MC44IDguOTczODggODAuOCA5Ljk2ODc1VjE0LjU5ODdINzguODI4VjEwLjM4MDdDNzguODI4IDkuMjgzODcgNzguMzgzIDguNzM1NDMgNzcuNDkzMSA4LjczNTQzQzc3LjE5NjQgOC43MzU0MyA3Ni45NDQ5IDguNzkxMDcgNzYuNzM3MyA4LjkwMjM0Qzc2LjUyOTYgOS4wMTM2MiA3Ni4zNjE5IDkuMTY4NjEgNzYuMjMzIDkuMzY3MzJDNzYuMTA0IDkuNTY0NzEgNzYuMDExMSA5Ljc5OTE4IDc1Ljk1MTggMTAuMDY4MUM3NS44OTI1IDEwLjMzNyA3NS44NjI4IDEwLjYzMzggNzUuODYyOCAxMC45NTk2VjE0LjZINzMuOTA2MlYxMC4zODA3QzczLjkwNjIgOS4yODM4NyA3My40NTYxIDguNzM1NDMgNzIuNTU3MiA4LjczNTQzQzcyLjI2MDUgOC43MzU0MyA3Mi4wMTE2IDguNzkxMDcgNzEuODA5MSA4LjkwMjM0QzcxLjYwNjYgOS4wMTM2MiA3MS40NDAyIDkuMTY4NjEgNzEuMzEyNSA5LjM2NzMyQzcxLjE4MzYgOS41NjQ3MSA3MS4wOTMzIDkuNzk5MTggNzEuMDM3OCAxMC4wNjgxQzcwLjk4MzcgMTAuMzM3IDcwLjk1NjYgMTAuNjMzOCA3MC45NTY2IDEwLjk1OTZWMTQuNkg2OVY2Ljk4NDE0SDcwLjY0ODNMNzAuODk4NSA4LjA5NTU4QzcxLjEyNTUgNy43Mjk5NiA3MS40MjIyIDcuNDIyNjIgNzEuNzg4NSA3LjE3MzU3QzcyLjE1NDggNi45MjQ1MiA3Mi42MjgxIDYuOCA3My4yMTIzIDYuOEM3NC4zMTkgNi44IDc1LjA4NTEgNy4yNzE2IDc1LjUxMDcgOC4yMTYxNEM3NS43MzM4IDcuODAxNSA3Ni4wNDk4IDcuNDYxMDQgNzYuNDU0OCA3LjE5NzQyWiIgZmlsbD0iYmxhY2siLz4KPHBhdGggZD0iTTg1LjkgOC43MDk3OEM4Ni45OTc2IDguNzA5NzggODcuODkwMiA5LjYwMjQgODcuODkwMiAxMC43Qzg3Ljg5MDIgMTEuNzk3NiA4Ni45OTc2IDEyLjY5MDIgODUuOSAxMi42OTAyQzg0LjgwMjQgMTIuNjkwMiA4My45MDk4IDExLjc5NzYgODMuOTA5OCAxMC43QzgzLjkwOTggOS42MDI0IDg0LjgwMjQgOC43MDk3OCA4NS45IDguNzA5NzhaTTg1LjkgNi44QzgzLjc0NjMgNi44IDgyIDguNTQ2MzEgODIgMTAuN0M4MiAxMi44NTM3IDgzLjc0NjMgMTQuNiA4NS45IDE0LjZDODguMDUzNyAxNC42IDg5LjggMTIuODUzNyA4OS44IDEwLjdDODkuOCA4LjU0NjMxIDg4LjA1MzcgNi44IDg1LjkgNi44WiIgZmlsbD0iYmxhY2siLz4KPHBhdGggZD0iTTYyLjc4MTYgNy4xOTc0MkM2My4xOTM0IDYuOTMzOCA2My43MTY3IDYuODAxMzMgNjQuMzUwMiA2LjgwMTMzQzY1LjIzNDEgNi44MDEzMyA2NS45MzA1IDcuMDgwODQgNjYuNDM4IDcuNjM4NTVDNjYuOTQ1NiA4LjE5NzU5IDY3LjIgOC45NzM4OCA2Ny4yIDkuOTY4NzVWMTQuNTk4N0g2NS4xOTQ4VjEwLjM4MDdDNjUuMTk0OCA5LjI4Mzg3IDY0Ljc0MjMgOC43MzU0MyA2My44Mzc0IDguNzM1NDNDNjMuNTM1NyA4LjczNTQzIDYzLjI4IDguNzkxMDcgNjMuMDY4OSA4LjkwMjM0QzYyLjg1NzcgOS4wMTM2MiA2Mi42ODcyIDkuMTY4NjEgNjIuNTU2MSA5LjM2NzMyQzYyLjQyNDkgOS41NjQ3MSA2Mi4zMzA1IDkuNzk5MTggNjIuMjcwMiAxMC4wNjgxQzYyLjIwOTggMTAuMzM3IDYyLjE3OTcgMTAuNjMzOCA2Mi4xNzk3IDEwLjk1OTZWMTQuNkg2MC4xOTAyVjEwLjM4MDdDNjAuMTkwMiA5LjI4Mzg3IDU5LjczMjUgOC43MzU0MyA1OC44MTg0IDguNzM1NDNDNTguNTE2NyA4LjczNTQzIDU4LjI2MzYgOC43OTEwNyA1OC4wNTY0IDguOTAyMzRDNTcuODUwNSA5LjAxMzYyIDU3LjY4MTMgOS4xNjg2MSA1Ny41NTE1IDkuMzY3MzJDNTcuNDIwMyA5LjU2NDcxIDU3LjMyNzIgOS43OTkxOCA1Ny4yNzIxIDEwLjA2ODFDNTcuMjE3IDEwLjMzNyA1Ny4xODk1IDEwLjYzMzggNTcuMTg5NSAxMC45NTk2VjE0LjZINTUuMlY2Ljk4NDE0SDU2Ljg3NjFMNTcuMTMwNSA4LjA5NTU4QzU3LjM2MTMgNy43Mjk5NiA1Ny42NjMgNy40MjI2MiA1OC4wMzU0IDcuMTczNTdDNTguNDA3OSA2LjkyNDUyIDU4Ljg4OTIgNi44IDU5LjQ4MzMgNi44QzYwLjYwODUgNi44IDYxLjM4NzUgNy4yNzE2IDYxLjgyMDMgOC4yMTYxNEM2Mi4wNDg1IDcuODAxNSA2Mi4zNjk4IDcuNDYxMDQgNjIuNzgxNiA3LjE5NzQyWiIgZmlsbD0iYmxhY2siLz4KPHBhdGggZD0iTTQ0LjM2NzggMTEuNTQ5NkM0My44MDA4IDEyLjE0NzYgNDMuMDExNyAxMi41MjAzIDQyLjEzODMgMTIuNTIwM0M0MC40MTcgMTIuNTIwMyAzOS4wMTYyIDExLjA3NTQgMzkuMDE2MiA5LjNDMzkuMDE2MiA3LjUyNDU1IDQwLjQxNyA2LjA3OTcgNDIuMTM4MyA2LjA3OTdDNDMuMDExNyA2LjA3OTcgNDMuODAwOCA2LjQ1MjQzIDQ0LjM2NzggNy4wNTA0TDQ1LjYgNS4zODU1OEM0NC42ODcgNC41MjU1MiA0My40NzI3IDQgNDIuMTM4MyA0QzM5LjMwMSA0IDM3IDYuMzcyMDkgMzcgOS4zQzM3IDEyLjIyNzkgMzkuMjk5NyAxNC42IDQyLjEzODMgMTQuNkM0My40NzI3IDE0LjYgNDQuNjg3IDE0LjA3NDUgNDUuNiAxMy4yMTQ0TDQ0LjM2NzggMTEuNTQ5NloiIGZpbGw9ImJsYWNrIi8+CjxwYXRoIGQ9Ik01MC4xIDguNzA5NzhDNTEuMTk3NiA4LjcwOTc4IDUyLjA5MDIgOS42MDI0IDUyLjA5MDIgMTAuN0M1Mi4wOTAyIDExLjc5NzYgNTEuMTk3NiAxMi42OTAyIDUwLjEgMTIuNjkwMkM0OS4wMDI0IDEyLjY5MDIgNDguMTA5OCAxMS43OTc2IDQ4LjEwOTggMTAuN0M0OC4xMDg1IDkuNjAyNCA0OS4wMDI0IDguNzA5NzggNTAuMSA4LjcwOTc4Wk01MC4xIDYuOEM0Ny45NDYzIDYuOCA0Ni4yIDguNTQ2MzEgNDYuMiAxMC43QzQ2LjIgMTIuODUzNyA0Ny45NDYzIDE0LjYgNTAuMSAxNC42QzUyLjI1MzcgMTQuNiA1NCAxMi44NTM3IDU0IDEwLjdDNTMuOTk4NyA4LjU0NjMxIDUyLjI1MzcgNi44IDUwLjEgNi44WiIgZmlsbD0iYmxhY2siLz4KPHBhdGggZD0iTTcxLjk4MyAyMC4zOTc0QzcyLjM5NDggMjAuMTMzOCA3Mi45MTggMjAuMDAxMyA3My41NTE1IDIwLjAwMTNDNzQuNDM1NCAyMC4wMDEzIDc1LjEzMTggMjAuMjgwOCA3NS42MzkzIDIwLjgzODZDNzYuMTQ2OSAyMS4zOTc2IDc2LjQgMjIuMTczOSA3Ni40IDIzLjE2ODhWMjcuNzk4N0g3NC4zOTQ4VjIzLjU4MDdDNzQuMzk0OCAyMi40ODM5IDczLjk0MjMgMjEuOTM1NCA3My4wMzc0IDIxLjkzNTRDNzIuNzM1NyAyMS45MzU0IDcyLjQ4IDIxLjk5MTEgNzIuMjY4OSAyMi4xMDIzQzcyLjA1NzcgMjIuMjEzNiA3MS44ODcyIDIyLjM2ODYgNzEuNzU2MSAyMi41NjczQzcxLjYyNDkgMjIuNzY0NyA3MS41MzA1IDIyLjk5OTIgNzEuNDcwMiAyMy4yNjgxQzcxLjQwOTggMjMuNTM3IDcxLjM3OTcgMjMuODMzOCA3MS4zNzk3IDI0LjE1OTZWMjcuOEg2OS4zOTAyVjIzLjU4MDdDNjkuMzkwMiAyMi40ODM5IDY4LjkzMjUgMjEuOTM1NCA2OC4wMTg0IDIxLjkzNTRDNjcuNzE2NyAyMS45MzU0IDY3LjQ2MzYgMjEuOTkxMSA2Ny4yNTY0IDIyLjEwMjNDNjcuMDUwNSAyMi4yMTM2IDY2Ljg4MTMgMjIuMzY4NiA2Ni43NTE1IDIyLjU2NzNDNjYuNjIwMyAyMi43NjQ3IDY2LjUyNzIgMjIuOTk5MiA2Ni40NzIxIDIzLjI2ODFDNjYuNDE3IDIzLjUzNyA2Ni4zODk1IDIzLjgzMzggNjYuMzg5NSAyNC4xNTk2VjI3LjhINjQuNFYyMC4xODQxSDY2LjA3NjFMNjYuMzMwNSAyMS4yOTU2QzY2LjU2MTMgMjAuOTMgNjYuODYzIDIwLjYyMjYgNjcuMjM1NCAyMC4zNzM2QzY3LjYwNzkgMjAuMTI0NSA2OC4wODkyIDIwIDY4LjY4MzMgMjBDNjkuODA4NSAyMCA3MC41ODc1IDIwLjQ3MTYgNzEuMDIwMyAyMS40MTYxQzcxLjI0OTggMjEuMDAxNSA3MS41NzEyIDIwLjY2MSA3MS45ODMgMjAuMzk3NFoiIGZpbGw9ImJsYWNrIi8+CjxwYXRoIGQ9Ik01MC40IDIxLjk1ODdDNTEuNTI1NyAyMS45NTg3IDUyLjQ0MTMgMjIuODc0MyA1Mi40NDEzIDI0QzUyLjQ0MTMgMjUuMTI1NyA1MS41MjU3IDI2LjA0MTMgNTAuNCAyNi4wNDEzQzQ5LjI3NDMgMjYuMDQxMyA0OC4zNTg4IDI1LjEyNTcgNDguMzU4OCAyNEM0OC4zNTg4IDIyLjg3NDMgNDkuMjc0MyAyMS45NTg3IDUwLjQgMjEuOTU4N1pNNTAuNCAyMEM0OC4xOTExIDIwIDQ2LjQgMjEuNzkxMSA0Ni40IDI0QzQ2LjQgMjYuMjA4OSA0OC4xOTExIDI4IDUwLjQgMjhDNTIuNjA4OSAyOCA1NC40IDI2LjIwODkgNTQuNCAyNEM1NC40IDIxLjc5MTEgNTIuNjA4OSAyMCA1MC40IDIwWiIgZmlsbD0iYmxhY2siLz4KPHBhdGggZD0iTTU5LjMgMjEuOTU4N0M2MC4zOTc2IDIxLjk1ODcgNjEuMjkwMiAyMi44NzQzIDYxLjI5MDIgMjRDNjEuMjkwMiAyNS4xMjU3IDYwLjM5NzYgMjYuMDQxMyA1OS4zIDI2LjA0MTNDNTguMjAyNCAyNi4wNDEzIDU3LjMwOTggMjUuMTI1NyA1Ny4zMDk4IDI0QzU3LjMwOTggMjIuODc0MyA1OC4yMDI0IDIxLjk1ODcgNTkuMyAyMS45NTg3Wk01OS4zIDIwQzU3LjE0NjMgMjAgNTUuNCAyMS43OTExIDU1LjQgMjRDNTUuNCAyNi4yMDg5IDU3LjE0NjMgMjggNTkuMyAyOEM2MS40NTM3IDI4IDYzLjIgMjYuMjA4OSA2My4yIDI0QzYzLjIgMjEuNzkxMSA2MS40NTM3IDIwIDU5LjMgMjBaIiBmaWxsPSJibGFjayIvPgo8cGF0aCBkPSJNNDYuMiAyNy44TDQzLjY5NzIgMjQuMDE1NUM0NC42MzggMjMuNjA0NSA0NS42MDQ5IDIyLjc1NzUgNDUuNjA0OSAyMC45MTA3QzQ1LjYwNDkgMjAuMzc1OSA0NS41MTI2IDE5Ljg4MDYgNDUuMzI4MSAxOS40MjYyQzQ1LjE0MzUgMTguOTcxNyA0NC44OTAxIDE4LjU4MDUgNDQuNTY2NiAxOC4yNTI1QzQ0LjI0MyAxNy45MjQ1IDQzLjg1NzEgMTcuNjY2MyA0My40MDg3IDE3LjQ4MDZDNDIuOTYwNCAxNy4yOTM1IDQyLjQ2NzkgMTcuMiA0MS45Mjk5IDE3LjJIMzcuNFYyNy44SDM5LjQ5MDlWMjQuNjA0M0g0MS43Mzc2TDQzLjc5NiAyNy44TDQzLjc5NDcgMjcuNzk0N0w0My43MTQxIDI3LjhINDYuMlpNMzkuNDkwOSAxOS4zMTk1SDQxLjkyODZDNDIuNDM2NyAxOS4zMTk1IDQyLjgyNzkgMTkuNDY4MyA0My4xMDA4IDE5Ljc2NkM0My4zNzUgMjAuMDYzNyA0My41MTE0IDIwLjQ0NDQgNDMuNTExNCAyMC45MDk0QzQzLjUxMTQgMjEuMzYzOSA0My4zNzUgMjEuNzM5MyA0My4xMDA4IDIyLjAzN0M0Mi44MjY2IDIyLjMzNDcgNDIuNDM1NCAyMi40ODM1IDQxLjkyODYgMjIuNDgzNUgzOS40OTA5VjE5LjMxOTVaIiBmaWxsPSJibGFjayIvPgo8cGF0aCBkPSJNMjguNjUgMTEuNzI4MkwxOC4yNzE3IDEuMzQ5ODRDMTYuNDcxOSAtMC40NDk5NDYgMTMuNTI3OSAtMC40NDk5NDYgMTEuNzI4MSAxLjM0OTg0TDEuMzQ5ODMgMTEuNzI4MkMtMC40NDk5NDMgMTMuNTI4IC0wLjQ0OTk0MyAxNi40NzIgMS4zNDk4MyAxOC4yNzE4TDExLjcyODEgMjguNjUwMkMxMy41Mjc5IDMwLjQ0OTkgMTYuNDczNiAzMC40NDk5IDE4LjI3MzMgMjguNjUwMkwyOC42NTE2IDE4LjI3MThDMzAuNDQ5NyAxNi40NzIgMzAuNDQ5NyAxMy41MjggMjguNjUgMTEuNzI4MlpNMTkuMTgyNCAxOS4xODI1TDE1LjAwMDcgMjMuMzY0Mkw2LjYzNzM4IDE1LjAwMDhMMTUuMDAwNyA2LjYzNzQzTDE5LjE4MjQgMTAuODE5MUwxNS4wMDA3IDE1LjAwMDhMMTkuMTgyNCAxOS4xODI1WiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyMCIgbWFzaz0idXJsKCNwYXRoLTEtaW5zaWRlLTFfNDkzMl8yNSkiLz4KPHBhdGggZD0iTTkzLjkxNDUgNy4xNTc3NEM5NC4zMTg3IDYuOTE5MjUgOTQuNzk2IDYuOCA5NS4zNDYzIDYuOEM5Ni4yMjUyIDYuOCA5Ni44ODc3IDcuMDcxNjEgOTcuMzMyMyA3LjYxNDg1Qzk3Ljc3NyA4LjE1ODA4IDk4IDguOTExOTggOTggOS44NzY1NFYxNC41OTg3SDk1Ljk3NjJWMTAuMzhDOTUuOTc2MiA5LjgwMTAyIDk1Ljg1MzYgOS4zODIzMyA5NS42MDg0IDkuMTIzOTdDOTUuMzYzMyA4Ljg2NTYgOTUuMDMwNyA4LjczNTc2IDk0LjYxMjEgOC43MzU3NkM5NC4wMzE5IDguNzM1NzYgOTMuNjE1OSA4LjkzNTgyIDkzLjM2MDMgOS4zMzcyOUM5My4xMDYgOS43Mzg3NSA5Mi45NzgyIDEwLjI3OTMgOTIuOTc4MiAxMC45NTlWMTQuNkg5MVY2Ljk4Mjg0SDkyLjY2NjVMOTIuOTE5NSA4LjA3OTlDOTMuMTc3NyA3LjcwMzYyIDkzLjUwODkgNy4zOTc1NSA5My45MTQ1IDcuMTU3NzRaIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIwIiBtYXNrPSJ1cmwoI3BhdGgtMS1pbnNpZGUtMV80OTMyXzI1KSIvPgo8cGF0aCBkPSJNNzYuNDU0OCA3LjE5NzQyQzc2Ljg1OTggNi45MzM4IDc3LjM3NDQgNi44MDEzMyA3Ny45OTc0IDYuODAxMzNDNzguODY2NiA2LjgwMTMzIDc5LjU1MTUgNy4wODA4NCA4MC4wNTA2IDcuNjM4NTVDODAuNTQ5OCA4LjE5NzU5IDgwLjggOC45NzM4OCA4MC44IDkuOTY4NzVWMTQuNTk4N0g3OC44MjhWMTAuMzgwN0M3OC44MjggOS4yODM4NyA3OC4zODMgOC43MzU0MyA3Ny40OTMxIDguNzM1NDNDNzcuMTk2NCA4LjczNTQzIDc2Ljk0NDkgOC43OTEwNyA3Ni43MzczIDguOTAyMzRDNzYuNTI5NiA5LjAxMzYyIDc2LjM2MTkgOS4xNjg2MSA3Ni4yMzMgOS4zNjczMkM3Ni4xMDQgOS41NjQ3MSA3Ni4wMTExIDkuNzk5MTggNzUuOTUxOCAxMC4wNjgxQzc1Ljg5MjUgMTAuMzM3IDc1Ljg2MjggMTAuNjMzOCA3NS44NjI4IDEwLjk1OTZWMTQuNkg3My45MDYyVjEwLjM4MDdDNzMuOTA2MiA5LjI4Mzg3IDczLjQ1NjEgOC43MzU0MyA3Mi41NTcyIDguNzM1NDNDNzIuMjYwNSA4LjczNTQzIDcyLjAxMTYgOC43OTEwNyA3MS44MDkxIDguOTAyMzRDNzEuNjA2NiA5LjAxMzYyIDcxLjQ0MDIgOS4xNjg2MSA3MS4zMTI1IDkuMzY3MzJDNzEuMTgzNiA5LjU2NDcxIDcxLjA5MzMgOS43OTkxOCA3MS4wMzc4IDEwLjA2ODFDNzAuOTgzNyAxMC4zMzcgNzAuOTU2NiAxMC42MzM4IDcwLjk1NjYgMTAuOTU5NlYxNC42SDY5VjYuOTg0MTRINzAuNjQ4M0w3MC44OTg1IDguMDk1NThDNzEuMTI1NSA3LjcyOTk2IDcxLjQyMjIgNy40MjI2MiA3MS43ODg1IDcuMTczNTdDNzIuMTU0OCA2LjkyNDUyIDcyLjYyODEgNi44IDczLjIxMjMgNi44Qzc0LjMxOSA2LjggNzUuMDg1MSA3LjI3MTYgNzUuNTEwNyA4LjIxNjE0Qzc1LjczMzggNy44MDE1IDc2LjA0OTggNy40NjEwNCA3Ni40NTQ4IDcuMTk3NDJaIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIwIiBtYXNrPSJ1cmwoI3BhdGgtMS1pbnNpZGUtMV80OTMyXzI1KSIvPgo8cGF0aCBkPSJNODUuOSA4LjcwOTc4Qzg2Ljk5NzYgOC43MDk3OCA4Ny44OTAyIDkuNjAyNCA4Ny44OTAyIDEwLjdDODcuODkwMiAxMS43OTc2IDg2Ljk5NzYgMTIuNjkwMiA4NS45IDEyLjY5MDJDODQuODAyNCAxMi42OTAyIDgzLjkwOTggMTEuNzk3NiA4My45MDk4IDEwLjdDODMuOTA5OCA5LjYwMjQgODQuODAyNCA4LjcwOTc4IDg1LjkgOC43MDk3OFpNODUuOSA2LjhDODMuNzQ2MyA2LjggODIgOC41NDYzMSA4MiAxMC43QzgyIDEyLjg1MzcgODMuNzQ2MyAxNC42IDg1LjkgMTQuNkM4OC4wNTM3IDE0LjYgODkuOCAxMi44NTM3IDg5LjggMTAuN0M4OS44IDguNTQ2MzEgODguMDUzNyA2LjggODUuOSA2LjhaIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIwIiBtYXNrPSJ1cmwoI3BhdGgtMS1pbnNpZGUtMV80OTMyXzI1KSIvPgo8cGF0aCBkPSJNNjIuNzgxNiA3LjE5NzQyQzYzLjE5MzQgNi45MzM4IDYzLjcxNjcgNi44MDEzMyA2NC4zNTAyIDYuODAxMzNDNjUuMjM0MSA2LjgwMTMzIDY1LjkzMDUgNy4wODA4NCA2Ni40MzggNy42Mzg1NUM2Ni45NDU2IDguMTk3NTkgNjcuMiA4Ljk3Mzg4IDY3LjIgOS45Njg3NVYxNC41OTg3SDY1LjE5NDhWMTAuMzgwN0M2NS4xOTQ4IDkuMjgzODcgNjQuNzQyMyA4LjczNTQzIDYzLjgzNzQgOC43MzU0M0M2My41MzU3IDguNzM1NDMgNjMuMjggOC43OTEwNyA2My4wNjg5IDguOTAyMzRDNjIuODU3NyA5LjAxMzYyIDYyLjY4NzIgOS4xNjg2MSA2Mi41NTYxIDkuMzY3MzJDNjIuNDI0OSA5LjU2NDcxIDYyLjMzMDUgOS43OTkxOCA2Mi4yNzAyIDEwLjA2ODFDNjIuMjA5OCAxMC4zMzcgNjIuMTc5NyAxMC42MzM4IDYyLjE3OTcgMTAuOTU5NlYxNC42SDYwLjE5MDJWMTAuMzgwN0M2MC4xOTAyIDkuMjgzODcgNTkuNzMyNSA4LjczNTQzIDU4LjgxODQgOC43MzU0M0M1OC41MTY3IDguNzM1NDMgNTguMjYzNiA4Ljc5MTA3IDU4LjA1NjQgOC45MDIzNEM1Ny44NTA1IDkuMDEzNjIgNTcuNjgxMyA5LjE2ODYxIDU3LjU1MTUgOS4zNjczMkM1Ny40MjAzIDkuNTY0NzEgNTcuMzI3MiA5Ljc5OTE4IDU3LjI3MjEgMTAuMDY4MUM1Ny4yMTcgMTAuMzM3IDU3LjE4OTUgMTAuNjMzOCA1Ny4xODk1IDEwLjk1OTZWMTQuNkg1NS4yVjYuOTg0MTRINTYuODc2MUw1Ny4xMzA1IDguMDk1NThDNTcuMzYxMyA3LjcyOTk2IDU3LjY2MyA3LjQyMjYyIDU4LjAzNTQgNy4xNzM1N0M1OC40MDc5IDYuOTI0NTIgNTguODg5MiA2LjggNTkuNDgzMyA2LjhDNjAuNjA4NSA2LjggNjEuMzg3NSA3LjI3MTYgNjEuODIwMyA4LjIxNjE0QzYyLjA0ODUgNy44MDE1IDYyLjM2OTggNy40NjEwNCA2Mi43ODE2IDcuMTk3NDJaIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIwIiBtYXNrPSJ1cmwoI3BhdGgtMS1pbnNpZGUtMV80OTMyXzI1KSIvPgo8cGF0aCBkPSJNNDQuMzY3OCAxMS41NDk2QzQzLjgwMDggMTIuMTQ3NiA0My4wMTE3IDEyLjUyMDMgNDIuMTM4MyAxMi41MjAzQzQwLjQxNyAxMi41MjAzIDM5LjAxNjIgMTEuMDc1NCAzOS4wMTYyIDkuM0MzOS4wMTYyIDcuNTI0NTUgNDAuNDE3IDYuMDc5NyA0Mi4xMzgzIDYuMDc5N0M0My4wMTE3IDYuMDc5NyA0My44MDA4IDYuNDUyNDMgNDQuMzY3OCA3LjA1MDRMNDUuNiA1LjM4NTU4QzQ0LjY4NyA0LjUyNTUyIDQzLjQ3MjcgNCA0Mi4xMzgzIDRDMzkuMzAxIDQgMzcgNi4zNzIwOSAzNyA5LjNDMzcgMTIuMjI3OSAzOS4yOTk3IDE0LjYgNDIuMTM4MyAxNC42QzQzLjQ3MjcgMTQuNiA0NC42ODcgMTQuMDc0NSA0NS42IDEzLjIxNDRMNDQuMzY3OCAxMS41NDk2WiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyMCIgbWFzaz0idXJsKCNwYXRoLTEtaW5zaWRlLTFfNDkzMl8yNSkiLz4KPHBhdGggZD0iTTUwLjEgOC43MDk3OEM1MS4xOTc2IDguNzA5NzggNTIuMDkwMiA5LjYwMjQgNTIuMDkwMiAxMC43QzUyLjA5MDIgMTEuNzk3NiA1MS4xOTc2IDEyLjY5MDIgNTAuMSAxMi42OTAyQzQ5LjAwMjQgMTIuNjkwMiA0OC4xMDk4IDExLjc5NzYgNDguMTA5OCAxMC43QzQ4LjEwODUgOS42MDI0IDQ5LjAwMjQgOC43MDk3OCA1MC4xIDguNzA5NzhaTTUwLjEgNi44QzQ3Ljk0NjMgNi44IDQ2LjIgOC41NDYzMSA0Ni4yIDEwLjdDNDYuMiAxMi44NTM3IDQ3Ljk0NjMgMTQuNiA1MC4xIDE0LjZDNTIuMjUzNyAxNC42IDU0IDEyLjg1MzcgNTQgMTAuN0M1My45OTg3IDguNTQ2MzEgNTIuMjUzNyA2LjggNTAuMSA2LjhaIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIwIiBtYXNrPSJ1cmwoI3BhdGgtMS1pbnNpZGUtMV80OTMyXzI1KSIvPgo8cGF0aCBkPSJNNzEuOTgzIDIwLjM5NzRDNzIuMzk0OCAyMC4xMzM4IDcyLjkxOCAyMC4wMDEzIDczLjU1MTUgMjAuMDAxM0M3NC40MzU0IDIwLjAwMTMgNzUuMTMxOCAyMC4yODA4IDc1LjYzOTMgMjAuODM4NkM3Ni4xNDY5IDIxLjM5NzYgNzYuNCAyMi4xNzM5IDc2LjQgMjMuMTY4OFYyNy43OTg3SDc0LjM5NDhWMjMuNTgwN0M3NC4zOTQ4IDIyLjQ4MzkgNzMuOTQyMyAyMS45MzU0IDczLjAzNzQgMjEuOTM1NEM3Mi43MzU3IDIxLjkzNTQgNzIuNDggMjEuOTkxMSA3Mi4yNjg5IDIyLjEwMjNDNzIuMDU3NyAyMi4yMTM2IDcxLjg4NzIgMjIuMzY4NiA3MS43NTYxIDIyLjU2NzNDNzEuNjI0OSAyMi43NjQ3IDcxLjUzMDUgMjIuOTk5MiA3MS40NzAyIDIzLjI2ODFDNzEuNDA5OCAyMy41MzcgNzEuMzc5NyAyMy44MzM4IDcxLjM3OTcgMjQuMTU5NlYyNy44SDY5LjM5MDJWMjMuNTgwN0M2OS4zOTAyIDIyLjQ4MzkgNjguOTMyNSAyMS45MzU0IDY4LjAxODQgMjEuOTM1NEM2Ny43MTY3IDIxLjkzNTQgNjcuNDYzNiAyMS45OTExIDY3LjI1NjQgMjIuMTAyM0M2Ny4wNTA1IDIyLjIxMzYgNjYuODgxMyAyMi4zNjg2IDY2Ljc1MTUgMjIuNTY3M0M2Ni42MjAzIDIyLjc2NDcgNjYuNTI3MiAyMi45OTkyIDY2LjQ3MjEgMjMuMjY4MUM2Ni40MTcgMjMuNTM3IDY2LjM4OTUgMjMuODMzOCA2Ni4zODk1IDI0LjE1OTZWMjcuOEg2NC40VjIwLjE4NDFINjYuMDc2MUw2Ni4zMzA1IDIxLjI5NTZDNjYuNTYxMyAyMC45MyA2Ni44NjMgMjAuNjIyNiA2Ny4yMzU0IDIwLjM3MzZDNjcuNjA3OSAyMC4xMjQ1IDY4LjA4OTIgMjAgNjguNjgzMyAyMEM2OS44MDg1IDIwIDcwLjU4NzUgMjAuNDcxNiA3MS4wMjAzIDIxLjQxNjFDNzEuMjQ5OCAyMS4wMDE1IDcxLjU3MTIgMjAuNjYxIDcxLjk4MyAyMC4zOTc0WiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyMCIgbWFzaz0idXJsKCNwYXRoLTEtaW5zaWRlLTFfNDkzMl8yNSkiLz4KPHBhdGggZD0iTTUwLjQgMjEuOTU4N0M1MS41MjU3IDIxLjk1ODcgNTIuNDQxMyAyMi44NzQzIDUyLjQ0MTMgMjRDNTIuNDQxMyAyNS4xMjU3IDUxLjUyNTcgMjYuMDQxMyA1MC40IDI2LjA0MTNDNDkuMjc0MyAyNi4wNDEzIDQ4LjM1ODggMjUuMTI1NyA0OC4zNTg4IDI0QzQ4LjM1ODggMjIuODc0MyA0OS4yNzQzIDIxLjk1ODcgNTAuNCAyMS45NTg3Wk01MC40IDIwQzQ4LjE5MTEgMjAgNDYuNCAyMS43OTExIDQ2LjQgMjRDNDYuNCAyNi4yMDg5IDQ4LjE5MTEgMjggNTAuNCAyOEM1Mi42MDg5IDI4IDU0LjQgMjYuMjA4OSA1NC40IDI0QzU0LjQgMjEuNzkxMSA1Mi42MDg5IDIwIDUwLjQgMjBaIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIwIiBtYXNrPSJ1cmwoI3BhdGgtMS1pbnNpZGUtMV80OTMyXzI1KSIvPgo8cGF0aCBkPSJNNTkuMyAyMS45NTg3QzYwLjM5NzYgMjEuOTU4NyA2MS4yOTAyIDIyLjg3NDMgNjEuMjkwMiAyNEM2MS4yOTAyIDI1LjEyNTcgNjAuMzk3NiAyNi4wNDEzIDU5LjMgMjYuMDQxM0M1OC4yMDI0IDI2LjA0MTMgNTcuMzA5OCAyNS4xMjU3IDU3LjMwOTggMjRDNTcuMzA5OCAyMi44NzQzIDU4LjIwMjQgMjEuOTU4NyA1OS4zIDIxLjk1ODdaTTU5LjMgMjBDNTcuMTQ2MyAyMCA1NS40IDIxLjc5MTEgNTUuNCAyNEM1NS40IDI2LjIwODkgNTcuMTQ2MyAyOCA1OS4zIDI4QzYxLjQ1MzcgMjggNjMuMiAyNi4yMDg5IDYzLjIgMjRDNjMuMiAyMS43OTExIDYxLjQ1MzcgMjAgNTkuMyAyMFoiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMjAiIG1hc2s9InVybCgjcGF0aC0xLWluc2lkZS0xXzQ5MzJfMjUpIi8+CjxwYXRoIGQ9Ik00Ni4yIDI3LjhMNDMuNjk3MiAyNC4wMTU1QzQ0LjYzOCAyMy42MDQ1IDQ1LjYwNDkgMjIuNzU3NSA0NS42MDQ5IDIwLjkxMDdDNDUuNjA0OSAyMC4zNzU5IDQ1LjUxMjYgMTkuODgwNiA0NS4zMjgxIDE5LjQyNjJDNDUuMTQzNSAxOC45NzE3IDQ0Ljg5MDEgMTguNTgwNSA0NC41NjY2IDE4LjI1MjVDNDQuMjQzIDE3LjkyNDUgNDMuODU3MSAxNy42NjYzIDQzLjQwODcgMTcuNDgwNkM0Mi45NjA0IDE3LjI5MzUgNDIuNDY3OSAxNy4yIDQxLjkyOTkgMTcuMkgzNy40VjI3LjhIMzkuNDkwOVYyNC42MDQzSDQxLjczNzZMNDMuNzk2IDI3LjhMNDMuNzk0NyAyNy43OTQ3TDQzLjcxNDEgMjcuOEg0Ni4yWk0zOS40OTA5IDE5LjMxOTVINDEuOTI4NkM0Mi40MzY3IDE5LjMxOTUgNDIuODI3OSAxOS40NjgzIDQzLjEwMDggMTkuNzY2QzQzLjM3NSAyMC4wNjM3IDQzLjUxMTQgMjAuNDQ0NCA0My41MTE0IDIwLjkwOTRDNDMuNTExNCAyMS4zNjM5IDQzLjM3NSAyMS43MzkzIDQzLjEwMDggMjIuMDM3QzQyLjgyNjYgMjIuMzM0NyA0Mi40MzU0IDIyLjQ4MzUgNDEuOTI4NiAyMi40ODM1SDM5LjQ5MDlWMTkuMzE5NVoiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMjAiIG1hc2s9InVybCgjcGF0aC0xLWluc2lkZS0xXzQ5MzJfMjUpIi8+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfNDkzMl8yNSI+CjxyZWN0IHdpZHRoPSI5OCIgaGVpZ2h0PSIzMCIgZmlsbD0id2hpdGUiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K"
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Use a Community API JWT as a Bearer token in the Authentication header.\n\nTokens can be created by Community Owners through https://app.commonroom.io/\n\nExample:\n\n```\ncurl -H \"Authorization: Bearer abcd123.xzy\" \\\n  https://api.commonroom.io/community/v1\n````\n"
+      }
+    },
+    "schemas": {
+      "ApiToken": {
+        "type": "object",
+        "properties": {
+          "jti": {
+            "type": "string",
+            "example": "tcpgph92"
+          },
+          "communityName": {
+            "type": "string",
+            "example": "Uncommon"
+          },
+          "communityId": {
+            "type": "string",
+            "example": "8p980hdo0"
+          }
+        }
+      },
+      "CommunityMember": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 147920
+          }
+        }
+      },
+      "Status": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "failure",
+              "not-found"
+            ],
+            "example": "success"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "required": [
+              "status"
+            ]
+          }
+        },
+        "example": {
+          "status": "not created",
+          "errors": [
+            "name is missing"
+          ]
+        }
+      },
+      "User": {
+        "type": "object",
+        "description": "Represents the user account in the Common Room community\nThis account is used for identity mangement via SCIM\nSpecification can be found at https://datatracker.ietf.org/doc/html/rfc7643#section-4.1\n",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "user@domain.com"
+          },
+          "userName": {
+            "type": "string",
+            "example": "user@domain.com"
+          },
+          "name": {
+            "type": "object",
+            "properties": {
+              "givenName": {
+                "type": "string",
+                "example": "John"
+              },
+              "familyName": {
+                "type": "string",
+                "example": "Doe"
+              }
+            }
+          },
+          "emails": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "example": "user@domain.com"
+                },
+                "primary": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "type": {
+                  "type": "string",
+                  "example": "work"
+                }
+              }
+            }
+          },
+          "active": {
+            "type": "boolean",
+            "example": true,
+            "description": "Indicates whether the user has a login account in the community"
+          },
+          "schemas": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "urn:ietf:params:scim:api:messages:2.0:User"
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.commonroom.io/community/v1",
+      "description": "Common Room Community API Production Server"
+    },
+    {
+      "url": "https://api.commonroom.io/scim/v2",
+      "description": "Common Room SCIM API"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Members"
+    },
+    {
+      "name": "Activities"
+    },
+    {
+      "name": "Segments"
+    },
+    {
+      "name": "SCIM"
+    },
+    {
+      "name": "Right to be Forgotten"
+    },
+    {
+      "name": "beta",
+      "description": "**BETA** APIs. These APIs are still under development.\n"
+    }
+  ],
+  "paths": {
+    "/api-token-status": {
+      "get": {
+        "summary": "API Token status information",
+        "description": "Status information about the API token used in the request.\n",
+        "tags": [
+          "beta"
+        ],
+        "operationId": "apiTokenStatus",
+        "responses": {
+          "200": {
+            "description": "Community API Token Information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiToken"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status",
+                  "example": {
+                    "status": "forbidden"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/": {
+      "post": {
+        "description": "Create or Update a Community Member\n",
+        "summary": "Create or update Community Member",
+        "tags": [
+          "Members"
+        ],
+        "operationId": "createOrUpdateCommunityMember",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "string",
+                    "description": "Source of the information"
+                  },
+                  "fullName": {
+                    "type": "string",
+                    "example": "Greg"
+                  },
+                  "avatarUrl": {
+                    "type": "string",
+                    "example": "https://img.example.com/profile/zyx.png"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Member Bio"
+                  },
+                  "socials": {
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "title": "social",
+                          "description": "A user's handle on a social network",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "github",
+                                "linkedin",
+                                "twitter",
+                                "youtube",
+                                "discord"
+                              ]
+                            },
+                            "value": {
+                              "type": "object",
+                              "title": "social.handle",
+                              "properties": {
+                                "handle": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "title": "email",
+                          "description": "A user's email address",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "email"
+                              ]
+                            },
+                            "value": {
+                              "type": "string",
+                              "description": "email address"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "segment": {
+                    "type": "number",
+                    "description": "Segment Id"
+                  },
+                  "company": {
+                    "type": "string",
+                    "description": "Name of the organization member is employed at",
+                    "example": "Common Room"
+                  },
+                  "domain": {
+                    "type": "string",
+                    "description": "Domain of the organization member is employed at",
+                    "example": "commonroom.io"
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Member's job title",
+                    "example": "CFO"
+                  },
+                  "role": {
+                    "type": "string",
+                    "description": "Member's job category",
+                    "example": "Finance"
+                  },
+                  "location": {
+                    "type": "object",
+                    "description": "Geographical data for the user",
+                    "properties": {
+                      "city": {
+                        "type": "string",
+                        "description": "The city where the user lives",
+                        "example": "San Francisco"
+                      },
+                      "region": {
+                        "type": "string",
+                        "description": "The state or province where the user lives",
+                        "example": "California"
+                      },
+                      "country": {
+                        "type": "string",
+                        "description": "The country where the user lives",
+                        "example": "United States of America"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "source"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/members/note": {
+      "post": {
+        "description": "Add a Note to a Community Member\n",
+        "summary": "Add a Note to a Community Member",
+        "tags": [
+          "Members"
+        ],
+        "operationId": "addNoteToMember",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "socialType": {
+                    "type": "string",
+                    "example": "email",
+                    "description": "Must be email, twitter, github, or linkedin"
+                  },
+                  "value": {
+                    "type": "string",
+                    "example": "email@domail.com",
+                    "description": "Value corresponding to socialType"
+                  },
+                  "note": {
+                    "type": "string",
+                    "description": "Note content"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Failure"
+          },
+          "404": {
+            "description": "Member Not Found"
+          }
+        }
+      }
+    },
+    "/members/customFields": {
+      "get": {
+        "description": "Gets all member custom fields for a community\n",
+        "summary": "Gets all member custom fields for a community",
+        "tags": [
+          "Members"
+        ],
+        "operationId": "getMemberCustomFields",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Custom field name"
+                      },
+                      "type": {
+                        "type": "string",
+                        "description": "Custom field type"
+                      },
+                      "values": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "description": "Array of acceptable types for enum custom field types"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Set an existing Custom Field for a Community Member\n",
+        "summary": "Set an existing Custom Field for a Community Member",
+        "tags": [
+          "Members"
+        ],
+        "operationId": "setMemberCustomFieldValue",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "socialType": {
+                    "type": "string",
+                    "example": "email",
+                    "description": "Must be email, twitter, github, or linkedin"
+                  },
+                  "value": {
+                    "type": "string",
+                    "example": "email@domail.com",
+                    "description": "Value corresponding to socialType"
+                  },
+                  "customFieldId": {
+                    "type": "number",
+                    "description": "Id of the custom field to set",
+                    "example": 12345
+                  },
+                  "customFieldValue": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "enum, string, date, int, url, boolean",
+                        "example": "boolean"
+                      },
+                      "value": {
+                        "description": "Value of custom field",
+                        "example": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Failure"
+          },
+          "404": {
+            "description": "Member or Custom Field Not Found"
+          }
+        }
+      }
+    },
+    "/members/tags": {
+      "post": {
+        "description": "Adds a new or existing tag to a Community Member\n",
+        "summary": "Adds a new or existing tag to a Community Member",
+        "tags": [
+          "Members"
+        ],
+        "operationId": "addTagsToMember",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "socialType": {
+                    "type": "string",
+                    "example": "email",
+                    "description": "Must be email, twitter, github, or linkedin"
+                  },
+                  "value": {
+                    "type": "string",
+                    "example": "email@domail.com",
+                    "description": "Value corresponding to socialType"
+                  },
+                  "tags": {
+                    "type": "string",
+                    "description": "Comma separated list of tags",
+                    "example": "tag1, tag2, tag3"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Failure"
+          },
+          "404": {
+            "description": "Member Not Found"
+          }
+        }
+      }
+    },
+    "/user/{email}": {
+      "summary": "Represents a Community Member",
+      "description": "Represents a Community Member associated with an email address within the community\nidentified by the authentication scheme.\n",
+      "parameters": [
+        {
+          "name": "email",
+          "schema": {
+            "type": "string",
+            "format": "email",
+            "example": "member@example.commonroom.io"
+          },
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get Community Member by E-Mail",
+        "description": "A Community Member's profile based on an email address.",
+        "tags": [
+          "Members"
+        ],
+        "operationId": "getMemberByEmail",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommunityMember"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Anonymize Community Member",
+        "description": "Request removal of all personally identifiable information (PII) for the\nCommunity Member associated by this email address.\n\nThis does not immediately anonymize the community member. The anonymization\nis queued and will happen at a future time within 15 days.\n",
+        "tags": [
+          "Members",
+          "Right to be Forgotten"
+        ],
+        "operationId": "anonymizeMember",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                },
+                "example": {
+                  "status": "success"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members": {
+      "parameters": [
+        {
+          "in": "query",
+          "name": "twitter",
+          "schema": {
+            "type": "string",
+            "example": "twitterHandle"
+          }
+        },
+        {
+          "in": "query",
+          "name": "email",
+          "schema": {
+            "type": "string",
+            "example": "email@domain.com"
+          }
+        },
+        {
+          "in": "query",
+          "name": "github",
+          "schema": {
+            "type": "string",
+            "example": "githubHandle"
+          }
+        },
+        {
+          "in": "query",
+          "name": "linkedin",
+          "schema": {
+            "type": "string",
+            "example": "in/username"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Get Community Member By E-Mail or Socials",
+        "tags": [
+          "Members"
+        ],
+        "operationId": "getMemberBySocials",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "fullName": {
+                        "type": "string",
+                        "example": "Greg"
+                      },
+                      "activities_count": {
+                        "type": "number"
+                      },
+                      "avatar": {
+                        "type": "string",
+                        "description": "Avatar URL string"
+                      },
+                      "bio": {
+                        "type": "string"
+                      },
+                      "organization": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "first_seen": {
+                        "type": "string",
+                        "description": "Date when member appeared in your community in ISO 8601 format"
+                      },
+                      "last_active": {
+                        "type": "string",
+                        "description": "Date of the member's last activity in ISO 8601 format"
+                      },
+                      "location": {
+                        "type": "object"
+                      },
+                      "member_tags": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "segments": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "number"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "url": {
+                        "type": "string"
+                      },
+                      "twitter": {
+                        "type": "string"
+                      },
+                      "github": {
+                        "type": "string"
+                      },
+                      "linkedin": {
+                        "type": "string"
+                      },
+                      "discord": {
+                        "type": "string"
+                      },
+                      "youtube": {
+                        "type": "string"
+                      },
+                      "common_room_member_url": {
+                        "type": "string"
+                      },
+                      "custom_fields": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string",
+                              "description": "enum, string, date, int, url, boolean",
+                              "example": "boolean"
+                            },
+                            "value": {
+                              "description": "Value of custom field",
+                              "example": true
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parameter Error"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/Users": {
+      "summary": "Represents Common Room users",
+      "description": "Represents users with a valid login. Community owners are returned\n",
+      "parameters": [
+        {
+          "in": "query",
+          "name": "startIndex",
+          "schema": {
+            "type": "integer",
+            "example": 1
+          }
+        },
+        {
+          "in": "query",
+          "name": "count",
+          "schema": {
+            "type": "integer",
+            "example": 15
+          }
+        },
+        {
+          "in": "query",
+          "name": "filter",
+          "schema": {
+            "type": "string",
+            "description": "filter on the userName.",
+            "example": "userName eq 'test.user@domain.io'"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Active community members by role",
+        "description": "Returns the list of active owners, filtered based on the query parameters",
+        "tags": [
+          "SCIM"
+        ],
+        "operationId": "activeCommunityMembersByRole",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "schemas": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "urn:ietf:params:scim:api:messages:2.0:ListResponse"
+                      }
+                    },
+                    "Resources": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    },
+                    "totalResults": {
+                      "type": "integer",
+                      "description": "Number of resources in the list"
+                    },
+                    "itemsPerPage": {
+                      "type": "integer",
+                      "description": "Constant number of items per page"
+                    },
+                    "startIndex": {
+                      "type": "integer",
+                      "description": "1-based index for the returned list"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates the community member with specific role",
+        "description": "Creates the community member with owner role",
+        "tags": [
+          "SCIM"
+        ],
+        "operationId": "createCommunityMemberWithSpecificRole",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "schemas": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "urn:ietf:params:scim:schemas:core:2.0:User"
+                    }
+                  },
+                  "userName": {
+                    "type": "string",
+                    "example": "test.user@domain.io"
+                  },
+                  "name": {
+                    "type": "object",
+                    "properties": {
+                      "givenName": {
+                        "type": "string",
+                        "example": "John"
+                      },
+                      "familyName": {
+                        "type": "string",
+                        "example": "Doe"
+                      }
+                    }
+                  },
+                  "emails": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "string",
+                          "example": "user@domain.com"
+                        },
+                        "primary": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "type": {
+                          "type": "string",
+                          "example": "work"
+                        }
+                      }
+                    }
+                  },
+                  "active": {
+                    "type": "boolean",
+                    "example": true,
+                    "description": "Indicates whether the user has a login account in the community"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "schemas": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "urn:ietf:params:scim:schemas:core:2.0:Error"
+                      }
+                    },
+                    "detail": {
+                      "type": "string",
+                      "example": "Failed to create user"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Users/:email": {
+      "summary": "Represents a specific user",
+      "description": "Retrieves or updates the specific user",
+      "parameters": [
+        {
+          "in": "path",
+          "name": "email",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": "User accounts' identifier. Typically the email address"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Retrieves a specific user account",
+        "tags": [
+          "SCIM"
+        ],
+        "operationId": "getSpecificUserAccount",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "schemas": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "urn:ietf:params:scim:schemas:core:2.0:Error"
+                      }
+                    },
+                    "detail": {
+                      "type": "string",
+                      "example": "No user found for user: {userName}"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Updates an user account",
+        "description": "Updates the user account specified in the query",
+        "tags": [
+          "SCIM"
+        ],
+        "operationId": "updateUserAccount",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "schemas": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "urn:ietf:params:scim:schemas:core:2.0:PatchOp"
+                    }
+                  },
+                  "Operations": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "op": {
+                          "type": "string",
+                          "example": "replace"
+                        },
+                        "value": {
+                          "type": "object",
+                          "properties": {
+                            "active": {
+                              "type": "boolean",
+                              "example": true,
+                              "description": "Will upgrade or downgrade user account's role based on this property. When set to false\nuser account is downgraded\n"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "schemas": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "urn:ietf:params:scim:schemas:core:2.0:Error"
+                      }
+                    },
+                    "detail": {
+                      "type": "string",
+                      "example": "No user found for user: {userName}"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/activities": {
+      "post": {
+        "description": "Add an activity to existing community member(s) with matching socials\n",
+        "summary": "Add an activity to existing community member(s)",
+        "tags": [
+          "Activities"
+        ],
+        "operationId": "createUserInputActivity",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "string",
+                    "description": "Source of the information"
+                  },
+                  "socialType": {
+                    "type": "string",
+                    "example": "email",
+                    "description": "Must be email, twitter, github, or linkedin"
+                  },
+                  "value": {
+                    "type": "string",
+                    "example": "email@domail.com",
+                    "description": "Value corresponding to socialType"
+                  },
+                  "activityType": {
+                    "type": "string",
+                    "example": "link",
+                    "description": "ActivityType. Use the GetActivityType API to get a list of types"
+                  },
+                  "activityBody": {
+                    "type": "string"
+                  },
+                  "occurredAt": {
+                    "type": "string",
+                    "description": "Date when the activity occurred in ISO 8601 format",
+                    "example": "2021-08-19T05:43:45.677Z"
+                  },
+                  "tags": {
+                    "type": "string",
+                    "description": "Comma separated string of tags to apply to the activity",
+                    "example": "Tag1, Tag2"
+                  }
+                },
+                "required": [
+                  "source",
+                  "socialType",
+                  "value",
+                  "activityType",
+                  "activityBody"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Failure"
+          }
+        }
+      }
+    },
+    "/activityTypes": {
+      "get": {
+        "description": "Gets all activity types\n",
+        "summary": "Get Activity Types",
+        "tags": [
+          "Activities"
+        ],
+        "operationId": "getActivityTypes",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "started_training"
+                      },
+                      "displayName": {
+                        "type": "string",
+                        "example": "Started training"
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "started_training",
+                        "deprecated": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/segments": {
+      "get": {
+        "description": "Gets all segments in a community\n",
+        "summary": "Get segments in a community",
+        "tags": [
+          "Segments"
+        ],
+        "operationId": "getSegments",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "description": "Segment id"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Display name of segment"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/segments/:id/status": {
+      "get": {
+        "description": "Gets all status for a segment\n",
+        "summary": "Gets all status for a segment",
+        "tags": [
+          "Segments"
+        ],
+        "operationId": "getSegmentStatuses",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "description": "Status id"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Display text of status"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/segments/:id": {
+      "post": {
+        "description": "Add existing community members to an existing segment\n",
+        "summary": "Add Community Member(s) to Segment",
+        "tags": [
+          "Segments"
+        ],
+        "operationId": "addMembersToSegment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "socialType": {
+                    "type": "string",
+                    "example": "email",
+                    "description": "Must be email, twitter, github, or linkedin"
+                  },
+                  "value": {
+                    "type": "string",
+                    "example": "email@domail.com, email2@domain.org",
+                    "description": "Comma separated list of values corresponding to socialType"
+                  },
+                  "statusId": {
+                    "type": "number",
+                    "example": 1234
+                  }
+                },
+                "required": [
+                  "socialType",
+                  "value"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/segments/note": {
+      "post": {
+        "description": "Add a Note to a Segment\n",
+        "summary": "Add a Note to a Segment",
+        "tags": [
+          "Segments"
+        ],
+        "operationId": "addNoteToSegment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "segmentId": {
+                    "type": "number",
+                    "example": 12345
+                  },
+                  "note": {
+                    "type": "string",
+                    "description": "Note content"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Failure"
+          }
+        }
+      }
+    }
+  }
+}

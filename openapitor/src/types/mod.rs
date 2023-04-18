@@ -13,19 +13,22 @@ use std::{collections::BTreeMap, str::FromStr};
 use anyhow::Result;
 use indexmap::map::IndexMap;
 use numeral::Cardinal;
+use once_cell::sync::Lazy;
+use regex::Regex;
 
 use crate::types::exts::{
     ParameterExt, ParameterSchemaOrContentExt, ReferenceOrExt, SchemaRenderExt, StatusCodeExt,
     TokenStreamExt,
 };
 
-/// Lazily compiled regex macro.
-/// Taken from <https://docs.rs/once_cell/1.17.1/once_cell/index.html#lazily-compiled-regex>
-macro_rules! regex {
-    ($re:literal $(,)?) => {{
-        static RE: once_cell::sync::OnceCell<regex::Regex> = once_cell::sync::OnceCell::new();
-        RE.get_or_init(|| regex::Regex::new($re).unwrap())
-    }};
+/// Regex to detect weird descriptions in OpenAPI specs.
+/// Rustdoc interprets the indented lines as a code block, and tries to run them
+/// as code. They aren't always code though.
+static LEADING_SPACES: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\n +"#).unwrap());
+
+/// Collapse leading spaces at the beginning of lines.
+pub fn sanitize_indents(s: &str) -> std::borrow::Cow<'_, str> {
+    LEADING_SPACES.replace_all(s, "\n")
 }
 
 /// Our collection of all our parsed types.
@@ -197,7 +200,7 @@ impl TypeSpace {
 
     #[allow(clippy::type_complexity)]
     fn get_all_of_properties(
-        &mut self,
+        &self,
         name: &str,
         all_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
     ) -> Result<(
@@ -337,7 +340,8 @@ impl TypeSpace {
         data: &openapiv3::SchemaData,
     ) -> Result<()> {
         let description = if let Some(d) = &data.description {
-            quote!(#[doc = #d])
+            let d_sanitized = sanitize_indents(d);
+            quote!(#[doc = #d_sanitized])
         } else {
             quote!()
         };
@@ -450,7 +454,8 @@ impl TypeSpace {
         }
 
         let description = if let Some(d) = &data.description {
-            quote!(#[doc = #d])
+            let d_sanitized = sanitize_indents(d);
+            quote!(#[doc = #d_sanitized])
         } else {
             quote!()
         };
@@ -496,8 +501,7 @@ impl TypeSpace {
             };
 
             let prop_desc = if let Some(d) = &inner_schema.schema_data.description {
-                let leading_spaces = regex!(r#"\n +"#);
-                let d_sanitized = leading_spaces.replace_all(d, "\n");
+                let d_sanitized = sanitize_indents(d);
                 quote!(#[doc = #d_sanitized])
             } else {
                 quote!()
@@ -517,22 +521,36 @@ impl TypeSpace {
                     proper_name(&prop)
                 };
 
-                // Check if the name is already taken.
-                if let Some(rendered) = self.types.get(&t) {
-                    if *rendered != inner_schema {
-                        // The name is already taken, so we need to make a new name.
-                        t = proper_name(&format!("{} {}", struct_name, prop));
-                    }
-                }
-
                 let mut should_render = true;
 
+                // Check if the name is already taken.
                 if let Some(rendered) = self.types.get(&t) {
-                    if rendered.schema_kind != inner_schema.schema_kind
-                        || rendered.schema_data != inner_schema.schema_data
+                    let mut compare_inner_schema = Box::new(inner_schema.clone());
+                    if let openapiv3::SchemaKind::Type(openapiv3::Type::Array(inner_array)) =
+                        &inner_schema.schema_kind
                     {
+                        if let Some(inner_array_items) = &inner_array.items {
+                            if let openapiv3::ReferenceOr::Item(item_schema) = inner_array_items {
+                                compare_inner_schema = item_schema.clone();
+                            }
+                        }
+                    }
+                    if prop == "emails" {
+                        println!(
+                            "RENDERED {:?}\nINNER SCHEMA {:?}",
+                            rendered, compare_inner_schema
+                        );
+                        println!(
+                            "RENDERED KIND {:?}\nINNER SCHEMA KIND {:?}",
+                            rendered.schema_kind, compare_inner_schema.schema_kind
+                        );
+                    }
+                    if *rendered != *compare_inner_schema {
+                        // The name is already taken, so we need to make a new name.
                         t = proper_name(&format!("{} {}", struct_name, prop));
                     } else {
+                        // When the schema exists but it is equal to the current schema,
+                        // we don't need to render it. AND we can use the existing name.
                         should_render = false;
                     }
                 }
@@ -785,7 +803,8 @@ impl TypeSpace {
         }
 
         let description = if let Some(d) = &data.description {
-            quote!(#[doc = #d])
+            let d_sanitized = sanitize_indents(d);
+            quote!(#[doc = #d_sanitized])
         } else {
             quote!()
         };
@@ -1046,9 +1065,13 @@ impl TypeSpace {
         // Handle the untagged types.
 
         for one_of in one_ofs {
+            let expanded_one_of = one_of.expand(&self.spec)?;
             if one_of.should_render()? && should_render {
                 // Render the schema.
                 name = format!("{}_OneOf", name);
+                if let Some(title) = &expanded_one_of.schema_data.title {
+                    name = title.to_string();
+                }
                 self.render_schema(&name, &one_of.item()?.clone())?;
             }
 
@@ -1066,9 +1089,9 @@ impl TypeSpace {
                 // We don't have a reference, we have an item.
                 // We need to expand the item.
                 let rendered_type =
-                    get_type_name_for_schema(&name, &one_of.expand(&self.spec)?, &self.spec, true)?;
+                    get_type_name_for_schema(&name, &expanded_one_of, &self.spec, true)?;
 
-                let n = if let Some(title) = &one_of.expand(&self.spec)?.schema_data.title {
+                let n = if let Some(title) = &expanded_one_of.schema_data.title {
                     let p = proper_name(title);
                     p.parse().map_err(|e| anyhow::anyhow!("{}", e))?
                 } else {
@@ -1484,6 +1507,9 @@ fn get_type_name_for_array(
             // We have an item.
             let item = s.item()?;
             // Get the type name for the item.
+            if name == "Operations" || name.contains("Operations") {
+                println!("getting type name for array item: {:?}", item);
+            }
             get_type_name_for_schema(name, item, spec, in_crate)?
         }
     } else {
