@@ -4,7 +4,7 @@ use std::{fmt::Write as _, str::FromStr};
 
 use anyhow::Result;
 use chrono::TimeZone;
-use rand::Rng;
+use rand::{distributions::Alphanumeric, Rng};
 
 /// A triat that implements generating a random value of a given type.
 pub trait Random {
@@ -19,7 +19,7 @@ impl Random for crate::types::phone_number::PhoneNumber {
         let mut rng = rand::thread_rng();
         let mut number = String::new();
         for _ in 0..10 {
-            number.push(rng.gen_range('0'..'9') as char);
+            number.push(rng.gen_range('0'..='9'));
         }
         Self::from_str(&number)
     }
@@ -94,26 +94,16 @@ impl Random for u64 {
 impl Random for std::net::Ipv4Addr {
     fn random() -> Result<Self> {
         let mut rng = rand::thread_rng();
-        // Return a random IPv4 address.
-        let mut ip = String::new();
-        for _ in 0..4 {
-            write!(ip, "{}.", rng.gen_range(0..255))?;
-        }
-        ip.pop();
-        Ok(ip.parse()?)
+        let [a, b, c, d]: [u8; 4] = rng.gen();
+        Ok(Self::new(a, b, c, d))
     }
 }
 
 impl Random for std::net::Ipv6Addr {
     fn random() -> Result<Self> {
         let mut rng = rand::thread_rng();
-        // Return a random IPv6 address.
-        let mut ip = String::new();
-        for _ in 0..8 {
-            write!(ip, "{:x}:", rng.gen_range(0..16))?;
-        }
-        ip.pop();
-        Ok(ip.parse()?)
+        let [a, b, c, d, e, f, g, h]: [u16; 8] = rng.gen();
+        Ok(Self::new(a, b, c, d, e, f, g, h))
     }
 }
 
@@ -121,12 +111,12 @@ impl Random for std::net::IpAddr {
     fn random() -> Result<Self> {
         // Generate a random IPv4 or IPv6 address.
         let mut rng = rand::thread_rng();
-        let ip_version = rng.gen_range(0..2);
-        match ip_version {
-            0 => Ok(std::net::IpAddr::V4(std::net::Ipv4Addr::random()?)),
-            1 => Ok(std::net::IpAddr::V6(std::net::Ipv6Addr::random()?)),
-            _ => unreachable!(),
-        }
+        let is_v4 = rng.gen();
+        Ok(if is_v4 {
+            std::net::IpAddr::V4(std::net::Ipv4Addr::random()?)
+        } else {
+            std::net::IpAddr::V6(std::net::Ipv6Addr::random()?)
+        })
     }
 }
 
@@ -134,18 +124,20 @@ impl Random for url::Url {
     fn random() -> Result<Self> {
         // Generate a random url.
         let mut rng = rand::thread_rng();
-        let scheme = rng.gen_range(0..2);
         let mut url = String::new();
-        match scheme {
-            0 => url.push_str("http://"),
-            1 => url.push_str("https://"),
-            _ => unreachable!(),
-        }
-        let mut host = String::new();
-        for _ in 0..rng.gen_range(1..10) {
-            write!(host, "{}.", rng.gen_range(0..255))?;
-        }
-        host.pop();
+        let is_http = rng.gen();
+        url.push_str(if is_http { "http://" } else { "https://" });
+        let host: String = (0..rng.gen_range(1..10usize))
+            .map(|_| {
+                // Generate a random subdomain
+                (&mut rng)
+                    .sample_iter(&Alphanumeric)
+                    .take(7)
+                    .map(char::from)
+                    .collect::<String>()
+            })
+            .collect::<Vec<_>>()
+            .join(".");
         url.push_str(&host);
         write!(url, "/{}", rng.gen_range(0..10))?;
         Ok(url::Url::parse(&url)?)
@@ -187,20 +179,18 @@ impl Random for chrono::DateTime<chrono::Utc> {
     fn random() -> Result<Self> {
         // Generate a random date and time.
         let mut rng = rand::thread_rng();
-        Ok(chrono::Utc
-            .ymd_opt(
+        let out = chrono::Utc
+            .with_ymd_and_hms(
                 rng.gen_range(1900..2100),
                 rng.gen_range(1..13),
                 rng.gen_range(1..28),
-            )
-            .unwrap()
-            .and_hms_milli_opt(
                 rng.gen_range(0..24),
                 rng.gen_range(0..60),
                 rng.gen_range(0..60),
-                rng.gen_range(0..1_000),
             )
-            .unwrap())
+            .unwrap()
+            + chrono::Duration::milliseconds(rng.gen_range(0..1_000));
+        Ok(out)
     }
 }
 
