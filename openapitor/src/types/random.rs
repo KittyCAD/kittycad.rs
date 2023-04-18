@@ -19,7 +19,7 @@ impl Random for crate::types::phone_number::PhoneNumber {
         let mut rng = rand::thread_rng();
         let mut number = String::new();
         for _ in 0..10 {
-            number.push(rng.gen_range('0'..='9') as char);
+            number.push(rng.gen_range('0'..='9'));
         }
         Self::from_str(&number)
     }

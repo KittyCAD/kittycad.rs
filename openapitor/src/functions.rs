@@ -1205,7 +1205,7 @@ fn generate_example_code_fn(
     let args = if raw_args.is_empty() {
         quote!()
     } else {
-        let a = raw_args.iter().map(|(_k, v)| quote!(#v));
+        let a = raw_args.values().map(|v| quote!(#v));
         quote!(#(#a),*,)
     };
 

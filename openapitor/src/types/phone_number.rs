@@ -56,17 +56,11 @@ impl std::str::FromStr for PhoneNumber {
         }
 
         let s = if !s.trim().starts_with('+') {
-            format!("+1{}", s)
-                .replace('-', "")
-                .replace('(', "")
-                .replace(')', "")
-                .replace(' ', "")
+            format!("+1{s}")
         } else {
-            s.replace('-', "")
-                .replace('(', "")
-                .replace(')', "")
-                .replace(' ', "")
-        };
+            s.to_string()
+        }
+        .replace(['-', '(', ')', ' '], "");
 
         Ok(PhoneNumber(Some(phonenumber::parse(None, &s).map_err(
             |e| anyhow::anyhow!("invalid phone number `{}`: {}", s, e),

@@ -9,10 +9,10 @@ impl TestContext {
     pub fn new() -> Result<Self> {
         // Create a temporary directory for the test.
         let tmp_dir = std::env::temp_dir();
-        let tmp_dir = tmp_dir.join(&format!("openapitor-{}", uuid::Uuid::new_v4()));
+        let tmp_dir = tmp_dir.join(format!("openapitor-{}", uuid::Uuid::new_v4()));
         std::fs::create_dir_all(&tmp_dir)?;
-        let src_dir = tmp_dir.clone().join("src");
-        std::fs::create_dir_all(&src_dir)?;
+        let src_dir = tmp_dir.join("src");
+        std::fs::create_dir_all(src_dir)?;
 
         Ok(TestContext { tmp_dir })
     }
@@ -74,7 +74,7 @@ fn test_kittycad_generation(ctx: &mut TestContext) {
 
     // Make the output tests directory.
     let output_tests_dir = ctx.tmp_dir.join("tests");
-    std::fs::create_dir_all(&output_tests_dir).unwrap();
+    std::fs::create_dir_all(output_tests_dir).unwrap();
 
     // Run tests.
     run_cargo_test(&opts).unwrap();
@@ -105,7 +105,7 @@ fn test_github_generation(ctx: &mut TestContext) {
     let test_file = include_str!("../tests/library/github.tests.rs");
     // Write our temporary file.
     let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
-    std::fs::write(&test_file_path, test_file).unwrap();
+    std::fs::write(test_file_path, test_file).unwrap();
 
     // Generate the library.
     crate::generate(&spec, &opts).unwrap();
@@ -141,7 +141,7 @@ fn test_oxide_generation(ctx: &mut TestContext) {
     let test_file = include_str!("../tests/library/oxide.tests.rs");
     // Write our temporary file.
     let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
-    std::fs::write(&test_file_path, test_file).unwrap();
+    std::fs::write(test_file_path, test_file).unwrap();
 
     // Generate the library.
     crate::generate(&spec, &opts).unwrap();
@@ -175,7 +175,7 @@ fn test_front_generation(ctx: &mut TestContext) {
     let test_file = include_str!("../tests/library/front.tests.rs");
     // Write our temporary file.
     let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
-    std::fs::write(&test_file_path, test_file).unwrap();
+    std::fs::write(test_file_path, test_file).unwrap();
 
     // Generate the library.
     crate::generate(&spec, &opts).unwrap();
@@ -210,7 +210,7 @@ fn test_gusto_generation(ctx: &mut TestContext) {
     let test_file = include_str!("../tests/library/gusto.tests.rs");
     // Write our temporary file.
     let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
-    std::fs::write(&test_file_path, test_file).unwrap();
+    std::fs::write(test_file_path, test_file).unwrap();
 
     // Generate the library.
     crate::generate(&spec, &opts).unwrap();
@@ -249,7 +249,7 @@ fn test_ramp_generation(ctx: &mut TestContext) {
     let test_file = include_str!("../tests/library/ramp.tests.rs");
     // Write our temporary file.
     let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
-    std::fs::write(&test_file_path, test_file).unwrap();
+    std::fs::write(test_file_path, test_file).unwrap();
 
     // Generate the library.
     crate::generate(&spec, &opts).unwrap();
