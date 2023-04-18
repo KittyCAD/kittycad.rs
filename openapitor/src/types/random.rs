@@ -4,7 +4,7 @@ use std::{fmt::Write as _, str::FromStr};
 
 use anyhow::Result;
 use chrono::TimeZone;
-use rand::Rng;
+use rand::{distributions::Alphanumeric, Rng};
 
 /// A triat that implements generating a random value of a given type.
 pub trait Random {
@@ -19,7 +19,7 @@ impl Random for crate::types::phone_number::PhoneNumber {
         let mut rng = rand::thread_rng();
         let mut number = String::new();
         for _ in 0..10 {
-            number.push(rng.gen_range('0'..'9') as char);
+            number.push(rng.gen_range('0'..='9') as char);
         }
         Self::from_str(&number)
     }
@@ -141,11 +141,17 @@ impl Random for url::Url {
             1 => url.push_str("https://"),
             _ => unreachable!(),
         }
-        let mut host = String::new();
-        for _ in 0..rng.gen_range(1..10) {
-            write!(host, "{}.", rng.gen_range(0..255))?;
-        }
-        host.pop();
+        let host: String = (0..rng.gen_range(1..10usize))
+            .map(|_| {
+                // Generate a random subdomain
+                (&mut rng)
+                    .sample_iter(&Alphanumeric)
+                    .take(7)
+                    .map(char::from)
+                    .collect::<String>()
+            })
+            .collect::<Vec<_>>()
+            .join(".");
         url.push_str(&host);
         write!(url, "/{}", rng.gen_range(0..10))?;
         Ok(url::Url::parse(&url)?)
@@ -187,20 +193,18 @@ impl Random for chrono::DateTime<chrono::Utc> {
     fn random() -> Result<Self> {
         // Generate a random date and time.
         let mut rng = rand::thread_rng();
-        Ok(chrono::Utc
-            .ymd_opt(
+        let out = chrono::Utc
+            .with_ymd_and_hms(
                 rng.gen_range(1900..2100),
                 rng.gen_range(1..13),
                 rng.gen_range(1..28),
-            )
-            .unwrap()
-            .and_hms_milli_opt(
                 rng.gen_range(0..24),
                 rng.gen_range(0..60),
                 rng.gen_range(0..60),
-                rng.gen_range(0..1_000),
             )
-            .unwrap())
+            .unwrap()
+            + chrono::Duration::milliseconds(rng.gen_range(0..1_000));
+        Ok(out)
     }
 }
 
