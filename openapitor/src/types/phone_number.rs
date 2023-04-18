@@ -56,16 +56,9 @@ impl std::str::FromStr for PhoneNumber {
         }
 
         let s = if !s.trim().starts_with('+') {
-            format!("+1{}", s)
-                .replace('-', "")
-                .replace('(', "")
-                .replace(')', "")
-                .replace(' ', "")
+            format!("+1{}", s).replace(['(', ')', ' '], "")
         } else {
-            s.replace('-', "")
-                .replace('(', "")
-                .replace(')', "")
-                .replace(' ', "")
+            s.replace(['(', ')', ' '], "")
         };
 
         Ok(PhoneNumber(Some(phonenumber::parse(None, &s).map_err(
