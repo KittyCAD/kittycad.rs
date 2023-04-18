@@ -205,12 +205,11 @@ pub mod phone_number {
                 return Ok(PhoneNumber(None));
             }
             let s = if !s.trim().starts_with('+') {
-                format!("+1{}", s)
-                    .replace('-', "")
-                    .replace(['(', ')', ' '], "")
+                format!("+1{s}")
             } else {
-                s.replace(['-', '(', ')', ' '], "")
-            };
+                s.to_string()
+            }
+            .replace(['-', '(', ')', ' '], "");
             Ok(PhoneNumber(Some(phonenumber::parse(None, &s).map_err(
                 |e| anyhow::anyhow!("invalid phone number `{}`: {}", s, e),
             )?)))
