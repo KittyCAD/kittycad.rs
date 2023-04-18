@@ -26,8 +26,8 @@ impl File {
              kittycad::Client::new_from_env();\n    let result: \
              kittycad::types::File2DVectorConversion = client\n        .file()\n        \
              .create_2d_vector_conversion(\n            \
-             kittycad::types::File2DVectorExportFormat::Png,\n            \
-             kittycad::types::File2DVectorImportFormat::Dxf,\n            \
+             kittycad::types::File2DVectorExportFormat::Svg,\n            \
+             kittycad::types::File2DVectorImportFormat::Svg,\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
@@ -64,7 +64,7 @@ impl File {
         }
     }
 
-    #[doc = "Get CAD file center of mass.\n\nGet the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_center_of_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileCenterOfMass = client\n        .file()\n        .create_center_of_mass(\n            kittycad::types::File3DImportFormat::Fbx,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get CAD file center of mass.\n\nGet the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_center_of_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileCenterOfMass = client\n        .file()\n        .create_center_of_mass(\n            kittycad::types::File3DImportFormat::Step,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_center_of_mass<'a>(
         &'a self,
@@ -106,8 +106,8 @@ impl File {
              convert. (required)\n\n```rust,no_run\nasync fn example_file_create_conversion() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::FileConversion = client\n        .file()\n        \
-             .create_conversion(\n            kittycad::types::FileExportFormat::Svg,\n            \
-             kittycad::types::FileImportFormat::Dae,\n            \
+             .create_conversion(\n            kittycad::types::FileExportFormat::Obj,\n            \
+             kittycad::types::FileImportFormat::ObjZip,\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
@@ -144,7 +144,7 @@ impl File {
         }
     }
 
-    #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `material_mass: f64`: The material mass. (required)\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::File3DImportFormat::Step,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get CAD file density.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `material_mass: f64`: The material mass. (required)\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::File3DImportFormat::Fbx,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_density<'a>(
         &'a self,
@@ -186,7 +186,7 @@ impl File {
              example_file_create_execution() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::CodeOutput = \
              client\n        .file()\n        .create_execution(\n            \
-             kittycad::types::CodeLanguage::Python,\n            \
+             kittycad::types::CodeLanguage::Node,\n            \
              Some(\"some-string\".to_string()),\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
@@ -228,7 +228,7 @@ impl File {
         }
     }
 
-    #[doc = "Get CAD file mass.\n\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `material_density: f64`: The material density. (required)\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileMass = client\n        .file()\n        .create_mass(\n            3.14 as f64,\n            kittycad::types::File3DImportFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get CAD file mass.\n\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `material_density: f64`: The material density. (required)\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileMass = client\n        .file()\n        .create_mass(\n            3.14 as f64,\n            kittycad::types::File3DImportFormat::Ply,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_mass<'a>(
         &'a self,
@@ -262,7 +262,7 @@ impl File {
         }
     }
 
-    #[doc = "Get CAD file surface area.\n\nGet the surface area of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_surface_area() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileSurfaceArea = client\n        .file()\n        .create_surface_area(\n            kittycad::types::File3DImportFormat::Step,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get CAD file surface area.\n\nGet the surface area of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `src_format: crate::types::File3DImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_surface_area() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileSurfaceArea = client\n        .file()\n        .create_surface_area(\n            kittycad::types::File3DImportFormat::Dxf,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_surface_area<'a>(
         &'a self,
@@ -301,7 +301,7 @@ impl File {
              (required)\n\n```rust,no_run\nasync fn example_file_create_volume() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::FileVolume = client\n        .file()\n        \
-             .create_volume(\n            kittycad::types::File3DImportFormat::Dae,\n            \
+             .create_volume(\n            kittycad::types::File3DImportFormat::Ply,\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]

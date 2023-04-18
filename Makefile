@@ -22,7 +22,7 @@ $(SPEC):
 
 .PHONY: kittycad
 kittycad: target/debug/openapitor
-	./target/debug/openapitor -i $(SPEC) -v $(VERSION) \
+	./target/debug/openapitor -i $(SPEC) --target-version $(VERSION) \
 		-o kittycad \
 		-n kittycad \
 		-d "A fully generated & opinionated API client for the KittyCAD API." \
