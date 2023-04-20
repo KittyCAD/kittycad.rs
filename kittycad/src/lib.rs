@@ -59,7 +59,6 @@
 #![allow(clippy::needless_lifetimes)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
-#[doc(hidden)]
 /// AI uses machine learning to generate 3D meshes.
 ///
 /// FROM: <https://docs.kittycad.io/api/ai>

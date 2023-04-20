@@ -564,7 +564,7 @@ license = "MIT"
 anyhow = "1"
 async-trait = "^0.1.53"
 bytes = {{ version = "1", features = ["serde"] }}
-clap = {{ version = "4.2.2", features = ["cargo", "derive", "env", "unicode"] }}
+clap = {{ version = "4.2.4", features = ["cargo", "derive", "env", "unicode"] }}
 chrono = {{ version = "0.4", default-features = false, features = ["serde", "std"] }}
 data-encoding = "^2.3.2"
 dirs = {{ version = "^4.0.0", optional = true }}
@@ -576,7 +576,7 @@ log = {{ version = "^0.4", features = ["serde"] }}
 mime = "0.3"
 parse-display = "^0.5"
 percent-encoding = "2.1"
-phonenumber = "^0.3.1"
+phonenumber = "0.3.2"
 reqwest = {{ version = "0.11", default-features = false, features = ["json", "multipart", "rustls-tls"] }}
 reqwest-conditional-middleware = "0.1.0"
 reqwest-middleware = "0.1.5"
@@ -588,7 +588,7 @@ serde_json = "1"
 serde_urlencoded = "^0.7"
 tabled = {{ version = "0.8.0", features = ["color"] }}
 thiserror = "1"
-tokio = {{ version = "1.20.1", features = ["full"] }}
+tokio = {{ version = "1.20.1", features = ["sync"] }}
 tracing = "^0.1"
 url = {{ version = "2", features = ["serde"] }}
 uuid = {{ version = "1", features = ["serde", "v4"] }}
@@ -598,7 +598,7 @@ expectorate = "1"
 futures-util = "^0.3.26"
 pretty_assertions = "1"
 rand = "0.8"
-tokio = {{ version = "1.20.0", features = ["full"] }}
+tokio = {{ version = "1.20.0", features = ["rt", "macros"] }}
 
 [package.metadata.docs.rs]
 all-features = true
