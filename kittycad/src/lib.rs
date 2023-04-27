@@ -29,7 +29,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! kittycad = "0.2.5"
+//! kittycad = "0.2.6"
 //! ```
 //!
 //! ## Basic example
@@ -79,6 +79,10 @@ pub mod apps;
 ///
 /// FROM: <https://docs.kittycad.io/api/constant>
 pub mod constant;
+/// Drawing API for updating your 3D files using the KittyCAD engine.
+///
+/// FROM: <https://docs.kittycad.io/api/drawing>
+pub mod drawing;
 /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
 ///
 /// FROM: <https://docs.kittycad.io/api/file>
@@ -254,6 +258,13 @@ impl Client {
     /// FROM: <https://docs.kittycad.io/api/constant>
     pub fn constant(&self) -> constant::Constant {
         constant::Constant::new(self.clone())
+    }
+
+    /// Drawing API for updating your 3D files using the KittyCAD engine.
+    ///
+    /// FROM: <https://docs.kittycad.io/api/drawing>
+    pub fn drawing(&self) -> drawing::Drawing {
+        drawing::Drawing::new(self.clone())
     }
 
     /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.

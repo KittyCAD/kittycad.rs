@@ -33,13 +33,13 @@ async fn test_create_file_volume() {
 
     let result = client
         .file()
-        .create_volume(crate::types::File3DImportFormat::Obj, &body.to_vec().into())
+        .create_volume(crate::types::FileImportFormat::Obj, &body.to_vec().into())
         .await
         .unwrap();
 
     assert_eq!(result.volume, Some(53.601147));
 
-    assert_eq!(result.src_format, crate::types::File3DImportFormat::Obj);
+    assert_eq!(result.src_format, crate::types::FileImportFormat::Obj);
     assert_eq!(result.status, crate::types::ApiCallStatus::Completed);
 }
 
