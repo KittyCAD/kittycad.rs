@@ -622,101 +622,6 @@
             "type": "object"
           },
           {
-            "description": "A 2DVectorfile conversion.",
-            "properties": {
-              "completed_at": {
-                "description": "The time and date the API call was completed.",
-                "format": "date-time",
-                "nullable": true,
-                "title": "DateTime",
-                "type": "string"
-              },
-              "created_at": {
-                "description": "The time and date the API call was created.",
-                "format": "date-time",
-                "title": "DateTime",
-                "type": "string"
-              },
-              "error": {
-                "description": "The error the function returned, if any.",
-                "nullable": true,
-                "type": "string"
-              },
-              "id": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Uuid"
-                  }
-                ],
-                "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
-              },
-              "output": {
-                "description": "The converted file, if completed, base64 encoded.",
-                "format": "byte",
-                "nullable": true,
-                "title": "String",
-                "type": "string"
-              },
-              "output_format": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/File2DVectorExportFormat"
-                  }
-                ],
-                "description": "The output format of the file conversion."
-              },
-              "src_format": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/File2DVectorImportFormat"
-                  }
-                ],
-                "description": "The source format of the file conversion."
-              },
-              "started_at": {
-                "description": "The time and date the API call was started.",
-                "format": "date-time",
-                "nullable": true,
-                "title": "DateTime",
-                "type": "string"
-              },
-              "status": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/ApiCallStatus"
-                  }
-                ],
-                "description": "The status of the API call."
-              },
-              "type": {
-                "enum": [
-                  "File2DVectorConversion"
-                ],
-                "type": "string"
-              },
-              "updated_at": {
-                "description": "The time and date the API call was last updated.",
-                "format": "date-time",
-                "title": "DateTime",
-                "type": "string"
-              },
-              "user_id": {
-                "description": "The user ID of the user who created the API call.",
-                "type": "string"
-              }
-            },
-            "required": [
-              "created_at",
-              "id",
-              "output_format",
-              "src_format",
-              "status",
-              "type",
-              "updated_at"
-            ],
-            "type": "object"
-          },
-          {
             "description": "File center of mass.",
             "properties": {
               "center_of_mass": {
@@ -757,7 +662,7 @@
               "src_format": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/File3DImportFormat"
+                    "$ref": "#/components/schemas/FileImportFormat"
                   }
                 ],
                 "description": "The source format of the file."
@@ -848,7 +753,7 @@
               "src_format": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/File3DImportFormat"
+                    "$ref": "#/components/schemas/FileImportFormat"
                   }
                 ],
                 "description": "The source format of the file."
@@ -927,7 +832,7 @@
               "src_format": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/File3DImportFormat"
+                    "$ref": "#/components/schemas/FileImportFormat"
                   }
                 ],
                 "description": "The source format of the file."
@@ -1024,7 +929,7 @@
               "src_format": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/File3DImportFormat"
+                    "$ref": "#/components/schemas/FileImportFormat"
                   }
                 ],
                 "description": "The source format of the file."
@@ -1103,7 +1008,7 @@
               "src_format": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/File3DImportFormat"
+                    "$ref": "#/components/schemas/FileImportFormat"
                   }
                 ],
                 "description": "The source format of the file."
@@ -1183,7 +1088,6 @@
         "description": "The type of async API call.",
         "enum": [
           "FileConversion",
-          "File2DVectorConversion",
           "FileVolume",
           "FileCenterOfMass",
           "FileMass",
@@ -2651,6 +2555,224 @@
         },
         "type": "object"
       },
+      "DrawingCmd": {
+        "description": "Commands that the KittyCAD engine can execute.",
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "description": "Draw a circle.",
+            "properties": {
+              "DrawCircle": {
+                "properties": {
+                  "center": {
+                    "description": "The center of the circle.",
+                    "items": {
+                      "format": "float",
+                      "type": "number"
+                    },
+                    "maxItems": 3,
+                    "minItems": 3,
+                    "type": "array"
+                  },
+                  "radius": {
+                    "description": "The radius of the circle.",
+                    "format": "float",
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "center",
+                  "radius"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "DrawCircle"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Extrude a sketch.",
+            "properties": {
+              "Extrude": {
+                "properties": {
+                  "distance": {
+                    "description": "How far to extrude.",
+                    "format": "float",
+                    "type": "number"
+                  },
+                  "sketch": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/DrawingCmdId"
+                      }
+                    ],
+                    "description": "Which sketch to extrude."
+                  }
+                },
+                "required": [
+                  "distance",
+                  "sketch"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "Extrude"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "DrawingCmdId": {
+        "description": "All commands have unique IDs. These should be randomly generated.",
+        "format": "uuid",
+        "type": "string"
+      },
+      "DrawingCmdReq": {
+        "description": "A graphics command submitted to the KittyCAD engine via the Drawing API.",
+        "properties": {
+          "cmd": {
+            "$ref": "#/components/schemas/DrawingCmd"
+          },
+          "cmd_id": {
+            "$ref": "#/components/schemas/DrawingCmdId"
+          },
+          "file_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "cmd",
+          "cmd_id",
+          "file_id"
+        ],
+        "type": "object"
+      },
+      "DrawingCmdReqBatch": {
+        "description": "A batch set of graphics commands submitted to the KittyCAD engine via the Drawing API.",
+        "properties": {
+          "cmds": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/DrawingCmdReq"
+            },
+            "description": "A set of commands to submit to the KittyCAD engine in a batch.",
+            "type": "object"
+          },
+          "file_id": {
+            "description": "Which file is being drawn in.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "cmds",
+          "file_id"
+        ],
+        "type": "object"
+      },
+      "DrawingError": {
+        "description": "Why a command submitted to the Drawing API failed.",
+        "properties": {
+          "error_code": {
+            "description": "A string error code which refers to a family of errors. E.g. \"InvalidInput\".",
+            "type": "string"
+          },
+          "external_message": {
+            "description": "Describe the specific error which occurred. Will be shown to users, not logged.",
+            "type": "string"
+          },
+          "internal_message": {
+            "description": "Describe the specific error which occurred. Will be logged, not shown to users.",
+            "type": "string"
+          },
+          "status_code": {
+            "description": "A HTTP status code.",
+            "format": "uint16",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "error_code",
+          "external_message",
+          "internal_message",
+          "status_code"
+        ],
+        "type": "object"
+      },
+      "DrawingOutcome": {
+        "description": "The result from one drawing command in a batch.",
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "description": "Each successful command has some result. Unfortunately this isn't strongly typed, because the result depends on the command. This means the OpenAPI schema for this won't be very useful.",
+            "properties": {
+              "Success": {}
+            },
+            "required": [
+              "Success"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "It failed. Why? See 'struct Error' above.",
+            "properties": {
+              "Error": {
+                "$ref": "#/components/schemas/DrawingError"
+              }
+            },
+            "required": [
+              "Error"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Cancelled because it required the output of a previous command, which failed.",
+            "properties": {
+              "Cancelled": {
+                "properties": {
+                  "what_failed": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/DrawingCmdId"
+                      }
+                    ],
+                    "description": "The ID of the command that failed, cancelling this command."
+                  }
+                },
+                "required": [
+                  "what_failed"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "Cancelled"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "DrawingOutcomes": {
+        "description": "The result from a batch of drawing commands.",
+        "properties": {
+          "outcomes": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/DrawingOutcome"
+            },
+            "description": "The results from each command in the batch.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "outcomes"
+        ],
+        "type": "object"
+      },
       "EmailAuthenticationForm": {
         "description": "The body of the form for email authentication.",
         "properties": {
@@ -2896,126 +3018,6 @@
         ],
         "type": "object"
       },
-      "File2DVectorConversion": {
-        "description": "A 2D Vector file conversion.",
-        "properties": {
-          "completed_at": {
-            "description": "The time and date the API call was completed.",
-            "format": "date-time",
-            "nullable": true,
-            "title": "DateTime",
-            "type": "string"
-          },
-          "created_at": {
-            "description": "The time and date the API call was created.",
-            "format": "date-time",
-            "title": "DateTime",
-            "type": "string"
-          },
-          "error": {
-            "description": "The error the function returned, if any.",
-            "nullable": true,
-            "type": "string"
-          },
-          "id": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ],
-            "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
-          },
-          "output": {
-            "description": "The converted file, if completed, base64 encoded.",
-            "format": "byte",
-            "nullable": true,
-            "title": "String",
-            "type": "string"
-          },
-          "output_format": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/File2DVectorExportFormat"
-              }
-            ],
-            "description": "The output format of the file conversion."
-          },
-          "src_format": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/File2DVectorImportFormat"
-              }
-            ],
-            "description": "The source format of the file conversion."
-          },
-          "started_at": {
-            "description": "The time and date the API call was started.",
-            "format": "date-time",
-            "nullable": true,
-            "title": "DateTime",
-            "type": "string"
-          },
-          "status": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ApiCallStatus"
-              }
-            ],
-            "description": "The status of the API call."
-          },
-          "updated_at": {
-            "description": "The time and date the API call was last updated.",
-            "format": "date-time",
-            "title": "DateTime",
-            "type": "string"
-          },
-          "user_id": {
-            "description": "The user ID of the user who created the API call.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "created_at",
-          "id",
-          "output_format",
-          "src_format",
-          "status",
-          "updated_at"
-        ],
-        "type": "object"
-      },
-      "File2DVectorExportFormat": {
-        "description": "The valid types of Vector output file formats.",
-        "enum": [
-          "dxf",
-          "png",
-          "ps",
-          "svg"
-        ],
-        "type": "string"
-      },
-      "File2DVectorImportFormat": {
-        "description": "The valid types of Vector source file formats.",
-        "enum": [
-          "dxf",
-          "svg"
-        ],
-        "type": "string"
-      },
-      "File3DImportFormat": {
-        "description": "The valid types of 3d source file formats, can include formats that use suplimentary files. For example, the OBJ format can use a MTL file.",
-        "enum": [
-          "dae",
-          "dxf",
-          "fbx",
-          "obj_zip",
-          "obj",
-          "ply",
-          "step",
-          "stl"
-        ],
-        "type": "string"
-      },
       "FileCenterOfMass": {
         "description": "A file center of mass result.",
         "properties": {
@@ -3057,7 +3059,7 @@
           "src_format": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/File3DImportFormat"
+                "$ref": "#/components/schemas/FileImportFormat"
               }
             ],
             "description": "The source format of the file."
@@ -3229,7 +3231,7 @@
           "src_format": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/File3DImportFormat"
+                "$ref": "#/components/schemas/FileImportFormat"
               }
             ],
             "description": "The source format of the file."
@@ -3279,8 +3281,7 @@
           "obj",
           "ply",
           "step",
-          "stl",
-          "svg"
+          "stl"
         ],
         "type": "string"
       },
@@ -3294,8 +3295,7 @@
           "obj",
           "ply",
           "step",
-          "stl",
-          "svg"
+          "stl"
         ],
         "type": "string"
       },
@@ -3343,7 +3343,7 @@
           "src_format": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/File3DImportFormat"
+                "$ref": "#/components/schemas/FileImportFormat"
               }
             ],
             "description": "The source format of the file."
@@ -3415,7 +3415,7 @@
           "src_format": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/File3DImportFormat"
+                "$ref": "#/components/schemas/FileImportFormat"
               }
             ],
             "description": "The source format of the file."
@@ -3506,7 +3506,7 @@
           "src_format": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/File3DImportFormat"
+                "$ref": "#/components/schemas/FileImportFormat"
               }
             ],
             "description": "The source format of the file."
@@ -9168,53 +9168,28 @@
         ]
       }
     },
-    "/file/2d/vector/conversion/{src_format}/{output_format}": {
+    "/drawing/cmd": {
       "post": {
-        "description": "Convert a 2D Vector file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\nIf the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
-        "operationId": "create_file_2d_vector_conversion",
-        "parameters": [
-          {
-            "description": "The format the file should be converted to.",
-            "in": "path",
-            "name": "output_format",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/File2DVectorExportFormat"
-            },
-            "style": "simple"
-          },
-          {
-            "description": "The format of the file to convert.",
-            "in": "path",
-            "name": "src_format",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/File2DVectorImportFormat"
-            },
-            "style": "simple"
-          }
-        ],
+        "description": "Response depends on which command was submitted, so unfortunately the OpenAPI schema can't generate the right response type.",
+        "operationId": "cmd",
         "requestBody": {
           "content": {
-            "application/octet-stream": {
+            "application/json": {
               "schema": {
-                "format": "binary",
-                "type": "string"
+                "$ref": "#/components/schemas/DrawingCmdReq"
               }
             }
           },
           "required": true
         },
         "responses": {
-          "201": {
+          "200": {
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/File2DVectorConversion"
-                }
+                "schema": {}
               }
             },
-            "description": "successful creation",
+            "description": "successful operation",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -9257,9 +9232,82 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert 2D Vector file.",
+        "summary": "Submit one drawing operation.",
         "tags": [
-          "file"
+          "drawing",
+          "hidden"
+        ]
+      }
+    },
+    "/drawing/cmd_batch": {
+      "post": {
+        "operationId": "cmd_batch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DrawingCmdReqBatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DrawingOutcomes"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Submit many drawing operations.",
+        "tags": [
+          "drawing",
+          "hidden"
         ]
       }
     },
@@ -9274,7 +9322,7 @@
             "name": "src_format",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/File3DImportFormat"
+              "$ref": "#/components/schemas/FileImportFormat"
             },
             "style": "form"
           }
@@ -9466,7 +9514,7 @@
             "name": "src_format",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/File3DImportFormat"
+              "$ref": "#/components/schemas/FileImportFormat"
             },
             "style": "form"
           }
@@ -9658,7 +9706,7 @@
             "name": "src_format",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/File3DImportFormat"
+              "$ref": "#/components/schemas/FileImportFormat"
             },
             "style": "form"
           }
@@ -9744,7 +9792,7 @@
             "name": "src_format",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/File3DImportFormat"
+              "$ref": "#/components/schemas/FileImportFormat"
             },
             "style": "form"
           }
@@ -9830,7 +9878,7 @@
             "name": "src_format",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/File3DImportFormat"
+              "$ref": "#/components/schemas/FileImportFormat"
             },
             "style": "form"
           }
@@ -15578,6 +15626,13 @@
         "url": "https://docs.kittycad.io/api/constant"
       },
       "name": "constant"
+    },
+    {
+      "description": "Drawing API for updating your 3D files using the KittyCAD engine.",
+      "externalDocs": {
+        "url": "https://docs.kittycad.io/api/drawing"
+      },
+      "name": "drawing"
     },
     {
       "description": "CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.",
