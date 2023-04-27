@@ -232,7 +232,7 @@
         "src_format": {
           "allOf": [
             {
-              "$ref": "#/components/schemas/File3DImportFormat"
+              "$ref": "#/components/schemas/FileImportFormat"
             }
           ],
           "description": "The source format of the file."
@@ -323,7 +323,7 @@
         "src_format": {
           "allOf": [
             {
-              "$ref": "#/components/schemas/File3DImportFormat"
+              "$ref": "#/components/schemas/FileImportFormat"
             }
           ],
           "description": "The source format of the file."
@@ -402,7 +402,7 @@
         "src_format": {
           "allOf": [
             {
-              "$ref": "#/components/schemas/File3DImportFormat"
+              "$ref": "#/components/schemas/FileImportFormat"
             }
           ],
           "description": "The source format of the file."
@@ -499,7 +499,7 @@
         "src_format": {
           "allOf": [
             {
-              "$ref": "#/components/schemas/File3DImportFormat"
+              "$ref": "#/components/schemas/FileImportFormat"
             }
           ],
           "description": "The source format of the file."
@@ -578,7 +578,7 @@
         "src_format": {
           "allOf": [
             {
-              "$ref": "#/components/schemas/File3DImportFormat"
+              "$ref": "#/components/schemas/FileImportFormat"
             }
           ],
           "description": "The source format of the file."
