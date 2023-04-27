@@ -25,7 +25,7 @@ pub struct FileDensity {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub material_mass: Option<f64>,
     #[doc = "The source format of the file."]
-    pub src_format: File3DImportFormat,
+    pub src_format: FileImportFormat,
     #[doc = "The time and date the API call was started."]
     #[serde(
         default,
