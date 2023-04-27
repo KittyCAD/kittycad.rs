@@ -1347,7 +1347,6 @@ impl tabled::Tabled for AsyncApiCall {
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
     FileConversion(FileConversion),
-    File2DVectorConversion(File2DVectorConversion),
     FileCenterOfMass(FileCenterOfMass),
     FileMass(FileMass),
     FileVolume(FileVolume),
@@ -1438,7 +1437,6 @@ impl tabled::Tabled for AsyncApiCallResultsPage {
 )]
 pub enum AsyncApiCallType {
     FileConversion,
-    File2DVectorConversion,
     FileVolume,
     FileCenterOfMass,
     FileMass,
@@ -4333,6 +4331,428 @@ impl tabled::Tabled for DockerSystemInfo {
     }
 }
 
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DrawCircle {
+    #[doc = "The center of the circle."]
+    pub center: Vec<f64>,
+    #[doc = "The radius of the circle."]
+    pub radius: f64,
+}
+
+impl std::fmt::Display for DrawCircle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for DrawCircle {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.center), format!("{:?}", self.radius)]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["center".to_string(), "radius".to_string()]
+    }
+}
+
+#[doc = "Draw a circle."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DrawingCmdOneOf {
+    #[serde(rename = "DrawCircle")]
+    pub draw_circle: DrawCircle,
+}
+
+impl std::fmt::Display for DrawingCmdOneOf {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for DrawingCmdOneOf {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.draw_circle)]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["draw_circle".to_string()]
+    }
+}
+
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Extrude {
+    #[doc = "How far to extrude."]
+    pub distance: f64,
+    #[doc = "Which sketch to extrude."]
+    pub sketch: uuid::Uuid,
+}
+
+impl std::fmt::Display for Extrude {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for Extrude {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.distance), format!("{:?}", self.sketch)]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["distance".to_string(), "sketch".to_string()]
+    }
+}
+
+#[doc = "Extrude a sketch."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DrawingCmdOneOfOneOf {
+    #[serde(rename = "Extrude")]
+    pub extrude: Extrude,
+}
+
+impl std::fmt::Display for DrawingCmdOneOfOneOf {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for DrawingCmdOneOfOneOf {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.extrude)]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["extrude".to_string()]
+    }
+}
+
+#[doc = "Commands that the KittyCAD engine can execute."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub enum DrawingCmd {
+    DrawingCmdOneOf(DrawingCmdOneOf),
+    DrawingCmdOneOfOneOf(DrawingCmdOneOfOneOf),
+}
+
+#[doc = "A graphics command submitted to the KittyCAD engine via the Drawing API."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DrawingCmdReq {
+    #[doc = "Commands that the KittyCAD engine can execute."]
+    pub cmd: DrawingCmd,
+    #[doc = "All commands have unique IDs. These should be randomly generated."]
+    pub cmd_id: uuid::Uuid,
+    pub file_id: String,
+}
+
+impl std::fmt::Display for DrawingCmdReq {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for DrawingCmdReq {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            format!("{:?}", self.cmd),
+            format!("{:?}", self.cmd_id),
+            self.file_id.clone(),
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "cmd".to_string(),
+            "cmd_id".to_string(),
+            "file_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "A batch set of graphics commands submitted to the KittyCAD engine via the Drawing API."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DrawingCmdReqBatch {
+    #[doc = "A set of commands to submit to the KittyCAD engine in a batch."]
+    pub cmds: std::collections::HashMap<String, DrawingCmdReq>,
+    #[doc = "Which file is being drawn in."]
+    pub file_id: String,
+}
+
+impl std::fmt::Display for DrawingCmdReqBatch {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for DrawingCmdReqBatch {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.cmds), self.file_id.clone()]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["cmds".to_string(), "file_id".to_string()]
+    }
+}
+
+#[doc = "Why a command submitted to the Drawing API failed."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DrawingError {
+    #[doc = "A string error code which refers to a family of errors. E.g. \"InvalidInput\"."]
+    pub error_code: String,
+    #[doc = "Describe the specific error which occurred. Will be shown to users, not logged."]
+    pub external_message: String,
+    #[doc = "Describe the specific error which occurred. Will be logged, not shown to users."]
+    pub internal_message: String,
+    #[doc = "A HTTP status code."]
+    pub status_code: u16,
+}
+
+impl std::fmt::Display for DrawingError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for DrawingError {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            self.error_code.clone(),
+            self.external_message.clone(),
+            self.internal_message.clone(),
+            format!("{:?}", self.status_code),
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "error_code".to_string(),
+            "external_message".to_string(),
+            "internal_message".to_string(),
+            "status_code".to_string(),
+        ]
+    }
+}
+
+#[doc = "Each successful command has some result. Unfortunately this isn't strongly typed, because the result depends on the command. This means the OpenAPI schema for this won't be very useful."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DrawingOutcomeOneOf {
+    #[serde(rename = "Success")]
+    pub success: serde_json::Value,
+}
+
+impl std::fmt::Display for DrawingOutcomeOneOf {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for DrawingOutcomeOneOf {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.success)]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["success".to_string()]
+    }
+}
+
+#[doc = "It failed. Why? See 'struct Error' above."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DrawingOutcomeOneOfOneOf {
+    #[doc = "Why a command submitted to the Drawing API failed."]
+    #[serde(rename = "Error")]
+    pub error: DrawingError,
+}
+
+impl std::fmt::Display for DrawingOutcomeOneOfOneOf {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for DrawingOutcomeOneOfOneOf {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.error)]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["error".to_string()]
+    }
+}
+
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Cancelled {
+    #[doc = "The ID of the command that failed, cancelling this command."]
+    pub what_failed: uuid::Uuid,
+}
+
+impl std::fmt::Display for Cancelled {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for Cancelled {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.what_failed)]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["what_failed".to_string()]
+    }
+}
+
+#[doc = "Cancelled because it required the output of a previous command, which failed."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DrawingOutcomeOneOfOneOfOneOf {
+    #[serde(rename = "Cancelled")]
+    pub cancelled: Cancelled,
+}
+
+impl std::fmt::Display for DrawingOutcomeOneOfOneOfOneOf {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for DrawingOutcomeOneOfOneOfOneOf {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.cancelled)]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["cancelled".to_string()]
+    }
+}
+
+#[doc = "The result from one drawing command in a batch."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+)]
+pub enum DrawingOutcome {
+    DrawingOutcomeOneOf(DrawingOutcomeOneOf),
+    DrawingOutcomeOneOfOneOf(DrawingOutcomeOneOfOneOf),
+    DrawingOutcomeOneOfOneOfOneOf(DrawingOutcomeOneOfOneOfOneOf),
+}
+
+#[doc = "The result from a batch of drawing commands."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DrawingOutcomes {
+    #[doc = "The results from each command in the batch."]
+    pub outcomes: std::collections::HashMap<String, DrawingOutcome>,
+}
+
+impl std::fmt::Display for DrawingOutcomes {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for DrawingOutcomes {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.outcomes)]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["outcomes".to_string()]
+    }
+}
+
 #[doc = "The body of the form for email authentication."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4761,198 +5181,6 @@ impl tabled::Tabled for ExtendedUserResultsPage {
     }
 }
 
-#[doc = "A 2D Vector file conversion."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct File2DVectorConversion {
-    #[doc = "The time and date the API call was completed."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the API call was created."]
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The error the function returned, if any."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
-    pub id: uuid::Uuid,
-    #[doc = "The converted file, if completed, base64 encoded."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub output: Option<base64::Base64Data>,
-    #[doc = "The output format of the file conversion."]
-    pub output_format: File2DVectorExportFormat,
-    #[doc = "The source format of the file conversion."]
-    pub src_format: File2DVectorImportFormat,
-    #[doc = "The time and date the API call was started."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the API call."]
-    pub status: ApiCallStatus,
-    #[doc = "The time and date the API call was last updated."]
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
-}
-
-impl std::fmt::Display for File2DVectorConversion {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for File2DVectorConversion {
-    const LENGTH: usize = 11;
-    fn fields(&self) -> Vec<String> {
-        vec![
-            if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
-            } else {
-                String::new()
-            },
-            format!("{:?}", self.created_at),
-            if let Some(error) = &self.error {
-                format!("{:?}", error)
-            } else {
-                String::new()
-            },
-            format!("{:?}", self.id),
-            if let Some(output) = &self.output {
-                format!("{:?}", output)
-            } else {
-                String::new()
-            },
-            format!("{:?}", self.output_format),
-            format!("{:?}", self.src_format),
-            if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
-            } else {
-                String::new()
-            },
-            format!("{:?}", self.status),
-            format!("{:?}", self.updated_at),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
-            } else {
-                String::new()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<String> {
-        vec![
-            "completed_at".to_string(),
-            "created_at".to_string(),
-            "error".to_string(),
-            "id".to_string(),
-            "output".to_string(),
-            "output_format".to_string(),
-            "src_format".to_string(),
-            "started_at".to_string(),
-            "status".to_string(),
-            "updated_at".to_string(),
-            "user_id".to_string(),
-        ]
-    }
-}
-
-#[doc = "The valid types of Vector output file formats."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-pub enum File2DVectorExportFormat {
-    #[serde(rename = "dxf")]
-    #[display("dxf")]
-    Dxf,
-    #[serde(rename = "png")]
-    #[display("png")]
-    Png,
-    #[serde(rename = "ps")]
-    #[display("ps")]
-    Ps,
-    #[serde(rename = "svg")]
-    #[display("svg")]
-    Svg,
-}
-
-#[doc = "The valid types of Vector source file formats."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-pub enum File2DVectorImportFormat {
-    #[serde(rename = "dxf")]
-    #[display("dxf")]
-    Dxf,
-    #[serde(rename = "svg")]
-    #[display("svg")]
-    Svg,
-}
-
-#[doc = "The valid types of 3d source file formats, can include formats that use suplimentary files. For example, the OBJ format can use a MTL file."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-pub enum File3DImportFormat {
-    #[serde(rename = "dae")]
-    #[display("dae")]
-    Dae,
-    #[serde(rename = "dxf")]
-    #[display("dxf")]
-    Dxf,
-    #[serde(rename = "fbx")]
-    #[display("fbx")]
-    Fbx,
-    #[serde(rename = "obj_zip")]
-    #[display("obj_zip")]
-    ObjZip,
-    #[serde(rename = "obj")]
-    #[display("obj")]
-    Obj,
-    #[serde(rename = "ply")]
-    #[display("ply")]
-    Ply,
-    #[serde(rename = "step")]
-    #[display("step")]
-    Step,
-    #[serde(rename = "stl")]
-    #[display("stl")]
-    Stl,
-}
-
 #[doc = "A file center of mass result."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4972,7 +5200,7 @@ pub struct FileCenterOfMass {
     #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The source format of the file."]
-    pub src_format: File3DImportFormat,
+    pub src_format: FileImportFormat,
     #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -5169,7 +5397,7 @@ pub struct FileDensity {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub material_mass: Option<f64>,
     #[doc = "The source format of the file."]
-    pub src_format: File3DImportFormat,
+    pub src_format: FileImportFormat,
     #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -5290,9 +5518,6 @@ pub enum FileExportFormat {
     #[serde(rename = "stl")]
     #[display("stl")]
     Stl,
-    #[serde(rename = "svg")]
-    #[display("svg")]
-    Svg,
 }
 
 #[doc = "The valid types of source file formats."]
@@ -5334,9 +5559,6 @@ pub enum FileImportFormat {
     #[serde(rename = "stl")]
     #[display("stl")]
     Stl,
-    #[serde(rename = "svg")]
-    #[display("svg")]
-    Svg,
 }
 
 #[doc = "A file mass result."]
@@ -5361,7 +5583,7 @@ pub struct FileMass {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub material_density: Option<f64>,
     #[doc = "The source format of the file."]
-    pub src_format: File3DImportFormat,
+    pub src_format: FileImportFormat,
     #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -5459,7 +5681,7 @@ pub struct FileSurfaceArea {
     #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The source format of the file."]
-    pub src_format: File3DImportFormat,
+    pub src_format: FileImportFormat,
     #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -5584,7 +5806,7 @@ pub struct FileVolume {
     #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The source format of the file."]
-    pub src_format: File3DImportFormat,
+    pub src_format: FileImportFormat,
     #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
