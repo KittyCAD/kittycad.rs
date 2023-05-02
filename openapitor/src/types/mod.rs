@@ -356,6 +356,43 @@ impl TypeSpace {
             return self.render_schema(name, first);
         }
 
+        // Check if this is a one_of with only one enum in each.
+        let mut is_enum_with_docs = false;
+        let mut enum_docs: Vec<String> = Default::default();
+        let mut enum_schema = openapiv3::StringType {
+            enumeration: Default::default(),
+            ..Default::default()
+        };
+        for one_of in one_ofs {
+            let schema = one_of.get_schema_from_reference(&self.spec, true)?;
+            if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) = &schema.schema_kind {
+                if s.enumeration.len() == 1 {
+                    // This is an enum with only one value.
+                    // Add the description to our array of descriptions.
+                    is_enum_with_docs = true;
+                    if let Some(description) = &schema.schema_data.description {
+                        enum_docs.push(description.clone());
+                    } else {
+                        enum_docs.push("".to_string());
+                    }
+                    // Add the value to our enum.
+                    enum_schema.enumeration.push(s.enumeration[0].clone());
+                } else {
+                    // This is not an object.
+                    is_enum_with_docs = false;
+                    break;
+                }
+            } else {
+                // This is not an object.
+                is_enum_with_docs = false;
+                break;
+            }
+        }
+
+        if is_enum_with_docs {
+            return self.render_enum(name, &enum_schema, data, enum_docs);
+        }
+
         let tag_result = get_one_of_tag(one_ofs, &self.spec)?;
 
         let mut serde_options = Vec::new();
@@ -768,7 +805,7 @@ impl TypeSpace {
         data: &openapiv3::SchemaData,
     ) -> Result<()> {
         if !s.enumeration.is_empty() {
-            return self.render_enum(name, s, data);
+            return self.render_enum(name, s, data, vec![]);
         }
 
         if let Some(ref max_length) = s.max_length {
@@ -797,6 +834,8 @@ impl TypeSpace {
         name: &str,
         s: &openapiv3::StringType,
         data: &openapiv3::SchemaData,
+        // The additional doc strings for the enum if they exist.
+        additional_docs: Vec<String>,
     ) -> Result<()> {
         if s.enumeration.is_empty() {
             anyhow::bail!("Cannot render empty string enumeration: {}", name);
@@ -813,7 +852,7 @@ impl TypeSpace {
         let enum_name = get_type_name(name, data)?;
 
         let mut values = quote!();
-        for e in &s.enumeration {
+        for (index, e) in s.enumeration.iter().enumerate() {
             if e.is_none() {
                 // GitHub will sometimes put in a null value.
                 // But it's fine because they also mark it as null.
@@ -840,6 +879,16 @@ impl TypeSpace {
                 );
             }
 
+            // Check if we have a description for the enum.
+            if let Some(description) = additional_docs.get(index) {
+                if !description.is_empty() {
+                    let description_sanitized = sanitize_indents(description);
+                    e_value = quote!(
+                        #[doc = #description_sanitized]
+                        #e_value
+                    );
+                }
+            }
             values = quote!(
                 #values
 
@@ -2319,6 +2368,27 @@ mod test {
 
         expectorate::assert_contents(
             "tests/types/kittycad.file-density-date-time-override-output.rs.gen",
+            &super::get_text_fmt(&type_space.rendered).unwrap(),
+        );
+    }
+
+    #[test]
+    fn test_render_one_of_enum_types() {
+        let schema = include_str!("../../tests/types/input/AccountProvider.json");
+
+        let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
+
+        let mut type_space = super::TypeSpace {
+            types: indexmap::map::IndexMap::new(),
+            spec: crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
+            rendered: quote!(),
+            opts: Default::default(),
+        };
+
+        type_space.render_schema("AccountProvier", &schema).unwrap();
+
+        expectorate::assert_contents(
+            "tests/types/kittycad.account-provider-output.rs.gen",
             &super::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
