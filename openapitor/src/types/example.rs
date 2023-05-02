@@ -478,12 +478,10 @@ pub fn generate_example_rust_from_schema(
                                     inner_array,
                                 )) = &item.schema_kind
                                 {
-                                    if let Some(inner_array_items) = &inner_array.items {
-                                        if let openapiv3::ReferenceOr::Item(item_schema) =
-                                            inner_array_items
-                                        {
-                                            item = item_schema.clone();
-                                        }
+                                    if let Some(openapiv3::ReferenceOr::Item(item_schema)) =
+                                        &inner_array.items
+                                    {
+                                        item = item_schema.clone();
                                     }
                                 }
                                 if rendered.schema_kind != item.schema_kind
@@ -492,7 +490,7 @@ pub fn generate_example_rust_from_schema(
                                     // Update the name of the type.
                                     t_name = crate::types::get_type_name_for_schema(
                                         &format!("{} {}", name, k),
-                                        &s,
+                                        s,
                                         &type_space.spec,
                                         true,
                                     )?;
@@ -620,118 +618,112 @@ pub fn generate_example_rust_from_schema(
                     .map_err(|err| anyhow::anyhow!("{}", err))?;
 
                 quote!(#name_ident::#item_ident)
+            } else if one_of.len() == 1 {
+                let one_of_item = &one_of[0];
+                let one_of_item_schema =
+                    one_of_item.get_schema_from_reference(&type_space.spec, true)?;
+                generate_example_rust_from_schema(type_space, name, &one_of_item_schema)?
             } else {
-                if one_of.len() == 1 {
-                    let one_of_item = &one_of[0];
-                    let one_of_item_schema =
-                        one_of_item.get_schema_from_reference(&type_space.spec, true)?;
-                    generate_example_rust_from_schema(type_space, name, &one_of_item_schema)?
-                } else {
-                    let type_name = crate::types::get_type_name_for_schema(
-                        name,
-                        schema,
-                        &type_space.spec,
-                        false,
-                    )?;
+                let type_name =
+                    crate::types::get_type_name_for_schema(name, schema, &type_space.spec, false)?;
 
-                    let tag_result = crate::types::get_one_of_tag(one_of, &type_space.spec)?;
-                    let mut ts = type_space.clone();
-                    let (values, _) = ts.get_one_of_values(name, one_of, &tag_result, false)?;
+                let tag_result = crate::types::get_one_of_tag(one_of, &type_space.spec)?;
+                let mut ts = type_space.clone();
+                let (values, _) = ts.get_one_of_values(name, one_of, &tag_result, false)?;
 
-                    if let Some((k, v)) = values.into_iter().next() {
-                        let enum_name: proc_macro2::TokenStream =
-                            k.parse().map_err(|e| anyhow::anyhow!("{}", e))?;
+                if let Some((k, v)) = values.into_iter().next() {
+                    let enum_name: proc_macro2::TokenStream =
+                        k.parse().map_err(|e| anyhow::anyhow!("{}", e))?;
 
-                        if let Some(content) = &tag_result.content {
-                            // We want to get the content type from the one_of.
-                            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
-                                &v.expand(&type_space.spec)?.schema_kind
-                            {
-                                if let Some(s) = o.properties.get(content) {
-                                    let example_schema =
-                                        s.get_schema_from_reference(&type_space.spec, true)?;
-                                    let example = generate_example_rust_from_schema(
-                                        type_space,
-                                        name,
-                                        &example_schema,
-                                    )?;
-                                    quote!(#type_name::#enum_name(#example))
-                                } else {
-                                    anyhow::bail!(
-                                        "no content property `{}` found in one_of: {:?}",
-                                        content,
-                                        o
-                                    )
-                                }
-                            } else {
-                                anyhow::bail!("one of item is not an object: {:?}", v)
-                            }
-                        } else if let Some(tag) = &tag_result.tag {
-                            // We want to get the content type from the one_of.
-                            let expanded = v.expand(&type_space.spec)?;
-                            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
-                                &expanded.schema_kind
-                            {
-                                // Remove the tag from the object.
-                                let mut properties = o.properties.clone();
-                                properties.remove(tag);
-                                let o = openapiv3::ObjectType {
-                                    properties,
-                                    required: o.required.clone(),
-                                    additional_properties: o.additional_properties.clone(),
-                                    ..Default::default()
-                                };
-                                // Create our schema.
-                                let schema = openapiv3::Schema {
-                                    schema_kind: openapiv3::SchemaKind::Type(
-                                        openapiv3::Type::Object(o),
-                                    ),
-                                    schema_data: expanded.schema_data.clone(),
-                                };
+                    if let Some(content) = &tag_result.content {
+                        // We want to get the content type from the one_of.
+                        if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
+                            &v.expand(&type_space.spec)?.schema_kind
+                        {
+                            if let Some(s) = o.properties.get(content) {
+                                let example_schema =
+                                    s.get_schema_from_reference(&type_space.spec, true)?;
                                 let example = generate_example_rust_from_schema(
                                     type_space,
-                                    &enum_name.rendered()?,
-                                    &schema,
-                                )?
-                                .to_string();
-
-                                let rendered = example
-                                    .trim_start_matches("crate::types::")
-                                    .trim_start_matches("crate :: types ::");
-                                let example: proc_macro2::TokenStream =
-                                    rendered.parse().map_err(|e| anyhow::anyhow!("{}", e))?;
-                                quote!(#type_name::#example)
+                                    name,
+                                    &example_schema,
+                                )?;
+                                quote!(#type_name::#enum_name(#example))
                             } else {
-                                anyhow::bail!("one of item is not an object: {:?}", v)
+                                anyhow::bail!(
+                                    "no content property `{}` found in one_of: {:?}",
+                                    content,
+                                    o
+                                )
                             }
                         } else {
-                            let inner_name = match &v {
-                                openapiv3::ReferenceOr::Reference { .. } => {
-                                    crate::types::get_type_name_from_reference(
-                                        &v.reference()?,
-                                        &type_space.spec,
-                                        true,
-                                    )?
-                                }
-                                openapiv3::ReferenceOr::Item(s) => {
-                                    crate::types::get_type_name_for_schema(
-                                        &k,
-                                        s,
-                                        &type_space.spec,
-                                        true,
-                                    )?
-                                }
+                            anyhow::bail!("one of item is not an object: {:?}", v)
+                        }
+                    } else if let Some(tag) = &tag_result.tag {
+                        // We want to get the content type from the one_of.
+                        let expanded = v.expand(&type_space.spec)?;
+                        if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
+                            &expanded.schema_kind
+                        {
+                            // Remove the tag from the object.
+                            let mut properties = o.properties.clone();
+                            properties.remove(tag);
+                            let o = openapiv3::ObjectType {
+                                properties,
+                                required: o.required.clone(),
+                                additional_properties: o.additional_properties.clone(),
+                                ..Default::default()
+                            };
+                            // Create our schema.
+                            let schema = openapiv3::Schema {
+                                schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(
+                                    o,
+                                )),
+                                schema_data: expanded.schema_data.clone(),
                             };
                             let example = generate_example_rust_from_schema(
                                 type_space,
-                                &inner_name.rendered()?,
-                                &v.expand(&type_space.spec)?,
-                            )?;
-                            quote!(#type_name::#enum_name(#example))
+                                &enum_name.rendered()?,
+                                &schema,
+                            )?
+                            .to_string();
+
+                            let rendered = example
+                                .trim_start_matches("crate::types::")
+                                .trim_start_matches("crate :: types ::");
+                            let example: proc_macro2::TokenStream =
+                                rendered.parse().map_err(|e| anyhow::anyhow!("{}", e))?;
+                            quote!(#type_name::#example)
+                        } else {
+                            anyhow::bail!("one of item is not an object: {:?}", v)
                         }
                     } else {
-                        anyhow::bail!("no one_of values found")
+                        let inner_name = match &v {
+                            openapiv3::ReferenceOr::Reference { .. } => {
+                                crate::types::get_type_name_from_reference(
+                                    &v.reference()?,
+                                    &type_space.spec,
+                                    true,
+                                )?
+                            }
+                            openapiv3::ReferenceOr::Item(s) => {
+                                crate::types::get_type_name_for_schema(
+                                    &k,
+                                    s,
+                                    &type_space.spec,
+                                    true,
+                                )?
+                            }
+                        };
+                        let example = generate_example_rust_from_schema(
+                            type_space,
+                            &inner_name.rendered()?,
+                            &v.expand(&type_space.spec)?,
+                        )?;
+                        quote!(#type_name::#enum_name(#example))
                     }
+                } else {
+                    anyhow::bail!("no one_of values found")
                 }
             }
         }

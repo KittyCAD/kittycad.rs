@@ -566,10 +566,9 @@ impl TypeSpace {
                     if let openapiv3::SchemaKind::Type(openapiv3::Type::Array(inner_array)) =
                         &inner_schema.schema_kind
                     {
-                        if let Some(inner_array_items) = &inner_array.items {
-                            if let openapiv3::ReferenceOr::Item(item_schema) = inner_array_items {
-                                compare_inner_schema = item_schema.clone();
-                            }
+                        if let Some(openapiv3::ReferenceOr::Item(item_schema)) = &inner_array.items
+                        {
+                            compare_inner_schema = item_schema.clone();
                         }
                     }
                     if prop == "emails" {
