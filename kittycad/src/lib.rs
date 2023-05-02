@@ -83,6 +83,10 @@ pub mod constant;
 ///
 /// FROM: <https://docs.kittycad.io/api/drawing>
 pub mod drawing;
+/// Endpoints that allow for code execution or creation of code execution environments.
+///
+/// FROM: <https://docs.kittycad.io/api/executor>
+pub mod executor;
 /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
 ///
 /// FROM: <https://docs.kittycad.io/api/file>
@@ -103,10 +107,6 @@ pub mod oauth2;
 ///
 /// FROM: <https://docs.kittycad.io/api/payments>
 pub mod payments;
-/// Sessions allow users to call the API from their session cookie in the browser.
-///
-/// FROM: <https://docs.kittycad.io/api/sessions>
-pub mod sessions;
 #[cfg(test)]
 mod tests;
 pub mod types;
@@ -267,6 +267,13 @@ impl Client {
         drawing::Drawing::new(self.clone())
     }
 
+    /// Endpoints that allow for code execution or creation of code execution environments.
+    ///
+    /// FROM: <https://docs.kittycad.io/api/executor>
+    pub fn executor(&self) -> executor::Executor {
+        executor::Executor::new(self.clone())
+    }
+
     /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
     ///
     /// FROM: <https://docs.kittycad.io/api/file>
@@ -300,13 +307,6 @@ impl Client {
     /// FROM: <https://docs.kittycad.io/api/payments>
     pub fn payments(&self) -> payments::Payments {
         payments::Payments::new(self.clone())
-    }
-
-    /// Sessions allow users to call the API from their session cookie in the browser.
-    ///
-    /// FROM: <https://docs.kittycad.io/api/sessions>
-    pub fn sessions(&self) -> sessions::Sessions {
-        sessions::Sessions::new(self.clone())
     }
 
     /// Unit conversion operations.

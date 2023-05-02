@@ -94,6 +94,26 @@ impl Meta {
         }
     }
 
+    #[doc = "Get prometheus metrics\n\nYou must be a KittyCAD employee to perform this \
+             request.\n\n```rust,no_run\nasync fn example_meta_get_metrics() -> anyhow::Result<()> \
+             {\n    let client = kittycad::Client::new_from_env();\n    \
+             client.meta().get_metrics().await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_metrics<'a>(&'a self) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "_meta/metrics"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
+        }
+    }
+
     #[doc = "Get AI plugin OpenAPI schema.\n\nThis is the same as the OpenAPI schema, BUT it has \
              some modifications to make it compatible with OpenAI. For example, descriptions must \
              be < 300 chars.\n\n```rust,no_run\nasync fn example_meta_get_openai_schema() -> \
