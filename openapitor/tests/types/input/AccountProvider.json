@@ -1,0 +1,19 @@
+{
+  "description": "An account provider.",
+  "oneOf": [
+    {
+      "description": "The Google account provider.",
+      "enum": [
+        "google"
+      ],
+      "type": "string"
+    },
+    {
+      "description": "The GitHub account provider.",
+      "enum": [
+        "github"
+      ],
+      "type": "string"
+    }
+  ]
+}

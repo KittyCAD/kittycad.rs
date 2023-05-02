@@ -478,12 +478,10 @@ pub fn generate_example_rust_from_schema(
                                     inner_array,
                                 )) = &item.schema_kind
                                 {
-                                    if let Some(inner_array_items) = &inner_array.items {
-                                        if let openapiv3::ReferenceOr::Item(item_schema) =
-                                            inner_array_items
-                                        {
-                                            item = item_schema.clone();
-                                        }
+                                    if let Some(openapiv3::ReferenceOr::Item(item_schema)) =
+                                        &inner_array.items
+                                    {
+                                        item = item_schema.clone();
                                     }
                                 }
                                 if rendered.schema_kind != item.schema_kind
@@ -492,7 +490,7 @@ pub fn generate_example_rust_from_schema(
                                     // Update the name of the type.
                                     t_name = crate::types::get_type_name_for_schema(
                                         &format!("{} {}", name, k),
-                                        &s,
+                                        s,
                                         &type_space.spec,
                                         true,
                                     )?;
@@ -572,7 +570,55 @@ pub fn generate_example_rust_from_schema(
             quote!(#b)
         }
         openapiv3::SchemaKind::OneOf { one_of } => {
-            if one_of.len() == 1 {
+            let mut is_enum_with_docs = false;
+            let mut enum_schema = openapiv3::StringType {
+                enumeration: Default::default(),
+                ..Default::default()
+            };
+            for of in one_of {
+                let schema = of.get_schema_from_reference(&type_space.spec, true)?;
+                if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) = &schema.schema_kind
+                {
+                    if s.enumeration.len() == 1 {
+                        // This is an enum with only one value.
+                        // Add the description to our array of descriptions.
+                        is_enum_with_docs = true;
+                        // Add the value to our enum.
+                        enum_schema.enumeration.push(s.enumeration[0].clone());
+                    } else {
+                        // This is not an object.
+                        is_enum_with_docs = false;
+                        break;
+                    }
+                } else {
+                    // This is not an object.
+                    is_enum_with_docs = false;
+                    break;
+                }
+            }
+
+            if is_enum_with_docs {
+                let enum_schema = openapiv3::Schema {
+                    schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::String(enum_schema)),
+                    schema_data: Default::default(),
+                };
+                let name_ident = crate::types::get_type_name_for_schema(
+                    name,
+                    &enum_schema,
+                    &type_space.spec,
+                    false,
+                )?
+                .strip_option()?;
+                // Get a random item from the enum.
+                let random_value =
+                    generate_example_json_from_schema(&enum_schema, &type_space.spec)?.to_string();
+                let random_value = random_value.trim_start_matches('"').trim_end_matches('"');
+                let item_ident: proc_macro2::TokenStream = crate::types::proper_name(random_value)
+                    .parse()
+                    .map_err(|err| anyhow::anyhow!("{}", err))?;
+
+                quote!(#name_ident::#item_ident)
+            } else if one_of.len() == 1 {
                 let one_of_item = &one_of[0];
                 let one_of_item_schema =
                     one_of_item.get_schema_from_reference(&type_space.spec, true)?;

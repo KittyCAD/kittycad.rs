@@ -172,7 +172,45 @@ impl Users {
         }
     }
 
-    #[doc = "List users.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "Get a session for your user.\n\nThis endpoint requires authentication by any KittyCAD \
+             user. It returns details of the requested API token for the \
+             user.\n\n**Parameters:**\n\n- `token: uuid::Uuid`: The API token. \
+             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_users_get_session_for() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::Session = \
+             client\n        .users()\n        .get_session_for(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_session_for<'a>(
+        &'a self,
+        token: uuid::Uuid,
+    ) -> Result<crate::types::Session, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/session/{token}".replace("{token}", &format!("{}", token))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
+        }
+    }
+
+    #[doc = "List users.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list<'a>(
         &'a self,
@@ -214,7 +252,7 @@ impl Users {
         }
     }
 
-    #[doc = "List users.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List users.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtAscending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub fn list_stream<'a>(
         &'a self,
