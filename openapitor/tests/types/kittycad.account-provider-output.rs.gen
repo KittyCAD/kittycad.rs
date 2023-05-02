@@ -1,0 +1,24 @@
+#[doc = "An account provider."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    tabled :: Tabled,
+    clap :: ValueEnum,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+pub enum AccountProvier {
+    #[doc = "The Google account provider."]
+    #[serde(rename = "google")]
+    #[display("google")]
+    Google,
+    #[doc = "The GitHub account provider."]
+    #[serde(rename = "github")]
+    #[display("github")]
+    Github,
+}
