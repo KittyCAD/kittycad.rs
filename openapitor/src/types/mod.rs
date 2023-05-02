@@ -349,13 +349,6 @@ impl TypeSpace {
         // Get the proper name version of the type.
         let one_of_name = get_type_name(name, data)?;
 
-        // Check if this this a one_of with a single item.
-        if one_ofs.len() == 1 {
-            let first = one_ofs[0].item()?;
-            // Return the one_of type.
-            return self.render_schema(name, first);
-        }
-
         // Check if this is a one_of with only one enum in each.
         let mut is_enum_with_docs = false;
         let mut enum_docs: Vec<String> = Default::default();
@@ -391,6 +384,13 @@ impl TypeSpace {
 
         if is_enum_with_docs {
             return self.render_enum(name, &enum_schema, data, enum_docs);
+        }
+
+        // Check if this this a one_of with a single item.
+        if one_ofs.len() == 1 {
+            let first = one_ofs[0].item()?;
+            // Return the one_of type.
+            return self.render_schema(name, first);
         }
 
         let tag_result = get_one_of_tag(one_ofs, &self.spec)?;
