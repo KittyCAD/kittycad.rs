@@ -4747,141 +4747,23 @@ impl tabled::Tabled for DockerSystemInfo {
     }
 }
 
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DrawCircle {
-    #[doc = "The center of the circle."]
-    pub center: Vec<f64>,
-    #[doc = "The radius of the circle."]
-    pub radius: f64,
-}
-
-impl std::fmt::Display for DrawCircle {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for DrawCircle {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.center), format!("{:?}", self.radius)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["center".to_string(), "radius".to_string()]
-    }
-}
-
-#[doc = "Draw a circle."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DrawingCmdOneOf {
-    #[serde(rename = "DrawCircle")]
-    pub draw_circle: DrawCircle,
-}
-
-impl std::fmt::Display for DrawingCmdOneOf {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for DrawingCmdOneOf {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.draw_circle)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["draw_circle".to_string()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Extrude {
-    #[doc = "How far to extrude."]
-    pub distance: f64,
-    #[doc = "Which sketch to extrude."]
-    pub sketch: uuid::Uuid,
-}
-
-impl std::fmt::Display for Extrude {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Extrude {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.distance), format!("{:?}", self.sketch)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["distance".to_string(), "sketch".to_string()]
-    }
-}
-
-#[doc = "Extrude a sketch."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DrawingCmdOneOfOneOf {
-    #[serde(rename = "Extrude")]
-    pub extrude: Extrude,
-}
-
-impl std::fmt::Display for DrawingCmdOneOfOneOf {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for DrawingCmdOneOfOneOf {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.extrude)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["extrude".to_string()]
-    }
-}
-
 #[doc = "Commands that the KittyCAD engine can execute."]
 #[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    tabled :: Tabled,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub enum DrawingCmd {
-    DrawingCmdOneOf(DrawingCmdOneOf),
-    DrawingCmdOneOfOneOf(DrawingCmdOneOfOneOf),
+    DrawCircle {
+        #[doc = "The center of the circle."]
+        center: Vec<f64>,
+        #[doc = "The radius of the circle."]
+        radius: f64,
+    },
+    Extrude {
+        #[doc = "How far to extrude."]
+        distance: f64,
+        #[doc = "Which sketch to extrude."]
+        sketch: uuid::Uuid,
+    },
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Drawing API."]
@@ -5003,140 +4885,25 @@ impl tabled::Tabled for DrawingError {
     }
 }
 
-#[doc = "Each successful command has some result. Unfortunately this isn't strongly typed, because the result depends on the command. This means the OpenAPI schema for this won't be very useful."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DrawingOutcomeOneOf {
-    #[serde(rename = "Success")]
-    pub success: serde_json::Value,
-}
-
-impl std::fmt::Display for DrawingOutcomeOneOf {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for DrawingOutcomeOneOf {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.success)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["success".to_string()]
-    }
-}
-
-#[doc = "It failed. Why? See 'struct Error' above."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DrawingOutcomeOneOfOneOf {
-    #[doc = "Why a command submitted to the Drawing API failed."]
-    #[serde(rename = "Error")]
-    pub error: DrawingError,
-}
-
-impl std::fmt::Display for DrawingOutcomeOneOfOneOf {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for DrawingOutcomeOneOfOneOf {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.error)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["error".to_string()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Cancelled {
-    #[doc = "The ID of the command that failed, cancelling this command."]
-    pub what_failed: uuid::Uuid,
-}
-
-impl std::fmt::Display for Cancelled {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for Cancelled {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.what_failed)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["what_failed".to_string()]
-    }
-}
-
-#[doc = "Cancelled because it required the output of a previous command, which failed."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DrawingOutcomeOneOfOneOfOneOf {
-    #[serde(rename = "Cancelled")]
-    pub cancelled: Cancelled,
-}
-
-impl std::fmt::Display for DrawingOutcomeOneOfOneOfOneOf {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for DrawingOutcomeOneOfOneOfOneOf {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.cancelled)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["cancelled".to_string()]
-    }
-}
-
 #[doc = "The result from one drawing command in a batch."]
 #[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    tabled :: Tabled,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub enum DrawingOutcome {
-    DrawingOutcomeOneOf(DrawingOutcomeOneOf),
-    DrawingOutcomeOneOfOneOf(DrawingOutcomeOneOfOneOf),
-    DrawingOutcomeOneOfOneOfOneOf(DrawingOutcomeOneOfOneOfOneOf),
+    Error {
+        #[doc = "A string error code which refers to a family of errors. E.g. \"InvalidInput\"."]
+        error_code: String,
+        #[doc = "Describe the specific error which occurred. Will be shown to users, not logged."]
+        external_message: String,
+        #[doc = "Describe the specific error which occurred. Will be logged, not shown to users."]
+        internal_message: String,
+        #[doc = "A HTTP status code."]
+        status_code: u16,
+    },
+    Cancelled {
+        #[doc = "The ID of the command that failed, cancelling this command."]
+        what_failed: uuid::Uuid,
+    },
 }
 
 #[doc = "The result from a batch of drawing commands."]

@@ -332,6 +332,77 @@ impl TypeSpace {
         )
     }
 
+    /// Render a one_of that is a bunch of nested objects.
+    fn render_one_of_nested_object(
+        &mut self,
+        name: &str,
+        one_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
+        data: &openapiv3::SchemaData,
+    ) -> Result<()> {
+        let description = if let Some(d) = &data.description {
+            let d_sanitized = sanitize_indents(d);
+            quote!(#[doc = #d_sanitized])
+        } else {
+            quote!()
+        };
+
+        // Get the proper name version of the type.
+        let one_of_name = get_type_name(name, data)?;
+
+        let mut values = quote!();
+        for one_of in one_ofs {
+            // Get the first property in the object.
+            let schema = one_of.get_schema_from_reference(&self.spec, true)?;
+            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
+                if o.properties.len() == 1 {
+                    // Check if the property is a nested object.
+                    for (inner_name, property) in o.properties.iter() {
+                        // Let the name be the struct name.
+                        let inner_name_ident = format_ident!("{}", inner_name);
+                        let property_schema =
+                            property.get_schema_from_reference(&self.spec, true)?;
+                        if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
+                            &property_schema.schema_kind
+                        {
+                            let inner_values =
+                                self.get_object_values(&inner_name_ident, o, false)?;
+                            values = quote! {
+                                #values
+                                #inner_name_ident {
+                                    #inner_values
+                                },
+                            };
+                        }
+                    }
+                }
+            }
+        }
+
+        let rendered = quote! {
+            #description
+            #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema)]
+            pub enum #one_of_name {
+                #values
+            }
+        };
+
+        // Add the type to our type space.
+        self.add_to_rendered(
+            &rendered,
+            (
+                one_of_name.to_string(),
+                openapiv3::Schema {
+                    schema_data: data.clone(),
+                    schema_kind: openapiv3::SchemaKind::OneOf {
+                        one_of: one_ofs.clone(),
+                    },
+                },
+            ),
+        )?;
+
+        Ok(())
+    }
+
     /// Render the full type for a one of.
     fn render_one_of(
         &mut self,
@@ -384,6 +455,38 @@ impl TypeSpace {
 
         if is_enum_with_docs {
             return self.render_enum(name, &enum_schema, data, enum_docs);
+        }
+
+        // Check if we only have objects with 1 item and a nested object.
+        let mut is_one_of_nested_object = false;
+        for one_of in one_ofs {
+            let schema = one_of.get_schema_from_reference(&self.spec, true)?;
+            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
+                if o.properties.len() == 1 {
+                    // Check if the property is a nested object.
+                    for (_, property) in o.properties.iter() {
+                        let property_schema =
+                            property.get_schema_from_reference(&self.spec, true)?;
+                        if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(_)) =
+                            &property_schema.schema_kind
+                        {
+                            is_one_of_nested_object = true;
+                        }
+                    }
+                } else {
+                    // This is not an object.
+                    is_one_of_nested_object = false;
+                    break;
+                }
+            } else {
+                // This is not an object.
+                is_one_of_nested_object = false;
+                break;
+            }
+        }
+
+        if is_one_of_nested_object {
+            return self.render_one_of_nested_object(name, one_ofs, data);
         }
 
         // Check if this this a one_of with a single item.
@@ -525,146 +628,7 @@ impl TypeSpace {
             }
         }
 
-        let mut values = quote!();
-        for (k, v) in &o.properties {
-            let prop = clean_property_name(k);
-
-            // Get the schema for the property.
-            let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
-                let s = &**i;
-                s.clone()
-            } else {
-                v.get_schema_from_reference(&self.spec, true)?
-            };
-
-            let prop_desc = if let Some(d) = &inner_schema.schema_data.description {
-                let d_sanitized = sanitize_indents(d);
-                quote!(#[doc = #d_sanitized])
-            } else {
-                quote!()
-            };
-
-            // Get the type name for the schema.
-            let mut type_name = if v.should_render()? {
-                // Check if the name for the property is already taken.
-                // Make sure there isn't an existing reference with this name.
-                let mut t = if let Some(components) = &self.spec.components {
-                    if components.schemas.contains_key(&proper_name(&prop)) {
-                        proper_name(&format!("{} {}", struct_name, prop))
-                    } else {
-                        proper_name(&prop)
-                    }
-                } else {
-                    proper_name(&prop)
-                };
-
-                let mut should_render = true;
-
-                // Check if the name is already taken.
-                if let Some(rendered) = self.types.get(&t) {
-                    let mut compare_inner_schema = Box::new(inner_schema.clone());
-                    if let openapiv3::SchemaKind::Type(openapiv3::Type::Array(inner_array)) =
-                        &inner_schema.schema_kind
-                    {
-                        if let Some(openapiv3::ReferenceOr::Item(item_schema)) = &inner_array.items
-                        {
-                            compare_inner_schema = item_schema.clone();
-                        }
-                    }
-                    if prop == "emails" {
-                        println!(
-                            "RENDERED {:?}\nINNER SCHEMA {:?}",
-                            rendered, compare_inner_schema
-                        );
-                        println!(
-                            "RENDERED KIND {:?}\nINNER SCHEMA KIND {:?}",
-                            rendered.schema_kind, compare_inner_schema.schema_kind
-                        );
-                    }
-                    if *rendered != *compare_inner_schema {
-                        // The name is already taken, so we need to make a new name.
-                        t = proper_name(&format!("{} {}", struct_name, prop));
-                    } else {
-                        // When the schema exists but it is equal to the current schema,
-                        // we don't need to render it. AND we can use the existing name.
-                        should_render = false;
-                    }
-                }
-
-                if should_render {
-                    // Render the schema.
-                    self.render_schema(&t, &inner_schema)?;
-                }
-
-                get_type_name_for_schema(&t, &inner_schema, &self.spec, true)?
-            } else if let openapiv3::ReferenceOr::Item(i) = v {
-                get_type_name_for_schema(&prop, i, &self.spec, true)?
-            } else {
-                get_type_name_from_reference(&v.reference()?, &self.spec, true)?
-            };
-
-            // Check if this type is required.
-            if !o.required.contains(k) && !type_name.is_option()? {
-                // Make the type optional.
-                type_name = quote!(Option<#type_name>);
-            }
-            let prop_ident = format_ident!("{}", prop);
-
-            let prop_value = quote!(
-                pub #prop_ident: #type_name,
-            );
-
-            let mut serde_props = Vec::<proc_macro2::TokenStream>::new();
-
-            if &prop != k {
-                serde_props.push(quote!(
-                    rename = #k
-                ));
-            }
-
-            if type_name.is_option()? {
-                serde_props.push(quote!(default));
-                serde_props.push(quote!(skip_serializing_if = "Option::is_none"));
-            }
-
-            // If we have a custom date format  and this is a datetime we need to override deserialize_with
-            if self.opts.date_time_format.is_some() {
-                if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
-                    inner_schema.schema_kind
-                {
-                    if s.format
-                        == openapiv3::VariantOrUnknownOrEmpty::Item(
-                            openapiv3::StringFormat::DateTime,
-                        )
-                    {
-                        if type_name.is_option()? {
-                            serde_props.push(quote!(
-                                deserialize_with =
-                                    "crate::utils::nullable_date_time_format::deserialize"
-                            ));
-                        } else {
-                            serde_props.push(quote!(
-                                deserialize_with = "crate::utils::date_time_format::deserialize"
-                            ));
-                        }
-                    }
-                }
-            }
-
-            let serde_full = if serde_props.is_empty() {
-                quote!()
-            } else {
-                quote!(#[serde(#(#serde_props),*)])
-            };
-
-            values = quote!(
-                #values
-
-                #prop_desc
-                #serde_full
-                #prop_value
-            );
-        }
+        let values = self.get_object_values(&struct_name, o, true)?;
 
         // Implement pagination for this type if we should.
         let mut pagination = quote!();
@@ -794,6 +758,162 @@ impl TypeSpace {
         )?;
 
         Ok(())
+    }
+
+    fn get_object_values(
+        &mut self,
+        struct_name: &proc_macro2::Ident,
+        o: &openapiv3::ObjectType,
+        is_pub: bool,
+    ) -> Result<proc_macro2::TokenStream> {
+        let mut values = quote!();
+        for (k, v) in &o.properties {
+            let prop = clean_property_name(k);
+
+            // Get the schema for the property.
+            let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
+                let s = &**i;
+                s.clone()
+            } else {
+                v.get_schema_from_reference(&self.spec, true)?
+            };
+
+            let prop_desc = if let Some(d) = &inner_schema.schema_data.description {
+                let d_sanitized = sanitize_indents(d);
+                quote!(#[doc = #d_sanitized])
+            } else {
+                quote!()
+            };
+
+            // Get the type name for the schema.
+            let mut type_name = if v.should_render()? {
+                // Check if the name for the property is already taken.
+                // Make sure there isn't an existing reference with this name.
+                let mut t = if let Some(components) = &self.spec.components {
+                    if components.schemas.contains_key(&proper_name(&prop)) {
+                        proper_name(&format!("{} {}", struct_name, prop))
+                    } else {
+                        proper_name(&prop)
+                    }
+                } else {
+                    proper_name(&prop)
+                };
+
+                let mut should_render = true;
+
+                // Check if the name is already taken.
+                if let Some(rendered) = self.types.get(&t) {
+                    let mut compare_inner_schema = Box::new(inner_schema.clone());
+                    if let openapiv3::SchemaKind::Type(openapiv3::Type::Array(inner_array)) =
+                        &inner_schema.schema_kind
+                    {
+                        if let Some(openapiv3::ReferenceOr::Item(item_schema)) = &inner_array.items
+                        {
+                            compare_inner_schema = item_schema.clone();
+                        }
+                    }
+                    if prop == "emails" {
+                        println!(
+                            "RENDERED {:?}\nINNER SCHEMA {:?}",
+                            rendered, compare_inner_schema
+                        );
+                        println!(
+                            "RENDERED KIND {:?}\nINNER SCHEMA KIND {:?}",
+                            rendered.schema_kind, compare_inner_schema.schema_kind
+                        );
+                    }
+                    if *rendered != *compare_inner_schema {
+                        // The name is already taken, so we need to make a new name.
+                        t = proper_name(&format!("{} {}", struct_name, prop));
+                    } else {
+                        // When the schema exists but it is equal to the current schema,
+                        // we don't need to render it. AND we can use the existing name.
+                        should_render = false;
+                    }
+                }
+
+                if should_render {
+                    // Render the schema.
+                    self.render_schema(&t, &inner_schema)?;
+                }
+
+                get_type_name_for_schema(&t, &inner_schema, &self.spec, true)?
+            } else if let openapiv3::ReferenceOr::Item(i) = v {
+                get_type_name_for_schema(&prop, i, &self.spec, true)?
+            } else {
+                get_type_name_from_reference(&v.reference()?, &self.spec, true)?
+            };
+
+            // Check if this type is required.
+            if !o.required.contains(k) && !type_name.is_option()? {
+                // Make the type optional.
+                type_name = quote!(Option<#type_name>);
+            }
+            let prop_ident = format_ident!("{}", prop);
+
+            let prop_value = if is_pub {
+                quote!(
+                    pub #prop_ident: #type_name,
+                )
+            } else {
+                quote!(
+                    #prop_ident: #type_name,
+                )
+            };
+
+            let mut serde_props = Vec::<proc_macro2::TokenStream>::new();
+
+            if &prop != k {
+                serde_props.push(quote!(
+                    rename = #k
+                ));
+            }
+
+            if type_name.is_option()? {
+                serde_props.push(quote!(default));
+                serde_props.push(quote!(skip_serializing_if = "Option::is_none"));
+            }
+
+            // If we have a custom date format  and this is a datetime we need to override deserialize_with
+            if self.opts.date_time_format.is_some() {
+                if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
+                    inner_schema.schema_kind
+                {
+                    if s.format
+                        == openapiv3::VariantOrUnknownOrEmpty::Item(
+                            openapiv3::StringFormat::DateTime,
+                        )
+                    {
+                        if type_name.is_option()? {
+                            serde_props.push(quote!(
+                                deserialize_with =
+                                    "crate::utils::nullable_date_time_format::deserialize"
+                            ));
+                        } else {
+                            serde_props.push(quote!(
+                                deserialize_with = "crate::utils::date_time_format::deserialize"
+                            ));
+                        }
+                    }
+                }
+            }
+
+            let serde_full = if serde_props.is_empty() {
+                quote!()
+            } else {
+                quote!(#[serde(#(#serde_props),*)])
+            };
+
+            values = quote!(
+                #values
+
+                #prop_desc
+                #serde_full
+                #prop_value
+            );
+        }
+
+        Ok(values)
     }
 
     /// Render a string type.
@@ -2388,6 +2508,27 @@ mod test {
 
         expectorate::assert_contents(
             "tests/types/kittycad.account-provider-output.rs.gen",
+            &super::get_text_fmt(&type_space.rendered).unwrap(),
+        );
+    }
+
+    #[test]
+    fn test_render_sum_enum_types() {
+        let schema = include_str!("../../tests/types/input/DrawingCmd.json");
+
+        let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
+
+        let mut type_space = super::TypeSpace {
+            types: indexmap::map::IndexMap::new(),
+            spec: crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
+            rendered: quote!(),
+            opts: Default::default(),
+        };
+
+        type_space.render_schema("DrawingCmd", &schema).unwrap();
+
+        expectorate::assert_contents(
+            "tests/types/kittycad.drawing-cmd-output.rs.gen",
             &super::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
