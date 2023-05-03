@@ -4754,15 +4754,15 @@ impl tabled::Tabled for DockerSystemInfo {
 pub enum DrawingCmd {
     DrawCircle {
         #[doc = "The center of the circle."]
-        pub center: Vec<f64>,
+        center: Vec<f64>,
         #[doc = "The radius of the circle."]
-        pub radius: f64,
+        radius: f64,
     },
     Extrude {
         #[doc = "How far to extrude."]
-        pub distance: f64,
+        distance: f64,
         #[doc = "Which sketch to extrude."]
-        pub sketch: uuid::Uuid,
+        sketch: uuid::Uuid,
     },
 }
 
@@ -4892,17 +4892,17 @@ impl tabled::Tabled for DrawingError {
 pub enum DrawingOutcome {
     Error {
         #[doc = "A string error code which refers to a family of errors. E.g. \"InvalidInput\"."]
-        pub error_code: String,
+        error_code: String,
         #[doc = "Describe the specific error which occurred. Will be shown to users, not logged."]
-        pub external_message: String,
+        external_message: String,
         #[doc = "Describe the specific error which occurred. Will be logged, not shown to users."]
-        pub internal_message: String,
+        internal_message: String,
         #[doc = "A HTTP status code."]
-        pub status_code: u16,
+        status_code: u16,
     },
     Cancelled {
         #[doc = "The ID of the command that failed, cancelling this command."]
-        pub what_failed: uuid::Uuid,
+        what_failed: uuid::Uuid,
     },
 }
 

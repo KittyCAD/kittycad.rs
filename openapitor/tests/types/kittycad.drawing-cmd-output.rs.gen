@@ -5,14 +5,14 @@
 pub enum DrawingCmd {
     DrawCircle {
         #[doc = "The center of the circle."]
-        pub center: Vec<f64>,
+        center: Vec<f64>,
         #[doc = "The radius of the circle."]
-        pub radius: f64,
+        radius: f64,
     },
     Extrude {
         #[doc = "How far to extrude."]
-        pub distance: f64,
+        distance: f64,
         #[doc = "Which sketch to extrude."]
-        pub sketch: uuid::Uuid,
+        sketch: uuid::Uuid,
     },
 }
