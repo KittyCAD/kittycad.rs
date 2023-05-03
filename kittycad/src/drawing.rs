@@ -18,9 +18,9 @@ impl Drawing {
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: serde_json::Value = client\n        .drawing()\n        \
              .cmd(&kittycad::types::DrawingCmdReq {\n            cmd: \
-             kittycad::types::DrawingCmd::kittycad::types::DrawCircle {\n                center: \
-             vec![3.14 as f64],\n                radius: 3.14 as f64,\n            },\n            \
-             cmd_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             kittycad::types::DrawingCmd::DrawCircle {\n                center: vec![3.14 as \
+             f64],\n                radius: 3.14 as f64,\n            },\n            cmd_id: \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
              file_id: \"some-string\".to_string(),\n        })\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
@@ -49,7 +49,7 @@ impl Drawing {
         }
     }
 
-    #[doc = "Submit many drawing operations.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_drawing_cmd_batch() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::DrawingOutcomes = client\n        .drawing()\n        .cmd_batch(&kittycad::types::DrawingCmdReqBatch {\n            cmds: std::collections::HashMap::from([(\n                \"some-key\".to_string(),\n                kittycad::types::DrawingCmdReq {\n                    cmd: kittycad::types::DrawingCmd::kittycad::types::DrawCircle {\n                        center: vec![3.14 as f64],\n                        radius: 3.14 as f64,\n                    },\n                    cmd_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                    file_id: \"some-string\".to_string(),\n                },\n            )]),\n            file_id: \"some-string\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Submit many drawing operations.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_drawing_cmd_batch() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::DrawingOutcomes = client\n        .drawing()\n        .cmd_batch(&kittycad::types::DrawingCmdReqBatch {\n            cmds: std::collections::HashMap::from([(\n                \"some-key\".to_string(),\n                kittycad::types::DrawingCmdReq {\n                    cmd: kittycad::types::DrawingCmd::DrawCircle {\n                        center: vec![3.14 as f64],\n                        radius: 3.14 as f64,\n                    },\n                    cmd_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                    file_id: \"some-string\".to_string(),\n                },\n            )]),\n            file_id: \"some-string\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn cmd_batch<'a>(
         &'a self,

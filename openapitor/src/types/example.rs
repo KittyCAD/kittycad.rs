@@ -393,13 +393,13 @@ pub fn generate_example_rust_from_schema(
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Number(_)) => {
             let mut t =
-                crate::types::get_type_name_for_schema(name, schema, &type_space.spec, false)?;
+                crate::types::get_type_name_for_schema(name, schema, &type_space.spec, in_crate)?;
             t = t.strip_option()?;
             quote!(3.14 as #t)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Integer(_)) => {
             let mut t =
-                crate::types::get_type_name_for_schema(name, schema, &type_space.spec, false)?;
+                crate::types::get_type_name_for_schema(name, schema, &type_space.spec, in_crate)?;
             t = t.strip_option()?;
             quote!(4 as #t)
         }
@@ -408,7 +408,7 @@ pub fn generate_example_rust_from_schema(
                 eprintln!("It's a Type(Object(...))");
             }
             let object_name =
-                crate::types::get_type_name_for_schema(name, schema, &type_space.spec, false)?
+                crate::types::get_type_name_for_schema(name, schema, &type_space.spec, in_crate)?
                     .strip_option()?;
 
             // If the object has no properties, but has additional_properties, just use that
@@ -691,8 +691,12 @@ pub fn generate_example_rust_from_schema(
                     one_of_item.get_schema_from_reference(&type_space.spec, true)?;
                 generate_example_rust_from_schema(type_space, name, &one_of_item_schema, in_crate)?
             } else {
-                let type_name =
-                    crate::types::get_type_name_for_schema(name, schema, &type_space.spec, false)?;
+                let type_name = crate::types::get_type_name_for_schema(
+                    name,
+                    schema,
+                    &type_space.spec,
+                    in_crate,
+                )?;
 
                 let tag_result = crate::types::get_one_of_tag(one_of, &type_space.spec)?;
                 let mut ts = type_space.clone();

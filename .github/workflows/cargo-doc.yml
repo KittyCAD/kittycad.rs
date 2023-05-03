@@ -36,4 +36,5 @@ jobs:
       - name: Run cargo doc
         run: |
           cargo doc --all
+          cargo test --doc
         shell: bash
