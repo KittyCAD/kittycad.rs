@@ -152,7 +152,7 @@ impl ApiCalls {
     ) -> Result<crate::types::ApiCallWithPrice, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "api-calls/{id}".replace("{id}", id)
@@ -301,7 +301,7 @@ impl ApiCalls {
     ) -> Result<crate::types::AsyncApiCallOutput, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "async/operations/{id}".replace("{id}", id)
@@ -442,7 +442,7 @@ impl ApiCalls {
     ) -> Result<crate::types::ApiCallWithPrice, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "user/api-calls/{id}".replace("{id}", id)
@@ -475,7 +475,7 @@ impl ApiCalls {
     ) -> Result<crate::types::ApiCallWithPriceResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "users/{id}/api-calls".replace("{id}", id)
@@ -534,7 +534,7 @@ impl ApiCalls {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
-                                    &format!(
+                                    format!(
                                         "{}/{}",
                                         self.client.base_url,
                                         "users/{id}/api-calls".replace("{id}", id)

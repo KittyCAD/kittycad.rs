@@ -263,7 +263,7 @@ impl Payments {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "user/payment/methods/{id}".replace("{id}", id)

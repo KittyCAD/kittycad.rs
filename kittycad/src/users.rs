@@ -432,7 +432,7 @@ impl Users {
     ) -> Result<crate::types::ExtendedUser, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "users-extended/{id}".replace("{id}", id)
@@ -462,7 +462,7 @@ impl Users {
     ) -> Result<crate::types::User, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "users/{id}".replace("{id}", id)
