@@ -597,7 +597,62 @@ pub fn generate_example_rust_from_schema(
                 }
             }
 
-            if is_enum_with_docs {
+            let mut is_one_of_nested_object = false;
+            for of in one_of {
+                let schema = of.get_schema_from_reference(&type_space.spec, true)?;
+                if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind
+                {
+                    if o.properties.len() == 1 {
+                        // Check if the property is a nested object.
+                        for (_, property) in o.properties.iter() {
+                            let property_schema =
+                                property.get_schema_from_reference(&type_space.spec, true)?;
+                            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(_)) =
+                                &property_schema.schema_kind
+                            {
+                                is_one_of_nested_object = true;
+                            }
+                        }
+                    } else {
+                        // This is not an object.
+                        is_one_of_nested_object = false;
+                        break;
+                    }
+                } else {
+                    // This is not an object.
+                    is_one_of_nested_object = false;
+                    break;
+                }
+            }
+
+            if is_one_of_nested_object {
+                let name_ident = crate::types::get_type_name(name, &Default::default())?;
+
+                // Get the render of the first object.
+                let mut inner_object = quote!();
+                for of in one_of {
+                    let schema = of.get_schema_from_reference(&type_space.spec, true)?;
+                    if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
+                        &schema.schema_kind
+                    {
+                        // Check if the property is a nested object.
+                        for (property_name, property) in o.properties.iter() {
+                            let property_schema =
+                                property.get_schema_from_reference(&type_space.spec, true)?;
+                            inner_object = generate_example_rust_from_schema(
+                                type_space,
+                                &property_name,
+                                &property_schema,
+                            )?
+                            .strip_crate_types()?;
+                        }
+                    }
+
+                    break;
+                }
+
+                quote!(crate::types::#name_ident::#inner_object)
+            } else if is_enum_with_docs {
                 let enum_schema = openapiv3::Schema {
                     schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::String(enum_schema)),
                     schema_data: Default::default(),

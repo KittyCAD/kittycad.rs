@@ -20,7 +20,7 @@ impl Hidden {
     ) -> Result<crate::types::VerificationToken, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "auth/email"),
+            &format!("{}/{}", self.client.base_url, "auth/email"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -33,6 +33,7 @@ impl Hidden {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -49,12 +50,12 @@ impl Hidden {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "auth/email/callback"),
+            &format!("{}/{}", self.client.base_url, "auth/email/callback"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![
-            ("email", email.to_string()),
-            ("token", token.to_string()),
+            ("email", format!("{}", email)),
+            ("token", format!("{}", token)),
         ];
         if let Some(p) = callback_url {
             query_params.push(("callback_url", p));
@@ -78,7 +79,7 @@ impl Hidden {
     pub async fn logout<'a>(&'a self) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "logout"),
+            &format!("{}/{}", self.client.base_url, "logout"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;

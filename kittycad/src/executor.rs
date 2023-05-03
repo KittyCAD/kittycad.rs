@@ -12,7 +12,18 @@ impl Executor {
         Self { client }
     }
 
-    #[doc = "Execute a KittyCAD program in a specific language.\n\n**Parameters:**\n\n- `lang: crate::types::CodeLanguage`: The language of the code. (required)\n- `output: Option<String>`: The output file we want to get the contents for (the paths are relative to where in litterbox it is being run). You can denote more than one file with a comma separated list of string paths.\n\n```rust,no_run\nasync fn example_executor_create_file_execution() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CodeOutput = client\n        .executor()\n        .create_file_execution(\n            kittycad::types::CodeLanguage::Go,\n            Some(\"some-string\".to_string()),\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Execute a KittyCAD program in a specific language.\n\n**Parameters:**\n\n- `lang: \
+             crate::types::CodeLanguage`: The language of the code. (required)\n- `output: \
+             Option<String>`: The output file we want to get the contents for (the paths are \
+             relative to where in litterbox it is being run). You can denote more than one file \
+             with a comma separated list of string paths.\n\n```rust,no_run\nasync fn \
+             example_executor_create_file_execution() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::CodeOutput = \
+             client\n        .executor()\n        .create_file_execution(\n            \
+             kittycad::types::CodeLanguage::Node,\n            \
+             Some(\"some-string\".to_string()),\n            \
+             &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_file_execution<'a>(
         &'a self,
@@ -22,7 +33,7 @@ impl Executor {
     ) -> Result<crate::types::CodeOutput, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "file/execute/{lang}".replace("{lang}", &format!("{}", lang))
@@ -45,6 +56,7 @@ impl Executor {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -59,7 +71,7 @@ impl Executor {
     pub async fn create_term<'a>(&'a self) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "ws/executor/term"),
+            &format!("{}/{}", self.client.base_url, "ws/executor/term"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;

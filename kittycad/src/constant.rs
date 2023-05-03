@@ -17,7 +17,7 @@ impl Constant {
              (required)\n\n```rust,no_run\nasync fn example_constant_get_physics() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::PhysicsConstant = client\n        .constant()\n        \
-             .get_physics(kittycad::types::PhysicsConstantName::F)\n        .await?;\n    \
+             .get_physics(kittycad::types::PhysicsConstantName::Sigma)\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_physics<'a>(
@@ -26,7 +26,7 @@ impl Constant {
     ) -> Result<crate::types::PhysicsConstant, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "constant/physics/{constant}".replace("{constant}", &format!("{}", constant))
@@ -42,6 +42,7 @@ impl Constant {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

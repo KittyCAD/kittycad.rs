@@ -1,0 +1,71 @@
+{
+  "description": "Commands that the KittyCAD engine can execute.",
+  "oneOf": [
+    {
+      "additionalProperties": false,
+      "description": "Draw a circle.",
+      "properties": {
+        "DrawCircle": {
+          "properties": {
+            "center": {
+              "description": "The center of the circle.",
+              "items": {
+                "format": "float",
+                "type": "number"
+              },
+              "maxItems": 3,
+              "minItems": 3,
+              "type": "array"
+            },
+            "radius": {
+              "description": "The radius of the circle.",
+              "format": "float",
+              "type": "number"
+            }
+          },
+          "required": [
+            "center",
+            "radius"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "DrawCircle"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "description": "Extrude a sketch.",
+      "properties": {
+        "Extrude": {
+          "properties": {
+            "distance": {
+              "description": "How far to extrude.",
+              "format": "float",
+              "type": "number"
+            },
+            "sketch": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/DrawingCmdId"
+                }
+              ],
+              "description": "Which sketch to extrude."
+            }
+          },
+          "required": [
+            "distance",
+            "sketch"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "Extrude"
+      ],
+      "type": "object"
+    }
+  ]
+}

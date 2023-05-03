@@ -20,7 +20,7 @@ impl Meta {
     pub async fn get_schema<'a>(&'a self) -> Result<serde_json::Value, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, ""),
+            &format!("{}/{}", self.client.base_url, ""),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -32,6 +32,7 @@ impl Meta {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -45,7 +46,7 @@ impl Meta {
     ) -> Result<crate::types::AiPluginManifest, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, ".well-known/ai-plugin.json"),
+            &format!("{}/{}", self.client.base_url, ".well-known/ai-plugin.json"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -57,6 +58,7 @@ impl Meta {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -76,7 +78,7 @@ impl Meta {
     ) -> Result<crate::types::Metadata, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "_meta/info"),
+            &format!("{}/{}", self.client.base_url, "_meta/info"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -88,6 +90,7 @@ impl Meta {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -102,7 +105,7 @@ impl Meta {
     pub async fn get_metrics<'a>(&'a self) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "_meta/metrics"),
+            &format!("{}/{}", self.client.base_url, "_meta/metrics"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -126,7 +129,7 @@ impl Meta {
     ) -> Result<serde_json::Value, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "openai/openapi.json"),
+            &format!("{}/{}", self.client.base_url, "openai/openapi.json"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -138,6 +141,7 @@ impl Meta {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -152,7 +156,7 @@ impl Meta {
     pub async fn ping<'a>(&'a self) -> Result<crate::types::Pong, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "ping"),
+            &format!("{}/{}", self.client.base_url, "ping"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -164,6 +168,7 @@ impl Meta {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
+                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

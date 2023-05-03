@@ -1,0 +1,18 @@
+#[doc = "Commands that the KittyCAD engine can execute."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub enum DrawingCmd {
+    DrawCircle {
+        #[doc = "The center of the circle."]
+        pub center: Vec<f64>,
+        #[doc = "The radius of the circle."]
+        pub radius: f64,
+    },
+    Extrude {
+        #[doc = "How far to extrude."]
+        pub distance: f64,
+        #[doc = "Which sketch to extrude."]
+        pub sketch: uuid::Uuid,
+    },
+}
