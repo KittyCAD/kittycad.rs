@@ -26,7 +26,7 @@ impl Constant {
     ) -> Result<crate::types::PhysicsConstant, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "constant/physics/{constant}".replace("{constant}", &format!("{}", constant))
@@ -42,7 +42,6 @@ impl Constant {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

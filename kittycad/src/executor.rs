@@ -33,7 +33,7 @@ impl Executor {
     ) -> Result<crate::types::CodeOutput, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "file/execute/{lang}".replace("{lang}", &format!("{}", lang))
@@ -56,7 +56,6 @@ impl Executor {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -71,7 +70,7 @@ impl Executor {
     pub async fn create_term<'a>(&'a self) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "ws/executor/term"),
+            format!("{}/{}", self.client.base_url, "ws/executor/term"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;

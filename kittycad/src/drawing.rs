@@ -20,7 +20,7 @@ impl Drawing {
     ) -> Result<serde_json::Value, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!("{}/{}", self.client.base_url, "drawing/cmd"),
+            format!("{}/{}", self.client.base_url, "drawing/cmd"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -33,7 +33,6 @@ impl Drawing {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -48,7 +47,7 @@ impl Drawing {
     ) -> Result<crate::types::DrawingOutcomes, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!("{}/{}", self.client.base_url, "drawing/cmd_batch"),
+            format!("{}/{}", self.client.base_url, "drawing/cmd_batch"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -61,7 +60,6 @@ impl Drawing {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

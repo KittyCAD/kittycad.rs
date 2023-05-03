@@ -499,18 +499,16 @@ impl tabled::Tabled for AiPluginApi {
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[derive(Default)]
 pub enum AiPluginApiType {
     #[doc = "An OpenAPI specification."]
     #[serde(rename = "openapi")]
     #[display("openapi")]
+    #[default]
     Openapi,
 }
 
-impl std::default::Default for AiPluginApiType {
-    fn default() -> Self {
-        AiPluginApiType::Openapi
-    }
-}
+
 
 #[doc = "AI plugin auth information."]
 #[derive(
@@ -7447,18 +7445,16 @@ impl tabled::Tabled for Oauth2ClientInfo {
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[derive(Default)]
 pub enum Oauth2GrantType {
     #[doc = "An OAuth 2.0 Device Authorization Grant."]
     #[serde(rename = "urn:ietf:params:oauth:grant-type:device_code")]
     #[display("urn:ietf:params:oauth:grant-type:device_code")]
+    #[default]
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
 
-impl std::default::Default for Oauth2GrantType {
-    fn default() -> Self {
-        Oauth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode
-    }
-}
+
 
 #[doc = "Onboarding details"]
 #[derive(
@@ -7748,18 +7744,16 @@ impl tabled::Tabled for PaymentMethodCardChecks {
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[derive(Default)]
 pub enum PaymentMethodType {
     #[doc = "A card payment method."]
     #[serde(rename = "card")]
     #[display("card")]
+    #[default]
     Card,
 }
 
-impl std::default::Default for PaymentMethodType {
-    fn default() -> Self {
-        PaymentMethodType::Card
-    }
-}
+
 
 #[doc = "A physics constant."]
 #[derive(

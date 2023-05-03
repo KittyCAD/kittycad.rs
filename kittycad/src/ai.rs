@@ -22,7 +22,7 @@ impl Ai {
     ) -> Result<crate::types::Mesh, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "ai/image-to-3d/{input_format}/{output_format}"
@@ -41,7 +41,6 @@ impl Ai {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -57,7 +56,7 @@ impl Ai {
     ) -> Result<crate::types::Mesh, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "ai/text-to-3d/{output_format}"
@@ -65,7 +64,7 @@ impl Ai {
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("prompt", format!("{}", prompt))];
+        let query_params = vec![("prompt", prompt.to_string())];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -76,7 +75,6 @@ impl Ai {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

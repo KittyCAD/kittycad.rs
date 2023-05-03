@@ -20,7 +20,7 @@ impl ApiCalls {
     ) -> Result<Vec<crate::types::ApiCallQueryGroup>, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "api-call-metrics"),
+            format!("{}/{}", self.client.base_url, "api-call-metrics"),
         );
         req = req.bearer_auth(&self.client.token);
         let query_params = vec![("group_by", format!("{}", group_by))];
@@ -34,7 +34,6 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -51,7 +50,7 @@ impl ApiCalls {
     ) -> Result<crate::types::ApiCallWithPriceResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "api-calls"),
+            format!("{}/{}", self.client.base_url, "api-calls"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
@@ -77,7 +76,6 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -106,7 +104,7 @@ impl ApiCalls {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
-                                    &format!("{}/{}", self.client.base_url, "api-calls"),
+                                    format!("{}/{}", self.client.base_url, "api-calls"),
                                 );
                                 req = req.bearer_auth(&self.client.token);
                                 let mut request = req.build()?;
@@ -123,7 +121,6 @@ impl ApiCalls {
                                             ),
                                             status,
                                         )
-                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -155,10 +152,10 @@ impl ApiCalls {
     ) -> Result<crate::types::ApiCallWithPrice, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
-                "api-calls/{id}".replace("{id}", &id)
+                "api-calls/{id}".replace("{id}", id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -171,7 +168,6 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -189,7 +185,7 @@ impl ApiCalls {
     ) -> Result<crate::types::AsyncApiCallResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "async/operations"),
+            format!("{}/{}", self.client.base_url, "async/operations"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
@@ -219,7 +215,6 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -248,7 +243,7 @@ impl ApiCalls {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
-                                    &format!("{}/{}", self.client.base_url, "async/operations"),
+                                    format!("{}/{}", self.client.base_url, "async/operations"),
                                 );
                                 req = req.bearer_auth(&self.client.token);
                                 let mut request = req.build()?;
@@ -265,7 +260,6 @@ impl ApiCalls {
                                             ),
                                             status,
                                         )
-                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -307,10 +301,10 @@ impl ApiCalls {
     ) -> Result<crate::types::AsyncApiCallOutput, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
-                "async/operations/{id}".replace("{id}", &id)
+                "async/operations/{id}".replace("{id}", id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -323,7 +317,6 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -340,7 +333,7 @@ impl ApiCalls {
     ) -> Result<crate::types::ApiCallWithPriceResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user/api-calls"),
+            format!("{}/{}", self.client.base_url, "user/api-calls"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
@@ -366,7 +359,6 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -395,7 +387,7 @@ impl ApiCalls {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
-                                    &format!("{}/{}", self.client.base_url, "user/api-calls"),
+                                    format!("{}/{}", self.client.base_url, "user/api-calls"),
                                 );
                                 req = req.bearer_auth(&self.client.token);
                                 let mut request = req.build()?;
@@ -412,7 +404,6 @@ impl ApiCalls {
                                             ),
                                             status,
                                         )
-                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -451,10 +442,10 @@ impl ApiCalls {
     ) -> Result<crate::types::ApiCallWithPrice, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/api-calls/{id}".replace("{id}", &id)
+                "user/api-calls/{id}".replace("{id}", id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -467,7 +458,6 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -485,10 +475,10 @@ impl ApiCalls {
     ) -> Result<crate::types::ApiCallWithPriceResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
-                "users/{id}/api-calls".replace("{id}", &id)
+                "users/{id}/api-calls".replace("{id}", id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -515,7 +505,6 @@ impl ApiCalls {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -545,10 +534,10 @@ impl ApiCalls {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
-                                    &format!(
+                                    format!(
                                         "{}/{}",
                                         self.client.base_url,
-                                        "users/{id}/api-calls".replace("{id}", &id)
+                                        "users/{id}/api-calls".replace("{id}", id)
                                     ),
                                 );
                                 req = req.bearer_auth(&self.client.token);
@@ -566,7 +555,6 @@ impl ApiCalls {
                                             ),
                                             status,
                                         )
-                                        .into()
                                     })
                                 } else {
                                     Err(crate::types::error::Error::UnexpectedResponse(resp))

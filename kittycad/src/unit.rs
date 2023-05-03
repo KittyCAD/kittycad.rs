@@ -34,7 +34,7 @@ impl Unit {
     ) -> Result<crate::types::UnitAccelerationConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/acceleration/{src_format}/{output_format}"
@@ -54,7 +54,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -71,7 +70,7 @@ impl Unit {
     ) -> Result<crate::types::UnitAngleConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/angle/{src_format}/{output_format}"
@@ -91,7 +90,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -108,7 +106,7 @@ impl Unit {
     ) -> Result<crate::types::UnitAngularVelocityConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/angular-velocity/{src_format}/{output_format}"
@@ -128,7 +126,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -145,7 +142,7 @@ impl Unit {
     ) -> Result<crate::types::UnitAreaConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/area/{src_format}/{output_format}"
@@ -165,7 +162,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -182,7 +178,7 @@ impl Unit {
     ) -> Result<crate::types::UnitChargeConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/charge/{src_format}/{output_format}"
@@ -202,7 +198,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -231,7 +226,7 @@ impl Unit {
     ) -> Result<crate::types::UnitConcentrationConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/concentration/{src_format}/{output_format}"
@@ -251,7 +246,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -281,7 +275,7 @@ impl Unit {
     ) -> Result<crate::types::UnitDataTransferRateConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/data-transfer-rate/{src_format}/{output_format}"
@@ -301,7 +295,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -318,7 +311,7 @@ impl Unit {
     ) -> Result<crate::types::UnitDataConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/data/{src_format}/{output_format}"
@@ -338,7 +331,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -355,7 +347,7 @@ impl Unit {
     ) -> Result<crate::types::UnitDensityConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/density/{src_format}/{output_format}"
@@ -375,7 +367,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -392,7 +383,7 @@ impl Unit {
     ) -> Result<crate::types::UnitEnergyConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/energy/{src_format}/{output_format}"
@@ -412,7 +403,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -429,7 +419,7 @@ impl Unit {
     ) -> Result<crate::types::UnitForceConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/force/{src_format}/{output_format}"
@@ -449,7 +439,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -466,7 +455,7 @@ impl Unit {
     ) -> Result<crate::types::UnitIlluminanceConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/illuminance/{src_format}/{output_format}"
@@ -486,7 +475,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -503,7 +491,7 @@ impl Unit {
     ) -> Result<crate::types::UnitLengthConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/length/{src_format}/{output_format}"
@@ -523,7 +511,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -540,7 +527,7 @@ impl Unit {
     ) -> Result<crate::types::UnitMagneticFieldStrengthConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/magnetic-field-strength/{src_format}/{output_format}"
@@ -560,7 +547,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -589,7 +575,7 @@ impl Unit {
     ) -> Result<crate::types::UnitMagneticFluxConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/magnetic-flux/{src_format}/{output_format}"
@@ -609,7 +595,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -626,7 +611,7 @@ impl Unit {
     ) -> Result<crate::types::UnitMassConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/mass/{src_format}/{output_format}"
@@ -646,7 +631,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -663,7 +647,7 @@ impl Unit {
     ) -> Result<crate::types::UnitMetricPowerCubedConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/metric/cubed/{src_format}/{output_format}"
@@ -683,7 +667,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -700,7 +683,7 @@ impl Unit {
     ) -> Result<crate::types::UnitMetricPowerConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/metric/power/{src_format}/{output_format}"
@@ -720,7 +703,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -749,7 +731,7 @@ impl Unit {
     ) -> Result<crate::types::UnitMetricPowerSquaredConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/metric/squared/{src_format}/{output_format}"
@@ -769,7 +751,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -786,7 +767,7 @@ impl Unit {
     ) -> Result<crate::types::UnitPowerConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/power/{src_format}/{output_format}"
@@ -806,7 +787,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -823,7 +803,7 @@ impl Unit {
     ) -> Result<crate::types::UnitPressureConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/pressure/{src_format}/{output_format}"
@@ -843,7 +823,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -860,7 +839,7 @@ impl Unit {
     ) -> Result<crate::types::UnitRadiationConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/radiation/{src_format}/{output_format}"
@@ -880,7 +859,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -897,7 +875,7 @@ impl Unit {
     ) -> Result<crate::types::UnitRadioactivityConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/radioactivity/{src_format}/{output_format}"
@@ -917,7 +895,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -934,7 +911,7 @@ impl Unit {
     ) -> Result<crate::types::UnitSolidAngleConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/solid-angle/{src_format}/{output_format}"
@@ -954,7 +931,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -983,7 +959,7 @@ impl Unit {
     ) -> Result<crate::types::UnitTemperatureConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/temperature/{src_format}/{output_format}"
@@ -1003,7 +979,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -1020,7 +995,7 @@ impl Unit {
     ) -> Result<crate::types::UnitTimeConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/time/{src_format}/{output_format}"
@@ -1040,7 +1015,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -1068,7 +1042,7 @@ impl Unit {
     ) -> Result<crate::types::UnitVelocityConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/velocity/{src_format}/{output_format}"
@@ -1088,7 +1062,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -1105,7 +1078,7 @@ impl Unit {
     ) -> Result<crate::types::UnitVoltageConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/voltage/{src_format}/{output_format}"
@@ -1125,7 +1098,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -1142,7 +1114,7 @@ impl Unit {
     ) -> Result<crate::types::UnitVolumeConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/volume/{src_format}/{output_format}"
@@ -1162,7 +1134,6 @@ impl Unit {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))

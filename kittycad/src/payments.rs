@@ -25,7 +25,7 @@ impl Payments {
     ) -> Result<crate::types::Customer, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user/payment"),
+            format!("{}/{}", self.client.base_url, "user/payment"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -37,7 +37,6 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -69,7 +68,7 @@ impl Payments {
     ) -> Result<crate::types::Customer, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::PUT,
-            &format!("{}/{}", self.client.base_url, "user/payment"),
+            format!("{}/{}", self.client.base_url, "user/payment"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -82,7 +81,6 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -114,7 +112,7 @@ impl Payments {
     ) -> Result<crate::types::Customer, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!("{}/{}", self.client.base_url, "user/payment"),
+            format!("{}/{}", self.client.base_url, "user/payment"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -127,7 +125,6 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -146,7 +143,7 @@ impl Payments {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
-            &format!("{}/{}", self.client.base_url, "user/payment"),
+            format!("{}/{}", self.client.base_url, "user/payment"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -165,7 +162,7 @@ impl Payments {
     ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user/payment/balance"),
+            format!("{}/{}", self.client.base_url, "user/payment/balance"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -177,7 +174,6 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -191,7 +187,7 @@ impl Payments {
     ) -> Result<crate::types::PaymentIntent, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!("{}/{}", self.client.base_url, "user/payment/intent"),
+            format!("{}/{}", self.client.base_url, "user/payment/intent"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -203,7 +199,6 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -217,7 +212,7 @@ impl Payments {
     ) -> Result<Vec<crate::types::Invoice>, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user/payment/invoices"),
+            format!("{}/{}", self.client.base_url, "user/payment/invoices"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -229,7 +224,6 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -243,7 +237,7 @@ impl Payments {
     ) -> Result<Vec<crate::types::PaymentMethod>, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user/payment/methods"),
+            format!("{}/{}", self.client.base_url, "user/payment/methods"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -255,7 +249,6 @@ impl Payments {
                     format_serde_error::SerdeError::new(text.to_string(), err),
                     status,
                 )
-                .into()
             })
         } else {
             Err(crate::types::error::Error::UnexpectedResponse(resp))
@@ -270,10 +263,10 @@ impl Payments {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/payment/methods/{id}".replace("{id}", &id)
+                "user/payment/methods/{id}".replace("{id}", id)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -300,7 +293,7 @@ impl Payments {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user/payment/tax"),
+            format!("{}/{}", self.client.base_url, "user/payment/tax"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
