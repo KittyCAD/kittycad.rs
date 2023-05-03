@@ -96,7 +96,7 @@ impl Payments {
              .create_information_for_user(&kittycad::types::BillingInfo {\n            address: \
              Some(kittycad::types::NewAddress {\n                city: \
              Some(\"some-string\".to_string()),\n                country: \
-             kittycad::types::CountryCode::Cn,\n                state: \
+             kittycad::types::CountryCode::Hu,\n                state: \
              Some(\"some-string\".to_string()),\n                street_1: \
              Some(\"some-string\".to_string()),\n                street_2: \
              Some(\"some-string\".to_string()),\n                user_id: \
@@ -263,7 +263,7 @@ impl Payments {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "user/payment/methods/{id}".replace("{id}", id)

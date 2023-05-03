@@ -485,7 +485,7 @@ impl tabled::Tabled for AiPluginApi {
     }
 }
 
-#[doc = "An OpenAPI specification."]
+#[doc = "AI plugin api type."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -501,6 +501,7 @@ impl tabled::Tabled for AiPluginApi {
 )]
 #[derive(Default)]
 pub enum AiPluginApiType {
+    #[doc = "An OpenAPI specification."]
     #[serde(rename = "openapi")]
     #[display("openapi")]
     #[default]
@@ -7430,7 +7431,7 @@ impl tabled::Tabled for Oauth2ClientInfo {
     }
 }
 
-#[doc = "An OAuth 2.0 Device Authorization Grant."]
+#[doc = "An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -7446,6 +7447,7 @@ impl tabled::Tabled for Oauth2ClientInfo {
 )]
 #[derive(Default)]
 pub enum Oauth2GrantType {
+    #[doc = "An OAuth 2.0 Device Authorization Grant."]
     #[serde(rename = "urn:ietf:params:oauth:grant-type:device_code")]
     #[display("urn:ietf:params:oauth:grant-type:device_code")]
     #[default]
@@ -7728,7 +7730,7 @@ impl tabled::Tabled for PaymentMethodCardChecks {
     }
 }
 
-#[doc = "A card payment method."]
+#[doc = "An enum representing the possible values of an `PaymentMethod`'s `type` field."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -7744,6 +7746,7 @@ impl tabled::Tabled for PaymentMethodCardChecks {
 )]
 #[derive(Default)]
 pub enum PaymentMethodType {
+    #[doc = "A card payment method."]
     #[serde(rename = "card")]
     #[display("card")]
     #[default]
