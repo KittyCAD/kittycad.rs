@@ -582,6 +582,7 @@ fn get_request_body_example(
                             type_space,
                             &name.rendered()?,
                             &s.expand(&type_space.spec)?,
+                            false,
                         )?
                     }
                     openapiv3::ReferenceOr::Item(s) => {
@@ -589,6 +590,7 @@ fn get_request_body_example(
                             type_space,
                             &generate_name_for_fn_schema(name, method, s, op, "Request Body"),
                             s,
+                            false,
                         )?
                     }
                 };
@@ -662,6 +664,7 @@ fn get_example_args(
             type_space,
             &t.rendered()?,
             &schema.expand(&type_space.spec)?,
+            false,
         )?;
 
         if !parameter_data.required

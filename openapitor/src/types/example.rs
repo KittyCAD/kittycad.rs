@@ -301,15 +301,20 @@ pub fn generate_example_rust_from_schema(
     type_space: &crate::types::TypeSpace,
     name: &str,
     schema: &openapiv3::Schema,
+    in_crate: bool,
 ) -> Result<proc_macro2::TokenStream> {
     // eprintln!("{name}");
     let log = name == "updateUserAccount Request Body";
     Ok(match &schema.schema_kind {
         openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
             if !s.enumeration.is_empty() {
-                let name_ident =
-                    crate::types::get_type_name_for_schema(name, schema, &type_space.spec, false)?
-                        .strip_option()?;
+                let name_ident = crate::types::get_type_name_for_schema(
+                    name,
+                    schema,
+                    &type_space.spec,
+                    in_crate,
+                )?
+                .strip_option()?;
                 // Get a random item from the enum.
                 let random_value =
                     generate_example_json_from_schema(schema, &type_space.spec)?.to_string();
@@ -388,13 +393,13 @@ pub fn generate_example_rust_from_schema(
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Number(_)) => {
             let mut t =
-                crate::types::get_type_name_for_schema(name, schema, &type_space.spec, false)?;
+                crate::types::get_type_name_for_schema(name, schema, &type_space.spec, in_crate)?;
             t = t.strip_option()?;
             quote!(3.14 as #t)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Integer(_)) => {
             let mut t =
-                crate::types::get_type_name_for_schema(name, schema, &type_space.spec, false)?;
+                crate::types::get_type_name_for_schema(name, schema, &type_space.spec, in_crate)?;
             t = t.strip_option()?;
             quote!(4 as #t)
         }
@@ -403,7 +408,7 @@ pub fn generate_example_rust_from_schema(
                 eprintln!("It's a Type(Object(...))");
             }
             let object_name =
-                crate::types::get_type_name_for_schema(name, schema, &type_space.spec, false)?
+                crate::types::get_type_name_for_schema(name, schema, &type_space.spec, in_crate)?
                     .strip_option()?;
 
             // If the object has no properties, but has additional_properties, just use that
@@ -423,12 +428,14 @@ pub fn generate_example_rust_from_schema(
                                     type_space,
                                     &reference,
                                     &schema.expand(&type_space.spec)?,
+                                    in_crate,
                                 )?
                             } else {
                                 generate_example_rust_from_schema(
                                     type_space,
                                     name,
                                     &schema.expand(&type_space.spec)?,
+                                    in_crate,
                                 )?
                             };
 
@@ -530,6 +537,7 @@ pub fn generate_example_rust_from_schema(
                     type_space,
                     &inner_name_rendered,
                     &inner_schema,
+                    in_crate,
                 )?;
 
                 let k_ident = format_ident!("{}", crate::types::clean_property_name(k));
@@ -539,6 +547,7 @@ pub fn generate_example_rust_from_schema(
                     && !example
                         .rendered()?
                         .starts_with("crate::types::phone_number::PhoneNumber")
+                    && !example.rendered()?.starts_with("phone_number::PhoneNumber")
                 {
                     args.push(quote!(#k_ident: Some(#example)));
                 } else {
@@ -558,6 +567,7 @@ pub fn generate_example_rust_from_schema(
                     type_space,
                     name.trim_start_matches("Vec").trim_end_matches('>'),
                     &items,
+                    in_crate,
                 )?;
                 quote!(vec![#item_example])
             } else {
@@ -643,13 +653,17 @@ pub fn generate_example_rust_from_schema(
                                 type_space,
                                 property_name,
                                 &property_schema,
-                            )?
-                            .strip_crate_types()?;
+                                true,
+                            )?;
                         }
                     }
                 }
 
-                quote!(crate::types::#name_ident::#inner_object)
+                if in_crate {
+                    quote!(#name_ident::#inner_object)
+                } else {
+                    quote!(crate::types::#name_ident::#inner_object)
+                }
             } else if is_enum_with_docs {
                 let enum_schema = openapiv3::Schema {
                     schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::String(enum_schema)),
@@ -659,7 +673,7 @@ pub fn generate_example_rust_from_schema(
                     name,
                     &enum_schema,
                     &type_space.spec,
-                    false,
+                    in_crate,
                 )?
                 .strip_option()?;
                 // Get a random item from the enum.
@@ -675,10 +689,14 @@ pub fn generate_example_rust_from_schema(
                 let one_of_item = &one_of[0];
                 let one_of_item_schema =
                     one_of_item.get_schema_from_reference(&type_space.spec, true)?;
-                generate_example_rust_from_schema(type_space, name, &one_of_item_schema)?
+                generate_example_rust_from_schema(type_space, name, &one_of_item_schema, in_crate)?
             } else {
-                let type_name =
-                    crate::types::get_type_name_for_schema(name, schema, &type_space.spec, false)?;
+                let type_name = crate::types::get_type_name_for_schema(
+                    name,
+                    schema,
+                    &type_space.spec,
+                    in_crate,
+                )?;
 
                 let tag_result = crate::types::get_one_of_tag(one_of, &type_space.spec)?;
                 let mut ts = type_space.clone();
@@ -700,6 +718,7 @@ pub fn generate_example_rust_from_schema(
                                     type_space,
                                     name,
                                     &example_schema,
+                                    in_crate,
                                 )?;
                                 quote!(#type_name::#enum_name(#example))
                             } else {
@@ -738,6 +757,7 @@ pub fn generate_example_rust_from_schema(
                                 type_space,
                                 &enum_name.rendered()?,
                                 &schema,
+                                in_crate,
                             )?
                             .to_string();
 
@@ -772,6 +792,7 @@ pub fn generate_example_rust_from_schema(
                             type_space,
                             &inner_name.rendered()?,
                             &v.expand(&type_space.spec)?,
+                            in_crate,
                         )?;
                         quote!(#type_name::#enum_name(#example))
                     }
@@ -785,7 +806,7 @@ pub fn generate_example_rust_from_schema(
                 let all_of_item = &all_of[0];
                 let all_of_item_schema =
                     all_of_item.get_schema_from_reference(&type_space.spec, true)?;
-                generate_example_rust_from_schema(type_space, name, &all_of_item_schema)?
+                generate_example_rust_from_schema(type_space, name, &all_of_item_schema, in_crate)?
             } else {
                 let (properties, required) = match type_space.get_all_of_properties(name, all_of) {
                     Ok(p) => p,
@@ -803,6 +824,7 @@ pub fn generate_example_rust_from_schema(
                                         one_of: all_of.clone(),
                                     },
                                 },
+                                in_crate,
                             );
                         }
 
@@ -823,6 +845,7 @@ pub fn generate_example_rust_from_schema(
                             },
                         )),
                     },
+                    in_crate,
                 )?
             }
         }
@@ -831,7 +854,7 @@ pub fn generate_example_rust_from_schema(
                 let any_of_item = &any_of[0];
                 let any_of_item_schema =
                     any_of_item.get_schema_from_reference(&type_space.spec, true)?;
-                generate_example_rust_from_schema(type_space, name, &any_of_item_schema)?
+                generate_example_rust_from_schema(type_space, name, &any_of_item_schema, in_crate)?
             } else {
                 // The any of needs to be an object with optional values since it can be any (one or more) of multiple types.
                 // We want to iterate over each of the subschemas and combine all of the types.
@@ -864,6 +887,7 @@ pub fn generate_example_rust_from_schema(
                                     one_of: any_of.clone(),
                                 },
                             },
+                            in_crate,
                         );
                     }
                 }
@@ -880,6 +904,7 @@ pub fn generate_example_rust_from_schema(
                             },
                         )),
                     },
+                    in_crate,
                 )?
             }
         }
@@ -906,6 +931,7 @@ pub fn generate_example_rust_from_schema(
                             },
                         )),
                     },
+                    in_crate,
                 );
             }
 
@@ -965,6 +991,7 @@ mod test {
             },
             "",
             &schema,
+            false,
         )
         .unwrap();
 
@@ -995,6 +1022,7 @@ mod test {
             },
             "",
             &schema,
+            false,
         )
         .unwrap();
 
@@ -1018,6 +1046,7 @@ mod test {
             },
             "",
             &schema,
+            false,
         )
         .unwrap();
 
@@ -1047,6 +1076,7 @@ mod test {
             },
             "",
             &schema,
+            false,
         )
         .unwrap();
 
@@ -1087,6 +1117,7 @@ mod test {
             },
             "MyType",
             &schema,
+            false,
         )
         .unwrap();
 
@@ -1141,6 +1172,7 @@ mod test {
             },
             "MyType",
             &schema,
+            false,
         )
         .unwrap();
 

@@ -373,9 +373,6 @@ pub trait TokenStreamExt {
     /// Remove the Vec<> from the type.
     fn strip_vec(&self) -> Result<proc_macro2::TokenStream>;
 
-    /// Trim imports crate::types.
-    fn strip_crate_types(&self) -> Result<proc_macro2::TokenStream>;
-
     /// Return `true` if the token stream is a string.
     fn is_string(&self) -> Result<bool>;
 
@@ -426,12 +423,6 @@ impl TokenStreamExt for proc_macro2::TokenStream {
 
         let rendered = self.rendered()?;
         let rendered = rendered.trim_start_matches("Vec<").trim_end_matches('>');
-        rendered.parse().map_err(|e| anyhow::anyhow!("{}", e))
-    }
-
-    fn strip_crate_types(&self) -> Result<proc_macro2::TokenStream> {
-        let rendered = self.rendered()?;
-        let rendered = rendered.trim_start_matches("crate::types::");
         rendered.parse().map_err(|e| anyhow::anyhow!("{}", e))
     }
 
