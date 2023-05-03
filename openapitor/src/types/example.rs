@@ -630,7 +630,7 @@ pub fn generate_example_rust_from_schema(
 
                 // Get the render of the first object.
                 let mut inner_object = quote!();
-                for of in one_of {
+                if let Some(of) = one_of.iter().next() {
                     let schema = of.get_schema_from_reference(&type_space.spec, true)?;
                     if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
                         &schema.schema_kind
@@ -641,14 +641,12 @@ pub fn generate_example_rust_from_schema(
                                 property.get_schema_from_reference(&type_space.spec, true)?;
                             inner_object = generate_example_rust_from_schema(
                                 type_space,
-                                &property_name,
+                                property_name,
                                 &property_schema,
                             )?
                             .strip_crate_types()?;
                         }
                     }
-
-                    break;
                 }
 
                 quote!(crate::types::#name_ident::#inner_object)
