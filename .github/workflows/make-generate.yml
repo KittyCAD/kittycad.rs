@@ -3,6 +3,7 @@ on:
     paths:
       - spec.json
       - .github/workflows/make-generate.yml
+      - VERSION.txt
 name: make-generate
 permissions:
   packages: read
