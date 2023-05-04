@@ -12020,27 +12020,6 @@
         ]
       }
     },
-    "/_meta/metrics": {
-      "get": {
-        "description": "You must be a KittyCAD employee to perform this request.",
-        "operationId": "get_metrics",
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {}
-              }
-            },
-            "description": ""
-          }
-        },
-        "summary": "Get prometheus metrics",
-        "tags": [
-          "meta",
-          "hidden"
-        ]
-      }
-    },
     "/ai/image-to-3d/{input_format}/{output_format}": {
       "post": {
         "description": "This is an alpha endpoint. It will change in the future. The current output is honestly pretty bad. So if you find this endpoint, you get what you pay for, which currently is nothing. But in the future will be made a lot better.",
