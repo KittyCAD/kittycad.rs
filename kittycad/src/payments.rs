@@ -52,7 +52,7 @@ impl Payments {
              .update_information_for_user(&kittycad::types::BillingInfo {\n            address: \
              Some(kittycad::types::NewAddress {\n                city: \
              Some(\"some-string\".to_string()),\n                country: \
-             kittycad::types::CountryCode::Az,\n                state: \
+             kittycad::types::CountryCode::Hm,\n                state: \
              Some(\"some-string\".to_string()),\n                street_1: \
              Some(\"some-string\".to_string()),\n                street_2: \
              Some(\"some-string\".to_string()),\n                user_id: \
@@ -96,7 +96,7 @@ impl Payments {
              .create_information_for_user(&kittycad::types::BillingInfo {\n            address: \
              Some(kittycad::types::NewAddress {\n                city: \
              Some(\"some-string\".to_string()),\n                country: \
-             kittycad::types::CountryCode::Pl,\n                state: \
+             kittycad::types::CountryCode::It,\n                state: \
              Some(\"some-string\".to_string()),\n                street_1: \
              Some(\"some-string\".to_string()),\n                street_2: \
              Some(\"some-string\".to_string()),\n                user_id: \
