@@ -4,7 +4,7 @@ use std::fmt::Write as _;
 
 use anyhow::Result;
 use indexmap::map::IndexMap;
-use rand::Rng;
+use rand::{Rng, SeedableRng};
 
 use crate::types::{
     exts::{ReferenceOrExt, SchemaRenderExt, TokenStreamExt},
@@ -16,7 +16,7 @@ pub fn generate_example_json_from_schema(
     schema: &openapiv3::Schema,
     spec: &openapiv3::OpenAPI,
 ) -> Result<serde_json::Value> {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rngs::SmallRng::seed_from_u64(23456);
     Ok(match &schema.schema_kind {
         openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
             if !s.enumeration.is_empty() {
