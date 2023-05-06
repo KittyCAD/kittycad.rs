@@ -4,7 +4,15 @@ use std::{fmt::Write as _, str::FromStr};
 
 use anyhow::Result;
 use chrono::TimeZone;
+use rand::rngs::SmallRng;
+use rand::SeedableRng;
 use rand::{distributions::Alphanumeric, Rng};
+
+const SEED: u64 = 123456;
+
+fn generator() -> SmallRng {
+    SmallRng::seed_from_u64(SEED)
+}
 
 /// A triat that implements generating a random value of a given type.
 pub trait Random {
@@ -16,7 +24,7 @@ pub trait Random {
 
 impl Random for crate::types::phone_number::PhoneNumber {
     fn random() -> Result<Self> {
-        let mut rng = rand::thread_rng();
+        let mut rng = generator();
         let mut number = String::new();
         for _ in 0..10 {
             number.push(rng.gen_range('0'..='9'));
@@ -33,67 +41,67 @@ impl Random for uuid::Uuid {
 
 impl Random for i8 {
     fn random() -> Result<Self> {
-        Ok(rand::thread_rng().gen_range(std::i8::MIN..std::i8::MAX))
+        Ok(generator().gen_range(std::i8::MIN..std::i8::MAX))
     }
 }
 
 impl Random for i16 {
     fn random() -> Result<Self> {
-        Ok(rand::thread_rng().gen_range(std::i16::MIN..std::i16::MAX))
+        Ok(generator().gen_range(std::i16::MIN..std::i16::MAX))
     }
 }
 
 impl Random for i32 {
     fn random() -> Result<Self> {
-        Ok(rand::thread_rng().gen_range(std::i32::MIN..std::i32::MAX))
+        Ok(generator().gen_range(std::i32::MIN..std::i32::MAX))
     }
 }
 
 impl Random for i64 {
     fn random() -> Result<Self> {
-        Ok(rand::thread_rng().gen_range(std::i64::MIN..std::i64::MAX))
+        Ok(generator().gen_range(std::i64::MIN..std::i64::MAX))
     }
 }
 
 impl Random for f32 {
     fn random() -> Result<Self> {
-        Ok(rand::thread_rng().gen_range(0.0..std::f32::MAX))
+        Ok(generator().gen_range(0.0..std::f32::MAX))
     }
 }
 
 impl Random for f64 {
     fn random() -> Result<Self> {
-        Ok(rand::thread_rng().gen_range(0.0..std::f64::MAX))
+        Ok(generator().gen_range(0.0..std::f64::MAX))
     }
 }
 
 impl Random for u8 {
     fn random() -> Result<Self> {
-        Ok(rand::thread_rng().gen_range(std::u8::MIN..std::u8::MAX))
+        Ok(generator().gen_range(std::u8::MIN..std::u8::MAX))
     }
 }
 
 impl Random for u16 {
     fn random() -> Result<Self> {
-        Ok(rand::thread_rng().gen_range(std::u16::MIN..std::u16::MAX))
+        Ok(generator().gen_range(std::u16::MIN..std::u16::MAX))
     }
 }
 
 impl Random for u32 {
     fn random() -> Result<Self> {
-        Ok(rand::thread_rng().gen_range(std::u32::MIN..std::u32::MAX))
+        Ok(generator().gen_range(std::u32::MIN..std::u32::MAX))
     }
 }
 
 impl Random for u64 {
     fn random() -> Result<Self> {
-        Ok(rand::thread_rng().gen_range(std::u64::MIN..std::u64::MAX))
+        Ok(generator().gen_range(std::u64::MIN..std::u64::MAX))
     }
 }
 
 impl Random for std::net::Ipv4Addr {
     fn random() -> Result<Self> {
-        let mut rng = rand::thread_rng();
+        let mut rng = generator();
         let [a, b, c, d]: [u8; 4] = rng.gen();
         Ok(Self::new(a, b, c, d))
     }
@@ -101,7 +109,7 @@ impl Random for std::net::Ipv4Addr {
 
 impl Random for std::net::Ipv6Addr {
     fn random() -> Result<Self> {
-        let mut rng = rand::thread_rng();
+        let mut rng = generator();
         let [a, b, c, d, e, f, g, h]: [u16; 8] = rng.gen();
         Ok(Self::new(a, b, c, d, e, f, g, h))
     }
@@ -110,7 +118,7 @@ impl Random for std::net::Ipv6Addr {
 impl Random for std::net::IpAddr {
     fn random() -> Result<Self> {
         // Generate a random IPv4 or IPv6 address.
-        let mut rng = rand::thread_rng();
+        let mut rng = generator();
         let is_v4 = rng.gen();
         Ok(if is_v4 {
             std::net::IpAddr::V4(std::net::Ipv4Addr::random()?)
@@ -123,7 +131,7 @@ impl Random for std::net::IpAddr {
 impl Random for url::Url {
     fn random() -> Result<Self> {
         // Generate a random url.
-        let mut rng = rand::thread_rng();
+        let mut rng = generator();
         let mut url = String::new();
         let is_http = rng.gen();
         url.push_str(if is_http { "http://" } else { "https://" });
@@ -147,7 +155,7 @@ impl Random for url::Url {
 impl Random for chrono::NaiveTime {
     fn random() -> Result<Self> {
         // Generate a random time.
-        let mut rng = rand::thread_rng();
+        let mut rng = generator();
         let hour = rng.gen_range(0..24);
         let minute = rng.gen_range(0..60);
         let second = rng.gen_range(0..60);
@@ -158,7 +166,7 @@ impl Random for chrono::NaiveTime {
 impl Random for chrono::NaiveDate {
     fn random() -> Result<Self> {
         // Generate a random date.
-        let mut rng = rand::thread_rng();
+        let mut rng = generator();
         let year = rng.gen_range(1900..2100);
         let month = rng.gen_range(1..13);
         let day = rng.gen_range(1..28);
@@ -178,7 +186,7 @@ impl Random for chrono::NaiveDateTime {
 impl Random for chrono::DateTime<chrono::Utc> {
     fn random() -> Result<Self> {
         // Generate a random date and time.
-        let mut rng = rand::thread_rng();
+        let mut rng = generator();
         let out = chrono::Utc
             .with_ymd_and_hms(
                 rng.gen_range(1900..2100),
@@ -196,13 +204,13 @@ impl Random for chrono::DateTime<chrono::Utc> {
 
 impl Random for bool {
     fn random() -> Result<Self> {
-        Ok(rand::thread_rng().gen())
+        Ok(generator().gen())
     }
 }
 
 impl Random for crate::types::base64::Base64Data {
     fn random() -> Result<Self> {
-        let mut rng = rand::thread_rng();
+        let mut rng = generator();
         let mut bytes = Vec::new();
         for _ in 0..rng.gen_range(8..16) {
             bytes.push(rng.gen_range(0..256) as u8);
