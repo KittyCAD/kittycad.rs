@@ -2,7 +2,7 @@
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub enum DrawingCmd {
+pub enum ModelingCmd {
     DrawCircle {
         #[doc = "The center of the circle."]
         center: Vec<f64>,

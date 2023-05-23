@@ -653,7 +653,7 @@ pub fn generate_example_rust_from_schema(
                                 type_space,
                                 property_name,
                                 &property_schema,
-                                true,
+                                in_crate,
                             )?;
                         }
                     }

@@ -137,25 +137,9 @@
   },
   {
     "op": "add",
-    "path": "/paths/~1drawing~1cmd/post/x-rust",
-    "value": {
-      "example": "/// Submit one drawing operation.\n/// \n/// Response depends on which command was submitted, so unfortunately the OpenAPI schema can't generate the right response type.\nuse std::str::FromStr;\nasync fn example_drawing_cmd() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: serde_json::Value = client\n        .drawing()\n        .cmd(&kittycad::types::DrawingCmdReq {\n            cmd: kittycad::types::DrawingCmd::DrawCircle {\n                center: vec![3.14 as f64],\n                radius: 3.14 as f64,\n            },\n            cmd_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            file_id: \"some-string\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/drawing/struct.Drawing.html#method.cmd"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1drawing~1cmd_batch/post/x-rust",
-    "value": {
-      "example": "/// Submit many drawing operations.\nuse std::str::FromStr;\nasync fn example_drawing_cmd_batch() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::DrawingOutcomes = client\n        .drawing()\n        .cmd_batch(&kittycad::types::DrawingCmdReqBatch {\n            cmds: std::collections::HashMap::from([(\n                \"some-key\".to_string(),\n                kittycad::types::DrawingCmdReq {\n                    cmd: kittycad::types::DrawingCmd::DrawCircle {\n                        center: vec![3.14 as f64],\n                        radius: 3.14 as f64,\n                    },\n                    cmd_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                    file_id: \"some-string\".to_string(),\n                },\n            )]),\n            file_id: \"some-string\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/drawing/struct.Drawing.html#method.cmd_batch"
-    }
-  },
-  {
-    "op": "add",
     "path": "/paths/~1file~1center-of-mass/post/x-rust",
     "value": {
-      "example": "/// Get CAD file center of mass.\n/// \n/// Get the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `src_format: crate::types::FileImportFormat`: The format of the file. (required)\nasync fn example_file_create_center_of_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileCenterOfMass = client\n        .file()\n        .create_center_of_mass(\n            kittycad::types::FileImportFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get CAD file center of mass.\n/// \n/// We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\n/// Currently, this endpoint returns the cartesian co-ordinate in world space measure units.\n/// In the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\n/// Get the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `src_format: crate::types::FileImportFormat`: The format of the file. (required)\nasync fn example_file_create_center_of_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileCenterOfMass = client\n        .file()\n        .create_center_of_mass(\n            kittycad::types::FileImportFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_center_of_mass"
     }
   },
@@ -171,7 +155,7 @@
     "op": "add",
     "path": "/paths/~1file~1density/post/x-rust",
     "value": {
-      "example": "/// Get CAD file density.\n/// \n/// Get the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `material_mass: f64`: The material mass. (required)\n/// - `src_format: crate::types::FileImportFormat`: The format of the file. (required)\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::FileImportFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get CAD file density.\n/// \n/// We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\n/// Currently, this endpoint assumes if you are giving a material mass in a specific mass units, we return a density in mass unit per cubic measure unit.\n/// In the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\n/// Get the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `material_mass: f64`: The material mass. (required)\n/// - `src_format: crate::types::FileImportFormat`: The format of the file. (required)\nasync fn example_file_create_density() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileDensity = client\n        .file()\n        .create_density(\n            3.14 as f64,\n            kittycad::types::FileImportFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_density"
     }
   },
@@ -187,7 +171,7 @@
     "op": "add",
     "path": "/paths/~1file~1mass/post/x-rust",
     "value": {
-      "example": "/// Get CAD file mass.\n/// \n/// Get the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `material_density: f64`: The material density. (required)\n/// - `src_format: crate::types::FileImportFormat`: The format of the file. (required)\nasync fn example_file_create_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileMass = client\n        .file()\n        .create_mass(\n            3.14 as f64,\n            kittycad::types::FileImportFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get CAD file mass.\n/// \n/// We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\n/// Currently, this endpoint assumes if you are giving a material density in a specific mass unit per cubic measure unit, we return a mass in mass units. The same mass units as passed in the material density.\n/// In the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\n/// Get the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `material_density: f64`: The material density. (required)\n/// - `src_format: crate::types::FileImportFormat`: The format of the file. (required)\nasync fn example_file_create_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileMass = client\n        .file()\n        .create_mass(\n            3.14 as f64,\n            kittycad::types::FileImportFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_mass"
     }
   },
@@ -195,7 +179,7 @@
     "op": "add",
     "path": "/paths/~1file~1surface-area/post/x-rust",
     "value": {
-      "example": "/// Get CAD file surface area.\n/// \n/// Get the surface area of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `src_format: crate::types::FileImportFormat`: The format of the file. (required)\nasync fn example_file_create_surface_area() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileSurfaceArea = client\n        .file()\n        .create_surface_area(\n            kittycad::types::FileImportFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get CAD file surface area.\n/// \n/// We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\n/// Currently, this endpoint returns the square measure units.\n/// In the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\n/// Get the surface area of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `src_format: crate::types::FileImportFormat`: The format of the file. (required)\nasync fn example_file_create_surface_area() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileSurfaceArea = client\n        .file()\n        .create_surface_area(\n            kittycad::types::FileImportFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_surface_area"
     }
   },
@@ -203,7 +187,7 @@
     "op": "add",
     "path": "/paths/~1file~1volume/post/x-rust",
     "value": {
-      "example": "/// Get CAD file volume.\n/// \n/// Get the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `src_format: crate::types::FileImportFormat`: The format of the file. (required)\nasync fn example_file_create_volume() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileVolume = client\n        .file()\n        .create_volume(\n            kittycad::types::FileImportFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get CAD file volume.\n/// \n/// We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\n/// Currently, this endpoint returns the cubic measure units.\n/// In the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\n/// Get the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n/// If the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `src_format: crate::types::FileImportFormat`: The format of the file. (required)\nasync fn example_file_create_volume() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileVolume = client\n        .file()\n        .create_volume(\n            kittycad::types::FileImportFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_volume"
     }
   },
@@ -213,6 +197,22 @@
     "value": {
       "example": "/// This endpoint removes the session cookie for a user.\n/// \n/// This is used in logout scenarios.\nasync fn example_hidden_logout() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.hidden().logout().await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.logout"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1modeling~1cmd/post/x-rust",
+    "value": {
+      "example": "/// Submit one modeling operation.\n/// \n/// Response depends on which command was submitted, so unfortunately the OpenAPI schema can't generate the right response type.\nuse std::str::FromStr;\nasync fn example_modeling_cmd() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: serde_json::Value = client\n        .modeling()\n        .cmd(&kittycad::types::ModelingCmdReq {\n            cmd: kittycad::types::ModelingCmd::kittycad::types::AddLine {\n                from: kittycad::types::Point3D {\n                    x: 3.14 as f64,\n                    y: 3.14 as f64,\n                    z: 3.14 as f64,\n                },\n                to: kittycad::types::Point3D {\n                    x: 3.14 as f64,\n                    y: 3.14 as f64,\n                    z: 3.14 as f64,\n                },\n            },\n            cmd_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            file_id: \"some-string\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/modeling/struct.Modeling.html#method.cmd"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1modeling~1cmd_batch/post/x-rust",
+    "value": {
+      "example": "/// Submit many modeling operations.\nuse std::str::FromStr;\nasync fn example_modeling_cmd_batch() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ModelingOutcomes = client\n        .modeling()\n        .cmd_batch(&kittycad::types::ModelingCmdReqBatch {\n            cmds: std::collections::HashMap::from([(\n                \"some-key\".to_string(),\n                kittycad::types::ModelingCmdReq {\n                    cmd: kittycad::types::ModelingCmd::kittycad::types::AddLine {\n                        from: kittycad::types::Point3D {\n                            x: 3.14 as f64,\n                            y: 3.14 as f64,\n                            z: 3.14 as f64,\n                        },\n                        to: kittycad::types::Point3D {\n                            x: 3.14 as f64,\n                            y: 3.14 as f64,\n                            z: 3.14 as f64,\n                        },\n                    },\n                    cmd_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                    file_id: \"some-string\".to_string(),\n                },\n            )]),\n            file_id: \"some-string\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/modeling/struct.Modeling.html#method.cmd_batch"
     }
   },
   {
@@ -741,6 +741,14 @@
     "value": {
       "example": "/// Create a terminal.\n/// \n/// Attach to a docker container to create an interactive terminal.\nasync fn example_executor_create_term() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.executor().create_term().await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/executor/struct.Executor.html#method.create_term"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1ws~1modeling~1commands/get/x-rust",
+    "value": {
+      "example": "/// Open a websocket which accepts modeling commands.\n/// \n/// Pass those commands to the engine via websocket, and pass responses back to the client. Basically, this is a websocket proxy between the frontend/client and the engine.\nasync fn example_modeling_commands_ws() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.modeling().commands_ws().await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/modeling/struct.Modeling.html#method.commands_ws"
     }
   }
 ]

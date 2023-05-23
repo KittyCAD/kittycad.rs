@@ -1674,10 +1674,6 @@ fn get_type_name_for_array(
         } else {
             // We have an item.
             let item = s.item()?;
-            // Get the type name for the item.
-            if name == "Operations" || name.contains("Operations") {
-                println!("getting type name for array item: {:?}", item);
-            }
             get_type_name_for_schema(name, item, spec, in_crate)?
         }
     } else {
@@ -2514,7 +2510,7 @@ mod test {
 
     #[test]
     fn test_render_sum_enum_types() {
-        let schema = include_str!("../../tests/types/input/DrawingCmd.json");
+        let schema = include_str!("../../tests/types/input/ModelingCmd.json");
 
         let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
 
@@ -2525,7 +2521,7 @@ mod test {
             opts: Default::default(),
         };
 
-        type_space.render_schema("DrawingCmd", &schema).unwrap();
+        type_space.render_schema("ModelingCmd", &schema).unwrap();
 
         expectorate::assert_contents(
             "tests/types/kittycad.drawing-cmd-output.rs.gen",

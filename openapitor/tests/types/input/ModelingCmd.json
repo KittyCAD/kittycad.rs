@@ -49,7 +49,7 @@
             "sketch": {
               "allOf": [
                 {
-                  "$ref": "#/components/schemas/DrawingCmdId"
+                  "$ref": "#/components/schemas/ModelingCmdId"
                 }
               ],
               "description": "Which sketch to extrude."
