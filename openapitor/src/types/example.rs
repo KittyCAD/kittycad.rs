@@ -649,12 +649,19 @@ pub fn generate_example_rust_from_schema(
                         for (property_name, property) in o.properties.iter() {
                             let property_schema =
                                 property.get_schema_from_reference(&type_space.spec, true)?;
-                            inner_object = generate_example_rust_from_schema(
+                            let inner_object_string = generate_example_rust_from_schema(
                                 type_space,
                                 property_name,
                                 &property_schema,
-                                true,
-                            )?;
+                                in_crate,
+                            )?
+                            .to_string();
+                            let rendered_inner = inner_object_string
+                                .trim_start_matches("crate::types::")
+                                .trim_start_matches("crate :: types ::");
+                            inner_object = rendered_inner
+                                .parse()
+                                .map_err(|e| anyhow::anyhow!("{}", e))?;
                         }
                     }
                 }

@@ -29,7 +29,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! kittycad = "0.2.8"
+//! kittycad = "0.2.9"
 //! ```
 //!
 //! ## Basic example
@@ -79,10 +79,6 @@ pub mod apps;
 ///
 /// FROM: <https://docs.kittycad.io/api/constant>
 pub mod constant;
-/// Drawing API for updating your 3D files using the KittyCAD engine.
-///
-/// FROM: <https://docs.kittycad.io/api/drawing>
-pub mod drawing;
 /// Endpoints that allow for code execution or creation of code execution environments.
 ///
 /// FROM: <https://docs.kittycad.io/api/executor>
@@ -99,6 +95,10 @@ pub mod hidden;
 ///
 /// FROM: <https://docs.kittycad.io/api/meta>
 pub mod meta;
+/// Modeling API for updating your 3D files using the KittyCAD engine.
+///
+/// FROM: <https://docs.kittycad.io/api/modeling>
+pub mod modeling;
 /// Endpoints that implement OAuth 2.0 grant flows.
 ///
 /// FROM: <https://docs.kittycad.io/api/oauth2>
@@ -260,13 +260,6 @@ impl Client {
         constant::Constant::new(self.clone())
     }
 
-    /// Drawing API for updating your 3D files using the KittyCAD engine.
-    ///
-    /// FROM: <https://docs.kittycad.io/api/drawing>
-    pub fn drawing(&self) -> drawing::Drawing {
-        drawing::Drawing::new(self.clone())
-    }
-
     /// Endpoints that allow for code execution or creation of code execution environments.
     ///
     /// FROM: <https://docs.kittycad.io/api/executor>
@@ -293,6 +286,13 @@ impl Client {
     /// FROM: <https://docs.kittycad.io/api/meta>
     pub fn meta(&self) -> meta::Meta {
         meta::Meta::new(self.clone())
+    }
+
+    /// Modeling API for updating your 3D files using the KittyCAD engine.
+    ///
+    /// FROM: <https://docs.kittycad.io/api/modeling>
+    pub fn modeling(&self) -> modeling::Modeling {
+        modeling::Modeling::new(self.clone())
     }
 
     /// Endpoints that implement OAuth 2.0 grant flows.

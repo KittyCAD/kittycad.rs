@@ -4832,195 +4832,6 @@ impl tabled::Tabled for DockerSystemInfo {
     }
 }
 
-#[doc = "Commands that the KittyCAD engine can execute."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub enum DrawingCmd {
-    DrawCircle {
-        #[doc = "The center of the circle."]
-        center: Vec<f64>,
-        #[doc = "The radius of the circle."]
-        radius: f64,
-    },
-    Extrude {
-        #[doc = "How far to extrude."]
-        distance: f64,
-        #[doc = "Which sketch to extrude."]
-        sketch: uuid::Uuid,
-    },
-}
-
-#[doc = "A graphics command submitted to the KittyCAD engine via the Drawing API."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DrawingCmdReq {
-    #[doc = "Commands that the KittyCAD engine can execute."]
-    pub cmd: DrawingCmd,
-    #[doc = "All commands have unique IDs. These should be randomly generated."]
-    pub cmd_id: uuid::Uuid,
-    pub file_id: String,
-}
-
-impl std::fmt::Display for DrawingCmdReq {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for DrawingCmdReq {
-    const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
-        vec![
-            format!("{:?}", self.cmd),
-            format!("{:?}", self.cmd_id),
-            self.file_id.clone(),
-        ]
-    }
-
-    fn headers() -> Vec<String> {
-        vec![
-            "cmd".to_string(),
-            "cmd_id".to_string(),
-            "file_id".to_string(),
-        ]
-    }
-}
-
-#[doc = "A batch set of graphics commands submitted to the KittyCAD engine via the Drawing API."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DrawingCmdReqBatch {
-    #[doc = "A set of commands to submit to the KittyCAD engine in a batch."]
-    pub cmds: std::collections::HashMap<String, DrawingCmdReq>,
-    #[doc = "Which file is being drawn in."]
-    pub file_id: String,
-}
-
-impl std::fmt::Display for DrawingCmdReqBatch {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for DrawingCmdReqBatch {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.cmds), self.file_id.clone()]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["cmds".to_string(), "file_id".to_string()]
-    }
-}
-
-#[doc = "Why a command submitted to the Drawing API failed."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DrawingError {
-    #[doc = "A string error code which refers to a family of errors. E.g. \"InvalidInput\"."]
-    pub error_code: String,
-    #[doc = "Describe the specific error which occurred. Will be shown to users, not logged."]
-    pub external_message: String,
-    #[doc = "Describe the specific error which occurred. Will be logged, not shown to users."]
-    pub internal_message: String,
-    #[doc = "A HTTP status code."]
-    pub status_code: u16,
-}
-
-impl std::fmt::Display for DrawingError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for DrawingError {
-    const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<String> {
-        vec![
-            self.error_code.clone(),
-            self.external_message.clone(),
-            self.internal_message.clone(),
-            format!("{:?}", self.status_code),
-        ]
-    }
-
-    fn headers() -> Vec<String> {
-        vec![
-            "error_code".to_string(),
-            "external_message".to_string(),
-            "internal_message".to_string(),
-            "status_code".to_string(),
-        ]
-    }
-}
-
-#[doc = "The result from one drawing command in a batch."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub enum DrawingOutcome {
-    Error {
-        #[doc = "A string error code which refers to a family of errors. E.g. \"InvalidInput\"."]
-        error_code: String,
-        #[doc = "Describe the specific error which occurred. Will be shown to users, not logged."]
-        external_message: String,
-        #[doc = "Describe the specific error which occurred. Will be logged, not shown to users."]
-        internal_message: String,
-        #[doc = "A HTTP status code."]
-        status_code: u16,
-    },
-    Cancelled {
-        #[doc = "The ID of the command that failed, cancelling this command."]
-        what_failed: uuid::Uuid,
-    },
-}
-
-#[doc = "The result from a batch of drawing commands."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DrawingOutcomes {
-    #[doc = "The results from each command in the batch."]
-    pub outcomes: std::collections::HashMap<String, DrawingOutcome>,
-}
-
-impl std::fmt::Display for DrawingOutcomes {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-impl tabled::Tabled for DrawingOutcomes {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.outcomes)]
-    }
-
-    fn headers() -> Vec<String> {
-        vec!["outcomes".to_string()]
-    }
-}
-
 #[doc = "The body of the form for email authentication."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -5131,12 +4942,16 @@ impl tabled::Tabled for EngineMetadata {
     parse_display :: Display,
 )]
 pub enum Environment {
+    #[doc = "The development environment. This is for running locally."]
     #[serde(rename = "DEVELOPMENT")]
     #[display("DEVELOPMENT")]
     Development,
+    #[doc = "The preview environment. This is when PRs are created and a service is deployed for \
+             testing."]
     #[serde(rename = "PREVIEW")]
     #[display("PREVIEW")]
     Preview,
+    #[doc = "The production environment."]
     #[serde(rename = "PRODUCTION")]
     #[display("PRODUCTION")]
     Production,
@@ -5452,6 +5267,38 @@ impl tabled::Tabled for ExtendedUserResultsPage {
 
     fn headers() -> Vec<String> {
         vec!["items".to_string(), "next_page".to_string()]
+    }
+}
+
+#[doc = "Command for extruding a solid."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Extrude {
+    #[doc = "How far off the plane to extrude"]
+    pub distance: f64,
+    #[doc = "Which sketch to extrude"]
+    pub target: uuid::Uuid,
+}
+
+impl std::fmt::Display for Extrude {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for Extrude {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.distance), format!("{:?}", self.target)]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["distance".to_string(), "target".to_string()]
     }
 }
 
@@ -7076,6 +6923,38 @@ impl tabled::Tabled for LeafNode {
     }
 }
 
+#[doc = "Command for adding a line."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Line3D {
+    #[doc = "Start of the line"]
+    pub from: Point3D,
+    #[doc = "End of the line"]
+    pub to: Point3D,
+}
+
+impl std::fmt::Display for Line3D {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for Line3D {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.from), format!("{:?}", self.to)]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["from".to_string(), "to".to_string()]
+    }
+}
+
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -7279,6 +7158,201 @@ pub enum Method {
     #[serde(rename = "EXTENSION")]
     #[display("EXTENSION")]
     Extension,
+}
+
+#[doc = "Commands that the KittyCAD engine can execute."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub enum ModelingCmd {
+    AddLine {
+        #[doc = "Start of the line"]
+        from: Point3D,
+        #[doc = "End of the line"]
+        to: Point3D,
+    },
+    Extrude {
+        #[doc = "How far off the plane to extrude"]
+        distance: f64,
+        #[doc = "Which sketch to extrude"]
+        target: uuid::Uuid,
+    },
+    SelectionClick {
+        #[doc = "Where the mouse was clicked. TODO engine#1035: Choose a coordinate system for \
+                 this."]
+        at: Point2D,
+    },
+}
+
+#[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ModelingCmdReq {
+    #[doc = "Which command to submit to the Kittycad engine."]
+    pub cmd: ModelingCmd,
+    #[doc = "ID of command being submitted."]
+    pub cmd_id: uuid::Uuid,
+    #[doc = "ID of the model's file."]
+    pub file_id: String,
+}
+
+impl std::fmt::Display for ModelingCmdReq {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for ModelingCmdReq {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            format!("{:?}", self.cmd),
+            format!("{:?}", self.cmd_id),
+            self.file_id.clone(),
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "cmd".to_string(),
+            "cmd_id".to_string(),
+            "file_id".to_string(),
+        ]
+    }
+}
+
+#[doc = "A batch set of graphics commands submitted to the KittyCAD engine via the Modeling API."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ModelingCmdReqBatch {
+    #[doc = "A set of commands to submit to the KittyCAD engine in a batch."]
+    pub cmds: std::collections::HashMap<String, ModelingCmdReq>,
+    #[doc = "Which file is being drawn in."]
+    pub file_id: String,
+}
+
+impl std::fmt::Display for ModelingCmdReqBatch {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for ModelingCmdReqBatch {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.cmds), self.file_id.clone()]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["cmds".to_string(), "file_id".to_string()]
+    }
+}
+
+#[doc = "Why a command submitted to the Modeling API failed."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ModelingError {
+    #[doc = "A string error code which refers to a family of errors. E.g. \"InvalidInput\"."]
+    pub error_code: String,
+    #[doc = "Describe the specific error which occurred. Will be shown to users, not logged."]
+    pub external_message: String,
+    #[doc = "Describe the specific error which occurred. Will be logged, not shown to users."]
+    pub internal_message: String,
+    #[doc = "A HTTP status code."]
+    pub status_code: u16,
+}
+
+impl std::fmt::Display for ModelingError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for ModelingError {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            self.error_code.clone(),
+            self.external_message.clone(),
+            self.internal_message.clone(),
+            format!("{:?}", self.status_code),
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec![
+            "error_code".to_string(),
+            "external_message".to_string(),
+            "internal_message".to_string(),
+            "status_code".to_string(),
+        ]
+    }
+}
+
+#[doc = "The result from one modeling command in a batch."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub enum ModelingOutcome {
+    Error {
+        #[doc = "A string error code which refers to a family of errors. E.g. \"InvalidInput\"."]
+        error_code: String,
+        #[doc = "Describe the specific error which occurred. Will be shown to users, not logged."]
+        external_message: String,
+        #[doc = "Describe the specific error which occurred. Will be logged, not shown to users."]
+        internal_message: String,
+        #[doc = "A HTTP status code."]
+        status_code: u16,
+    },
+    Cancelled {
+        #[doc = "The ID of the command that failed, cancelling this command."]
+        what_failed: uuid::Uuid,
+    },
+}
+
+#[doc = "The result from a batch of modeling commands."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ModelingOutcomes {
+    #[doc = "The results from each command in the batch."]
+    pub outcomes: std::collections::HashMap<String, ModelingOutcome>,
+}
+
+impl std::fmt::Display for ModelingOutcomes {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for ModelingOutcomes {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.outcomes)]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["outcomes".to_string()]
+    }
 }
 
 #[doc = "The struct that is used to create a new record. This is automatically generated and has \
@@ -8058,6 +8132,71 @@ impl tabled::Tabled for PluginsInfo {
             "network".to_string(),
             "volume".to_string(),
         ]
+    }
+}
+
+#[doc = "A point in 2D space"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Point2D {
+    pub x: f64,
+    pub y: f64,
+}
+
+impl std::fmt::Display for Point2D {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for Point2D {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<String> {
+        vec![format!("{:?}", self.x), format!("{:?}", self.y)]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["x".to_string(), "y".to_string()]
+    }
+}
+
+#[doc = "A point in 3D space"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Point3D {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+}
+
+impl std::fmt::Display for Point3D {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+impl tabled::Tabled for Point3D {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<String> {
+        vec![
+            format!("{:?}", self.x),
+            format!("{:?}", self.y),
+            format!("{:?}", self.z),
+        ]
+    }
+
+    fn headers() -> Vec<String> {
+        vec!["x".to_string(), "y".to_string(), "z".to_string()]
     }
 }
 
