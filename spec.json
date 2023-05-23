@@ -5041,224 +5041,6 @@
         },
         "type": "object"
       },
-      "DrawingCmd": {
-        "description": "Commands that the KittyCAD engine can execute.",
-        "oneOf": [
-          {
-            "additionalProperties": false,
-            "description": "Draw a circle.",
-            "properties": {
-              "DrawCircle": {
-                "properties": {
-                  "center": {
-                    "description": "The center of the circle.",
-                    "items": {
-                      "format": "float",
-                      "type": "number"
-                    },
-                    "maxItems": 3,
-                    "minItems": 3,
-                    "type": "array"
-                  },
-                  "radius": {
-                    "description": "The radius of the circle.",
-                    "format": "float",
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "center",
-                  "radius"
-                ],
-                "type": "object"
-              }
-            },
-            "required": [
-              "DrawCircle"
-            ],
-            "type": "object"
-          },
-          {
-            "additionalProperties": false,
-            "description": "Extrude a sketch.",
-            "properties": {
-              "Extrude": {
-                "properties": {
-                  "distance": {
-                    "description": "How far to extrude.",
-                    "format": "float",
-                    "type": "number"
-                  },
-                  "sketch": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/DrawingCmdId"
-                      }
-                    ],
-                    "description": "Which sketch to extrude."
-                  }
-                },
-                "required": [
-                  "distance",
-                  "sketch"
-                ],
-                "type": "object"
-              }
-            },
-            "required": [
-              "Extrude"
-            ],
-            "type": "object"
-          }
-        ]
-      },
-      "DrawingCmdId": {
-        "description": "All commands have unique IDs. These should be randomly generated.",
-        "format": "uuid",
-        "type": "string"
-      },
-      "DrawingCmdReq": {
-        "description": "A graphics command submitted to the KittyCAD engine via the Drawing API.",
-        "properties": {
-          "cmd": {
-            "$ref": "#/components/schemas/DrawingCmd"
-          },
-          "cmd_id": {
-            "$ref": "#/components/schemas/DrawingCmdId"
-          },
-          "file_id": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "cmd",
-          "cmd_id",
-          "file_id"
-        ],
-        "type": "object"
-      },
-      "DrawingCmdReqBatch": {
-        "description": "A batch set of graphics commands submitted to the KittyCAD engine via the Drawing API.",
-        "properties": {
-          "cmds": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/DrawingCmdReq"
-            },
-            "description": "A set of commands to submit to the KittyCAD engine in a batch.",
-            "type": "object"
-          },
-          "file_id": {
-            "description": "Which file is being drawn in.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "cmds",
-          "file_id"
-        ],
-        "type": "object"
-      },
-      "DrawingError": {
-        "description": "Why a command submitted to the Drawing API failed.",
-        "properties": {
-          "error_code": {
-            "description": "A string error code which refers to a family of errors. E.g. \"InvalidInput\".",
-            "type": "string"
-          },
-          "external_message": {
-            "description": "Describe the specific error which occurred. Will be shown to users, not logged.",
-            "type": "string"
-          },
-          "internal_message": {
-            "description": "Describe the specific error which occurred. Will be logged, not shown to users.",
-            "type": "string"
-          },
-          "status_code": {
-            "description": "A HTTP status code.",
-            "format": "uint16",
-            "minimum": 0,
-            "type": "integer"
-          }
-        },
-        "required": [
-          "error_code",
-          "external_message",
-          "internal_message",
-          "status_code"
-        ],
-        "type": "object"
-      },
-      "DrawingOutcome": {
-        "description": "The result from one drawing command in a batch.",
-        "oneOf": [
-          {
-            "additionalProperties": false,
-            "description": "Each successful command has some result. Unfortunately this isn't strongly typed, because the result depends on the command. This means the OpenAPI schema for this won't be very useful.",
-            "properties": {
-              "Success": {}
-            },
-            "required": [
-              "Success"
-            ],
-            "type": "object"
-          },
-          {
-            "additionalProperties": false,
-            "description": "It failed. Why? See 'struct Error' above.",
-            "properties": {
-              "Error": {
-                "$ref": "#/components/schemas/DrawingError"
-              }
-            },
-            "required": [
-              "Error"
-            ],
-            "type": "object"
-          },
-          {
-            "additionalProperties": false,
-            "description": "Cancelled because it required the output of a previous command, which failed.",
-            "properties": {
-              "Cancelled": {
-                "properties": {
-                  "what_failed": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/DrawingCmdId"
-                      }
-                    ],
-                    "description": "The ID of the command that failed, cancelling this command."
-                  }
-                },
-                "required": [
-                  "what_failed"
-                ],
-                "type": "object"
-              }
-            },
-            "required": [
-              "Cancelled"
-            ],
-            "type": "object"
-          }
-        ]
-      },
-      "DrawingOutcomes": {
-        "description": "The result from a batch of drawing commands.",
-        "properties": {
-          "outcomes": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/DrawingOutcome"
-            },
-            "description": "The results from each command in the batch.",
-            "type": "object"
-          }
-        },
-        "required": [
-          "outcomes"
-        ],
-        "type": "object"
-      },
       "EmailAuthenticationForm": {
         "description": "The body of the form for email authentication.",
         "properties": {
@@ -5335,12 +5117,29 @@
       },
       "Environment": {
         "description": "The environment the server is running in.",
-        "enum": [
-          "DEVELOPMENT",
-          "PREVIEW",
-          "PRODUCTION"
-        ],
-        "type": "string"
+        "oneOf": [
+          {
+            "description": "The development environment. This is for running locally.",
+            "enum": [
+              "DEVELOPMENT"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "The preview environment. This is when PRs are created and a service is deployed for testing.",
+            "enum": [
+              "PREVIEW"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "The production environment.",
+            "enum": [
+              "PRODUCTION"
+            ],
+            "type": "string"
+          }
+        ]
       },
       "Error": {
         "description": "Error information from a response.",
@@ -5501,6 +5300,29 @@
         },
         "required": [
           "items"
+        ],
+        "type": "object"
+      },
+      "Extrude": {
+        "description": "Command for extruding a solid.",
+        "properties": {
+          "distance": {
+            "description": "How far off the plane to extrude",
+            "format": "double",
+            "type": "number"
+          },
+          "target": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ModelingCmdId"
+              }
+            ],
+            "description": "Which sketch to extrude"
+          }
+        },
+        "required": [
+          "distance",
+          "target"
         ],
         "type": "object"
       },
@@ -6632,6 +6454,32 @@
         },
         "type": "object"
       },
+      "Line3d": {
+        "description": "Command for adding a line.",
+        "properties": {
+          "from": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ],
+            "description": "Start of the line"
+          },
+          "to": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ],
+            "description": "End of the line"
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ],
+        "type": "object"
+      },
       "Mesh": {
         "properties": {
           "mesh": {
@@ -6815,6 +6663,221 @@
             "type": "string"
           }
         ]
+      },
+      "ModelingCmd": {
+        "description": "Commands that the KittyCAD engine can execute.",
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "description": "Add a line",
+            "properties": {
+              "AddLine": {
+                "$ref": "#/components/schemas/Line3d"
+              }
+            },
+            "required": [
+              "AddLine"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Extrude a solid",
+            "properties": {
+              "Extrude": {
+                "$ref": "#/components/schemas/Extrude"
+              }
+            },
+            "required": [
+              "Extrude"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Mouse clicked on the engine window, trying to select some surface.",
+            "properties": {
+              "SelectionClick": {
+                "properties": {
+                  "at": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point2d"
+                      }
+                    ],
+                    "description": "Where the mouse was clicked. TODO engine#1035: Choose a coordinate system for this."
+                  }
+                },
+                "required": [
+                  "at"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "SelectionClick"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "ModelingCmdId": {
+        "description": "All commands have unique IDs. These should be randomly generated.",
+        "format": "uuid",
+        "type": "string"
+      },
+      "ModelingCmdReq": {
+        "description": "A graphics command submitted to the KittyCAD engine via the Modeling API.",
+        "properties": {
+          "cmd": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ModelingCmd"
+              }
+            ],
+            "description": "Which command to submit to the Kittycad engine."
+          },
+          "cmd_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ModelingCmdId"
+              }
+            ],
+            "description": "ID of command being submitted."
+          },
+          "file_id": {
+            "description": "ID of the model's file.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "cmd",
+          "cmd_id",
+          "file_id"
+        ],
+        "type": "object"
+      },
+      "ModelingCmdReqBatch": {
+        "description": "A batch set of graphics commands submitted to the KittyCAD engine via the Modeling API.",
+        "properties": {
+          "cmds": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ModelingCmdReq"
+            },
+            "description": "A set of commands to submit to the KittyCAD engine in a batch.",
+            "type": "object"
+          },
+          "file_id": {
+            "description": "Which file is being drawn in.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "cmds",
+          "file_id"
+        ],
+        "type": "object"
+      },
+      "ModelingError": {
+        "description": "Why a command submitted to the Modeling API failed.",
+        "properties": {
+          "error_code": {
+            "description": "A string error code which refers to a family of errors. E.g. \"InvalidInput\".",
+            "type": "string"
+          },
+          "external_message": {
+            "description": "Describe the specific error which occurred. Will be shown to users, not logged.",
+            "type": "string"
+          },
+          "internal_message": {
+            "description": "Describe the specific error which occurred. Will be logged, not shown to users.",
+            "type": "string"
+          },
+          "status_code": {
+            "description": "A HTTP status code.",
+            "format": "uint16",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "error_code",
+          "external_message",
+          "internal_message",
+          "status_code"
+        ],
+        "type": "object"
+      },
+      "ModelingOutcome": {
+        "description": "The result from one modeling command in a batch.",
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "description": "Each successful command has some result. Unfortunately this isn't strongly typed, because the result depends on the command. This means the OpenAPI schema for this won't be very useful.",
+            "properties": {
+              "Success": {}
+            },
+            "required": [
+              "Success"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "It failed. Why? See 'struct Error' above.",
+            "properties": {
+              "Error": {
+                "$ref": "#/components/schemas/ModelingError"
+              }
+            },
+            "required": [
+              "Error"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Cancelled because it required the output of a previous command, which failed.",
+            "properties": {
+              "Cancelled": {
+                "properties": {
+                  "what_failed": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/ModelingCmdId"
+                      }
+                    ],
+                    "description": "The ID of the command that failed, cancelling this command."
+                  }
+                },
+                "required": [
+                  "what_failed"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "Cancelled"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "ModelingOutcomes": {
+        "description": "The result from a batch of modeling commands.",
+        "properties": {
+          "outcomes": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ModelingOutcome"
+            },
+            "description": "The results from each command in the batch.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "outcomes"
+        ],
+        "type": "object"
       },
       "NewAddress": {
         "description": "The struct that is used to create a new record. This is automatically generated and has all the same fields as the main struct only it is missing the `id`.",
@@ -7364,6 +7427,47 @@
             "type": "array"
           }
         },
+        "type": "object"
+      },
+      "Point2d": {
+        "description": "A point in 2D space",
+        "properties": {
+          "x": {
+            "format": "float",
+            "type": "number"
+          },
+          "y": {
+            "format": "float",
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ],
+        "type": "object"
+      },
+      "Point3d": {
+        "description": "A point in 3D space",
+        "properties": {
+          "x": {
+            "format": "float",
+            "type": "number"
+          },
+          "y": {
+            "format": "float",
+            "type": "number"
+          },
+          "z": {
+            "format": "float",
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "z"
+        ],
         "type": "object"
       },
       "PointEMetadata": {
@@ -12089,7 +12193,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -12248,7 +12352,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -12757,7 +12861,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -13051,7 +13155,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -13292,255 +13396,6 @@
         ]
       }
     },
-    "/drawing/cmd": {
-      "options": {
-        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_cmd",
-        "responses": {
-          "204": {
-            "description": "successful operation, no content",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "summary": "OPTIONS endoint.",
-        "tags": [
-          "hidden"
-        ]
-      },
-      "post": {
-        "description": "Response depends on which command was submitted, so unfortunately the OpenAPI schema can't generate the right response type.",
-        "operationId": "cmd",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DrawingCmdReq"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "summary": "Submit one drawing operation.",
-        "tags": [
-          "drawing",
-          "hidden"
-        ]
-      }
-    },
-    "/drawing/cmd_batch": {
-      "options": {
-        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_cmd_batch",
-        "responses": {
-          "204": {
-            "description": "successful operation, no content",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "summary": "OPTIONS endoint.",
-        "tags": [
-          "hidden"
-        ]
-      },
-      "post": {
-        "operationId": "cmd_batch",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DrawingCmdReqBatch"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DrawingOutcomes"
-                }
-              }
-            },
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "summary": "Submit many drawing operations.",
-        "tags": [
-          "drawing",
-          "hidden"
-        ]
-      }
-    },
     "/file/center-of-mass": {
       "options": {
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
@@ -13590,13 +13445,13 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
       },
       "post": {
-        "description": "Get the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nCurrently, this endpoint returns the cartesian co-ordinate in world space measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_center_of_mass",
         "parameters": [
           {
@@ -13675,7 +13530,8 @@
         "summary": "Get CAD file center of mass.",
         "tags": [
           "file",
-          "beta"
+          "beta",
+          "hidden"
         ]
       }
     },
@@ -13748,7 +13604,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -13894,13 +13750,13 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
       },
       "post": {
-        "description": "Get the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nCurrently, this endpoint assumes if you are giving a material mass in a specific mass units, we return a density in mass unit per cubic measure unit.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_density",
         "parameters": [
           {
@@ -14053,7 +13909,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -14199,13 +14055,13 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
       },
       "post": {
-        "description": "Get the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nCurrently, this endpoint assumes if you are giving a material density in a specific mass unit per cubic measure unit, we return a mass in mass units. The same mass units as passed in the material density.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_mass",
         "parameters": [
           {
@@ -14347,13 +14203,13 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
       },
       "post": {
-        "description": "Get the surface area of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nCurrently, this endpoint returns the square measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the surface area of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_surface_area",
         "parameters": [
           {
@@ -14432,7 +14288,8 @@
         "summary": "Get CAD file surface area.",
         "tags": [
           "file",
-          "beta"
+          "beta",
+          "hidden"
         ]
       }
     },
@@ -14485,13 +14342,13 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
       },
       "post": {
-        "description": "Get the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nCurrently, this endpoint returns the cubic measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_volume",
         "parameters": [
           {
@@ -14570,7 +14427,8 @@
         "summary": "Get CAD file volume.",
         "tags": [
           "file",
-          "beta"
+          "beta",
+          "hidden"
         ]
       }
     },
@@ -14623,7 +14481,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -14690,6 +14548,255 @@
         ]
       }
     },
+    "/modeling/cmd": {
+      "options": {
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_cmd",
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "OPTIONS endpoint.",
+        "tags": [
+          "hidden"
+        ]
+      },
+      "post": {
+        "description": "Response depends on which command was submitted, so unfortunately the OpenAPI schema can't generate the right response type.",
+        "operationId": "cmd",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelingCmdReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Submit one modeling operation.",
+        "tags": [
+          "modeling",
+          "hidden"
+        ]
+      }
+    },
+    "/modeling/cmd_batch": {
+      "options": {
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_cmd_batch",
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "OPTIONS endpoint.",
+        "tags": [
+          "hidden"
+        ]
+      },
+      "post": {
+        "operationId": "cmd_batch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelingCmdReqBatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelingOutcomes"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Submit many modeling operations.",
+        "tags": [
+          "modeling",
+          "hidden"
+        ]
+      }
+    },
     "/oauth2/device/auth": {
       "options": {
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
@@ -14739,7 +14846,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -14823,7 +14930,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -14942,7 +15049,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -18197,7 +18304,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -18577,7 +18684,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -18841,7 +18948,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -19198,7 +19305,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -19455,7 +19562,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -19779,7 +19886,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "OPTIONS endoint.",
+        "summary": "OPTIONS endpoint.",
         "tags": [
           "hidden"
         ]
@@ -20372,6 +20479,28 @@
         ],
         "x-dropshot-websocket": {}
       }
+    },
+    "/ws/modeling/commands": {
+      "get": {
+        "description": "Pass those commands to the engine via websocket, and pass responses back to the client. Basically, this is a websocket proxy between the frontend/client and the engine.",
+        "operationId": "modeling_commands_ws",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {}
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Open a websocket which accepts modeling commands.",
+        "tags": [
+          "modeling",
+          "hidden"
+        ],
+        "x-dropshot-websocket": {}
+      }
     }
   },
   "tags": [
@@ -20418,13 +20547,6 @@
       "name": "constant"
     },
     {
-      "description": "Drawing API for updating your 3D files using the KittyCAD engine.",
-      "externalDocs": {
-        "url": "https://docs.kittycad.io/api/drawing"
-      },
-      "name": "drawing"
-    },
-    {
       "description": "Endpoints that allow for code execution or creation of code execution environments.",
       "externalDocs": {
         "url": "https://docs.kittycad.io/api/executor"
@@ -20451,6 +20573,13 @@
         "url": "https://docs.kittycad.io/api/meta"
       },
       "name": "meta"
+    },
+    {
+      "description": "Modeling API for updating your 3D files using the KittyCAD engine.",
+      "externalDocs": {
+        "url": "https://docs.kittycad.io/api/modeling"
+      },
+      "name": "modeling"
     },
     {
       "description": "Endpoints that implement OAuth 2.0 grant flows.",
