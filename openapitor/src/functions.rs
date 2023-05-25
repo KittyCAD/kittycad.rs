@@ -6,6 +6,7 @@ use std::{
 };
 
 use anyhow::Result;
+use proc_macro2::TokenStream;
 
 use crate::types::{
     exts::{
@@ -14,6 +15,44 @@ use crate::types::{
     },
     sanitize_indents,
 };
+
+/// Returns example
+fn generate_websocket_fn(
+    type_space: &mut crate::types::TypeSpace,
+    name: &str,
+    method: &http::Method,
+    op: &openapiv3::Operation,
+    global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
+) -> Result<(TokenStream, HashMap<String, String>)> {
+    let docs = generate_docs(type_space, name, method, op, global_params)?;
+    // Get the function name.
+    let fn_name = op.get_fn_name()?;
+    let fn_name_ident = format_ident!("{}", fn_name);
+    let response_type = quote!(reqwest::Upgraded);
+    // Get the function args.
+    let raw_args = get_args(type_space, op, global_params)?;
+    // Make sure if we have args, we start with a comma.
+    let args = if raw_args.is_empty() {
+        quote!()
+    } else {
+        let a = raw_args.iter().map(|(k, v)| {
+            let n = format_ident!("{}", crate::types::clean_property_name(k));
+            quote!(#n: #v)
+        });
+        quote!(,#(#a),*)
+    };
+    let function_body = quote!(todo!("connect to the server and upgrade to websocket"));
+    let function = quote! {
+        #[doc = #docs]
+        #[tracing::instrument]
+        pub async fn #fn_name_ident<'a>(&'a self #args) -> Result<#response_type, crate::types::error::Error> {
+            #function_body
+        }
+    };
+
+    // TODO: Build actual example
+    Ok((function, Default::default()))
+}
 
 /// Generate functions for each path operation.
 pub fn generate_files(
@@ -46,19 +85,11 @@ pub fn generate_files(
             };
 
             let tag = op.get_tag()?;
-
-            let (mut new_operation, example) = if op.extensions.contains_key("x-dropshot-websocket")
-            {
-                // let function = quote! {
-                //     #[doc = #docs]
-                //     #[tracing::instrument]
-                //     pub async fn #fn_name_ident<'a>(&'a self #args #request_body) -> Result<#response_type, crate::types::error::Error> {
-                //         #function_body
-                //     }
-                // };
-
-                // add_fn_to_tag(&mut tag_files, &tag, &function)?;
-                todo!()
+            let example = if op.extensions.contains_key("x-dropshot-websocket") {
+                let (function, example) =
+                    generate_websocket_fn(type_space, name, method, op, global_params)?;
+                add_fn_to_tag(&mut tag_files, &tag, &function)?;
+                example
             } else {
                 // Get the docs.
                 let docs = generate_docs(type_space, name, method, op, global_params)?;
@@ -147,7 +178,7 @@ pub fn generate_files(
 
                 // Let's pause here and update our spec with the new function.
                 // Add the docs to our spec.
-                let new_operation = op.clone();
+                // let new_operation = op.clone();
                 let mut example: HashMap<String, String> = HashMap::new();
 
                 example.insert("example".to_string(), example_code_fn);
@@ -266,10 +297,11 @@ pub fn generate_files(
 
                     add_fn_to_tag(&mut tag_files, &tag, &function)?;
                 }
-                (new_operation, example)
+                example
             };
 
             // Update our api spec with the new functions.
+            let mut new_operation = op.clone();
             new_operation
                 .extensions
                 .insert("x-rust".to_string(), serde_json::json!(example));
