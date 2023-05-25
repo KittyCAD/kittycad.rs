@@ -45,6 +45,8 @@ pub fn generate_files(
                 return Ok(());
             };
 
+            let is_websocket = op.extensions.contains_key("x-dropshot-websocket");
+
             let tag = op.get_tag()?;
 
             // Get the docs.

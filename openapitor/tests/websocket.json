@@ -1,0 +1,74 @@
+{
+  "components": {
+    "responses": {
+      "Error": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        },
+        "description": "Error"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "description": "Error information from a response.",
+        "properties": {
+          "error_code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "request_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "request_id"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "demo",
+    "version": "0.1"
+  },
+  "openapi": "3.0.3",
+  "paths": {
+    "/counter": {
+      "get": {
+        "description": "from the value given for the query parameter \"start.\"",
+        "operationId": "example_api_websocket_counter",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start",
+            "schema": {
+              "format": "uint8",
+              "minimum": 0,
+              "nullable": true,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {}
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "An eternally-increasing sequence of bytes, wrapping on overflow, starting",
+        "x-dropshot-websocket": {}
+      }
+    }
+  }
+}
