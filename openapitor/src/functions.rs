@@ -45,208 +45,229 @@ pub fn generate_files(
                 return Ok(());
             };
 
-            let is_websocket = op.extensions.contains_key("x-dropshot-websocket");
-
             let tag = op.get_tag()?;
 
-            // Get the docs.
-            let docs = generate_docs(type_space, name, method, op, global_params)?;
+            let (mut new_operation, example) = if op.extensions.contains_key("x-dropshot-websocket")
+            {
+                // let function = quote! {
+                //     #[doc = #docs]
+                //     #[tracing::instrument]
+                //     pub async fn #fn_name_ident<'a>(&'a self #args #request_body) -> Result<#response_type, crate::types::error::Error> {
+                //         #function_body
+                //     }
+                // };
 
-            // Get the function name.
-            let fn_name = op.get_fn_name()?;
-            let fn_name_ident = format_ident!("{}", fn_name);
+                // add_fn_to_tag(&mut tag_files, &tag, &function)?;
+                todo!()
+            } else {
+                // Get the docs.
+                let docs = generate_docs(type_space, name, method, op, global_params)?;
 
-            // Get the response for the function.
-            let response_type =
-                if let Some(response) = get_response_type(type_space, name, method, op)? {
-                    let t = response.type_name;
-                    quote!(#t)
+                // Get the function name.
+                let fn_name = op.get_fn_name()?;
+                let fn_name_ident = format_ident!("{}", fn_name);
+
+                // Get the response for the function.
+                let response_type =
+                    if let Some(response) = get_response_type(type_space, name, method, op)? {
+                        let t = response.type_name;
+                        quote!(#t)
+                    } else {
+                        // We don't have a response, so we'll return `()`.
+                        quote!(())
+                    };
+
+                // Get the function args.
+                let raw_args = get_args(type_space, op, global_params)?;
+                // Make sure if we have args, we start with a comma.
+                let args = if raw_args.is_empty() {
+                    quote!()
                 } else {
-                    // We don't have a response, so we'll return `()`.
-                    quote!(())
+                    let a = raw_args.iter().map(|(k, v)| {
+                        let n = format_ident!("{}", crate::types::clean_property_name(k));
+                        quote!(#n: #v)
+                    });
+                    quote!(,#(#a),*)
                 };
 
-            // Get the function args.
-            let raw_args = get_args(type_space, op, global_params)?;
-            // Make sure if we have args, we start with a comma.
-            let args = if raw_args.is_empty() {
-                quote!()
-            } else {
-                let a = raw_args.iter().map(|(k, v)| {
-                    let n = format_ident!("{}", crate::types::clean_property_name(k));
-                    quote!(#n: #v)
-                });
-                quote!(,#(#a),*)
-            };
+                // Get the request body for the function if there is one.
+                let request_body = if let Some(rb) = get_request_body(type_space, name, method, op)?
+                {
+                    let t = rb.type_name;
+                    // We add the comma at the front, so it works.
+                    quote!(, body: &#t)
+                } else {
+                    // We don't have a request body, so we'll return nothing.
+                    quote!()
+                };
 
-            // Get the request body for the function if there is one.
-            let request_body = if let Some(rb) = get_request_body(type_space, name, method, op)? {
-                let t = rb.type_name;
-                // We add the comma at the front, so it works.
-                quote!(, body: &#t)
-            } else {
-                // We don't have a request body, so we'll return nothing.
-                quote!()
-            };
+                // Get the function body.
+                let function_body =
+                    get_function_body(type_space, name, method, op, false, opts, global_params)?;
 
-            // Get the function body.
-            let function_body =
-                get_function_body(type_space, name, method, op, false, opts, global_params)?;
+                let example_code_fn = generate_example_code_fn(
+                    type_space,
+                    name,
+                    method,
+                    &tag,
+                    op,
+                    opts,
+                    global_params,
+                )?;
+                // For the rust docs example code we want to trim the doc string since it is
+                // repetitive.
+                let rust_doc_example_code_fn = &example_code_fn[example_code_fn
+                    .find("\nuse ")
+                    .unwrap_or_else(|| example_code_fn.find("async fn example_").unwrap_or(0))
+                    ..example_code_fn.len()]
+                    .trim();
 
-            let example_code_fn =
-                generate_example_code_fn(type_space, name, method, &tag, op, opts, global_params)?;
-            // For the rust docs example code we want to trim the doc string since it is
-            // repetitive.
-            let rust_doc_example_code_fn = &example_code_fn[example_code_fn
-                .find("\nuse ")
-                .unwrap_or_else(|| example_code_fn.find("async fn example_").unwrap_or(0))
-                ..example_code_fn.len()]
-                .trim();
-
-            // Add our example code to our docs.
-            // This way we can test the examples compile by running `rust doc`.
-            // We want the code to comile but not be run as there are functions that
-            // would delete our user etc.
-            let docs = format!(
-                r#"{}
+                // Add our example code to our docs.
+                // This way we can test the examples compile by running `rust doc`.
+                // We want the code to comile but not be run as there are functions that
+                // would delete our user etc.
+                let docs = format!(
+                    r#"{}
 
 ```rust,no_run
 {}
 ```"#,
-                docs, rust_doc_example_code_fn
-            );
-
-            let function = quote! {
-                #[doc = #docs]
-                #[tracing::instrument]
-                pub async fn #fn_name_ident<'a>(&'a self #args #request_body) -> Result<#response_type, crate::types::error::Error> {
-                    #function_body
-                }
-            };
-
-            add_fn_to_tag(&mut tag_files, &tag, &function)?;
-
-            // Let's pause here and update our spec with the new function.
-            // Add the docs to our spec.
-            let mut new_operation = op.clone();
-            let mut example: HashMap<String, String> = HashMap::new();
-
-            example.insert("example".to_string(), example_code_fn);
-
-            example.insert(
-                "libDocsLink".to_string(),
-                format!(
-                    "https://docs.rs/{}/latest/{}/{}/struct.{}.html#method.{}",
-                    opts.name,
-                    opts.name,
-                    tag,
-                    crate::types::proper_name(&tag),
-                    fn_name
-                ),
-            );
-
-            // Let's check if this function can be paginated.
-            let pagination_properties =
-                get_pagination_properties(name, method, op, &type_space.spec)?;
-            if pagination_properties.can_paginate() {
-                // If we can paginate we should generate a paginated stream function.
-                let stream_fn_name_ident = format_ident!("{}_stream", fn_name);
-
-                // Get the inner args for the function.
-                let page_param_str = pagination_properties.page_param_str()?;
-
-                // Make sure if we have args, we start with a comma.
-                // Get the args again without the page param.
-                let min_args = if raw_args.is_empty() {
-                    quote!()
-                } else {
-                    let mut a = Vec::new();
-                    for (k, v) in raw_args.iter() {
-                        // Skip the next page arg.
-                        if k != &page_param_str {
-                            let n = format_ident!("{}", k);
-                            a.push(quote!(#n: #v))
-                        }
-                    }
-                    quote!(,#(#a),*)
-                };
-
-                let inner_args = if raw_args.is_empty() {
-                    quote!()
-                } else {
-                    let mut a = Vec::new();
-                    for (k, _v) in raw_args.iter() {
-                        // Skip the next page arg.
-                        if k != &page_param_str {
-                            let n = format_ident!("{}", k);
-                            a.push(quote!(#n))
-                        } else {
-                            // Make the arg none for our page parameter.
-                            a.push(quote!(None))
-                        }
-                    }
-                    quote!(#(#a),*)
-                };
-
-                // Check if we have a body as an arg.
-                let body_arg = if request_body.is_empty() {
-                    quote!()
-                } else {
-                    quote!(,body)
-                };
-
-                let paginated_function_body =
-                    get_function_body(type_space, name, method, op, true, opts, global_params)?;
-
-                let item_type = pagination_properties.item_type(false)?;
+                    docs, rust_doc_example_code_fn
+                );
 
                 let function = quote! {
                     #[doc = #docs]
                     #[tracing::instrument]
-                    pub fn #stream_fn_name_ident<'a>(&'a self #min_args #request_body) -> impl futures::Stream<Item = Result<#item_type, crate::types::error::Error>> + Unpin + '_  {
-                        use futures::{StreamExt, TryFutureExt, TryStreamExt};
-                        use crate::types::paginate::Pagination;
-
-                        // Get the result from our main function.
-                        self.#fn_name_ident(#inner_args #body_arg)
-                            .map_ok(move |result| {
-                                let items = futures::stream::iter(result.items().into_iter().map(Ok));
-
-                                // Get the next pages.
-                                let next_pages = futures::stream::try_unfold(
-                                    result,
-                                    move |new_result| async move {
-                                        if new_result.has_more_pages() {
-                                            // Get the next page, we modify the request directly,
-                                            // so that if we want to generate an API that uses
-                                            // Link headers or any other weird shit it works.
-                                            async {
-                                                #paginated_function_body
-                                            }.map_ok(|result: #response_type| {
-                                                Some((futures::stream::iter(
-                                                        result.items().into_iter().map(Ok),
-                                                    ),
-                                                    result,
-                                                ))
-                                            })
-                                            .await
-                                        } else {
-                                            // We have no more pages.
-                                            Ok(None)
-                                        }
-                                    }
-                                )
-                                .try_flatten();
-
-                                items.chain(next_pages)
-                            })
-                            .try_flatten_stream()
-                            .boxed()
-                        }
+                    pub async fn #fn_name_ident<'a>(&'a self #args #request_body) -> Result<#response_type, crate::types::error::Error> {
+                        #function_body
+                    }
                 };
 
                 add_fn_to_tag(&mut tag_files, &tag, &function)?;
-            }
+
+                // Let's pause here and update our spec with the new function.
+                // Add the docs to our spec.
+                let new_operation = op.clone();
+                let mut example: HashMap<String, String> = HashMap::new();
+
+                example.insert("example".to_string(), example_code_fn);
+
+                example.insert(
+                    "libDocsLink".to_string(),
+                    format!(
+                        "https://docs.rs/{}/latest/{}/{}/struct.{}.html#method.{}",
+                        opts.name,
+                        opts.name,
+                        tag,
+                        crate::types::proper_name(&tag),
+                        fn_name
+                    ),
+                );
+
+                // Let's check if this function can be paginated.
+                let pagination_properties =
+                    get_pagination_properties(name, method, op, &type_space.spec)?;
+                if pagination_properties.can_paginate() {
+                    // If we can paginate we should generate a paginated stream function.
+                    let stream_fn_name_ident = format_ident!("{}_stream", fn_name);
+
+                    // Get the inner args for the function.
+                    let page_param_str = pagination_properties.page_param_str()?;
+
+                    // Make sure if we have args, we start with a comma.
+                    // Get the args again without the page param.
+                    let min_args = if raw_args.is_empty() {
+                        quote!()
+                    } else {
+                        let mut a = Vec::new();
+                        for (k, v) in raw_args.iter() {
+                            // Skip the next page arg.
+                            if k != &page_param_str {
+                                let n = format_ident!("{}", k);
+                                a.push(quote!(#n: #v))
+                            }
+                        }
+                        quote!(,#(#a),*)
+                    };
+
+                    let inner_args = if raw_args.is_empty() {
+                        quote!()
+                    } else {
+                        let mut a = Vec::new();
+                        for (k, _v) in raw_args.iter() {
+                            // Skip the next page arg.
+                            if k != &page_param_str {
+                                let n = format_ident!("{}", k);
+                                a.push(quote!(#n))
+                            } else {
+                                // Make the arg none for our page parameter.
+                                a.push(quote!(None))
+                            }
+                        }
+                        quote!(#(#a),*)
+                    };
+
+                    // Check if we have a body as an arg.
+                    let body_arg = if request_body.is_empty() {
+                        quote!()
+                    } else {
+                        quote!(,body)
+                    };
+
+                    let paginated_function_body =
+                        get_function_body(type_space, name, method, op, true, opts, global_params)?;
+
+                    let item_type = pagination_properties.item_type(false)?;
+
+                    let function = quote! {
+                        #[doc = #docs]
+                        #[tracing::instrument]
+                        pub fn #stream_fn_name_ident<'a>(&'a self #min_args #request_body) -> impl futures::Stream<Item = Result<#item_type, crate::types::error::Error>> + Unpin + '_  {
+                            use futures::{StreamExt, TryFutureExt, TryStreamExt};
+                            use crate::types::paginate::Pagination;
+
+                            // Get the result from our main function.
+                            self.#fn_name_ident(#inner_args #body_arg)
+                                .map_ok(move |result| {
+                                    let items = futures::stream::iter(result.items().into_iter().map(Ok));
+
+                                    // Get the next pages.
+                                    let next_pages = futures::stream::try_unfold(
+                                        result,
+                                        move |new_result| async move {
+                                            if new_result.has_more_pages() {
+                                                // Get the next page, we modify the request directly,
+                                                // so that if we want to generate an API that uses
+                                                // Link headers or any other weird shit it works.
+                                                async {
+                                                    #paginated_function_body
+                                                }.map_ok(|result: #response_type| {
+                                                    Some((futures::stream::iter(
+                                                            result.items().into_iter().map(Ok),
+                                                        ),
+                                                        result,
+                                                    ))
+                                                })
+                                                .await
+                                            } else {
+                                                // We have no more pages.
+                                                Ok(None)
+                                            }
+                                        }
+                                    )
+                                    .try_flatten();
+
+                                    items.chain(next_pages)
+                                })
+                                .try_flatten_stream()
+                                .boxed()
+                            }
+                    };
+
+                    add_fn_to_tag(&mut tag_files, &tag, &function)?;
+                }
+                (new_operation, example)
+            };
 
             // Update our api spec with the new functions.
             new_operation
