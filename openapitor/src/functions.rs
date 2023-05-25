@@ -23,6 +23,7 @@ fn generate_websocket_fn(
     method: &http::Method,
     op: &openapiv3::Operation,
     global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
+    opts: &crate::Opts,
 ) -> Result<(TokenStream, HashMap<String, String>)> {
     let docs = generate_docs(type_space, name, method, op, global_params)?;
     // Get the function name.
@@ -41,7 +42,56 @@ fn generate_websocket_fn(
         });
         quote!(,#(#a),*)
     };
-    let function_body = quote!(todo!("connect to the server and upgrade to websocket"));
+
+    let url_path = name.trim_start_matches('/');
+    let method_ident = format_ident!("{}", method.to_string());
+
+    // Let's get the path parameters.
+    let path_params = get_path_params(type_space, op, global_params)?;
+    let clean_url = clean_url_from(&path_params)?;
+
+    // Let's get the query parameters.
+    let query_params = get_query_params(type_space, op, global_params)?;
+    let query_params_code = gen_query_params_code(&query_params, false)?;
+
+    let auth_code = generate_auth_code(opts)?;
+
+    let websocket_headers = quote! {
+        req = req
+            .header(reqwest::header::CONNECTION, "Upgrade")
+            .header(reqwest::header::UPGRADE, "websocket")
+            .header(reqwest::header::SEC_WEBSOCKET_VERSION, "13")
+            .header(
+                reqwest::header::SEC_WEBSOCKET_KEY,
+                base64::Engine::encode(
+                    &base64::engine::general_purpose::STANDARD,
+                    rand::random::<[u8; 16]>(),
+                ),
+            );
+    };
+
+    let function_body = quote! {
+        let mut req = self.client.client.request(
+            http::Method::#method_ident,
+            format!("{}/{}", self.client.base_url, #url_path#clean_url),
+        );
+
+        #auth_code
+
+        #query_params_code
+
+        #websocket_headers
+
+        let resp = req.send().await?;
+        if resp.status().is_client_error() || resp.status().is_server_error() {
+            return Err(crate::types::error::Error::UnexpectedResponse(resp));
+        }
+        // TODO: This isn't really a request error, but the response was already consumed.
+        // So we can't use Error::UnexpectedResponse.
+        let upgraded = resp.upgrade().await.map_err(crate::types::error::Error::RequestError)?;
+        Ok(upgraded)
+    };
+
     let function = quote! {
         #[doc = #docs]
         #[tracing::instrument]
@@ -89,7 +139,7 @@ pub fn generate_files(
             let generate_ws = std::env::var("GENERATE_WS").is_ok();
             let example = if generate_ws && op.extensions.contains_key("x-dropshot-websocket") {
                 let (function, example) =
-                    generate_websocket_fn(type_space, name, method, op, global_params)?;
+                    generate_websocket_fn(type_space, name, method, op, global_params, opts)?;
                 add_fn_to_tag(&mut tag_files, &tag, &function)?;
                 example
             } else {

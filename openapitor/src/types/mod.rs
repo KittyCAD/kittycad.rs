@@ -2464,7 +2464,7 @@ mod test {
 
     #[test]
     fn test_websocket() {
-        let schema = include_str!("../../tests/websocket.json");
+        let schema = include_str!("../../tests/types/input/websocket.json");
         let spec: openapiv3::OpenAPI = serde_json::from_str(schema).unwrap();
         let mut type_space = super::generate_types(&spec, Default::default()).unwrap();
 
@@ -2481,7 +2481,10 @@ mod test {
             .to_string();
 
         assert!(source_code.contains("pub async fn example_api_websocket_counter"));
-        eprintln!("{source_code}");
+        expectorate::assert_contents(
+            "tests/types/websocket.rs.gen",
+            &rustfmt_wrapper::rustfmt(&source_code).unwrap(),
+        );
     }
 
     #[test]

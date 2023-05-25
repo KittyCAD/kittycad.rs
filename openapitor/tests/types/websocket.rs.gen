@@ -1,0 +1,37 @@
+#[doc = "An eternally-increasing sequence of bytes, wrapping on overflow, starting\n\nfrom the value given for the query parameter \"start.\"\n\n**Parameters:**\n\n- `start: Option<u8>`"]
+#[tracing::instrument]
+pub async fn example_api_websocket_counter<'a>(
+    &'a self,
+    start: Option<u8>,
+) -> Result<reqwest::Upgraded, crate::types::error::Error> {
+    let mut req = self.client.client.request(
+        http::Method::GET,
+        format!("{}/{}", self.client.base_url, "counter"),
+    );
+    req = req.bearer_auth(&self.client.token);
+    let mut query_params = vec![];
+    if let Some(p) = start {
+        query_params.push(("start", format!("{}", p)));
+    }
+    req = req.query(&query_params);
+    req = req
+        .header(reqwest::header::CONNECTION, "Upgrade")
+        .header(reqwest::header::UPGRADE, "websocket")
+        .header(reqwest::header::SEC_WEBSOCKET_VERSION, "13")
+        .header(
+            reqwest::header::SEC_WEBSOCKET_KEY,
+            base64::Engine::encode(
+                &base64::engine::general_purpose::STANDARD,
+                rand::random::<[u8; 16]>(),
+            ),
+        );
+    let resp = req.send().await?;
+    if resp.status().is_client_error() || resp.status().is_server_error() {
+        return Err(crate::types::error::Error::UnexpectedResponse(resp));
+    }
+    let upgraded = resp
+        .upgrade()
+        .await
+        .map_err(crate::types::error::Error::RequestError)?;
+    Ok(upgraded)
+}

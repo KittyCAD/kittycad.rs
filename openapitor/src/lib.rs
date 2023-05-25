@@ -563,6 +563,7 @@ license = "MIT"
 [dependencies]
 anyhow = "1"
 async-trait = "^0.1.53"
+base64 = "0.21"
 bytes = {{ version = "1", features = ["serde"] }}
 clap = {{ version = "4.2.4", features = ["cargo", "derive", "env", "unicode"] }}
 chrono = {{ version = "0.4", default-features = false, features = ["serde", "std"] }}
@@ -577,6 +578,7 @@ mime = "0.3"
 parse-display = "^0.5"
 percent-encoding = "2.1"
 phonenumber = "0.3.2"
+rand = "0.8"
 reqwest = {{ version = "0.11", default-features = false, features = ["json", "multipart", "rustls-tls"] }}
 reqwest-conditional-middleware = "0.2.1"
 reqwest-middleware = "0.2.2"
