@@ -1053,6 +1053,17 @@ fn gen_query_params_code(
     })
 }
 
+fn generate_auth_code(opts: &crate::Opts) -> Result<TokenStream> {
+    let out = if opts.token_endpoint.is_some() {
+        quote!(req = req.bearer_auth(&self.client.token.read().await.access_token);)
+    } else if opts.basic_auth {
+        quote!(req = req.basic_auth(&self.client.username, Some(&self.client.password));)
+    } else {
+        quote!(req = req.bearer_auth(&self.client.token);)
+    };
+    Ok(out)
+}
+
 /// Return the function body for the operation.
 fn get_function_body(
     type_space: &mut crate::types::TypeSpace,
@@ -1187,13 +1198,7 @@ fn get_function_body(
         )
     };
 
-    let bearer_auth = if opts.token_endpoint.is_some() {
-        quote!(req = req.bearer_auth(&self.client.token.read().await.access_token);)
-    } else if opts.basic_auth {
-        quote!(req = req.basic_auth(&self.client.username, Some(&self.client.password));)
-    } else {
-        quote!(req = req.bearer_auth(&self.client.token);)
-    };
+    let auth_code = generate_auth_code(opts)?;
 
     Ok(quote! {
         let mut req = self.client.client.request(
@@ -1202,7 +1207,7 @@ fn get_function_body(
         );
 
         // Add in our authentication.
-        #bearer_auth
+        #auth_code
 
         #query_params_code
 
