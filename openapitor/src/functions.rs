@@ -961,6 +961,29 @@ fn get_query_params(
     Ok(query_params)
 }
 
+fn clean_url_from(path_params: &BTreeMap<String, TokenStream>) -> Result<TokenStream> {
+    if path_params.is_empty() {
+        return Ok(quote!());
+    }
+    let mut clean_string = quote!();
+    for (name, t) in path_params {
+        let url_string = format!("{{{}}}", name);
+        let cleaned_name = crate::types::clean_property_name(name);
+        let name_ident = format_ident!("{}", cleaned_name);
+
+        clean_string = if t.is_string()? {
+            quote! {
+                #clean_string.replace(#url_string, &#name_ident)
+            }
+        } else {
+            quote! {
+                #clean_string.replace(#url_string, &format!("{}", #name_ident))
+            }
+        };
+    }
+    Ok(clean_string)
+}
+
 /// Return the function body for the operation.
 fn get_function_body(
     type_space: &mut crate::types::TypeSpace,
@@ -976,27 +999,7 @@ fn get_function_body(
 
     // Let's get the path parameters.
     let path_params = get_path_params(type_space, op, global_params)?;
-    let clean_url = if !path_params.is_empty() {
-        let mut clean_string = quote!();
-        for (name, t) in &path_params {
-            let url_string = format!("{{{}}}", name);
-            let cleaned_name = crate::types::clean_property_name(name);
-            let name_ident = format_ident!("{}", cleaned_name);
-
-            clean_string = if t.is_string()? {
-                quote! {
-                    #clean_string.replace(#url_string, &#name_ident)
-                }
-            } else {
-                quote! {
-                    #clean_string.replace(#url_string, &format!("{}", #name_ident))
-                }
-            };
-        }
-        clean_string
-    } else {
-        quote!()
-    };
+    let clean_url = clean_url_from(&path_params)?;
 
     // Let's get the query parameters.
     let query_params = get_query_params(type_space, op, global_params)?;
