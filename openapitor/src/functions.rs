@@ -135,9 +135,7 @@ pub fn generate_files(
             };
 
             let tag = op.get_tag()?;
-            // TODO: Remove this when Websocket generation works.
-            let generate_ws = std::env::var("GENERATE_WS").is_ok();
-            let example = if generate_ws && op.extensions.contains_key("x-dropshot-websocket") {
+            let example = if op.extensions.contains_key("x-dropshot-websocket") {
                 let (function, example) =
                     generate_websocket_fn(type_space, name, method, op, global_params, opts)?;
                 add_fn_to_tag(&mut tag_files, &tag, &function)?;

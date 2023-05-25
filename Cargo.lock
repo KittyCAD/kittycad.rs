@@ -929,6 +929,7 @@ version = "0.2.10"
 dependencies = [
  "anyhow",
  "async-trait",
+ "base64",
  "bytes",
  "chrono",
  "clap",
