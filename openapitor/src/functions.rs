@@ -984,6 +984,75 @@ fn clean_url_from(path_params: &BTreeMap<String, TokenStream>) -> Result<TokenSt
     Ok(clean_string)
 }
 
+fn gen_query_params_code(
+    query_params: &BTreeMap<String, TokenStream>,
+    paginated: bool,
+) -> Result<TokenStream> {
+    if query_params.is_empty() || paginated {
+        return Ok(quote!());
+    }
+
+    let mut required_params = Vec::new();
+    let mut optional_params = Vec::new();
+    for (name, t) in query_params {
+        let cleaned_name = crate::types::clean_property_name(name);
+        let name_ident = format_ident!("{}", cleaned_name);
+
+        let type_text = crate::types::get_text(t)?;
+
+        if t.is_vec()? {
+            required_params.push(quote! {
+               (#name, itertools::join(#name_ident, ","))
+            })
+        } else if !t.is_option()? {
+            if type_text == "String" {
+                required_params.push(quote! {
+                   (#name, #name_ident)
+                })
+            } else {
+                required_params.push(quote! {
+                   (#name, format!("{}", #name_ident))
+                })
+            }
+        } else if type_text == "Option<String>" {
+            optional_params.push(quote! {
+                if let Some(p) = #name_ident {
+                    query_params.push((#name, p));
+                }
+            })
+        } else if type_text == "crate::types::phone_number::PhoneNumber" {
+            optional_params.push(quote! {
+                if let Some(p) = #name_ident.0 {
+                    query_params.push((#name, format!("{p}")));
+                }
+            })
+        } else if t.is_option_vec()? {
+            optional_params.push(quote! {
+                if let Some(p) = #name_ident {
+                    query_params.push((#name, itertools::join(p, ",")));
+                }
+            })
+        } else {
+            optional_params.push(quote! {
+                if let Some(p) = #name_ident {
+                    query_params.push((#name, format!("{}", p)));
+                }
+            })
+        }
+    }
+
+    let is_mut = if optional_params.is_empty() {
+        quote!()
+    } else {
+        quote!(mut)
+    };
+    Ok(quote! {
+        let #is_mut query_params = vec![ #(#required_params),* ];
+        #(#optional_params)*
+        req = req.query(&query_params);
+    })
+}
+
 /// Return the function body for the operation.
 fn get_function_body(
     type_space: &mut crate::types::TypeSpace,
@@ -1003,69 +1072,7 @@ fn get_function_body(
 
     // Let's get the query parameters.
     let query_params = get_query_params(type_space, op, global_params)?;
-    let query_params_code = if !query_params.is_empty() && !paginated {
-        let mut required_params = Vec::new();
-        let mut optional_params = Vec::new();
-        for (name, t) in &query_params {
-            let cleaned_name = crate::types::clean_property_name(name);
-            let name_ident = format_ident!("{}", cleaned_name);
-
-            let type_text = crate::types::get_text(t)?;
-
-            if t.is_vec()? {
-                required_params.push(quote! {
-                   (#name, itertools::join(#name_ident, ","))
-                })
-            } else if !t.is_option()? {
-                if type_text == "String" {
-                    required_params.push(quote! {
-                       (#name, #name_ident)
-                    })
-                } else {
-                    required_params.push(quote! {
-                       (#name, format!("{}", #name_ident))
-                    })
-                }
-            } else if type_text == "Option<String>" {
-                optional_params.push(quote! {
-                    if let Some(p) = #name_ident {
-                        query_params.push((#name, p));
-                    }
-                })
-            } else if type_text == "crate::types::phone_number::PhoneNumber" {
-                optional_params.push(quote! {
-                    if let Some(p) = #name_ident.0 {
-                        query_params.push((#name, format!("{p}")));
-                    }
-                })
-            } else if t.is_option_vec()? {
-                optional_params.push(quote! {
-                    if let Some(p) = #name_ident {
-                        query_params.push((#name, itertools::join(p, ",")));
-                    }
-                })
-            } else {
-                optional_params.push(quote! {
-                    if let Some(p) = #name_ident {
-                        query_params.push((#name, format!("{}", p)));
-                    }
-                })
-            }
-        }
-
-        let is_mut = if optional_params.is_empty() {
-            quote!()
-        } else {
-            quote!(mut)
-        };
-        quote! {
-            let #is_mut query_params = vec![ #(#required_params),* ];
-            #(#optional_params)*
-            req = req.query(&query_params);
-        }
-    } else {
-        quote!()
-    };
+    let query_params_code = gen_query_params_code(&query_params, paginated)?;
 
     // Get if there is a request body.
     let request_body = if let Some(request_body) = get_request_body(type_space, name, method, op)? {
