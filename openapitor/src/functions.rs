@@ -276,48 +276,17 @@ pub fn generate_files(
             Ok(())
         };
 
-        gen(
-            name.as_str(),
-            &http::Method::GET,
-            op.get.as_ref(),
-            &op.parameters,
-        )?;
-        gen(
-            name.as_str(),
-            &http::Method::PUT,
-            op.put.as_ref(),
-            &op.parameters,
-        )?;
-        gen(
-            name.as_str(),
-            &http::Method::POST,
-            op.post.as_ref(),
-            &op.parameters,
-        )?;
-        gen(
-            name.as_str(),
-            &http::Method::DELETE,
-            op.delete.as_ref(),
-            &op.parameters,
-        )?;
-        gen(
-            name.as_str(),
-            &http::Method::HEAD,
-            op.head.as_ref(),
-            &op.parameters,
-        )?;
-        gen(
-            name.as_str(),
-            &http::Method::PATCH,
-            op.patch.as_ref(),
-            &op.parameters,
-        )?;
-        gen(
-            name.as_str(),
-            &http::Method::TRACE,
-            op.trace.as_ref(),
-            &op.parameters,
-        )?;
+        for method in &[
+            http::Method::GET,
+            http::Method::PUT,
+            http::Method::POST,
+            http::Method::DELETE,
+            http::Method::HEAD,
+            http::Method::PATCH,
+            http::Method::TRACE,
+        ] {
+            gen(name.as_str(), method, op.get.as_ref(), &op.parameters)?;
+        }
     }
 
     Ok((tag_files, new_spec))
