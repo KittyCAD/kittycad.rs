@@ -1374,12 +1374,29 @@
       },
       "CodeLanguage": {
         "description": "The language code is written in.",
-        "enum": [
-          "go",
-          "python",
-          "node"
-        ],
-        "type": "string"
+        "oneOf": [
+          {
+            "description": "The `go` programming language.",
+            "enum": [
+              "go"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "The `python` programming language.",
+            "enum": [
+              "python"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "The `node` programming language.",
+            "enum": [
+              "node"
+            ],
+            "type": "string"
+          }
+        ]
       },
       "CodeOutput": {
         "description": "Output of the code being executed.",
