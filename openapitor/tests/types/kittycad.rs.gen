@@ -1754,12 +1754,15 @@ impl tabled::Tabled for Cluster {
     parse_display :: Display,
 )]
 pub enum CodeLanguage {
+    #[doc = "The `go` programming language."]
     #[serde(rename = "go")]
     #[display("go")]
     Go,
+    #[doc = "The `python` programming language."]
     #[serde(rename = "python")]
     #[display("python")]
     Python,
+    #[doc = "The `node` programming language."]
     #[serde(rename = "node")]
     #[display("node")]
     Node,
