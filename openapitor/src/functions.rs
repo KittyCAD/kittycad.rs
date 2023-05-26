@@ -73,7 +73,7 @@ fn generate_websocket_fn(
     let function_body = quote! {
         let mut req = self.client.client.request(
             http::Method::#method_ident,
-            format!("{}/{}", self.client.base_url, #url_path#clean_url),
+            format!("{}/{}", self.client.base_url, #url_path #clean_url),
         );
 
         #auth_code
@@ -1251,7 +1251,7 @@ fn get_function_body(
     Ok(quote! {
         let mut req = self.client.client.request(
             http::Method::#method_ident,
-            &format!("{}/{}", self.client.base_url, #path#clean_url),
+            &format!("{}/{}", self.client.base_url, #path #clean_url),
         );
 
         // Add in our authentication.
