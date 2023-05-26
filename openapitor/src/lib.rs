@@ -590,7 +590,6 @@ serde_json = "1"
 serde_urlencoded = "^0.7"
 tabled = {{ version = "0.8.0", features = ["color"] }}
 thiserror = "1"
-tokio = {{ version = "1.20.1", features = ["sync"] }}
 tracing = "^0.1"
 url = {{ version = "2", features = ["serde"] }}
 uuid = {{ version = "1", features = ["serde", "v4"] }}
@@ -601,6 +600,7 @@ futures-util = "^0.3.26"
 pretty_assertions = "1"
 rand = "0.8"
 tokio = {{ version = "1.20.0", features = ["rt", "macros"] }}
+tokio-tungstenite = "0.19"
 
 [package.metadata.docs.rs]
 all-features = true
@@ -613,7 +613,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 fn run_cargo_fmt(opts: &Opts) -> Result<()> {
     log::info!("Running `cargo fmt`...");
 
-    // Shell out and run cargo clippy on the output directory.
+    // Shell out and run cargo fmt on the output directory.
     let output = if opts.output.display().to_string() == "." {
         "".to_string()
     } else {
