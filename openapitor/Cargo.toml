@@ -25,7 +25,7 @@ quote = "1"
 rand = { version = "0.8.5", features = ["small_rng"] }
 regex = "^1.6"
 reqwest = { version = "0.11", default-features = false, features = ["json", "multipart", "rustls-tls"] }
-reqwest-middleware = "0.1.5"
+reqwest-middleware = "0.2.2"
 rustfmt-wrapper = "^0.2"
 schemars = { version = "0.8", features = ["bigdecimal", "chrono", "url", "uuid1"] }
 serde = { version = "1", features = [ "derive" ]}
