@@ -2463,6 +2463,31 @@ mod test {
     }
 
     #[test]
+    fn test_websocket() {
+        let schema = include_str!("../../tests/types/input/websocket.json");
+        let spec: openapiv3::OpenAPI = serde_json::from_str(schema).unwrap();
+        let mut type_space = super::generate_types(&spec, Default::default()).unwrap();
+
+        let files = crate::functions::generate_files(&mut type_space, &Default::default())
+            .unwrap()
+            .0;
+
+        // The Rust source code for the websocket endpoint.
+        let source_code = files
+            .iter()
+            .find(|(k, _)| k == &"default")
+            .unwrap()
+            .1
+            .to_string();
+
+        assert!(source_code.contains("pub async fn example_api_websocket_counter"));
+        expectorate::assert_contents(
+            "tests/types/websocket.rs.gen",
+            &rustfmt_wrapper::rustfmt(&source_code).unwrap(),
+        );
+    }
+
+    #[test]
     fn test_render_object_with_custom_date_format() {
         let schema = include_str!("../../tests/types/input/FileDensity.json");
 

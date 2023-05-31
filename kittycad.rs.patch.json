@@ -618,17 +618,11 @@
   {
     "op": "add",
     "path": "/paths/~1ws~1executor~1term/get/x-rust",
-    "value": {
-      "example": "/// Create a terminal.\n/// \n/// Attach to a docker container to create an interactive terminal.\nasync fn example_executor_create_term() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.executor().create_term().await?;\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/executor/struct.Executor.html#method.create_term"
-    }
+    "value": {}
   },
   {
     "op": "add",
     "path": "/paths/~1ws~1modeling~1commands/get/x-rust",
-    "value": {
-      "example": "/// Open a websocket which accepts modeling commands.\n/// \n/// Pass those commands to the engine via websocket, and pass responses back to the client. Basically, this is a websocket proxy between the frontend/client and the engine.\nasync fn example_modeling_commands_ws() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.modeling().commands_ws().await?;\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/modeling/struct.Modeling.html#method.commands_ws"
-    }
+    "value": {}
   }
 ]

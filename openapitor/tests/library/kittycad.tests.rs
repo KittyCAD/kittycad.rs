@@ -1,5 +1,8 @@
 use futures::TryStreamExt;
 use pretty_assertions::assert_eq;
+use tokio_tungstenite::tungstenite::Message as WsMsg;
+
+use crate::types::{ModelingCmd, ModelingCmdReq, Point3D};
 
 fn test_client() -> crate::Client {
     crate::Client::new_from_env()
@@ -167,4 +170,72 @@ async fn test_user_self() {
     let client = test_client();
 
     let _result = client.users().get_self().await.unwrap();
+}
+
+#[tokio::test]
+async fn test_modeling_websocket() {
+    use futures::{SinkExt, StreamExt};
+
+    let client = test_client();
+
+    let ws = match client.modeling().commands_ws().await {
+        Ok(ws) => ws,
+        Err(crate::types::error::Error::UnexpectedResponse(resp)) => {
+            let txt = resp.text().await.unwrap();
+            panic!("Failed to connect to modeling websocket: {}", txt);
+        }
+        err => panic!("Failed to connect to modeling websocket: {:?}", err),
+    };
+    let (mut write, mut read) = tokio_tungstenite::WebSocketStream::from_raw_socket(
+        ws,
+        tokio_tungstenite::tungstenite::protocol::Role::Client,
+        None,
+    )
+    .await
+    .split();
+
+    let cmd = ModelingCmdReq {
+        cmd: ModelingCmd::AddLine {
+            from: Point3D {
+                x: 1.0,
+                y: 1.0,
+                z: 0.0,
+            },
+            to: Point3D {
+                x: 2.0,
+                y: 2.0,
+                z: 0.0,
+            },
+        },
+        cmd_id: Default::default(),
+        file_id: Default::default(),
+    };
+    let cmd_serialized = serde_json::to_string(&cmd).unwrap();
+
+    write.send(WsMsg::Text(cmd_serialized)).await.unwrap();
+
+    // Finish sending
+    drop(write);
+
+    // Get Websocket messages from API server
+    let num_modeling_cmds = 1;
+    let mut text_resps = 0;
+    while let Some(msg) = read.next().await {
+        match msg.unwrap() {
+            WsMsg::Text(resp) => {
+                eprintln!("Got a websocket response: {resp}");
+                text_resps += 1;
+                if text_resps == num_modeling_cmds {
+                    break;
+                }
+            }
+            // MDN says that when you're writing a Websocket server, "You might also get a pong
+            // without ever sending a ping; ignore this if it happens."
+            // See <https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#pings_and_pongs_the_heartbeat_of_websockets>
+            WsMsg::Pong(_) => {}
+            other => {
+                panic!("Unexpected websocket message from server: {}", other)
+            }
+        }
+    }
 }

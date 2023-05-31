@@ -68,23 +68,36 @@ impl Modeling {
 
     #[doc = "Open a websocket which accepts modeling commands.\n\nPass those commands to the \
              engine via websocket, and pass responses back to the client. Basically, this is a \
-             websocket proxy between the frontend/client and the engine.\n\n```rust,no_run\nasync \
-             fn example_modeling_commands_ws() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    client.modeling().commands_ws().await?;\n    \
-             Ok(())\n}\n```"]
+             websocket proxy between the frontend/client and the engine."]
     #[tracing::instrument]
-    pub async fn commands_ws<'a>(&'a self) -> Result<(), crate::types::error::Error> {
-        let mut req = self.client.client.request(
+    pub async fn commands_ws<'a>(
+        &'a self,
+    ) -> Result<reqwest::Upgraded, crate::types::error::Error> {
+        let mut req = self.client.client_http1_only.request(
             http::Method::GET,
             format!("{}/{}", self.client.base_url, "ws/modeling/commands"),
         );
         req = req.bearer_auth(&self.client.token);
+        req = req
+            .header(reqwest::header::CONNECTION, "Upgrade")
+            .header(reqwest::header::UPGRADE, "websocket")
+            .header(reqwest::header::SEC_WEBSOCKET_VERSION, "13")
+            .header(
+                reqwest::header::SEC_WEBSOCKET_KEY,
+                base64::Engine::encode(
+                    &base64::engine::general_purpose::STANDARD,
+                    rand::random::<[u8; 16]>(),
+                ),
+            );
         let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            Ok(())
-        } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+        if resp.status().is_client_error() || resp.status().is_server_error() {
+            return Err(crate::types::error::Error::UnexpectedResponse(resp));
         }
+
+        let upgraded = resp
+            .upgrade()
+            .await
+            .map_err(crate::types::error::Error::RequestError)?;
+        Ok(upgraded)
     }
 }
