@@ -180,6 +180,7 @@ pub struct Client {
     base_url: String,
 
     client: reqwest_middleware::ClientWithMiddleware,
+    client_http1_only: reqwest_middleware::ClientWithMiddleware,
 }
 
 impl Client {
@@ -201,8 +202,14 @@ impl Client {
             .timeout(std::time::Duration::from_secs(60))
             .connect_timeout(std::time::Duration::from_secs(60))
             .build();
-        match client {
-            Ok(c) => {
+        let client_http1 = reqwest::Client::builder()
+            .user_agent(APP_USER_AGENT)
+            .timeout(std::time::Duration::from_secs(60))
+            .connect_timeout(std::time::Duration::from_secs(60))
+            .http1_only()
+            .build();
+        match (client, client_http1) {
+            (Ok(c), Ok(c1)) => {
                 let client = reqwest_middleware::ClientBuilder::new(c)
                     // Trace HTTP requests. See the tracing crate to make use of these traces.
                     .with(reqwest_tracing::TracingMiddleware::default())
@@ -212,15 +219,22 @@ impl Client {
                         |req: &reqwest::Request| req.try_clone().is_some(),
                     ))
                     .build();
-
+                let client_http1_only = reqwest_middleware::ClientBuilder::new(c1)
+                    .with(reqwest_tracing::TracingMiddleware::default())
+                    .with(reqwest_conditional_middleware::ConditionalMiddleware::new(
+                        reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
+                        |req: &reqwest::Request| req.try_clone().is_some(),
+                    ))
+                    .build();
                 Client {
                     token: token.to_string(),
                     base_url: "BASE_URL".to_string(),
 
                     client,
+                    client_http1_only,
                 }
             }
-            Err(e) => panic!("creating reqwest client failed: {:?}", e),
+            (Err(e), _) | (_, Err(e)) => panic!("creating reqwest client failed: {:?}", e),
         }
     }
 

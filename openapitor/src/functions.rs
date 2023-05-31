@@ -71,7 +71,7 @@ fn generate_websocket_fn(
     };
 
     let function_body = quote! {
-        let mut req = self.client.client.request(
+        let mut req = self.client.client_http1_only.request(
             http::Method::#method_ident,
             format!("{}/{}", self.client.base_url, #url_path #clean_url),
         );

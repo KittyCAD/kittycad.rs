@@ -73,7 +73,7 @@ impl Modeling {
     pub async fn commands_ws<'a>(
         &'a self,
     ) -> Result<reqwest::Upgraded, crate::types::error::Error> {
-        let mut req = self.client.client.request(
+        let mut req = self.client.client_http1_only.request(
             http::Method::GET,
             format!("{}/{}", self.client.base_url, "ws/modeling/commands"),
         );

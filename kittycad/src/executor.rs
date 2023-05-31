@@ -67,7 +67,7 @@ impl Executor {
     pub async fn create_term<'a>(
         &'a self,
     ) -> Result<reqwest::Upgraded, crate::types::error::Error> {
-        let mut req = self.client.client.request(
+        let mut req = self.client.client_http1_only.request(
             http::Method::GET,
             format!("{}/{}", self.client.base_url, "ws/executor/term"),
         );
