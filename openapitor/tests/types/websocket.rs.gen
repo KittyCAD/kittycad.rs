@@ -4,7 +4,7 @@ pub async fn example_api_websocket_counter<'a>(
     &'a self,
     start: Option<u8>,
 ) -> Result<reqwest::Upgraded, crate::types::error::Error> {
-    let mut req = self.client.client.request(
+    let mut req = self.client.client_http1_only.request(
         http::Method::GET,
         format!("{}/{}", self.client.base_url, "counter"),
     );
