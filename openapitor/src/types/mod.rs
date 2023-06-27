@@ -674,7 +674,7 @@ impl TypeSpace {
         for (k, v) in &o.properties {
             let prop = clean_property_name(k);
             let prop_ident = format_ident!("{}", prop);
-            headers.push(quote!(#prop.to_string()));
+            headers.push(quote!(#prop.into()));
 
             // Get the schema for the property.
             let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
@@ -689,24 +689,24 @@ impl TypeSpace {
             // Check if this type is required.
             if o.required.contains(k) && type_name.is_string()? {
                 fields.push(quote!(
-                    self.#prop_ident.clone()
+                    self.#prop_ident.clone().into()
                 ));
             } else if !o.required.contains(k)
                 && type_name.rendered()? != "phone_number::PhoneNumber"
             {
                 fields.push(quote!(
                     if let Some(#prop_ident) = &self.#prop_ident {
-                        format!("{:?}", #prop_ident)
+                        format!("{:?}", #prop_ident).into()
                     } else {
-                        String::new()
+                        String::new().into()
                     }
                 ));
             } else if type_name.rendered()? == "PhoneNumber" {
                 fields.push(quote!(
-                    self.#prop_ident.to_string()
+                    self.#prop_ident.to_string().into()
                 ));
             } else {
-                fields.push(quote!(format!("{:?}", self.#prop_ident)));
+                fields.push(quote!(format!("{:?}", self.#prop_ident).into()));
             }
         }
 
@@ -714,12 +714,12 @@ impl TypeSpace {
             impl tabled::Tabled for #struct_name {
                 const LENGTH: usize = #length;
 
-                fn fields(&self) -> Vec<String> {
+                fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
                     vec![
                         #(#fields),*
                     ]
                 }
-                fn headers() -> Vec<String> {
+                fn headers() -> Vec<std::borrow::Cow<'static, str>> {
                     vec![
                         #(#headers),*
                     ]

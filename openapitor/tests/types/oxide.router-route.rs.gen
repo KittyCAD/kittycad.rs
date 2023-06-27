@@ -35,31 +35,31 @@ impl std::fmt::Display for RouterRoute {
 
 impl tabled::Tabled for RouterRoute {
     const LENGTH: usize = 9;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.destination),
-            format!("{:?}", self.id),
-            format!("{:?}", self.kind),
-            self.name.clone(),
-            format!("{:?}", self.target),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
-            format!("{:?}", self.vpc_router_id),
+            self.description.clone().into(),
+            format!("{:?}", self.destination).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.kind).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.target).into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
+            format!("{:?}", self.vpc_router_id).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "destination".to_string(),
-            "id".to_string(),
-            "kind".to_string(),
-            "name".to_string(),
-            "target".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
-            "vpc_router_id".to_string(),
+            "description".into(),
+            "destination".into(),
+            "id".into(),
+            "kind".into(),
+            "name".into(),
+            "target".into(),
+            "time_created".into(),
+            "time_modified".into(),
+            "vpc_router_id".into(),
         ]
     }
 }

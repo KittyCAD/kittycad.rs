@@ -55,59 +55,59 @@ impl std::fmt::Display for FileDensity {
 
 impl tabled::Tabled for FileDensity {
     const LENGTH: usize = 11;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at)
+                format!("{:?}", completed_at).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            format!("{:?}", self.created_at),
+            format!("{:?}", self.created_at).into(),
             if let Some(density) = &self.density {
-                format!("{:?}", density)
+                format!("{:?}", density).into()
             } else {
-                String::new()
+                String::new().into()
             },
             if let Some(error) = &self.error {
-                format!("{:?}", error)
+                format!("{:?}", error).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            format!("{:?}", self.id),
+            format!("{:?}", self.id).into(),
             if let Some(material_mass) = &self.material_mass {
-                format!("{:?}", material_mass)
+                format!("{:?}", material_mass).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            format!("{:?}", self.src_format),
+            format!("{:?}", self.src_format).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at)
+                format!("{:?}", started_at).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            format!("{:?}", self.status),
-            format!("{:?}", self.updated_at),
+            format!("{:?}", self.status).into(),
+            format!("{:?}", self.updated_at).into(),
             if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id)
+                format!("{:?}", user_id).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "completed_at".to_string(),
-            "created_at".to_string(),
-            "density".to_string(),
-            "error".to_string(),
-            "id".to_string(),
-            "material_mass".to_string(),
-            "src_format".to_string(),
-            "started_at".to_string(),
-            "status".to_string(),
-            "updated_at".to_string(),
-            "user_id".to_string(),
+            "completed_at".into(),
+            "created_at".into(),
+            "density".into(),
+            "error".into(),
+            "id".into(),
+            "material_mass".into(),
+            "src_format".into(),
+            "started_at".into(),
+            "status".into(),
+            "updated_at".into(),
+            "user_id".into(),
         ]
     }
 }

@@ -468,12 +468,15 @@ impl std::fmt::Display for DerEncodedKeyPair {
 
 impl tabled::Tabled for DerEncodedKeyPair {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![self.private_key.clone(), self.public_cert.clone()]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.private_key.clone().into(),
+            self.public_cert.clone().into(),
+        ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["private_key".to_string(), "public_cert".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["private_key".into(), "public_cert".into()]
     }
 }
 
@@ -498,19 +501,19 @@ impl std::fmt::Display for DeviceAccessTokenRequest {
 
 impl tabled::Tabled for DeviceAccessTokenRequest {
     const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.client_id),
-            self.device_code.clone(),
-            self.grant_type.clone(),
+            format!("{:?}", self.client_id).into(),
+            self.device_code.clone().into(),
+            self.grant_type.clone().into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "client_id".to_string(),
-            "device_code".to_string(),
-            "grant_type".to_string(),
+            "client_id".into(),
+            "device_code".into(),
+            "grant_type".into(),
         ]
     }
 }
@@ -534,12 +537,12 @@ impl std::fmt::Display for DeviceAuthRequest {
 
 impl tabled::Tabled for DeviceAuthRequest {
     const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.client_id)]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.client_id).into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["client_id".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["client_id".into()]
     }
 }
 
@@ -562,12 +565,12 @@ impl std::fmt::Display for DeviceAuthVerify {
 
 impl tabled::Tabled for DeviceAuthVerify {
     const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![self.user_code.clone()]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.user_code.clone().into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["user_code".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["user_code".into()]
     }
 }
 
@@ -617,12 +620,15 @@ impl std::fmt::Display for Digest {
 
 impl tabled::Tabled for Digest {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.value.clone()]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.type_).into(),
+            self.value.clone().into(),
+        ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["type_".into(), "value".into()]
     }
 }
 
@@ -667,45 +673,45 @@ impl std::fmt::Display for Disk {
 
 impl tabled::Tabled for Disk {
     const LENGTH: usize = 12;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.block_size),
-            self.description.clone(),
-            self.device_path.clone(),
-            format!("{:?}", self.id),
+            format!("{:?}", self.block_size).into(),
+            self.description.clone().into(),
+            self.device_path.clone().into(),
+            format!("{:?}", self.id).into(),
             if let Some(image_id) = &self.image_id {
-                format!("{:?}", image_id)
+                format!("{:?}", image_id).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            self.name.clone(),
-            format!("{:?}", self.project_id),
-            format!("{:?}", self.size),
+            self.name.clone().into(),
+            format!("{:?}", self.project_id).into(),
+            format!("{:?}", self.size).into(),
             if let Some(snapshot_id) = &self.snapshot_id {
-                format!("{:?}", snapshot_id)
+                format!("{:?}", snapshot_id).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            format!("{:?}", self.state),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
+            format!("{:?}", self.state).into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "block_size".to_string(),
-            "description".to_string(),
-            "device_path".to_string(),
-            "id".to_string(),
-            "image_id".to_string(),
-            "name".to_string(),
-            "project_id".to_string(),
-            "size".to_string(),
-            "snapshot_id".to_string(),
-            "state".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
+            "block_size".into(),
+            "description".into(),
+            "device_path".into(),
+            "id".into(),
+            "image_id".into(),
+            "name".into(),
+            "project_id".into(),
+            "size".into(),
+            "snapshot_id".into(),
+            "state".into(),
+            "time_created".into(),
+            "time_modified".into(),
         ]
     }
 }
@@ -736,21 +742,21 @@ impl std::fmt::Display for DiskCreate {
 
 impl tabled::Tabled for DiskCreate {
     const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.disk_source),
-            self.name.clone(),
-            format!("{:?}", self.size),
+            self.description.clone().into(),
+            format!("{:?}", self.disk_source).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.size).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "disk_source".to_string(),
-            "name".to_string(),
-            "size".to_string(),
+            "description".into(),
+            "disk_source".into(),
+            "name".into(),
+            "size".into(),
         ]
     }
 }
@@ -776,12 +782,12 @@ impl std::fmt::Display for DiskIdentifier {
 
 impl tabled::Tabled for DiskIdentifier {
     const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![self.name.clone()]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.name.clone().into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["name".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["name".into()]
     }
 }
 
@@ -836,19 +842,19 @@ impl crate::types::paginate::Pagination for DiskResultsPage {
 
 impl tabled::Tabled for DiskResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -925,12 +931,12 @@ impl std::fmt::Display for Distribution {
 
 impl tabled::Tabled for Distribution {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![self.name.clone(), self.version.clone()]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.name.clone().into(), self.version.clone().into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["name".to_string(), "version".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["name".into(), "version".into()]
     }
 }
 
@@ -957,24 +963,20 @@ impl std::fmt::Display for Error {
 
 impl tabled::Tabled for Error {
     const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(error_code) = &self.error_code {
-                format!("{:?}", error_code)
+                format!("{:?}", error_code).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            self.message.clone(),
-            self.request_id.clone(),
+            self.message.clone().into(),
+            self.request_id.clone().into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec![
-            "error_code".to_string(),
-            "message".to_string(),
-            "request_id".to_string(),
-        ]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["error_code".into(), "message".into(), "request_id".into()]
     }
 }
 
@@ -1002,16 +1004,16 @@ impl std::fmt::Display for FieldSchema {
 
 impl tabled::Tabled for FieldSchema {
     const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.name.clone(),
-            format!("{:?}", self.source),
-            format!("{:?}", self.ty),
+            self.name.clone().into(),
+            format!("{:?}", self.source).into(),
+            format!("{:?}", self.ty).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["name".to_string(), "source".to_string(), "ty".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["name".into(), "source".into(), "ty".into()]
     }
 }
 
@@ -1116,12 +1118,12 @@ impl std::fmt::Display for FleetRolePolicy {
 
 impl tabled::Tabled for FleetRolePolicy {
     const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.role_assignments)]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.role_assignments).into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["role_assignments".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["role_assignments".into()]
     }
 }
 
@@ -1148,19 +1150,19 @@ impl std::fmt::Display for FleetRoleRoleAssignment {
 
 impl tabled::Tabled for FleetRoleRoleAssignment {
     const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.identity_id),
-            format!("{:?}", self.identity_type),
-            format!("{:?}", self.role_name),
+            format!("{:?}", self.identity_id).into(),
+            format!("{:?}", self.identity_type).into(),
+            format!("{:?}", self.role_name).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "identity_id".to_string(),
-            "identity_type".to_string(),
-            "role_name".to_string(),
+            "identity_id".into(),
+            "identity_type".into(),
+            "role_name".into(),
         ]
     }
 }
@@ -1208,43 +1210,43 @@ impl std::fmt::Display for GlobalImage {
 
 impl tabled::Tabled for GlobalImage {
     const LENGTH: usize = 11;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.block_size),
-            self.description.clone(),
+            format!("{:?}", self.block_size).into(),
+            self.description.clone().into(),
             if let Some(digest) = &self.digest {
-                format!("{:?}", digest)
+                format!("{:?}", digest).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            self.distribution.clone(),
-            format!("{:?}", self.id),
-            self.name.clone(),
-            format!("{:?}", self.size),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
+            self.distribution.clone().into(),
+            format!("{:?}", self.id).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.size).into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
             if let Some(url) = &self.url {
-                format!("{:?}", url)
+                format!("{:?}", url).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            self.version.clone(),
+            self.version.clone().into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "block_size".to_string(),
-            "description".to_string(),
-            "digest".to_string(),
-            "distribution".to_string(),
-            "id".to_string(),
-            "name".to_string(),
-            "size".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
-            "url".to_string(),
-            "version".to_string(),
+            "block_size".into(),
+            "description".into(),
+            "digest".into(),
+            "distribution".into(),
+            "id".into(),
+            "name".into(),
+            "size".into(),
+            "time_created".into(),
+            "time_modified".into(),
+            "url".into(),
+            "version".into(),
         ]
     }
 }
@@ -1277,23 +1279,23 @@ impl std::fmt::Display for GlobalImageCreate {
 
 impl tabled::Tabled for GlobalImageCreate {
     const LENGTH: usize = 5;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.block_size),
-            self.description.clone(),
-            format!("{:?}", self.distribution),
-            self.name.clone(),
-            format!("{:?}", self.source),
+            format!("{:?}", self.block_size).into(),
+            self.description.clone().into(),
+            format!("{:?}", self.distribution).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.source).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "block_size".to_string(),
-            "description".to_string(),
-            "distribution".to_string(),
-            "name".to_string(),
-            "source".to_string(),
+            "block_size".into(),
+            "description".into(),
+            "distribution".into(),
+            "name".into(),
+            "source".into(),
         ]
     }
 }
@@ -1349,19 +1351,19 @@ impl crate::types::paginate::Pagination for GlobalImageResultsPage {
 
 impl tabled::Tabled for GlobalImageResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -1396,25 +1398,25 @@ impl std::fmt::Display for IdentityProvider {
 
 impl tabled::Tabled for IdentityProvider {
     const LENGTH: usize = 6;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.id),
-            self.name.clone(),
-            format!("{:?}", self.provider_type),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
+            self.description.clone().into(),
+            format!("{:?}", self.id).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.provider_type).into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "id".to_string(),
-            "name".to_string(),
-            "provider_type".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
+            "description".into(),
+            "id".into(),
+            "name".into(),
+            "provider_type".into(),
+            "time_created".into(),
+            "time_modified".into(),
         ]
     }
 }
@@ -1470,19 +1472,19 @@ impl crate::types::paginate::Pagination for IdentityProviderResultsPage {
 
 impl tabled::Tabled for IdentityProviderResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -1598,47 +1600,47 @@ impl std::fmt::Display for Image {
 
 impl tabled::Tabled for Image {
     const LENGTH: usize = 11;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.block_size),
-            self.description.clone(),
+            format!("{:?}", self.block_size).into(),
+            self.description.clone().into(),
             if let Some(digest) = &self.digest {
-                format!("{:?}", digest)
+                format!("{:?}", digest).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            format!("{:?}", self.id),
-            self.name.clone(),
-            format!("{:?}", self.project_id),
-            format!("{:?}", self.size),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
+            format!("{:?}", self.id).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.project_id).into(),
+            format!("{:?}", self.size).into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
             if let Some(url) = &self.url {
-                format!("{:?}", url)
+                format!("{:?}", url).into()
             } else {
-                String::new()
+                String::new().into()
             },
             if let Some(version) = &self.version {
-                format!("{:?}", version)
+                format!("{:?}", version).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "block_size".to_string(),
-            "description".to_string(),
-            "digest".to_string(),
-            "id".to_string(),
-            "name".to_string(),
-            "project_id".to_string(),
-            "size".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
-            "url".to_string(),
-            "version".to_string(),
+            "block_size".into(),
+            "description".into(),
+            "digest".into(),
+            "id".into(),
+            "name".into(),
+            "project_id".into(),
+            "size".into(),
+            "time_created".into(),
+            "time_modified".into(),
+            "url".into(),
+            "version".into(),
         ]
     }
 }
@@ -1669,21 +1671,21 @@ impl std::fmt::Display for ImageCreate {
 
 impl tabled::Tabled for ImageCreate {
     const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.block_size),
-            self.description.clone(),
-            self.name.clone(),
-            format!("{:?}", self.source),
+            format!("{:?}", self.block_size).into(),
+            self.description.clone().into(),
+            self.name.clone().into(),
+            format!("{:?}", self.source).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "block_size".to_string(),
-            "description".to_string(),
-            "name".to_string(),
-            "source".to_string(),
+            "block_size".into(),
+            "description".into(),
+            "name".into(),
+            "source".into(),
         ]
     }
 }
@@ -1739,19 +1741,19 @@ impl crate::types::paginate::Pagination for ImageResultsPage {
 
 impl tabled::Tabled for ImageResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -1815,35 +1817,35 @@ impl std::fmt::Display for Instance {
 
 impl tabled::Tabled for Instance {
     const LENGTH: usize = 11;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            self.hostname.clone(),
-            format!("{:?}", self.id),
-            format!("{:?}", self.memory),
-            self.name.clone(),
-            format!("{:?}", self.ncpus),
-            format!("{:?}", self.project_id),
-            format!("{:?}", self.run_state),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
-            format!("{:?}", self.time_run_state_updated),
+            self.description.clone().into(),
+            self.hostname.clone().into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.memory).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.ncpus).into(),
+            format!("{:?}", self.project_id).into(),
+            format!("{:?}", self.run_state).into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
+            format!("{:?}", self.time_run_state_updated).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "hostname".to_string(),
-            "id".to_string(),
-            "memory".to_string(),
-            "name".to_string(),
-            "ncpus".to_string(),
-            "project_id".to_string(),
-            "run_state".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
-            "time_run_state_updated".to_string(),
+            "description".into(),
+            "hostname".into(),
+            "id".into(),
+            "memory".into(),
+            "name".into(),
+            "ncpus".into(),
+            "project_id".into(),
+            "run_state".into(),
+            "time_created".into(),
+            "time_modified".into(),
+            "time_run_state_updated".into(),
         ]
     }
 }
@@ -1884,41 +1886,41 @@ impl std::fmt::Display for InstanceCreate {
 
 impl tabled::Tabled for InstanceCreate {
     const LENGTH: usize = 8;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
+            self.description.clone().into(),
             if let Some(disks) = &self.disks {
-                format!("{:?}", disks)
+                format!("{:?}", disks).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            self.hostname.clone(),
-            format!("{:?}", self.memory),
-            self.name.clone(),
-            format!("{:?}", self.ncpus),
+            self.hostname.clone().into(),
+            format!("{:?}", self.memory).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.ncpus).into(),
             if let Some(network_interfaces) = &self.network_interfaces {
-                format!("{:?}", network_interfaces)
+                format!("{:?}", network_interfaces).into()
             } else {
-                String::new()
+                String::new().into()
             },
             if let Some(user_data) = &self.user_data {
-                format!("{:?}", user_data)
+                format!("{:?}", user_data).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "disks".to_string(),
-            "hostname".to_string(),
-            "memory".to_string(),
-            "name".to_string(),
-            "ncpus".to_string(),
-            "network_interfaces".to_string(),
-            "user_data".to_string(),
+            "description".into(),
+            "disks".into(),
+            "hostname".into(),
+            "memory".into(),
+            "name".into(),
+            "ncpus".into(),
+            "network_interfaces".into(),
+            "user_data".into(),
         ]
     }
 }
@@ -1966,12 +1968,12 @@ impl std::fmt::Display for InstanceMigrate {
 
 impl tabled::Tabled for InstanceMigrate {
     const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.dst_sled_id)]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.dst_sled_id).into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["dst_sled_id".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["dst_sled_id".into()]
     }
 }
 
@@ -2046,19 +2048,19 @@ impl crate::types::paginate::Pagination for InstanceResultsPage {
 
 impl tabled::Tabled for InstanceResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -2085,15 +2087,15 @@ impl std::fmt::Display for InstanceSerialConsoleData {
 
 impl tabled::Tabled for InstanceSerialConsoleData {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.data),
-            format!("{:?}", self.last_byte_offset),
+            format!("{:?}", self.data).into(),
+            format!("{:?}", self.last_byte_offset).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["data".to_string(), "last_byte_offset".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["data".into(), "last_byte_offset".into()]
     }
 }
 
@@ -2187,23 +2189,23 @@ impl std::fmt::Display for IpPool {
 
 impl tabled::Tabled for IpPool {
     const LENGTH: usize = 5;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.id),
-            self.name.clone(),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
+            self.description.clone().into(),
+            format!("{:?}", self.id).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "id".to_string(),
-            "name".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
+            "description".into(),
+            "id".into(),
+            "name".into(),
+            "time_created".into(),
+            "time_modified".into(),
         ]
     }
 }
@@ -2230,12 +2232,12 @@ impl std::fmt::Display for IpPoolCreate {
 
 impl tabled::Tabled for IpPoolCreate {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![self.description.clone(), self.name.clone()]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.description.clone().into(), self.name.clone().into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["description".to_string(), "name".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["description".into(), "name".into()]
     }
 }
 
@@ -2260,20 +2262,16 @@ impl std::fmt::Display for IpPoolRange {
 
 impl tabled::Tabled for IpPoolRange {
     const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.id),
-            format!("{:?}", self.range),
-            format!("{:?}", self.time_created),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.range).into(),
+            format!("{:?}", self.time_created).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec![
-            "id".to_string(),
-            "range".to_string(),
-            "time_created".to_string(),
-        ]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["id".into(), "range".into(), "time_created".into()]
     }
 }
 
@@ -2328,19 +2326,19 @@ impl crate::types::paginate::Pagination for IpPoolRangeResultsPage {
 
 impl tabled::Tabled for IpPoolRangeResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -2395,19 +2393,19 @@ impl crate::types::paginate::Pagination for IpPoolResultsPage {
 
 impl tabled::Tabled for IpPoolResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -2434,23 +2432,23 @@ impl std::fmt::Display for IpPoolUpdate {
 
 impl tabled::Tabled for IpPoolUpdate {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(description) = &self.description {
-                format!("{:?}", description)
+                format!("{:?}", description).into()
             } else {
-                String::new()
+                String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{:?}", name).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["description".to_string(), "name".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["description".into(), "name".into()]
     }
 }
 
@@ -2489,12 +2487,15 @@ impl std::fmt::Display for Ipv4Range {
 
 impl tabled::Tabled for Ipv4Range {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.first), format!("{:?}", self.last)]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.first).into(),
+            format!("{:?}", self.last).into(),
+        ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["first".to_string(), "last".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["first".into(), "last".into()]
     }
 }
 
@@ -2519,12 +2520,15 @@ impl std::fmt::Display for Ipv6Range {
 
 impl tabled::Tabled for Ipv6Range {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.first), format!("{:?}", self.last)]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.first).into(),
+            format!("{:?}", self.last).into(),
+        ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["first".to_string(), "last".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["first".into(), "last".into()]
     }
 }
 
@@ -2569,35 +2573,35 @@ impl std::fmt::Display for NetworkInterface {
 
 impl tabled::Tabled for NetworkInterface {
     const LENGTH: usize = 11;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.id),
-            format!("{:?}", self.instance_id),
-            format!("{:?}", self.ip),
-            self.mac.clone(),
-            self.name.clone(),
-            format!("{:?}", self.primary),
-            format!("{:?}", self.subnet_id),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
-            format!("{:?}", self.vpc_id),
+            self.description.clone().into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.instance_id).into(),
+            format!("{:?}", self.ip).into(),
+            self.mac.clone().into(),
+            self.name.clone().into(),
+            format!("{:?}", self.primary).into(),
+            format!("{:?}", self.subnet_id).into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
+            format!("{:?}", self.vpc_id).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "id".to_string(),
-            "instance_id".to_string(),
-            "ip".to_string(),
-            "mac".to_string(),
-            "name".to_string(),
-            "primary".to_string(),
-            "subnet_id".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
-            "vpc_id".to_string(),
+            "description".into(),
+            "id".into(),
+            "instance_id".into(),
+            "ip".into(),
+            "mac".into(),
+            "name".into(),
+            "primary".into(),
+            "subnet_id".into(),
+            "time_created".into(),
+            "time_modified".into(),
+            "vpc_id".into(),
         ]
     }
 }
@@ -2631,27 +2635,27 @@ impl std::fmt::Display for NetworkInterfaceCreate {
 
 impl tabled::Tabled for NetworkInterfaceCreate {
     const LENGTH: usize = 5;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
+            self.description.clone().into(),
             if let Some(ip) = &self.ip {
-                format!("{:?}", ip)
+                format!("{:?}", ip).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            self.name.clone(),
-            self.subnet_name.clone(),
-            self.vpc_name.clone(),
+            self.name.clone().into(),
+            self.subnet_name.clone().into(),
+            self.vpc_name.clone().into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "ip".to_string(),
-            "name".to_string(),
-            "subnet_name".to_string(),
-            "vpc_name".to_string(),
+            "description".into(),
+            "ip".into(),
+            "name".into(),
+            "subnet_name".into(),
+            "vpc_name".into(),
         ]
     }
 }
@@ -2707,19 +2711,19 @@ impl crate::types::paginate::Pagination for NetworkInterfaceResultsPage {
 
 impl tabled::Tabled for NetworkInterfaceResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -2749,32 +2753,28 @@ impl std::fmt::Display for NetworkInterfaceUpdate {
 
 impl tabled::Tabled for NetworkInterfaceUpdate {
     const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(description) = &self.description {
-                format!("{:?}", description)
+                format!("{:?}", description).into()
             } else {
-                String::new()
+                String::new().into()
             },
             if let Some(make_primary) = &self.make_primary {
-                format!("{:?}", make_primary)
+                format!("{:?}", make_primary).into()
             } else {
-                String::new()
+                String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{:?}", name).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec![
-            "description".to_string(),
-            "make_primary".to_string(),
-            "name".to_string(),
-        ]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["description".into(), "make_primary".into(), "name".into()]
     }
 }
 
@@ -2807,23 +2807,23 @@ impl std::fmt::Display for Organization {
 
 impl tabled::Tabled for Organization {
     const LENGTH: usize = 5;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.id),
-            self.name.clone(),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
+            self.description.clone().into(),
+            format!("{:?}", self.id).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "id".to_string(),
-            "name".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
+            "description".into(),
+            "id".into(),
+            "name".into(),
+            "time_created".into(),
+            "time_modified".into(),
         ]
     }
 }
@@ -2850,12 +2850,12 @@ impl std::fmt::Display for OrganizationCreate {
 
 impl tabled::Tabled for OrganizationCreate {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![self.description.clone(), self.name.clone()]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.description.clone().into(), self.name.clone().into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["description".to_string(), "name".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["description".into(), "name".into()]
     }
 }
 
@@ -2910,19 +2910,19 @@ impl crate::types::paginate::Pagination for OrganizationResultsPage {
 
 impl tabled::Tabled for OrganizationResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -2972,12 +2972,12 @@ impl std::fmt::Display for OrganizationRolePolicy {
 
 impl tabled::Tabled for OrganizationRolePolicy {
     const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.role_assignments)]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.role_assignments).into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["role_assignments".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["role_assignments".into()]
     }
 }
 
@@ -3004,19 +3004,19 @@ impl std::fmt::Display for OrganizationRoleRoleAssignment {
 
 impl tabled::Tabled for OrganizationRoleRoleAssignment {
     const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.identity_id),
-            format!("{:?}", self.identity_type),
-            format!("{:?}", self.role_name),
+            format!("{:?}", self.identity_id).into(),
+            format!("{:?}", self.identity_type).into(),
+            format!("{:?}", self.role_name).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "identity_id".to_string(),
-            "identity_type".to_string(),
-            "role_name".to_string(),
+            "identity_id".into(),
+            "identity_type".into(),
+            "role_name".into(),
         ]
     }
 }
@@ -3044,23 +3044,23 @@ impl std::fmt::Display for OrganizationUpdate {
 
 impl tabled::Tabled for OrganizationUpdate {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(description) = &self.description {
-                format!("{:?}", description)
+                format!("{:?}", description).into()
             } else {
-                String::new()
+                String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{:?}", name).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["description".to_string(), "name".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["description".into(), "name".into()]
     }
 }
 
@@ -3094,25 +3094,25 @@ impl std::fmt::Display for Project {
 
 impl tabled::Tabled for Project {
     const LENGTH: usize = 6;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.id),
-            self.name.clone(),
-            format!("{:?}", self.organization_id),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
+            self.description.clone().into(),
+            format!("{:?}", self.id).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.organization_id).into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "id".to_string(),
-            "name".to_string(),
-            "organization_id".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
+            "description".into(),
+            "id".into(),
+            "name".into(),
+            "organization_id".into(),
+            "time_created".into(),
+            "time_modified".into(),
         ]
     }
 }
@@ -3139,12 +3139,12 @@ impl std::fmt::Display for ProjectCreate {
 
 impl tabled::Tabled for ProjectCreate {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![self.description.clone(), self.name.clone()]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.description.clone().into(), self.name.clone().into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["description".to_string(), "name".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["description".into(), "name".into()]
     }
 }
 
@@ -3199,19 +3199,19 @@ impl crate::types::paginate::Pagination for ProjectResultsPage {
 
 impl tabled::Tabled for ProjectResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -3261,12 +3261,12 @@ impl std::fmt::Display for ProjectRolePolicy {
 
 impl tabled::Tabled for ProjectRolePolicy {
     const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.role_assignments)]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.role_assignments).into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["role_assignments".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["role_assignments".into()]
     }
 }
 
@@ -3293,19 +3293,19 @@ impl std::fmt::Display for ProjectRoleRoleAssignment {
 
 impl tabled::Tabled for ProjectRoleRoleAssignment {
     const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.identity_id),
-            format!("{:?}", self.identity_type),
-            format!("{:?}", self.role_name),
+            format!("{:?}", self.identity_id).into(),
+            format!("{:?}", self.identity_type).into(),
+            format!("{:?}", self.role_name).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "identity_id".to_string(),
-            "identity_type".to_string(),
-            "role_name".to_string(),
+            "identity_id".into(),
+            "identity_type".into(),
+            "role_name".into(),
         ]
     }
 }
@@ -3333,23 +3333,23 @@ impl std::fmt::Display for ProjectUpdate {
 
 impl tabled::Tabled for ProjectUpdate {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(description) = &self.description {
-                format!("{:?}", description)
+                format!("{:?}", description).into()
             } else {
-                String::new()
+                String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{:?}", name).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["description".to_string(), "name".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["description".into(), "name".into()]
     }
 }
 
@@ -3378,20 +3378,16 @@ impl std::fmt::Display for Rack {
 
 impl tabled::Tabled for Rack {
     const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.id),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec![
-            "id".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
-        ]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["id".into(), "time_created".into(), "time_modified".into()]
     }
 }
 
@@ -3446,19 +3442,19 @@ impl crate::types::paginate::Pagination for RackResultsPage {
 
 impl tabled::Tabled for RackResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -3484,12 +3480,12 @@ impl std::fmt::Display for Role {
 
 impl tabled::Tabled for Role {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![self.description.clone(), self.name.clone()]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.description.clone().into(), self.name.clone().into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["description".to_string(), "name".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["description".into(), "name".into()]
     }
 }
 
@@ -3544,19 +3540,19 @@ impl crate::types::paginate::Pagination for RoleResultsPage {
 
 impl tabled::Tabled for RoleResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -3643,31 +3639,31 @@ impl std::fmt::Display for RouterRoute {
 
 impl tabled::Tabled for RouterRoute {
     const LENGTH: usize = 9;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.destination),
-            format!("{:?}", self.id),
-            format!("{:?}", self.kind),
-            self.name.clone(),
-            format!("{:?}", self.target),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
-            format!("{:?}", self.vpc_router_id),
+            self.description.clone().into(),
+            format!("{:?}", self.destination).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.kind).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.target).into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
+            format!("{:?}", self.vpc_router_id).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "destination".to_string(),
-            "id".to_string(),
-            "kind".to_string(),
-            "name".to_string(),
-            "target".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
-            "vpc_router_id".to_string(),
+            "description".into(),
+            "destination".into(),
+            "id".into(),
+            "kind".into(),
+            "name".into(),
+            "target".into(),
+            "time_created".into(),
+            "time_modified".into(),
+            "vpc_router_id".into(),
         ]
     }
 }
@@ -3698,21 +3694,21 @@ impl std::fmt::Display for RouterRouteCreateParams {
 
 impl tabled::Tabled for RouterRouteCreateParams {
     const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.destination),
-            self.name.clone(),
-            format!("{:?}", self.target),
+            self.description.clone().into(),
+            format!("{:?}", self.destination).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.target).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "destination".to_string(),
-            "name".to_string(),
-            "target".to_string(),
+            "description".into(),
+            "destination".into(),
+            "name".into(),
+            "target".into(),
         ]
     }
 }
@@ -3797,19 +3793,19 @@ impl crate::types::paginate::Pagination for RouterRouteResultsPage {
 
 impl tabled::Tabled for RouterRouteResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -3840,29 +3836,29 @@ impl std::fmt::Display for RouterRouteUpdateParams {
 
 impl tabled::Tabled for RouterRouteUpdateParams {
     const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(description) = &self.description {
-                format!("{:?}", description)
+                format!("{:?}", description).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            format!("{:?}", self.destination),
+            format!("{:?}", self.destination).into(),
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{:?}", name).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            format!("{:?}", self.target),
+            format!("{:?}", self.target).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "destination".to_string(),
-            "name".to_string(),
-            "target".to_string(),
+            "description".into(),
+            "destination".into(),
+            "name".into(),
+            "target".into(),
         ]
     }
 }
@@ -3887,12 +3883,15 @@ impl std::fmt::Display for Saga {
 
 impl tabled::Tabled for Saga {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.id), format!("{:?}", self.state)]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.state).into(),
+        ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["id".to_string(), "state".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["id".into(), "state".into()]
     }
 }
 
@@ -3970,19 +3969,19 @@ impl crate::types::paginate::Pagination for SagaResultsPage {
 
 impl tabled::Tabled for SagaResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -4050,39 +4049,39 @@ impl std::fmt::Display for SamlIdentityProvider {
 
 impl tabled::Tabled for SamlIdentityProvider {
     const LENGTH: usize = 11;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.acs_url.clone(),
-            self.description.clone(),
-            format!("{:?}", self.id),
-            self.idp_entity_id.clone(),
-            self.name.clone(),
+            self.acs_url.clone().into(),
+            self.description.clone().into(),
+            format!("{:?}", self.id).into(),
+            self.idp_entity_id.clone().into(),
+            self.name.clone().into(),
             if let Some(public_cert) = &self.public_cert {
-                format!("{:?}", public_cert)
+                format!("{:?}", public_cert).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            self.slo_url.clone(),
-            self.sp_client_id.clone(),
-            self.technical_contact_email.clone(),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
+            self.slo_url.clone().into(),
+            self.sp_client_id.clone().into(),
+            self.technical_contact_email.clone().into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "acs_url".to_string(),
-            "description".to_string(),
-            "id".to_string(),
-            "idp_entity_id".to_string(),
-            "name".to_string(),
-            "public_cert".to_string(),
-            "slo_url".to_string(),
-            "sp_client_id".to_string(),
-            "technical_contact_email".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
+            "acs_url".into(),
+            "description".into(),
+            "id".into(),
+            "idp_entity_id".into(),
+            "name".into(),
+            "public_cert".into(),
+            "slo_url".into(),
+            "sp_client_id".into(),
+            "technical_contact_email".into(),
+            "time_created".into(),
+            "time_modified".into(),
         ]
     }
 }
@@ -4124,35 +4123,35 @@ impl std::fmt::Display for SamlIdentityProviderCreate {
 
 impl tabled::Tabled for SamlIdentityProviderCreate {
     const LENGTH: usize = 9;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.acs_url.clone(),
-            self.description.clone(),
-            self.idp_entity_id.clone(),
-            format!("{:?}", self.idp_metadata_source),
-            self.name.clone(),
+            self.acs_url.clone().into(),
+            self.description.clone().into(),
+            self.idp_entity_id.clone().into(),
+            format!("{:?}", self.idp_metadata_source).into(),
+            self.name.clone().into(),
             if let Some(signing_keypair) = &self.signing_keypair {
-                format!("{:?}", signing_keypair)
+                format!("{:?}", signing_keypair).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            self.slo_url.clone(),
-            self.sp_client_id.clone(),
-            self.technical_contact_email.clone(),
+            self.slo_url.clone().into(),
+            self.sp_client_id.clone().into(),
+            self.technical_contact_email.clone().into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "acs_url".to_string(),
-            "description".to_string(),
-            "idp_entity_id".to_string(),
-            "idp_metadata_source".to_string(),
-            "name".to_string(),
-            "signing_keypair".to_string(),
-            "slo_url".to_string(),
-            "sp_client_id".to_string(),
-            "technical_contact_email".to_string(),
+            "acs_url".into(),
+            "description".into(),
+            "idp_entity_id".into(),
+            "idp_metadata_source".into(),
+            "name".into(),
+            "signing_keypair".into(),
+            "slo_url".into(),
+            "sp_client_id".into(),
+            "technical_contact_email".into(),
         ]
     }
 }
@@ -4190,27 +4189,27 @@ impl std::fmt::Display for Silo {
 
 impl tabled::Tabled for Silo {
     const LENGTH: usize = 7;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.discoverable),
-            format!("{:?}", self.id),
-            self.name.clone(),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
-            format!("{:?}", self.user_provision_type),
+            self.description.clone().into(),
+            format!("{:?}", self.discoverable).into(),
+            format!("{:?}", self.id).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
+            format!("{:?}", self.user_provision_type).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "discoverable".to_string(),
-            "id".to_string(),
-            "name".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
-            "user_provision_type".to_string(),
+            "description".into(),
+            "discoverable".into(),
+            "id".into(),
+            "name".into(),
+            "time_created".into(),
+            "time_modified".into(),
+            "user_provision_type".into(),
         ]
     }
 }
@@ -4240,21 +4239,21 @@ impl std::fmt::Display for SiloCreate {
 
 impl tabled::Tabled for SiloCreate {
     const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.discoverable),
-            self.name.clone(),
-            format!("{:?}", self.user_provision_type),
+            self.description.clone().into(),
+            format!("{:?}", self.discoverable).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.user_provision_type).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "discoverable".to_string(),
-            "name".to_string(),
-            "user_provision_type".to_string(),
+            "description".into(),
+            "discoverable".into(),
+            "name".into(),
+            "user_provision_type".into(),
         ]
     }
 }
@@ -4310,19 +4309,19 @@ impl crate::types::paginate::Pagination for SiloResultsPage {
 
 impl tabled::Tabled for SiloResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -4372,12 +4371,12 @@ impl std::fmt::Display for SiloRolePolicy {
 
 impl tabled::Tabled for SiloRolePolicy {
     const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.role_assignments)]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.role_assignments).into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["role_assignments".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["role_assignments".into()]
     }
 }
 
@@ -4404,19 +4403,19 @@ impl std::fmt::Display for SiloRoleRoleAssignment {
 
 impl tabled::Tabled for SiloRoleRoleAssignment {
     const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.identity_id),
-            format!("{:?}", self.identity_type),
-            format!("{:?}", self.role_name),
+            format!("{:?}", self.identity_id).into(),
+            format!("{:?}", self.identity_type).into(),
+            format!("{:?}", self.role_name).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "identity_id".to_string(),
-            "identity_type".to_string(),
-            "role_name".to_string(),
+            "identity_id".into(),
+            "identity_type".into(),
+            "role_name".into(),
         ]
     }
 }
@@ -4447,21 +4446,21 @@ impl std::fmt::Display for Sled {
 
 impl tabled::Tabled for Sled {
     const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.id),
-            self.service_address.clone(),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
+            format!("{:?}", self.id).into(),
+            self.service_address.clone().into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "id".to_string(),
-            "service_address".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
+            "id".into(),
+            "service_address".into(),
+            "time_created".into(),
+            "time_modified".into(),
         ]
     }
 }
@@ -4517,19 +4516,19 @@ impl crate::types::paginate::Pagination for SledResultsPage {
 
 impl tabled::Tabled for SledResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -4566,29 +4565,29 @@ impl std::fmt::Display for Snapshot {
 
 impl tabled::Tabled for Snapshot {
     const LENGTH: usize = 8;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.disk_id),
-            format!("{:?}", self.id),
-            self.name.clone(),
-            format!("{:?}", self.project_id),
-            format!("{:?}", self.size),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
+            self.description.clone().into(),
+            format!("{:?}", self.disk_id).into(),
+            format!("{:?}", self.id).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.project_id).into(),
+            format!("{:?}", self.size).into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "disk_id".to_string(),
-            "id".to_string(),
-            "name".to_string(),
-            "project_id".to_string(),
-            "size".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
+            "description".into(),
+            "disk_id".into(),
+            "id".into(),
+            "name".into(),
+            "project_id".into(),
+            "size".into(),
+            "time_created".into(),
+            "time_modified".into(),
         ]
     }
 }
@@ -4617,20 +4616,16 @@ impl std::fmt::Display for SnapshotCreate {
 
 impl tabled::Tabled for SnapshotCreate {
     const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            self.disk.clone(),
-            self.name.clone(),
+            self.description.clone().into(),
+            self.disk.clone().into(),
+            self.name.clone().into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec![
-            "description".to_string(),
-            "disk".to_string(),
-            "name".to_string(),
-        ]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["description".into(), "disk".into(), "name".into()]
     }
 }
 
@@ -4685,19 +4680,19 @@ impl crate::types::paginate::Pagination for SnapshotResultsPage {
 
 impl tabled::Tabled for SnapshotResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -4720,12 +4715,12 @@ impl std::fmt::Display for SpoofLoginBody {
 
 impl tabled::Tabled for SpoofLoginBody {
     const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![self.username.clone()]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.username.clone().into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["username".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["username".into()]
     }
 }
 
@@ -4762,27 +4757,27 @@ impl std::fmt::Display for SshKey {
 
 impl tabled::Tabled for SshKey {
     const LENGTH: usize = 7;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.id),
-            self.name.clone(),
-            self.public_key.clone(),
-            format!("{:?}", self.silo_user_id),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
+            self.description.clone().into(),
+            format!("{:?}", self.id).into(),
+            self.name.clone().into(),
+            self.public_key.clone().into(),
+            format!("{:?}", self.silo_user_id).into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "id".to_string(),
-            "name".to_string(),
-            "public_key".to_string(),
-            "silo_user_id".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
+            "description".into(),
+            "id".into(),
+            "name".into(),
+            "public_key".into(),
+            "silo_user_id".into(),
+            "time_created".into(),
+            "time_modified".into(),
         ]
     }
 }
@@ -4811,20 +4806,16 @@ impl std::fmt::Display for SshKeyCreate {
 
 impl tabled::Tabled for SshKeyCreate {
     const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            self.name.clone(),
-            self.public_key.clone(),
+            self.description.clone().into(),
+            self.name.clone().into(),
+            self.public_key.clone().into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec![
-            "description".to_string(),
-            "name".to_string(),
-            "public_key".to_string(),
-        ]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["description".into(), "name".into(), "public_key".into()]
     }
 }
 
@@ -4879,19 +4870,19 @@ impl crate::types::paginate::Pagination for SshKeyResultsPage {
 
 impl tabled::Tabled for SshKeyResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -4920,21 +4911,21 @@ impl std::fmt::Display for TimeseriesSchema {
 
 impl tabled::Tabled for TimeseriesSchema {
     const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.created),
-            format!("{:?}", self.datum_type),
-            format!("{:?}", self.field_schema),
-            self.timeseries_name.clone(),
+            format!("{:?}", self.created).into(),
+            format!("{:?}", self.datum_type).into(),
+            format!("{:?}", self.field_schema).into(),
+            self.timeseries_name.clone().into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "created".to_string(),
-            "datum_type".to_string(),
-            "field_schema".to_string(),
-            "timeseries_name".to_string(),
+            "created".into(),
+            "datum_type".into(),
+            "field_schema".into(),
+            "timeseries_name".into(),
         ]
     }
 }
@@ -4990,19 +4981,19 @@ impl crate::types::paginate::Pagination for TimeseriesSchemaResultsPage {
 
 impl tabled::Tabled for TimeseriesSchemaResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -5028,12 +5019,15 @@ impl std::fmt::Display for User {
 
 impl tabled::Tabled for User {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![self.display_name.clone(), format!("{:?}", self.id)]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.display_name.clone().into(),
+            format!("{:?}", self.id).into(),
+        ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["display_name".to_string(), "id".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["display_name".into(), "id".into()]
     }
 }
 
@@ -5066,23 +5060,23 @@ impl std::fmt::Display for UserBuiltin {
 
 impl tabled::Tabled for UserBuiltin {
     const LENGTH: usize = 5;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.id),
-            self.name.clone(),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
+            self.description.clone().into(),
+            format!("{:?}", self.id).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "id".to_string(),
-            "name".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
+            "description".into(),
+            "id".into(),
+            "name".into(),
+            "time_created".into(),
+            "time_modified".into(),
         ]
     }
 }
@@ -5138,19 +5132,19 @@ impl crate::types::paginate::Pagination for UserBuiltinResultsPage {
 
 impl tabled::Tabled for UserBuiltinResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -5228,19 +5222,19 @@ impl crate::types::paginate::Pagination for UserResultsPage {
 
 impl tabled::Tabled for UserResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -5282,31 +5276,31 @@ impl std::fmt::Display for Vpc {
 
 impl tabled::Tabled for Vpc {
     const LENGTH: usize = 9;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            self.dns_name.clone(),
-            format!("{:?}", self.id),
-            self.ipv_6_prefix.clone(),
-            self.name.clone(),
-            format!("{:?}", self.project_id),
-            format!("{:?}", self.system_router_id),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
+            self.description.clone().into(),
+            self.dns_name.clone().into(),
+            format!("{:?}", self.id).into(),
+            self.ipv_6_prefix.clone().into(),
+            self.name.clone().into(),
+            format!("{:?}", self.project_id).into(),
+            format!("{:?}", self.system_router_id).into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "dns_name".to_string(),
-            "id".to_string(),
-            "ipv_6_prefix".to_string(),
-            "name".to_string(),
-            "project_id".to_string(),
-            "system_router_id".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
+            "description".into(),
+            "dns_name".into(),
+            "id".into(),
+            "ipv_6_prefix".into(),
+            "name".into(),
+            "project_id".into(),
+            "system_router_id".into(),
+            "time_created".into(),
+            "time_modified".into(),
         ]
     }
 }
@@ -5342,25 +5336,25 @@ impl std::fmt::Display for VpcCreate {
 
 impl tabled::Tabled for VpcCreate {
     const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            self.dns_name.clone(),
+            self.description.clone().into(),
+            self.dns_name.clone().into(),
             if let Some(ipv_6_prefix) = &self.ipv_6_prefix {
-                format!("{:?}", ipv_6_prefix)
+                format!("{:?}", ipv_6_prefix).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            self.name.clone(),
+            self.name.clone().into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "dns_name".to_string(),
-            "ipv_6_prefix".to_string(),
-            "name".to_string(),
+            "description".into(),
+            "dns_name".into(),
+            "ipv_6_prefix".into(),
+            "name".into(),
         ]
     }
 }
@@ -5408,37 +5402,37 @@ impl std::fmt::Display for VpcFirewallRule {
 
 impl tabled::Tabled for VpcFirewallRule {
     const LENGTH: usize = 12;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.action),
-            self.description.clone(),
-            format!("{:?}", self.direction),
-            format!("{:?}", self.filters),
-            format!("{:?}", self.id),
-            self.name.clone(),
-            format!("{:?}", self.priority),
-            format!("{:?}", self.status),
-            format!("{:?}", self.targets),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
-            format!("{:?}", self.vpc_id),
+            format!("{:?}", self.action).into(),
+            self.description.clone().into(),
+            format!("{:?}", self.direction).into(),
+            format!("{:?}", self.filters).into(),
+            format!("{:?}", self.id).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.priority).into(),
+            format!("{:?}", self.status).into(),
+            format!("{:?}", self.targets).into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
+            format!("{:?}", self.vpc_id).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "action".to_string(),
-            "description".to_string(),
-            "direction".to_string(),
-            "filters".to_string(),
-            "id".to_string(),
-            "name".to_string(),
-            "priority".to_string(),
-            "status".to_string(),
-            "targets".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
-            "vpc_id".to_string(),
+            "action".into(),
+            "description".into(),
+            "direction".into(),
+            "filters".into(),
+            "id".into(),
+            "name".into(),
+            "priority".into(),
+            "status".into(),
+            "targets".into(),
+            "time_created".into(),
+            "time_modified".into(),
+            "vpc_id".into(),
         ]
     }
 }
@@ -5515,32 +5509,28 @@ impl std::fmt::Display for VpcFirewallRuleFilter {
 
 impl tabled::Tabled for VpcFirewallRuleFilter {
     const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(hosts) = &self.hosts {
-                format!("{:?}", hosts)
+                format!("{:?}", hosts).into()
             } else {
-                String::new()
+                String::new().into()
             },
             if let Some(ports) = &self.ports {
-                format!("{:?}", ports)
+                format!("{:?}", ports).into()
             } else {
-                String::new()
+                String::new().into()
             },
             if let Some(protocols) = &self.protocols {
-                format!("{:?}", protocols)
+                format!("{:?}", protocols).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec![
-            "hosts".to_string(),
-            "ports".to_string(),
-            "protocols".to_string(),
-        ]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["hosts".into(), "ports".into(), "protocols".into()]
     }
 }
 
@@ -5675,29 +5665,29 @@ impl std::fmt::Display for VpcFirewallRuleUpdate {
 
 impl tabled::Tabled for VpcFirewallRuleUpdate {
     const LENGTH: usize = 8;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.action),
-            self.description.clone(),
-            format!("{:?}", self.direction),
-            format!("{:?}", self.filters),
-            self.name.clone(),
-            format!("{:?}", self.priority),
-            format!("{:?}", self.status),
-            format!("{:?}", self.targets),
+            format!("{:?}", self.action).into(),
+            self.description.clone().into(),
+            format!("{:?}", self.direction).into(),
+            format!("{:?}", self.filters).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.priority).into(),
+            format!("{:?}", self.status).into(),
+            format!("{:?}", self.targets).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "action".to_string(),
-            "description".to_string(),
-            "direction".to_string(),
-            "filters".to_string(),
-            "name".to_string(),
-            "priority".to_string(),
-            "status".to_string(),
-            "targets".to_string(),
+            "action".into(),
+            "description".into(),
+            "direction".into(),
+            "filters".into(),
+            "name".into(),
+            "priority".into(),
+            "status".into(),
+            "targets".into(),
         ]
     }
 }
@@ -5722,12 +5712,12 @@ impl std::fmt::Display for VpcFirewallRuleUpdateParams {
 
 impl tabled::Tabled for VpcFirewallRuleUpdateParams {
     const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.rules)]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.rules).into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["rules".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["rules".into()]
     }
 }
 
@@ -5751,12 +5741,12 @@ impl std::fmt::Display for VpcFirewallRules {
 
 impl tabled::Tabled for VpcFirewallRules {
     const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.rules)]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.rules).into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["rules".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["rules".into()]
     }
 }
 
@@ -5811,19 +5801,19 @@ impl crate::types::paginate::Pagination for VpcResultsPage {
 
 impl tabled::Tabled for VpcResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -5859,27 +5849,27 @@ impl std::fmt::Display for VpcRouter {
 
 impl tabled::Tabled for VpcRouter {
     const LENGTH: usize = 7;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.id),
-            format!("{:?}", self.kind),
-            self.name.clone(),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
-            format!("{:?}", self.vpc_id),
+            self.description.clone().into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.kind).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
+            format!("{:?}", self.vpc_id).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "id".to_string(),
-            "kind".to_string(),
-            "name".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
-            "vpc_id".to_string(),
+            "description".into(),
+            "id".into(),
+            "kind".into(),
+            "name".into(),
+            "time_created".into(),
+            "time_modified".into(),
+            "vpc_id".into(),
         ]
     }
 }
@@ -5906,12 +5896,12 @@ impl std::fmt::Display for VpcRouterCreate {
 
 impl tabled::Tabled for VpcRouterCreate {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![self.description.clone(), self.name.clone()]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.description.clone().into(), self.name.clone().into()]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["description".to_string(), "name".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["description".into(), "name".into()]
     }
 }
 
@@ -5988,19 +5978,19 @@ impl crate::types::paginate::Pagination for VpcRouterResultsPage {
 
 impl tabled::Tabled for VpcRouterResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -6027,23 +6017,23 @@ impl std::fmt::Display for VpcRouterUpdate {
 
 impl tabled::Tabled for VpcRouterUpdate {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(description) = &self.description {
-                format!("{:?}", description)
+                format!("{:?}", description).into()
             } else {
-                String::new()
+                String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{:?}", name).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["description".to_string(), "name".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["description".into(), "name".into()]
     }
 }
 
@@ -6084,29 +6074,29 @@ impl std::fmt::Display for VpcSubnet {
 
 impl tabled::Tabled for VpcSubnet {
     const LENGTH: usize = 8;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            format!("{:?}", self.id),
-            self.ipv_4_block.clone(),
-            self.ipv_6_block.clone(),
-            self.name.clone(),
-            format!("{:?}", self.time_created),
-            format!("{:?}", self.time_modified),
-            format!("{:?}", self.vpc_id),
+            self.description.clone().into(),
+            format!("{:?}", self.id).into(),
+            self.ipv_4_block.clone().into(),
+            self.ipv_6_block.clone().into(),
+            self.name.clone().into(),
+            format!("{:?}", self.time_created).into(),
+            format!("{:?}", self.time_modified).into(),
+            format!("{:?}", self.vpc_id).into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "id".to_string(),
-            "ipv_4_block".to_string(),
-            "ipv_6_block".to_string(),
-            "name".to_string(),
-            "time_created".to_string(),
-            "time_modified".to_string(),
-            "vpc_id".to_string(),
+            "description".into(),
+            "id".into(),
+            "ipv_4_block".into(),
+            "ipv_6_block".into(),
+            "name".into(),
+            "time_created".into(),
+            "time_modified".into(),
+            "vpc_id".into(),
         ]
     }
 }
@@ -6143,25 +6133,25 @@ impl std::fmt::Display for VpcSubnetCreate {
 
 impl tabled::Tabled for VpcSubnetCreate {
     const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.description.clone(),
-            self.ipv_4_block.clone(),
+            self.description.clone().into(),
+            self.ipv_4_block.clone().into(),
             if let Some(ipv_6_block) = &self.ipv_6_block {
-                format!("{:?}", ipv_6_block)
+                format!("{:?}", ipv_6_block).into()
             } else {
-                String::new()
+                String::new().into()
             },
-            self.name.clone(),
+            self.name.clone().into(),
         ]
     }
 
-    fn headers() -> Vec<String> {
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "description".to_string(),
-            "ipv_4_block".to_string(),
-            "ipv_6_block".to_string(),
-            "name".to_string(),
+            "description".into(),
+            "ipv_4_block".into(),
+            "ipv_6_block".into(),
+            "name".into(),
         ]
     }
 }
@@ -6217,19 +6207,19 @@ impl crate::types::paginate::Pagination for VpcSubnetResultsPage {
 
 impl tabled::Tabled for VpcSubnetResultsPage {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.items),
+            format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page)
+                format!("{:?}", next_page).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["items".to_string(), "next_page".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -6256,23 +6246,23 @@ impl std::fmt::Display for VpcSubnetUpdate {
 
 impl tabled::Tabled for VpcSubnetUpdate {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(description) = &self.description {
-                format!("{:?}", description)
+                format!("{:?}", description).into()
             } else {
-                String::new()
+                String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{:?}", name).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["description".to_string(), "name".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["description".into(), "name".into()]
     }
 }
 
@@ -6301,32 +6291,28 @@ impl std::fmt::Display for VpcUpdate {
 
 impl tabled::Tabled for VpcUpdate {
     const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<String> {
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(description) = &self.description {
-                format!("{:?}", description)
+                format!("{:?}", description).into()
             } else {
-                String::new()
+                String::new().into()
             },
             if let Some(dns_name) = &self.dns_name {
-                format!("{:?}", dns_name)
+                format!("{:?}", dns_name).into()
             } else {
-                String::new()
+                String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name)
+                format!("{:?}", name).into()
             } else {
-                String::new()
+                String::new().into()
             },
         ]
     }
 
-    fn headers() -> Vec<String> {
-        vec![
-            "description".to_string(),
-            "dns_name".to_string(),
-            "name".to_string(),
-        ]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["description".into(), "dns_name".into(), "name".into()]
     }
 }
 
