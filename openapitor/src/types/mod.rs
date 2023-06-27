@@ -67,6 +67,7 @@ pub fn generate_types(spec: &openapiv3::OpenAPI, opts: crate::Opts) -> Result<Ty
         rendered: quote!(
             //! This module contains the generated types for the library.
 
+            #[cfg(feature = "tabled")]
             use tabled::Tabled;
 
             #base64_mod
@@ -517,7 +518,8 @@ impl TypeSpace {
 
         let rendered = quote! {
             #description
-            #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema, tabled::Tabled)]
+            #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema)]
+            #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
             #serde_options
             pub enum #one_of_name {
                 #values
@@ -711,6 +713,7 @@ impl TypeSpace {
         }
 
         let tabled = quote! {
+            #[cfg(feature = "tabled")]
             impl tabled::Tabled for #struct_name {
                 const LENGTH: usize = #length;
 
@@ -1042,7 +1045,9 @@ impl TypeSpace {
 
         let rendered = quote! {
             #description
-            #[derive(serde::Serialize, serde::Deserialize, PartialEq, Hash, Debug, Clone, schemars::JsonSchema, tabled::Tabled, clap::ValueEnum, parse_display::FromStr, parse_display::Display)]
+            #[derive(serde::Serialize, serde::Deserialize, PartialEq, Hash, Debug, Clone, schemars::JsonSchema, parse_display::FromStr, parse_display::Display)]
+            #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+            #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
             pub enum #enum_name {
                 #values
             }

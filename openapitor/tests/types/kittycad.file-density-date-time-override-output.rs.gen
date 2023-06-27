@@ -53,6 +53,7 @@ impl std::fmt::Display for FileDensity {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for FileDensity {
     const LENGTH: usize = 11;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {

@@ -1,4 +1,5 @@
 #![doc = r" This module contains the generated types for the library."]
+#[cfg(feature = "tabled")]
 use tabled::Tabled;
 pub mod base64 {
     #![doc = " Base64 data that encodes to url safe base64, but can decode from multiple"]
@@ -417,11 +418,11 @@ pub mod error {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum AccountProvider {
     #[doc = "The Google account provider."]
     #[serde(rename = "google")]
@@ -458,6 +459,7 @@ impl std::fmt::Display for AiPluginApi {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for AiPluginApi {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -490,11 +492,11 @@ impl tabled::Tabled for AiPluginApi {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[derive(Default)]
 pub enum AiPluginApiType {
     #[doc = "An OpenAPI specification."]
@@ -529,6 +531,7 @@ impl std::fmt::Display for AiPluginAuth {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for AiPluginAuth {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -560,11 +563,11 @@ impl tabled::Tabled for AiPluginAuth {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum AiPluginAuthType {
     #[doc = "None."]
     #[serde(rename = "none")]
@@ -593,11 +596,11 @@ pub enum AiPluginAuthType {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum AiPluginHttpAuthType {
     #[doc = "Basic."]
     #[serde(rename = "basic")]
@@ -653,6 +656,7 @@ impl std::fmt::Display for AiPluginManifest {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for AiPluginManifest {
     const LENGTH: usize = 10;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -729,6 +733,7 @@ impl std::fmt::Display for ApiCallQueryGroup {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for ApiCallQueryGroup {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -752,11 +757,11 @@ impl tabled::Tabled for ApiCallQueryGroup {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum ApiCallQueryGroupBy {
     #[doc = "The email of the user that requested the API call."]
     #[serde(rename = "email")]
@@ -793,11 +798,11 @@ pub enum ApiCallQueryGroupBy {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum ApiCallStatus {
     #[doc = "The async API call is queued."]
     Queued,
@@ -891,6 +896,7 @@ impl std::fmt::Display for ApiCallWithPrice {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for ApiCallWithPrice {
     const LENGTH: usize = 22;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -1061,6 +1067,7 @@ impl crate::types::paginate::Pagination for ApiCallWithPriceResultsPage {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for ApiCallWithPriceResultsPage {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -1111,6 +1118,7 @@ impl std::fmt::Display for ApiToken {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for ApiToken {
     const LENGTH: usize = 6;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -1193,6 +1201,7 @@ impl crate::types::paginate::Pagination for ApiTokenResultsPage {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for ApiTokenResultsPage {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -1231,6 +1240,7 @@ impl std::fmt::Display for AppClientInfo {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for AppClientInfo {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -1295,6 +1305,7 @@ impl std::fmt::Display for AsyncApiCall {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for AsyncApiCall {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -1362,14 +1373,9 @@ impl tabled::Tabled for AsyncApiCall {
 
 #[doc = "The output from the async API call."]
 #[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    tabled :: Tabled,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
     FileConversion(FileConversion),
@@ -1429,6 +1435,7 @@ impl crate::types::paginate::Pagination for AsyncApiCallResultsPage {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for AsyncApiCallResultsPage {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -1456,11 +1463,11 @@ impl tabled::Tabled for AsyncApiCallResultsPage {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum AsyncApiCallType {
     #[doc = "File conversion."]
     FileConversion,
@@ -1502,6 +1509,7 @@ impl std::fmt::Display for BillingInfo {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for BillingInfo {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -1544,6 +1552,7 @@ impl std::fmt::Display for CacheMetadata {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for CacheMetadata {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -1597,6 +1606,7 @@ impl std::fmt::Display for CardDetails {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for CardDetails {
     const LENGTH: usize = 8;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -1693,6 +1703,7 @@ impl std::fmt::Display for Cluster {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Cluster {
     const LENGTH: usize = 6;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -1751,11 +1762,11 @@ impl tabled::Tabled for Cluster {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum CodeLanguage {
     #[doc = "The `go` programming language."]
     #[serde(rename = "go")]
@@ -1797,6 +1808,7 @@ impl std::fmt::Display for CodeOutput {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for CodeOutput {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -1848,6 +1860,7 @@ impl std::fmt::Display for Commit {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Commit {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -2019,6 +2032,7 @@ impl std::fmt::Display for Connection {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Connection {
     const LENGTH: usize = 46;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -2297,11 +2311,11 @@ impl tabled::Tabled for Connection {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum CountryCode {
     #[doc = "Afghanistan"]
     #[serde(rename = "AF")]
@@ -3311,11 +3325,11 @@ pub enum CountryCode {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum CreatedAtSortMode {
     #[doc = "sort in increasing order of \"created_at\""]
     #[serde(rename = "created-at-ascending")]
@@ -3336,11 +3350,11 @@ pub enum CreatedAtSortMode {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum Currency {
     #[doc = "United Arab Emirates Dirham"]
     #[serde(rename = "aed")]
@@ -3956,6 +3970,7 @@ impl std::fmt::Display for Customer {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Customer {
     const LENGTH: usize = 10;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -4069,6 +4084,7 @@ impl std::fmt::Display for CustomerBalance {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for CustomerBalance {
     const LENGTH: usize = 8;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -4125,6 +4141,7 @@ impl std::fmt::Display for DeviceAccessTokenRequestForm {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for DeviceAccessTokenRequestForm {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -4163,6 +4180,7 @@ impl std::fmt::Display for DeviceAuthRequestForm {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for DeviceAuthRequestForm {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -4194,6 +4212,7 @@ impl std::fmt::Display for DeviceAuthVerifyParams {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for DeviceAuthVerifyParams {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -4453,6 +4472,7 @@ impl std::fmt::Display for DockerSystemInfo {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for DockerSystemInfo {
     const LENGTH: usize = 60;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -4848,6 +4868,7 @@ impl std::fmt::Display for EmailAuthenticationForm {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for EmailAuthenticationForm {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -4896,6 +4917,7 @@ impl std::fmt::Display for EngineMetadata {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for EngineMetadata {
     const LENGTH: usize = 6;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -4930,11 +4952,11 @@ impl tabled::Tabled for EngineMetadata {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum Environment {
     #[doc = "The development environment. This is for running locally."]
     #[serde(rename = "DEVELOPMENT")]
@@ -4972,6 +4994,7 @@ impl std::fmt::Display for Error {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Error {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -5015,6 +5038,7 @@ impl std::fmt::Display for ExecutorMetadata {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for ExecutorMetadata {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -5100,6 +5124,7 @@ impl std::fmt::Display for ExtendedUser {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for ExtendedUser {
     const LENGTH: usize = 16;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -5242,6 +5267,7 @@ impl crate::types::paginate::Pagination for ExtendedUserResultsPage {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for ExtendedUserResultsPage {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -5281,6 +5307,7 @@ impl std::fmt::Display for Extrude {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Extrude {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -5337,6 +5364,7 @@ impl std::fmt::Display for FileCenterOfMass {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for FileCenterOfMass {
     const LENGTH: usize = 10;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -5434,6 +5462,7 @@ impl std::fmt::Display for FileConversion {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for FileConversion {
     const LENGTH: usize = 11;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -5534,6 +5563,7 @@ impl std::fmt::Display for FileDensity {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for FileDensity {
     const LENGTH: usize = 11;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -5602,11 +5632,11 @@ impl tabled::Tabled for FileDensity {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum FileExportFormat {
     #[doc = "The COLLADA/DAE file format. <https://en.wikipedia.org/wiki/COLLADA>"]
     #[serde(rename = "dae")]
@@ -5651,11 +5681,11 @@ pub enum FileExportFormat {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum FileImportFormat {
     #[doc = "The COLLADA/DAE file format. <https://en.wikipedia.org/wiki/COLLADA>"]
     #[serde(rename = "dae")]
@@ -5738,6 +5768,7 @@ impl std::fmt::Display for FileMass {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for FileMass {
     const LENGTH: usize = 11;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -5839,6 +5870,7 @@ impl std::fmt::Display for FileSurfaceArea {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for FileSurfaceArea {
     const LENGTH: usize = 10;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -5912,6 +5944,7 @@ impl std::fmt::Display for FileSystemMetadata {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for FileSystemMetadata {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -5965,6 +5998,7 @@ impl std::fmt::Display for FileVolume {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for FileVolume {
     const LENGTH: usize = 10;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -6050,6 +6084,7 @@ impl std::fmt::Display for Gateway {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Gateway {
     const LENGTH: usize = 5;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -6102,11 +6137,11 @@ impl tabled::Tabled for Gateway {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum ImageType {
     #[serde(rename = "png")]
     #[display("png")]
@@ -6151,6 +6186,7 @@ impl std::fmt::Display for IndexInfo {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for IndexInfo {
     const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -6297,6 +6333,7 @@ impl std::fmt::Display for Invoice {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Invoice {
     const LENGTH: usize = 24;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -6487,6 +6524,7 @@ impl std::fmt::Display for InvoiceLineItem {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for InvoiceLineItem {
     const LENGTH: usize = 6;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -6545,11 +6583,11 @@ impl tabled::Tabled for InvoiceLineItem {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum InvoiceStatus {
     #[doc = "Deleted."]
     #[serde(rename = "deleted")]
@@ -6603,6 +6641,7 @@ impl std::fmt::Display for Jetstream {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Jetstream {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -6656,6 +6695,7 @@ impl std::fmt::Display for JetstreamApiStats {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for JetstreamApiStats {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -6712,6 +6752,7 @@ impl std::fmt::Display for JetstreamConfig {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for JetstreamConfig {
     const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -6787,6 +6828,7 @@ impl std::fmt::Display for JetstreamStats {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for JetstreamStats {
     const LENGTH: usize = 7;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -6871,6 +6913,7 @@ impl std::fmt::Display for LeafNode {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for LeafNode {
     const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -6929,6 +6972,7 @@ impl std::fmt::Display for Line3D {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Line3D {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -6960,6 +7004,7 @@ impl std::fmt::Display for Mesh {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Mesh {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -6997,6 +7042,7 @@ impl std::fmt::Display for MetaClusterInfo {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for MetaClusterInfo {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -7058,6 +7104,7 @@ impl std::fmt::Display for Metadata {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Metadata {
     const LENGTH: usize = 8;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -7096,11 +7143,11 @@ impl tabled::Tabled for Metadata {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum Method {
     #[doc = "The `OPTIONS` method as defined in [RFC 7231](https://tools.ietf.org/html/rfc7231#section-4.2.1)."]
     #[serde(rename = "OPTIONS")]
@@ -7191,6 +7238,7 @@ impl std::fmt::Display for ModelingCmdReq {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for ModelingCmdReq {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -7227,6 +7275,7 @@ impl std::fmt::Display for ModelingCmdReqBatch {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for ModelingCmdReqBatch {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -7266,6 +7315,7 @@ impl std::fmt::Display for ModelingError {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for ModelingError {
     const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -7327,6 +7377,7 @@ impl std::fmt::Display for ModelingOutcomes {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for ModelingOutcomes {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -7376,6 +7427,7 @@ impl std::fmt::Display for NewAddress {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for NewAddress {
     const LENGTH: usize = 7;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -7457,6 +7509,7 @@ impl std::fmt::Display for Oauth2ClientInfo {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Oauth2ClientInfo {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -7497,11 +7550,11 @@ impl tabled::Tabled for Oauth2ClientInfo {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[derive(Default)]
 pub enum Oauth2GrantType {
     #[doc = "An OAuth 2.0 Device Authorization Grant."]
@@ -7540,6 +7593,7 @@ impl std::fmt::Display for Onboarding {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Onboarding {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -7597,6 +7651,7 @@ impl std::fmt::Display for OutputFile {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for OutputFile {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -7641,6 +7696,7 @@ impl std::fmt::Display for PaymentIntent {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for PaymentIntent {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -7686,6 +7742,7 @@ impl std::fmt::Display for PaymentMethod {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for PaymentMethod {
     const LENGTH: usize = 6;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -7756,6 +7813,7 @@ impl std::fmt::Display for PaymentMethodCardChecks {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for PaymentMethodCardChecks {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -7796,11 +7854,11 @@ impl tabled::Tabled for PaymentMethodCardChecks {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[derive(Default)]
 pub enum PaymentMethodType {
     #[doc = "A card payment method."]
@@ -7854,6 +7912,7 @@ impl std::fmt::Display for PhysicsConstant {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for PhysicsConstant {
     const LENGTH: usize = 10;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -7916,11 +7975,11 @@ impl tabled::Tabled for PhysicsConstant {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum PhysicsConstantName {
     #[doc = "pi - Ratio of a circle's circumference to its diameter. <https://en.wikipedia.org/wiki/Pi>"]
     #[serde(rename = "pi")]
@@ -8081,6 +8140,7 @@ impl std::fmt::Display for PluginsInfo {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for PluginsInfo {
     const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -8137,6 +8197,7 @@ impl std::fmt::Display for Point2D {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Point2D {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -8171,6 +8232,7 @@ impl std::fmt::Display for Point3D {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Point3D {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -8206,6 +8268,7 @@ impl std::fmt::Display for PointEMetadata {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for PointEMetadata {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -8236,6 +8299,7 @@ impl std::fmt::Display for Pong {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Pong {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -8289,6 +8353,7 @@ impl std::fmt::Display for RegistryServiceConfig {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for RegistryServiceConfig {
     const LENGTH: usize = 5;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -8362,6 +8427,7 @@ impl std::fmt::Display for Runtime {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Runtime {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -8415,6 +8481,7 @@ impl std::fmt::Display for Session {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Session {
     const LENGTH: usize = 6;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -8456,11 +8523,11 @@ impl tabled::Tabled for Session {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum SystemInfoCgroupDriverEnum {
     #[serde(rename = "")]
     #[display("")]
@@ -8484,11 +8551,11 @@ pub enum SystemInfoCgroupDriverEnum {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum SystemInfoCgroupVersionEnum {
     #[serde(rename = "")]
     #[display("")]
@@ -8523,6 +8590,7 @@ impl std::fmt::Display for SystemInfoDefaultAddressPools {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for SystemInfoDefaultAddressPools {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -8553,11 +8621,11 @@ impl tabled::Tabled for SystemInfoDefaultAddressPools {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum SystemInfoIsolationEnum {
     #[serde(rename = "")]
     #[display("")]
@@ -8582,11 +8650,11 @@ pub enum SystemInfoIsolationEnum {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitAngle {
     #[doc = "Degrees <https://en.wikipedia.org/wiki/Degree_(angle)>"]
     #[serde(rename = "degrees")]
@@ -8645,6 +8713,7 @@ impl std::fmt::Display for UnitAngleConversion {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for UnitAngleConversion {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -8715,11 +8784,11 @@ impl tabled::Tabled for UnitAngleConversion {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitArea {
     #[doc = "Acres <https://en.wikipedia.org/wiki/Acre>"]
     #[serde(rename = "acres")]
@@ -8826,6 +8895,7 @@ impl std::fmt::Display for UnitAreaConversion {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for UnitAreaConversion {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -8896,11 +8966,11 @@ impl tabled::Tabled for UnitAreaConversion {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitCurrent {
     #[doc = "Amperes <https://en.wikipedia.org/wiki/Ampere>"]
     #[serde(rename = "amperes")]
@@ -8967,6 +9037,7 @@ impl std::fmt::Display for UnitCurrentConversion {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for UnitCurrentConversion {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -9037,11 +9108,11 @@ impl tabled::Tabled for UnitCurrentConversion {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitEnergy {
     #[doc = "British Thermal Unit (BTU) <https://en.wikipedia.org/wiki/British_thermal_unit>"]
     #[serde(rename = "btu")]
@@ -9116,6 +9187,7 @@ impl std::fmt::Display for UnitEnergyConversion {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for UnitEnergyConversion {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -9186,11 +9258,11 @@ impl tabled::Tabled for UnitEnergyConversion {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitForce {
     #[doc = "Dynes <https://en.wikipedia.org/wiki/Dyne>"]
     #[serde(rename = "dynes")]
@@ -9269,6 +9341,7 @@ impl std::fmt::Display for UnitForceConversion {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for UnitForceConversion {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -9339,11 +9412,11 @@ impl tabled::Tabled for UnitForceConversion {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitFrequency {
     #[doc = "Gigahertz <https://en.wikipedia.org/wiki/Hertz>"]
     #[serde(rename = "gigahertz")]
@@ -9426,6 +9499,7 @@ impl std::fmt::Display for UnitFrequencyConversion {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for UnitFrequencyConversion {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -9496,11 +9570,11 @@ impl tabled::Tabled for UnitFrequencyConversion {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitLength {
     #[doc = "Centimetres <https://en.wikipedia.org/wiki/Centimetre>"]
     #[serde(rename = "centimetres")]
@@ -9603,6 +9677,7 @@ impl std::fmt::Display for UnitLengthConversion {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for UnitLengthConversion {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -9673,11 +9748,11 @@ impl tabled::Tabled for UnitLengthConversion {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitMass {
     #[doc = "Carats <https://en.wikipedia.org/wiki/Carat_(mass)>"]
     #[serde(rename = "carats")]
@@ -9788,6 +9863,7 @@ impl std::fmt::Display for UnitMassConversion {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for UnitMassConversion {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -9858,11 +9934,11 @@ impl tabled::Tabled for UnitMassConversion {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitPower {
     #[doc = "British thermal units (BTU) per minute <https://en.wikipedia.org/wiki/British_thermal_unit>"]
     #[serde(rename = "btu_per_minute")]
@@ -9941,6 +10017,7 @@ impl std::fmt::Display for UnitPowerConversion {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for UnitPowerConversion {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -10011,11 +10088,11 @@ impl tabled::Tabled for UnitPowerConversion {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitPressure {
     #[doc = "Atmospheres <https://en.wikipedia.org/wiki/Standard_atmosphere_(unit)>"]
     #[serde(rename = "atmospheres")]
@@ -10094,6 +10171,7 @@ impl std::fmt::Display for UnitPressureConversion {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for UnitPressureConversion {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -10164,11 +10242,11 @@ impl tabled::Tabled for UnitPressureConversion {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitTemperature {
     #[doc = "Celsius <https://en.wikipedia.org/wiki/Celsius>"]
     #[serde(rename = "celsius")]
@@ -10235,6 +10313,7 @@ impl std::fmt::Display for UnitTemperatureConversion {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for UnitTemperatureConversion {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -10305,11 +10384,11 @@ impl tabled::Tabled for UnitTemperatureConversion {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitTorque {
     #[doc = "Newton metres <https://en.wikipedia.org/wiki/Newton_metre>"]
     #[serde(rename = "newton_metres")]
@@ -10368,6 +10447,7 @@ impl std::fmt::Display for UnitTorqueConversion {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for UnitTorqueConversion {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -10438,11 +10518,11 @@ impl tabled::Tabled for UnitTorqueConversion {
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitVolume {
     #[doc = "Cubic centimeters (cc or cm³) <https://en.wikipedia.org/wiki/Cubic_centimetre>"]
     #[serde(rename = "cubic_centimetres")]
@@ -10569,6 +10649,7 @@ impl std::fmt::Display for UnitVolumeConversion {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for UnitVolumeConversion {
     const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -10665,6 +10746,7 @@ impl std::fmt::Display for UpdateUser {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for UpdateUser {
     const LENGTH: usize = 6;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -10765,6 +10847,7 @@ impl std::fmt::Display for User {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for User {
     const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -10889,6 +10972,7 @@ impl crate::types::paginate::Pagination for UserResultsPage {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for UserResultsPage {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
@@ -10939,6 +11023,7 @@ impl std::fmt::Display for VerificationToken {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for VerificationToken {
     const LENGTH: usize = 5;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {

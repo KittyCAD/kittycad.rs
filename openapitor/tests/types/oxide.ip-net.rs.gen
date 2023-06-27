@@ -1,12 +1,7 @@
 #[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    tabled :: Tabled,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum IpNet {
     V4(String),
     V6(String),

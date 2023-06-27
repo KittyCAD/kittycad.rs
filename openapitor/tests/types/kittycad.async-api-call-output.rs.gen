@@ -1,13 +1,8 @@
 #[doc = "The output from the async API call."]
 #[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    tabled :: Tabled,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
     FileConversion(FileConversion),

@@ -565,7 +565,7 @@ anyhow = "1"
 async-trait = "^0.1.53"
 base64 = "0.21"
 bytes = {{ version = "1", features = ["serde"] }}
-clap = {{ version = "4.2.4", features = ["cargo", "derive", "env", "unicode"] }}
+clap = {{ version = "4.2.4", features = ["cargo", "derive", "env", "unicode"], optional = true }}
 chrono = {{ version = "0.4", default-features = false, features = ["serde", "std"] }}
 data-encoding = "^2.3.2"
 dirs = {{ version = "^5.0.1", optional = true }}
@@ -588,7 +588,7 @@ schemars = {{ version = "0.8", features = ["bytes", "chrono", "url", "uuid1"] }}
 serde = {{ version = "1", features = ["derive"] }}
 serde_json = "1"
 serde_urlencoded = "^0.7"
-tabled = {{ version = "0.12.0", features = ["color"] }}
+tabled = {{ version = "0.12.0", features = ["color"], optional = true }}
 thiserror = "1"
 tokio = {{ version = "1.20.1", features = ["sync"] }}
 tracing = "^0.1"
@@ -602,6 +602,11 @@ pretty_assertions = "1"
 rand = "0.8"
 tokio = {{ version = "1.20.0", features = ["rt", "macros"] }}
 tokio-tungstenite = "0.19"
+
+[features]
+default = []
+clap = ["dep:clap"]
+tabled = ["dep:tabled"]
 
 [package.metadata.docs.rs]
 all-features = true
@@ -657,6 +662,10 @@ fn run_cargo_clippy(opts: &Opts) -> Result<()> {
     cmd.args([
         "clippy",
         "--fix",
+        "--features",
+        "clap",
+        "--features",
+        "tabled",
         "--allow-dirty",
         "--allow-no-vcs", // We need this arg for the tests.
     ])
