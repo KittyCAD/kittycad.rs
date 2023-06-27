@@ -33,6 +33,7 @@ impl std::fmt::Display for RouterRoute {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for RouterRoute {
     const LENGTH: usize = 9;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {

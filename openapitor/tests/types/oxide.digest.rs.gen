@@ -6,11 +6,11 @@
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum Type {
     #[serde(rename = "sha256")]
     #[display("sha256")]
@@ -42,6 +42,7 @@ impl std::fmt::Display for Digest {
     }
 }
 
+#[cfg(feature = "tabled")]
 impl tabled::Tabled for Digest {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {

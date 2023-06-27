@@ -73,6 +73,7 @@ async fn serialize_one_of() {
     );
 }
 
+#[cfg(feature = "tabled")]
 #[tokio::test]
 async fn tabled_one_of() {
     let client = test_client();

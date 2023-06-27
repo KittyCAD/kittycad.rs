@@ -7,11 +7,11 @@
     Debug,
     Clone,
     schemars :: JsonSchema,
-    tabled :: Tabled,
-    clap :: ValueEnum,
     parse_display :: FromStr,
     parse_display :: Display,
 )]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum AccountProvier {
     #[doc = "The Google account provider."]
     #[serde(rename = "google")]
