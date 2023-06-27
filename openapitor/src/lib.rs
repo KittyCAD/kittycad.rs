@@ -575,7 +575,7 @@ http = "^0.2.8"
 itertools = "^0.10.3"
 log = {{ version = "^0.4", features = ["serde"] }}
 mime = "0.3"
-parse-display = "^0.5"
+parse-display = "^0.8.1"
 percent-encoding = "2.1"
 phonenumber = "0.3.2"
 rand = "0.8"
