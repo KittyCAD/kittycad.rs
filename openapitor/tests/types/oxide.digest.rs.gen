@@ -44,11 +44,14 @@ impl std::fmt::Display for Digest {
 
 impl tabled::Tabled for Digest {
     const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<String> {
-        vec![format!("{:?}", self.type_), self.value.clone()]
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.type_).into(),
+            self.value.clone().into(),
+        ]
     }
 
-    fn headers() -> Vec<String> {
-        vec!["type_".to_string(), "value".to_string()]
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["type_".into(), "value".into()]
     }
 }
