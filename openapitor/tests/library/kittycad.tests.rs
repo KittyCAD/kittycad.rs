@@ -2,7 +2,9 @@ use futures::TryStreamExt;
 use pretty_assertions::assert_eq;
 use tokio_tungstenite::tungstenite::Message as WsMsg;
 
-use crate::types::{ModelingCmd, ModelingCmdReq, Point3D};
+use crate::types::{
+    ExtendPath, ModelingCmd, ModelingCmdExtendPath, ModelingCmdReq, PathSegment, Point3D,
+};
 
 fn test_client() -> crate::Client {
     crate::Client::new_from_env()
@@ -36,13 +38,13 @@ async fn test_create_file_volume() {
 
     let result = client
         .file()
-        .create_volume(crate::types::File3DImportFormat::Obj, &body.to_vec().into())
+        .create_volume(crate::types::FileImportFormat::Obj, &body.to_vec().into())
         .await
         .unwrap();
 
     assert_eq!(result.volume, Some(53.601147));
 
-    assert_eq!(result.src_format, crate::types::File3DImportFormat::Obj);
+    assert_eq!(result.src_format, crate::types::FileImportFormat::Obj);
     assert_eq!(result.status, crate::types::ApiCallStatus::Completed);
 }
 
@@ -176,6 +178,7 @@ async fn test_user_self() {
 #[tokio::test]
 async fn test_modeling_websocket() {
     use futures::{SinkExt, StreamExt};
+    use uuid::Uuid;
 
     let client = test_client();
 
@@ -195,25 +198,58 @@ async fn test_modeling_websocket() {
     .await
     .split();
 
-    let cmd = ModelingCmdReq {
-        cmd: ModelingCmd::AddLine {
-            from: Point3D {
-                x: 1.0,
-                y: 1.0,
-                z: 0.0,
-            },
-            to: Point3D {
-                x: 2.0,
-                y: 2.0,
-                z: 0.0,
-            },
-        },
-        cmd_id: Default::default(),
-        file_id: Default::default(),
-    };
-    let cmd_serialized = serde_json::to_string(&cmd).unwrap();
+    // Start a path
+    let path_id = Uuid::new_v4();
+    write
+        .send(WsMsg::Text(
+            serde_json::to_string(&ModelingCmdReq {
+                cmd: ModelingCmd::ModelingCmdStartPath(
+                    crate::types::ModelingCmdStartPath::StartPath,
+                ),
+                cmd_id: path_id,
+                file_id: Default::default(),
+            })
+            .unwrap(),
+        ))
+        .await
+        .unwrap();
 
-    write.send(WsMsg::Text(cmd_serialized)).await.unwrap();
+    // Draw the path in a triangle shape.
+    let points = [
+        Point3D {
+            x: 1.0,
+            y: 0.0,
+            z: 0.0,
+        },
+        Point3D {
+            x: 0.0,
+            y: 1.0,
+            z: 0.0,
+        },
+        Point3D {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        },
+    ];
+    for point in points {
+        write
+            .send(WsMsg::Text(
+                serde_json::to_string(&ModelingCmdReq {
+                    cmd: ModelingCmd::ModelingCmdExtendPath(ModelingCmdExtendPath {
+                        extend_path: ExtendPath {
+                            path: path_id,
+                            segment: PathSegment::Line { end: point },
+                        },
+                    }),
+                    cmd_id: Uuid::new_v4(),
+                    file_id: Default::default(),
+                })
+                .unwrap(),
+            ))
+            .await
+            .unwrap();
+    }
 
     // Finish sending
     drop(write);

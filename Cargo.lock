@@ -1226,7 +1226,7 @@ checksum = "44d11de466f4a3006fe8a5e7ec84e93b79c70cb992ae0aa0eb631ad2df8abfe2"
 
 [[package]]
 name = "openapitor"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "Inflector",
  "anyhow",
