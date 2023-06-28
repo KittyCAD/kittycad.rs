@@ -303,7 +303,6 @@ pub fn generate_example_rust_from_schema(
     schema: &openapiv3::Schema,
     in_crate: bool,
 ) -> Result<proc_macro2::TokenStream> {
-    let log = name == "updateUserAccount Request Body";
     Ok(match &schema.schema_kind {
         openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
             if !s.enumeration.is_empty() {
@@ -403,9 +402,6 @@ pub fn generate_example_rust_from_schema(
             quote!(4 as #t)
         }
         openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
-            if log {
-                eprintln!("It's a Type(Object(...))");
-            }
             let object_name =
                 crate::types::get_type_name_for_schema(name, schema, &type_space.spec, in_crate)?
                     .strip_option()?;
@@ -468,9 +464,6 @@ pub fn generate_example_rust_from_schema(
                             &type_space.spec,
                             true,
                         )?;
-                        if log {
-                            eprintln!("{}", t_name);
-                        }
                         // Check if we should render the schema.
                         if v.should_render()? {
                             // Check if we already have a type with this name.
@@ -501,23 +494,6 @@ pub fn generate_example_rust_from_schema(
                                         true,
                                     )?;
                                 }
-                                if log {
-                                    if rendered.schema_data != item.schema_data {
-                                        eprintln!(
-                                            "Already had a type with that name, but the original schema data had {:?} and we wanted {:?}, so updated name to {}",
-                                            rendered.schema_data,
-                                            item.schema_data,
-                                            t_name
-                                        );
-                                    } else if rendered.schema_kind != item.schema_kind {
-                                        eprintln!(
-                                            "Already had a type with that name, but the original schema kind had {:#?} and we wanted {:#?}, so updated name to {}",
-                                            rendered.schema_kind,
-                                            item.schema_kind,
-                                            t_name
-                                        );
-                                    }
-                                }
                             }
                         }
 
@@ -526,9 +502,6 @@ pub fn generate_example_rust_from_schema(
                 };
 
                 let inner_name_rendered = inner_name.strip_option()?.rendered()?;
-                if log {
-                    eprintln!("example: {inner_name_rendered}");
-                }
 
                 let inner_schema = v.get_schema_from_reference(&type_space.spec, true)?;
 
