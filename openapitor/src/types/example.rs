@@ -303,7 +303,6 @@ pub fn generate_example_rust_from_schema(
     schema: &openapiv3::Schema,
     in_crate: bool,
 ) -> Result<proc_macro2::TokenStream> {
-    // eprintln!("{name}");
     let log = name == "updateUserAccount Request Body";
     Ok(match &schema.schema_kind {
         openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
