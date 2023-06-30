@@ -1251,8 +1251,12 @@ impl TypeSpace {
                         }
                     }
                     // Enums with named fields, e.g. MyEnum::Variant{field: String}
+                    // In this case,
+                    // Enum variants should be named after their nested object.
+                    // E.g. instead of ModelingCmd::ModelingCmd, it should be
+                    // ModelingCmd::ModelingCmdCameraDragStart.
                     openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
-                        if let Some(prop_name) = o.properties.last().map(|(k, _v)| k.to_owned()) {
+                        if let Some(prop_name) = o.properties.first().map(|(k, _v)| k.to_owned()) {
                             format!("{original_name}_{prop_name}")
                         } else {
                             log::warn!("Weird object oneof with no enum for the name: {o:?}");

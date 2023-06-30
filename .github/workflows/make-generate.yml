@@ -43,6 +43,7 @@ jobs:
         with:
           path: target
           key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+      - uses: taiki-e/install-action@nextest
       - name: Run make generate
         run: |
           export EXPECTORATE=overwrite

@@ -4,6 +4,7 @@ use std::fmt::Write as _;
 
 use anyhow::Result;
 use indexmap::map::IndexMap;
+use openapiv3::Type;
 use rand::{Rng, SeedableRng};
 
 use crate::types::{
@@ -681,7 +682,22 @@ pub fn generate_example_rust_from_schema(
                 let mut ts = type_space.clone();
                 let (values, _) = ts.get_one_of_values(name, one_of, &tag_result, false)?;
 
-                if let Some((k, v)) = values.into_iter().next() {
+                if let Some((mut k, v)) = values.into_iter().next() {
+                    match &v {
+                        openapiv3::ReferenceOr::Item(i) => match &i.schema_kind {
+                            openapiv3::SchemaKind::Type(Type::Object(o))
+                                if o.properties.len() == 1 =>
+                            {
+                                // Enum variants should be named after their nested object.
+                                // E.g. instead of ModelingCmd::ModelingCmd, it should be
+                                // ModelingCmd::ModelingCmdCameraDragStart.
+                                k.push_str(o.properties.first().clone().unwrap().0);
+                            }
+                            _ => {}
+                        },
+                        _ => {}
+                    };
+
                     let enum_name: proc_macro2::TokenStream =
                         k.parse().map_err(|e| anyhow::anyhow!("{}", e))?;
 
