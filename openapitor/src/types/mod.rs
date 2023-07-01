@@ -378,7 +378,6 @@ impl TypeSpace {
                 }
             }
         }
-
         let rendered = quote! {
             #description
             #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema)]
@@ -1113,7 +1112,7 @@ impl TypeSpace {
         let mut values: BTreeMap<String, openapiv3::ReferenceOr<openapiv3::Schema>> =
             Default::default();
         let mut rendered_value = quote!();
-        let mut name = name.to_string();
+        let (mut name, original_name) = (name.to_string(), name);
 
         // If we have a tag and/or content this is pretty simple.
         if let Some(tag) = &tag_result.tag {
@@ -1241,7 +1240,34 @@ impl TypeSpace {
             let expanded_one_of = one_of.expand(&self.spec)?;
             if one_of.should_render()? && should_render {
                 // Render the schema.
-                name = format!("{}_OneOf", name);
+                name = match &expanded_one_of.schema_kind {
+                    // Enums with no fields, e.g. MyEnum::SimpleVariant
+                    openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
+                        if let Some(Some(variant_name)) = s.enumeration.first() {
+                            format!("{original_name}_{variant_name}")
+                        } else {
+                            log::warn!("Weird string oneof with no enum for the name: {s:?}");
+                            continue;
+                        }
+                    }
+                    // Enums with named fields, e.g. MyEnum::Variant{field: String}
+                    // In this case,
+                    // Enum variants should be named after their nested object.
+                    // E.g. instead of ModelingCmd::ModelingCmd, it should be
+                    // ModelingCmd::ModelingCmdCameraDragStart.
+                    openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
+                        if let Some(prop_name) = o.properties.first().map(|(k, _v)| k.to_owned()) {
+                            format!("{original_name}_{prop_name}")
+                        } else {
+                            log::warn!("Weird object oneof with no enum for the name: {o:?}");
+                            continue;
+                        }
+                    }
+                    other => {
+                        log::warn!("Weird oneof whose type isn't handled: {other:?}");
+                        continue;
+                    }
+                };
                 if let Some(title) = &expanded_one_of.schema_data.title {
                     name = title.to_string();
                 }
@@ -1290,7 +1316,6 @@ impl TypeSpace {
                 #o_type
             );
         }
-
         Ok((values, rendered_value))
     }
 }

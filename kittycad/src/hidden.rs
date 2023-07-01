@@ -70,33 +70,6 @@ impl Hidden {
         }
     }
 
-    #[doc = "Purely for debug. Echoes headers back.\n\n```rust,no_run\nasync fn \
-             example_hidden_echo_headers() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: String = \
-             client.hidden().echo_headers().await?;\n    println!(\"{:?}\", result);\n    \
-             Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn echo_headers<'a>(&'a self) -> Result<String, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::POST,
-            format!("{}/{}", self.client.base_url, "debug/echo/headers"),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
-        }
-    }
-
     #[doc = "This endpoint removes the session cookie for a user.\n\nThis is used in logout \
              scenarios.\n\n```rust,no_run\nasync fn example_hidden_logout() -> anyhow::Result<()> \
              {\n    let client = kittycad::Client::new_from_env();\n    \

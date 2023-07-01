@@ -1284,6 +1284,32 @@
         ],
         "type": "object"
       },
+      "CameraDragInteractionType": {
+        "description": "The valid types of source file formats.",
+        "oneOf": [
+          {
+            "description": "Camera pan",
+            "enum": [
+              "pan"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Camera rotate (revolve/orbit)",
+            "enum": [
+              "rotate"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Camera zoom (increase or decrease distance to reference point center)",
+            "enum": [
+              "zoom"
+            ],
+            "type": "string"
+          }
+        ]
+      },
       "CardDetails": {
         "description": "The card details of a payment method.",
         "properties": {
@@ -3514,6 +3540,34 @@
           }
         ]
       },
+      "Coupon": {
+        "description": "The resource representing a Coupon.",
+        "properties": {
+          "amount_off": {
+            "description": "Amount (in the `currency` specified) that will be taken off the subtotal of any invoices for this customer.",
+            "format": "money-usd",
+            "nullable": true,
+            "title": "Number",
+            "type": "number"
+          },
+          "deleted": {
+            "default": false,
+            "description": "Always true for a deleted object.",
+            "type": "boolean"
+          },
+          "id": {
+            "description": "Unique identifier for the object.",
+            "type": "string"
+          },
+          "percent_off": {
+            "description": "Percent that will be taken off the subtotal of any invoices for this customer for the duration of the coupon.\n\nFor example, a coupon with percent_off of 50 will make a %s100 invoice %s50 instead.",
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
       "CreatedAtSortMode": {
         "description": "Supported set of sort modes for scanning by created_at only.\n\nCurrently, we only support scanning in ascending order.",
         "oneOf": [
@@ -4699,6 +4753,23 @@
         },
         "required": [
           "user_code"
+        ],
+        "type": "object"
+      },
+      "Discount": {
+        "description": "The resource representing a Discount.",
+        "properties": {
+          "coupon": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Coupon"
+              }
+            ],
+            "description": "The coupon that applied to create this discount."
+          }
+        },
+        "required": [
+          "coupon"
         ],
         "type": "object"
       },
@@ -6108,6 +6179,13 @@
             "description": "Description of the invoice.",
             "type": "string"
           },
+          "discounts": {
+            "description": "The discounts applied to the invoice. This is an array of discount objects.",
+            "items": {
+              "$ref": "#/components/schemas/Discount"
+            },
+            "type": "array"
+          },
           "id": {
             "description": "Unique identifier for the object.",
             "type": "string"
@@ -6471,32 +6549,6 @@
         },
         "type": "object"
       },
-      "Line3d": {
-        "description": "Command for adding a line.",
-        "properties": {
-          "from": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Point3d"
-              }
-            ],
-            "description": "Start of the line"
-          },
-          "to": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Point3d"
-              }
-            ],
-            "description": "End of the line"
-          }
-        },
-        "required": [
-          "from",
-          "to"
-        ],
-        "type": "object"
-      },
       "Mesh": {
         "properties": {
           "mesh": {
@@ -6685,21 +6737,85 @@
         "description": "Commands that the KittyCAD engine can execute.",
         "oneOf": [
           {
+            "description": "Start a path.",
+            "enum": [
+              "StartPath"
+            ],
+            "type": "string"
+          },
+          {
             "additionalProperties": false,
-            "description": "Add a line",
+            "description": "Move the path's \"pen\".",
             "properties": {
-              "AddLine": {
-                "$ref": "#/components/schemas/Line3d"
+              "MovePathPen": {
+                "properties": {
+                  "path": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/ModelingCmdId"
+                      }
+                    ],
+                    "description": "The ID of the command which created the path."
+                  },
+                  "to": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point3d"
+                      }
+                    ],
+                    "description": "Where the path's pen should be."
+                  }
+                },
+                "required": [
+                  "path",
+                  "to"
+                ],
+                "type": "object"
               }
             },
             "required": [
-              "AddLine"
+              "MovePathPen"
             ],
             "type": "object"
           },
           {
             "additionalProperties": false,
-            "description": "Extrude a solid",
+            "description": "Extend a path by adding a new segment which starts at the path's \"pen\". If no \"pen\" location has been set before (via `MovePen`), then the pen is at the origin.",
+            "properties": {
+              "ExtendPath": {
+                "properties": {
+                  "path": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/ModelingCmdId"
+                      }
+                    ],
+                    "description": "The ID of the command which created the path."
+                  },
+                  "segment": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/PathSegment"
+                      }
+                    ],
+                    "description": "Segment to append to the path. This segment will implicitly begin at the current \"pen\" location."
+                  }
+                },
+                "required": [
+                  "path",
+                  "segment"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "ExtendPath"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Extrude a solid.",
             "properties": {
               "Extrude": {
                 "$ref": "#/components/schemas/Extrude"
@@ -6712,27 +6828,106 @@
           },
           {
             "additionalProperties": false,
-            "description": "Mouse clicked on the engine window, trying to select some surface.",
+            "description": "Camera drag started.",
             "properties": {
-              "SelectionClick": {
+              "CameraDragStart": {
                 "properties": {
-                  "at": {
+                  "interaction": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/CameraDragInteractionType"
+                      }
+                    ],
+                    "description": "The type of camera drag interaction."
+                  },
+                  "window": {
                     "allOf": [
                       {
                         "$ref": "#/components/schemas/Point2d"
                       }
                     ],
-                    "description": "Where the mouse was clicked. TODO engine#1035: Choose a coordinate system for this."
+                    "description": "The initial mouse position."
                   }
                 },
                 "required": [
-                  "at"
+                  "interaction",
+                  "window"
                 ],
                 "type": "object"
               }
             },
             "required": [
-              "SelectionClick"
+              "CameraDragStart"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Camera drag continued.",
+            "properties": {
+              "CameraDragMove": {
+                "properties": {
+                  "interaction": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/CameraDragInteractionType"
+                      }
+                    ],
+                    "description": "The type of camera drag interaction."
+                  },
+                  "window": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point2d"
+                      }
+                    ],
+                    "description": "The current mouse position."
+                  }
+                },
+                "required": [
+                  "interaction",
+                  "window"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "CameraDragMove"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Camera drag ended.",
+            "properties": {
+              "CameraDragEnd": {
+                "properties": {
+                  "interaction": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/CameraDragInteractionType"
+                      }
+                    ],
+                    "description": "The type of camera drag interaction."
+                  },
+                  "window": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point2d"
+                      }
+                    ],
+                    "description": "The final mouse position."
+                  }
+                },
+                "required": [
+                  "interaction",
+                  "window"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "CameraDragEnd"
             ],
             "type": "object"
           }
@@ -7001,6 +7196,125 @@
           }
         },
         "type": "object"
+      },
+      "PathSegment": {
+        "description": "A segment of a path. Paths are composed of many segments.",
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "description": "A straight line segment. Goes from the current path \"pen\" to the given endpoint.",
+            "properties": {
+              "Line": {
+                "properties": {
+                  "end": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point3d"
+                      }
+                    ],
+                    "description": "End point of the line."
+                  }
+                },
+                "required": [
+                  "end"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "Line"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "A circular arc segment.",
+            "properties": {
+              "Arc": {
+                "properties": {
+                  "angle_end": {
+                    "description": "Start of the arc along circle's perimeter.",
+                    "format": "float",
+                    "type": "number"
+                  },
+                  "angle_start": {
+                    "description": "Start of the arc along circle's perimeter.",
+                    "format": "float",
+                    "type": "number"
+                  },
+                  "center": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point2d"
+                      }
+                    ],
+                    "description": "Center of the circle"
+                  },
+                  "radius": {
+                    "description": "Radius of the circle",
+                    "format": "float",
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "angle_end",
+                  "angle_start",
+                  "center",
+                  "radius"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "Arc"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "A cubic bezier curve segment. Start at the end of the current line, go through control point 1 and 2, then end at a given point.",
+            "properties": {
+              "Bezier": {
+                "properties": {
+                  "control1": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point3d"
+                      }
+                    ],
+                    "description": "First control point."
+                  },
+                  "control2": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point3d"
+                      }
+                    ],
+                    "description": "Second control point."
+                  },
+                  "end": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point3d"
+                      }
+                    ],
+                    "description": "Final control point."
+                  }
+                },
+                "required": [
+                  "control1",
+                  "control2",
+                  "end"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "Bezier"
+            ],
+            "type": "object"
+          }
+        ]
       },
       "PaymentIntent": {
         "description": "A payment intent response.",
@@ -10542,7 +10856,9 @@
           "api-calls",
           "hidden"
         ],
-        "x-dropshot-pagination": true
+        "x-dropshot-pagination": {
+          "required": []
+        }
       }
     },
     "/api-calls/{id}": {
@@ -10964,7 +11280,9 @@
           "api-calls",
           "hidden"
         ],
-        "x-dropshot-pagination": true
+        "x-dropshot-pagination": {
+          "required": []
+        }
       }
     },
     "/async/operations/{id}": {
@@ -11326,121 +11644,6 @@
         "summary": "Get a physics constant.",
         "tags": [
           "constant",
-          "hidden"
-        ]
-      }
-    },
-    "/debug/echo/headers": {
-      "options": {
-        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_echo_headers",
-        "responses": {
-          "204": {
-            "description": "successful operation, no content",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "summary": "OPTIONS endpoint.",
-        "tags": [
-          "hidden"
-        ]
-      },
-      "post": {
-        "operationId": "echo_headers",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "title": "String",
-                  "type": "string"
-                }
-              }
-            },
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "summary": "Purely for debug. Echoes headers back.",
-        "tags": [
           "hidden"
         ]
       }
@@ -15017,7 +15220,9 @@
         "tags": [
           "api-calls"
         ],
-        "x-dropshot-pagination": true
+        "x-dropshot-pagination": {
+          "required": []
+        }
       }
     },
     "/user/api-calls/{id}": {
@@ -15182,7 +15387,9 @@
         "tags": [
           "api-tokens"
         ],
-        "x-dropshot-pagination": true
+        "x-dropshot-pagination": {
+          "required": []
+        }
       },
       "options": {
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
@@ -16660,7 +16867,9 @@
           "users",
           "hidden"
         ],
-        "x-dropshot-pagination": true
+        "x-dropshot-pagination": {
+          "required": []
+        }
       }
     },
     "/users-extended": {
@@ -16753,7 +16962,9 @@
           "users",
           "hidden"
         ],
-        "x-dropshot-pagination": true
+        "x-dropshot-pagination": {
+          "required": []
+        }
       }
     },
     "/users-extended/{id}": {
@@ -17003,7 +17214,9 @@
           "api-calls",
           "hidden"
         ],
-        "x-dropshot-pagination": true
+        "x-dropshot-pagination": {
+          "required": []
+        }
       }
     },
     "/ws/executor/term": {
