@@ -1564,7 +1564,7 @@ impl tabled::Tabled for CacheMetadata {
     }
 }
 
-#[doc = "The valid types of source file formats."]
+#[doc = "The type of camera drag interaction."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -5421,9 +5421,13 @@ impl tabled::Tabled for ExtendedUserResultsPage {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Extrude {
+    #[doc = "Whether to cap the extrusion with a face, or not. If true, the resulting solid will \
+             be closed on all sides, like a dice. If false, it will be open on one side, like a \
+             drinking glass."]
+    pub cap: bool,
     #[doc = "How far off the plane to extrude"]
     pub distance: f64,
-    #[doc = "Which sketch to extrude"]
+    #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
     pub target: uuid::Uuid,
 }
 
@@ -5439,16 +5443,17 @@ impl std::fmt::Display for Extrude {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Extrude {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            format!("{:?}", self.cap).into(),
             format!("{:?}", self.distance).into(),
             format!("{:?}", self.target).into(),
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["distance".into(), "target".into()]
+        vec!["cap".into(), "distance".into(), "target".into()]
     }
 }
 
@@ -7450,7 +7455,7 @@ impl tabled::Tabled for ModelingCmdExtendPath {
     }
 }
 
-#[doc = "Extrude a solid."]
+#[doc = "Extrude a 2D solid."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -7479,6 +7484,67 @@ impl tabled::Tabled for ModelingCmdExtrude {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["extrude".into()]
+    }
+}
+
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ClosePath {
+    #[doc = "Which path to close."]
+    pub path_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for ClosePath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ClosePath {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.path_id).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["path_id".into()]
+    }
+}
+
+#[doc = "Closes a path, converting it to a 2D solid."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ModelingCmdClosePath {
+    #[serde(rename = "ClosePath")]
+    pub close_path: ClosePath,
+}
+
+impl std::fmt::Display for ModelingCmdClosePath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ModelingCmdClosePath {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.close_path).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["close_path".into()]
     }
 }
 
@@ -7554,6 +7620,11 @@ impl tabled::Tabled for ModelingCmdCameraDragStart {
 pub struct CameraDragMove {
     #[doc = "The type of camera drag interaction."]
     pub interaction: CameraDragInteractionType,
+    #[doc = "Logical timestamp. The client should increment this with every event in the current \
+             mouse drag. That way, if the events are being sent over an unordered channel, the \
+             API can ignore the older events."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<u32>,
     #[doc = "The current mouse position."]
     pub window: Point2D,
 }
@@ -7570,16 +7641,21 @@ impl std::fmt::Display for CameraDragMove {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CameraDragMove {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.interaction).into(),
+            if let Some(sequence) = &self.sequence {
+                format!("{:?}", sequence).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.window).into(),
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["interaction".into(), "window".into()]
+        vec!["interaction".into(), "sequence".into(), "window".into()]
     }
 }
 
@@ -7690,6 +7766,7 @@ pub enum ModelingCmd {
     ModelingCmdMovePathPen(ModelingCmdMovePathPen),
     ModelingCmdExtendPath(ModelingCmdExtendPath),
     ModelingCmdExtrude(ModelingCmdExtrude),
+    ModelingCmdClosePath(ModelingCmdClosePath),
     ModelingCmdCameraDragStart(ModelingCmdCameraDragStart),
     ModelingCmdCameraDragMove(ModelingCmdCameraDragMove),
     ModelingCmdCameraDragEnd(ModelingCmdCameraDragEnd),
