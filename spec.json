@@ -1285,7 +1285,7 @@
         "type": "object"
       },
       "CameraDragInteractionType": {
-        "description": "The valid types of source file formats.",
+        "description": "The type of camera drag interaction.",
         "oneOf": [
           {
             "description": "Camera pan",
@@ -5394,6 +5394,10 @@
       "Extrude": {
         "description": "Command for extruding a solid.",
         "properties": {
+          "cap": {
+            "description": "Whether to cap the extrusion with a face, or not. If true, the resulting solid will be closed on all sides, like a dice. If false, it will be open on one side, like a drinking glass.",
+            "type": "boolean"
+          },
           "distance": {
             "description": "How far off the plane to extrude",
             "format": "double",
@@ -5405,10 +5409,11 @@
                 "$ref": "#/components/schemas/ModelingCmdId"
               }
             ],
-            "description": "Which sketch to extrude"
+            "description": "Which sketch to extrude. Must be a closed 2D solid."
           }
         },
         "required": [
+          "cap",
           "distance",
           "target"
         ],
@@ -6815,7 +6820,7 @@
           },
           {
             "additionalProperties": false,
-            "description": "Extrude a solid.",
+            "description": "Extrude a 2D solid.",
             "properties": {
               "Extrude": {
                 "$ref": "#/components/schemas/Extrude"
@@ -6823,6 +6828,29 @@
             },
             "required": [
               "Extrude"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Closes a path, converting it to a 2D solid.",
+            "properties": {
+              "ClosePath": {
+                "properties": {
+                  "path_id": {
+                    "description": "Which path to close.",
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path_id"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "ClosePath"
             ],
             "type": "object"
           },
@@ -6874,6 +6902,13 @@
                       }
                     ],
                     "description": "The type of camera drag interaction."
+                  },
+                  "sequence": {
+                    "description": "Logical timestamp. The client should increment this with every event in the current mouse drag. That way, if the events are being sent over an unordered channel, the API can ignore the older events.",
+                    "format": "uint32",
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
                   },
                   "window": {
                     "allOf": [
