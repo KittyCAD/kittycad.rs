@@ -26,6 +26,8 @@ jobs:
           rustup component add rustfmt --toolchain nightly
           rustup component add clippy
           echo PATH="${HOME}/.cargo/bin:${PATH}" >> ${GITHUB_ENV}
+      - uses: taiki-e/install-action@cargo-llvm-cov
+      - uses: taiki-e/install-action@nextest
       - name: make generate
         shell: bash
         run: |
