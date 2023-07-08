@@ -1476,6 +1476,67 @@ pub enum AsyncApiCallType {
     FileSurfaceArea,
 }
 
+#[doc = "Co-ordinate axis specifier.\n\nSee [cglearn.eu] for background reading.\n\n[cglearn.eu]: https://cglearn.eu/pub/computer-graphics/introduction-to-geometry#material-coordinate-systems-1"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Axis {
+    #[doc = "'Y' axis."]
+    #[serde(rename = "y")]
+    #[display("y")]
+    Y,
+    #[doc = "'Z' axis."]
+    #[serde(rename = "z")]
+    #[display("z")]
+    Z,
+}
+
+#[doc = "An [`Axis`] paired with a [`Direction`]."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AxisDirectionPair {
+    #[doc = "Axis specifier."]
+    pub axis: Axis,
+    #[doc = "Specifies which direction the axis is pointing."]
+    pub direction: Direction,
+}
+
+impl std::fmt::Display for AxisDirectionPair {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AxisDirectionPair {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.axis).into(),
+            format!("{:?}", self.direction).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["axis".into(), "direction".into()]
+    }
+}
+
 #[doc = "The billing information for payments."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4284,6 +4345,31 @@ impl tabled::Tabled for DeviceAuthVerifyParams {
     }
 }
 
+#[doc = "Specifies the sign of a co-ordinate axis."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Direction {
+    #[doc = "Increasing numbers."]
+    #[serde(rename = "positive")]
+    #[display("positive")]
+    Positive,
+    #[doc = "Decreasing numbers."]
+    #[serde(rename = "negative")]
+    #[display("negative")]
+    Negative,
+}
+
 #[doc = "The resource representing a Discount."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -5471,13 +5557,22 @@ pub struct FileConversion {
     pub error: Option<String>,
     #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
-    #[doc = "The converted file, if completed, base64 encoded."]
+    #[doc = "The converted file (if single file conversion), if completed, base64 encoded. This field is deprecated, and will be removed in a future release. Use `outputs` instead."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub output: Option<base64::Base64Data>,
     #[doc = "The output format of the file conversion."]
     pub output_format: FileExportFormat,
+    #[doc = "The output format options of the file conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output_format_options: Option<OutputFormat>,
+    #[doc = "The converted files (if multiple file conversion), if completed, base64 encoded. The key of the map is the path of the output file."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub outputs: Option<std::collections::HashMap<String, base64::Base64Data>>,
     #[doc = "The source format of the file conversion."]
     pub src_format: FileImportFormat,
+    #[doc = "The source format options of the file conversion."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub src_format_options: Option<InputFormat>,
     #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -5502,7 +5597,7 @@ impl std::fmt::Display for FileConversion {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FileConversion {
-    const LENGTH: usize = 11;
+    const LENGTH: usize = 14;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -5523,7 +5618,22 @@ impl tabled::Tabled for FileConversion {
                 String::new().into()
             },
             format!("{:?}", self.output_format).into(),
+            if let Some(output_format_options) = &self.output_format_options {
+                format!("{:?}", output_format_options).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(outputs) = &self.outputs {
+                format!("{:?}", outputs).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.src_format).into(),
+            if let Some(src_format_options) = &self.src_format_options {
+                format!("{:?}", src_format_options).into()
+            } else {
+                String::new().into()
+            },
             if let Some(started_at) = &self.started_at {
                 format!("{:?}", started_at).into()
             } else {
@@ -5547,7 +5657,10 @@ impl tabled::Tabled for FileConversion {
             "id".into(),
             "output".into(),
             "output_format".into(),
+            "output_format_options".into(),
+            "outputs".into(),
             "src_format".into(),
+            "src_format_options".into(),
             "started_at".into(),
             "status".into(),
             "updated_at".into(),
@@ -5692,7 +5805,11 @@ pub enum FileExportFormat {
     #[serde(rename = "fbxb")]
     #[display("fbxb")]
     Fbxb,
-    #[doc = "The OBJ file format. A zip file containing both the obj file itself and its associated mtl file for full processing. <https://en.wikipedia.org/wiki/Wavefront_.obj_file>> The OBJ file format. <https://en.wikipedia.org/wiki/Wavefront_.obj_file> It may or may not have an an attached material (mtl // mtllib) within the file, but we interact with it as if it does not."]
+    #[doc = "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, although by default it will be in binary format and thus technically (glb)."]
+    #[serde(rename = "gltf")]
+    #[display("gltf")]
+    Gltf,
+    #[doc = "The OBJ file format. <https://en.wikipedia.org/wiki/Wavefront_.obj_file> It may or may not have an an attached material (mtl // mtllib) within the file, but we interact with it as if it does not."]
     #[serde(rename = "obj")]
     #[display("obj")]
     Obj,
@@ -5737,10 +5854,10 @@ pub enum FileImportFormat {
     #[serde(rename = "fbx")]
     #[display("fbx")]
     Fbx,
-    #[doc = "The OBJ file format. A zip file containing both the obj file itself and its associated mtl file for full processing. <https://en.wikipedia.org/wiki/Wavefront_.obj_file>>"]
-    #[serde(rename = "obj_zip")]
-    #[display("obj_zip")]
-    ObjZip,
+    #[doc = "glTF 2.0."]
+    #[serde(rename = "gltf")]
+    #[display("gltf")]
+    Gltf,
     #[doc = "The OBJ file format. <https://en.wikipedia.org/wiki/Wavefront_.obj_file> It may or may not have an an attached material (mtl // mtllib) within the file, but we interact with it as if it does not."]
     #[serde(rename = "obj")]
     #[display("obj")]
@@ -6251,6 +6368,19 @@ impl tabled::Tabled for IndexInfo {
             "secure".into(),
         ]
     }
+}
+
+#[doc = "Input format specifier."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum InputFormat {
+    Gltf {},
+    Step { coords: System },
+    Obj { coords: System },
+    Stl { coords: System },
 }
 
 #[doc = "An invoice."]
@@ -8094,6 +8224,19 @@ impl tabled::Tabled for OutputFile {
     }
 }
 
+#[doc = "Output format specifier."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum OutputFormat {
+    Gltf { storage: Storage },
+    Obj { coords: System },
+    Step { coords: System },
+    Stl { coords: System, storage: Storage },
+}
+
 #[doc = "A segment of a path. Paths are composed of many segments."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8941,6 +9084,71 @@ impl tabled::Tabled for Session {
             "updated_at".into(),
             "user_id".into(),
         ]
+    }
+}
+
+#[doc = "Describes the storage format of a glTF 2.0 scene."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Storage {
+    #[doc = "Binary glTF 2.0.\n\nThis is a single binary with .glb extension.\n\nThis is the default setting."]
+    #[serde(rename = "binary")]
+    #[display("binary")]
+    Binary,
+    #[doc = "Standard glTF 2.0.\n\nThis is a JSON file with .gltf extension paired with a separate binary blob file with .bin extension."]
+    #[serde(rename = "standard")]
+    #[display("standard")]
+    Standard,
+    #[doc = "Embedded glTF 2.0.\n\nSingle JSON file with .gltf extension binary data encoded as base64 data URIs."]
+    #[serde(rename = "embedded")]
+    #[display("embedded")]
+    Embedded,
+}
+
+#[doc = "Co-ordinate system definition.\n\nThe `up` axis must be orthogonal to the `forward` axis.\n\nSee [cglearn.eu] for background reading.\n\n[cglearn.eu](https://cglearn.eu/pub/computer-graphics/introduction-to-geometry#material-coordinate-systems-1)"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct System {
+    #[doc = "Axis the front face of a model looks along."]
+    pub forward: AxisDirectionPair,
+    #[doc = "Axis pointing up and away from a model."]
+    pub up: AxisDirectionPair,
+}
+
+impl std::fmt::Display for System {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for System {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.forward).into(),
+            format!("{:?}", self.up).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["forward".into(), "up".into()]
     }
 }
 

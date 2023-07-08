@@ -670,7 +670,7 @@
                 "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
               },
               "output": {
-                "description": "The converted file, if completed, base64 encoded.",
+                "description": "The converted file (if single file conversion), if completed, base64 encoded. This field is deprecated, and will be removed in a future release. Use `outputs` instead.",
                 "format": "byte",
                 "nullable": true,
                 "title": "String",
@@ -684,6 +684,24 @@
                 ],
                 "description": "The output format of the file conversion."
               },
+              "output_format_options": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/OutputFormat"
+                  }
+                ],
+                "description": "The output format options of the file conversion.",
+                "nullable": true
+              },
+              "outputs": {
+                "additionalProperties": {
+                  "format": "byte",
+                  "title": "String",
+                  "type": "string"
+                },
+                "description": "The converted files (if multiple file conversion), if completed, base64 encoded. The key of the map is the path of the output file.",
+                "type": "object"
+              },
               "src_format": {
                 "allOf": [
                   {
@@ -691,6 +709,15 @@
                   }
                 ],
                 "description": "The source format of the file conversion."
+              },
+              "src_format_options": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/InputFormat"
+                  }
+                ],
+                "description": "The source format options of the file conversion.",
+                "nullable": true
               },
               "started_at": {
                 "description": "The time and date the API call was started.",
@@ -1244,6 +1271,51 @@
             "type": "string"
           }
         ]
+      },
+      "Axis": {
+        "description": "Co-ordinate axis specifier.\n\nSee [cglearn.eu] for background reading.\n\n[cglearn.eu]: https://cglearn.eu/pub/computer-graphics/introduction-to-geometry#material-coordinate-systems-1",
+        "oneOf": [
+          {
+            "description": "'Y' axis.",
+            "enum": [
+              "y"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "'Z' axis.",
+            "enum": [
+              "z"
+            ],
+            "type": "string"
+          }
+        ]
+      },
+      "AxisDirectionPair": {
+        "description": "An [`Axis`] paired with a [`Direction`].",
+        "properties": {
+          "axis": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Axis"
+              }
+            ],
+            "description": "Axis specifier."
+          },
+          "direction": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Direction"
+              }
+            ],
+            "description": "Specifies which direction the axis is pointing."
+          }
+        },
+        "required": [
+          "axis",
+          "direction"
+        ],
+        "type": "object"
       },
       "BillingInfo": {
         "description": "The billing information for payments.",
@@ -4756,6 +4828,25 @@
         ],
         "type": "object"
       },
+      "Direction": {
+        "description": "Specifies the sign of a co-ordinate axis.",
+        "oneOf": [
+          {
+            "description": "Increasing numbers.",
+            "enum": [
+              "positive"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Decreasing numbers.",
+            "enum": [
+              "negative"
+            ],
+            "type": "string"
+          }
+        ]
+      },
       "Discount": {
         "description": "The resource representing a Discount.",
         "properties": {
@@ -5530,7 +5621,7 @@
             "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
           },
           "output": {
-            "description": "The converted file, if completed, base64 encoded.",
+            "description": "The converted file (if single file conversion), if completed, base64 encoded. This field is deprecated, and will be removed in a future release. Use `outputs` instead.",
             "format": "byte",
             "nullable": true,
             "title": "String",
@@ -5544,6 +5635,24 @@
             ],
             "description": "The output format of the file conversion."
           },
+          "output_format_options": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OutputFormat"
+              }
+            ],
+            "description": "The output format options of the file conversion.",
+            "nullable": true
+          },
+          "outputs": {
+            "additionalProperties": {
+              "format": "byte",
+              "title": "String",
+              "type": "string"
+            },
+            "description": "The converted files (if multiple file conversion), if completed, base64 encoded. The key of the map is the path of the output file.",
+            "type": "object"
+          },
           "src_format": {
             "allOf": [
               {
@@ -5551,6 +5660,15 @@
               }
             ],
             "description": "The source format of the file conversion."
+          },
+          "src_format_options": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InputFormat"
+              }
+            ],
+            "description": "The source format options of the file conversion.",
+            "nullable": true
           },
           "started_at": {
             "description": "The time and date the API call was started.",
@@ -5704,7 +5822,14 @@
             "type": "string"
           },
           {
-            "description": "The OBJ file format. A zip file containing both the obj file itself and its associated mtl file for full processing. <https://en.wikipedia.org/wiki/Wavefront_.obj_file>> The OBJ file format. <https://en.wikipedia.org/wiki/Wavefront_.obj_file> It may or may not have an an attached material (mtl // mtllib) within the file, but we interact with it as if it does not.",
+            "description": "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, although by default it will be in binary format and thus technically (glb).",
+            "enum": [
+              "gltf"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "The OBJ file format. <https://en.wikipedia.org/wiki/Wavefront_.obj_file> It may or may not have an an attached material (mtl // mtllib) within the file, but we interact with it as if it does not.",
             "enum": [
               "obj"
             ],
@@ -5758,9 +5883,9 @@
             "type": "string"
           },
           {
-            "description": "The OBJ file format. A zip file containing both the obj file itself and its associated mtl file for full processing. <https://en.wikipedia.org/wiki/Wavefront_.obj_file>>",
+            "description": "glTF 2.0.",
             "enum": [
-              "obj_zip"
+              "gltf"
             ],
             "type": "string"
           },
@@ -6116,6 +6241,98 @@
           }
         },
         "type": "object"
+      },
+      "InputFormat": {
+        "description": "Input format specifier.",
+        "oneOf": [
+          {
+            "description": "Binary glTF 2.0. We refer to this as glTF since that is how our customers refer to it, but this can also import binary glTF (glb).",
+            "properties": {
+              "type": {
+                "enum": [
+                  "Gltf"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "ISO 10303-21 (STEP) format.",
+            "properties": {
+              "coords": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/System"
+                  }
+                ],
+                "description": "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"
+              },
+              "type": {
+                "enum": [
+                  "Step"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "coords",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Wavefront OBJ format.",
+            "properties": {
+              "coords": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/System"
+                  }
+                ],
+                "description": "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"
+              },
+              "type": {
+                "enum": [
+                  "Obj"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "coords",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "*ST**ereo**L**ithography format.",
+            "properties": {
+              "coords": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/System"
+                  }
+                ],
+                "description": "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"
+              },
+              "type": {
+                "enum": [
+                  "Stl"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "coords",
+              "type"
+            ],
+            "type": "object"
+          }
+        ]
       },
       "Invoice": {
         "description": "An invoice.",
@@ -7232,6 +7449,116 @@
         },
         "type": "object"
       },
+      "OutputFormat": {
+        "description": "Output format specifier.",
+        "oneOf": [
+          {
+            "description": "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, although by default it will be in binary format and thus technically (glb). If you prefer ascii output, you can set that option for the export.",
+            "properties": {
+              "storage": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Storage"
+                  }
+                ],
+                "description": "Specifies which kind of glTF 2.0 will be exported."
+              },
+              "type": {
+                "enum": [
+                  "Gltf"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "storage",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Wavefront OBJ format.",
+            "properties": {
+              "coords": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/System"
+                  }
+                ],
+                "description": "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"
+              },
+              "type": {
+                "enum": [
+                  "Obj"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "coords",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "ISO 10303-21 (STEP) format.",
+            "properties": {
+              "coords": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/System"
+                  }
+                ],
+                "description": "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"
+              },
+              "type": {
+                "enum": [
+                  "Step"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "coords",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "*ST**ereo**L**ithography format.",
+            "properties": {
+              "coords": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/System"
+                  }
+                ],
+                "description": "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"
+              },
+              "storage": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Storage"
+                  }
+                ],
+                "description": "Export storage."
+              },
+              "type": {
+                "enum": [
+                  "Stl"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "coords",
+              "storage",
+              "type"
+            ],
+            "type": "object"
+          }
+        ]
+      },
       "PathSegment": {
         "description": "A segment of a path. Paths are composed of many segments.",
         "oneOf": [
@@ -7963,6 +8290,58 @@
           "expires",
           "session_token",
           "updated_at"
+        ],
+        "type": "object"
+      },
+      "Storage": {
+        "description": "Describes the storage format of a glTF 2.0 scene.",
+        "oneOf": [
+          {
+            "description": "Binary glTF 2.0.\n\nThis is a single binary with .glb extension.\n\nThis is the default setting.",
+            "enum": [
+              "binary"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Standard glTF 2.0.\n\nThis is a JSON file with .gltf extension paired with a separate binary blob file with .bin extension.",
+            "enum": [
+              "standard"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Embedded glTF 2.0.\n\nSingle JSON file with .gltf extension binary data encoded as base64 data URIs.",
+            "enum": [
+              "embedded"
+            ],
+            "type": "string"
+          }
+        ]
+      },
+      "System": {
+        "description": "Co-ordinate system definition.\n\nThe `up` axis must be orthogonal to the `forward` axis.\n\nSee [cglearn.eu] for background reading.\n\n[cglearn.eu](https://cglearn.eu/pub/computer-graphics/introduction-to-geometry#material-coordinate-systems-1)",
+        "properties": {
+          "forward": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AxisDirectionPair"
+              }
+            ],
+            "description": "Axis the front face of a model looks along."
+          },
+          "up": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AxisDirectionPair"
+              }
+            ],
+            "description": "Axis pointing up and away from a model."
+          }
+        },
+        "required": [
+          "forward",
+          "up"
         ],
         "type": "object"
       },
@@ -11897,7 +12276,7 @@
         ]
       },
       "post": {
-        "description": "Convert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\nIf the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "If you wish to specify the conversion options, use the `/file/conversion` endpoint instead.\nConvert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\nIf the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_conversion",
         "parameters": [
           {
@@ -11982,7 +12361,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "summary": "Convert CAD file.",
+        "summary": "Convert CAD file with defaults.",
         "tags": [
           "file"
         ]
