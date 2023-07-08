@@ -5,7 +5,19 @@
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
-    FileConversion(FileConversion),
+    FileConversion {
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        created_at: chrono::DateTime<chrono::Utc>,
+        error: Option<String>,
+        id: uuid::Uuid,
+        output: Option<base64::Base64Data>,
+        output_format: FileExportFormat,
+        src_format: FileImportFormat,
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        status: ApiCallStatus,
+        updated_at: chrono::DateTime<chrono::Utc>,
+        user_id: Option<String>,
+    },
     FileCenterOfMass(FileCenterOfMass),
     FileMass(FileMass),
     FileVolume(FileVolume),
