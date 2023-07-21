@@ -74,7 +74,7 @@ impl Client {
             reqwest_retry::policies::ExponentialBackoff::builder().build_with_max_retries(3);
         let client = reqwest::Client::builder()
             .user_agent(APP_USER_AGENT)
-            .timeout(std::time::Duration::from_secs(60))
+            .timeout(std::time::Duration::from_secs(600))
             .connect_timeout(std::time::Duration::from_secs(60))
             .build();
         match client {
@@ -199,12 +199,12 @@ impl Client {
             reqwest_retry::policies::ExponentialBackoff::builder().build_with_max_retries(3);
         let client = reqwest::Client::builder()
             .user_agent(APP_USER_AGENT)
-            .timeout(std::time::Duration::from_secs(60))
+            .timeout(std::time::Duration::from_secs(600))
             .connect_timeout(std::time::Duration::from_secs(60))
             .build();
         let client_http1 = reqwest::Client::builder()
             .user_agent(APP_USER_AGENT)
-            .timeout(std::time::Duration::from_secs(60))
+            .timeout(std::time::Duration::from_secs(600))
             .connect_timeout(std::time::Duration::from_secs(60))
             .http1_only()
             .build();
