@@ -38,7 +38,11 @@ async fn test_create_file_volume() {
 
     let result = client
         .file()
-        .create_volume(crate::types::FileImportFormat::Obj, &body.to_vec().into())
+        .create_volume(
+            Some(crate::types::UnitVolume::M3),
+            crate::types::FileImportFormat::Obj,
+            &body.to_vec().into(),
+        )
         .await
         .unwrap();
 

@@ -906,11 +906,18 @@ impl TypeSpace {
                 quote!(#[serde(#(#serde_props),*)])
             };
 
+            let deprecated = if inner_schema.schema_data.deprecated {
+                quote!(#[deprecated])
+            } else {
+                quote!()
+            };
+
             values = quote!(
                 #values
 
                 #prop_desc
                 #serde_full
+                #deprecated
                 #prop_value
             );
         }
