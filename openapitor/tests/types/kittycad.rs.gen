@@ -5451,9 +5451,13 @@ impl tabled::Tabled for Extrude {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FileCenterOfMass {
-    #[doc = "The resulting center of mass."]
+    #[doc = "The resulting center of mass. This is deprecated and will be removed in a future release. Use `centers_of_mass` instead."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub center_of_mass: Option<Vec<f64>>,
+    #[deprecated]
+    pub center_of_mass: Option<Point3D>,
+    #[doc = "The center of mass for each mesh in the file. The key of the hash map is the mesh name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub centers_of_mass: Option<std::collections::HashMap<String, Point3D>>,
     #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -5464,6 +5468,8 @@ pub struct FileCenterOfMass {
     pub error: Option<String>,
     #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
+    #[doc = "The output unit for the center of mass."]
+    pub output_unit: UnitLength,
     #[doc = "The source format of the file."]
     pub src_format: FileImportFormat,
     #[doc = "The time and date the API call was started."]
@@ -5490,11 +5496,16 @@ impl std::fmt::Display for FileCenterOfMass {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FileCenterOfMass {
-    const LENGTH: usize = 10;
+    const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(center_of_mass) = &self.center_of_mass {
                 format!("{:?}", center_of_mass).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(centers_of_mass) = &self.centers_of_mass {
+                format!("{:?}", centers_of_mass).into()
             } else {
                 String::new().into()
             },
@@ -5510,6 +5521,7 @@ impl tabled::Tabled for FileCenterOfMass {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
+            format!("{:?}", self.output_unit).into(),
             format!("{:?}", self.src_format).into(),
             if let Some(started_at) = &self.started_at {
                 format!("{:?}", started_at).into()
@@ -5529,10 +5541,12 @@ impl tabled::Tabled for FileCenterOfMass {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "center_of_mass".into(),
+            "centers_of_mass".into(),
             "completed_at".into(),
             "created_at".into(),
             "error".into(),
             "id".into(),
+            "output_unit".into(),
             "src_format".into(),
             "started_at".into(),
             "status".into(),
@@ -5559,6 +5573,7 @@ pub struct FileConversion {
     pub id: uuid::Uuid,
     #[doc = "The converted file (if single file conversion), if completed, base64 encoded. This field is deprecated, and will be removed in a future release. Use `outputs` instead."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[deprecated]
     pub output: Option<base64::Base64Data>,
     #[doc = "The output format of the file conversion."]
     pub output_format: FileExportFormat,
@@ -5679,8 +5694,12 @@ pub struct FileDensity {
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The resulting density."]
+    #[doc = "The density for each mesh in the file. The key of the hash map is the mesh name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub densities: Option<std::collections::HashMap<String, f64>>,
+    #[doc = "The resulting density. This is deprecated and will be removed in a future release, use `densities` instead."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[deprecated]
     pub density: Option<f64>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -5690,6 +5709,10 @@ pub struct FileDensity {
     #[doc = "The material mass as denoted by the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub material_mass: Option<f64>,
+    #[doc = "The material mass unit."]
+    pub material_mass_unit: UnitMass,
+    #[doc = "The output unit for the density."]
+    pub output_unit: UnitDensity,
     #[doc = "The source format of the file."]
     pub src_format: FileImportFormat,
     #[doc = "The time and date the API call was started."]
@@ -5716,7 +5739,7 @@ impl std::fmt::Display for FileDensity {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FileDensity {
-    const LENGTH: usize = 11;
+    const LENGTH: usize = 14;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -5725,6 +5748,11 @@ impl tabled::Tabled for FileDensity {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
+            if let Some(densities) = &self.densities {
+                format!("{:?}", densities).into()
+            } else {
+                String::new().into()
+            },
             if let Some(density) = &self.density {
                 format!("{:?}", density).into()
             } else {
@@ -5741,6 +5769,8 @@ impl tabled::Tabled for FileDensity {
             } else {
                 String::new().into()
             },
+            format!("{:?}", self.material_mass_unit).into(),
+            format!("{:?}", self.output_unit).into(),
             format!("{:?}", self.src_format).into(),
             if let Some(started_at) = &self.started_at {
                 format!("{:?}", started_at).into()
@@ -5761,10 +5791,13 @@ impl tabled::Tabled for FileDensity {
         vec![
             "completed_at".into(),
             "created_at".into(),
+            "densities".into(),
             "density".into(),
             "error".into(),
             "id".into(),
             "material_mass".into(),
+            "material_mass_unit".into(),
+            "output_unit".into(),
             "src_format".into(),
             "started_at".into(),
             "status".into(),
@@ -5793,10 +5826,6 @@ pub enum FileExportFormat {
     #[serde(rename = "dae")]
     #[display("dae")]
     Dae,
-    #[doc = "The DXF file format. <https://en.wikipedia.org/wiki/AutoCAD_DXF>"]
-    #[serde(rename = "dxf")]
-    #[display("dxf")]
-    Dxf,
     #[doc = "The FBX file format. <https://en.wikipedia.org/wiki/FBX>"]
     #[serde(rename = "fbx")]
     #[display("fbx")]
@@ -5846,10 +5875,6 @@ pub enum FileImportFormat {
     #[serde(rename = "dae")]
     #[display("dae")]
     Dae,
-    #[doc = "The DXF file format. <https://en.wikipedia.org/wiki/AutoCAD_DXF>"]
-    #[serde(rename = "dxf")]
-    #[display("dxf")]
-    Dxf,
     #[doc = "The FBX file format. <https://en.wikipedia.org/wiki/FBX>"]
     #[serde(rename = "fbx")]
     #[display("fbx")]
@@ -5891,12 +5916,20 @@ pub struct FileMass {
     pub error: Option<String>,
     #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
-    #[doc = "The resulting mass."]
+    #[doc = "The resulting mass. This is deprecated and will be removed in a future release, use `masses` instead."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[deprecated]
     pub mass: Option<f64>,
+    #[doc = "The mass for each mesh in the file. The key of the hash map is the mesh name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub masses: Option<std::collections::HashMap<String, f64>>,
     #[doc = "The material density as denoted by the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub material_density: Option<f64>,
+    #[doc = "The material density unit."]
+    pub material_density_unit: UnitDensity,
+    #[doc = "The output unit for the mass."]
+    pub output_unit: UnitMass,
     #[doc = "The source format of the file."]
     pub src_format: FileImportFormat,
     #[doc = "The time and date the API call was started."]
@@ -5923,7 +5956,7 @@ impl std::fmt::Display for FileMass {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FileMass {
-    const LENGTH: usize = 11;
+    const LENGTH: usize = 14;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -5943,11 +5976,18 @@ impl tabled::Tabled for FileMass {
             } else {
                 String::new().into()
             },
+            if let Some(masses) = &self.masses {
+                format!("{:?}", masses).into()
+            } else {
+                String::new().into()
+            },
             if let Some(material_density) = &self.material_density {
                 format!("{:?}", material_density).into()
             } else {
                 String::new().into()
             },
+            format!("{:?}", self.material_density_unit).into(),
+            format!("{:?}", self.output_unit).into(),
             format!("{:?}", self.src_format).into(),
             if let Some(started_at) = &self.started_at {
                 format!("{:?}", started_at).into()
@@ -5971,7 +6011,10 @@ impl tabled::Tabled for FileMass {
             "error".into(),
             "id".into(),
             "mass".into(),
+            "masses".into(),
             "material_density".into(),
+            "material_density_unit".into(),
+            "output_unit".into(),
             "src_format".into(),
             "started_at".into(),
             "status".into(),
@@ -5996,6 +6039,8 @@ pub struct FileSurfaceArea {
     pub error: Option<String>,
     #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
+    #[doc = "The output unit for the surface area."]
+    pub output_unit: UnitArea,
     #[doc = "The source format of the file."]
     pub src_format: FileImportFormat,
     #[doc = "The time and date the API call was started."]
@@ -6003,9 +6048,13 @@ pub struct FileSurfaceArea {
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The resulting surface area."]
+    #[doc = "The resulting surface area. This is deprecated and will be removed in a future release. Use `surface_areas` instead."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[deprecated]
     pub surface_area: Option<f64>,
+    #[doc = "The surface area for each mesh in the file. The key of the hash map is the mesh name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub surface_areas: Option<std::collections::HashMap<String, f64>>,
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
@@ -6025,7 +6074,7 @@ impl std::fmt::Display for FileSurfaceArea {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FileSurfaceArea {
-    const LENGTH: usize = 10;
+    const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -6040,6 +6089,7 @@ impl tabled::Tabled for FileSurfaceArea {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
+            format!("{:?}", self.output_unit).into(),
             format!("{:?}", self.src_format).into(),
             if let Some(started_at) = &self.started_at {
                 format!("{:?}", started_at).into()
@@ -6049,6 +6099,11 @@ impl tabled::Tabled for FileSurfaceArea {
             format!("{:?}", self.status).into(),
             if let Some(surface_area) = &self.surface_area {
                 format!("{:?}", surface_area).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(surface_areas) = &self.surface_areas {
+                format!("{:?}", surface_areas).into()
             } else {
                 String::new().into()
             },
@@ -6067,10 +6122,12 @@ impl tabled::Tabled for FileSurfaceArea {
             "created_at".into(),
             "error".into(),
             "id".into(),
+            "output_unit".into(),
             "src_format".into(),
             "started_at".into(),
             "status".into(),
             "surface_area".into(),
+            "surface_areas".into(),
             "updated_at".into(),
             "user_id".into(),
         ]
@@ -6123,6 +6180,8 @@ pub struct FileVolume {
     pub error: Option<String>,
     #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
+    #[doc = "The output unit for the volume."]
+    pub output_unit: UnitVolume,
     #[doc = "The source format of the file."]
     pub src_format: FileImportFormat,
     #[doc = "The time and date the API call was started."]
@@ -6135,9 +6194,13 @@ pub struct FileVolume {
     #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
-    #[doc = "The resulting volume."]
+    #[doc = "The resulting volume. This is deprecated and will be removed in a future release. Use `volumes` instead."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[deprecated]
     pub volume: Option<f64>,
+    #[doc = "The volumes for each mesh in the file. The key of the hash map is the mesh name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub volumes: Option<std::collections::HashMap<String, f64>>,
 }
 
 impl std::fmt::Display for FileVolume {
@@ -6152,7 +6215,7 @@ impl std::fmt::Display for FileVolume {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FileVolume {
-    const LENGTH: usize = 10;
+    const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -6167,6 +6230,7 @@ impl tabled::Tabled for FileVolume {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
+            format!("{:?}", self.output_unit).into(),
             format!("{:?}", self.src_format).into(),
             if let Some(started_at) = &self.started_at {
                 format!("{:?}", started_at).into()
@@ -6185,6 +6249,11 @@ impl tabled::Tabled for FileVolume {
             } else {
                 String::new().into()
             },
+            if let Some(volumes) = &self.volumes {
+                format!("{:?}", volumes).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
@@ -6194,12 +6263,14 @@ impl tabled::Tabled for FileVolume {
             "created_at".into(),
             "error".into(),
             "id".into(),
+            "output_unit".into(),
             "src_format".into(),
             "started_at".into(),
             "status".into(),
             "updated_at".into(),
             "user_id".into(),
             "volume".into(),
+            "volumes".into(),
         ]
     }
 }
@@ -6379,8 +6450,9 @@ impl tabled::Tabled for IndexInfo {
 pub enum InputFormat {
     Gltf {},
     Step { coords: System },
-    Obj { coords: System },
-    Stl { coords: System },
+    Obj { coords: System, units: UnitLength },
+    Ply { coords: System, units: UnitLength },
+    Stl { coords: System, units: UnitLength },
 }
 
 #[doc = "An invoice."]
@@ -7754,6 +7826,241 @@ impl tabled::Tabled for ModelingCmdCameraDragEnd {
     }
 }
 
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DefaultCameraLookAt {
+    #[doc = "What the camera is looking at. Center of the camera's field of vision"]
+    pub center: Point3D,
+    #[doc = "Which way is \"up\", from the camera's point of view."]
+    pub up: Point3D,
+    #[doc = "Where the camera is positioned"]
+    pub vantage: Point3D,
+}
+
+impl std::fmt::Display for DefaultCameraLookAt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DefaultCameraLookAt {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.center).into(),
+            format!("{:?}", self.up).into(),
+            format!("{:?}", self.vantage).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["center".into(), "up".into(), "vantage".into()]
+    }
+}
+
+#[doc = "Change what the default camera is looking at."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ModelingCmdDefaultCameraLookAt {
+    #[serde(rename = "DefaultCameraLookAt")]
+    pub default_camera_look_at: DefaultCameraLookAt,
+}
+
+impl std::fmt::Display for ModelingCmdDefaultCameraLookAt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ModelingCmdDefaultCameraLookAt {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.default_camera_look_at).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["default_camera_look_at".into()]
+    }
+}
+
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DefaultCameraEnableSketchMode {
+    #[doc = "How far to the sketching plane?"]
+    pub distance_to_plane: f64,
+    #[doc = "What's the origin of the sketching plane?"]
+    pub origin: Point3D,
+    #[doc = "Should the camera use orthographic projection? In other words, should an object's size in the rendered image stay constant regardless of its distance from the camera."]
+    pub ortho: bool,
+    #[doc = "Which 3D axis of the scene should be the X axis of the sketching plane?"]
+    pub x_axis: Point3D,
+    #[doc = "Which 3D axis of the scene should be the Y axis of the sketching plane?"]
+    pub y_axis: Point3D,
+}
+
+impl std::fmt::Display for DefaultCameraEnableSketchMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DefaultCameraEnableSketchMode {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.distance_to_plane).into(),
+            format!("{:?}", self.origin).into(),
+            format!("{:?}", self.ortho).into(),
+            format!("{:?}", self.x_axis).into(),
+            format!("{:?}", self.y_axis).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "distance_to_plane".into(),
+            "origin".into(),
+            "ortho".into(),
+            "x_axis".into(),
+            "y_axis".into(),
+        ]
+    }
+}
+
+#[doc = "Enable sketch mode, where users can sketch 2D geometry. Users choose a plane to sketch on."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ModelingCmdDefaultCameraEnableSketchMode {
+    #[serde(rename = "DefaultCameraEnableSketchMode")]
+    pub default_camera_enable_sketch_mode: DefaultCameraEnableSketchMode,
+}
+
+impl std::fmt::Display for ModelingCmdDefaultCameraEnableSketchMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ModelingCmdDefaultCameraEnableSketchMode {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.default_camera_enable_sketch_mode).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["default_camera_enable_sketch_mode".into()]
+    }
+}
+
+#[doc = "Disable sketch mode, from the default camera."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ModelingCmdDefaultCameraDisableSketchMode {
+    DefaultCameraDisableSketchMode,
+}
+
+impl std::default::Default for ModelingCmdDefaultCameraDisableSketchMode {
+    fn default() -> Self {
+        ModelingCmdDefaultCameraDisableSketchMode::DefaultCameraDisableSketchMode
+    }
+}
+
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Export {
+    #[doc = "The file format to export to."]
+    pub format: OutputFormat,
+}
+
+impl std::fmt::Display for Export {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Export {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.format).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["format".into()]
+    }
+}
+
+#[doc = "Export the scene to a file."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ModelingCmdExport {
+    #[serde(rename = "Export")]
+    pub export: Export,
+}
+
+impl std::fmt::Display for ModelingCmdExport {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ModelingCmdExport {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.export).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["export".into()]
+    }
+}
+
 #[doc = "Commands that the KittyCAD engine can execute."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -7768,6 +8075,10 @@ pub enum ModelingCmd {
     ModelingCmdCameraDragStart(ModelingCmdCameraDragStart),
     ModelingCmdCameraDragMove(ModelingCmdCameraDragMove),
     ModelingCmdCameraDragEnd(ModelingCmdCameraDragEnd),
+    ModelingCmdDefaultCameraLookAt(ModelingCmdDefaultCameraLookAt),
+    ModelingCmdDefaultCameraEnableSketchMode(ModelingCmdDefaultCameraEnableSketchMode),
+    ModelingCmdDefaultCameraDisableSketchMode(ModelingCmdDefaultCameraDisableSketchMode),
+    ModelingCmdExport(ModelingCmdExport),
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -8233,6 +8544,7 @@ impl tabled::Tabled for OutputFile {
 pub enum OutputFormat {
     Gltf { storage: Storage },
     Obj { coords: System },
+    Ply { coords: System, storage: Storage },
     Step { coords: System },
     Stl { coords: System, storage: Storage },
 }
@@ -9427,62 +9739,38 @@ impl tabled::Tabled for UnitAngleConversion {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitArea {
-    #[doc = "Acres <https://en.wikipedia.org/wiki/Acre>"]
-    #[serde(rename = "acres")]
-    #[display("acres")]
-    Acres,
-    #[doc = "Hectares <https://en.wikipedia.org/wiki/Hectare>"]
-    #[serde(rename = "hectares")]
-    #[display("hectares")]
-    Hectares,
     #[doc = "Square centimetres <https://en.wikipedia.org/wiki/Square_centimetre>"]
-    #[serde(rename = "square_centimetres")]
-    #[display("square_centimetres")]
-    SquareCentimetres,
+    #[serde(rename = "cm2")]
+    #[display("cm2")]
+    Cm2,
     #[doc = "Square decimetres <https://en.wikipedia.org/wiki/Square_decimetre>"]
-    #[serde(rename = "square_decimetres")]
-    #[display("square_decimetres")]
-    SquareDecimetres,
+    #[serde(rename = "dm2")]
+    #[display("dm2")]
+    Dm2,
     #[doc = "Square feet <https://en.wikipedia.org/wiki/Square_foot>"]
-    #[serde(rename = "square_feet")]
-    #[display("square_feet")]
-    SquareFeet,
-    #[doc = "Square hectometres <https://en.wikipedia.org/wiki/Square_hectometre>"]
-    #[serde(rename = "square_hectometres")]
-    #[display("square_hectometres")]
-    SquareHectometres,
+    #[serde(rename = "ft2")]
+    #[display("ft2")]
+    Ft2,
     #[doc = "Square inches <https://en.wikipedia.org/wiki/Square_inch>"]
-    #[serde(rename = "square_inches")]
-    #[display("square_inches")]
-    SquareInches,
+    #[serde(rename = "in2")]
+    #[display("in2")]
+    In2,
     #[doc = "Square kilometres <https://en.wikipedia.org/wiki/Square_kilometre>"]
-    #[serde(rename = "square_kilometres")]
-    #[display("square_kilometres")]
-    SquareKilometres,
+    #[serde(rename = "km2")]
+    #[display("km2")]
+    Km2,
     #[doc = "Square metres <https://en.wikipedia.org/wiki/Square_metre>"]
-    #[serde(rename = "square_metres")]
-    #[display("square_metres")]
-    SquareMetres,
-    #[doc = "Square micrometres <https://en.wikipedia.org/wiki/Square_micrometre>"]
-    #[serde(rename = "square_micrometres")]
-    #[display("square_micrometres")]
-    SquareMicrometres,
-    #[doc = "Square miles <https://en.wikipedia.org/wiki/Square_mile>"]
-    #[serde(rename = "square_miles")]
-    #[display("square_miles")]
-    SquareMiles,
+    #[serde(rename = "m2")]
+    #[display("m2")]
+    M2,
     #[doc = "Square millimetres <https://en.wikipedia.org/wiki/Square_millimetre>"]
-    #[serde(rename = "square_millimetres")]
-    #[display("square_millimetres")]
-    SquareMillimetres,
-    #[doc = "Square nanometres <https://en.wikipedia.org/wiki/Square_nanometre>"]
-    #[serde(rename = "square_nanometres")]
-    #[display("square_nanometres")]
-    SquareNanometres,
+    #[serde(rename = "mm2")]
+    #[display("mm2")]
+    Mm2,
     #[doc = "Square yards <https://en.wikipedia.org/wiki/Square_mile>"]
-    #[serde(rename = "square_yards")]
-    #[display("square_yards")]
-    SquareYards,
+    #[serde(rename = "yd2")]
+    #[display("yd2")]
+    Yd2,
 }
 
 #[doc = "Result of converting between units."]
@@ -9734,6 +10022,31 @@ impl tabled::Tabled for UnitCurrentConversion {
             "user_id".into(),
         ]
     }
+}
+
+#[doc = "The valid types for density units."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum UnitDensity {
+    #[doc = "Pounds per cubic feet."]
+    #[serde(rename = "lb:ft3")]
+    #[display("lb:ft3")]
+    LbFt3,
+    #[doc = "Kilograms per cubic meter."]
+    #[serde(rename = "kg:m3")]
+    #[display("kg:m3")]
+    KgM3,
 }
 
 #[doc = "The valid types of energy units."]
@@ -10214,57 +10527,29 @@ impl tabled::Tabled for UnitFrequencyConversion {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitLength {
     #[doc = "Centimetres <https://en.wikipedia.org/wiki/Centimetre>"]
-    #[serde(rename = "centimetres")]
-    #[display("centimetres")]
-    Centimetres,
-    #[doc = "Decimetres <https://en.wikipedia.org/wiki/Decimetre>"]
-    #[serde(rename = "decimetres")]
-    #[display("decimetres")]
-    Decimetres,
+    #[serde(rename = "cm")]
+    #[display("cm")]
+    Cm,
     #[doc = "Feet <https://en.wikipedia.org/wiki/Foot_(unit)>"]
-    #[serde(rename = "feet")]
-    #[display("feet")]
-    Feet,
-    #[doc = "Furlongs <https://en.wikipedia.org/wiki/Furlong>"]
-    #[serde(rename = "furlongs")]
-    #[display("furlongs")]
-    Furlongs,
-    #[doc = "Hectometres <https://en.wikipedia.org/wiki/Hectometre>"]
-    #[serde(rename = "hectometres")]
-    #[display("hectometres")]
-    Hectometres,
+    #[serde(rename = "ft")]
+    #[display("ft")]
+    Ft,
     #[doc = "Inches <https://en.wikipedia.org/wiki/Inch>"]
-    #[serde(rename = "inches")]
-    #[display("inches")]
-    Inches,
-    #[doc = "Kilometres <https://en.wikipedia.org/wiki/Kilometre>"]
-    #[serde(rename = "kilometres")]
-    #[display("kilometres")]
-    Kilometres,
+    #[serde(rename = "in")]
+    #[display("in")]
+    In,
     #[doc = "Metres <https://en.wikipedia.org/wiki/Metre>"]
-    #[serde(rename = "metres")]
-    #[display("metres")]
-    Metres,
-    #[doc = "Micrometres <https://en.wikipedia.org/wiki/Micrometre>"]
-    #[serde(rename = "micrometres")]
-    #[display("micrometres")]
-    Micrometres,
-    #[doc = "Miles <https://en.wikipedia.org/wiki/Mile>"]
-    #[serde(rename = "miles")]
-    #[display("miles")]
-    Miles,
+    #[serde(rename = "m")]
+    #[display("m")]
+    M,
     #[doc = "Millimetres <https://en.wikipedia.org/wiki/Millimetre>"]
-    #[serde(rename = "millimetres")]
-    #[display("millimetres")]
-    Millimetres,
-    #[doc = "Nanometres <https://en.wikipedia.org/wiki/Nanometre>"]
-    #[serde(rename = "nanometres")]
-    #[display("nanometres")]
-    Nanometres,
+    #[serde(rename = "mm")]
+    #[display("mm")]
+    Mm,
     #[doc = "Yards <https://en.wikipedia.org/wiki/Yard>"]
-    #[serde(rename = "yards")]
-    #[display("yards")]
-    Yards,
+    #[serde(rename = "yd")]
+    #[display("yd")]
+    Yd,
 }
 
 #[doc = "Result of converting between units."]
@@ -10391,66 +10676,18 @@ impl tabled::Tabled for UnitLengthConversion {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitMass {
-    #[doc = "Carats <https://en.wikipedia.org/wiki/Carat_(mass)>"]
-    #[serde(rename = "carats")]
-    #[display("carats")]
-    Carats,
-    #[doc = "Grains <https://en.wikipedia.org/wiki/Grain_(unit)>"]
-    #[serde(rename = "grains")]
-    #[display("grains")]
-    Grains,
     #[doc = "Grams <https://en.wikipedia.org/wiki/Gram>"]
-    #[serde(rename = "grams")]
-    #[display("grams")]
-    Grams,
+    #[serde(rename = "g")]
+    #[display("g")]
+    G,
     #[doc = "Kilograms <https://en.wikipedia.org/wiki/Kilogram>"]
-    #[serde(rename = "kilograms")]
-    #[display("kilograms")]
-    Kilograms,
-    #[doc = "Long tons <https://en.wikipedia.org/wiki/Long_ton>"]
-    #[serde(rename = "long_tons")]
-    #[display("long_tons")]
-    LongTons,
-    #[doc = "Metric tons <https://en.wikipedia.org/wiki/Tonne>"]
-    #[serde(rename = "metric_tons")]
-    #[display("metric_tons")]
-    MetricTons,
-    #[doc = "Micrograms <https://en.wikipedia.org/wiki/Microgram>"]
-    #[serde(rename = "micrograms")]
-    #[display("micrograms")]
-    Micrograms,
-    #[doc = "Milligrams <https://en.wikipedia.org/wiki/Milligram>"]
-    #[serde(rename = "milligrams")]
-    #[display("milligrams")]
-    Milligrams,
-    #[doc = "Ounces <https://en.wikipedia.org/wiki/Ounce>"]
-    #[serde(rename = "ounces")]
-    #[display("ounces")]
-    Ounces,
-    #[doc = "Pennyweights <https://en.wikipedia.org/wiki/Pennyweight>"]
-    #[serde(rename = "pennyweights")]
-    #[display("pennyweights")]
-    Pennyweights,
+    #[serde(rename = "kg")]
+    #[display("kg")]
+    Kg,
     #[doc = "Pounds <https://en.wikipedia.org/wiki/Pound_(mass)>"]
-    #[serde(rename = "pounds")]
-    #[display("pounds")]
-    Pounds,
-    #[doc = "Short tons <https://en.wikipedia.org/wiki/Short_ton>"]
-    #[serde(rename = "short_tons")]
-    #[display("short_tons")]
-    ShortTons,
-    #[doc = "Stones <https://en.wikipedia.org/wiki/Stone_(unit)>"]
-    #[serde(rename = "stones")]
-    #[display("stones")]
-    Stones,
-    #[doc = "Troy ounces <https://en.wikipedia.org/wiki/Troy_ounce>"]
-    #[serde(rename = "troy_ounces")]
-    #[display("troy_ounces")]
-    TroyOunces,
-    #[doc = "Troy pounds <https://en.wikipedia.org/wiki/Troy_pound>"]
-    #[serde(rename = "troy_pounds")]
-    #[display("troy_pounds")]
-    TroyPounds,
+    #[serde(rename = "lb")]
+    #[display("lb")]
+    Lb,
 }
 
 #[doc = "Result of converting between units."]
@@ -11161,82 +11398,42 @@ impl tabled::Tabled for UnitTorqueConversion {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitVolume {
-    #[doc = "Cubic centimeters (cc or cm³) <https://en.wikipedia.org/wiki/Cubic_centimetre>"]
-    #[serde(rename = "cubic_centimetres")]
-    #[display("cubic_centimetres")]
-    CubicCentimetres,
+    #[doc = "Cubic centimetres (cc or cm³) <https://en.wikipedia.org/wiki/Cubic_centimetre>"]
+    #[serde(rename = "cm3")]
+    #[display("cm3")]
+    Cm3,
     #[doc = "Cubic feet (ft³) <https://en.wikipedia.org/wiki/Cubic_foot>"]
-    #[serde(rename = "cubic_feet")]
-    #[display("cubic_feet")]
-    CubicFeet,
+    #[serde(rename = "ft3")]
+    #[display("ft3")]
+    Ft3,
     #[doc = "Cubic inches (cu in or in³) <https://en.wikipedia.org/wiki/Cubic_inch>"]
-    #[serde(rename = "cubic_inches")]
-    #[display("cubic_inches")]
-    CubicInches,
+    #[serde(rename = "in3")]
+    #[display("in3")]
+    In3,
     #[doc = "Cubic metres (m³) <https://en.wikipedia.org/wiki/Cubic_metre>"]
-    #[serde(rename = "cubic_metres")]
-    #[display("cubic_metres")]
-    CubicMetres,
+    #[serde(rename = "m3")]
+    #[display("m3")]
+    M3,
     #[doc = "Cubic yards (yd³) <https://en.wikipedia.org/wiki/Cubic_yard>"]
-    #[serde(rename = "cubic_yards")]
-    #[display("cubic_yards")]
-    CubicYards,
-    #[doc = "Cups <https://en.wikipedia.org/wiki/Cup_(unit)>"]
-    #[serde(rename = "cups")]
-    #[display("cups")]
-    Cups,
-    #[doc = "Drams <https://en.wikipedia.org/wiki/Fluid_dram>"]
-    #[serde(rename = "drams")]
-    #[display("drams")]
-    Drams,
-    #[doc = "Drops <https://en.wikipedia.org/wiki/Minim_(unit)>"]
-    #[serde(rename = "drops")]
-    #[display("drops")]
-    Drops,
+    #[serde(rename = "yd3")]
+    #[display("yd3")]
+    Yd3,
     #[doc = "US Fluid Ounces (fl oz) <https://en.wikipedia.org/wiki/Fluid_ounce>"]
-    #[serde(rename = "fluid_ounces")]
-    #[display("fluid_ounces")]
-    FluidOunces,
-    #[doc = "UK Fluid Ounces (fl oz) <https://en.wikipedia.org/wiki/Fluid_ounce>"]
-    #[serde(rename = "fluid_ounces_uk")]
-    #[display("fluid_ounces_uk")]
-    FluidOuncesUk,
+    #[serde(rename = "usfloz")]
+    #[display("usfloz")]
+    Usfloz,
     #[doc = "US Gallons (gal US) <https://en.wikipedia.org/wiki/Gallon>"]
-    #[serde(rename = "gallons")]
-    #[display("gallons")]
-    Gallons,
-    #[doc = "UK/Imperial Gallons (gal) <https://en.wikipedia.org/wiki/Gallon>"]
-    #[serde(rename = "gallons_uk")]
-    #[display("gallons_uk")]
-    GallonsUk,
+    #[serde(rename = "usgal")]
+    #[display("usgal")]
+    Usgal,
     #[doc = "Liters (l) <https://en.wikipedia.org/wiki/Litre>"]
-    #[serde(rename = "litres")]
-    #[display("litres")]
-    Litres,
+    #[serde(rename = "l")]
+    #[display("l")]
+    L,
     #[doc = "Milliliters (ml) <https://en.wikipedia.org/wiki/Litre>"]
-    #[serde(rename = "millilitres")]
-    #[display("millilitres")]
-    Millilitres,
-    #[doc = "Pints <https://en.wikipedia.org/wiki/Pint>"]
-    #[serde(rename = "pints")]
-    #[display("pints")]
-    Pints,
-    #[doc = "Pints in the United Kingdom (UK) <https://en.wikipedia.org/wiki/Pint>"]
-    #[serde(rename = "pints_uk")]
-    #[display("pints_uk")]
-    PintsUk,
-    #[doc = "Quarts <https://en.wikipedia.org/wiki/Quart>"]
-    #[serde(rename = "quarts")]
-    #[display("quarts")]
-    Quarts,
-    #[doc = "Tablespoons (tbsp) <https://en.wikipedia.org/wiki/Tablespoon>"]
-    #[serde(rename = "tablespoons")]
-    #[display("tablespoons")]
-    Tablespoons,
-    #[doc = "Teaspoons (tsp) <https://en.wikipedia.org/wiki/Teaspoon>"]
-    #[serde(rename = "teaspoons")]
-    #[display("teaspoons")]
-    Teaspoons,
+    #[serde(rename = "ml")]
+    #[display("ml")]
+    Ml,
 }
 
 #[doc = "Result of converting between units."]

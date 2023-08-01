@@ -670,6 +670,7 @@
                 "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
               },
               "output": {
+                "deprecated": true,
                 "description": "The converted file (if single file conversion), if completed, base64 encoded. This field is deprecated, and will be removed in a future release. Use `outputs` instead.",
                 "format": "byte",
                 "nullable": true,
@@ -766,13 +767,21 @@
             "description": "File center of mass.",
             "properties": {
               "center_of_mass": {
-                "description": "The resulting center of mass.",
-                "items": {
-                  "format": "double",
-                  "type": "number"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ],
+                "deprecated": true,
+                "description": "The resulting center of mass. This is deprecated and will be removed in a future release. Use `centers_of_mass` instead.",
+                "nullable": true
+              },
+              "centers_of_mass": {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/Point3d"
                 },
-                "nullable": true,
-                "type": "array"
+                "description": "The center of mass for each mesh in the file. The key of the hash map is the mesh name.",
+                "type": "object"
               },
               "completed_at": {
                 "description": "The time and date the API call was completed.",
@@ -799,6 +808,14 @@
                   }
                 ],
                 "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
+              },
+              "output_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ],
+                "description": "The output unit for the center of mass."
               },
               "src_format": {
                 "allOf": [
@@ -843,6 +860,7 @@
             "required": [
               "created_at",
               "id",
+              "output_unit",
               "src_format",
               "status",
               "type",
@@ -880,16 +898,41 @@
                 "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
               },
               "mass": {
-                "description": "The resulting mass.",
+                "deprecated": true,
+                "description": "The resulting mass. This is deprecated and will be removed in a future release, use `masses` instead.",
                 "format": "double",
                 "nullable": true,
                 "type": "number"
               },
+              "masses": {
+                "additionalProperties": {
+                  "format": "double",
+                  "type": "number"
+                },
+                "description": "The mass for each mesh in the file. The key of the hash map is the mesh name.",
+                "type": "object"
+              },
               "material_density": {
                 "default": 0.0,
                 "description": "The material density as denoted by the user.",
-                "format": "float",
+                "format": "double",
                 "type": "number"
+              },
+              "material_density_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitDensity"
+                  }
+                ],
+                "description": "The material density unit."
+              },
+              "output_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitMass"
+                  }
+                ],
+                "description": "The output unit for the mass."
               },
               "src_format": {
                 "allOf": [
@@ -934,6 +977,8 @@
             "required": [
               "created_at",
               "id",
+              "material_density_unit",
+              "output_unit",
               "src_format",
               "status",
               "type",
@@ -969,6 +1014,14 @@
                   }
                 ],
                 "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
+              },
+              "output_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitVolume"
+                  }
+                ],
+                "description": "The output unit for the volume."
               },
               "src_format": {
                 "allOf": [
@@ -1010,15 +1063,25 @@
                 "type": "string"
               },
               "volume": {
-                "description": "The resulting volume.",
+                "deprecated": true,
+                "description": "The resulting volume. This is deprecated and will be removed in a future release. Use `volumes` instead.",
                 "format": "double",
                 "nullable": true,
                 "type": "number"
+              },
+              "volumes": {
+                "additionalProperties": {
+                  "format": "double",
+                  "type": "number"
+                },
+                "description": "The volumes for each mesh in the file. The key of the hash map is the mesh name.",
+                "type": "object"
               }
             },
             "required": [
               "created_at",
               "id",
+              "output_unit",
               "src_format",
               "status",
               "type",
@@ -1042,8 +1105,17 @@
                 "title": "DateTime",
                 "type": "string"
               },
+              "densities": {
+                "additionalProperties": {
+                  "format": "double",
+                  "type": "number"
+                },
+                "description": "The density for each mesh in the file. The key of the hash map is the mesh name.",
+                "type": "object"
+              },
               "density": {
-                "description": "The resulting density.",
+                "deprecated": true,
+                "description": "The resulting density. This is deprecated and will be removed in a future release, use `densities` instead.",
                 "format": "double",
                 "nullable": true,
                 "type": "number"
@@ -1064,8 +1136,24 @@
               "material_mass": {
                 "default": 0.0,
                 "description": "The material mass as denoted by the user.",
-                "format": "float",
+                "format": "double",
                 "type": "number"
+              },
+              "material_mass_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitMass"
+                  }
+                ],
+                "description": "The material mass unit."
+              },
+              "output_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitDensity"
+                  }
+                ],
+                "description": "The output unit for the density."
               },
               "src_format": {
                 "allOf": [
@@ -1110,6 +1198,8 @@
             "required": [
               "created_at",
               "id",
+              "material_mass_unit",
+              "output_unit",
               "src_format",
               "status",
               "type",
@@ -1146,6 +1236,14 @@
                 ],
                 "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
               },
+              "output_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitArea"
+                  }
+                ],
+                "description": "The output unit for the surface area."
+              },
               "src_format": {
                 "allOf": [
                   {
@@ -1170,10 +1268,19 @@
                 "description": "The status of the API call."
               },
               "surface_area": {
-                "description": "The resulting surface area.",
+                "deprecated": true,
+                "description": "The resulting surface area. This is deprecated and will be removed in a future release. Use `surface_areas` instead.",
                 "format": "double",
                 "nullable": true,
                 "type": "number"
+              },
+              "surface_areas": {
+                "additionalProperties": {
+                  "format": "double",
+                  "type": "number"
+                },
+                "description": "The surface area for each mesh in the file. The key of the hash map is the mesh name.",
+                "type": "object"
               },
               "type": {
                 "enum": [
@@ -1195,6 +1302,7 @@
             "required": [
               "created_at",
               "id",
+              "output_unit",
               "src_format",
               "status",
               "type",
@@ -5514,13 +5622,21 @@
         "description": "A file center of mass result.",
         "properties": {
           "center_of_mass": {
-            "description": "The resulting center of mass.",
-            "items": {
-              "format": "double",
-              "type": "number"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ],
+            "deprecated": true,
+            "description": "The resulting center of mass. This is deprecated and will be removed in a future release. Use `centers_of_mass` instead.",
+            "nullable": true
+          },
+          "centers_of_mass": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Point3d"
             },
-            "nullable": true,
-            "type": "array"
+            "description": "The center of mass for each mesh in the file. The key of the hash map is the mesh name.",
+            "type": "object"
           },
           "completed_at": {
             "description": "The time and date the API call was completed.",
@@ -5547,6 +5663,14 @@
               }
             ],
             "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
+          },
+          "output_unit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitLength"
+              }
+            ],
+            "description": "The output unit for the center of mass."
           },
           "src_format": {
             "allOf": [
@@ -5585,6 +5709,7 @@
         "required": [
           "created_at",
           "id",
+          "output_unit",
           "src_format",
           "status",
           "updated_at"
@@ -5621,6 +5746,7 @@
             "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
           },
           "output": {
+            "deprecated": true,
             "description": "The converted file (if single file conversion), if completed, base64 encoded. This field is deprecated, and will be removed in a future release. Use `outputs` instead.",
             "format": "byte",
             "nullable": true,
@@ -5722,8 +5848,17 @@
             "title": "DateTime",
             "type": "string"
           },
+          "densities": {
+            "additionalProperties": {
+              "format": "double",
+              "type": "number"
+            },
+            "description": "The density for each mesh in the file. The key of the hash map is the mesh name.",
+            "type": "object"
+          },
           "density": {
-            "description": "The resulting density.",
+            "deprecated": true,
+            "description": "The resulting density. This is deprecated and will be removed in a future release, use `densities` instead.",
             "format": "double",
             "nullable": true,
             "type": "number"
@@ -5744,8 +5879,24 @@
           "material_mass": {
             "default": 0.0,
             "description": "The material mass as denoted by the user.",
-            "format": "float",
+            "format": "double",
             "type": "number"
+          },
+          "material_mass_unit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitMass"
+              }
+            ],
+            "description": "The material mass unit."
+          },
+          "output_unit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitDensity"
+              }
+            ],
+            "description": "The output unit for the density."
           },
           "src_format": {
             "allOf": [
@@ -5784,6 +5935,8 @@
         "required": [
           "created_at",
           "id",
+          "material_mass_unit",
+          "output_unit",
           "src_format",
           "status",
           "updated_at"
@@ -5797,13 +5950,6 @@
             "description": "The COLLADA/DAE file format. <https://en.wikipedia.org/wiki/COLLADA>",
             "enum": [
               "dae"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "The DXF file format. <https://en.wikipedia.org/wiki/AutoCAD_DXF>",
-            "enum": [
-              "dxf"
             ],
             "type": "string"
           },
@@ -5865,13 +6011,6 @@
             "description": "The COLLADA/DAE file format. <https://en.wikipedia.org/wiki/COLLADA>",
             "enum": [
               "dae"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "The DXF file format. <https://en.wikipedia.org/wiki/AutoCAD_DXF>",
-            "enum": [
-              "dxf"
             ],
             "type": "string"
           },
@@ -5949,16 +6088,41 @@
             "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
           },
           "mass": {
-            "description": "The resulting mass.",
+            "deprecated": true,
+            "description": "The resulting mass. This is deprecated and will be removed in a future release, use `masses` instead.",
             "format": "double",
             "nullable": true,
             "type": "number"
           },
+          "masses": {
+            "additionalProperties": {
+              "format": "double",
+              "type": "number"
+            },
+            "description": "The mass for each mesh in the file. The key of the hash map is the mesh name.",
+            "type": "object"
+          },
           "material_density": {
             "default": 0.0,
             "description": "The material density as denoted by the user.",
-            "format": "float",
+            "format": "double",
             "type": "number"
+          },
+          "material_density_unit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitDensity"
+              }
+            ],
+            "description": "The material density unit."
+          },
+          "output_unit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitMass"
+              }
+            ],
+            "description": "The output unit for the mass."
           },
           "src_format": {
             "allOf": [
@@ -5997,6 +6161,8 @@
         "required": [
           "created_at",
           "id",
+          "material_density_unit",
+          "output_unit",
           "src_format",
           "status",
           "updated_at"
@@ -6032,6 +6198,14 @@
             ],
             "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
           },
+          "output_unit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitArea"
+              }
+            ],
+            "description": "The output unit for the surface area."
+          },
           "src_format": {
             "allOf": [
               {
@@ -6056,10 +6230,19 @@
             "description": "The status of the API call."
           },
           "surface_area": {
-            "description": "The resulting surface area.",
+            "deprecated": true,
+            "description": "The resulting surface area. This is deprecated and will be removed in a future release. Use `surface_areas` instead.",
             "format": "double",
             "nullable": true,
             "type": "number"
+          },
+          "surface_areas": {
+            "additionalProperties": {
+              "format": "double",
+              "type": "number"
+            },
+            "description": "The surface area for each mesh in the file. The key of the hash map is the mesh name.",
+            "type": "object"
           },
           "updated_at": {
             "description": "The time and date the API call was last updated.",
@@ -6075,6 +6258,7 @@
         "required": [
           "created_at",
           "id",
+          "output_unit",
           "src_format",
           "status",
           "updated_at"
@@ -6123,6 +6307,14 @@
             ],
             "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
           },
+          "output_unit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitVolume"
+              }
+            ],
+            "description": "The output unit for the volume."
+          },
           "src_format": {
             "allOf": [
               {
@@ -6157,15 +6349,25 @@
             "type": "string"
           },
           "volume": {
-            "description": "The resulting volume.",
+            "deprecated": true,
+            "description": "The resulting volume. This is deprecated and will be removed in a future release. Use `volumes` instead.",
             "format": "double",
             "nullable": true,
             "type": "number"
+          },
+          "volumes": {
+            "additionalProperties": {
+              "format": "double",
+              "type": "number"
+            },
+            "description": "The volumes for each mesh in the file. The key of the hash map is the mesh name.",
+            "type": "object"
           }
         },
         "required": [
           "created_at",
           "id",
+          "output_unit",
           "src_format",
           "status",
           "updated_at"
@@ -6300,11 +6502,53 @@
                   "Obj"
                 ],
                 "type": "string"
+              },
+              "units": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ],
+                "description": "The units of the input data. This is very important for correct scaling and when calculating physics properties like mass, etc."
               }
             },
             "required": [
               "coords",
-              "type"
+              "type",
+              "units"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The PLY Polygon File Format.",
+            "properties": {
+              "coords": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/System"
+                  }
+                ],
+                "description": "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"
+              },
+              "type": {
+                "enum": [
+                  "Ply"
+                ],
+                "type": "string"
+              },
+              "units": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ],
+                "description": "The units of the input data. This is very important for correct scaling and when calculating physics properties like mass, etc."
+              }
+            },
+            "required": [
+              "coords",
+              "type",
+              "units"
             ],
             "type": "object"
           },
@@ -6324,11 +6568,20 @@
                   "Stl"
                 ],
                 "type": "string"
+              },
+              "units": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ],
+                "description": "The units of the input data. This is very important for correct scaling and when calculating physics properties like mass, etc."
               }
             },
             "required": [
               "coords",
-              "type"
+              "type",
+              "units"
             ],
             "type": "object"
           }
@@ -7182,6 +7435,138 @@
               "CameraDragEnd"
             ],
             "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Change what the default camera is looking at.",
+            "properties": {
+              "DefaultCameraLookAt": {
+                "properties": {
+                  "center": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point3d"
+                      }
+                    ],
+                    "description": "What the camera is looking at. Center of the camera's field of vision"
+                  },
+                  "up": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point3d"
+                      }
+                    ],
+                    "description": "Which way is \"up\", from the camera's point of view."
+                  },
+                  "vantage": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point3d"
+                      }
+                    ],
+                    "description": "Where the camera is positioned"
+                  }
+                },
+                "required": [
+                  "center",
+                  "up",
+                  "vantage"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "DefaultCameraLookAt"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Enable sketch mode, where users can sketch 2D geometry. Users choose a plane to sketch on.",
+            "properties": {
+              "DefaultCameraEnableSketchMode": {
+                "properties": {
+                  "distance_to_plane": {
+                    "description": "How far to the sketching plane?",
+                    "format": "float",
+                    "type": "number"
+                  },
+                  "origin": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point3d"
+                      }
+                    ],
+                    "description": "What's the origin of the sketching plane?"
+                  },
+                  "ortho": {
+                    "description": "Should the camera use orthographic projection? In other words, should an object's size in the rendered image stay constant regardless of its distance from the camera.",
+                    "type": "boolean"
+                  },
+                  "x_axis": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point3d"
+                      }
+                    ],
+                    "description": "Which 3D axis of the scene should be the X axis of the sketching plane?"
+                  },
+                  "y_axis": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point3d"
+                      }
+                    ],
+                    "description": "Which 3D axis of the scene should be the Y axis of the sketching plane?"
+                  }
+                },
+                "required": [
+                  "distance_to_plane",
+                  "origin",
+                  "ortho",
+                  "x_axis",
+                  "y_axis"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "DefaultCameraEnableSketchMode"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Disable sketch mode, from the default camera.",
+            "enum": [
+              "DefaultCameraDisableSketchMode"
+            ],
+            "type": "string"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Export the scene to a file.",
+            "properties": {
+              "Export": {
+                "properties": {
+                  "format": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/OutputFormat"
+                      }
+                    ],
+                    "description": "The file format to export to."
+                  }
+                },
+                "required": [
+                  "format"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "Export"
+            ],
+            "type": "object"
           }
         ]
       },
@@ -7496,6 +7881,39 @@
             },
             "required": [
               "coords",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The PLY Polygon File Format.",
+            "properties": {
+              "coords": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/System"
+                  }
+                ],
+                "description": "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"
+              },
+              "storage": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Storage"
+                  }
+                ],
+                "description": "The storage for the output PLY file."
+              },
+              "type": {
+                "enum": [
+                  "Ply"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "coords",
+              "storage",
               "type"
             ],
             "type": "object"
@@ -8503,100 +8921,58 @@
         "description": "The valid types of area units.",
         "oneOf": [
           {
-            "description": "Acres <https://en.wikipedia.org/wiki/Acre>",
-            "enum": [
-              "acres"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Hectares <https://en.wikipedia.org/wiki/Hectare>",
-            "enum": [
-              "hectares"
-            ],
-            "type": "string"
-          },
-          {
             "description": "Square centimetres <https://en.wikipedia.org/wiki/Square_centimetre>",
             "enum": [
-              "square_centimetres"
+              "cm2"
             ],
             "type": "string"
           },
           {
             "description": "Square decimetres <https://en.wikipedia.org/wiki/Square_decimetre>",
             "enum": [
-              "square_decimetres"
+              "dm2"
             ],
             "type": "string"
           },
           {
             "description": "Square feet <https://en.wikipedia.org/wiki/Square_foot>",
             "enum": [
-              "square_feet"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Square hectometres <https://en.wikipedia.org/wiki/Square_hectometre>",
-            "enum": [
-              "square_hectometres"
+              "ft2"
             ],
             "type": "string"
           },
           {
             "description": "Square inches <https://en.wikipedia.org/wiki/Square_inch>",
             "enum": [
-              "square_inches"
+              "in2"
             ],
             "type": "string"
           },
           {
             "description": "Square kilometres <https://en.wikipedia.org/wiki/Square_kilometre>",
             "enum": [
-              "square_kilometres"
+              "km2"
             ],
             "type": "string"
           },
           {
             "description": "Square metres <https://en.wikipedia.org/wiki/Square_metre>",
             "enum": [
-              "square_metres"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Square micrometres <https://en.wikipedia.org/wiki/Square_micrometre>",
-            "enum": [
-              "square_micrometres"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Square miles <https://en.wikipedia.org/wiki/Square_mile>",
-            "enum": [
-              "square_miles"
+              "m2"
             ],
             "type": "string"
           },
           {
             "description": "Square millimetres <https://en.wikipedia.org/wiki/Square_millimetre>",
             "enum": [
-              "square_millimetres"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Square nanometres <https://en.wikipedia.org/wiki/Square_nanometre>",
-            "enum": [
-              "square_nanometres"
+              "mm2"
             ],
             "type": "string"
           },
           {
             "description": "Square yards <https://en.wikipedia.org/wiki/Square_mile>",
             "enum": [
-              "square_yards"
+              "yd2"
             ],
             "type": "string"
           }
@@ -8820,6 +9196,25 @@
           "updated_at"
         ],
         "type": "object"
+      },
+      "UnitDensity": {
+        "description": "The valid types for density units.",
+        "oneOf": [
+          {
+            "description": "Pounds per cubic feet.",
+            "enum": [
+              "lb:ft3"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Kilograms per cubic meter.",
+            "enum": [
+              "kg:m3"
+            ],
+            "type": "string"
+          }
+        ]
       },
       "UnitEnergy": {
         "description": "The valid types of energy units.",
@@ -9268,91 +9663,42 @@
           {
             "description": "Centimetres <https://en.wikipedia.org/wiki/Centimetre>",
             "enum": [
-              "centimetres"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Decimetres <https://en.wikipedia.org/wiki/Decimetre>",
-            "enum": [
-              "decimetres"
+              "cm"
             ],
             "type": "string"
           },
           {
             "description": "Feet <https://en.wikipedia.org/wiki/Foot_(unit)>",
             "enum": [
-              "feet"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Furlongs <https://en.wikipedia.org/wiki/Furlong>",
-            "enum": [
-              "furlongs"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Hectometres <https://en.wikipedia.org/wiki/Hectometre>",
-            "enum": [
-              "hectometres"
+              "ft"
             ],
             "type": "string"
           },
           {
             "description": "Inches <https://en.wikipedia.org/wiki/Inch>",
             "enum": [
-              "inches"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Kilometres <https://en.wikipedia.org/wiki/Kilometre>",
-            "enum": [
-              "kilometres"
+              "in"
             ],
             "type": "string"
           },
           {
             "description": "Metres <https://en.wikipedia.org/wiki/Metre>",
             "enum": [
-              "metres"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Micrometres <https://en.wikipedia.org/wiki/Micrometre>",
-            "enum": [
-              "micrometres"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Miles <https://en.wikipedia.org/wiki/Mile>",
-            "enum": [
-              "miles"
+              "m"
             ],
             "type": "string"
           },
           {
             "description": "Millimetres <https://en.wikipedia.org/wiki/Millimetre>",
             "enum": [
-              "millimetres"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Nanometres <https://en.wikipedia.org/wiki/Nanometre>",
-            "enum": [
-              "nanometres"
+              "mm"
             ],
             "type": "string"
           },
           {
             "description": "Yards <https://en.wikipedia.org/wiki/Yard>",
             "enum": [
-              "yards"
+              "yd"
             ],
             "type": "string"
           }
@@ -9455,107 +9801,23 @@
         "description": "The valid types of mass units.",
         "oneOf": [
           {
-            "description": "Carats <https://en.wikipedia.org/wiki/Carat_(mass)>",
-            "enum": [
-              "carats"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Grains <https://en.wikipedia.org/wiki/Grain_(unit)>",
-            "enum": [
-              "grains"
-            ],
-            "type": "string"
-          },
-          {
             "description": "Grams <https://en.wikipedia.org/wiki/Gram>",
             "enum": [
-              "grams"
+              "g"
             ],
             "type": "string"
           },
           {
             "description": "Kilograms <https://en.wikipedia.org/wiki/Kilogram>",
             "enum": [
-              "kilograms"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Long tons <https://en.wikipedia.org/wiki/Long_ton>",
-            "enum": [
-              "long_tons"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Metric tons <https://en.wikipedia.org/wiki/Tonne>",
-            "enum": [
-              "metric_tons"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Micrograms <https://en.wikipedia.org/wiki/Microgram>",
-            "enum": [
-              "micrograms"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Milligrams <https://en.wikipedia.org/wiki/Milligram>",
-            "enum": [
-              "milligrams"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Ounces <https://en.wikipedia.org/wiki/Ounce>",
-            "enum": [
-              "ounces"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Pennyweights <https://en.wikipedia.org/wiki/Pennyweight>",
-            "enum": [
-              "pennyweights"
+              "kg"
             ],
             "type": "string"
           },
           {
             "description": "Pounds <https://en.wikipedia.org/wiki/Pound_(mass)>",
             "enum": [
-              "pounds"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Short tons <https://en.wikipedia.org/wiki/Short_ton>",
-            "enum": [
-              "short_tons"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Stones <https://en.wikipedia.org/wiki/Stone_(unit)>",
-            "enum": [
-              "stones"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Troy ounces <https://en.wikipedia.org/wiki/Troy_ounce>",
-            "enum": [
-              "troy_ounces"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Troy pounds <https://en.wikipedia.org/wiki/Troy_pound>",
-            "enum": [
-              "troy_pounds"
+              "lb"
             ],
             "type": "string"
           }
@@ -10190,135 +10452,65 @@
         "description": "The valid types of volume units.",
         "oneOf": [
           {
-            "description": "Cubic centimeters (cc or cm³) <https://en.wikipedia.org/wiki/Cubic_centimetre>",
+            "description": "Cubic centimetres (cc or cm³) <https://en.wikipedia.org/wiki/Cubic_centimetre>",
             "enum": [
-              "cubic_centimetres"
+              "cm3"
             ],
             "type": "string"
           },
           {
             "description": "Cubic feet (ft³) <https://en.wikipedia.org/wiki/Cubic_foot>",
             "enum": [
-              "cubic_feet"
+              "ft3"
             ],
             "type": "string"
           },
           {
             "description": "Cubic inches (cu in or in³) <https://en.wikipedia.org/wiki/Cubic_inch>",
             "enum": [
-              "cubic_inches"
+              "in3"
             ],
             "type": "string"
           },
           {
             "description": "Cubic metres (m³) <https://en.wikipedia.org/wiki/Cubic_metre>",
             "enum": [
-              "cubic_metres"
+              "m3"
             ],
             "type": "string"
           },
           {
             "description": "Cubic yards (yd³) <https://en.wikipedia.org/wiki/Cubic_yard>",
             "enum": [
-              "cubic_yards"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Cups <https://en.wikipedia.org/wiki/Cup_(unit)>",
-            "enum": [
-              "cups"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Drams <https://en.wikipedia.org/wiki/Fluid_dram>",
-            "enum": [
-              "drams"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Drops <https://en.wikipedia.org/wiki/Minim_(unit)>",
-            "enum": [
-              "drops"
+              "yd3"
             ],
             "type": "string"
           },
           {
             "description": "US Fluid Ounces (fl oz) <https://en.wikipedia.org/wiki/Fluid_ounce>",
             "enum": [
-              "fluid_ounces"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "UK Fluid Ounces (fl oz) <https://en.wikipedia.org/wiki/Fluid_ounce>",
-            "enum": [
-              "fluid_ounces_uk"
+              "usfloz"
             ],
             "type": "string"
           },
           {
             "description": "US Gallons (gal US) <https://en.wikipedia.org/wiki/Gallon>",
             "enum": [
-              "gallons"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "UK/Imperial Gallons (gal) <https://en.wikipedia.org/wiki/Gallon>",
-            "enum": [
-              "gallons_uk"
+              "usgal"
             ],
             "type": "string"
           },
           {
             "description": "Liters (l) <https://en.wikipedia.org/wiki/Litre>",
             "enum": [
-              "litres"
+              "l"
             ],
             "type": "string"
           },
           {
             "description": "Milliliters (ml) <https://en.wikipedia.org/wiki/Litre>",
             "enum": [
-              "millilitres"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Pints <https://en.wikipedia.org/wiki/Pint>",
-            "enum": [
-              "pints"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Pints in the United Kingdom (UK) <https://en.wikipedia.org/wiki/Pint>",
-            "enum": [
-              "pints_uk"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Quarts <https://en.wikipedia.org/wiki/Quart>",
-            "enum": [
-              "quarts"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Tablespoons (tbsp) <https://en.wikipedia.org/wiki/Tablespoon>",
-            "enum": [
-              "tablespoons"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Teaspoons (tsp) <https://en.wikipedia.org/wiki/Teaspoon>",
-            "enum": [
-              "teaspoons"
+              "ml"
             ],
             "type": "string"
           }
@@ -12121,6 +12313,14 @@
         "operationId": "create_file_center_of_mass",
         "parameters": [
           {
+            "description": "The output unit for the center of mass.",
+            "in": "query",
+            "name": "output_unit",
+            "schema": {
+              "$ref": "#/components/schemas/UnitLength"
+            }
+          },
+          {
             "description": "The format of the file.",
             "in": "query",
             "name": "src_format",
@@ -12431,8 +12631,24 @@
             "name": "material_mass",
             "required": true,
             "schema": {
-              "format": "float",
+              "format": "double",
               "type": "number"
+            }
+          },
+          {
+            "description": "The unit of the material mass.",
+            "in": "query",
+            "name": "material_mass_unit",
+            "schema": {
+              "$ref": "#/components/schemas/UnitMass"
+            }
+          },
+          {
+            "description": "The output unit for the density.",
+            "in": "query",
+            "name": "output_unit",
+            "schema": {
+              "$ref": "#/components/schemas/UnitDensity"
             }
           },
           {
@@ -12736,8 +12952,24 @@
             "name": "material_density",
             "required": true,
             "schema": {
-              "format": "float",
+              "format": "double",
               "type": "number"
+            }
+          },
+          {
+            "description": "The unit of the material density.",
+            "in": "query",
+            "name": "material_density_unit",
+            "schema": {
+              "$ref": "#/components/schemas/UnitDensity"
+            }
+          },
+          {
+            "description": "The output unit for the mass.",
+            "in": "query",
+            "name": "output_unit",
+            "schema": {
+              "$ref": "#/components/schemas/UnitMass"
             }
           },
           {
@@ -12879,6 +13111,14 @@
         "operationId": "create_file_surface_area",
         "parameters": [
           {
+            "description": "The output unit for the surface area.",
+            "in": "query",
+            "name": "output_unit",
+            "schema": {
+              "$ref": "#/components/schemas/UnitArea"
+            }
+          },
+          {
             "description": "The format of the file.",
             "in": "query",
             "name": "src_format",
@@ -13017,6 +13257,14 @@
         "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nCurrently, this endpoint returns the cubic measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_volume",
         "parameters": [
+          {
+            "description": "The output unit for the volume.",
+            "in": "query",
+            "name": "output_unit",
+            "schema": {
+              "$ref": "#/components/schemas/UnitVolume"
+            }
+          },
           {
             "description": "The format of the file.",
             "in": "query",
