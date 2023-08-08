@@ -154,7 +154,7 @@ impl Client {
         let client_http1 = reqwest::Client::builder()
             // For file conversions we need this to be long.
             .user_agent(APP_USER_AGENT)
-            .timeout(std::time::Duration::from_secs(60))
+            .timeout(std::time::Duration::from_secs(600))
             .connect_timeout(std::time::Duration::from_secs(60))
             .http1_only()
             .build();
