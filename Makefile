@@ -28,6 +28,7 @@ kittycad: target/debug/openapitor
 		-d "A fully generated & opinionated API client for the KittyCAD API." \
 		--spec-url "https://api.kittycad.io" \
 		--base-url "https://api.kittycad.io" \
+		--request-timeout-seconds 600 \
 		--repo-name "KittyCAD/kittycad.rs" $(EXTRA_ARGS)
 	mv -f $(CURDIR)/kittycad/kittycad.rs.patch.json $(CURDIR)
 

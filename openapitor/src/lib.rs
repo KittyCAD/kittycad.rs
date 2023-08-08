@@ -458,6 +458,10 @@ pub struct Opts {
     /// Use basic auth for authentication instead of bearer tokens
     #[arg(long)]
     pub basic_auth: bool,
+
+    /// Default timeout on the client
+    #[arg(long)]
+    pub request_timeout_seconds: u64,
 }
 
 impl Opts {
@@ -523,6 +527,7 @@ impl Default for Opts {
             user_consent_endpoint: Default::default(),
             date_time_format: Default::default(),
             basic_auth: Default::default(),
+            request_timeout_seconds: 60,
         }
     }
 }
