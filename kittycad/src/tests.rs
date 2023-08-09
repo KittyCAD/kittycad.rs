@@ -2,9 +2,7 @@ use futures::TryStreamExt;
 use pretty_assertions::assert_eq;
 use tokio_tungstenite::tungstenite::Message as WsMsg;
 
-use crate::types::{
-    ExtendPath, ModelingCmd, ModelingCmdExtendPath, ModelingCmdReq, PathSegment, Point3D,
-};
+use crate::types::{ModelingCmd, ModelingCmdReq, PathSegment, Point3D};
 
 fn test_client() -> crate::Client {
     crate::Client::new_from_env()
@@ -186,7 +184,7 @@ async fn test_modeling_websocket() {
 
     let client = test_client();
 
-    let ws = match client.modeling().commands_ws().await {
+    let ws = match client.modeling().commands_ws(None, None, None, None).await {
         Ok(ws) => ws,
         Err(crate::types::error::Error::UnexpectedResponse(resp)) => {
             let txt = resp.text().await.unwrap();
@@ -207,9 +205,7 @@ async fn test_modeling_websocket() {
     write
         .send(WsMsg::Text(
             serde_json::to_string(&ModelingCmdReq {
-                cmd: ModelingCmd::ModelingCmdStartPath(
-                    crate::types::ModelingCmdStartPath::StartPath,
-                ),
+                cmd: ModelingCmd::StartPath {},
                 cmd_id: path_id,
                 file_id: Default::default(),
             })
@@ -240,12 +236,10 @@ async fn test_modeling_websocket() {
         write
             .send(WsMsg::Text(
                 serde_json::to_string(&ModelingCmdReq {
-                    cmd: ModelingCmd::ModelingCmdExtendPath(ModelingCmdExtendPath {
-                        extend_path: ExtendPath {
-                            path: path_id,
-                            segment: PathSegment::Line { end: point },
-                        },
-                    }),
+                    cmd: ModelingCmd::ExtendPath {
+                        path: path_id,
+                        segment: PathSegment::Line { end: point },
+                    },
                     cmd_id: Uuid::new_v4(),
                     file_id: Default::default(),
                 })

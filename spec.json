@@ -211,6 +211,163 @@
         ],
         "type": "object"
       },
+      "AnnotationLineEnd": {
+        "description": "Annotation line end type",
+        "enum": [
+          "none",
+          "arrow"
+        ],
+        "type": "string"
+      },
+      "AnnotationLineEndOptions": {
+        "description": "Options for annotation text",
+        "properties": {
+          "end": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationLineEnd"
+              }
+            ],
+            "description": "How to style the end of the annotation line."
+          },
+          "start": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationLineEnd"
+              }
+            ],
+            "description": "How to style the start of the annotation line."
+          }
+        },
+        "required": [
+          "end",
+          "start"
+        ],
+        "type": "object"
+      },
+      "AnnotationOptions": {
+        "description": "Options for annotations",
+        "properties": {
+          "color": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Color"
+              }
+            ],
+            "description": "Color to render the annotation",
+            "nullable": true
+          },
+          "line_ends": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationLineEndOptions"
+              }
+            ],
+            "description": "How to style the start and end of the line",
+            "nullable": true
+          },
+          "line_width": {
+            "description": "Width of the annotation's line",
+            "format": "float",
+            "nullable": true,
+            "type": "number"
+          },
+          "position": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ],
+            "description": "Position to put the annotation",
+            "nullable": true
+          },
+          "text": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationTextOptions"
+              }
+            ],
+            "description": "Text displayed on the annotation",
+            "nullable": true
+          }
+        },
+        "type": "object"
+      },
+      "AnnotationTextAlignmentX": {
+        "description": "Horizontal Text aligment",
+        "enum": [
+          "left",
+          "center",
+          "right"
+        ],
+        "type": "string"
+      },
+      "AnnotationTextAlignmentY": {
+        "description": "Vertical Text aligment",
+        "enum": [
+          "bottom",
+          "center",
+          "top"
+        ],
+        "type": "string"
+      },
+      "AnnotationTextOptions": {
+        "description": "Options for annotation text",
+        "properties": {
+          "point_size": {
+            "description": "Text font's point size",
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "text": {
+            "description": "Text displayed on the annotation",
+            "type": "string"
+          },
+          "x": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationTextAlignmentX"
+              }
+            ],
+            "description": "Alignment along the X axis"
+          },
+          "y": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationTextAlignmentY"
+              }
+            ],
+            "description": "Alignment along the Y axis"
+          }
+        },
+        "required": [
+          "point_size",
+          "text",
+          "x",
+          "y"
+        ],
+        "type": "object"
+      },
+      "AnnotationType": {
+        "description": "The type of annotation",
+        "oneOf": [
+          {
+            "description": "2D annotation type (screen or planar space)",
+            "enum": [
+              "t2d"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "3D annotation type",
+            "enum": [
+              "t3d"
+            ],
+            "type": "string"
+          }
+        ]
+      },
       "ApiCallQueryGroup": {
         "description": "A response for a query on the API call table that is grouped by something.",
         "properties": {
@@ -772,16 +929,8 @@
                     "$ref": "#/components/schemas/Point3d"
                   }
                 ],
-                "deprecated": true,
-                "description": "The resulting center of mass. This is deprecated and will be removed in a future release. Use `centers_of_mass` instead.",
+                "description": "The resulting center of mass.",
                 "nullable": true
-              },
-              "centers_of_mass": {
-                "additionalProperties": {
-                  "$ref": "#/components/schemas/Point3d"
-                },
-                "description": "The center of mass for each mesh in the file. The key of the hash map is the mesh name.",
-                "type": "object"
               },
               "completed_at": {
                 "description": "The time and date the API call was completed.",
@@ -898,19 +1047,10 @@
                 "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
               },
               "mass": {
-                "deprecated": true,
-                "description": "The resulting mass. This is deprecated and will be removed in a future release, use `masses` instead.",
+                "description": "The resulting mass.",
                 "format": "double",
                 "nullable": true,
                 "type": "number"
-              },
-              "masses": {
-                "additionalProperties": {
-                  "format": "double",
-                  "type": "number"
-                },
-                "description": "The mass for each mesh in the file. The key of the hash map is the mesh name.",
-                "type": "object"
               },
               "material_density": {
                 "default": 0.0,
@@ -1063,19 +1203,10 @@
                 "type": "string"
               },
               "volume": {
-                "deprecated": true,
-                "description": "The resulting volume. This is deprecated and will be removed in a future release. Use `volumes` instead.",
+                "description": "The resulting volume.",
                 "format": "double",
                 "nullable": true,
                 "type": "number"
-              },
-              "volumes": {
-                "additionalProperties": {
-                  "format": "double",
-                  "type": "number"
-                },
-                "description": "The volumes for each mesh in the file. The key of the hash map is the mesh name.",
-                "type": "object"
               }
             },
             "required": [
@@ -1105,17 +1236,8 @@
                 "title": "DateTime",
                 "type": "string"
               },
-              "densities": {
-                "additionalProperties": {
-                  "format": "double",
-                  "type": "number"
-                },
-                "description": "The density for each mesh in the file. The key of the hash map is the mesh name.",
-                "type": "object"
-              },
               "density": {
-                "deprecated": true,
-                "description": "The resulting density. This is deprecated and will be removed in a future release, use `densities` instead.",
+                "description": "The resulting density.",
                 "format": "double",
                 "nullable": true,
                 "type": "number"
@@ -1268,19 +1390,10 @@
                 "description": "The status of the API call."
               },
               "surface_area": {
-                "deprecated": true,
-                "description": "The resulting surface area. This is deprecated and will be removed in a future release. Use `surface_areas` instead.",
+                "description": "The resulting surface area.",
                 "format": "double",
                 "nullable": true,
                 "type": "number"
-              },
-              "surface_areas": {
-                "additionalProperties": {
-                  "format": "double",
-                  "type": "number"
-                },
-                "description": "The surface area for each mesh in the file. The key of the hash map is the mesh name.",
-                "type": "object"
               },
               "type": {
                 "enum": [
@@ -1625,6 +1738,38 @@
             "type": "string"
           }
         },
+        "type": "object"
+      },
+      "Color": {
+        "description": "An RGBA color",
+        "properties": {
+          "a": {
+            "description": "Alpha",
+            "format": "float",
+            "type": "number"
+          },
+          "b": {
+            "description": "Blue",
+            "format": "float",
+            "type": "number"
+          },
+          "g": {
+            "description": "Green",
+            "format": "float",
+            "type": "number"
+          },
+          "r": {
+            "description": "Red",
+            "format": "float",
+            "type": "number"
+          }
+        },
+        "required": [
+          "a",
+          "b",
+          "g",
+          "r"
+        ],
         "type": "object"
       },
       "Commit": {
@@ -5478,6 +5623,26 @@
         ],
         "type": "object"
       },
+      "ExportFile": {
+        "description": "A file to be exported to the client.",
+        "properties": {
+          "contents": {
+            "description": "The contents of the file, base64 encoded.",
+            "format": "byte",
+            "title": "String",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the file.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "contents",
+          "name"
+        ],
+        "type": "object"
+      },
       "ExtendedUser": {
         "description": "Extended user information.\n\nThis is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Front",
         "properties": {
@@ -5590,34 +5755,6 @@
         ],
         "type": "object"
       },
-      "Extrude": {
-        "description": "Command for extruding a solid.",
-        "properties": {
-          "cap": {
-            "description": "Whether to cap the extrusion with a face, or not. If true, the resulting solid will be closed on all sides, like a dice. If false, it will be open on one side, like a drinking glass.",
-            "type": "boolean"
-          },
-          "distance": {
-            "description": "How far off the plane to extrude",
-            "format": "double",
-            "type": "number"
-          },
-          "target": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ModelingCmdId"
-              }
-            ],
-            "description": "Which sketch to extrude. Must be a closed 2D solid."
-          }
-        },
-        "required": [
-          "cap",
-          "distance",
-          "target"
-        ],
-        "type": "object"
-      },
       "FileCenterOfMass": {
         "description": "A file center of mass result.",
         "properties": {
@@ -5627,16 +5764,8 @@
                 "$ref": "#/components/schemas/Point3d"
               }
             ],
-            "deprecated": true,
-            "description": "The resulting center of mass. This is deprecated and will be removed in a future release. Use `centers_of_mass` instead.",
+            "description": "The resulting center of mass.",
             "nullable": true
-          },
-          "centers_of_mass": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/Point3d"
-            },
-            "description": "The center of mass for each mesh in the file. The key of the hash map is the mesh name.",
-            "type": "object"
           },
           "completed_at": {
             "description": "The time and date the API call was completed.",
@@ -5848,17 +5977,8 @@
             "title": "DateTime",
             "type": "string"
           },
-          "densities": {
-            "additionalProperties": {
-              "format": "double",
-              "type": "number"
-            },
-            "description": "The density for each mesh in the file. The key of the hash map is the mesh name.",
-            "type": "object"
-          },
           "density": {
-            "deprecated": true,
-            "description": "The resulting density. This is deprecated and will be removed in a future release, use `densities` instead.",
+            "description": "The resulting density.",
             "format": "double",
             "nullable": true,
             "type": "number"
@@ -6088,19 +6208,10 @@
             "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
           },
           "mass": {
-            "deprecated": true,
-            "description": "The resulting mass. This is deprecated and will be removed in a future release, use `masses` instead.",
+            "description": "The resulting mass.",
             "format": "double",
             "nullable": true,
             "type": "number"
-          },
-          "masses": {
-            "additionalProperties": {
-              "format": "double",
-              "type": "number"
-            },
-            "description": "The mass for each mesh in the file. The key of the hash map is the mesh name.",
-            "type": "object"
           },
           "material_density": {
             "default": 0.0,
@@ -6230,19 +6341,10 @@
             "description": "The status of the API call."
           },
           "surface_area": {
-            "deprecated": true,
-            "description": "The resulting surface area. This is deprecated and will be removed in a future release. Use `surface_areas` instead.",
+            "description": "The resulting surface area.",
             "format": "double",
             "nullable": true,
             "type": "number"
-          },
-          "surface_areas": {
-            "additionalProperties": {
-              "format": "double",
-              "type": "number"
-            },
-            "description": "The surface area for each mesh in the file. The key of the hash map is the mesh name.",
-            "type": "object"
           },
           "updated_at": {
             "description": "The time and date the API call was last updated.",
@@ -6349,19 +6451,10 @@
             "type": "string"
           },
           "volume": {
-            "deprecated": true,
-            "description": "The resulting volume. This is deprecated and will be removed in a future release. Use `volumes` instead.",
+            "description": "The resulting volume.",
             "format": "double",
             "nullable": true,
             "type": "number"
-          },
-          "volumes": {
-            "additionalProperties": {
-              "format": "double",
-              "type": "number"
-            },
-            "description": "The volumes for each mesh in the file. The key of the hash map is the mesh name.",
-            "type": "object"
           }
         },
         "required": [
@@ -6452,7 +6545,7 @@
             "properties": {
               "type": {
                 "enum": [
-                  "Gltf"
+                  "gltf"
                 ],
                 "type": "string"
               }
@@ -6465,23 +6558,14 @@
           {
             "description": "ISO 10303-21 (STEP) format.",
             "properties": {
-              "coords": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/System"
-                  }
-                ],
-                "description": "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"
-              },
               "type": {
                 "enum": [
-                  "Step"
+                  "step"
                 ],
                 "type": "string"
               }
             },
             "required": [
-              "coords",
               "type"
             ],
             "type": "object"
@@ -6499,7 +6583,7 @@
               },
               "type": {
                 "enum": [
-                  "Obj"
+                  "obj"
                 ],
                 "type": "string"
               },
@@ -6532,7 +6616,7 @@
               },
               "type": {
                 "enum": [
-                  "Ply"
+                  "ply"
                 ],
                 "type": "string"
               },
@@ -6565,7 +6649,7 @@
               },
               "type": {
                 "enum": [
-                  "Stl"
+                  "stl"
                 ],
                 "type": "string"
               },
@@ -7213,358 +7297,798 @@
         "oneOf": [
           {
             "description": "Start a path.",
-            "enum": [
-              "StartPath"
+            "properties": {
+              "type": {
+                "enum": [
+                  "start_path"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
             ],
-            "type": "string"
+            "type": "object"
           },
           {
-            "additionalProperties": false,
             "description": "Move the path's \"pen\".",
             "properties": {
-              "MovePathPen": {
-                "properties": {
-                  "path": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/ModelingCmdId"
-                      }
-                    ],
-                    "description": "The ID of the command which created the path."
-                  },
-                  "to": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Point3d"
-                      }
-                    ],
-                    "description": "Where the path's pen should be."
+              "path": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ModelingCmdId"
                   }
-                },
-                "required": [
-                  "path",
-                  "to"
                 ],
-                "type": "object"
+                "description": "The ID of the command which created the path."
+              },
+              "to": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ],
+                "description": "Where the path's pen should be."
+              },
+              "type": {
+                "enum": [
+                  "move_path_pen"
+                ],
+                "type": "string"
               }
             },
             "required": [
-              "MovePathPen"
+              "path",
+              "to",
+              "type"
             ],
             "type": "object"
           },
           {
-            "additionalProperties": false,
             "description": "Extend a path by adding a new segment which starts at the path's \"pen\". If no \"pen\" location has been set before (via `MovePen`), then the pen is at the origin.",
             "properties": {
-              "ExtendPath": {
-                "properties": {
-                  "path": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/ModelingCmdId"
-                      }
-                    ],
-                    "description": "The ID of the command which created the path."
-                  },
-                  "segment": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/PathSegment"
-                      }
-                    ],
-                    "description": "Segment to append to the path. This segment will implicitly begin at the current \"pen\" location."
+              "path": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ModelingCmdId"
                   }
-                },
-                "required": [
-                  "path",
-                  "segment"
                 ],
-                "type": "object"
+                "description": "The ID of the command which created the path."
+              },
+              "segment": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PathSegment"
+                  }
+                ],
+                "description": "Segment to append to the path. This segment will implicitly begin at the current \"pen\" location."
+              },
+              "type": {
+                "enum": [
+                  "extend_path"
+                ],
+                "type": "string"
               }
             },
             "required": [
-              "ExtendPath"
+              "path",
+              "segment",
+              "type"
             ],
             "type": "object"
           },
           {
-            "additionalProperties": false,
             "description": "Extrude a 2D solid.",
             "properties": {
-              "Extrude": {
-                "$ref": "#/components/schemas/Extrude"
+              "cap": {
+                "description": "Whether to cap the extrusion with a face, or not. If true, the resulting solid will be closed on all sides, like a dice. If false, it will be open on one side, like a drinking glass.",
+                "type": "boolean"
+              },
+              "distance": {
+                "description": "How far off the plane to extrude",
+                "format": "double",
+                "type": "number"
+              },
+              "target": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ModelingCmdId"
+                  }
+                ],
+                "description": "Which sketch to extrude. Must be a closed 2D solid."
+              },
+              "type": {
+                "enum": [
+                  "extrude"
+                ],
+                "type": "string"
               }
             },
             "required": [
-              "Extrude"
+              "cap",
+              "distance",
+              "target",
+              "type"
             ],
             "type": "object"
           },
           {
-            "additionalProperties": false,
             "description": "Closes a path, converting it to a 2D solid.",
             "properties": {
-              "ClosePath": {
-                "properties": {
-                  "path_id": {
-                    "description": "Which path to close.",
-                    "format": "uuid",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "path_id"
+              "path_id": {
+                "description": "Which path to close.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "close_path"
                 ],
-                "type": "object"
+                "type": "string"
               }
             },
             "required": [
-              "ClosePath"
+              "path_id",
+              "type"
             ],
             "type": "object"
           },
           {
-            "additionalProperties": false,
             "description": "Camera drag started.",
             "properties": {
-              "CameraDragStart": {
-                "properties": {
-                  "interaction": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/CameraDragInteractionType"
-                      }
-                    ],
-                    "description": "The type of camera drag interaction."
-                  },
-                  "window": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Point2d"
-                      }
-                    ],
-                    "description": "The initial mouse position."
+              "interaction": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CameraDragInteractionType"
                   }
-                },
-                "required": [
-                  "interaction",
-                  "window"
                 ],
-                "type": "object"
+                "description": "The type of camera drag interaction."
+              },
+              "type": {
+                "enum": [
+                  "camera_drag_start"
+                ],
+                "type": "string"
+              },
+              "window": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ],
+                "description": "The initial mouse position."
               }
             },
             "required": [
-              "CameraDragStart"
+              "interaction",
+              "type",
+              "window"
             ],
             "type": "object"
           },
           {
-            "additionalProperties": false,
             "description": "Camera drag continued.",
             "properties": {
-              "CameraDragMove": {
-                "properties": {
-                  "interaction": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/CameraDragInteractionType"
-                      }
-                    ],
-                    "description": "The type of camera drag interaction."
-                  },
-                  "sequence": {
-                    "description": "Logical timestamp. The client should increment this with every event in the current mouse drag. That way, if the events are being sent over an unordered channel, the API can ignore the older events.",
-                    "format": "uint32",
-                    "minimum": 0,
-                    "nullable": true,
-                    "type": "integer"
-                  },
-                  "window": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Point2d"
-                      }
-                    ],
-                    "description": "The current mouse position."
+              "interaction": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CameraDragInteractionType"
                   }
-                },
-                "required": [
-                  "interaction",
-                  "window"
                 ],
-                "type": "object"
+                "description": "The type of camera drag interaction."
+              },
+              "sequence": {
+                "description": "Logical timestamp. The client should increment this with every event in the current mouse drag. That way, if the events are being sent over an unordered channel, the API can ignore the older events.",
+                "format": "uint32",
+                "minimum": 0,
+                "nullable": true,
+                "type": "integer"
+              },
+              "type": {
+                "enum": [
+                  "camera_drag_move"
+                ],
+                "type": "string"
+              },
+              "window": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ],
+                "description": "The current mouse position."
               }
             },
             "required": [
-              "CameraDragMove"
+              "interaction",
+              "type",
+              "window"
             ],
             "type": "object"
           },
           {
-            "additionalProperties": false,
             "description": "Camera drag ended.",
             "properties": {
-              "CameraDragEnd": {
-                "properties": {
-                  "interaction": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/CameraDragInteractionType"
-                      }
-                    ],
-                    "description": "The type of camera drag interaction."
-                  },
-                  "window": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Point2d"
-                      }
-                    ],
-                    "description": "The final mouse position."
+              "interaction": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CameraDragInteractionType"
                   }
-                },
-                "required": [
-                  "interaction",
-                  "window"
                 ],
-                "type": "object"
+                "description": "The type of camera drag interaction."
+              },
+              "type": {
+                "enum": [
+                  "camera_drag_end"
+                ],
+                "type": "string"
+              },
+              "window": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ],
+                "description": "The final mouse position."
               }
             },
             "required": [
-              "CameraDragEnd"
+              "interaction",
+              "type",
+              "window"
             ],
             "type": "object"
           },
           {
-            "additionalProperties": false,
             "description": "Change what the default camera is looking at.",
             "properties": {
-              "DefaultCameraLookAt": {
-                "properties": {
-                  "center": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Point3d"
-                      }
-                    ],
-                    "description": "What the camera is looking at. Center of the camera's field of vision"
-                  },
-                  "up": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Point3d"
-                      }
-                    ],
-                    "description": "Which way is \"up\", from the camera's point of view."
-                  },
-                  "vantage": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Point3d"
-                      }
-                    ],
-                    "description": "Where the camera is positioned"
+              "center": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
                   }
-                },
-                "required": [
-                  "center",
-                  "up",
-                  "vantage"
                 ],
-                "type": "object"
+                "description": "What the camera is looking at. Center of the camera's field of vision"
+              },
+              "type": {
+                "enum": [
+                  "default_camera_look_at"
+                ],
+                "type": "string"
+              },
+              "up": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ],
+                "description": "Which way is \"up\", from the camera's point of view."
+              },
+              "vantage": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ],
+                "description": "Where the camera is positioned"
               }
             },
             "required": [
-              "DefaultCameraLookAt"
+              "center",
+              "type",
+              "up",
+              "vantage"
             ],
             "type": "object"
           },
           {
-            "additionalProperties": false,
             "description": "Enable sketch mode, where users can sketch 2D geometry. Users choose a plane to sketch on.",
             "properties": {
-              "DefaultCameraEnableSketchMode": {
-                "properties": {
-                  "distance_to_plane": {
-                    "description": "How far to the sketching plane?",
-                    "format": "float",
-                    "type": "number"
-                  },
-                  "origin": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Point3d"
-                      }
-                    ],
-                    "description": "What's the origin of the sketching plane?"
-                  },
-                  "ortho": {
-                    "description": "Should the camera use orthographic projection? In other words, should an object's size in the rendered image stay constant regardless of its distance from the camera.",
-                    "type": "boolean"
-                  },
-                  "x_axis": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Point3d"
-                      }
-                    ],
-                    "description": "Which 3D axis of the scene should be the X axis of the sketching plane?"
-                  },
-                  "y_axis": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Point3d"
-                      }
-                    ],
-                    "description": "Which 3D axis of the scene should be the Y axis of the sketching plane?"
+              "distance_to_plane": {
+                "description": "How far to the sketching plane?",
+                "format": "float",
+                "type": "number"
+              },
+              "origin": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
                   }
-                },
-                "required": [
-                  "distance_to_plane",
-                  "origin",
-                  "ortho",
-                  "x_axis",
-                  "y_axis"
                 ],
-                "type": "object"
+                "description": "What's the origin of the sketching plane?"
+              },
+              "ortho": {
+                "description": "Should the camera use orthographic projection? In other words, should an object's size in the rendered image stay constant regardless of its distance from the camera.",
+                "type": "boolean"
+              },
+              "type": {
+                "enum": [
+                  "default_camera_enable_sketch_mode"
+                ],
+                "type": "string"
+              },
+              "x_axis": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ],
+                "description": "Which 3D axis of the scene should be the X axis of the sketching plane?"
+              },
+              "y_axis": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ],
+                "description": "Which 3D axis of the scene should be the Y axis of the sketching plane?"
               }
             },
             "required": [
-              "DefaultCameraEnableSketchMode"
+              "distance_to_plane",
+              "origin",
+              "ortho",
+              "type",
+              "x_axis",
+              "y_axis"
             ],
             "type": "object"
           },
           {
             "description": "Disable sketch mode, from the default camera.",
-            "enum": [
-              "DefaultCameraDisableSketchMode"
-            ],
-            "type": "string"
-          },
-          {
-            "additionalProperties": false,
-            "description": "Export the scene to a file.",
             "properties": {
-              "Export": {
-                "properties": {
-                  "format": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/OutputFormat"
-                      }
-                    ],
-                    "description": "The file format to export to."
-                  }
-                },
-                "required": [
-                  "format"
+              "type": {
+                "enum": [
+                  "default_camera_disable_sketch_mode"
                 ],
-                "type": "object"
+                "type": "string"
               }
             },
             "required": [
-              "Export"
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Export the scene to a file.",
+            "properties": {
+              "entity_ids": {
+                "description": "IDs of the entities to be exported. If this is empty, then all entities are exported.",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "format": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/OutputFormat"
+                  }
+                ],
+                "description": "The file format to export to."
+              },
+              "type": {
+                "enum": [
+                  "export"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_ids",
+              "format",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "What is this entity's parent?",
+            "properties": {
+              "entity_id": {
+                "description": "ID of the entity being queried.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "entity_get_parent_id"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "How many children does the entity have?",
+            "properties": {
+              "entity_id": {
+                "description": "ID of the entity being queried.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "entity_get_num_children"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "What is the UUID of this entity's n-th child?",
+            "properties": {
+              "child_index": {
+                "description": "Index into the entity's list of children.",
+                "format": "uint32",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "entity_id": {
+                "description": "ID of the entity being queried.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "entity_get_child_uuid"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "child_index",
+              "entity_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "What are all UUIDs of this entity's children?",
+            "properties": {
+              "entity_id": {
+                "description": "ID of the entity being queried.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "entity_get_all_child_uuids"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Enter edit mode",
+            "properties": {
+              "target": {
+                "description": "The edit target",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "edit_mode_enter"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "target",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Exit edit mode",
+            "properties": {
+              "type": {
+                "enum": [
+                  "edit_mode_exit"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Modifies the selection by simulating a \"mouse click\" at the given x,y window coordinate Returns ID of whatever was selected.",
+            "properties": {
+              "selected_at_window": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ],
+                "description": "Where in the window was selected"
+              },
+              "selection_type": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SceneSelectionType"
+                  }
+                ],
+                "description": "What entity was selected?"
+              },
+              "type": {
+                "enum": [
+                  "select_with_point"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "selected_at_window",
+              "selection_type",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Clear the selection",
+            "properties": {
+              "type": {
+                "enum": [
+                  "select_clear"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Adds one or more entities (by UUID) to the selection.",
+            "properties": {
+              "entities": {
+                "description": "Which entities to select",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": {
+                "enum": [
+                  "select_add"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entities",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Removes one or more entities (by UUID) from the selection.",
+            "properties": {
+              "entities": {
+                "description": "Which entities to unselect",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": {
+                "enum": [
+                  "select_remove"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entities",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Replaces the current selection with these new entities (by UUID). Equivalent to doing SelectClear then SelectAdd.",
+            "properties": {
+              "entities": {
+                "description": "Which entities to select",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": {
+                "enum": [
+                  "select_replace"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entities",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Find all IDs of selected entities",
+            "properties": {
+              "type": {
+                "enum": [
+                  "select_get"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Changes the current highlighted entity to whichever one is at the given window coordinate. If there's no entity at this location, clears the highlight.",
+            "properties": {
+              "selected_at_window": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ],
+                "description": "Coordinates of the window being clicked"
+              },
+              "sequence": {
+                "description": "Logical timestamp. The client should increment this with every event in the current mouse drag. That way, if the events are being sent over an unordered channel, the API can ignore the older events.",
+                "format": "uint32",
+                "minimum": 0,
+                "nullable": true,
+                "type": "integer"
+              },
+              "type": {
+                "enum": [
+                  "highlight_set_entity"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "selected_at_window",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Changes the current highlighted entity to these entities.",
+            "properties": {
+              "entities": {
+                "description": "Highlight these entities.",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": {
+                "enum": [
+                  "highlight_set_entities"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entities",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Create a new annotation",
+            "properties": {
+              "annotation_type": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AnnotationType"
+                  }
+                ],
+                "description": "What type of annotation to create."
+              },
+              "clobber": {
+                "description": "If true, any existing drawables within the obj will be replaced (the object will be reset)",
+                "type": "boolean"
+              },
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AnnotationOptions"
+                  }
+                ],
+                "description": "What should the annotation contain?"
+              },
+              "type": {
+                "enum": [
+                  "new_annotation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "annotation_type",
+              "clobber",
+              "options",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Update an annotation",
+            "properties": {
+              "annotation_id": {
+                "description": "Which annotation to update",
+                "format": "uuid",
+                "type": "string"
+              },
+              "options": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AnnotationOptions"
+                  }
+                ],
+                "description": "If any of these fields are set, they will overwrite the previous options for the annotation."
+              },
+              "type": {
+                "enum": [
+                  "update_annotation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "annotation_id",
+              "options",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Hide or show an object",
+            "properties": {
+              "hidden": {
+                "description": "Whether or not the object should be hidden.",
+                "type": "boolean"
+              },
+              "object_id": {
+                "description": "Which object to change",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "object_visible"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "hidden",
+              "object_id",
+              "type"
             ],
             "type": "object"
           }
@@ -7662,12 +8186,14 @@
         "oneOf": [
           {
             "additionalProperties": false,
-            "description": "Each successful command has some result. Unfortunately this isn't strongly typed, because the result depends on the command. This means the OpenAPI schema for this won't be very useful.",
+            "description": "Each successful command has some result.",
             "properties": {
-              "Success": {}
+              "success": {
+                "$ref": "#/components/schemas/OkModelingCmdResponse"
+              }
             },
             "required": [
-              "Success"
+              "success"
             ],
             "type": "object"
           },
@@ -7675,12 +8201,12 @@
             "additionalProperties": false,
             "description": "It failed. Why? See 'struct Error' above.",
             "properties": {
-              "Error": {
+              "error": {
                 "$ref": "#/components/schemas/ModelingError"
               }
             },
             "required": [
-              "Error"
+              "error"
             ],
             "type": "object"
           },
@@ -7688,7 +8214,7 @@
             "additionalProperties": false,
             "description": "Cancelled because it required the output of a previous command, which failed.",
             "properties": {
-              "Cancelled": {
+              "cancelled": {
                 "properties": {
                   "what_failed": {
                     "allOf": [
@@ -7706,7 +8232,7 @@
               }
             },
             "required": [
-              "Cancelled"
+              "cancelled"
             ],
             "type": "object"
           }
@@ -7800,6 +8326,210 @@
           }
         ]
       },
+      "OkModelingCmdResponse": {
+        "description": "A successful response from a modeling command. This can be one of several types of responses, depending on the command.",
+        "oneOf": [
+          {
+            "description": "An empty response, used for any command that does not explicitly have a response defined here.",
+            "properties": {
+              "type": {
+                "enum": [
+                  "empty"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `Export` command. When this is being performed over a websocket, this is sent as binary not JSON. The binary data can be deserialized as `bincode` into a `Vec<ExportFile>`.",
+            "properties": {
+              "files": {
+                "description": "The files that were exported.",
+                "items": {
+                  "$ref": "#/components/schemas/ExportFile"
+                },
+                "type": "array"
+              },
+              "type": {
+                "enum": [
+                  "export"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "files",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `SelectWithPoint` command.",
+            "properties": {
+              "entity_id": {
+                "description": "The UUID of the entity that was selected.",
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "select_with_point"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `HighlightSetEntity` command.",
+            "properties": {
+              "entity_id": {
+                "description": "The UUID of the entity that was highlighted.",
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "sequence": {
+                "description": "If the client sent a sequence ID with its request, the backend sends it back.",
+                "format": "uint32",
+                "minimum": 0,
+                "nullable": true,
+                "type": "integer"
+              },
+              "type": {
+                "enum": [
+                  "highlight_set_entity"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `EntityGetChildUuid` command.",
+            "properties": {
+              "entity_id": {
+                "description": "The UUID of the child entity.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "entity_get_child_uuid"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `EntityGetNumChildren` command.",
+            "properties": {
+              "num": {
+                "description": "The number of children the entity has.",
+                "format": "uint32",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "type": {
+                "enum": [
+                  "entity_get_num_children"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "num",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `EntityGetParentId` command.",
+            "properties": {
+              "entity_id": {
+                "description": "The UUID of the parent entity.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "entity_get_parent_id"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `EntityGetAllChildUuids` command.",
+            "properties": {
+              "entity_ids": {
+                "description": "The UUIDs of the child entities.",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": {
+                "enum": [
+                  "entity_get_all_child_uuids"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_ids",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `SelectGet` command.",
+            "properties": {
+              "entity_ids": {
+                "description": "The UUIDs of the selected entities.",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": {
+                "enum": [
+                  "select_get"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_ids",
+              "type"
+            ],
+            "type": "object"
+          }
+        ]
+      },
       "Onboarding": {
         "description": "Onboarding details",
         "properties": {
@@ -7850,7 +8580,7 @@
               },
               "type": {
                 "enum": [
-                  "Gltf"
+                  "gltf"
                 ],
                 "type": "string"
               }
@@ -7874,7 +8604,7 @@
               },
               "type": {
                 "enum": [
-                  "Obj"
+                  "obj"
                 ],
                 "type": "string"
               }
@@ -7906,7 +8636,7 @@
               },
               "type": {
                 "enum": [
-                  "Ply"
+                  "ply"
                 ],
                 "type": "string"
               }
@@ -7931,7 +8661,7 @@
               },
               "type": {
                 "enum": [
-                  "Step"
+                  "step"
                 ],
                 "type": "string"
               }
@@ -7963,7 +8693,7 @@
               },
               "type": {
                 "enum": [
-                  "Stl"
+                  "stl"
                 ],
                 "type": "string"
               }
@@ -7981,116 +8711,110 @@
         "description": "A segment of a path. Paths are composed of many segments.",
         "oneOf": [
           {
-            "additionalProperties": false,
             "description": "A straight line segment. Goes from the current path \"pen\" to the given endpoint.",
             "properties": {
-              "Line": {
-                "properties": {
-                  "end": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Point3d"
-                      }
-                    ],
-                    "description": "End point of the line."
+              "end": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
                   }
-                },
-                "required": [
-                  "end"
                 ],
-                "type": "object"
+                "description": "End point of the line."
+              },
+              "type": {
+                "enum": [
+                  "line"
+                ],
+                "type": "string"
               }
             },
             "required": [
-              "Line"
+              "end",
+              "type"
             ],
             "type": "object"
           },
           {
-            "additionalProperties": false,
             "description": "A circular arc segment.",
             "properties": {
-              "Arc": {
-                "properties": {
-                  "angle_end": {
-                    "description": "Start of the arc along circle's perimeter.",
-                    "format": "float",
-                    "type": "number"
-                  },
-                  "angle_start": {
-                    "description": "Start of the arc along circle's perimeter.",
-                    "format": "float",
-                    "type": "number"
-                  },
-                  "center": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Point2d"
-                      }
-                    ],
-                    "description": "Center of the circle"
-                  },
-                  "radius": {
-                    "description": "Radius of the circle",
-                    "format": "float",
-                    "type": "number"
+              "angle_end": {
+                "description": "Start of the arc along circle's perimeter.",
+                "format": "float",
+                "type": "number"
+              },
+              "angle_start": {
+                "description": "Start of the arc along circle's perimeter.",
+                "format": "float",
+                "type": "number"
+              },
+              "center": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
                   }
-                },
-                "required": [
-                  "angle_end",
-                  "angle_start",
-                  "center",
-                  "radius"
                 ],
-                "type": "object"
+                "description": "Center of the circle"
+              },
+              "radius": {
+                "description": "Radius of the circle",
+                "format": "float",
+                "type": "number"
+              },
+              "type": {
+                "enum": [
+                  "arc"
+                ],
+                "type": "string"
               }
             },
             "required": [
-              "Arc"
+              "angle_end",
+              "angle_start",
+              "center",
+              "radius",
+              "type"
             ],
             "type": "object"
           },
           {
-            "additionalProperties": false,
             "description": "A cubic bezier curve segment. Start at the end of the current line, go through control point 1 and 2, then end at a given point.",
             "properties": {
-              "Bezier": {
-                "properties": {
-                  "control1": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Point3d"
-                      }
-                    ],
-                    "description": "First control point."
-                  },
-                  "control2": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Point3d"
-                      }
-                    ],
-                    "description": "Second control point."
-                  },
-                  "end": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Point3d"
-                      }
-                    ],
-                    "description": "Final control point."
+              "control1": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
                   }
-                },
-                "required": [
-                  "control1",
-                  "control2",
-                  "end"
                 ],
-                "type": "object"
+                "description": "First control point."
+              },
+              "control2": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ],
+                "description": "Second control point."
+              },
+              "end": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ],
+                "description": "Final control point."
+              },
+              "type": {
+                "enum": [
+                  "bezier"
+                ],
+                "type": "string"
               }
             },
             "required": [
-              "Bezier"
+              "control1",
+              "control2",
+              "end",
+              "type"
             ],
             "type": "object"
           }
@@ -8664,6 +9388,32 @@
           }
         },
         "type": "object"
+      },
+      "SceneSelectionType": {
+        "description": "The type of scene selection change",
+        "oneOf": [
+          {
+            "description": "Replaces the selection",
+            "enum": [
+              "replace"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Adds to the selection",
+            "enum": [
+              "add"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Removes from the selection",
+            "enum": [
+              "remove"
+            ],
+            "type": "string"
+          }
+        ]
       },
       "Session": {
         "description": "An authentication session.\n\nFor our UIs, these are automatically created by Next.js.",
@@ -17907,6 +18657,46 @@
       "get": {
         "description": "Pass those commands to the engine via websocket, and pass responses back to the client. Basically, this is a websocket proxy between the frontend/client and the engine.",
         "operationId": "modeling_commands_ws",
+        "parameters": [
+          {
+            "description": "Frames per second of the video feed.",
+            "in": "query",
+            "name": "fps",
+            "schema": {
+              "format": "uint32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "If true, engine will render video frames as fast as it can.",
+            "in": "query",
+            "name": "unlocked_framerate",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Height of the video feed. Must be a multiple of 4.",
+            "in": "query",
+            "name": "video_res_height",
+            "schema": {
+              "format": "uint32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Width of the video feed. Must be a multiple of 4.",
+            "in": "query",
+            "name": "video_res_width",
+            "schema": {
+              "format": "uint32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "default": {
             "content": {
