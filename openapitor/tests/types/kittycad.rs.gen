@@ -709,6 +709,260 @@ impl tabled::Tabled for AiPluginManifest {
     }
 }
 
+#[doc = "Annotation line end type"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum AnnotationLineEnd {
+    #[serde(rename = "none")]
+    #[display("none")]
+    None,
+    #[serde(rename = "arrow")]
+    #[display("arrow")]
+    Arrow,
+}
+
+#[doc = "Options for annotation text"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AnnotationLineEndOptions {
+    #[doc = "How to style the end of the annotation line."]
+    pub end: AnnotationLineEnd,
+    #[doc = "How to style the start of the annotation line."]
+    pub start: AnnotationLineEnd,
+}
+
+impl std::fmt::Display for AnnotationLineEndOptions {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AnnotationLineEndOptions {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.end).into(),
+            format!("{:?}", self.start).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["end".into(), "start".into()]
+    }
+}
+
+#[doc = "Options for annotations"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AnnotationOptions {
+    #[doc = "Color to render the annotation"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub color: Option<Color>,
+    #[doc = "How to style the start and end of the line"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub line_ends: Option<AnnotationLineEndOptions>,
+    #[doc = "Width of the annotation's line"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub line_width: Option<f64>,
+    #[doc = "Position to put the annotation"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub position: Option<Point3D>,
+    #[doc = "Text displayed on the annotation"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub text: Option<AnnotationTextOptions>,
+}
+
+impl std::fmt::Display for AnnotationOptions {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AnnotationOptions {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(color) = &self.color {
+                format!("{:?}", color).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(line_ends) = &self.line_ends {
+                format!("{:?}", line_ends).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(line_width) = &self.line_width {
+                format!("{:?}", line_width).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(position) = &self.position {
+                format!("{:?}", position).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(text) = &self.text {
+                format!("{:?}", text).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "color".into(),
+            "line_ends".into(),
+            "line_width".into(),
+            "position".into(),
+            "text".into(),
+        ]
+    }
+}
+
+#[doc = "Horizontal Text aligment"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum AnnotationTextAlignmentX {
+    #[serde(rename = "left")]
+    #[display("left")]
+    Left,
+    #[serde(rename = "center")]
+    #[display("center")]
+    Center,
+    #[serde(rename = "right")]
+    #[display("right")]
+    Right,
+}
+
+#[doc = "Vertical Text aligment"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum AnnotationTextAlignmentY {
+    #[serde(rename = "bottom")]
+    #[display("bottom")]
+    Bottom,
+    #[serde(rename = "center")]
+    #[display("center")]
+    Center,
+    #[serde(rename = "top")]
+    #[display("top")]
+    Top,
+}
+
+#[doc = "Options for annotation text"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AnnotationTextOptions {
+    #[doc = "Text font's point size"]
+    pub point_size: u32,
+    #[doc = "Text displayed on the annotation"]
+    pub text: String,
+    #[doc = "Alignment along the X axis"]
+    pub x: AnnotationTextAlignmentX,
+    #[doc = "Alignment along the Y axis"]
+    pub y: AnnotationTextAlignmentY,
+}
+
+impl std::fmt::Display for AnnotationTextOptions {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AnnotationTextOptions {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.point_size).into(),
+            self.text.clone().into(),
+            format!("{:?}", self.x).into(),
+            format!("{:?}", self.y).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["point_size".into(), "text".into(), "x".into(), "y".into()]
+    }
+}
+
+#[doc = "The type of annotation"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum AnnotationType {
+    #[doc = "2D annotation type (screen or planar space)"]
+    #[serde(rename = "t2d")]
+    #[display("t2d")]
+    T2D,
+    #[doc = "3D annotation type"]
+    #[serde(rename = "t3d")]
+    #[display("t3d")]
+    T3D,
+}
+
 #[doc = "A response for a query on the API call table that is grouped by something."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -1915,6 +2169,48 @@ impl tabled::Tabled for CodeOutput {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["output_files".into(), "stderr".into(), "stdout".into()]
+    }
+}
+
+#[doc = "An RGBA color"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Color {
+    #[doc = "Alpha"]
+    pub a: f64,
+    #[doc = "Blue"]
+    pub b: f64,
+    #[doc = "Green"]
+    pub g: f64,
+    #[doc = "Red"]
+    pub r: f64,
+}
+
+impl std::fmt::Display for Color {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Color {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.a).into(),
+            format!("{:?}", self.b).into(),
+            format!("{:?}", self.g).into(),
+            format!("{:?}", self.r).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["a".into(), "b".into(), "g".into(), "r".into()]
     }
 }
 
@@ -5183,6 +5479,42 @@ impl tabled::Tabled for ExecutorMetadata {
     }
 }
 
+#[doc = "A file to be exported to the client."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ExportFile {
+    #[doc = "The contents of the file, base64 encoded."]
+    pub contents: base64::Base64Data,
+    #[doc = "The name of the file."]
+    pub name: String,
+}
+
+impl std::fmt::Display for ExportFile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ExportFile {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.contents).into(),
+            self.name.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["contents".into(), "name".into()]
+    }
+}
+
 #[doc = "Extended user information.\n\nThis is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Front"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -5407,57 +5739,14 @@ impl tabled::Tabled for ExtendedUserResultsPage {
     }
 }
 
-#[doc = "Command for extruding a solid."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Extrude {
-    #[doc = "Whether to cap the extrusion with a face, or not. If true, the resulting solid will be closed on all sides, like a dice. If false, it will be open on one side, like a drinking glass."]
-    pub cap: bool,
-    #[doc = "How far off the plane to extrude"]
-    pub distance: f64,
-    #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
-    pub target: uuid::Uuid,
-}
-
-impl std::fmt::Display for Extrude {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for Extrude {
-    const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.cap).into(),
-            format!("{:?}", self.distance).into(),
-            format!("{:?}", self.target).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["cap".into(), "distance".into(), "target".into()]
-    }
-}
-
 #[doc = "A file center of mass result."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FileCenterOfMass {
-    #[doc = "The resulting center of mass. This is deprecated and will be removed in a future release. Use `centers_of_mass` instead."]
+    #[doc = "The resulting center of mass."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[deprecated]
     pub center_of_mass: Option<Point3D>,
-    #[doc = "The center of mass for each mesh in the file. The key of the hash map is the mesh name."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub centers_of_mass: Option<std::collections::HashMap<String, Point3D>>,
     #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -5496,16 +5785,11 @@ impl std::fmt::Display for FileCenterOfMass {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FileCenterOfMass {
-    const LENGTH: usize = 12;
+    const LENGTH: usize = 11;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(center_of_mass) = &self.center_of_mass {
                 format!("{:?}", center_of_mass).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(centers_of_mass) = &self.centers_of_mass {
-                format!("{:?}", centers_of_mass).into()
             } else {
                 String::new().into()
             },
@@ -5541,7 +5825,6 @@ impl tabled::Tabled for FileCenterOfMass {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "center_of_mass".into(),
-            "centers_of_mass".into(),
             "completed_at".into(),
             "created_at".into(),
             "error".into(),
@@ -5694,12 +5977,8 @@ pub struct FileDensity {
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The density for each mesh in the file. The key of the hash map is the mesh name."]
+    #[doc = "The resulting density."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub densities: Option<std::collections::HashMap<String, f64>>,
-    #[doc = "The resulting density. This is deprecated and will be removed in a future release, use `densities` instead."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[deprecated]
     pub density: Option<f64>,
     #[doc = "The error the function returned, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -5739,7 +6018,7 @@ impl std::fmt::Display for FileDensity {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FileDensity {
-    const LENGTH: usize = 14;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -5748,11 +6027,6 @@ impl tabled::Tabled for FileDensity {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
-            if let Some(densities) = &self.densities {
-                format!("{:?}", densities).into()
-            } else {
-                String::new().into()
-            },
             if let Some(density) = &self.density {
                 format!("{:?}", density).into()
             } else {
@@ -5791,7 +6065,6 @@ impl tabled::Tabled for FileDensity {
         vec![
             "completed_at".into(),
             "created_at".into(),
-            "densities".into(),
             "density".into(),
             "error".into(),
             "id".into(),
@@ -5916,13 +6189,9 @@ pub struct FileMass {
     pub error: Option<String>,
     #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
-    #[doc = "The resulting mass. This is deprecated and will be removed in a future release, use `masses` instead."]
+    #[doc = "The resulting mass."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[deprecated]
     pub mass: Option<f64>,
-    #[doc = "The mass for each mesh in the file. The key of the hash map is the mesh name."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub masses: Option<std::collections::HashMap<String, f64>>,
     #[doc = "The material density as denoted by the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub material_density: Option<f64>,
@@ -5956,7 +6225,7 @@ impl std::fmt::Display for FileMass {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FileMass {
-    const LENGTH: usize = 14;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -5973,11 +6242,6 @@ impl tabled::Tabled for FileMass {
             format!("{:?}", self.id).into(),
             if let Some(mass) = &self.mass {
                 format!("{:?}", mass).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(masses) = &self.masses {
-                format!("{:?}", masses).into()
             } else {
                 String::new().into()
             },
@@ -6011,7 +6275,6 @@ impl tabled::Tabled for FileMass {
             "error".into(),
             "id".into(),
             "mass".into(),
-            "masses".into(),
             "material_density".into(),
             "material_density_unit".into(),
             "output_unit".into(),
@@ -6048,13 +6311,9 @@ pub struct FileSurfaceArea {
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The status of the API call."]
     pub status: ApiCallStatus,
-    #[doc = "The resulting surface area. This is deprecated and will be removed in a future release. Use `surface_areas` instead."]
+    #[doc = "The resulting surface area."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[deprecated]
     pub surface_area: Option<f64>,
-    #[doc = "The surface area for each mesh in the file. The key of the hash map is the mesh name."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub surface_areas: Option<std::collections::HashMap<String, f64>>,
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
@@ -6074,7 +6333,7 @@ impl std::fmt::Display for FileSurfaceArea {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FileSurfaceArea {
-    const LENGTH: usize = 12;
+    const LENGTH: usize = 11;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -6102,11 +6361,6 @@ impl tabled::Tabled for FileSurfaceArea {
             } else {
                 String::new().into()
             },
-            if let Some(surface_areas) = &self.surface_areas {
-                format!("{:?}", surface_areas).into()
-            } else {
-                String::new().into()
-            },
             format!("{:?}", self.updated_at).into(),
             if let Some(user_id) = &self.user_id {
                 format!("{:?}", user_id).into()
@@ -6127,7 +6381,6 @@ impl tabled::Tabled for FileSurfaceArea {
             "started_at".into(),
             "status".into(),
             "surface_area".into(),
-            "surface_areas".into(),
             "updated_at".into(),
             "user_id".into(),
         ]
@@ -6194,13 +6447,9 @@ pub struct FileVolume {
     #[doc = "The user ID of the user who created the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
-    #[doc = "The resulting volume. This is deprecated and will be removed in a future release. Use `volumes` instead."]
+    #[doc = "The resulting volume."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[deprecated]
     pub volume: Option<f64>,
-    #[doc = "The volumes for each mesh in the file. The key of the hash map is the mesh name."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub volumes: Option<std::collections::HashMap<String, f64>>,
 }
 
 impl std::fmt::Display for FileVolume {
@@ -6215,7 +6464,7 @@ impl std::fmt::Display for FileVolume {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FileVolume {
-    const LENGTH: usize = 12;
+    const LENGTH: usize = 11;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -6249,11 +6498,6 @@ impl tabled::Tabled for FileVolume {
             } else {
                 String::new().into()
             },
-            if let Some(volumes) = &self.volumes {
-                format!("{:?}", volumes).into()
-            } else {
-                String::new().into()
-            },
         ]
     }
 
@@ -6270,7 +6514,6 @@ impl tabled::Tabled for FileVolume {
             "updated_at".into(),
             "user_id".into(),
             "volume".into(),
-            "volumes".into(),
         ]
     }
 }
@@ -6448,10 +6691,15 @@ impl tabled::Tabled for IndexInfo {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum InputFormat {
+    #[serde(rename = "gltf")]
     Gltf {},
-    Step { coords: System },
+    #[serde(rename = "step")]
+    Step {},
+    #[serde(rename = "obj")]
     Obj { coords: System, units: UnitLength },
+    #[serde(rename = "ply")]
     Ply { coords: System, units: UnitLength },
+    #[serde(rename = "stl")]
     Stl { coords: System, units: UnitLength },
 }
 
@@ -7371,714 +7619,117 @@ pub enum Method {
     Extension,
 }
 
-#[doc = "Start a path."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum ModelingCmdStartPath {
-    StartPath,
-}
-
-impl std::default::Default for ModelingCmdStartPath {
-    fn default() -> Self {
-        ModelingCmdStartPath::StartPath
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct MovePathPen {
-    #[doc = "The ID of the command which created the path."]
-    pub path: uuid::Uuid,
-    #[doc = "Where the path's pen should be."]
-    pub to: Point3D,
-}
-
-impl std::fmt::Display for MovePathPen {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for MovePathPen {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.path).into(),
-            format!("{:?}", self.to).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["path".into(), "to".into()]
-    }
-}
-
-#[doc = "Move the path's \"pen\"."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ModelingCmdMovePathPen {
-    #[serde(rename = "MovePathPen")]
-    pub move_path_pen: MovePathPen,
-}
-
-impl std::fmt::Display for ModelingCmdMovePathPen {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ModelingCmdMovePathPen {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.move_path_pen).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["move_path_pen".into()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ExtendPath {
-    #[doc = "The ID of the command which created the path."]
-    pub path: uuid::Uuid,
-    #[doc = "Segment to append to the path. This segment will implicitly begin at the current \"pen\" location."]
-    pub segment: PathSegment,
-}
-
-impl std::fmt::Display for ExtendPath {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ExtendPath {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.path).into(),
-            format!("{:?}", self.segment).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["path".into(), "segment".into()]
-    }
-}
-
-#[doc = "Extend a path by adding a new segment which starts at the path's \"pen\". If no \"pen\" location has been set before (via `MovePen`), then the pen is at the origin."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ModelingCmdExtendPath {
-    #[serde(rename = "ExtendPath")]
-    pub extend_path: ExtendPath,
-}
-
-impl std::fmt::Display for ModelingCmdExtendPath {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ModelingCmdExtendPath {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.extend_path).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["extend_path".into()]
-    }
-}
-
-#[doc = "Extrude a 2D solid."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ModelingCmdExtrude {
-    #[doc = "Command for extruding a solid."]
-    #[serde(rename = "Extrude")]
-    pub extrude: Extrude,
-}
-
-impl std::fmt::Display for ModelingCmdExtrude {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ModelingCmdExtrude {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.extrude).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["extrude".into()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ClosePath {
-    #[doc = "Which path to close."]
-    pub path_id: uuid::Uuid,
-}
-
-impl std::fmt::Display for ClosePath {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ClosePath {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.path_id).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["path_id".into()]
-    }
-}
-
-#[doc = "Closes a path, converting it to a 2D solid."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ModelingCmdClosePath {
-    #[serde(rename = "ClosePath")]
-    pub close_path: ClosePath,
-}
-
-impl std::fmt::Display for ModelingCmdClosePath {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ModelingCmdClosePath {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.close_path).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["close_path".into()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct CameraDragStart {
-    #[doc = "The type of camera drag interaction."]
-    pub interaction: CameraDragInteractionType,
-    #[doc = "The initial mouse position."]
-    pub window: Point2D,
-}
-
-impl std::fmt::Display for CameraDragStart {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for CameraDragStart {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.interaction).into(),
-            format!("{:?}", self.window).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["interaction".into(), "window".into()]
-    }
-}
-
-#[doc = "Camera drag started."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ModelingCmdCameraDragStart {
-    #[serde(rename = "CameraDragStart")]
-    pub camera_drag_start: CameraDragStart,
-}
-
-impl std::fmt::Display for ModelingCmdCameraDragStart {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ModelingCmdCameraDragStart {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.camera_drag_start).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["camera_drag_start".into()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct CameraDragMove {
-    #[doc = "The type of camera drag interaction."]
-    pub interaction: CameraDragInteractionType,
-    #[doc = "Logical timestamp. The client should increment this with every event in the current mouse drag. That way, if the events are being sent over an unordered channel, the API can ignore the older events."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub sequence: Option<u32>,
-    #[doc = "The current mouse position."]
-    pub window: Point2D,
-}
-
-impl std::fmt::Display for CameraDragMove {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for CameraDragMove {
-    const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.interaction).into(),
-            if let Some(sequence) = &self.sequence {
-                format!("{:?}", sequence).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.window).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["interaction".into(), "sequence".into(), "window".into()]
-    }
-}
-
-#[doc = "Camera drag continued."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ModelingCmdCameraDragMove {
-    #[serde(rename = "CameraDragMove")]
-    pub camera_drag_move: CameraDragMove,
-}
-
-impl std::fmt::Display for ModelingCmdCameraDragMove {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ModelingCmdCameraDragMove {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.camera_drag_move).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["camera_drag_move".into()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct CameraDragEnd {
-    #[doc = "The type of camera drag interaction."]
-    pub interaction: CameraDragInteractionType,
-    #[doc = "The final mouse position."]
-    pub window: Point2D,
-}
-
-impl std::fmt::Display for CameraDragEnd {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for CameraDragEnd {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.interaction).into(),
-            format!("{:?}", self.window).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["interaction".into(), "window".into()]
-    }
-}
-
-#[doc = "Camera drag ended."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ModelingCmdCameraDragEnd {
-    #[serde(rename = "CameraDragEnd")]
-    pub camera_drag_end: CameraDragEnd,
-}
-
-impl std::fmt::Display for ModelingCmdCameraDragEnd {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ModelingCmdCameraDragEnd {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.camera_drag_end).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["camera_drag_end".into()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DefaultCameraLookAt {
-    #[doc = "What the camera is looking at. Center of the camera's field of vision"]
-    pub center: Point3D,
-    #[doc = "Which way is \"up\", from the camera's point of view."]
-    pub up: Point3D,
-    #[doc = "Where the camera is positioned"]
-    pub vantage: Point3D,
-}
-
-impl std::fmt::Display for DefaultCameraLookAt {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for DefaultCameraLookAt {
-    const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.center).into(),
-            format!("{:?}", self.up).into(),
-            format!("{:?}", self.vantage).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["center".into(), "up".into(), "vantage".into()]
-    }
-}
-
-#[doc = "Change what the default camera is looking at."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ModelingCmdDefaultCameraLookAt {
-    #[serde(rename = "DefaultCameraLookAt")]
-    pub default_camera_look_at: DefaultCameraLookAt,
-}
-
-impl std::fmt::Display for ModelingCmdDefaultCameraLookAt {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ModelingCmdDefaultCameraLookAt {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.default_camera_look_at).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["default_camera_look_at".into()]
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DefaultCameraEnableSketchMode {
-    #[doc = "How far to the sketching plane?"]
-    pub distance_to_plane: f64,
-    #[doc = "What's the origin of the sketching plane?"]
-    pub origin: Point3D,
-    #[doc = "Should the camera use orthographic projection? In other words, should an object's size in the rendered image stay constant regardless of its distance from the camera."]
-    pub ortho: bool,
-    #[doc = "Which 3D axis of the scene should be the X axis of the sketching plane?"]
-    pub x_axis: Point3D,
-    #[doc = "Which 3D axis of the scene should be the Y axis of the sketching plane?"]
-    pub y_axis: Point3D,
-}
-
-impl std::fmt::Display for DefaultCameraEnableSketchMode {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for DefaultCameraEnableSketchMode {
-    const LENGTH: usize = 5;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.distance_to_plane).into(),
-            format!("{:?}", self.origin).into(),
-            format!("{:?}", self.ortho).into(),
-            format!("{:?}", self.x_axis).into(),
-            format!("{:?}", self.y_axis).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "distance_to_plane".into(),
-            "origin".into(),
-            "ortho".into(),
-            "x_axis".into(),
-            "y_axis".into(),
-        ]
-    }
-}
-
-#[doc = "Enable sketch mode, where users can sketch 2D geometry. Users choose a plane to sketch on."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ModelingCmdDefaultCameraEnableSketchMode {
-    #[serde(rename = "DefaultCameraEnableSketchMode")]
-    pub default_camera_enable_sketch_mode: DefaultCameraEnableSketchMode,
-}
-
-impl std::fmt::Display for ModelingCmdDefaultCameraEnableSketchMode {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ModelingCmdDefaultCameraEnableSketchMode {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.default_camera_enable_sketch_mode).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["default_camera_enable_sketch_mode".into()]
-    }
-}
-
-#[doc = "Disable sketch mode, from the default camera."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum ModelingCmdDefaultCameraDisableSketchMode {
-    DefaultCameraDisableSketchMode,
-}
-
-impl std::default::Default for ModelingCmdDefaultCameraDisableSketchMode {
-    fn default() -> Self {
-        ModelingCmdDefaultCameraDisableSketchMode::DefaultCameraDisableSketchMode
-    }
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Export {
-    #[doc = "The file format to export to."]
-    pub format: OutputFormat,
-}
-
-impl std::fmt::Display for Export {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for Export {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.format).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["format".into()]
-    }
-}
-
-#[doc = "Export the scene to a file."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ModelingCmdExport {
-    #[serde(rename = "Export")]
-    pub export: Export,
-}
-
-impl std::fmt::Display for ModelingCmdExport {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ModelingCmdExport {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.export).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["export".into()]
-    }
-}
-
 #[doc = "Commands that the KittyCAD engine can execute."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
 pub enum ModelingCmd {
-    ModelingCmdStartPath(ModelingCmdStartPath),
-    ModelingCmdMovePathPen(ModelingCmdMovePathPen),
-    ModelingCmdExtendPath(ModelingCmdExtendPath),
-    ModelingCmdExtrude(ModelingCmdExtrude),
-    ModelingCmdClosePath(ModelingCmdClosePath),
-    ModelingCmdCameraDragStart(ModelingCmdCameraDragStart),
-    ModelingCmdCameraDragMove(ModelingCmdCameraDragMove),
-    ModelingCmdCameraDragEnd(ModelingCmdCameraDragEnd),
-    ModelingCmdDefaultCameraLookAt(ModelingCmdDefaultCameraLookAt),
-    ModelingCmdDefaultCameraEnableSketchMode(ModelingCmdDefaultCameraEnableSketchMode),
-    ModelingCmdDefaultCameraDisableSketchMode(ModelingCmdDefaultCameraDisableSketchMode),
-    ModelingCmdExport(ModelingCmdExport),
+    #[serde(rename = "start_path")]
+    StartPath {},
+    #[serde(rename = "move_path_pen")]
+    MovePathPen { path: uuid::Uuid, to: Point3D },
+    #[serde(rename = "extend_path")]
+    ExtendPath {
+        path: uuid::Uuid,
+        segment: PathSegment,
+    },
+    #[serde(rename = "extrude")]
+    Extrude {
+        cap: bool,
+        distance: f64,
+        target: uuid::Uuid,
+    },
+    #[serde(rename = "close_path")]
+    ClosePath { path_id: uuid::Uuid },
+    #[serde(rename = "camera_drag_start")]
+    CameraDragStart {
+        interaction: CameraDragInteractionType,
+        window: Point2D,
+    },
+    #[serde(rename = "camera_drag_move")]
+    CameraDragMove {
+        interaction: CameraDragInteractionType,
+        sequence: Option<u32>,
+        window: Point2D,
+    },
+    #[serde(rename = "camera_drag_end")]
+    CameraDragEnd {
+        interaction: CameraDragInteractionType,
+        window: Point2D,
+    },
+    #[serde(rename = "default_camera_look_at")]
+    DefaultCameraLookAt {
+        center: Point3D,
+        up: Point3D,
+        vantage: Point3D,
+    },
+    #[serde(rename = "default_camera_enable_sketch_mode")]
+    DefaultCameraEnableSketchMode {
+        distance_to_plane: f64,
+        origin: Point3D,
+        ortho: bool,
+        x_axis: Point3D,
+        y_axis: Point3D,
+    },
+    #[serde(rename = "default_camera_disable_sketch_mode")]
+    DefaultCameraDisableSketchMode {},
+    #[serde(rename = "export")]
+    Export {
+        entity_ids: Vec<uuid::Uuid>,
+        format: OutputFormat,
+    },
+    #[serde(rename = "entity_get_parent_id")]
+    EntityGetParentId { entity_id: uuid::Uuid },
+    #[serde(rename = "entity_get_num_children")]
+    EntityGetNumChildren { entity_id: uuid::Uuid },
+    #[serde(rename = "entity_get_child_uuid")]
+    EntityGetChildUuid {
+        child_index: u32,
+        entity_id: uuid::Uuid,
+    },
+    #[serde(rename = "entity_get_all_child_uuids")]
+    EntityGetAllChildUuids { entity_id: uuid::Uuid },
+    #[serde(rename = "edit_mode_enter")]
+    EditModeEnter { target: uuid::Uuid },
+    #[serde(rename = "edit_mode_exit")]
+    EditModeExit {},
+    #[serde(rename = "select_with_point")]
+    SelectWithPoint {
+        selected_at_window: Point2D,
+        selection_type: SceneSelectionType,
+    },
+    #[serde(rename = "select_clear")]
+    SelectClear {},
+    #[serde(rename = "select_add")]
+    SelectAdd { entities: Vec<uuid::Uuid> },
+    #[serde(rename = "select_remove")]
+    SelectRemove { entities: Vec<uuid::Uuid> },
+    #[serde(rename = "select_replace")]
+    SelectReplace { entities: Vec<uuid::Uuid> },
+    #[serde(rename = "select_get")]
+    SelectGet {},
+    #[serde(rename = "highlight_set_entity")]
+    HighlightSetEntity {
+        selected_at_window: Point2D,
+        sequence: Option<u32>,
+    },
+    #[serde(rename = "highlight_set_entities")]
+    HighlightSetEntities { entities: Vec<uuid::Uuid> },
+    #[serde(rename = "new_annotation")]
+    NewAnnotation {
+        annotation_type: AnnotationType,
+        clobber: bool,
+        options: AnnotationOptions,
+    },
+    #[serde(rename = "update_annotation")]
+    UpdateAnnotation {
+        annotation_id: uuid::Uuid,
+        options: AnnotationOptions,
+    },
+    #[serde(rename = "object_visible")]
+    ObjectVisible { hidden: bool, object_id: uuid::Uuid },
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -8208,7 +7859,7 @@ impl tabled::Tabled for ModelingError {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub enum ModelingOutcome {
-    Error {
+    error {
         #[doc = "A string error code which refers to a family of errors. E.g. \"InvalidInput\"."]
         error_code: String,
         #[doc = "Describe the specific error which occurred. Will be shown to users, not logged."]
@@ -8218,7 +7869,7 @@ pub enum ModelingOutcome {
         #[doc = "A HTTP status code."]
         status_code: u16,
     },
-    Cancelled {
+    cancelled {
         #[doc = "The ID of the command that failed, cancelling this command."]
         what_failed: uuid::Uuid,
     },
@@ -8429,6 +8080,36 @@ impl std::default::Default for Oauth2GrantType {
     }
 }
 
+#[doc = "A successful response from a modeling command. This can be one of several types of responses, depending on the command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum OkModelingCmdResponse {
+    #[serde(rename = "empty")]
+    Empty {},
+    #[serde(rename = "export")]
+    Export { files: Vec<ExportFile> },
+    #[serde(rename = "select_with_point")]
+    SelectWithPoint { entity_id: Option<uuid::Uuid> },
+    #[serde(rename = "highlight_set_entity")]
+    HighlightSetEntity {
+        entity_id: Option<uuid::Uuid>,
+        sequence: Option<u32>,
+    },
+    #[serde(rename = "entity_get_child_uuid")]
+    EntityGetChildUuid { entity_id: uuid::Uuid },
+    #[serde(rename = "entity_get_num_children")]
+    EntityGetNumChildren { num: u32 },
+    #[serde(rename = "entity_get_parent_id")]
+    EntityGetParentId { entity_id: uuid::Uuid },
+    #[serde(rename = "entity_get_all_child_uuids")]
+    EntityGetAllChildUuids { entity_ids: Vec<uuid::Uuid> },
+    #[serde(rename = "select_get")]
+    SelectGet { entity_ids: Vec<uuid::Uuid> },
+}
+
 #[doc = "Onboarding details"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8542,10 +8223,15 @@ impl tabled::Tabled for OutputFile {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum OutputFormat {
+    #[serde(rename = "gltf")]
     Gltf { storage: Storage },
+    #[serde(rename = "obj")]
     Obj { coords: System },
+    #[serde(rename = "ply")]
     Ply { coords: System, storage: Storage },
+    #[serde(rename = "step")]
     Step { coords: System },
+    #[serde(rename = "stl")]
     Stl { coords: System, storage: Storage },
 }
 
@@ -8553,29 +8239,22 @@ pub enum OutputFormat {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
 pub enum PathSegment {
-    Line {
-        #[doc = "End point of the line."]
-        end: Point3D,
-    },
+    #[serde(rename = "line")]
+    Line { end: Point3D },
+    #[serde(rename = "arc")]
     Arc {
-        #[doc = "Start of the arc along circle's perimeter."]
         angle_end: f64,
-        #[doc = "Start of the arc along circle's perimeter."]
         angle_start: f64,
-        #[doc = "Center of the circle"]
         center: Point2D,
-        #[doc = "Radius of the circle"]
         radius: f64,
     },
+    #[serde(rename = "bezier")]
     Bezier {
-        #[doc = "First control point."]
-        #[serde(rename = "control1")]
-        control_1: Point3D,
-        #[doc = "Second control point."]
-        #[serde(rename = "control2")]
-        control_2: Point3D,
-        #[doc = "Final control point."]
+        control1: Point3D,
+        control2: Point3D,
         end: Point3D,
     },
 }
@@ -9332,6 +9011,35 @@ impl tabled::Tabled for Runtime {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["path".into(), "runtime_args".into()]
     }
+}
+
+#[doc = "The type of scene selection change"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum SceneSelectionType {
+    #[doc = "Replaces the selection"]
+    #[serde(rename = "replace")]
+    #[display("replace")]
+    Replace,
+    #[doc = "Adds to the selection"]
+    #[serde(rename = "add")]
+    #[display("add")]
+    Add,
+    #[doc = "Removes from the selection"]
+    #[serde(rename = "remove")]
+    #[display("remove")]
+    Remove,
 }
 
 #[doc = "An authentication session.\n\nFor our UIs, these are automatically created by Next.js."]
