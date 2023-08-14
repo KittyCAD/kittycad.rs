@@ -134,31 +134,23 @@ pub struct Client {
 }
 
 impl Client {
+    #[tracing::instrument]
     /// Create a new Client struct. It takes a type that can convert into
     /// an &str (`String` or `Vec<u8>` for example). As long as the function is
     /// given a valid API key your requests will work.
-    #[tracing::instrument]
-    pub fn new<T>(token: T) -> Self
+    /// Also takes reqwest client builders, for customizing the client's behaviour.
+    pub fn new_from_reqwest<T>(
+        token: T,
+        builder_http: reqwest::ClientBuilder,
+        builder_websocket: reqwest::ClientBuilder,
+    ) -> Self
     where
         T: ToString + std::fmt::Debug,
     {
         // Retry up to 3 times with increasing intervals between attempts.
         let retry_policy =
             reqwest_retry::policies::ExponentialBackoff::builder().build_with_max_retries(3);
-        let client = reqwest::Client::builder()
-            .user_agent(APP_USER_AGENT)
-            // For file conversions we need this to be long.
-            .timeout(std::time::Duration::from_secs(600))
-            .connect_timeout(std::time::Duration::from_secs(60))
-            .build();
-        let client_http1 = reqwest::Client::builder()
-            // For file conversions we need this to be long.
-            .user_agent(APP_USER_AGENT)
-            .timeout(std::time::Duration::from_secs(600))
-            .connect_timeout(std::time::Duration::from_secs(60))
-            .http1_only()
-            .build();
-        match (client, client_http1) {
+        match (builder_http.build(), builder_websocket.build()) {
             (Ok(c), Ok(c1)) => {
                 let client = reqwest_middleware::ClientBuilder::new(c)
                     // Trace HTTP requests. See the tracing crate to make use of these traces.
@@ -186,6 +178,28 @@ impl Client {
             }
             (Err(e), _) | (_, Err(e)) => panic!("creating reqwest client failed: {:?}", e),
         }
+    }
+
+    /// Create a new Client struct. It takes a type that can convert into
+    /// an &str (`String` or `Vec<u8>` for example). As long as the function is
+    /// given a valid API key your requests will work.
+    #[tracing::instrument]
+    pub fn new<T>(token: T) -> Self
+    where
+        T: ToString + std::fmt::Debug,
+    {
+        let client = reqwest::Client::builder()
+            .user_agent(APP_USER_AGENT)
+            // For file conversions we need this to be long.
+            .timeout(std::time::Duration::from_secs(600))
+            .connect_timeout(std::time::Duration::from_secs(60));
+        let client_http1 = reqwest::Client::builder()
+            // For file conversions we need this to be long.
+            .user_agent(APP_USER_AGENT)
+            .timeout(std::time::Duration::from_secs(600))
+            .connect_timeout(std::time::Duration::from_secs(60))
+            .http1_only();
+        Self::new_from_reqwest(token, client, client_http1)
     }
 
     /// Set the base URL for the client to something other than the default: <https://api.kittycad.io>.
