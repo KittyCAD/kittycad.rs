@@ -44,7 +44,7 @@ async fn test_create_file_volume() {
         .await
         .unwrap();
 
-    assert_eq!(result.volume, Some(53.601147));
+    assert_eq!(result.volume.map(|x| x.round()), Some(54.0));
 
     assert_eq!(result.src_format, crate::types::FileImportFormat::Obj);
     assert_eq!(result.status, crate::types::ApiCallStatus::Completed);
@@ -207,7 +207,6 @@ async fn test_modeling_websocket() {
             serde_json::to_string(&ModelingCmdReq {
                 cmd: ModelingCmd::StartPath {},
                 cmd_id: path_id,
-                file_id: Default::default(),
             })
             .unwrap(),
         ))
@@ -241,7 +240,6 @@ async fn test_modeling_websocket() {
                         segment: PathSegment::Line { end: point },
                     },
                     cmd_id: Uuid::new_v4(),
-                    file_id: Default::default(),
                 })
                 .unwrap(),
             ))

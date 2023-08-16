@@ -29,7 +29,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! kittycad = "0.2.13"
+//! kittycad = "0.2.14"
 //! ```
 //!
 //! ## Basic example
@@ -75,10 +75,6 @@ pub mod api_tokens;
 ///
 /// FROM: <https://docs.kittycad.io/api/apps>
 pub mod apps;
-/// Constants. These are helpful as helpers.
-///
-/// FROM: <https://docs.kittycad.io/api/constant>
-pub mod constant;
 /// Endpoints that allow for code execution or creation of code execution environments.
 ///
 /// FROM: <https://docs.kittycad.io/api/executor>
@@ -281,13 +277,6 @@ impl Client {
     /// FROM: <https://docs.kittycad.io/api/apps>
     pub fn apps(&self) -> apps::Apps {
         apps::Apps::new(self.clone())
-    }
-
-    /// Constants. These are helpful as helpers.
-    ///
-    /// FROM: <https://docs.kittycad.io/api/constant>
-    pub fn constant(&self) -> constant::Constant {
-        constant::Constant::new(self.clone())
     }
 
     /// Endpoints that allow for code execution or creation of code execution environments.

@@ -5455,6 +5455,47 @@ impl tabled::Tabled for EngineMetadata {
     }
 }
 
+#[doc = "The type of entity"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum EntityType {
+    #[serde(rename = "entity")]
+    #[display("entity")]
+    Entity,
+    #[serde(rename = "object")]
+    #[display("object")]
+    Object,
+    #[serde(rename = "path")]
+    #[display("path")]
+    Path,
+    #[serde(rename = "curve")]
+    #[display("curve")]
+    Curve,
+    #[serde(rename = "solid2d")]
+    #[display("solid2d")]
+    Solid2D,
+    #[serde(rename = "solid3d")]
+    #[display("solid3d")]
+    Solid3D,
+    #[serde(rename = "edge")]
+    #[display("edge")]
+    Edge,
+    #[serde(rename = "face")]
+    #[display("face")]
+    Face,
+}
+
 #[doc = "The environment the server is running in."]
 #[derive(
     serde :: Serialize,
@@ -7800,6 +7841,7 @@ pub enum ModelingCmd {
     },
     #[serde(rename = "default_camera_enable_sketch_mode")]
     DefaultCameraEnableSketchMode {
+        animated: bool,
         distance_to_plane: f64,
         origin: Point3D,
         ortho: bool,
@@ -7863,6 +7905,37 @@ pub enum ModelingCmd {
     },
     #[serde(rename = "object_visible")]
     ObjectVisible { hidden: bool, object_id: uuid::Uuid },
+    #[serde(rename = "get_entity_type")]
+    GetEntityType { entity_id: uuid::Uuid },
+    #[serde(rename = "solid3d_get_all_edge_faces")]
+    Solid3DGetAllEdgeFaces {
+        edge_id: uuid::Uuid,
+        object_id: uuid::Uuid,
+    },
+    #[serde(rename = "solid3d_get_all_opposite_edges")]
+    Solid3DGetAllOppositeEdges {
+        along_vector: Option<Point3D>,
+        edge_id: uuid::Uuid,
+        object_id: uuid::Uuid,
+    },
+    #[serde(rename = "solid3d_get_opposite_edge")]
+    Solid3DGetOppositeEdge {
+        edge_id: uuid::Uuid,
+        face_uuid: uuid::Uuid,
+        object_id: uuid::Uuid,
+    },
+    #[serde(rename = "solid3d_get_next_adjacent_edge")]
+    Solid3DGetNextAdjacentEdge {
+        edge_id: uuid::Uuid,
+        face_uuid: uuid::Uuid,
+        object_id: uuid::Uuid,
+    },
+    #[serde(rename = "solid3d_get_prev_adjacent_edge")]
+    Solid3DGetPrevAdjacentEdge {
+        edge_id: uuid::Uuid,
+        face_uuid: uuid::Uuid,
+        object_id: uuid::Uuid,
+    },
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -7874,8 +7947,6 @@ pub struct ModelingCmdReq {
     pub cmd: ModelingCmd,
     #[doc = "ID of command being submitted."]
     pub cmd_id: uuid::Uuid,
-    #[doc = "ID of the model's file."]
-    pub file_id: String,
 }
 
 impl std::fmt::Display for ModelingCmdReq {
@@ -7890,17 +7961,16 @@ impl std::fmt::Display for ModelingCmdReq {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ModelingCmdReq {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.cmd).into(),
             format!("{:?}", self.cmd_id).into(),
-            self.file_id.clone().into(),
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["cmd".into(), "cmd_id".into(), "file_id".into()]
+        vec!["cmd".into(), "cmd_id".into()]
     }
 }
 
@@ -7911,8 +7981,6 @@ impl tabled::Tabled for ModelingCmdReq {
 pub struct ModelingCmdReqBatch {
     #[doc = "A set of commands to submit to the KittyCAD engine in a batch."]
     pub cmds: std::collections::HashMap<String, ModelingCmdReq>,
-    #[doc = "Which file is being drawn in."]
-    pub file_id: String,
 }
 
 impl std::fmt::Display for ModelingCmdReqBatch {
@@ -7927,16 +7995,13 @@ impl std::fmt::Display for ModelingCmdReqBatch {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ModelingCmdReqBatch {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.cmds).into(),
-            self.file_id.clone().into(),
-        ]
+        vec![format!("{:?}", self.cmds).into()]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["cmds".into(), "file_id".into()]
+        vec!["cmds".into()]
     }
 }
 
@@ -7992,7 +8057,7 @@ impl tabled::Tabled for ModelingError {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub enum ModelingOutcome {
-    error {
+    Error {
         #[doc = "A string error code which refers to a family of errors. E.g. \"InvalidInput\"."]
         error_code: String,
         #[doc = "Describe the specific error which occurred. Will be shown to users, not logged."]
@@ -8002,7 +8067,7 @@ pub enum ModelingOutcome {
         #[doc = "A HTTP status code."]
         status_code: u16,
     },
-    cancelled {
+    Cancelled {
         #[doc = "The ID of the command that failed, cancelling this command."]
         what_failed: uuid::Uuid,
     },
@@ -8245,6 +8310,18 @@ pub enum OkModelingCmdResponse {
     EntityGetAllChildUuids { entity_ids: Vec<uuid::Uuid> },
     #[serde(rename = "select_get")]
     SelectGet { entity_ids: Vec<uuid::Uuid> },
+    #[serde(rename = "get_entity_type")]
+    GetEntityType { entity_type: EntityType },
+    #[serde(rename = "solid3d_get_all_edge_faces")]
+    Solid3DGetAllEdgeFaces { faces: Vec<uuid::Uuid> },
+    #[serde(rename = "solid3d_get_all_opposite_edges")]
+    Solid3DGetAllOppositeEdges { edges: Vec<uuid::Uuid> },
+    #[serde(rename = "solid3d_get_opposite_edge")]
+    Solid3DGetOppositeEdge { edge: uuid::Uuid },
+    #[serde(rename = "solid3d_get_prev_adjacent_edge")]
+    Solid3DGetPrevAdjacentEdge { edge: uuid::Uuid },
+    #[serde(rename = "solid3d_get_next_adjacent_edge")]
+    Solid3DGetNextAdjacentEdge { edge: uuid::Uuid },
 }
 
 #[doc = "Onboarding details"]
@@ -8593,245 +8670,6 @@ pub enum PaymentMethodType {
 }
 
 
-
-#[doc = "A physics constant."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct PhysicsConstant {
-    #[doc = "The time and date the API call was completed."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The constant we are returning."]
-    pub constant: PhysicsConstantName,
-    #[doc = "The time and date the API call was created."]
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The error the function returned, if any."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
-    pub id: uuid::Uuid,
-    #[doc = "The time and date the API call was started."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the API call."]
-    pub status: ApiCallStatus,
-    #[doc = "The time and date the API call was last updated."]
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
-    #[doc = "The resulting value of the constant."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub value: Option<f64>,
-}
-
-impl std::fmt::Display for PhysicsConstant {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for PhysicsConstant {
-    const LENGTH: usize = 10;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.constant).into(),
-            format!("{:?}", self.created_at).into(),
-            if let Some(error) = &self.error {
-                format!("{:?}", error).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.id).into(),
-            if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.status).into(),
-            format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(value) = &self.value {
-                format!("{:?}", value).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "completed_at".into(),
-            "constant".into(),
-            "created_at".into(),
-            "error".into(),
-            "id".into(),
-            "started_at".into(),
-            "status".into(),
-            "updated_at".into(),
-            "user_id".into(),
-            "value".into(),
-        ]
-    }
-}
-
-#[doc = "The valid types of phys constant names."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum PhysicsConstantName {
-    #[doc = "pi - Ratio of a circle's circumference to its diameter. <https://en.wikipedia.org/wiki/Pi>"]
-    #[serde(rename = "pi")]
-    #[display("pi")]
-    Pi,
-    #[doc = "c - Speed of light in vacuum. <https://en.wikipedia.org/wiki//Speed_of_light>"]
-    #[serde(rename = "c")]
-    #[display("c")]
-    C,
-    #[doc = "Speed of light in a vacuum. <https://en.wikipedia.org/wiki//Speed_of_light>"]
-    #[serde(rename = "speed_of_light")]
-    #[display("speed_of_light")]
-    SpeedOfLight,
-    #[doc = "G - Newtonian constant of gravitation. <https://en.wikipedia.org/wiki/Gravitational_constant>"]
-    G,
-    #[doc = "Newtonian constant of gravitation. <https://en.wikipedia.org/wiki/Gravitational_constant>"]
-    #[serde(rename = "newtonian_gravitation")]
-    #[display("newtonian_gravitation")]
-    NewtonianGravitation,
-    #[doc = "h - Planck constant. <https://en.wikipedia.org/wiki/Planck_constant>"]
-    #[serde(rename = "h")]
-    #[display("h")]
-    H,
-    #[doc = "Planck constant. <https://en.wikipedia.org/wiki/Planck_constant>"]
-    #[serde(rename = "planck_const")]
-    #[display("planck_const")]
-    PlanckConst,
-    #[doc = "mu_0 - vacuum permeability. <https://en.wikipedia.org/wiki/Vacuum_permeability>"]
-    #[serde(rename = "mu_0")]
-    #[display("mu_0")]
-    Mu0,
-    #[doc = "vacuum permeability. <https://en.wikipedia.org/wiki/Vacuum_permeability>"]
-    #[serde(rename = "vacuum_permeability")]
-    #[display("vacuum_permeability")]
-    VacuumPermeability,
-    #[doc = "ε_0 - vacuum permitivity. <https://en.wikipedia.org/wiki/Vacuum_permittivity>"]
-    #[serde(rename = "E_0")]
-    #[display("E_0")]
-    E0,
-    #[doc = "vacuum permitivity. <https://en.wikipedia.org/wiki/Vacuum_permittivity>]"]
-    #[serde(rename = "vacuum_permitivity")]
-    #[display("vacuum_permitivity")]
-    VacuumPermitivity,
-    #[doc = "Z_0 - characteristic impedance of vacuum. <https://en.wikipedia.org/wiki/Impedance_of_free_space>"]
-    #[serde(rename = "Z_0")]
-    #[display("Z_0")]
-    Z0,
-    #[doc = "characteristic impedance of vacuum. <https://en.wikipedia.org/wiki/Impedance_of_free_space>"]
-    #[serde(rename = "vacuum_impedance")]
-    #[display("vacuum_impedance")]
-    VacuumImpedance,
-    #[doc = "k_e - Coulomb's constant. <https://en.wikipedia.org/wiki/Coulomb_constant>"]
-    #[serde(rename = "k_e")]
-    #[display("k_e")]
-    KE,
-    #[doc = "Coulomb's constant. <https://en.wikipedia.org/wiki/Coulomb_constant>"]
-    #[serde(rename = "coulomb_const")]
-    #[display("coulomb_const")]
-    CoulombConst,
-    #[doc = "e - elementary charge. <https://en.wikipedia.org/wiki/Elementary_charge>"]
-    #[serde(rename = "e")]
-    #[display("e")]
-    E,
-    #[doc = "elementary charge. <https://en.wikipedia.org/wiki/Elementary_charge>"]
-    #[serde(rename = "elementary_charge")]
-    #[display("elementary_charge")]
-    ElementaryCharge,
-    #[doc = "m_e - electron mass. <https://en.wikipedia.org/wiki/Electron_mass>"]
-    #[serde(rename = "m_e")]
-    #[display("m_e")]
-    ME,
-    #[doc = "electron mass. <https://en.wikipedia.org/wiki/Electron_mass>"]
-    #[serde(rename = "electron_mass")]
-    #[display("electron_mass")]
-    ElectronMass,
-    #[doc = "m_p - proton mass. <https://en.wikipedia.org/wiki/Proton>"]
-    #[serde(rename = "m_p")]
-    #[display("m_p")]
-    MP,
-    #[doc = "proton mass. <https://en.wikipedia.org/wiki/Proton>"]
-    #[serde(rename = "proton_mass")]
-    #[display("proton_mass")]
-    ProtonMass,
-    #[doc = "mu_B - Bohr magneton. <https://en.wikipedia.org/wiki/Bohr_magneton>"]
-    #[serde(rename = "mu_B")]
-    #[display("mu_B")]
-    MuB,
-    #[doc = "Bohr magneton. <https://en.wikipedia.org/wiki/Bohr_magneton>"]
-    #[serde(rename = "bohr_magneton")]
-    #[display("bohr_magneton")]
-    BohrMagneton,
-    #[doc = "NA - Avogadro's Number. <https://en.wikipedia.org/wiki/Avogadro_constant>"]
-    #[serde(rename = "NA")]
-    #[display("NA")]
-    Na,
-    #[doc = "Avogadro's Number. <https://en.wikipedia.org/wiki/Avogadro_constant>"]
-    #[serde(rename = "avogadro_num")]
-    #[display("avogadro_num")]
-    AvogadroNum,
-    #[doc = "R - Molar Gas constant. <https://en.wikipedia.org/wiki/Gas_constant>"]
-    R,
-    #[doc = "Molar Gas constant. <https://en.wikipedia.org/wiki/Gas_constant>"]
-    #[serde(rename = "molar_gas_const")]
-    #[display("molar_gas_const")]
-    MolarGasConst,
-    #[doc = "K_B - Boltzmann constant. <https://en.wikipedia.org/wiki/Boltzmann_constant>"]
-    #[serde(rename = "K_B")]
-    #[display("K_B")]
-    KB,
-    #[doc = "Boltzmann constant. <https://en.wikipedia.org/wiki/Boltzmann_constant>"]
-    #[serde(rename = "boltzmann_const")]
-    #[display("boltzmann_const")]
-    BoltzmannConst,
-    #[doc = "F - Faraday constant. <https://en.wikipedia.org/wiki/Faraday_constant>"]
-    F,
-    #[doc = "Faraday constant. <https://en.wikipedia.org/wiki/Faraday_constant>"]
-    #[serde(rename = "faraday_const")]
-    #[display("faraday_const")]
-    FaradayConst,
-    #[doc = "Sigma - Stefan-Boltzmann constant. <https://en.wikipedia.org/wiki/Stefan%E2%80%93Boltzmann_constant>"]
-    #[serde(rename = "sigma")]
-    #[display("sigma")]
-    Sigma,
-    #[doc = "Stefan-Boltzmann constant. <https://en.wikipedia.org/wiki/Stefan%E2%80%93Boltzmann_constant>"]
-    #[serde(rename = "stefan_boltzmann_const")]
-    #[display("stefan_boltzmann_const")]
-    StefanBoltzmannConst,
-}
 
 #[doc = "Available plugins per type.\n\n**Note**: Only unmanaged (V1) plugins are included in this \
          list. V1 plugins are \\\"lazily\\\" loaded, and are not returned in this list if there is \

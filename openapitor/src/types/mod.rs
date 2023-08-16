@@ -359,7 +359,7 @@ impl TypeSpace {
                     // Check if the property is a nested object.
                     for (inner_name, property) in o.properties.iter() {
                         // Let the name be the struct name.
-                        let inner_name_ident = format_ident!("{}", inner_name);
+                        let inner_name_ident = format_ident!("{}", proper_name(inner_name));
                         let property_schema =
                             property.get_schema_from_reference(&self.spec, true)?;
                         if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
