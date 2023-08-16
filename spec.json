@@ -5547,6 +5547,20 @@
         ],
         "type": "object"
       },
+      "EntityType": {
+        "description": "The type of entity",
+        "enum": [
+          "entity",
+          "object",
+          "path",
+          "curve",
+          "solid2d",
+          "solid3d",
+          "edge",
+          "face"
+        ],
+        "type": "string"
+      },
       "Environment": {
         "description": "The environment the server is running in.",
         "oneOf": [
@@ -7583,6 +7597,10 @@
           {
             "description": "Enable sketch mode, where users can sketch 2D geometry. Users choose a plane to sketch on.",
             "properties": {
+              "animated": {
+                "description": "Should we animate or snap for the camera transition?",
+                "type": "boolean"
+              },
               "distance_to_plane": {
                 "description": "How far to the sketching plane?",
                 "format": "float",
@@ -7624,6 +7642,7 @@
               }
             },
             "required": [
+              "animated",
               "distance_to_plane",
               "origin",
               "ortho",
@@ -8091,6 +8110,189 @@
               "type"
             ],
             "type": "object"
+          },
+          {
+            "description": "What type of entity is this?",
+            "properties": {
+              "entity_id": {
+                "description": "ID of the entity being queried.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "get_entity_type"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Gets all faces which use the given edge.",
+            "properties": {
+              "edge_id": {
+                "description": "Which edge you want the faces of.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "object_id": {
+                "description": "Which object is being queried.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "solid3d_get_all_edge_faces"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "edge_id",
+              "object_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Gets all edges which are opposite the given edge, across all possible faces.",
+            "properties": {
+              "along_vector": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ],
+                "description": "If given, ohnly faces parallel to this vector will be considered.",
+                "nullable": true
+              },
+              "edge_id": {
+                "description": "Which edge you want the opposites of.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "object_id": {
+                "description": "Which object is being queried.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "solid3d_get_all_opposite_edges"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "edge_id",
+              "object_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Gets the edge opposite the given edge, along the given face.",
+            "properties": {
+              "edge_id": {
+                "description": "Which edge you want the opposite of.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "face_uuid": {
+                "description": "Which face is used to figure out the opposite edge?",
+                "format": "uuid",
+                "type": "string"
+              },
+              "object_id": {
+                "description": "Which object is being queried.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "solid3d_get_opposite_edge"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "edge_id",
+              "face_uuid",
+              "object_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Gets the next adjacent edge for the given edge, along the given face.",
+            "properties": {
+              "edge_id": {
+                "description": "Which edge you want the opposite of.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "face_uuid": {
+                "description": "Which face is used to figure out the opposite edge?",
+                "format": "uuid",
+                "type": "string"
+              },
+              "object_id": {
+                "description": "Which object is being queried.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "solid3d_get_next_adjacent_edge"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "edge_id",
+              "face_uuid",
+              "object_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Gets the previous adjacent edge for the given edge, along the given face.",
+            "properties": {
+              "edge_id": {
+                "description": "Which edge you want the opposite of.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "face_uuid": {
+                "description": "Which face is used to figure out the opposite edge?",
+                "format": "uuid",
+                "type": "string"
+              },
+              "object_id": {
+                "description": "Which object is being queried.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "solid3d_get_prev_adjacent_edge"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "edge_id",
+              "face_uuid",
+              "object_id",
+              "type"
+            ],
+            "type": "object"
           }
         ]
       },
@@ -8117,16 +8319,11 @@
               }
             ],
             "description": "ID of command being submitted."
-          },
-          "file_id": {
-            "description": "ID of the model's file.",
-            "type": "string"
           }
         },
         "required": [
           "cmd",
-          "cmd_id",
-          "file_id"
+          "cmd_id"
         ],
         "type": "object"
       },
@@ -8139,15 +8336,10 @@
             },
             "description": "A set of commands to submit to the KittyCAD engine in a batch.",
             "type": "object"
-          },
-          "file_id": {
-            "description": "Which file is being drawn in.",
-            "type": "string"
           }
         },
         "required": [
-          "cmds",
-          "file_id"
+          "cmds"
         ],
         "type": "object"
       },
@@ -8524,6 +8716,141 @@
             },
             "required": [
               "entity_ids",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `GetEntityType` command.",
+            "properties": {
+              "entity_type": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/EntityType"
+                  }
+                ],
+                "description": "The type of the entity."
+              },
+              "type": {
+                "enum": [
+                  "get_entity_type"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_type",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `Solid3dGetAllEdgeFaces` command.",
+            "properties": {
+              "faces": {
+                "description": "The UUIDs of the faces.",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": {
+                "enum": [
+                  "solid3d_get_all_edge_faces"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "faces",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `Solid3dGetAllOppositeEdges` command.",
+            "properties": {
+              "edges": {
+                "description": "The UUIDs of the edges.",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": {
+                "enum": [
+                  "solid3d_get_all_opposite_edges"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "edges",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `Solid3dGetOppositeEdge` command.",
+            "properties": {
+              "edge": {
+                "description": "The UUID of the edge.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "solid3d_get_opposite_edge"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "edge",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `Solid3dGetPrevAdjacentEdge` command.",
+            "properties": {
+              "edge": {
+                "description": "The UUID of the edge.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "solid3d_get_prev_adjacent_edge"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "edge",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `Solid3dGetNextAdjacentEdge` command.",
+            "properties": {
+              "edge": {
+                "description": "The UUID of the edge.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "solid3d_get_next_adjacent_edge"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "edge",
               "type"
             ],
             "type": "object"
@@ -8911,320 +9238,6 @@
             "description": "A card payment method.",
             "enum": [
               "card"
-            ],
-            "type": "string"
-          }
-        ]
-      },
-      "PhysicsConstant": {
-        "description": "A physics constant.",
-        "properties": {
-          "completed_at": {
-            "description": "The time and date the API call was completed.",
-            "format": "date-time",
-            "nullable": true,
-            "title": "DateTime",
-            "type": "string"
-          },
-          "constant": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PhysicsConstantName"
-              }
-            ],
-            "description": "The constant we are returning."
-          },
-          "created_at": {
-            "description": "The time and date the API call was created.",
-            "format": "date-time",
-            "title": "DateTime",
-            "type": "string"
-          },
-          "error": {
-            "description": "The error the function returned, if any.",
-            "nullable": true,
-            "type": "string"
-          },
-          "id": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ],
-            "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
-          },
-          "started_at": {
-            "description": "The time and date the API call was started.",
-            "format": "date-time",
-            "nullable": true,
-            "title": "DateTime",
-            "type": "string"
-          },
-          "status": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ApiCallStatus"
-              }
-            ],
-            "description": "The status of the API call."
-          },
-          "updated_at": {
-            "description": "The time and date the API call was last updated.",
-            "format": "date-time",
-            "title": "DateTime",
-            "type": "string"
-          },
-          "user_id": {
-            "description": "The user ID of the user who created the API call.",
-            "type": "string"
-          },
-          "value": {
-            "description": "The resulting value of the constant.",
-            "format": "double",
-            "nullable": true,
-            "type": "number"
-          }
-        },
-        "required": [
-          "constant",
-          "created_at",
-          "id",
-          "status",
-          "updated_at"
-        ],
-        "type": "object"
-      },
-      "PhysicsConstantName": {
-        "description": "The valid types of phys constant names.",
-        "oneOf": [
-          {
-            "description": "pi - Ratio of a circle's circumference to its diameter. <https://en.wikipedia.org/wiki/Pi>",
-            "enum": [
-              "pi"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "c - Speed of light in vacuum. <https://en.wikipedia.org/wiki//Speed_of_light>",
-            "enum": [
-              "c"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Speed of light in a vacuum. <https://en.wikipedia.org/wiki//Speed_of_light>",
-            "enum": [
-              "speed_of_light"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "G - Newtonian constant of gravitation. <https://en.wikipedia.org/wiki/Gravitational_constant>",
-            "enum": [
-              "G"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Newtonian constant of gravitation. <https://en.wikipedia.org/wiki/Gravitational_constant>",
-            "enum": [
-              "newtonian_gravitation"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "h - Planck constant. <https://en.wikipedia.org/wiki/Planck_constant>",
-            "enum": [
-              "h"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Planck constant. <https://en.wikipedia.org/wiki/Planck_constant>",
-            "enum": [
-              "planck_const"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "mu_0 - vacuum permeability. <https://en.wikipedia.org/wiki/Vacuum_permeability>",
-            "enum": [
-              "mu_0"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "vacuum permeability. <https://en.wikipedia.org/wiki/Vacuum_permeability>",
-            "enum": [
-              "vacuum_permeability"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "ε_0 - vacuum permitivity. <https://en.wikipedia.org/wiki/Vacuum_permittivity>",
-            "enum": [
-              "E_0"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "vacuum permitivity. <https://en.wikipedia.org/wiki/Vacuum_permittivity>]",
-            "enum": [
-              "vacuum_permitivity"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Z_0 - characteristic impedance of vacuum. <https://en.wikipedia.org/wiki/Impedance_of_free_space>",
-            "enum": [
-              "Z_0"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "characteristic impedance of vacuum. <https://en.wikipedia.org/wiki/Impedance_of_free_space>",
-            "enum": [
-              "vacuum_impedance"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "k_e - Coulomb's constant. <https://en.wikipedia.org/wiki/Coulomb_constant>",
-            "enum": [
-              "k_e"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Coulomb's constant. <https://en.wikipedia.org/wiki/Coulomb_constant>",
-            "enum": [
-              "coulomb_const"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "e - elementary charge. <https://en.wikipedia.org/wiki/Elementary_charge>",
-            "enum": [
-              "e"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "elementary charge. <https://en.wikipedia.org/wiki/Elementary_charge>",
-            "enum": [
-              "elementary_charge"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "m_e - electron mass. <https://en.wikipedia.org/wiki/Electron_mass>",
-            "enum": [
-              "m_e"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "electron mass. <https://en.wikipedia.org/wiki/Electron_mass>",
-            "enum": [
-              "electron_mass"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "m_p - proton mass. <https://en.wikipedia.org/wiki/Proton>",
-            "enum": [
-              "m_p"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "proton mass. <https://en.wikipedia.org/wiki/Proton>",
-            "enum": [
-              "proton_mass"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "mu_B - Bohr magneton. <https://en.wikipedia.org/wiki/Bohr_magneton>",
-            "enum": [
-              "mu_B"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Bohr magneton. <https://en.wikipedia.org/wiki/Bohr_magneton>",
-            "enum": [
-              "bohr_magneton"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "NA - Avogadro's Number. <https://en.wikipedia.org/wiki/Avogadro_constant>",
-            "enum": [
-              "NA"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Avogadro's Number. <https://en.wikipedia.org/wiki/Avogadro_constant>",
-            "enum": [
-              "avogadro_num"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "R - Molar Gas constant. <https://en.wikipedia.org/wiki/Gas_constant>",
-            "enum": [
-              "R"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Molar Gas constant. <https://en.wikipedia.org/wiki/Gas_constant>",
-            "enum": [
-              "molar_gas_const"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "K_B - Boltzmann constant. <https://en.wikipedia.org/wiki/Boltzmann_constant>",
-            "enum": [
-              "K_B"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Boltzmann constant. <https://en.wikipedia.org/wiki/Boltzmann_constant>",
-            "enum": [
-              "boltzmann_const"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "F - Faraday constant. <https://en.wikipedia.org/wiki/Faraday_constant>",
-            "enum": [
-              "F"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Faraday constant. <https://en.wikipedia.org/wiki/Faraday_constant>",
-            "enum": [
-              "faraday_const"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Sigma - Stefan-Boltzmann constant. <https://en.wikipedia.org/wiki/Stefan%E2%80%93Boltzmann_constant>",
-            "enum": [
-              "sigma"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Stefan-Boltzmann constant. <https://en.wikipedia.org/wiki/Stefan%E2%80%93Boltzmann_constant>",
-            "enum": [
-              "stefan_boltzmann_const"
             ],
             "type": "string"
           }
@@ -12931,79 +12944,6 @@
         ]
       }
     },
-    "/constant/physics/{constant}": {
-      "get": {
-        "operationId": "get_physics_constant",
-        "parameters": [
-          {
-            "description": "The constant to get.",
-            "in": "path",
-            "name": "constant",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/PhysicsConstantName"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PhysicsConstant"
-                }
-              }
-            },
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "summary": "Get a physics constant.",
-        "tags": [
-          "constant",
-          "hidden"
-        ]
-      }
-    },
     "/file/center-of-mass": {
       "options": {
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
@@ -13059,7 +12999,7 @@
         ]
       },
       "post": {
-        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nCurrently, this endpoint returns the cartesian co-ordinate in world space measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint returns the cartesian co-ordinate in world space measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_center_of_mass",
         "parameters": [
           {
@@ -13372,7 +13312,7 @@
         ]
       },
       "post": {
-        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nCurrently, this endpoint assumes if you are giving a material mass in a specific mass units, we return a density in mass unit per cubic measure unit.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint assumes if you are giving a material mass in a specific mass units, we return a density in mass unit per cubic measure unit.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_density",
         "parameters": [
           {
@@ -13693,7 +13633,7 @@
         ]
       },
       "post": {
-        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nCurrently, this endpoint assumes if you are giving a material density in a specific mass unit per cubic measure unit, we return a mass in mass units. The same mass units as passed in the material density.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint assumes if you are giving a material density in a specific mass unit per cubic measure unit, we return a mass in mass units. The same mass units as passed in the material density.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_mass",
         "parameters": [
           {
@@ -13857,7 +13797,7 @@
         ]
       },
       "post": {
-        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nCurrently, this endpoint returns the square measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the surface area of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint returns the square measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the surface area of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_surface_area",
         "parameters": [
           {
@@ -14004,7 +13944,7 @@
         ]
       },
       "post": {
-        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nCurrently, this endpoint returns the cubic measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint returns the cubic measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_volume",
         "parameters": [
           {
