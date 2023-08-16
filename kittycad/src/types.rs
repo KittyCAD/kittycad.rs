@@ -6233,18 +6233,6 @@ impl tabled::Tabled for FileDensity {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum FileExportFormat {
-    #[doc = "The COLLADA/DAE file format. <https://en.wikipedia.org/wiki/COLLADA>"]
-    #[serde(rename = "dae")]
-    #[display("dae")]
-    Dae,
-    #[doc = "The FBX file format. <https://en.wikipedia.org/wiki/FBX>"]
-    #[serde(rename = "fbx")]
-    #[display("fbx")]
-    Fbx,
-    #[doc = "The FBX file format (in binary). <https://en.wikipedia.org/wiki/FBX>"]
-    #[serde(rename = "fbxb")]
-    #[display("fbxb")]
-    Fbxb,
     #[doc = "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, \
              although by default it will be in binary format and thus technically (glb)."]
     #[serde(rename = "gltf")]
@@ -6285,14 +6273,6 @@ pub enum FileExportFormat {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum FileImportFormat {
-    #[doc = "The COLLADA/DAE file format. <https://en.wikipedia.org/wiki/COLLADA>"]
-    #[serde(rename = "dae")]
-    #[display("dae")]
-    Dae,
-    #[doc = "The FBX file format. <https://en.wikipedia.org/wiki/FBX>"]
-    #[serde(rename = "fbx")]
-    #[display("fbx")]
-    Fbx,
     #[doc = "glTF 2.0."]
     #[serde(rename = "gltf")]
     #[display("gltf")]
