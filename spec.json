@@ -6081,27 +6081,6 @@
         "description": "The valid types of output file formats.",
         "oneOf": [
           {
-            "description": "The COLLADA/DAE file format. <https://en.wikipedia.org/wiki/COLLADA>",
-            "enum": [
-              "dae"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "The FBX file format. <https://en.wikipedia.org/wiki/FBX>",
-            "enum": [
-              "fbx"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "The FBX file format (in binary). <https://en.wikipedia.org/wiki/FBX>",
-            "enum": [
-              "fbxb"
-            ],
-            "type": "string"
-          },
-          {
             "description": "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, although by default it will be in binary format and thus technically (glb).",
             "enum": [
               "gltf"
@@ -6141,20 +6120,6 @@
       "FileImportFormat": {
         "description": "The valid types of source file formats.",
         "oneOf": [
-          {
-            "description": "The COLLADA/DAE file format. <https://en.wikipedia.org/wiki/COLLADA>",
-            "enum": [
-              "dae"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "The FBX file format. <https://en.wikipedia.org/wiki/FBX>",
-            "enum": [
-              "fbx"
-            ],
-            "type": "string"
-          },
           {
             "description": "glTF 2.0.",
             "enum": [
