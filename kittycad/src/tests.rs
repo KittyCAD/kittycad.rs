@@ -207,7 +207,6 @@ async fn test_modeling_websocket() {
             serde_json::to_string(&ModelingCmdReq {
                 cmd: ModelingCmd::StartPath {},
                 cmd_id: path_id,
-                file_id: Default::default(),
             })
             .unwrap(),
         ))
@@ -241,7 +240,6 @@ async fn test_modeling_websocket() {
                         segment: PathSegment::Line { end: point },
                     },
                     cmd_id: Uuid::new_v4(),
-                    file_id: Default::default(),
                 })
                 .unwrap(),
             ))

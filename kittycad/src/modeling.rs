@@ -22,9 +22,8 @@ impl Modeling {
              kittycad::types::CameraDragInteractionType::Zoom,\n                window: \
              kittycad::types::Point2D {\n                    x: 3.14 as f64,\n                    \
              y: 3.14 as f64,\n                },\n            },\n            cmd_id: \
-             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
-             file_id: \"some-string\".to_string(),\n        })\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        })\n        \
+             .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn cmd<'a>(
         &'a self,
@@ -51,7 +50,7 @@ impl Modeling {
         }
     }
 
-    #[doc = "Submit many modeling operations.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_modeling_cmd_batch() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ModelingOutcomes = client\n        .modeling()\n        .cmd_batch(&kittycad::types::ModelingCmdReqBatch {\n            cmds: std::collections::HashMap::from([(\n                \"some-key\".to_string(),\n                kittycad::types::ModelingCmdReq {\n                    cmd: kittycad::types::ModelingCmd::CameraDragEnd {\n                        interaction: kittycad::types::CameraDragInteractionType::Zoom,\n                        window: kittycad::types::Point2D {\n                            x: 3.14 as f64,\n                            y: 3.14 as f64,\n                        },\n                    },\n                    cmd_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                    file_id: \"some-string\".to_string(),\n                },\n            )]),\n            file_id: \"some-string\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Submit many modeling operations.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_modeling_cmd_batch() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ModelingOutcomes = client\n        .modeling()\n        .cmd_batch(&kittycad::types::ModelingCmdReqBatch {\n            cmds: std::collections::HashMap::from([(\n                \"some-key\".to_string(),\n                kittycad::types::ModelingCmdReq {\n                    cmd: kittycad::types::ModelingCmd::CameraDragEnd {\n                        interaction: kittycad::types::CameraDragInteractionType::Zoom,\n                        window: kittycad::types::Point2D {\n                            x: 3.14 as f64,\n                            y: 3.14 as f64,\n                        },\n                    },\n                    cmd_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                },\n            )]),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn cmd_batch<'a>(
         &'a self,
