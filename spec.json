@@ -5493,6 +5493,28 @@
         ],
         "type": "object"
       },
+      "EngineError": {
+        "description": "An error.",
+        "properties": {
+          "error_code": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ErrorCode"
+              }
+            ],
+            "description": "The error code."
+          },
+          "message": {
+            "description": "The error message.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "error_code",
+          "message"
+        ],
+        "type": "object"
+      },
       "EngineMetadata": {
         "description": "Metadata about our currently running server.\n\nThis is mostly used for internal purposes and debugging.",
         "properties": {
@@ -5588,24 +5610,21 @@
         ]
       },
       "Error": {
-        "description": "An error.",
+        "description": "Error information from a response.",
         "properties": {
-          "code": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ErrorCode"
-              }
-            ],
-            "description": "The error code."
+          "error_code": {
+            "type": "string"
           },
           "message": {
-            "description": "The error message.",
+            "type": "string"
+          },
+          "request_id": {
             "type": "string"
           }
         },
         "required": [
-          "code",
-          "message"
+          "message",
+          "request_id"
         ],
         "type": "object"
       },
@@ -5634,7 +5653,7 @@
           "errors": {
             "description": "A list of errors.",
             "items": {
-              "$ref": "#/components/schemas/Error"
+              "$ref": "#/components/schemas/EngineError"
             },
             "type": "array"
           }
