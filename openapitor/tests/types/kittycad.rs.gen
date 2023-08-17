@@ -5416,6 +5416,42 @@ impl tabled::Tabled for EmailAuthenticationForm {
     }
 }
 
+#[doc = "An error."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EngineError {
+    #[doc = "The error code."]
+    pub error_code: ErrorCode,
+    #[doc = "The error message."]
+    pub message: String,
+}
+
+impl std::fmt::Display for EngineError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EngineError {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.error_code).into(),
+            self.message.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["error_code".into(), "message".into()]
+    }
+}
+
 #[doc = "Metadata about our currently running server.\n\nThis is mostly used for internal purposes and debugging."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -5541,15 +5577,15 @@ pub enum Environment {
     Production,
 }
 
-#[doc = "An error."]
+#[doc = "Error information from a response."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Error {
-    #[doc = "The error code."]
-    pub code: ErrorCode,
-    #[doc = "The error message."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error_code: Option<String>,
     pub message: String,
+    pub request_id: String,
 }
 
 impl std::fmt::Display for Error {
@@ -5564,16 +5600,21 @@ impl std::fmt::Display for Error {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Error {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.code).into(),
+            if let Some(error_code) = &self.error_code {
+                format!("{:?}", error_code).into()
+            } else {
+                String::new().into()
+            },
             self.message.clone().into(),
+            self.request_id.clone().into(),
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["code".into(), "message".into()]
+        vec!["error_code".into(), "message".into(), "request_id".into()]
     }
 }
 
@@ -5608,7 +5649,7 @@ pub enum ErrorCode {
 )]
 pub struct ErrorResponse {
     #[doc = "A list of errors."]
-    pub errors: Vec<Error>,
+    pub errors: Vec<EngineError>,
 }
 
 impl std::fmt::Display for ErrorResponse {
@@ -9455,7 +9496,7 @@ impl tabled::Tabled for Session {
 pub enum SnakeCaseResult {
     Err {
         #[doc = "A list of errors."]
-        errors: Vec<Error>,
+        errors: Vec<EngineError>,
     },
 }
 
