@@ -1,12 +1,17 @@
 {
-  "type": "FileConversion",
+  "type": "file_conversion",
   "completed_at": "2022-06-17T00:28:10.059Z",
   "created_at": "2022-06-17T00:27:43.806596404Z",
+  "error": null,
   "id": "23a9759f-ee9b-47de-9a55-deb1ed035793",
+  "output": null,
   "output_format": "obj",
+  "output_format_options": null,
+  "outputs": null,
   "src_format": "stl",
+  "src_format_options": null,
   "started_at": "2022-06-17T00:28:01.084Z",
-  "status": "Completed",
+  "status": "completed",
   "updated_at": "2022-06-17T00:27:43.806596404Z",
   "user_id": "cl0lrkfqu000609jsv1geiudg"
 }
