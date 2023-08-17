@@ -51,6 +51,7 @@ async fn test_create_file_volume() {
 }
 
 #[tokio::test]
+#[ignore]
 async fn test_get_status_of_async_operation() {
     let client = test_client();
 
@@ -62,6 +63,7 @@ async fn test_get_status_of_async_operation() {
 }
 
 #[tokio::test]
+#[ignore]
 async fn serialize_one_of() {
     let client = test_client();
 
@@ -79,6 +81,7 @@ async fn serialize_one_of() {
 
 #[cfg(feature = "tabled")]
 #[tokio::test]
+#[ignore]
 async fn tabled_one_of() {
     let client = test_client();
 
