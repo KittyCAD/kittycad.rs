@@ -4,7 +4,7 @@
     "path": "/info/x-rust",
     "value": {
       "client": "// Authenticate via an API token.\nlet client = kittycad::Client::new(\"$TOKEN\");\n\n// - OR -\n\n// Authenticate with your token and host parsed from the environment variables:\n// `KITTYCAD_API_TOKEN`.\nlet client = kittycad::Client::new_from_env();",
-      "install": "[dependencies]\nkittycad = \"0.2.14\""
+      "install": "[dependencies]\nkittycad = \"0.2.15\""
     }
   },
   {
@@ -201,7 +201,7 @@
   },
   {
     "op": "add",
-    "path": "/paths/~1modeling~1cmd_batch/post/x-rust",
+    "path": "/paths/~1modeling~1cmd-batch/post/x-rust",
     "value": {
       "example": "/// Submit many modeling operations.\nuse std::str::FromStr;\nasync fn example_modeling_cmd_batch() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ModelingOutcomes = client\n        .modeling()\n        .cmd_batch(&kittycad::types::ModelingCmdReqBatch {\n            cmds: std::collections::HashMap::from([(\n                \"some-key\".to_string(),\n                kittycad::types::ModelingCmdReq {\n                    cmd: kittycad::types::ModelingCmd::CameraDragEnd {\n                        interaction: kittycad::types::CameraDragInteractionType::Zoom,\n                        window: kittycad::types::Point2D {\n                            x: 3.14 as f64,\n                            y: 3.14 as f64,\n                        },\n                    },\n                    cmd_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                },\n            )]),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/modeling/struct.Modeling.html#method.cmd_batch"

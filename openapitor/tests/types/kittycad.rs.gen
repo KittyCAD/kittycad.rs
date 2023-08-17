@@ -1054,16 +1054,24 @@ pub enum ApiCallQueryGroupBy {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum ApiCallStatus {
     #[doc = "The async API call is queued."]
+    #[serde(rename = "queued")]
+    #[display("queued")]
     Queued,
     #[doc = "The async API call was uploaded to be converted."]
+    #[serde(rename = "uploaded")]
+    #[display("uploaded")]
     Uploaded,
     #[doc = "The async API call is in progress."]
-    #[serde(rename = "In Progress")]
-    #[display("In Progress")]
+    #[serde(rename = "in_progress")]
+    #[display("in_progress")]
     InProgress,
     #[doc = "The async API call has completed."]
+    #[serde(rename = "completed")]
+    #[display("completed")]
     Completed,
     #[doc = "The async API call has failed."]
+    #[serde(rename = "failed")]
+    #[display("failed")]
     Failed,
 }
 
@@ -1625,12 +1633,97 @@ impl tabled::Tabled for AsyncApiCall {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
-    FileConversion(FileConversion),
-    FileCenterOfMass(FileCenterOfMass),
-    FileMass(FileMass),
-    FileVolume(FileVolume),
-    FileDensity(FileDensity),
-    FileSurfaceArea(FileSurfaceArea),
+    #[serde(rename = "file_conversion")]
+    FileConversion {
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        created_at: chrono::DateTime<chrono::Utc>,
+        error: Option<String>,
+        id: uuid::Uuid,
+        output: Option<base64::Base64Data>,
+        output_format: FileExportFormat,
+        output_format_options: Option<OutputFormat>,
+        outputs: Option<std::collections::HashMap<String, base64::Base64Data>>,
+        src_format: FileImportFormat,
+        src_format_options: Option<InputFormat>,
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        status: ApiCallStatus,
+        updated_at: chrono::DateTime<chrono::Utc>,
+        user_id: Option<String>,
+    },
+    #[serde(rename = "file_center_of_mass")]
+    FileCenterOfMass {
+        center_of_mass: Option<Point3D>,
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        created_at: chrono::DateTime<chrono::Utc>,
+        error: Option<String>,
+        id: uuid::Uuid,
+        output_unit: UnitLength,
+        src_format: FileImportFormat,
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        status: ApiCallStatus,
+        updated_at: chrono::DateTime<chrono::Utc>,
+        user_id: Option<String>,
+    },
+    #[serde(rename = "file_mass")]
+    FileMass {
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        created_at: chrono::DateTime<chrono::Utc>,
+        error: Option<String>,
+        id: uuid::Uuid,
+        mass: Option<f64>,
+        material_density: Option<f64>,
+        material_density_unit: UnitDensity,
+        output_unit: UnitMass,
+        src_format: FileImportFormat,
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        status: ApiCallStatus,
+        updated_at: chrono::DateTime<chrono::Utc>,
+        user_id: Option<String>,
+    },
+    #[serde(rename = "file_volume")]
+    FileVolume {
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        created_at: chrono::DateTime<chrono::Utc>,
+        error: Option<String>,
+        id: uuid::Uuid,
+        output_unit: UnitVolume,
+        src_format: FileImportFormat,
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        status: ApiCallStatus,
+        updated_at: chrono::DateTime<chrono::Utc>,
+        user_id: Option<String>,
+        volume: Option<f64>,
+    },
+    #[serde(rename = "file_density")]
+    FileDensity {
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        created_at: chrono::DateTime<chrono::Utc>,
+        density: Option<f64>,
+        error: Option<String>,
+        id: uuid::Uuid,
+        material_mass: Option<f64>,
+        material_mass_unit: UnitMass,
+        output_unit: UnitDensity,
+        src_format: FileImportFormat,
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        status: ApiCallStatus,
+        updated_at: chrono::DateTime<chrono::Utc>,
+        user_id: Option<String>,
+    },
+    #[serde(rename = "file_surface_area")]
+    FileSurfaceArea {
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        created_at: chrono::DateTime<chrono::Utc>,
+        error: Option<String>,
+        id: uuid::Uuid,
+        output_unit: UnitArea,
+        src_format: FileImportFormat,
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        status: ApiCallStatus,
+        surface_area: Option<f64>,
+        updated_at: chrono::DateTime<chrono::Utc>,
+        user_id: Option<String>,
+    },
 }
 
 #[doc = "A single page of results"]
@@ -1717,16 +1810,28 @@ impl tabled::Tabled for AsyncApiCallResultsPage {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum AsyncApiCallType {
     #[doc = "File conversion."]
+    #[serde(rename = "file_conversion")]
+    #[display("file_conversion")]
     FileConversion,
     #[doc = "File volume."]
+    #[serde(rename = "file_volume")]
+    #[display("file_volume")]
     FileVolume,
     #[doc = "File center of mass."]
+    #[serde(rename = "file_center_of_mass")]
+    #[display("file_center_of_mass")]
     FileCenterOfMass,
     #[doc = "File mass."]
+    #[serde(rename = "file_mass")]
+    #[display("file_mass")]
     FileMass,
     #[doc = "File density."]
+    #[serde(rename = "file_density")]
+    #[display("file_density")]
     FileDensity,
     #[doc = "File surface area."]
+    #[serde(rename = "file_surface_area")]
+    #[display("file_surface_area")]
     FileSurfaceArea,
 }
 
@@ -3773,13 +3878,13 @@ impl tabled::Tabled for Coupon {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum CreatedAtSortMode {
-    #[doc = "sort in increasing order of \"created_at\""]
-    #[serde(rename = "created-at-ascending")]
-    #[display("created-at-ascending")]
+    #[doc = "Sort in increasing order of \"created_at\"."]
+    #[serde(rename = "created_at_ascending")]
+    #[display("created_at_ascending")]
     CreatedAtAscending,
-    #[doc = "sort in decreasing order of \"created_at\""]
-    #[serde(rename = "created-at-descending")]
-    #[display("created-at-descending")]
+    #[doc = "Sort in decreasing order of \"created_at\"."]
+    #[serde(rename = "created_at_descending")]
+    #[display("created_at_descending")]
     CreatedAtDescending,
 }
 
@@ -5436,15 +5541,15 @@ pub enum Environment {
     Production,
 }
 
-#[doc = "Error information from a response."]
+#[doc = "An error."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Error {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub error_code: Option<String>,
+    #[doc = "The error code."]
+    pub code: ErrorCode,
+    #[doc = "The error message."]
     pub message: String,
-    pub request_id: String,
 }
 
 impl std::fmt::Display for Error {
@@ -5459,21 +5564,72 @@ impl std::fmt::Display for Error {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Error {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            if let Some(error_code) = &self.error_code {
-                format!("{:?}", error_code).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.code).into(),
             self.message.clone().into(),
-            self.request_id.clone().into(),
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["error_code".into(), "message".into(), "request_id".into()]
+        vec!["code".into(), "message".into()]
+    }
+}
+
+#[doc = "The type of errorcode."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ErrorCode {
+    #[doc = "User requested something impossible or invalid"]
+    #[serde(rename = "bad_request")]
+    #[display("bad_request")]
+    BadRequest,
+    #[doc = "Engine failed to complete request, consider retrying"]
+    #[serde(rename = "internal_engine")]
+    #[display("internal_engine")]
+    InternalEngine,
+}
+
+#[doc = "The error response."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ErrorResponse {
+    #[doc = "A list of errors."]
+    pub errors: Vec<Error>,
+}
+
+impl std::fmt::Display for ErrorResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ErrorResponse {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.errors).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["errors".into()]
     }
 }
 
@@ -6612,6 +6768,55 @@ impl tabled::Tabled for Gateway {
             "port".into(),
             "tls_timeout".into(),
         ]
+    }
+}
+
+#[doc = "Representation of an ICE server used for STUN/TURN Used to initiate WebRTC connections based on <https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer>"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct IceServer {
+    #[doc = "Credentials for a given TURN server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub credential: Option<String>,
+    #[doc = "URLs for a given STUN/TURN server. IceServer urls can either be a string or an array of strings But, we choose to always convert to an array of strings for consistency"]
+    pub urls: Vec<String>,
+    #[doc = "Username for a given TURN server."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub username: Option<String>,
+}
+
+impl std::fmt::Display for IceServer {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for IceServer {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(credential) = &self.credential {
+                format!("{:?}", credential).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.urls).into(),
+            if let Some(username) = &self.username {
+                format!("{:?}", username).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["credential".into(), "urls".into(), "username".into()]
     }
 }
 
@@ -7768,19 +7973,19 @@ pub enum ModelingCmd {
     #[serde(rename = "solid3d_get_opposite_edge")]
     Solid3DGetOppositeEdge {
         edge_id: uuid::Uuid,
-        face_uuid: uuid::Uuid,
+        face_id: uuid::Uuid,
         object_id: uuid::Uuid,
     },
     #[serde(rename = "solid3d_get_next_adjacent_edge")]
     Solid3DGetNextAdjacentEdge {
         edge_id: uuid::Uuid,
-        face_uuid: uuid::Uuid,
+        face_id: uuid::Uuid,
         object_id: uuid::Uuid,
     },
     #[serde(rename = "solid3d_get_prev_adjacent_edge")]
     Solid3DGetPrevAdjacentEdge {
         edge_id: uuid::Uuid,
-        face_uuid: uuid::Uuid,
+        face_id: uuid::Uuid,
         object_id: uuid::Uuid,
     },
 }
@@ -8706,6 +8911,42 @@ impl tabled::Tabled for Pong {
     }
 }
 
+#[doc = "A raw file with unencoded contents to be passed over binary websockets."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct RawFile {
+    #[doc = "The contents of the file."]
+    pub contents: Vec<u8>,
+    #[doc = "The name of the file."]
+    pub name: String,
+}
+
+impl std::fmt::Display for RawFile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for RawFile {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.contents).into(),
+            self.name.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["contents".into(), "name".into()]
+    }
+}
+
 #[doc = "RegistryServiceConfig stores daemon registry services configuration."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8782,6 +9023,288 @@ impl tabled::Tabled for RegistryServiceConfig {
             "insecure_registry_cid_rs".into(),
             "mirrors".into(),
         ]
+    }
+}
+
+#[doc = "ICECandidate represents a ice candidate"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct RtcIceCandidate {
+    #[doc = "The address of the candidate."]
+    pub address: String,
+    #[doc = "The component of the candidate."]
+    pub component: u16,
+    #[doc = "The foundation for the address."]
+    pub foundation: String,
+    #[doc = "The port used for the candidate."]
+    pub port: u16,
+    #[doc = "The priority of the candidate."]
+    pub priority: u32,
+    #[doc = "The protocol used for the candidate."]
+    pub protocol: RtcIceProtocol,
+    #[doc = "The related address of the candidate."]
+    pub related_address: String,
+    #[doc = "The related port of the candidate."]
+    pub related_port: u16,
+    #[doc = "The stats ID."]
+    pub stats_id: String,
+    #[doc = "The TCP type of the candidate."]
+    pub tcp_type: String,
+    #[doc = "The type of the candidate."]
+    pub typ: RtcIceCandidateType,
+}
+
+impl std::fmt::Display for RtcIceCandidate {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for RtcIceCandidate {
+    const LENGTH: usize = 11;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.address.clone().into(),
+            format!("{:?}", self.component).into(),
+            self.foundation.clone().into(),
+            format!("{:?}", self.port).into(),
+            format!("{:?}", self.priority).into(),
+            format!("{:?}", self.protocol).into(),
+            self.related_address.clone().into(),
+            format!("{:?}", self.related_port).into(),
+            self.stats_id.clone().into(),
+            self.tcp_type.clone().into(),
+            format!("{:?}", self.typ).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "address".into(),
+            "component".into(),
+            "foundation".into(),
+            "port".into(),
+            "priority".into(),
+            "protocol".into(),
+            "related_address".into(),
+            "related_port".into(),
+            "stats_id".into(),
+            "tcp_type".into(),
+            "typ".into(),
+        ]
+    }
+}
+
+#[doc = "ICECandidateInit is used to serialize ice candidates"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct RtcIceCandidateInit {
+    #[doc = "The candidate string associated with the object."]
+    pub candidate: String,
+    #[doc = "The index (starting at zero) of the m-line in the SDP this candidate is associated with."]
+    #[serde(
+        rename = "sdpMLineIndex",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub sdp_m_line_index: Option<u16>,
+    #[doc = "The identifier of the \"media stream identification\" as defined in [RFC 8841](https://tools.ietf.org/html/rfc8841)."]
+    #[serde(rename = "sdpMid", default, skip_serializing_if = "Option::is_none")]
+    pub sdp_mid: Option<String>,
+    #[doc = "The username fragment (as defined in [RFC 8445](https://tools.ietf.org/html/rfc8445#section-5.2.1)) associated with the object."]
+    #[serde(
+        rename = "usernameFragment",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub username_fragment: Option<String>,
+}
+
+impl std::fmt::Display for RtcIceCandidateInit {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for RtcIceCandidateInit {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.candidate.clone().into(),
+            if let Some(sdp_m_line_index) = &self.sdp_m_line_index {
+                format!("{:?}", sdp_m_line_index).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(sdp_mid) = &self.sdp_mid {
+                format!("{:?}", sdp_mid).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(username_fragment) = &self.username_fragment {
+                format!("{:?}", username_fragment).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "candidate".into(),
+            "sdp_m_line_index".into(),
+            "sdp_mid".into(),
+            "username_fragment".into(),
+        ]
+    }
+}
+
+#[doc = "ICECandidateType represents the type of the ICE candidate used."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum RtcIceCandidateType {
+    #[doc = "Unspecified indicates that the candidate type is unspecified."]
+    #[serde(rename = "unspecified")]
+    #[display("unspecified")]
+    Unspecified,
+    #[doc = "ICECandidateTypeHost indicates that the candidate is of Host type as described in <https://tools.ietf.org/html/rfc8445#section-5.1.1.1>. A candidate obtained by binding to a specific port from an IP address on the host. This includes IP addresses on physical interfaces and logical ones, such as ones obtained through VPNs."]
+    #[serde(rename = "host")]
+    #[display("host")]
+    Host,
+    #[doc = "ICECandidateTypeSrflx indicates the the candidate is of Server Reflexive type as described <https://tools.ietf.org/html/rfc8445#section-5.1.1.2>. A candidate type whose IP address and port are a binding allocated by a NAT for an ICE agent after it sends a packet through the NAT to a server, such as a STUN server."]
+    #[serde(rename = "srflx")]
+    #[display("srflx")]
+    Srflx,
+    #[doc = "ICECandidateTypePrflx indicates that the candidate is of Peer Reflexive type. A candidate type whose IP address and port are a binding allocated by a NAT for an ICE agent after it sends a packet through the NAT to its peer."]
+    #[serde(rename = "prflx")]
+    #[display("prflx")]
+    Prflx,
+    #[doc = "ICECandidateTypeRelay indicates the the candidate is of Relay type as described in <https://tools.ietf.org/html/rfc8445#section-5.1.1.2>. A candidate type obtained from a relay server, such as a TURN server."]
+    #[serde(rename = "relay")]
+    #[display("relay")]
+    Relay,
+}
+
+#[doc = "ICEProtocol indicates the transport protocol type that is used in the ice.URL structure."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum RtcIceProtocol {
+    #[doc = "Unspecified indicates that the protocol is unspecified."]
+    #[serde(rename = "unspecified")]
+    #[display("unspecified")]
+    Unspecified,
+    #[doc = "UDP indicates the URL uses a UDP transport."]
+    #[serde(rename = "udp")]
+    #[display("udp")]
+    Udp,
+    #[doc = "TCP indicates the URL uses a TCP transport."]
+    #[serde(rename = "tcp")]
+    #[display("tcp")]
+    Tcp,
+}
+
+#[doc = "SDPType describes the type of an SessionDescription."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum RtcSdpType {
+    #[doc = "Unspecified indicates that the type is unspecified."]
+    #[serde(rename = "unspecified")]
+    #[display("unspecified")]
+    Unspecified,
+    #[doc = "indicates that a description MUST be treated as an SDP offer."]
+    #[serde(rename = "offer")]
+    #[display("offer")]
+    Offer,
+    #[doc = "indicates that a description MUST be treated as an SDP answer, but not a final answer. A description used as an SDP pranswer may be applied as a response to an SDP offer, or an update to a previously sent SDP pranswer."]
+    #[serde(rename = "pranswer")]
+    #[display("pranswer")]
+    Pranswer,
+    #[doc = "indicates that a description MUST be treated as an SDP final answer, and the offer-answer exchange MUST be considered complete. A description used as an SDP answer may be applied as a response to an SDP offer or as an update to a previously sent SDP pranswer."]
+    #[serde(rename = "answer")]
+    #[display("answer")]
+    Answer,
+    #[doc = "indicates that a description MUST be treated as canceling the current SDP negotiation and moving the SDP offer and answer back to what it was in the previous stable state. Note the local or remote SDP descriptions in the previous stable state could be null if there has not yet been a successful offer-answer negotiation."]
+    #[serde(rename = "rollback")]
+    #[display("rollback")]
+    Rollback,
+}
+
+#[doc = "SessionDescription is used to expose local and remote session descriptions."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct RtcSessionDescription {
+    #[doc = "SDP string."]
+    pub sdp: String,
+    #[doc = "SDP type."]
+    #[serde(rename = "type")]
+    pub type_: RtcSdpType,
+}
+
+impl std::fmt::Display for RtcSessionDescription {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for RtcSessionDescription {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.sdp.clone().into(), format!("{:?}", self.type_).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["sdp".into(), "type_".into()]
     }
 }
 
@@ -8923,6 +9446,17 @@ impl tabled::Tabled for Session {
             "user_id".into(),
         ]
     }
+}
+
+#[doc = "Serde serializes Result into JSON as \"Ok\" and \"Err\", but we want \"ok\" and \"err\". So, create a new enum that serializes as lowercase."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub enum SnakeCaseResult {
+    Err {
+        #[doc = "A list of errors."]
+        errors: Vec<Error>,
+    },
 }
 
 #[doc = "Describes the storage format of a glTF 2.0 scene."]
@@ -11408,4 +11942,44 @@ impl tabled::Tabled for VerificationToken {
             "updated_at".into(),
         ]
     }
+}
+
+#[doc = "The websocket messages the server receives."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum WebSocketMessages {
+    #[serde(rename = "trickle_ice")]
+    TrickleIce { candidate: RtcIceCandidateInit },
+    #[serde(rename = "sdp_offer")]
+    SdpOffer { offer: RtcSessionDescription },
+    #[serde(rename = "modeling_cmd_req")]
+    ModelingCmdReq {
+        cmd: ModelingCmd,
+        cmd_id: uuid::Uuid,
+    },
+}
+
+#[doc = "The websocket messages this server sends."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum WebSocketResponses {
+    #[serde(rename = "trickle_ice")]
+    TrickleIce { candidate: RtcIceCandidate },
+    #[serde(rename = "sdp_answer")]
+    SdpAnswer { answer: RtcSessionDescription },
+    #[serde(rename = "ice_server_info")]
+    IceServerInfo { ice_servers: Vec<IceServer> },
+    #[serde(rename = "modeling")]
+    Modeling {
+        cmd_id: uuid::Uuid,
+        result: SnakeCaseResult,
+    },
+    #[serde(rename = "export")]
+    Export { files: Vec<RawFile> },
 }

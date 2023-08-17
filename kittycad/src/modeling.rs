@@ -58,7 +58,7 @@ impl Modeling {
     ) -> Result<crate::types::ModelingOutcomes, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "modeling/cmd_batch"),
+            format!("{}/{}", self.client.base_url, "modeling/cmd-batch"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
