@@ -438,35 +438,35 @@
           {
             "description": "The async API call is queued.",
             "enum": [
-              "Queued"
+              "queued"
             ],
             "type": "string"
           },
           {
             "description": "The async API call was uploaded to be converted.",
             "enum": [
-              "Uploaded"
+              "uploaded"
             ],
             "type": "string"
           },
           {
             "description": "The async API call is in progress.",
             "enum": [
-              "In Progress"
+              "in_progress"
             ],
             "type": "string"
           },
           {
             "description": "The async API call has completed.",
             "enum": [
-              "Completed"
+              "completed"
             ],
             "type": "string"
           },
           {
             "description": "The async API call has failed.",
             "enum": [
-              "Failed"
+              "failed"
             ],
             "type": "string"
           }
@@ -894,7 +894,7 @@
               },
               "type": {
                 "enum": [
-                  "FileConversion"
+                  "file_conversion"
                 ],
                 "type": "string"
               },
@@ -991,7 +991,7 @@
               },
               "type": {
                 "enum": [
-                  "FileCenterOfMass"
+                  "file_center_of_mass"
                 ],
                 "type": "string"
               },
@@ -1099,7 +1099,7 @@
               },
               "type": {
                 "enum": [
-                  "FileMass"
+                  "file_mass"
                 ],
                 "type": "string"
               },
@@ -1188,7 +1188,7 @@
               },
               "type": {
                 "enum": [
-                  "FileVolume"
+                  "file_volume"
                 ],
                 "type": "string"
               },
@@ -1302,7 +1302,7 @@
               },
               "type": {
                 "enum": [
-                  "FileDensity"
+                  "file_density"
                 ],
                 "type": "string"
               },
@@ -1397,7 +1397,7 @@
               },
               "type": {
                 "enum": [
-                  "FileSurfaceArea"
+                  "file_surface_area"
                 ],
                 "type": "string"
               },
@@ -1452,42 +1452,42 @@
           {
             "description": "File conversion.",
             "enum": [
-              "FileConversion"
+              "file_conversion"
             ],
             "type": "string"
           },
           {
             "description": "File volume.",
             "enum": [
-              "FileVolume"
+              "file_volume"
             ],
             "type": "string"
           },
           {
             "description": "File center of mass.",
             "enum": [
-              "FileCenterOfMass"
+              "file_center_of_mass"
             ],
             "type": "string"
           },
           {
             "description": "File mass.",
             "enum": [
-              "FileMass"
+              "file_mass"
             ],
             "type": "string"
           },
           {
             "description": "File density.",
             "enum": [
-              "FileDensity"
+              "file_density"
             ],
             "type": "string"
           },
           {
             "description": "File surface area.",
             "enum": [
-              "FileSurfaceArea"
+              "file_surface_area"
             ],
             "type": "string"
           }
@@ -3897,16 +3897,16 @@
         "description": "Supported set of sort modes for scanning by created_at only.\n\nCurrently, we only support scanning in ascending order.",
         "oneOf": [
           {
-            "description": "sort in increasing order of \"created_at\"",
+            "description": "Sort in increasing order of \"created_at\".",
             "enum": [
-              "created-at-ascending"
+              "created_at_ascending"
             ],
             "type": "string"
           },
           {
-            "description": "sort in decreasing order of \"created_at\"",
+            "description": "Sort in decreasing order of \"created_at\".",
             "enum": [
-              "created-at-descending"
+              "created_at_descending"
             ],
             "type": "string"
           }
@@ -5588,21 +5588,59 @@
         ]
       },
       "Error": {
-        "description": "Error information from a response.",
+        "description": "An error.",
         "properties": {
-          "error_code": {
-            "type": "string"
+          "code": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ErrorCode"
+              }
+            ],
+            "description": "The error code."
           },
           "message": {
-            "type": "string"
-          },
-          "request_id": {
+            "description": "The error message.",
             "type": "string"
           }
         },
         "required": [
-          "message",
-          "request_id"
+          "code",
+          "message"
+        ],
+        "type": "object"
+      },
+      "ErrorCode": {
+        "description": "The type of errorcode.",
+        "oneOf": [
+          {
+            "description": "User requested something impossible or invalid",
+            "enum": [
+              "bad_request"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Engine failed to complete request, consider retrying",
+            "enum": [
+              "internal_engine"
+            ],
+            "type": "string"
+          }
+        ]
+      },
+      "ErrorResponse": {
+        "description": "The error response.",
+        "properties": {
+          "errors": {
+            "description": "A list of errors.",
+            "items": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "errors"
         ],
         "type": "object"
       },
@@ -6478,6 +6516,32 @@
             "type": "integer"
           }
         },
+        "type": "object"
+      },
+      "IceServer": {
+        "description": "Representation of an ICE server used for STUN/TURN Used to initiate WebRTC connections based on <https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer>",
+        "properties": {
+          "credential": {
+            "description": "Credentials for a given TURN server.",
+            "nullable": true,
+            "type": "string"
+          },
+          "urls": {
+            "description": "URLs for a given STUN/TURN server. IceServer urls can either be a string or an array of strings But, we choose to always convert to an array of strings for consistency",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "username": {
+            "description": "Username for a given TURN server.",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "urls"
+        ],
         "type": "object"
       },
       "ImageType": {
@@ -8168,7 +8232,7 @@
                 "format": "uuid",
                 "type": "string"
               },
-              "face_uuid": {
+              "face_id": {
                 "description": "Which face is used to figure out the opposite edge?",
                 "format": "uuid",
                 "type": "string"
@@ -8187,7 +8251,7 @@
             },
             "required": [
               "edge_id",
-              "face_uuid",
+              "face_id",
               "object_id",
               "type"
             ],
@@ -8201,7 +8265,7 @@
                 "format": "uuid",
                 "type": "string"
               },
-              "face_uuid": {
+              "face_id": {
                 "description": "Which face is used to figure out the opposite edge?",
                 "format": "uuid",
                 "type": "string"
@@ -8220,7 +8284,7 @@
             },
             "required": [
               "edge_id",
-              "face_uuid",
+              "face_id",
               "object_id",
               "type"
             ],
@@ -8234,7 +8298,7 @@
                 "format": "uuid",
                 "type": "string"
               },
-              "face_uuid": {
+              "face_id": {
                 "description": "Which face is used to figure out the opposite edge?",
                 "format": "uuid",
                 "type": "string"
@@ -8253,7 +8317,7 @@
             },
             "required": [
               "edge_id",
-              "face_uuid",
+              "face_id",
               "object_id",
               "type"
             ],
@@ -9309,6 +9373,29 @@
         ],
         "type": "object"
       },
+      "RawFile": {
+        "description": "A raw file with unencoded contents to be passed over binary websockets.",
+        "properties": {
+          "contents": {
+            "description": "The contents of the file.",
+            "items": {
+              "format": "uint8",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "The name of the file.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "contents",
+          "name"
+        ],
+        "type": "object"
+      },
       "RegistryServiceConfig": {
         "description": "RegistryServiceConfig stores daemon registry services configuration.",
         "properties": {
@@ -9347,6 +9434,243 @@
             "type": "array"
           }
         },
+        "type": "object"
+      },
+      "RtcIceCandidate": {
+        "description": "ICECandidate represents a ice candidate",
+        "properties": {
+          "address": {
+            "description": "The address of the candidate.",
+            "type": "string"
+          },
+          "component": {
+            "description": "The component of the candidate.",
+            "format": "uint16",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "foundation": {
+            "description": "The foundation for the address.",
+            "type": "string"
+          },
+          "port": {
+            "description": "The port used for the candidate.",
+            "format": "uint16",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "priority": {
+            "description": "The priority of the candidate.",
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "protocol": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RtcIceProtocol"
+              }
+            ],
+            "description": "The protocol used for the candidate."
+          },
+          "related_address": {
+            "description": "The related address of the candidate.",
+            "type": "string"
+          },
+          "related_port": {
+            "description": "The related port of the candidate.",
+            "format": "uint16",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "stats_id": {
+            "description": "The stats ID.",
+            "type": "string"
+          },
+          "tcp_type": {
+            "description": "The TCP type of the candidate.",
+            "type": "string"
+          },
+          "typ": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RtcIceCandidateType"
+              }
+            ],
+            "description": "The type of the candidate."
+          }
+        },
+        "required": [
+          "address",
+          "component",
+          "foundation",
+          "port",
+          "priority",
+          "protocol",
+          "related_address",
+          "related_port",
+          "stats_id",
+          "tcp_type",
+          "typ"
+        ],
+        "type": "object"
+      },
+      "RtcIceCandidateInit": {
+        "description": "ICECandidateInit is used to serialize ice candidates",
+        "properties": {
+          "candidate": {
+            "description": "The candidate string associated with the object.",
+            "type": "string"
+          },
+          "sdpMLineIndex": {
+            "description": "The index (starting at zero) of the m-line in the SDP this candidate is associated with.",
+            "format": "uint16",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "sdpMid": {
+            "description": "The identifier of the \"media stream identification\" as defined in [RFC 8841](https://tools.ietf.org/html/rfc8841).",
+            "nullable": true,
+            "type": "string"
+          },
+          "usernameFragment": {
+            "description": "The username fragment (as defined in [RFC 8445](https://tools.ietf.org/html/rfc8445#section-5.2.1)) associated with the object.",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate"
+        ],
+        "type": "object"
+      },
+      "RtcIceCandidateType": {
+        "description": "ICECandidateType represents the type of the ICE candidate used.",
+        "oneOf": [
+          {
+            "description": "Unspecified indicates that the candidate type is unspecified.",
+            "enum": [
+              "unspecified"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "ICECandidateTypeHost indicates that the candidate is of Host type as described in <https://tools.ietf.org/html/rfc8445#section-5.1.1.1>. A candidate obtained by binding to a specific port from an IP address on the host. This includes IP addresses on physical interfaces and logical ones, such as ones obtained through VPNs.",
+            "enum": [
+              "host"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "ICECandidateTypeSrflx indicates the the candidate is of Server Reflexive type as described <https://tools.ietf.org/html/rfc8445#section-5.1.1.2>. A candidate type whose IP address and port are a binding allocated by a NAT for an ICE agent after it sends a packet through the NAT to a server, such as a STUN server.",
+            "enum": [
+              "srflx"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "ICECandidateTypePrflx indicates that the candidate is of Peer Reflexive type. A candidate type whose IP address and port are a binding allocated by a NAT for an ICE agent after it sends a packet through the NAT to its peer.",
+            "enum": [
+              "prflx"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "ICECandidateTypeRelay indicates the the candidate is of Relay type as described in <https://tools.ietf.org/html/rfc8445#section-5.1.1.2>. A candidate type obtained from a relay server, such as a TURN server.",
+            "enum": [
+              "relay"
+            ],
+            "type": "string"
+          }
+        ]
+      },
+      "RtcIceProtocol": {
+        "description": "ICEProtocol indicates the transport protocol type that is used in the ice.URL structure.",
+        "oneOf": [
+          {
+            "description": "Unspecified indicates that the protocol is unspecified.",
+            "enum": [
+              "unspecified"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "UDP indicates the URL uses a UDP transport.",
+            "enum": [
+              "udp"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "TCP indicates the URL uses a TCP transport.",
+            "enum": [
+              "tcp"
+            ],
+            "type": "string"
+          }
+        ]
+      },
+      "RtcSdpType": {
+        "description": "SDPType describes the type of an SessionDescription.",
+        "oneOf": [
+          {
+            "description": "Unspecified indicates that the type is unspecified.",
+            "enum": [
+              "unspecified"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "indicates that a description MUST be treated as an SDP offer.",
+            "enum": [
+              "offer"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "indicates that a description MUST be treated as an SDP answer, but not a final answer. A description used as an SDP pranswer may be applied as a response to an SDP offer, or an update to a previously sent SDP pranswer.",
+            "enum": [
+              "pranswer"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "indicates that a description MUST be treated as an SDP final answer, and the offer-answer exchange MUST be considered complete. A description used as an SDP answer may be applied as a response to an SDP offer or as an update to a previously sent SDP pranswer.",
+            "enum": [
+              "answer"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "indicates that a description MUST be treated as canceling the current SDP negotiation and moving the SDP offer and answer back to what it was in the previous stable state. Note the local or remote SDP descriptions in the previous stable state could be null if there has not yet been a successful offer-answer negotiation.",
+            "enum": [
+              "rollback"
+            ],
+            "type": "string"
+          }
+        ]
+      },
+      "RtcSessionDescription": {
+        "description": "SessionDescription is used to expose local and remote session descriptions.",
+        "properties": {
+          "sdp": {
+            "description": "SDP string.",
+            "type": "string"
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RtcSdpType"
+              }
+            ],
+            "description": "SDP type."
+          }
+        },
+        "required": [
+          "sdp",
+          "type"
+        ],
         "type": "object"
       },
       "Runtime": {
@@ -9438,6 +9762,37 @@
           "updated_at"
         ],
         "type": "object"
+      },
+      "SnakeCaseResult": {
+        "description": "Serde serializes Result into JSON as \"Ok\" and \"Err\", but we want \"ok\" and \"err\". So, create a new enum that serializes as lowercase.",
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "description": "The result is Ok.",
+            "properties": {
+              "ok": {
+                "$ref": "#/components/schemas/OkModelingCmdResponse"
+              }
+            },
+            "required": [
+              "ok"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "The result is Err.",
+            "properties": {
+              "err": {
+                "$ref": "#/components/schemas/ErrorResponse"
+              }
+            },
+            "required": [
+              "err"
+            ],
+            "type": "object"
+          }
+        ]
       },
       "Storage": {
         "description": "Describes the storage format of a glTF 2.0 scene.",
@@ -11508,6 +11863,224 @@
           "updated_at"
         ],
         "type": "object"
+      },
+      "WebSocketMessages": {
+        "description": "The websocket messages the server receives.",
+        "oneOf": [
+          {
+            "description": "The trickle ICE candidate request.",
+            "properties": {
+              "candidate": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RtcIceCandidateInit"
+                  }
+                ],
+                "description": "Information about the ICE candidate."
+              },
+              "type": {
+                "enum": [
+                  "trickle_ice"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "candidate",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The SDP offer request.",
+            "properties": {
+              "offer": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RtcSessionDescription"
+                  }
+                ],
+                "description": "The session description."
+              },
+              "type": {
+                "enum": [
+                  "sdp_offer"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "offer",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The modeling command request.",
+            "properties": {
+              "cmd": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ModelingCmd"
+                  }
+                ],
+                "description": "Which command to submit to the Kittycad engine."
+              },
+              "cmd_id": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ModelingCmdId"
+                  }
+                ],
+                "description": "ID of command being submitted."
+              },
+              "type": {
+                "enum": [
+                  "modeling_cmd_req"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "cmd",
+              "cmd_id",
+              "type"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "WebSocketResponses": {
+        "description": "The websocket messages this server sends.",
+        "oneOf": [
+          {
+            "description": "The trickle ICE candidate response.",
+            "properties": {
+              "candidate": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RtcIceCandidate"
+                  }
+                ],
+                "description": "Information about the ICE candidate."
+              },
+              "type": {
+                "enum": [
+                  "trickle_ice"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "candidate",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The SDP answer response.",
+            "properties": {
+              "answer": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RtcSessionDescription"
+                  }
+                ],
+                "description": "The session description."
+              },
+              "type": {
+                "enum": [
+                  "sdp_answer"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "answer",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The ICE server info response.",
+            "properties": {
+              "ice_servers": {
+                "description": "Information about the ICE servers.",
+                "items": {
+                  "$ref": "#/components/schemas/IceServer"
+                },
+                "type": "array"
+              },
+              "type": {
+                "enum": [
+                  "ice_server_info"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "ice_servers",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The modeling command response.",
+            "properties": {
+              "cmd_id": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ModelingCmdId"
+                  }
+                ],
+                "description": "The ID of the command."
+              },
+              "result": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SnakeCaseResult"
+                  }
+                ],
+                "description": "The result of the command."
+              },
+              "type": {
+                "enum": [
+                  "modeling"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "cmd_id",
+              "result",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The export command response, this is sent as binary.",
+            "properties": {
+              "files": {
+                "description": "The exported files.",
+                "items": {
+                  "$ref": "#/components/schemas/RawFile"
+                },
+                "type": "array"
+              },
+              "type": {
+                "enum": [
+                  "export"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "files",
+              "type"
+            ],
+            "type": "object"
+          }
+        ]
       }
     }
   },
@@ -14001,6 +14574,77 @@
         ]
       }
     },
+    "/hidden/ws/modeling": {
+      "options": {
+        "operationId": "hidden_ws_modeling_types",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebSocketMessages"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebSocketResponses"
+                }
+              }
+            },
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "summary": "Hidden endpoint for defining the modeling websocket types.",
+        "tags": [
+          "hidden"
+        ]
+      }
+    },
     "/logout": {
       "options": {
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
@@ -14241,7 +14885,7 @@
         ]
       }
     },
-    "/modeling/cmd_batch": {
+    "/modeling/cmd-batch": {
       "options": {
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
         "operationId": "options_cmd_batch",
