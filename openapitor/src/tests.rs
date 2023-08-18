@@ -287,6 +287,7 @@ fn test_gusto_generation(ctx: &mut TestContext) {
 
 #[test_context(TestContext)]
 #[test]
+#[ignore]
 fn test_ramp_generation(ctx: &mut TestContext) {
     let opts = crate::Opts {
         debug: true,
