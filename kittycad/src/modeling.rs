@@ -86,6 +86,7 @@ impl Modeling {
              4.\n- `video_res_width: Option<u32>`: Width of the video feed. Must be a multiple of \
              4."]
     #[tracing::instrument]
+    #[cfg(not(target_arch = "wasm32"))]
     pub async fn commands_ws<'a>(
         &'a self,
         fps: Option<u32>,

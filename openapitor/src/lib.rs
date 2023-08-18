@@ -585,17 +585,16 @@ percent-encoding = "2.1"
 phonenumber = "0.3.2"
 rand = "0.8"
 reqwest = {{ version = "0.11", default-features = false, features = ["json", "multipart", "rustls-tls"] }}
-reqwest-conditional-middleware = "0.2.1"
-reqwest-middleware = "0.2.2"
-reqwest-retry = "0.2.2"
-reqwest-tracing = {{ version = "0.4.4", features = ["opentelemetry_0_17"] }}
+reqwest-conditional-middleware = {{ version = "0.2.1", optional = true }}
+reqwest-middleware = {{ version = "0.2.2", optional = true }}
+reqwest-retry = {{ version = "0.2.2", optional = true }}
+reqwest-tracing = {{ version = "0.4.4", features = ["opentelemetry_0_17"], optional = true }}
 schemars = {{ version = "0.8", features = ["bytes", "chrono", "url", "uuid1"] }}
 serde = {{ version = "1", features = ["derive"] }}
 serde_json = "1"
 serde_urlencoded = "^0.7"
 tabled = {{ version = "0.14.0", features = ["color"], optional = true }}
 thiserror = "1"
-tokio = {{ version = "1.20.1", features = ["sync"] }}
 tracing = "^0.1"
 url = {{ version = "2", features = ["serde"] }}
 uuid = {{ version = "1", features = ["serde", "v4"] }}
@@ -609,9 +608,11 @@ tokio = {{ version = "1.20.0", features = ["rt", "macros"] }}
 tokio-tungstenite = "0.19"
 
 [features]
-default = []
+default = ["retry"]
 clap = ["dep:clap"]
 tabled = ["dep:tabled"]
+retry = ["dep:reqwest-conditional-middleware", "dep:reqwest-retry", "dep:reqwest-middleware", "dep:reqwest-tracing"]
+js = ["uuid/js"]
 
 [package.metadata.docs.rs]
 all-features = true

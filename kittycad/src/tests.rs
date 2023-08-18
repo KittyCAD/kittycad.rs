@@ -1,3 +1,4 @@
+#[cfg(not(feature = "js"))]
 use futures::TryStreamExt;
 use pretty_assertions::assert_eq;
 use tokio_tungstenite::tungstenite::Message as WsMsg;
@@ -95,6 +96,7 @@ async fn tabled_one_of() {
 }
 
 #[tokio::test]
+#[cfg(not(feature = "js"))]
 async fn test_stream() {
     let client = test_client();
 

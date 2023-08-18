@@ -5,6 +5,7 @@ pub enum Error {
     /// The request did not conform to API requirements.
     InvalidRequest(String),
 
+    #[cfg(feature = "retry")]
     /// A server error either due to the data, or with the connection.
     CommunicationError(reqwest_middleware::Error),
 
@@ -21,8 +22,12 @@ pub enum Error {
 
     /// An expected error response.
     InvalidResponsePayload {
+        #[cfg(feature = "retry")]
         /// The error.
         error: reqwest_middleware::Error,
+        #[cfg(not(feature = "retry"))]
+        /// The error.
+        error: reqwest::Error,
         /// The full response.
         response: reqwest::Response,
     },
@@ -38,7 +43,9 @@ impl Error {
         match self {
             Error::InvalidRequest(_) => None,
             Error::RequestError(e) => e.status(),
+            #[cfg(feature = "retry")]
             Error::CommunicationError(reqwest_middleware::Error::Reqwest(e)) => e.status(),
+            #[cfg(feature = "retry")]
             Error::CommunicationError(reqwest_middleware::Error::Middleware(_)) => None,
             Error::SerdeError { error: _, status } => Some(*status),
             Error::InvalidResponsePayload { error: _, response } => Some(response.status()),
@@ -55,6 +62,7 @@ impl Error {
     }
 }
 
+#[cfg(feature = "retry")]
 impl From<reqwest_middleware::Error> for Error {
     fn from(e: reqwest_middleware::Error) -> Self {
         Self::CommunicationError(e)
@@ -73,6 +81,7 @@ impl std::fmt::Display for Error {
             Error::InvalidRequest(s) => {
                 write!(f, "Invalid Request: {}", s)
             }
+            #[cfg(feature = "retry")]
             Error::CommunicationError(e) => {
                 write!(f, "Communication Error: {}", e)
             }
@@ -105,6 +114,7 @@ impl std::fmt::Debug for Error {
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
+            #[cfg(feature = "retry")]
             Error::CommunicationError(e) => Some(e),
             Error::SerdeError { error, status: _ } => Some(error),
             Error::InvalidResponsePayload { error, response: _ } => Some(error),

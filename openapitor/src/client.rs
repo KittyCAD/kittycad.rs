@@ -53,6 +53,7 @@ pub fn generate_client(opts: &crate::Opts) -> String {
 const CLIENT_FUNCTIONS_BASIC_AUTH: &str = r#"
 use std::env;
 
+#[cfg(not(target_arch = "wasm32"))]
 static APP_USER_AGENT: &str = concat!(
     env!("CARGO_PKG_NAME"),
     ".rs/",
@@ -66,7 +67,10 @@ pub struct Client {
     password: String,
     base_url: String,
 
+    #[cfg(feature = "retry")]
     client: reqwest_middleware::ClientWithMiddleware,
+    #[cfg(not(feature = "retry"))]
+    client: reqwest::Client,
 }
 
 impl Client {
@@ -81,35 +85,48 @@ impl Client {
     where
         T: ToString + std::fmt::Debug,
     {
-        // Retry up to 3 times with increasing intervals between attempts.
-        let retry_policy =
-            reqwest_retry::policies::ExponentialBackoff::builder().build_with_max_retries(3);
         let client = reqwest::Client::builder()
             .user_agent(APP_USER_AGENT)
             .timeout(std::time::Duration::from_secs(TIMEOUT_NUM_SECONDS))
             .connect_timeout(std::time::Duration::from_secs(60))
             .build();
-        match client {
-            Ok(c) => {
-                let client = reqwest_middleware::ClientBuilder::new(c)
-                    // Trace HTTP requests. See the tracing crate to make use of these traces.
-                    .with(reqwest_tracing::TracingMiddleware::default())
-                    // Retry failed requests.
-                    .with(reqwest_conditional_middleware::ConditionalMiddleware::new(
-                        reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
-                        |req: &reqwest::Request| req.try_clone().is_some(),
-                    ))
-                    .build();
+        #[cfg(feature = "retry")]
+        {
+            // Retry up to 3 times with increasing intervals between attempts.
+            let retry_policy =
+                reqwest_retry::policies::ExponentialBackoff::builder().build_with_max_retries(3);
+            match client {
+                Ok(c) => {
+                    let client = reqwest_middleware::ClientBuilder::new(c)
+                        // Trace HTTP requests. See the tracing crate to make use of these traces.
+                        .with(reqwest_tracing::TracingMiddleware::default())
+                        // Retry failed requests.
+                        .with(reqwest_conditional_middleware::ConditionalMiddleware::new(
+                            reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
+                            |req: &reqwest::Request| req.try_clone().is_some(),
+                        ))
+                        .build();
 
-                Client {
-                    username: username.to_string(),
-                    password: password.to_string(),
-                    base_url: "BASE_URL".to_string(),
+                    Client {
+                        username: username.to_string(),
+                        password: password.to_string(),
+                        base_url: "BASE_URL".to_string(),
 
-                    client,
+                        client,
+                    }
                 }
+                Err(e) => panic!("creating reqwest client failed: {:?}", e),
             }
-            Err(e) => panic!("creating reqwest client failed: {:?}", e),
+        }
+        #[cfg(not(feature = "retry"))]
+        {
+            Client {
+                username: username.to_string(),
+                password: password.to_string(),
+                base_url: "BASE_URL".to_string(),
+
+                client,
+            }
         }
     }
 
@@ -179,6 +196,7 @@ impl Client {
 const CLIENT_FUNCTIONS_TOKEN: &str = r#"
 use std::env;
 
+#[cfg(not(target_arch = "wasm32"))]
 static APP_USER_AGENT: &str = concat!(
     env!("CARGO_PKG_NAME"),
     ".rs/",
@@ -191,16 +209,32 @@ pub struct Client {
     token: String,
     base_url: String,
 
+    #[cfg(feature = "retry")]
     client: reqwest_middleware::ClientWithMiddleware,
+    #[cfg(feature = "retry")]
+    #[cfg(not(target_arch = "wasm32"))]
     client_http1_only: reqwest_middleware::ClientWithMiddleware,
+
+    #[cfg(not(feature = "retry"))]
+    client: reqwest::Client,
+    #[cfg(not(feature = "retry"))]
+    #[cfg(not(target_arch = "wasm32"))]
+    client_http1_only: reqwest::Client,
 }
 
+/// A request builder.
+#[cfg(feature = "retry")]
+pub struct RequestBuilder(reqwest_middleware::RequestBuilder);
+#[cfg(not(feature = "retry"))]
+pub struct RequestBuilder(reqwest::RequestBuilder);
+
 impl Client {
-    #[tracing::instrument]
     /// Create a new Client struct. It takes a type that can convert into
     /// an &str (`String` or `Vec<u8>` for example). As long as the function is
     /// given a valid API key your requests will work.
     /// Also takes reqwest client builders, for customizing the client's behaviour.
+    #[tracing::instrument]
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn new_from_reqwest<T>(
         token: T,
         builder_http: reqwest::ClientBuilder,
@@ -209,36 +243,105 @@ impl Client {
     where
         T: ToString + std::fmt::Debug,
     {
-        // Retry up to 3 times with increasing intervals between attempts.
-        let retry_policy =
-            reqwest_retry::policies::ExponentialBackoff::builder().build_with_max_retries(3);
-        match (builder_http.build(), builder_websocket.build()) {
-            (Ok(c), Ok(c1)) => {
-                let client = reqwest_middleware::ClientBuilder::new(c)
-                    // Trace HTTP requests. See the tracing crate to make use of these traces.
-                    .with(reqwest_tracing::TracingMiddleware::default())
-                    // Retry failed requests.
-                    .with(reqwest_conditional_middleware::ConditionalMiddleware::new(
-                        reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
-                        |req: &reqwest::Request| req.try_clone().is_some(),
-                    ))
-                    .build();
-                let client_http1_only = reqwest_middleware::ClientBuilder::new(c1)
-                    .with(reqwest_tracing::TracingMiddleware::default())
-                    .with(reqwest_conditional_middleware::ConditionalMiddleware::new(
-                        reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
-                        |req: &reqwest::Request| req.try_clone().is_some(),
-                    ))
-                    .build();
-                Client {
+        #[cfg(feature = "retry")]
+        {
+            // Retry up to 3 times with increasing intervals between attempts.
+            let retry_policy =
+                reqwest_retry::policies::ExponentialBackoff::builder().build_with_max_retries(3);
+            match (builder_http.build(), builder_websocket.build()) {
+                (Ok(c), Ok(c1)) => {
+                    let client = reqwest_middleware::ClientBuilder::new(c)
+                        // Trace HTTP requests. See the tracing crate to make use of these traces.
+                        .with(reqwest_tracing::TracingMiddleware::default())
+                        // Retry failed requests.
+                        .with(reqwest_conditional_middleware::ConditionalMiddleware::new(
+                            reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
+                            |req: &reqwest::Request| req.try_clone().is_some(),
+                        ))
+                        .build();
+                    let client_http1_only = reqwest_middleware::ClientBuilder::new(c1)
+                        .with(reqwest_tracing::TracingMiddleware::default())
+                        .with(reqwest_conditional_middleware::ConditionalMiddleware::new(
+                            reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
+                            |req: &reqwest::Request| req.try_clone().is_some(),
+                        ))
+                        .build();
+                    Client {
+                        token: token.to_string(),
+                        base_url: "https://api.kittycad.io".to_string(),
+
+                        client,
+                        client_http1_only,
+                    }
+                }
+                (Err(e), _) | (_, Err(e)) => panic!("creating reqwest client failed: {:?}", e),
+            }
+        }
+        #[cfg(not(feature = "retry"))]
+        {
+            match (builder_http.build(), builder_websocket.build()) {
+                (Ok(c), Ok(c1)) => Client {
                     token: token.to_string(),
                     base_url: "https://api.kittycad.io".to_string(),
 
-                    client,
-                    client_http1_only,
-                }
+                    client: c,
+                    client_http1_only: c1,
+                },
+                (Err(e), _) | (_, Err(e)) => panic!("creating reqwest client failed: {:?}", e),
             }
-            (Err(e), _) | (_, Err(e)) => panic!("creating reqwest client failed: {:?}", e),
+        }
+    }
+
+    /// Create a new Client struct. It takes a type that can convert into
+    /// an &str (`String` or `Vec<u8>` for example). As long as the function is
+    /// given a valid API key your requests will work.
+    /// Also takes reqwest client builders, for customizing the client's behaviour.
+    #[tracing::instrument]
+    #[cfg(target_arch = "wasm32")]
+    pub fn new_from_reqwest<T>(
+        token: T,
+        builder_http: reqwest::ClientBuilder,
+    ) -> Self
+    where
+        T: ToString + std::fmt::Debug,
+    {
+        #[cfg(feature = "retry")]
+        {
+            // Retry up to 3 times with increasing intervals between attempts.
+            let retry_policy =
+                reqwest_retry::policies::ExponentialBackoff::builder().build_with_max_retries(3);
+            match builder_http.build() {
+                Ok(c) => {
+                    let client = reqwest_middleware::ClientBuilder::new(c)
+                        // Trace HTTP requests. See the tracing crate to make use of these traces.
+                        .with(reqwest_tracing::TracingMiddleware::default())
+                        // Retry failed requests.
+                        .with(reqwest_conditional_middleware::ConditionalMiddleware::new(
+                            reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
+                            |req: &reqwest::Request| req.try_clone().is_some(),
+                        ))
+                        .build();
+                    Client {
+                        token: token.to_string(),
+                        base_url: "https://api.kittycad.io".to_string(),
+
+                        client,
+                    }
+                }
+                Err(e) => panic!("creating reqwest client failed: {:?}", e),
+            }
+        }
+        #[cfg(not(feature = "retry"))]
+        {
+            match builder_http.build() {
+                Ok(c) => Client {
+                    token: token.to_string(),
+                    base_url: "https://api.kittycad.io".to_string(),
+
+                    client: c,
+                },
+                Err(e) => panic!("creating reqwest client failed: {:?}", e),
+            }
         }
     }
 
@@ -250,18 +353,25 @@ impl Client {
     where
         T: ToString + std::fmt::Debug,
     {
+        #[cfg(not(target_arch = "wasm32"))]
         let client = reqwest::Client::builder()
             .user_agent(APP_USER_AGENT)
             // For file conversions we need this to be long.
             .timeout(std::time::Duration::from_secs(600))
             .connect_timeout(std::time::Duration::from_secs(60));
+        #[cfg(target_arch = "wasm32")]
+        let client = reqwest::Client::builder();
+        #[cfg(not(target_arch = "wasm32"))]
         let client_http1 = reqwest::Client::builder()
             // For file conversions we need this to be long.
             .user_agent(APP_USER_AGENT)
             .timeout(std::time::Duration::from_secs(600))
             .connect_timeout(std::time::Duration::from_secs(60))
             .http1_only();
-        Self::new_from_reqwest(token, client, client_http1)
+        #[cfg(not(target_arch = "wasm32"))]
+        return Self::new_from_reqwest(token, client, client_http1);
+        #[cfg(target_arch = "wasm32")]
+        Self::new_from_reqwest(token, client)
     }
 
     /// Set the base URL for the client to something other than the default: <BASE_URL>.
@@ -291,7 +401,7 @@ impl Client {
         method: reqwest::Method,
         uri: &str,
         body: Option<reqwest::Body>,
-    ) -> anyhow::Result<reqwest_middleware::RequestBuilder>
+    ) -> anyhow::Result<RequestBuilder>
     {
         let u = if uri.starts_with("https://") || uri.starts_with("http://") {
             uri.to_string()
@@ -321,7 +431,7 @@ impl Client {
             req = req.body(body);
         }
 
-        Ok(req)
+        Ok(RequestBuilder(req))
     }
 "#;
 
@@ -331,6 +441,7 @@ use std::{env, sync::Arc, convert::TryInto, ops::Add, time::{Duration, Instant}}
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+#[cfg(not(target_arch = "wasm32"))]
 static APP_USER_AGENT: &str = concat!(
     env!("CARGO_PKG_NAME"),
     ".rs/",
@@ -348,7 +459,10 @@ pub struct Client {
 
     auto_refresh: bool,
 
+    #[cfg(feature = "retry")]
     client: reqwest_middleware::ClientWithMiddleware,
+    #[cfg(not(feature = "retry"))]
+    client: reqwest::Client,
 }
 
 /// An access token.
@@ -414,40 +528,61 @@ impl Client {
         T: ToString + std::fmt::Debug,
         Q: ToString + std::fmt::Debug,
     {
-        // Retry up to 3 times with increasing intervals between attempts.
-        let retry_policy =
-            reqwest_retry::policies::ExponentialBackoff::builder().build_with_max_retries(3);
         let client = reqwest::Client::builder()
             .user_agent(APP_USER_AGENT)
             .build();
-        match client {
-            Ok(c) => {
-                let client = reqwest_middleware::ClientBuilder::new(c)
-                    // Trace HTTP requests. See the tracing crate to make use of these traces.
-                    .with(reqwest_tracing::TracingMiddleware::default())
-                    // Retry failed requests.
-                    .with(reqwest_conditional_middleware::ConditionalMiddleware::new(
-                        reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
-                        |req: &reqwest::Request| req.try_clone().is_some(),
-                    ))
-                    .build();
 
-                Client {
-                    base_url: "BASE_URL".to_string(),
-                    client_id: client_id.to_string(),
-                    client_secret: client_secret.to_string(),
-                    redirect_uri: redirect_uri.to_string(),
-                    token: Arc::new(tokio::sync::RwLock::new(InnerToken {
-                        access_token: token.to_string(),
-                        refresh_token: refresh_token.to_string(),
-                        expires_at: None,
-                    })),
+        #[cfg(feature = "retry")]
+        {
+            // Retry up to 3 times with increasing intervals between attempts.
+            let retry_policy =
+                reqwest_retry::policies::ExponentialBackoff::builder().build_with_max_retries(3);
+            match client {
+                Ok(c) => {
+                    let client = reqwest_middleware::ClientBuilder::new(c)
+                        // Trace HTTP requests. See the tracing crate to make use of these traces.
+                        .with(reqwest_tracing::TracingMiddleware::default())
+                        // Retry failed requests.
+                        .with(reqwest_conditional_middleware::ConditionalMiddleware::new(
+                            reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
+                            |req: &reqwest::Request| req.try_clone().is_some(),
+                        ))
+                        .build();
 
-                    auto_refresh: false,
-                    client,
+                    Client {
+                        base_url: "BASE_URL".to_string(),
+                        client_id: client_id.to_string(),
+                        client_secret: client_secret.to_string(),
+                        redirect_uri: redirect_uri.to_string(),
+                        token: Arc::new(tokio::sync::RwLock::new(InnerToken {
+                            access_token: token.to_string(),
+                            refresh_token: refresh_token.to_string(),
+                            expires_at: None,
+                        })),
+
+                        auto_refresh: false,
+                        client,
+                    }
                 }
+                Err(e) => panic!("creating reqwest client failed: {:?}", e),
             }
-            Err(e) => panic!("creating reqwest client failed: {:?}", e),
+        }
+        #[cfg(not(feature = "retry"))]
+        {
+            Client {
+                base_url: "BASE_URL".to_string(),
+                client_id: client_id.to_string(),
+                client_secret: client_secret.to_string(),
+                redirect_uri: redirect_uri.to_string(),
+                token: Arc::new(tokio::sync::RwLock::new(InnerToken {
+                    access_token: token.to_string(),
+                    refresh_token: refresh_token.to_string(),
+                    expires_at: None,
+                })),
+
+                auto_refresh: false,
+                client,
+            }
         }
     }
 

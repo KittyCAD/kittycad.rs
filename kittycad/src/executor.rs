@@ -64,6 +64,7 @@ impl Executor {
 
     #[doc = "Create a terminal.\n\nAttach to a docker container to create an interactive terminal."]
     #[tracing::instrument]
+    #[cfg(not(target_arch = "wasm32"))]
     pub async fn create_term<'a>(
         &'a self,
     ) -> Result<reqwest::Upgraded, crate::types::error::Error> {
