@@ -35,6 +35,7 @@ jobs:
           key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
       - name: Run cargo build
         run: |
+          rustup target add wasm32-unknown-unknown
           export CARGO_TARGET_WASM32_WASI_RUNNER=webassembly
           cargo build --target wasm32-unknown-unknown -p kittycad --no-default-features --features js
         shell: bash
