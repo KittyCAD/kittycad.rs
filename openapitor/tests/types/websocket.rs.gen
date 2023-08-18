@@ -1,5 +1,6 @@
 #[doc = "An eternally-increasing sequence of bytes, wrapping on overflow, starting\n\nfrom the value given for the query parameter \"start.\"\n\n**Parameters:**\n\n- `start: Option<u8>`"]
 #[tracing::instrument]
+#[cfg(not(target_arch = "wasm32"))]
 pub async fn example_api_websocket_counter<'a>(
     &'a self,
     start: Option<u8>,
