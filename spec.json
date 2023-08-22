@@ -4890,6 +4890,14 @@
           }
         ]
       },
+      "CurveType": {
+        "description": "The type of Curve (embedded within path)",
+        "enum": [
+          "line",
+          "nurbs"
+        ],
+        "type": "string"
+      },
       "Customer": {
         "description": "The resource representing a payment \"Customer\".",
         "properties": {
@@ -5579,7 +5587,8 @@
           "solid2d",
           "solid3d",
           "edge",
-          "face"
+          "face",
+          "plane"
         ],
         "type": "string"
       },
@@ -7643,6 +7652,27 @@
             "type": "object"
           },
           {
+            "description": "Adjust zoom of the default camera.",
+            "properties": {
+              "magnitude": {
+                "description": "Move the camera forward along the vector it's looking at, by this magnitudedefaultCameraZoom. Basically, how much should the camera move forward by.",
+                "format": "float",
+                "type": "number"
+              },
+              "type": {
+                "enum": [
+                  "default_camera_zoom"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "magnitude",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
             "description": "Enable sketch mode, where users can sketch 2D geometry. Users choose a plane to sketch on.",
             "properties": {
               "animated": {
@@ -8341,6 +8371,334 @@
               "type"
             ],
             "type": "object"
+          },
+          {
+            "description": "Sends object to front or back.",
+            "properties": {
+              "front": {
+                "description": "Bring to front = true, send to back = false.",
+                "type": "boolean"
+              },
+              "object_id": {
+                "description": "Which object is being changed.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "send_object"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "front",
+              "object_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Set opacity of the entity.",
+            "properties": {
+              "entity_id": {
+                "description": "Which entity is being changed.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "opacity": {
+                "description": "How transparent should it be? 0 or lower is totally transparent. 1 or greater is totally opaque.",
+                "format": "float",
+                "type": "number"
+              },
+              "type": {
+                "enum": [
+                  "entity_set_opacity"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_id",
+              "opacity",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Fade the entity in or out.",
+            "properties": {
+              "duration_seconds": {
+                "default": 0.4000000059604645,
+                "description": "How many seconds the animation should take.",
+                "format": "float",
+                "type": "number"
+              },
+              "entity_id": {
+                "description": "Which entity is being changed.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "fade_in": {
+                "description": "Fade in = true, fade out = false.",
+                "type": "boolean"
+              },
+              "type": {
+                "enum": [
+                  "entity_fade"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_id",
+              "fade_in",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Make a plane.",
+            "properties": {
+              "clobber": {
+                "description": "If true, any existing drawables within the obj will be replaced (the object will be reset)",
+                "type": "boolean"
+              },
+              "origin": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ],
+                "description": "Origin of the plane"
+              },
+              "size": {
+                "description": "What should the plane's span/extent? When rendered visually, this is both the width and height along X and Y axis respectively.",
+                "format": "float",
+                "type": "number"
+              },
+              "type": {
+                "enum": [
+                  "make_plane"
+                ],
+                "type": "string"
+              },
+              "x_axis": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ],
+                "description": "What should the plane's X axis be?"
+              },
+              "y_axis": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ],
+                "description": "What should the plane's Y axis be?"
+              }
+            },
+            "required": [
+              "clobber",
+              "origin",
+              "size",
+              "type",
+              "x_axis",
+              "y_axis"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Set the plane's color.",
+            "properties": {
+              "color": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Color"
+                  }
+                ],
+                "description": "What color it should be."
+              },
+              "plane_id": {
+                "description": "Which plane is being changed.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "plane_set_color"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "color",
+              "plane_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Set the active tool.",
+            "properties": {
+              "tool": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SceneToolType"
+                  }
+                ],
+                "description": "What tool should be active."
+              },
+              "type": {
+                "enum": [
+                  "set_tool"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "tool",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Send a mouse move event.",
+            "properties": {
+              "type": {
+                "enum": [
+                  "mouse_move"
+                ],
+                "type": "string"
+              },
+              "window": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ],
+                "description": "Where the mouse is"
+              }
+            },
+            "required": [
+              "type",
+              "window"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Send a mouse click event. Updates modified/selected entities.",
+            "properties": {
+              "type": {
+                "enum": [
+                  "mouse_click"
+                ],
+                "type": "string"
+              },
+              "window": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ],
+                "description": "Where the mouse is"
+              }
+            },
+            "required": [
+              "type",
+              "window"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Enable sketch mode on the given plane.",
+            "properties": {
+              "animated": {
+                "description": "Animate the transition to sketch mode.",
+                "type": "boolean"
+              },
+              "ortho": {
+                "description": "Use an orthographic camera.",
+                "type": "boolean"
+              },
+              "plane_id": {
+                "description": "Sketch on this plane.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "sketch_mode_enable"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "animated",
+              "ortho",
+              "plane_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Disable sketch mode.",
+            "properties": {
+              "type": {
+                "enum": [
+                  "sketch_mode_disable"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Get type of a given curve.",
+            "properties": {
+              "curve_id": {
+                "description": "Which curve to query.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "curve_get_type"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "curve_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Get control points of a given curve.",
+            "properties": {
+              "curve_id": {
+                "description": "Which curve to query.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "curve_get_control_points"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "curve_id",
+              "type"
+            ],
+            "type": "object"
           }
         ]
       },
@@ -8899,6 +9257,86 @@
             },
             "required": [
               "edge",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `MouseClick` command.",
+            "properties": {
+              "entities_modified": {
+                "description": "Entities that are modified.",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "entities_selected": {
+                "description": "Entities that are selected.",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": {
+                "enum": [
+                  "mouse_click"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entities_modified",
+              "entities_selected",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `CurveGetType` command.",
+            "properties": {
+              "curve_type": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CurveType"
+                  }
+                ],
+                "description": "Curve type"
+              },
+              "type": {
+                "enum": [
+                  "curve_get_type"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "curve_type",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `CurveGetControlPoints` command.",
+            "properties": {
+              "control_points": {
+                "description": "Control points in the curve.",
+                "items": {
+                  "$ref": "#/components/schemas/Point3d"
+                },
+                "type": "array"
+              },
+              "type": {
+                "enum": [
+                  "curve_get_control_points"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "control_points",
               "type"
             ],
             "type": "object"
@@ -9735,6 +10173,18 @@
             "type": "string"
           }
         ]
+      },
+      "SceneToolType": {
+        "description": "The type of scene's active tool",
+        "enum": [
+          "camera_revolve",
+          "select",
+          "move",
+          "sketch_line",
+          "sketch_curve",
+          "sketch_curve_mod"
+        ],
+        "type": "string"
       },
       "Session": {
         "description": "An authentication session.\n\nFor our UIs, these are automatically created by Next.js.",

@@ -4471,6 +4471,29 @@ pub enum Currency {
     Zmw,
 }
 
+#[doc = "The type of Curve (embedded within path)"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CurveType {
+    #[serde(rename = "line")]
+    #[display("line")]
+    Line,
+    #[serde(rename = "nurbs")]
+    #[display("nurbs")]
+    Nurbs,
+}
+
 #[doc = "The resource representing a payment \"Customer\"."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -5556,6 +5579,9 @@ pub enum EntityType {
     #[serde(rename = "face")]
     #[display("face")]
     Face,
+    #[serde(rename = "plane")]
+    #[display("plane")]
+    Plane,
 }
 
 #[doc = "The environment the server is running in."]
@@ -7942,6 +7968,8 @@ pub enum ModelingCmd {
         up: Point3D,
         vantage: Point3D,
     },
+    #[serde(rename = "default_camera_zoom")]
+    DefaultCameraZoom { magnitude: f64 },
     #[serde(rename = "default_camera_enable_sketch_mode")]
     DefaultCameraEnableSketchMode {
         animated: bool,
@@ -8039,6 +8067,44 @@ pub enum ModelingCmd {
         face_id: uuid::Uuid,
         object_id: uuid::Uuid,
     },
+    #[serde(rename = "send_object")]
+    SendObject { front: bool, object_id: uuid::Uuid },
+    #[serde(rename = "entity_set_opacity")]
+    EntitySetOpacity { entity_id: uuid::Uuid, opacity: f64 },
+    #[serde(rename = "entity_fade")]
+    EntityFade {
+        duration_seconds: Option<f64>,
+        entity_id: uuid::Uuid,
+        fade_in: bool,
+    },
+    #[serde(rename = "make_plane")]
+    MakePlane {
+        clobber: bool,
+        origin: Point3D,
+        size: f64,
+        x_axis: Point3D,
+        y_axis: Point3D,
+    },
+    #[serde(rename = "plane_set_color")]
+    PlaneSetColor { color: Color, plane_id: uuid::Uuid },
+    #[serde(rename = "set_tool")]
+    SetTool { tool: SceneToolType },
+    #[serde(rename = "mouse_move")]
+    MouseMove { window: Point2D },
+    #[serde(rename = "mouse_click")]
+    MouseClick { window: Point2D },
+    #[serde(rename = "sketch_mode_enable")]
+    SketchModeEnable {
+        animated: bool,
+        ortho: bool,
+        plane_id: uuid::Uuid,
+    },
+    #[serde(rename = "sketch_mode_disable")]
+    SketchModeDisable {},
+    #[serde(rename = "curve_get_type")]
+    CurveGetType { curve_id: uuid::Uuid },
+    #[serde(rename = "curve_get_control_points")]
+    CurveGetControlPoints { curve_id: uuid::Uuid },
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -8421,6 +8487,15 @@ pub enum OkModelingCmdResponse {
     Solid3DGetPrevAdjacentEdge { edge: uuid::Uuid },
     #[serde(rename = "solid3d_get_next_adjacent_edge")]
     Solid3DGetNextAdjacentEdge { edge: uuid::Uuid },
+    #[serde(rename = "mouse_click")]
+    MouseClick {
+        entities_modified: Vec<uuid::Uuid>,
+        entities_selected: Vec<uuid::Uuid>,
+    },
+    #[serde(rename = "curve_get_type")]
+    CurveGetType { curve_type: CurveType },
+    #[serde(rename = "curve_get_control_points")]
+    CurveGetControlPoints { control_points: Vec<Point3D> },
 }
 
 #[doc = "Onboarding details"]
@@ -9432,6 +9507,41 @@ pub enum SceneSelectionType {
     #[serde(rename = "remove")]
     #[display("remove")]
     Remove,
+}
+
+#[doc = "The type of scene's active tool"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum SceneToolType {
+    #[serde(rename = "camera_revolve")]
+    #[display("camera_revolve")]
+    CameraRevolve,
+    #[serde(rename = "select")]
+    #[display("select")]
+    Select,
+    #[serde(rename = "move")]
+    #[display("move")]
+    Move,
+    #[serde(rename = "sketch_line")]
+    #[display("sketch_line")]
+    SketchLine,
+    #[serde(rename = "sketch_curve")]
+    #[display("sketch_curve")]
+    SketchCurve,
+    #[serde(rename = "sketch_curve_mod")]
+    #[display("sketch_curve_mod")]
+    SketchCurveMod,
 }
 
 #[doc = "An authentication session.\n\nFor our UIs, these are automatically created by Next.js."]
