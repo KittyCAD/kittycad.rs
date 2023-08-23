@@ -29,7 +29,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! kittycad = "0.2.17"
+//! kittycad = "0.2.18"
 //! ```
 //!
 //! ## Basic example
@@ -62,66 +62,83 @@
 /// AI uses machine learning to generate 3D meshes.
 ///
 /// FROM: <https://docs.kittycad.io/api/ai>
+#[cfg(feature = "requests")]
 pub mod ai;
 /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
 ///
 /// FROM: <https://docs.kittycad.io/api/api-calls>
+#[cfg(feature = "requests")]
 pub mod api_calls;
 /// API tokens allow users to call the API outside of their session token that is used as a cookie in the user interface. Users can create, delete, and list their API tokens. But, of course, you need an API token to do this, so first be sure to generate one in the account UI.
 ///
 /// FROM: <https://docs.kittycad.io/api/api-tokens>
+#[cfg(feature = "requests")]
 pub mod api_tokens;
 /// Endpoints for third party app grant flows.
 ///
 /// FROM: <https://docs.kittycad.io/api/apps>
+#[cfg(feature = "requests")]
 pub mod apps;
 /// Endpoints that allow for code execution or creation of code execution environments.
 ///
 /// FROM: <https://docs.kittycad.io/api/executor>
+#[cfg(feature = "requests")]
 pub mod executor;
 /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
 ///
 /// FROM: <https://docs.kittycad.io/api/file>
+#[cfg(feature = "requests")]
 pub mod file;
 /// Hidden API endpoints that should not show up in the docs.
 ///
 /// FROM: <https://docs.kittycad.io/api/hidden>
+#[cfg(feature = "requests")]
 pub mod hidden;
 /// Meta information about the API.
 ///
 /// FROM: <https://docs.kittycad.io/api/meta>
+#[cfg(feature = "requests")]
 pub mod meta;
 /// Modeling API for updating your 3D files using the KittyCAD engine.
 ///
 /// FROM: <https://docs.kittycad.io/api/modeling>
+#[cfg(feature = "requests")]
 pub mod modeling;
 /// Endpoints that implement OAuth 2.0 grant flows.
 ///
 /// FROM: <https://docs.kittycad.io/api/oauth2>
+#[cfg(feature = "requests")]
 pub mod oauth2;
 /// Operations around payments and billing.
 ///
 /// FROM: <https://docs.kittycad.io/api/payments>
+#[cfg(feature = "requests")]
 pub mod payments;
 #[cfg(test)]
+#[cfg(feature = "requests")]
 mod tests;
 pub mod types;
 /// Unit conversion operations.
 ///
 /// FROM: <https://docs.kittycad.io/api/file>
+#[cfg(feature = "requests")]
 pub mod unit;
 /// A user is someone who uses the KittyCAD API. Here, we can create, delete, and list users. We can also get information about a user. Operations will only be authorized if the user is requesting information about themselves.
 ///
 /// FROM: <https://docs.kittycad.io/api/users>
+#[cfg(feature = "requests")]
 pub mod users;
 
+#[cfg(feature = "requests")]
 use std::env;
 
 #[cfg(not(target_arch = "wasm32"))]
+#[cfg(feature = "requests")]
 static APP_USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), ".rs/", env!("CARGO_PKG_VERSION"),);
 
 /// Entrypoint for interacting with the API client.
 #[derive(Clone, Debug)]
+#[cfg(feature = "requests")]
 pub struct Client {
     token: String,
     base_url: String,
@@ -141,10 +158,13 @@ pub struct Client {
 
 /// A request builder.
 #[cfg(feature = "retry")]
+#[cfg(feature = "requests")]
 pub struct RequestBuilder(reqwest_middleware::RequestBuilder);
 #[cfg(not(feature = "retry"))]
+#[cfg(feature = "requests")]
 pub struct RequestBuilder(reqwest::RequestBuilder);
 
+#[cfg(feature = "requests")]
 impl Client {
     /// Create a new Client struct. It takes a type that can convert into
     /// an &str (`String` or `Vec<u8>` for example). As long as the function is

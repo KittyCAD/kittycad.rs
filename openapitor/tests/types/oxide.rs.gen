@@ -130,6 +130,7 @@ pub mod base64 {
     }
 }
 
+#[cfg(feature = "requests")]
 pub mod paginate {
     #![doc = " Utility functions used for pagination."]
     use anyhow::Result;
@@ -292,6 +293,7 @@ pub mod phone_number {
     }
 }
 
+#[cfg(feature = "requests")]
 pub mod error {
     #![doc = " Error methods."]
     #[doc = " Error produced by generated client methods."]
@@ -832,6 +834,7 @@ impl std::fmt::Display for DiskResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for DiskResultsPage {
     type Item = Disk;
     fn has_more_pages(&self) -> bool {
@@ -1339,6 +1342,7 @@ impl std::fmt::Display for GlobalImageResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for GlobalImageResultsPage {
     type Item = GlobalImage;
     fn has_more_pages(&self) -> bool {
@@ -1462,6 +1466,7 @@ impl std::fmt::Display for IdentityProviderResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for IdentityProviderResultsPage {
     type Item = IdentityProvider;
     fn has_more_pages(&self) -> bool {
@@ -1729,6 +1734,7 @@ impl std::fmt::Display for ImageResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for ImageResultsPage {
     type Item = Image;
     fn has_more_pages(&self) -> bool {
@@ -2025,6 +2031,7 @@ impl std::fmt::Display for InstanceResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for InstanceResultsPage {
     type Item = Instance;
     fn has_more_pages(&self) -> bool {
@@ -2303,6 +2310,7 @@ impl std::fmt::Display for IpPoolRangeResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for IpPoolRangeResultsPage {
     type Item = IpPoolRange;
     fn has_more_pages(&self) -> bool {
@@ -2371,6 +2379,7 @@ impl std::fmt::Display for IpPoolResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for IpPoolResultsPage {
     type Item = IpPool;
     fn has_more_pages(&self) -> bool {
@@ -2690,6 +2699,7 @@ impl std::fmt::Display for NetworkInterfaceResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for NetworkInterfaceResultsPage {
     type Item = NetworkInterface;
     fn has_more_pages(&self) -> bool {
@@ -2893,6 +2903,7 @@ impl std::fmt::Display for OrganizationResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for OrganizationResultsPage {
     type Item = Organization;
     fn has_more_pages(&self) -> bool {
@@ -3188,6 +3199,7 @@ impl std::fmt::Display for ProjectResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for ProjectResultsPage {
     type Item = Project;
     fn has_more_pages(&self) -> bool {
@@ -3436,6 +3448,7 @@ impl std::fmt::Display for RackResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for RackResultsPage {
     type Item = Rack;
     fn has_more_pages(&self) -> bool {
@@ -3536,6 +3549,7 @@ impl std::fmt::Display for RoleResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for RoleResultsPage {
     type Item = Role;
     fn has_more_pages(&self) -> bool {
@@ -3782,6 +3796,7 @@ impl std::fmt::Display for RouterRouteResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for RouterRouteResultsPage {
     type Item = RouterRoute;
     fn has_more_pages(&self) -> bool {
@@ -3956,6 +3971,7 @@ impl std::fmt::Display for SagaResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for SagaResultsPage {
     type Item = Saga;
     fn has_more_pages(&self) -> bool {
@@ -4296,6 +4312,7 @@ impl std::fmt::Display for SiloResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for SiloResultsPage {
     type Item = Silo;
     fn has_more_pages(&self) -> bool {
@@ -4507,6 +4524,7 @@ impl std::fmt::Display for SledResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for SledResultsPage {
     type Item = Sled;
     fn has_more_pages(&self) -> bool {
@@ -4674,6 +4692,7 @@ impl std::fmt::Display for SnapshotResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for SnapshotResultsPage {
     type Item = Snapshot;
     fn has_more_pages(&self) -> bool {
@@ -4868,6 +4887,7 @@ impl std::fmt::Display for SshKeyResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for SshKeyResultsPage {
     type Item = SshKey;
     fn has_more_pages(&self) -> bool {
@@ -4981,6 +5001,7 @@ impl std::fmt::Display for TimeseriesSchemaResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for TimeseriesSchemaResultsPage {
     type Item = TimeseriesSchema;
     fn has_more_pages(&self) -> bool {
@@ -5135,6 +5156,7 @@ impl std::fmt::Display for UserBuiltinResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for UserBuiltinResultsPage {
     type Item = UserBuiltin;
     fn has_more_pages(&self) -> bool {
@@ -5226,6 +5248,7 @@ impl std::fmt::Display for UserResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for UserResultsPage {
     type Item = User;
     fn has_more_pages(&self) -> bool {
@@ -5803,6 +5826,7 @@ impl std::fmt::Display for VpcResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for VpcResultsPage {
     type Item = Vpc;
     fn has_more_pages(&self) -> bool {
@@ -5983,6 +6007,7 @@ impl std::fmt::Display for VpcRouterResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for VpcRouterResultsPage {
     type Item = VpcRouter;
     fn has_more_pages(&self) -> bool {
@@ -6216,6 +6241,7 @@ impl std::fmt::Display for VpcSubnetResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for VpcSubnetResultsPage {
     type Item = VpcSubnet;
     fn has_more_pages(&self) -> bool {

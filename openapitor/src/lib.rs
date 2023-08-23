@@ -84,6 +84,7 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
         if module == "tests" {
             a("#[cfg(test)]");
         }
+        a("#[cfg(feature = \"requests\")]");
         a(&format!("mod {};", module));
     }
 
@@ -173,6 +174,7 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
         if !docs.is_empty() {
             a(&format!("/// {}", docs.replace('\n', "\n/// "),));
         }
+        a("#[cfg(feature = \"requests\")]");
         a(&format!("pub mod {};", clean_tag_name(&tag.name)));
     }
 
@@ -567,24 +569,22 @@ license = "MIT"
 
 [dependencies]
 anyhow = "1"
-async-trait = "^0.1.53"
+async-trait = {{ version = "^0.1.53", optional = true }}
 base64 = "0.21"
 bytes = {{ version = "1", features = ["serde"] }}
 clap = {{ version = "4.2.4", features = ["cargo", "derive", "env", "unicode"], optional = true }}
 chrono = {{ version = "0.4", default-features = false, features = ["serde", "std"] }}
 data-encoding = "^2.3.2"
 dirs = {{ version = "^5.0.1", optional = true }}
-format_serde_error = "^0.3.0"
-futures = "0.3.26"
-http = "^0.2.8"
+format_serde_error = {{ version = "^0.3.0", optional = true }}
+futures = {{ version = "0.3.26", optional = true }}
+http = {{ version = "^0.2.8", optional = true }}
 itertools = "^0.10.3"
-log = {{ version = "^0.4", features = ["serde"] }}
-mime = "0.3"
+log = {{ version = "^0.4", features = ["serde"], optional = true }}
 parse-display = "^0.8.1"
-percent-encoding = "2.1"
 phonenumber = "0.3.2"
-rand = "0.8"
-reqwest = {{ version = "0.11", default-features = false, features = ["json", "multipart", "rustls-tls"] }}
+rand = {{ version = "0.8", optional = true }}
+reqwest = {{ version = "0.11", default-features = false, features = ["json", "multipart", "rustls-tls"], optional = true }}
 reqwest-conditional-middleware = {{ version = "0.2.1", optional = true }}
 reqwest-middleware = {{ version = "0.2.2", optional = true }}
 reqwest-retry = {{ version = "0.2.2", optional = true }}
@@ -592,10 +592,10 @@ reqwest-tracing = {{ version = "0.4.4", features = ["opentelemetry_0_17"], optio
 schemars = {{ version = "0.8", features = ["bytes", "chrono", "url", "uuid1"] }}
 serde = {{ version = "1", features = ["derive"] }}
 serde_json = "1"
-serde_urlencoded = "^0.7"
+serde_urlencoded = {{ version = "^0.7", optional = true }}
 tabled = {{ version = "0.14.0", features = ["color"], optional = true }}
 thiserror = "1"
-tracing = "^0.1"
+tracing = {{ version = "^0.1", optional = true }}
 url = {{ version = "2", features = ["serde"] }}
 uuid = {{ version = "1", features = ["serde", "v4"] }}
 
@@ -608,9 +608,10 @@ tokio = {{ version = "1.20.0", features = ["rt", "macros"] }}
 tokio-tungstenite = "0.19"
 
 [features]
-default = ["retry"]
+default = ["requests", "retry"]
 clap = ["dep:clap"]
 tabled = ["dep:tabled"]
+requests = ["dep:async-trait", "dep:format_serde_error", "dep:futures", "dep:http", "dep:log", "dep:rand", "dep:reqwest", "dep:serde_urlencoded", "dep:tracing"]
 retry = ["dep:reqwest-conditional-middleware", "dep:reqwest-retry", "dep:reqwest-middleware", "dep:reqwest-tracing"]
 js = ["uuid/js"]
 

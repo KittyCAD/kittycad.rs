@@ -51,9 +51,11 @@ pub fn generate_client(opts: &crate::Opts) -> String {
 }
 
 const CLIENT_FUNCTIONS_BASIC_AUTH: &str = r#"
+#[cfg(feature = "requests")]
 use std::env;
 
 #[cfg(not(target_arch = "wasm32"))]
+#[cfg(feature = "requests")]
 static APP_USER_AGENT: &str = concat!(
     env!("CARGO_PKG_NAME"),
     ".rs/",
@@ -62,6 +64,7 @@ static APP_USER_AGENT: &str = concat!(
 
 /// Entrypoint for interacting with the API client.
 #[derive(Clone, Debug)]
+#[cfg(feature = "requests")]
 pub struct Client {
     username: String,
     password: String,
@@ -73,6 +76,7 @@ pub struct Client {
     client: reqwest::Client,
 }
 
+#[cfg(feature = "requests")]
 impl Client {
     /// Create a new Client struct. It takes a type that can convert into
     /// an &str (`String` or `Vec<u8>` for example). As long as the function is
@@ -194,9 +198,11 @@ impl Client {
 "#;
 
 const CLIENT_FUNCTIONS_TOKEN: &str = r#"
+#[cfg(feature = "requests")]
 use std::env;
 
 #[cfg(not(target_arch = "wasm32"))]
+#[cfg(feature = "requests")]
 static APP_USER_AGENT: &str = concat!(
     env!("CARGO_PKG_NAME"),
     ".rs/",
@@ -205,6 +211,7 @@ static APP_USER_AGENT: &str = concat!(
 
 /// Entrypoint for interacting with the API client.
 #[derive(Clone, Debug)]
+#[cfg(feature = "requests")]
 pub struct Client {
     token: String,
     base_url: String,
@@ -224,10 +231,13 @@ pub struct Client {
 
 /// A request builder.
 #[cfg(feature = "retry")]
+#[cfg(feature = "requests")]
 pub struct RequestBuilder(reqwest_middleware::RequestBuilder);
 #[cfg(not(feature = "retry"))]
+#[cfg(feature = "requests")]
 pub struct RequestBuilder(reqwest::RequestBuilder);
 
+#[cfg(feature = "requests")]
 impl Client {
     /// Create a new Client struct. It takes a type that can convert into
     /// an &str (`String` or `Vec<u8>` for example). As long as the function is
@@ -442,6 +452,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[cfg(not(target_arch = "wasm32"))]
+#[cfg(feature = "requests")]
 static APP_USER_AGENT: &str = concat!(
     env!("CARGO_PKG_NAME"),
     ".rs/",
@@ -450,6 +461,7 @@ static APP_USER_AGENT: &str = concat!(
 
 /// Entrypoint for interacting with the API client.
 #[derive(Clone, Debug)]
+#[cfg(feature = "requests")]
 pub struct Client {
     base_url: String,
     token: Arc<tokio::sync::RwLock<InnerToken>>,
@@ -467,6 +479,7 @@ pub struct Client {
 
 /// An access token.
 #[derive(Debug, JsonSchema, Clone, Default, Serialize, Deserialize)]
+#[cfg(feature = "requests")]
 pub struct AccessToken {
     #[serde(
         default,
@@ -500,15 +513,18 @@ pub struct AccessToken {
 /// Time in seconds before the access token expiration point that a refresh should
 /// be performed. This value is subtracted from the `expires_in` value returned by
 /// the provider prior to storing
+#[cfg(feature = "requests")]
 const REFRESH_THRESHOLD: Duration = Duration::from_secs(60);
 
 #[derive(Debug, Clone)]
+#[cfg(feature = "requests")]
 struct InnerToken {
     access_token: String,
     refresh_token: String,
     expires_at: Option<Instant>,
 }
 
+#[cfg(feature = "requests")]
 impl Client {
     /// Create a new Client struct. It takes a type that can convert into
     /// an &str (`String` or `Vec<u8>` for example). As long as the function is

@@ -133,6 +133,7 @@ pub mod base64 {
     }
 }
 
+#[cfg(feature = "requests")]
 pub mod paginate {
     #![doc = " Utility functions used for pagination."]
     use anyhow::Result;
@@ -298,6 +299,7 @@ pub mod phone_number {
     }
 }
 
+#[cfg(feature = "requests")]
 pub mod error {
     #![doc = " Error methods."]
     #[doc = " Error produced by generated client methods."]
@@ -1312,6 +1314,7 @@ impl std::fmt::Display for ApiCallWithPriceResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for ApiCallWithPriceResultsPage {
     type Item = ApiCallWithPrice;
     fn has_more_pages(&self) -> bool {
@@ -1446,6 +1449,7 @@ impl std::fmt::Display for ApiTokenResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for ApiTokenResultsPage {
     type Item = ApiToken;
     fn has_more_pages(&self) -> bool {
@@ -1765,6 +1769,7 @@ impl std::fmt::Display for AsyncApiCallResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for AsyncApiCallResultsPage {
     type Item = AsyncApiCall;
     fn has_more_pages(&self) -> bool {
@@ -6062,6 +6067,7 @@ impl std::fmt::Display for ExtendedUserResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for ExtendedUserResultsPage {
     type Item = ExtendedUser;
     fn has_more_pages(&self) -> bool {
@@ -12177,6 +12183,7 @@ impl std::fmt::Display for UserResultsPage {
     }
 }
 
+#[cfg(feature = "requests")]
 impl crate::types::paginate::Pagination for UserResultsPage {
     type Item = User;
     fn has_more_pages(&self) -> bool {

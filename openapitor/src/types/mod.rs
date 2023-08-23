@@ -72,10 +72,12 @@ pub fn generate_types(spec: &openapiv3::OpenAPI, opts: crate::Opts) -> Result<Ty
 
             #base64_mod
 
+            #[cfg(feature = "requests")]
             #paginate_mod
 
             #phone_number_mod
 
+            #[cfg(feature = "requests")]
             #error_mod
         ),
         opts,
@@ -641,6 +643,7 @@ impl TypeSpace {
             let next_page_ident = format_ident!("{}", next_page_str);
 
             pagination = quote!(
+                #[cfg(feature = "requests")]
                 impl crate::types::paginate::Pagination for #struct_name {
                     type Item = #page_item;
 
