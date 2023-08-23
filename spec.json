@@ -6147,7 +6147,14 @@
         "description": "The valid types of output file formats.",
         "oneOf": [
           {
-            "description": "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, although by default it will be in binary format and thus technically (glb).",
+            "description": "Binary glTF 2.0.\n\nThis is a single binary with .glb extension.\n\nThis is better if you want a compressed format as opposed to the human readable glTF that lacks compression.",
+            "enum": [
+              "glb"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "glTF 2.0. Embedded glTF 2.0 (pretty printed).\n\nSingle JSON file with .gltf extension binary data encoded as base64 data URIs.\n\nThe JSON contents are pretty printed.\n\nIt is human readable, single file, and you can view the diff easily in a git commit.",
             "enum": [
               "gltf"
             ],
@@ -6571,6 +6578,18 @@
           "urls"
         ],
         "type": "object"
+      },
+      "ImageFormat": {
+        "description": "Enum containing the variety of image formats snapshots may be exported to.",
+        "oneOf": [
+          {
+            "description": ".png format",
+            "enum": [
+              "png"
+            ],
+            "type": "string"
+          }
+        ]
       },
       "ImageType": {
         "description": "An enumeration.",
@@ -8699,6 +8718,30 @@
               "type"
             ],
             "type": "object"
+          },
+          {
+            "description": "Take a snapshot.",
+            "properties": {
+              "format": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ImageFormat"
+                  }
+                ],
+                "description": "What image format to return."
+              },
+              "type": {
+                "enum": [
+                  "take_snapshot"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "format",
+              "type"
+            ],
+            "type": "object"
           }
         ]
       },
@@ -8740,7 +8783,6 @@
             "additionalProperties": {
               "$ref": "#/components/schemas/ModelingCmdReq"
             },
-            "description": "A set of commands to submit to the KittyCAD engine in a batch.",
             "type": "object"
           }
         },
@@ -8843,7 +8885,6 @@
             "additionalProperties": {
               "$ref": "#/components/schemas/ModelingOutcome"
             },
-            "description": "The results from each command in the batch.",
             "type": "object"
           }
         },
@@ -9340,6 +9381,31 @@
               "type"
             ],
             "type": "object"
+          },
+          {
+            "description": "The response from the `Take Snapshot` command.",
+            "properties": {
+              "contents": {
+                "description": "Contents of the image.",
+                "items": {
+                  "format": "uint8",
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              "type": {
+                "enum": [
+                  "take_snapshot"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "contents",
+              "type"
+            ],
+            "type": "object"
           }
         ]
       },
@@ -9383,6 +9449,14 @@
           {
             "description": "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, although by default it will be in binary format and thus technically (glb). If you prefer ascii output, you can set that option for the export.",
             "properties": {
+              "presentation": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Presentation"
+                  }
+                ],
+                "description": "Specifies how the JSON will be presented."
+              },
               "storage": {
                 "allOf": [
                   {
@@ -9399,6 +9473,7 @@
               }
             },
             "required": [
+              "presentation",
               "storage",
               "type"
             ],
@@ -9829,6 +9904,25 @@
           "message"
         ],
         "type": "object"
+      },
+      "Presentation": {
+        "description": "Describes the presentation style of the glTF JSON.",
+        "oneOf": [
+          {
+            "description": "Condense the JSON into the smallest possible size.\n\nThis is the default setting.",
+            "enum": [
+              "compact"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Expand the JSON into a more human readable format.",
+            "enum": [
+              "pretty"
+            ],
+            "type": "string"
+          }
+        ]
       },
       "RawFile": {
         "description": "A raw file with unencoded contents to be passed over binary websockets.",
@@ -15301,7 +15395,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/OkModelingCmdResponse"
+                }
               }
             },
             "description": "successful operation",
@@ -19712,6 +19808,14 @@
               "format": "uint32",
               "minimum": 0,
               "type": "integer"
+            }
+          },
+          {
+            "description": "If true, will start a webrtc connection.",
+            "in": "query",
+            "name": "webrtc",
+            "schema": {
+              "type": "boolean"
             }
           }
         ],
