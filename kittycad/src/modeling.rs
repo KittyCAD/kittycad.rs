@@ -16,7 +16,7 @@ impl Modeling {
              unfortunately the OpenAPI schema can't generate the right response \
              type.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_modeling_cmd() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: serde_json::Value = client\n        .modeling()\n        \
+             result: kittycad::types::OkModelingCmdResponse = client\n        .modeling()\n        \
              .cmd(&kittycad::types::ModelingCmdReq {\n            cmd: \
              kittycad::types::ModelingCmd::CameraDragEnd {\n                interaction: \
              kittycad::types::CameraDragInteractionType::Zoom,\n                window: \
@@ -28,7 +28,7 @@ impl Modeling {
     pub async fn cmd<'a>(
         &'a self,
         body: &crate::types::ModelingCmdReq,
-    ) -> Result<serde_json::Value, crate::types::error::Error> {
+    ) -> Result<crate::types::OkModelingCmdResponse, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
             format!("{}/{}", self.client.base_url, "modeling/cmd"),
@@ -84,7 +84,7 @@ impl Modeling {
              Option<bool>`: If true, engine will render video frames as fast as it can.\n- \
              `video_res_height: Option<u32>`: Height of the video feed. Must be a multiple of \
              4.\n- `video_res_width: Option<u32>`: Width of the video feed. Must be a multiple of \
-             4."]
+             4.\n- `webrtc: Option<bool>`: If true, will start a webrtc connection."]
     #[tracing::instrument]
     #[cfg(not(target_arch = "wasm32"))]
     pub async fn commands_ws<'a>(
@@ -93,6 +93,7 @@ impl Modeling {
         unlocked_framerate: Option<bool>,
         video_res_height: Option<u32>,
         video_res_width: Option<u32>,
+        webrtc: Option<bool>,
     ) -> Result<reqwest::Upgraded, crate::types::error::Error> {
         let mut req = self.client.client_http1_only.request(
             http::Method::GET,
@@ -114,6 +115,10 @@ impl Modeling {
 
         if let Some(p) = video_res_width {
             query_params.push(("video_res_width", format!("{}", p)));
+        }
+
+        if let Some(p) = webrtc {
+            query_params.push(("webrtc", format!("{}", p)));
         }
 
         req = req.query(&query_params);
