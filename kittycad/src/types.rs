@@ -6472,8 +6472,16 @@ impl tabled::Tabled for FileDensity {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum FileExportFormat {
-    #[doc = "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, \
-             although by default it will be in binary format and thus technically (glb)."]
+    #[doc = "Binary glTF 2.0.\n\nThis is a single binary with .glb extension.\n\nThis is better \
+             if you want a compressed format as opposed to the human readable glTF that lacks \
+             compression."]
+    #[serde(rename = "glb")]
+    #[display("glb")]
+    Glb,
+    #[doc = "glTF 2.0. Embedded glTF 2.0 (pretty printed).\n\nSingle JSON file with .gltf \
+             extension binary data encoded as base64 data URIs.\n\nThe JSON contents are pretty \
+             printed.\n\nIt is human readable, single file, and you can view the diff easily in a \
+             git commit."]
     #[serde(rename = "gltf")]
     #[display("gltf")]
     Gltf,
@@ -7006,6 +7014,31 @@ impl tabled::Tabled for IceServer {
         vec!["credential".into(), "urls".into(), "username".into()]
     }
 }
+
+#[doc = "Enum containing the variety of image formats snapshots may be exported to."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[derive(Default)]
+pub enum ImageFormat {
+    #[doc = ".png format"]
+    #[serde(rename = "png")]
+    #[display("png")]
+    #[default]
+    Png,
+}
+
+
 
 #[doc = "An enumeration."]
 #[derive(
@@ -8245,6 +8278,8 @@ pub enum ModelingCmd {
     CurveGetType { curve_id: uuid::Uuid },
     #[serde(rename = "curve_get_control_points")]
     CurveGetControlPoints { curve_id: uuid::Uuid },
+    #[serde(rename = "take_snapshot")]
+    TakeSnapshot { format: ImageFormat },
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -8288,7 +8323,6 @@ impl tabled::Tabled for ModelingCmdReq {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ModelingCmdReqBatch {
-    #[doc = "A set of commands to submit to the KittyCAD engine in a batch."]
     pub cmds: std::collections::HashMap<String, ModelingCmdReq>,
 }
 
@@ -8387,7 +8421,6 @@ pub enum ModelingOutcome {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ModelingOutcomes {
-    #[doc = "The results from each command in the batch."]
     pub outcomes: std::collections::HashMap<String, ModelingOutcome>,
 }
 
@@ -8640,6 +8673,8 @@ pub enum OkModelingCmdResponse {
     CurveGetType { curve_type: CurveType },
     #[serde(rename = "curve_get_control_points")]
     CurveGetControlPoints { control_points: Vec<Point3D> },
+    #[serde(rename = "take_snapshot")]
+    TakeSnapshot { contents: Vec<u8> },
 }
 
 #[doc = "Onboarding details"]
@@ -8758,7 +8793,10 @@ impl tabled::Tabled for OutputFile {
 #[serde(tag = "type")]
 pub enum OutputFormat {
     #[serde(rename = "gltf")]
-    Gltf { storage: Storage },
+    Gltf {
+        presentation: Presentation,
+        storage: Storage,
+    },
     #[serde(rename = "obj")]
     Obj { coords: System },
     #[serde(rename = "ply")]
@@ -9189,6 +9227,31 @@ impl tabled::Tabled for Pong {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["message".into()]
     }
+}
+
+#[doc = "Describes the presentation style of the glTF JSON."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Presentation {
+    #[doc = "Condense the JSON into the smallest possible size.\n\nThis is the default setting."]
+    #[serde(rename = "compact")]
+    #[display("compact")]
+    Compact,
+    #[doc = "Expand the JSON into a more human readable format."]
+    #[serde(rename = "pretty")]
+    #[display("pretty")]
+    Pretty,
 }
 
 #[doc = "A raw file with unencoded contents to be passed over binary websockets."]
