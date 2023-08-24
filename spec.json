@@ -635,6 +635,28 @@
         ],
         "type": "object"
       },
+      "ApiError": {
+        "description": "An error.",
+        "properties": {
+          "error_code": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ErrorCode"
+              }
+            ],
+            "description": "The error code."
+          },
+          "message": {
+            "description": "The error message.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "error_code",
+          "message"
+        ],
+        "type": "object"
+      },
       "ApiToken": {
         "description": "An API token.\n\nThese are used to authenticate users with Bearer authentication.",
         "properties": {
@@ -697,6 +719,41 @@
         },
         "required": [
           "items"
+        ],
+        "type": "object"
+      },
+      "ApiWebSocketResponse": {
+        "description": "Websocket responses can either be successful or unsuccessful. Slightly different schemas in either case.",
+        "properties": {
+          "errors": {
+            "description": "The errors that occurred. If `success` is true, this is empty. If `success` is false, this should be non-empty.",
+            "items": {
+              "$ref": "#/components/schemas/ApiError"
+            },
+            "type": "array"
+          },
+          "request_id": {
+            "description": "Which request this is a response to. If the request was a modeling command, this is the modeling command ID. If no request ID was sent, this will be null.",
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "resp": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OkWebSocketResponseData"
+              }
+            ],
+            "description": "The data sent with a successful response. This will be flattened into a 'type' and 'data' field. If `success` is true, this is non-empty. If `success` is false, this is empty.",
+            "nullable": true
+          },
+          "success": {
+            "description": "Always false",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success"
         ],
         "type": "object"
       },
@@ -4890,6 +4947,39 @@
           }
         ]
       },
+      "CurveGetControlPoints": {
+        "description": "The response from the `CurveGetControlPoints` command.",
+        "properties": {
+          "control_points": {
+            "description": "Control points in the curve.",
+            "items": {
+              "$ref": "#/components/schemas/Point3d"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "control_points"
+        ],
+        "type": "object"
+      },
+      "CurveGetType": {
+        "description": "The response from the `CurveGetType` command.",
+        "properties": {
+          "curve_type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CurveType"
+              }
+            ],
+            "description": "Curve type"
+          }
+        },
+        "required": [
+          "curve_type"
+        ],
+        "type": "object"
+      },
       "CurveType": {
         "description": "The type of Curve (embedded within path)",
         "enum": [
@@ -5501,28 +5591,6 @@
         ],
         "type": "object"
       },
-      "EngineError": {
-        "description": "An error.",
-        "properties": {
-          "error_code": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ErrorCode"
-              }
-            ],
-            "description": "The error code."
-          },
-          "message": {
-            "description": "The error message.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "error_code",
-          "message"
-        ],
-        "type": "object"
-      },
       "EngineMetadata": {
         "description": "Metadata about our currently running server.\n\nThis is mostly used for internal purposes and debugging.",
         "properties": {
@@ -5574,6 +5642,66 @@
           "fs",
           "git_hash",
           "pubsub"
+        ],
+        "type": "object"
+      },
+      "EntityGetAllChildUuids": {
+        "description": "The response from the `EntityGetAllChildUuids` command.",
+        "properties": {
+          "entity_ids": {
+            "description": "The UUIDs of the child entities.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "entity_ids"
+        ],
+        "type": "object"
+      },
+      "EntityGetChildUuid": {
+        "description": "The response from the `EntityGetChildUuid` command.",
+        "properties": {
+          "entity_id": {
+            "description": "The UUID of the child entity.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id"
+        ],
+        "type": "object"
+      },
+      "EntityGetNumChildren": {
+        "description": "The response from the `EntityGetNumChildren` command.",
+        "properties": {
+          "num": {
+            "description": "The number of children the entity has.",
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "num"
+        ],
+        "type": "object"
+      },
+      "EntityGetParentId": {
+        "description": "The response from the `EntityGetParentId` command.",
+        "properties": {
+          "entity_id": {
+            "description": "The UUID of the parent entity.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id"
         ],
         "type": "object"
       },
@@ -5638,39 +5766,58 @@
         "type": "object"
       },
       "ErrorCode": {
-        "description": "The type of errorcode.",
+        "description": "The type of error sent by the KittyCAD API.",
         "oneOf": [
           {
-            "description": "User requested something impossible or invalid",
+            "description": "Graphics engine failed to complete request, consider retrying",
+            "enum": [
+              "internal_engine"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "API failed to complete request, consider retrying",
+            "enum": [
+              "internal_api"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "User requested something geometrically or graphically impossible. Don't retry this request, as it's inherently impossible. Instead, read the error message and change your request.",
             "enum": [
               "bad_request"
             ],
             "type": "string"
           },
           {
-            "description": "Engine failed to complete request, consider retrying",
+            "description": "Client sent invalid JSON.",
             "enum": [
-              "internal_engine"
+              "invalid_json"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Problem sending data between client and KittyCAD API.",
+            "enum": [
+              "connection_problem"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Client sent a Websocket message type which the KittyCAD API does not handle.",
+            "enum": [
+              "message_type_not_accepted"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Client sent a Websocket message intended for WebRTC but it was configured as a WebRTC connection.",
+            "enum": [
+              "message_type_not_accepted_for_web_r_t_c"
             ],
             "type": "string"
           }
         ]
-      },
-      "ErrorResponse": {
-        "description": "The error response.",
-        "properties": {
-          "errors": {
-            "description": "A list of errors.",
-            "items": {
-              "$ref": "#/components/schemas/EngineError"
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "errors"
-        ],
-        "type": "object"
       },
       "ExecutorMetadata": {
         "description": "Metadata about our currently running server.\n\nThis is mostly used for internal purposes and debugging.",
@@ -5700,6 +5847,22 @@
           "docker_info",
           "environment",
           "git_hash"
+        ],
+        "type": "object"
+      },
+      "Export": {
+        "description": "The response from the `Export` endpoint.",
+        "properties": {
+          "files": {
+            "description": "The files that were exported.",
+            "items": {
+              "$ref": "#/components/schemas/ExportFile"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "files"
         ],
         "type": "object"
       },
@@ -6548,6 +6711,42 @@
             "default": 0,
             "description": "The TLS timeout for the gateway.",
             "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "GetEntityType": {
+        "description": "The response from the `GetEntityType` command.",
+        "properties": {
+          "entity_type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EntityType"
+              }
+            ],
+            "description": "The type of the entity."
+          }
+        },
+        "required": [
+          "entity_type"
+        ],
+        "type": "object"
+      },
+      "HighlightSetEntity": {
+        "description": "The response from the `HighlightSetEntity` command.",
+        "properties": {
+          "entity_id": {
+            "description": "The UUID of the entity that was highlighted.",
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "sequence": {
+            "description": "If the client sent a sequence ID with its request, the backend sends it back.",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
             "type": "integer"
           }
         },
@@ -8893,6 +9092,32 @@
         ],
         "type": "object"
       },
+      "MouseClick": {
+        "description": "The response from the `MouseClick` command.",
+        "properties": {
+          "entities_modified": {
+            "description": "Entities that are modified.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "entities_selected": {
+            "description": "Entities that are selected.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "entities_modified",
+          "entities_selected"
+        ],
+        "type": "object"
+      },
       "NewAddress": {
         "description": "The struct that is used to create a new record. This is automatically generated and has all the same fields as the main struct only it is missing the `id`.",
         "properties": {
@@ -8986,12 +9211,8 @@
           {
             "description": "The response from the `Export` command. When this is being performed over a websocket, this is sent as binary not JSON. The binary data can be deserialized as `bincode` into a `Vec<ExportFile>`.",
             "properties": {
-              "files": {
-                "description": "The files that were exported.",
-                "items": {
-                  "$ref": "#/components/schemas/ExportFile"
-                },
-                "type": "array"
+              "data": {
+                "$ref": "#/components/schemas/Export"
               },
               "type": {
                 "enum": [
@@ -9001,7 +9222,7 @@
               }
             },
             "required": [
-              "files",
+              "data",
               "type"
             ],
             "type": "object"
@@ -9009,11 +9230,8 @@
           {
             "description": "The response from the `SelectWithPoint` command.",
             "properties": {
-              "entity_id": {
-                "description": "The UUID of the entity that was selected.",
-                "format": "uuid",
-                "nullable": true,
-                "type": "string"
+              "data": {
+                "$ref": "#/components/schemas/SelectWithPoint"
               },
               "type": {
                 "enum": [
@@ -9023,6 +9241,7 @@
               }
             },
             "required": [
+              "data",
               "type"
             ],
             "type": "object"
@@ -9030,18 +9249,8 @@
           {
             "description": "The response from the `HighlightSetEntity` command.",
             "properties": {
-              "entity_id": {
-                "description": "The UUID of the entity that was highlighted.",
-                "format": "uuid",
-                "nullable": true,
-                "type": "string"
-              },
-              "sequence": {
-                "description": "If the client sent a sequence ID with its request, the backend sends it back.",
-                "format": "uint32",
-                "minimum": 0,
-                "nullable": true,
-                "type": "integer"
+              "data": {
+                "$ref": "#/components/schemas/HighlightSetEntity"
               },
               "type": {
                 "enum": [
@@ -9051,6 +9260,7 @@
               }
             },
             "required": [
+              "data",
               "type"
             ],
             "type": "object"
@@ -9058,10 +9268,8 @@
           {
             "description": "The response from the `EntityGetChildUuid` command.",
             "properties": {
-              "entity_id": {
-                "description": "The UUID of the child entity.",
-                "format": "uuid",
-                "type": "string"
+              "data": {
+                "$ref": "#/components/schemas/EntityGetChildUuid"
               },
               "type": {
                 "enum": [
@@ -9071,7 +9279,7 @@
               }
             },
             "required": [
-              "entity_id",
+              "data",
               "type"
             ],
             "type": "object"
@@ -9079,11 +9287,8 @@
           {
             "description": "The response from the `EntityGetNumChildren` command.",
             "properties": {
-              "num": {
-                "description": "The number of children the entity has.",
-                "format": "uint32",
-                "minimum": 0,
-                "type": "integer"
+              "data": {
+                "$ref": "#/components/schemas/EntityGetNumChildren"
               },
               "type": {
                 "enum": [
@@ -9093,7 +9298,7 @@
               }
             },
             "required": [
-              "num",
+              "data",
               "type"
             ],
             "type": "object"
@@ -9101,10 +9306,8 @@
           {
             "description": "The response from the `EntityGetParentId` command.",
             "properties": {
-              "entity_id": {
-                "description": "The UUID of the parent entity.",
-                "format": "uuid",
-                "type": "string"
+              "data": {
+                "$ref": "#/components/schemas/EntityGetParentId"
               },
               "type": {
                 "enum": [
@@ -9114,7 +9317,7 @@
               }
             },
             "required": [
-              "entity_id",
+              "data",
               "type"
             ],
             "type": "object"
@@ -9122,13 +9325,8 @@
           {
             "description": "The response from the `EntityGetAllChildUuids` command.",
             "properties": {
-              "entity_ids": {
-                "description": "The UUIDs of the child entities.",
-                "items": {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                "type": "array"
+              "data": {
+                "$ref": "#/components/schemas/EntityGetAllChildUuids"
               },
               "type": {
                 "enum": [
@@ -9138,7 +9336,7 @@
               }
             },
             "required": [
-              "entity_ids",
+              "data",
               "type"
             ],
             "type": "object"
@@ -9146,13 +9344,8 @@
           {
             "description": "The response from the `SelectGet` command.",
             "properties": {
-              "entity_ids": {
-                "description": "The UUIDs of the selected entities.",
-                "items": {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                "type": "array"
+              "data": {
+                "$ref": "#/components/schemas/SelectGet"
               },
               "type": {
                 "enum": [
@@ -9162,7 +9355,7 @@
               }
             },
             "required": [
-              "entity_ids",
+              "data",
               "type"
             ],
             "type": "object"
@@ -9170,13 +9363,8 @@
           {
             "description": "The response from the `GetEntityType` command.",
             "properties": {
-              "entity_type": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/EntityType"
-                  }
-                ],
-                "description": "The type of the entity."
+              "data": {
+                "$ref": "#/components/schemas/GetEntityType"
               },
               "type": {
                 "enum": [
@@ -9186,7 +9374,7 @@
               }
             },
             "required": [
-              "entity_type",
+              "data",
               "type"
             ],
             "type": "object"
@@ -9194,13 +9382,8 @@
           {
             "description": "The response from the `Solid3dGetAllEdgeFaces` command.",
             "properties": {
-              "faces": {
-                "description": "The UUIDs of the faces.",
-                "items": {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                "type": "array"
+              "data": {
+                "$ref": "#/components/schemas/Solid3dGetAllEdgeFaces"
               },
               "type": {
                 "enum": [
@@ -9210,7 +9393,7 @@
               }
             },
             "required": [
-              "faces",
+              "data",
               "type"
             ],
             "type": "object"
@@ -9218,13 +9401,8 @@
           {
             "description": "The response from the `Solid3dGetAllOppositeEdges` command.",
             "properties": {
-              "edges": {
-                "description": "The UUIDs of the edges.",
-                "items": {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                "type": "array"
+              "data": {
+                "$ref": "#/components/schemas/Solid3dGetAllOppositeEdges"
               },
               "type": {
                 "enum": [
@@ -9234,7 +9412,7 @@
               }
             },
             "required": [
-              "edges",
+              "data",
               "type"
             ],
             "type": "object"
@@ -9242,10 +9420,8 @@
           {
             "description": "The response from the `Solid3dGetOppositeEdge` command.",
             "properties": {
-              "edge": {
-                "description": "The UUID of the edge.",
-                "format": "uuid",
-                "type": "string"
+              "data": {
+                "$ref": "#/components/schemas/Solid3dGetOppositeEdge"
               },
               "type": {
                 "enum": [
@@ -9255,7 +9431,7 @@
               }
             },
             "required": [
-              "edge",
+              "data",
               "type"
             ],
             "type": "object"
@@ -9263,10 +9439,8 @@
           {
             "description": "The response from the `Solid3dGetPrevAdjacentEdge` command.",
             "properties": {
-              "edge": {
-                "description": "The UUID of the edge.",
-                "format": "uuid",
-                "type": "string"
+              "data": {
+                "$ref": "#/components/schemas/Solid3dGetPrevAdjacentEdge"
               },
               "type": {
                 "enum": [
@@ -9276,7 +9450,7 @@
               }
             },
             "required": [
-              "edge",
+              "data",
               "type"
             ],
             "type": "object"
@@ -9284,10 +9458,8 @@
           {
             "description": "The response from the `Solid3dGetNextAdjacentEdge` command.",
             "properties": {
-              "edge": {
-                "description": "The UUID of the edge.",
-                "format": "uuid",
-                "type": "string"
+              "data": {
+                "$ref": "#/components/schemas/Solid3dGetNextAdjacentEdge"
               },
               "type": {
                 "enum": [
@@ -9297,7 +9469,7 @@
               }
             },
             "required": [
-              "edge",
+              "data",
               "type"
             ],
             "type": "object"
@@ -9305,21 +9477,8 @@
           {
             "description": "The response from the `MouseClick` command.",
             "properties": {
-              "entities_modified": {
-                "description": "Entities that are modified.",
-                "items": {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "entities_selected": {
-                "description": "Entities that are selected.",
-                "items": {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                "type": "array"
+              "data": {
+                "$ref": "#/components/schemas/MouseClick"
               },
               "type": {
                 "enum": [
@@ -9329,8 +9488,7 @@
               }
             },
             "required": [
-              "entities_modified",
-              "entities_selected",
+              "data",
               "type"
             ],
             "type": "object"
@@ -9338,13 +9496,8 @@
           {
             "description": "The response from the `CurveGetType` command.",
             "properties": {
-              "curve_type": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/CurveType"
-                  }
-                ],
-                "description": "Curve type"
+              "data": {
+                "$ref": "#/components/schemas/CurveGetType"
               },
               "type": {
                 "enum": [
@@ -9354,7 +9507,7 @@
               }
             },
             "required": [
-              "curve_type",
+              "data",
               "type"
             ],
             "type": "object"
@@ -9362,12 +9515,8 @@
           {
             "description": "The response from the `CurveGetControlPoints` command.",
             "properties": {
-              "control_points": {
-                "description": "Control points in the curve.",
-                "items": {
-                  "$ref": "#/components/schemas/Point3d"
-                },
-                "type": "array"
+              "data": {
+                "$ref": "#/components/schemas/CurveGetControlPoints"
               },
               "type": {
                 "enum": [
@@ -9377,7 +9526,7 @@
               }
             },
             "required": [
-              "control_points",
+              "data",
               "type"
             ],
             "type": "object"
@@ -9385,14 +9534,8 @@
           {
             "description": "The response from the `Take Snapshot` command.",
             "properties": {
-              "contents": {
-                "description": "Contents of the image.",
-                "items": {
-                  "format": "uint8",
-                  "minimum": 0,
-                  "type": "integer"
-                },
-                "type": "array"
+              "data": {
+                "$ref": "#/components/schemas/TakeSnapshot"
               },
               "type": {
                 "enum": [
@@ -9402,7 +9545,170 @@
               }
             },
             "required": [
-              "contents",
+              "data",
+              "type"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "OkWebSocketResponseData": {
+        "description": "The websocket messages this server sends.",
+        "oneOf": [
+          {
+            "description": "Information about the ICE servers.",
+            "properties": {
+              "data": {
+                "properties": {
+                  "ice_servers": {
+                    "description": "Information about the ICE servers.",
+                    "items": {
+                      "$ref": "#/components/schemas/IceServer"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "ice_servers"
+                ],
+                "type": "object"
+              },
+              "type": {
+                "enum": [
+                  "ice_server_info"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The trickle ICE candidate response.",
+            "properties": {
+              "data": {
+                "properties": {
+                  "candidate": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/RtcIceCandidateInit"
+                      }
+                    ],
+                    "description": "Information about the ICE candidate."
+                  }
+                },
+                "required": [
+                  "candidate"
+                ],
+                "type": "object"
+              },
+              "type": {
+                "enum": [
+                  "trickle_ice"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The SDP answer response.",
+            "properties": {
+              "data": {
+                "properties": {
+                  "answer": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/RtcSessionDescription"
+                      }
+                    ],
+                    "description": "The session description."
+                  }
+                },
+                "required": [
+                  "answer"
+                ],
+                "type": "object"
+              },
+              "type": {
+                "enum": [
+                  "sdp_answer"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The modeling command response.",
+            "properties": {
+              "data": {
+                "properties": {
+                  "modeling_response": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/OkModelingCmdResponse"
+                      }
+                    ],
+                    "description": "The result of the command."
+                  }
+                },
+                "required": [
+                  "modeling_response"
+                ],
+                "type": "object"
+              },
+              "type": {
+                "enum": [
+                  "modeling"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The exported files.",
+            "properties": {
+              "data": {
+                "properties": {
+                  "files": {
+                    "description": "The exported files",
+                    "items": {
+                      "$ref": "#/components/schemas/RawFile"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "files"
+                ],
+                "type": "object"
+              },
+              "type": {
+                "enum": [
+                  "export"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "data",
               "type"
             ],
             "type": "object"
@@ -9987,85 +10293,6 @@
         },
         "type": "object"
       },
-      "RtcIceCandidate": {
-        "description": "ICECandidate represents a ice candidate",
-        "properties": {
-          "address": {
-            "description": "The address of the candidate.",
-            "type": "string"
-          },
-          "component": {
-            "description": "The component of the candidate.",
-            "format": "uint16",
-            "minimum": 0,
-            "type": "integer"
-          },
-          "foundation": {
-            "description": "The foundation for the address.",
-            "type": "string"
-          },
-          "port": {
-            "description": "The port used for the candidate.",
-            "format": "uint16",
-            "minimum": 0,
-            "type": "integer"
-          },
-          "priority": {
-            "description": "The priority of the candidate.",
-            "format": "uint32",
-            "minimum": 0,
-            "type": "integer"
-          },
-          "protocol": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RtcIceProtocol"
-              }
-            ],
-            "description": "The protocol used for the candidate."
-          },
-          "related_address": {
-            "description": "The related address of the candidate.",
-            "type": "string"
-          },
-          "related_port": {
-            "description": "The related port of the candidate.",
-            "format": "uint16",
-            "minimum": 0,
-            "type": "integer"
-          },
-          "stats_id": {
-            "description": "The stats ID.",
-            "type": "string"
-          },
-          "tcp_type": {
-            "description": "The TCP type of the candidate.",
-            "type": "string"
-          },
-          "typ": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RtcIceCandidateType"
-              }
-            ],
-            "description": "The type of the candidate."
-          }
-        },
-        "required": [
-          "address",
-          "component",
-          "foundation",
-          "port",
-          "priority",
-          "protocol",
-          "related_address",
-          "related_port",
-          "stats_id",
-          "tcp_type",
-          "typ"
-        ],
-        "type": "object"
-      },
       "RtcIceCandidateInit": {
         "description": "ICECandidateInit is used to serialize ice candidates",
         "properties": {
@@ -10095,72 +10322,6 @@
           "candidate"
         ],
         "type": "object"
-      },
-      "RtcIceCandidateType": {
-        "description": "ICECandidateType represents the type of the ICE candidate used.",
-        "oneOf": [
-          {
-            "description": "Unspecified indicates that the candidate type is unspecified.",
-            "enum": [
-              "unspecified"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "ICECandidateTypeHost indicates that the candidate is of Host type as described in <https://tools.ietf.org/html/rfc8445#section-5.1.1.1>. A candidate obtained by binding to a specific port from an IP address on the host. This includes IP addresses on physical interfaces and logical ones, such as ones obtained through VPNs.",
-            "enum": [
-              "host"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "ICECandidateTypeSrflx indicates the the candidate is of Server Reflexive type as described <https://tools.ietf.org/html/rfc8445#section-5.1.1.2>. A candidate type whose IP address and port are a binding allocated by a NAT for an ICE agent after it sends a packet through the NAT to a server, such as a STUN server.",
-            "enum": [
-              "srflx"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "ICECandidateTypePrflx indicates that the candidate is of Peer Reflexive type. A candidate type whose IP address and port are a binding allocated by a NAT for an ICE agent after it sends a packet through the NAT to its peer.",
-            "enum": [
-              "prflx"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "ICECandidateTypeRelay indicates the the candidate is of Relay type as described in <https://tools.ietf.org/html/rfc8445#section-5.1.1.2>. A candidate type obtained from a relay server, such as a TURN server.",
-            "enum": [
-              "relay"
-            ],
-            "type": "string"
-          }
-        ]
-      },
-      "RtcIceProtocol": {
-        "description": "ICEProtocol indicates the transport protocol type that is used in the ice.URL structure.",
-        "oneOf": [
-          {
-            "description": "Unspecified indicates that the protocol is unspecified.",
-            "enum": [
-              "unspecified"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "UDP indicates the URL uses a UDP transport.",
-            "enum": [
-              "udp"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "TCP indicates the URL uses a TCP transport.",
-            "enum": [
-              "tcp"
-            ],
-            "type": "string"
-          }
-        ]
       },
       "RtcSdpType": {
         "description": "SDPType describes the type of an SessionDescription.",
@@ -10280,6 +10441,35 @@
         ],
         "type": "string"
       },
+      "SelectGet": {
+        "description": "The response from the `SelectGet` command.",
+        "properties": {
+          "entity_ids": {
+            "description": "The UUIDs of the selected entities.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "entity_ids"
+        ],
+        "type": "object"
+      },
+      "SelectWithPoint": {
+        "description": "The response from the `SelectWithPoint` command.",
+        "properties": {
+          "entity_id": {
+            "description": "The UUID of the entity that was selected.",
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "Session": {
         "description": "An authentication session.\n\nFor our UIs, these are automatically created by Next.js.",
         "properties": {
@@ -10326,36 +10516,81 @@
         ],
         "type": "object"
       },
-      "SnakeCaseResult": {
-        "description": "Serde serializes Result into JSON as \"Ok\" and \"Err\", but we want \"ok\" and \"err\". So, create a new enum that serializes as lowercase.",
-        "oneOf": [
-          {
-            "additionalProperties": false,
-            "description": "The result is Ok.",
-            "properties": {
-              "ok": {
-                "$ref": "#/components/schemas/OkModelingCmdResponse"
-              }
+      "Solid3dGetAllEdgeFaces": {
+        "description": "The response from the `Solid3dGetAllEdgeFaces` command.",
+        "properties": {
+          "faces": {
+            "description": "The UUIDs of the faces.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
             },
-            "required": [
-              "ok"
-            ],
-            "type": "object"
-          },
-          {
-            "additionalProperties": false,
-            "description": "The result is Err.",
-            "properties": {
-              "err": {
-                "$ref": "#/components/schemas/ErrorResponse"
-              }
-            },
-            "required": [
-              "err"
-            ],
-            "type": "object"
+            "type": "array"
           }
-        ]
+        },
+        "required": [
+          "faces"
+        ],
+        "type": "object"
+      },
+      "Solid3dGetAllOppositeEdges": {
+        "description": "The response from the `Solid3dGetAllOppositeEdges` command.",
+        "properties": {
+          "edges": {
+            "description": "The UUIDs of the edges.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "edges"
+        ],
+        "type": "object"
+      },
+      "Solid3dGetNextAdjacentEdge": {
+        "description": "The response from the `Solid3dGetNextAdjacentEdge` command.",
+        "properties": {
+          "edge": {
+            "description": "The UUID of the edge.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "edge"
+        ],
+        "type": "object"
+      },
+      "Solid3dGetOppositeEdge": {
+        "description": "The response from the `Solid3dGetOppositeEdge` command.",
+        "properties": {
+          "edge": {
+            "description": "The UUID of the edge.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "edge"
+        ],
+        "type": "object"
+      },
+      "Solid3dGetPrevAdjacentEdge": {
+        "description": "The response from the `Solid3dGetPrevAdjacentEdge` command.",
+        "properties": {
+          "edge": {
+            "description": "The UUID of the edge.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "edge"
+        ],
+        "type": "object"
       },
       "Storage": {
         "description": "Describes the storage format of a glTF 2.0 scene.",
@@ -10450,6 +10685,24 @@
           "process"
         ],
         "type": "string"
+      },
+      "TakeSnapshot": {
+        "description": "The response from the `TakeSnapshot` command.",
+        "properties": {
+          "contents": {
+            "description": "Contents of the image.",
+            "items": {
+              "format": "uint8",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "contents"
+        ],
+        "type": "object"
       },
       "UnitAngle": {
         "description": "The valid types of angle formats.",
@@ -12510,135 +12763,18 @@
               "type"
             ],
             "type": "object"
-          }
-        ]
-      },
-      "WebSocketResponses": {
-        "description": "The websocket messages this server sends.",
-        "oneOf": [
-          {
-            "description": "The trickle ICE candidate response.",
-            "properties": {
-              "candidate": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/RtcIceCandidate"
-                  }
-                ],
-                "description": "Information about the ICE candidate."
-              },
-              "type": {
-                "enum": [
-                  "trickle_ice"
-                ],
-                "type": "string"
-              }
-            },
-            "required": [
-              "candidate",
-              "type"
-            ],
-            "type": "object"
           },
           {
-            "description": "The SDP answer response.",
+            "description": "The client-to-server Ping to ensure the WebSocket stays alive.",
             "properties": {
-              "answer": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/RtcSessionDescription"
-                  }
-                ],
-                "description": "The session description."
-              },
               "type": {
                 "enum": [
-                  "sdp_answer"
+                  "ping"
                 ],
                 "type": "string"
               }
             },
             "required": [
-              "answer",
-              "type"
-            ],
-            "type": "object"
-          },
-          {
-            "description": "The ICE server info response.",
-            "properties": {
-              "ice_servers": {
-                "description": "Information about the ICE servers.",
-                "items": {
-                  "$ref": "#/components/schemas/IceServer"
-                },
-                "type": "array"
-              },
-              "type": {
-                "enum": [
-                  "ice_server_info"
-                ],
-                "type": "string"
-              }
-            },
-            "required": [
-              "ice_servers",
-              "type"
-            ],
-            "type": "object"
-          },
-          {
-            "description": "The modeling command response.",
-            "properties": {
-              "cmd_id": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/ModelingCmdId"
-                  }
-                ],
-                "description": "The ID of the command."
-              },
-              "result": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/SnakeCaseResult"
-                  }
-                ],
-                "description": "The result of the command."
-              },
-              "type": {
-                "enum": [
-                  "modeling"
-                ],
-                "type": "string"
-              }
-            },
-            "required": [
-              "cmd_id",
-              "result",
-              "type"
-            ],
-            "type": "object"
-          },
-          {
-            "description": "The export command response, this is sent as binary.",
-            "properties": {
-              "files": {
-                "description": "The exported files.",
-                "items": {
-                  "$ref": "#/components/schemas/RawFile"
-                },
-                "type": "array"
-              },
-              "type": {
-                "enum": [
-                  "export"
-                ],
-                "type": "string"
-              }
-            },
-            "required": [
-              "files",
               "type"
             ],
             "type": "object"
@@ -15155,7 +15291,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WebSocketResponses"
+                  "$ref": "#/components/schemas/ApiWebSocketResponse"
                 }
               }
             },
