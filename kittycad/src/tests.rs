@@ -186,7 +186,11 @@ async fn test_modeling_websocket() {
 
     let client = test_client();
 
-    let ws = match client.modeling().commands_ws(None, None, None, None).await {
+    let ws = match client
+        .modeling()
+        .commands_ws(None, None, None, None, None)
+        .await
+    {
         Ok(ws) => ws,
         Err(crate::types::error::Error::UnexpectedResponse(resp)) => {
             let txt = resp.text().await.unwrap();
