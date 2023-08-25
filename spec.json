@@ -722,7 +722,7 @@
         ],
         "type": "object"
       },
-      "ApiWebSocketResponse": {
+      "WebSocketResponse": {
         "description": "Websocket responses can either be successful or unsuccessful. Slightly different schemas in either case.",
         "properties": {
           "errors": {
@@ -12680,7 +12680,7 @@
         ],
         "type": "object"
       },
-      "WebSocketMessages": {
+      "WebSocketRequest": {
         "description": "The websocket messages the server receives.",
         "oneOf": [
           {
@@ -15280,7 +15280,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/WebSocketMessages"
+                "$ref": "#/components/schemas/WebSocketRequest"
               }
             }
           },
@@ -15291,7 +15291,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiWebSocketResponse"
+                  "$ref": "#/components/schemas/WebSocketResponse"
                 }
               }
             },
