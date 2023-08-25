@@ -232,10 +232,10 @@ pub struct Client {
 /// A request builder.
 #[cfg(feature = "retry")]
 #[cfg(feature = "requests")]
-pub struct RequestBuilder(reqwest_middleware::RequestBuilder);
+pub struct RequestBuilder(pub reqwest_middleware::RequestBuilder);
 #[cfg(not(feature = "retry"))]
 #[cfg(feature = "requests")]
-pub struct RequestBuilder(reqwest::RequestBuilder);
+pub struct RequestBuilder(pub reqwest::RequestBuilder);
 
 #[cfg(feature = "requests")]
 impl Client {
