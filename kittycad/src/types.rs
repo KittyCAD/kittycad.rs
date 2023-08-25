@@ -1537,7 +1537,7 @@ impl tabled::Tabled for ApiTokenResultsPage {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct ApiWebSocketResponse {
+pub struct WebSocketResponse {
     #[doc = "The errors that occurred. If `success` is true, this is empty. If `success` is \
              false, this should be non-empty."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1555,7 +1555,7 @@ pub struct ApiWebSocketResponse {
     pub success: bool,
 }
 
-impl std::fmt::Display for ApiWebSocketResponse {
+impl std::fmt::Display for WebSocketResponse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -1566,7 +1566,7 @@ impl std::fmt::Display for ApiWebSocketResponse {
 }
 
 #[cfg(feature = "tabled")]
-impl tabled::Tabled for ApiWebSocketResponse {
+impl tabled::Tabled for WebSocketResponse {
     const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
@@ -12865,7 +12865,7 @@ impl tabled::Tabled for VerificationToken {
 )]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
-pub enum WebSocketMessages {
+pub enum WebSocketRequest {
     #[serde(rename = "trickle_ice")]
     TrickleIce { candidate: RtcIceCandidateInit },
     #[serde(rename = "sdp_offer")]
