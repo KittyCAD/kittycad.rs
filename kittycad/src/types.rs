@@ -1361,6 +1361,42 @@ impl tabled::Tabled for ApiCallWithPriceResultsPage {
     }
 }
 
+#[doc = "An error."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ApiError {
+    #[doc = "The error code."]
+    pub error_code: ErrorCode,
+    #[doc = "The error message."]
+    pub message: String,
+}
+
+impl std::fmt::Display for ApiError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ApiError {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.error_code).into(),
+            self.message.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["error_code".into(), "message".into()]
+    }
+}
+
 #[doc = "An API token.\n\nThese are used to authenticate users with Bearer authentication."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -1493,6 +1529,73 @@ impl tabled::Tabled for ApiTokenResultsPage {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "Websocket responses can either be successful or unsuccessful. Slightly different schemas \
+         in either case."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ApiWebSocketResponse {
+    #[doc = "The errors that occurred. If `success` is true, this is empty. If `success` is \
+             false, this should be non-empty."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub errors: Option<Vec<ApiError>>,
+    #[doc = "Which request this is a response to. If the request was a modeling command, this is \
+             the modeling command ID. If no request ID was sent, this will be null."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub request_id: Option<uuid::Uuid>,
+    #[doc = "The data sent with a successful response. This will be flattened into a 'type' and \
+             'data' field. If `success` is true, this is non-empty. If `success` is false, this \
+             is empty."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub resp: Option<OkWebSocketResponseData>,
+    #[doc = "Always false"]
+    pub success: bool,
+}
+
+impl std::fmt::Display for ApiWebSocketResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ApiWebSocketResponse {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(errors) = &self.errors {
+                format!("{:?}", errors).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(request_id) = &self.request_id {
+                format!("{:?}", request_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(resp) = &self.resp {
+                format!("{:?}", resp).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.success).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "errors".into(),
+            "request_id".into(),
+            "resp".into(),
+            "success".into(),
+        ]
     }
 }
 
@@ -4490,6 +4593,68 @@ pub enum Currency {
     Zmw,
 }
 
+#[doc = "The response from the `CurveGetControlPoints` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CurveGetControlPoints {
+    #[doc = "Control points in the curve."]
+    pub control_points: Vec<Point3D>,
+}
+
+impl std::fmt::Display for CurveGetControlPoints {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CurveGetControlPoints {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.control_points).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["control_points".into()]
+    }
+}
+
+#[doc = "The response from the `CurveGetType` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CurveGetType {
+    #[doc = "Curve type"]
+    pub curve_type: CurveType,
+}
+
+impl std::fmt::Display for CurveGetType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CurveGetType {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.curve_type).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["curve_type".into()]
+    }
+}
+
 #[doc = "The type of Curve (embedded within path)"]
 #[derive(
     serde :: Serialize,
@@ -5542,42 +5707,6 @@ impl tabled::Tabled for EmailAuthenticationForm {
     }
 }
 
-#[doc = "An error."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct EngineError {
-    #[doc = "The error code."]
-    pub error_code: ErrorCode,
-    #[doc = "The error message."]
-    pub message: String,
-}
-
-impl std::fmt::Display for EngineError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for EngineError {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.error_code).into(),
-            self.message.clone().into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["error_code".into(), "message".into()]
-    }
-}
-
 #[doc = "Metadata about our currently running server.\n\nThis is mostly used for internal purposes \
          and debugging."]
 #[derive(
@@ -5631,6 +5760,130 @@ impl tabled::Tabled for EngineMetadata {
             "git_hash".into(),
             "pubsub".into(),
         ]
+    }
+}
+
+#[doc = "The response from the `EntityGetAllChildUuids` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityGetAllChildUuids {
+    #[doc = "The UUIDs of the child entities."]
+    pub entity_ids: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for EntityGetAllChildUuids {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityGetAllChildUuids {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.entity_ids).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_ids".into()]
+    }
+}
+
+#[doc = "The response from the `EntityGetChildUuid` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityGetChildUuid {
+    #[doc = "The UUID of the child entity."]
+    pub entity_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for EntityGetChildUuid {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityGetChildUuid {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.entity_id).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_id".into()]
+    }
+}
+
+#[doc = "The response from the `EntityGetNumChildren` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityGetNumChildren {
+    #[doc = "The number of children the entity has."]
+    pub num: u32,
+}
+
+impl std::fmt::Display for EntityGetNumChildren {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityGetNumChildren {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.num).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["num".into()]
+    }
+}
+
+#[doc = "The response from the `EntityGetParentId` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityGetParentId {
+    #[doc = "The UUID of the parent entity."]
+    pub entity_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for EntityGetParentId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityGetParentId {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.entity_id).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_id".into()]
     }
 }
 
@@ -5749,7 +6002,7 @@ impl tabled::Tabled for Error {
     }
 }
 
-#[doc = "The type of errorcode."]
+#[doc = "The type of error sent by the KittyCAD API."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -5764,45 +6017,37 @@ impl tabled::Tabled for Error {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum ErrorCode {
-    #[doc = "User requested something impossible or invalid"]
-    #[serde(rename = "bad_request")]
-    #[display("bad_request")]
-    BadRequest,
-    #[doc = "Engine failed to complete request, consider retrying"]
+    #[doc = "Graphics engine failed to complete request, consider retrying"]
     #[serde(rename = "internal_engine")]
     #[display("internal_engine")]
     InternalEngine,
-}
-
-#[doc = "The error response."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ErrorResponse {
-    #[doc = "A list of errors."]
-    pub errors: Vec<EngineError>,
-}
-
-impl std::fmt::Display for ErrorResponse {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ErrorResponse {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.errors).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["errors".into()]
-    }
+    #[doc = "API failed to complete request, consider retrying"]
+    #[serde(rename = "internal_api")]
+    #[display("internal_api")]
+    InternalApi,
+    #[doc = "User requested something geometrically or graphically impossible. Don't retry this \
+             request, as it's inherently impossible. Instead, read the error message and change \
+             your request."]
+    #[serde(rename = "bad_request")]
+    #[display("bad_request")]
+    BadRequest,
+    #[doc = "Client sent invalid JSON."]
+    #[serde(rename = "invalid_json")]
+    #[display("invalid_json")]
+    InvalidJson,
+    #[doc = "Problem sending data between client and KittyCAD API."]
+    #[serde(rename = "connection_problem")]
+    #[display("connection_problem")]
+    ConnectionProblem,
+    #[doc = "Client sent a Websocket message type which the KittyCAD API does not handle."]
+    #[serde(rename = "message_type_not_accepted")]
+    #[display("message_type_not_accepted")]
+    MessageTypeNotAccepted,
+    #[doc = "Client sent a Websocket message intended for WebRTC but it was configured as a \
+             WebRTC connection."]
+    #[serde(rename = "message_type_not_accepted_for_web_r_t_c")]
+    #[display("message_type_not_accepted_for_web_r_t_c")]
+    MessageTypeNotAcceptedForWebRTC,
 }
 
 #[doc = "Metadata about our currently running server.\n\nThis is mostly used for internal purposes \
@@ -5846,6 +6091,37 @@ impl tabled::Tabled for ExecutorMetadata {
             "environment".into(),
             "git_hash".into(),
         ]
+    }
+}
+
+#[doc = "The response from the `Export` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Export {
+    #[doc = "The files that were exported."]
+    pub files: Vec<ExportFile>,
+}
+
+impl std::fmt::Display for Export {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Export {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.files).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["files".into()]
     }
 }
 
@@ -6962,6 +7238,83 @@ impl tabled::Tabled for Gateway {
             "port".into(),
             "tls_timeout".into(),
         ]
+    }
+}
+
+#[doc = "The response from the `GetEntityType` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct GetEntityType {
+    #[doc = "The type of the entity."]
+    pub entity_type: EntityType,
+}
+
+impl std::fmt::Display for GetEntityType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for GetEntityType {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.entity_type).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_type".into()]
+    }
+}
+
+#[doc = "The response from the `HighlightSetEntity` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct HighlightSetEntity {
+    #[doc = "The UUID of the entity that was highlighted."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_id: Option<uuid::Uuid>,
+    #[doc = "If the client sent a sequence ID with its request, the backend sends it back."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<u32>,
+}
+
+impl std::fmt::Display for HighlightSetEntity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for HighlightSetEntity {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(entity_id) = &self.entity_id {
+                format!("{:?}", entity_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(sequence) = &self.sequence {
+                format!("{:?}", sequence).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_id".into(), "sequence".into()]
     }
 }
 
@@ -8446,6 +8799,42 @@ impl tabled::Tabled for ModelingOutcomes {
     }
 }
 
+#[doc = "The response from the `MouseClick` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct MouseClick {
+    #[doc = "Entities that are modified."]
+    pub entities_modified: Vec<uuid::Uuid>,
+    #[doc = "Entities that are selected."]
+    pub entities_selected: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for MouseClick {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for MouseClick {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.entities_modified).into(),
+            format!("{:?}", self.entities_selected).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entities_modified".into(), "entities_selected".into()]
+    }
+}
+
 #[doc = "The struct that is used to create a new record. This is automatically generated and has \
          all the same fields as the main struct only it is missing the `id`."]
 #[derive(
@@ -8634,47 +9023,62 @@ pub enum OkModelingCmdResponse {
     #[serde(rename = "empty")]
     Empty {},
     #[serde(rename = "export")]
-    Export { files: Vec<ExportFile> },
+    Export { data: Export },
     #[serde(rename = "select_with_point")]
-    SelectWithPoint { entity_id: Option<uuid::Uuid> },
+    SelectWithPoint { data: SelectWithPoint },
     #[serde(rename = "highlight_set_entity")]
-    HighlightSetEntity {
-        entity_id: Option<uuid::Uuid>,
-        sequence: Option<u32>,
-    },
+    HighlightSetEntity { data: HighlightSetEntity },
     #[serde(rename = "entity_get_child_uuid")]
-    EntityGetChildUuid { entity_id: uuid::Uuid },
+    EntityGetChildUuid { data: EntityGetChildUuid },
     #[serde(rename = "entity_get_num_children")]
-    EntityGetNumChildren { num: u32 },
+    EntityGetNumChildren { data: EntityGetNumChildren },
     #[serde(rename = "entity_get_parent_id")]
-    EntityGetParentId { entity_id: uuid::Uuid },
+    EntityGetParentId { data: EntityGetParentId },
     #[serde(rename = "entity_get_all_child_uuids")]
-    EntityGetAllChildUuids { entity_ids: Vec<uuid::Uuid> },
+    EntityGetAllChildUuids { data: EntityGetAllChildUuids },
     #[serde(rename = "select_get")]
-    SelectGet { entity_ids: Vec<uuid::Uuid> },
+    SelectGet { data: SelectGet },
     #[serde(rename = "get_entity_type")]
-    GetEntityType { entity_type: EntityType },
+    GetEntityType { data: GetEntityType },
     #[serde(rename = "solid3d_get_all_edge_faces")]
-    Solid3DGetAllEdgeFaces { faces: Vec<uuid::Uuid> },
+    Solid3DGetAllEdgeFaces { data: Solid3DGetAllEdgeFaces },
     #[serde(rename = "solid3d_get_all_opposite_edges")]
-    Solid3DGetAllOppositeEdges { edges: Vec<uuid::Uuid> },
+    Solid3DGetAllOppositeEdges { data: Solid3DGetAllOppositeEdges },
     #[serde(rename = "solid3d_get_opposite_edge")]
-    Solid3DGetOppositeEdge { edge: uuid::Uuid },
+    Solid3DGetOppositeEdge { data: Solid3DGetOppositeEdge },
     #[serde(rename = "solid3d_get_prev_adjacent_edge")]
-    Solid3DGetPrevAdjacentEdge { edge: uuid::Uuid },
+    Solid3DGetPrevAdjacentEdge { data: Solid3DGetPrevAdjacentEdge },
     #[serde(rename = "solid3d_get_next_adjacent_edge")]
-    Solid3DGetNextAdjacentEdge { edge: uuid::Uuid },
+    Solid3DGetNextAdjacentEdge { data: Solid3DGetNextAdjacentEdge },
     #[serde(rename = "mouse_click")]
-    MouseClick {
-        entities_modified: Vec<uuid::Uuid>,
-        entities_selected: Vec<uuid::Uuid>,
-    },
+    MouseClick { data: MouseClick },
     #[serde(rename = "curve_get_type")]
-    CurveGetType { curve_type: CurveType },
+    CurveGetType { data: CurveGetType },
     #[serde(rename = "curve_get_control_points")]
-    CurveGetControlPoints { control_points: Vec<Point3D> },
+    CurveGetControlPoints { data: CurveGetControlPoints },
     #[serde(rename = "take_snapshot")]
-    TakeSnapshot { contents: Vec<u8> },
+    TakeSnapshot { data: TakeSnapshot },
+}
+
+#[doc = "The websocket messages this server sends."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type", content = "data")]
+pub enum OkWebSocketResponseData {
+    #[serde(rename = "ice_server_info")]
+    IceServerInfo { ice_servers: Vec<IceServer> },
+    #[serde(rename = "trickle_ice")]
+    TrickleIce { candidate: RtcIceCandidateInit },
+    #[serde(rename = "sdp_answer")]
+    SdpAnswer { answer: RtcSessionDescription },
+    #[serde(rename = "modeling")]
+    Modeling {
+        modeling_response: OkModelingCmdResponse,
+    },
+    #[serde(rename = "export")]
+    Export { files: Vec<RawFile> },
 }
 
 #[doc = "Onboarding details"]
@@ -9380,81 +9784,6 @@ impl tabled::Tabled for RegistryServiceConfig {
     }
 }
 
-#[doc = "ICECandidate represents a ice candidate"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct RtcIceCandidate {
-    #[doc = "The address of the candidate."]
-    pub address: String,
-    #[doc = "The component of the candidate."]
-    pub component: u16,
-    #[doc = "The foundation for the address."]
-    pub foundation: String,
-    #[doc = "The port used for the candidate."]
-    pub port: u16,
-    #[doc = "The priority of the candidate."]
-    pub priority: u32,
-    #[doc = "The protocol used for the candidate."]
-    pub protocol: RtcIceProtocol,
-    #[doc = "The related address of the candidate."]
-    pub related_address: String,
-    #[doc = "The related port of the candidate."]
-    pub related_port: u16,
-    #[doc = "The stats ID."]
-    pub stats_id: String,
-    #[doc = "The TCP type of the candidate."]
-    pub tcp_type: String,
-    #[doc = "The type of the candidate."]
-    pub typ: RtcIceCandidateType,
-}
-
-impl std::fmt::Display for RtcIceCandidate {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for RtcIceCandidate {
-    const LENGTH: usize = 11;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            self.address.clone().into(),
-            format!("{:?}", self.component).into(),
-            self.foundation.clone().into(),
-            format!("{:?}", self.port).into(),
-            format!("{:?}", self.priority).into(),
-            format!("{:?}", self.protocol).into(),
-            self.related_address.clone().into(),
-            format!("{:?}", self.related_port).into(),
-            self.stats_id.clone().into(),
-            self.tcp_type.clone().into(),
-            format!("{:?}", self.typ).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "address".into(),
-            "component".into(),
-            "foundation".into(),
-            "port".into(),
-            "priority".into(),
-            "protocol".into(),
-            "related_address".into(),
-            "related_port".into(),
-            "stats_id".into(),
-            "tcp_type".into(),
-            "typ".into(),
-        ]
-    }
-}
-
 #[doc = "ICECandidateInit is used to serialize ice candidates"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9524,74 +9853,6 @@ impl tabled::Tabled for RtcIceCandidateInit {
             "username_fragment".into(),
         ]
     }
-}
-
-#[doc = "ICECandidateType represents the type of the ICE candidate used."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum RtcIceCandidateType {
-    #[doc = "Unspecified indicates that the candidate type is unspecified."]
-    #[serde(rename = "unspecified")]
-    #[display("unspecified")]
-    Unspecified,
-    #[doc = "ICECandidateTypeHost indicates that the candidate is of Host type as described in <https://tools.ietf.org/html/rfc8445#section-5.1.1.1>. A candidate obtained by binding to a specific port from an IP address on the host. This includes IP addresses on physical interfaces and logical ones, such as ones obtained through VPNs."]
-    #[serde(rename = "host")]
-    #[display("host")]
-    Host,
-    #[doc = "ICECandidateTypeSrflx indicates the the candidate is of Server Reflexive type as described <https://tools.ietf.org/html/rfc8445#section-5.1.1.2>. A candidate type whose IP address and port are a binding allocated by a NAT for an ICE agent after it sends a packet through the NAT to a server, such as a STUN server."]
-    #[serde(rename = "srflx")]
-    #[display("srflx")]
-    Srflx,
-    #[doc = "ICECandidateTypePrflx indicates that the candidate is of Peer Reflexive type. A \
-             candidate type whose IP address and port are a binding allocated by a NAT for an ICE \
-             agent after it sends a packet through the NAT to its peer."]
-    #[serde(rename = "prflx")]
-    #[display("prflx")]
-    Prflx,
-    #[doc = "ICECandidateTypeRelay indicates the the candidate is of Relay type as described in <https://tools.ietf.org/html/rfc8445#section-5.1.1.2>. A candidate type obtained from a relay server, such as a TURN server."]
-    #[serde(rename = "relay")]
-    #[display("relay")]
-    Relay,
-}
-
-#[doc = "ICEProtocol indicates the transport protocol type that is used in the ice.URL structure."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum RtcIceProtocol {
-    #[doc = "Unspecified indicates that the protocol is unspecified."]
-    #[serde(rename = "unspecified")]
-    #[display("unspecified")]
-    Unspecified,
-    #[doc = "UDP indicates the URL uses a UDP transport."]
-    #[serde(rename = "udp")]
-    #[display("udp")]
-    Udp,
-    #[doc = "TCP indicates the URL uses a TCP transport."]
-    #[serde(rename = "tcp")]
-    #[display("tcp")]
-    Tcp,
 }
 
 #[doc = "SDPType describes the type of an SessionDescription."]
@@ -9786,6 +10047,73 @@ pub enum SceneToolType {
     SketchCurveMod,
 }
 
+#[doc = "The response from the `SelectGet` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SelectGet {
+    #[doc = "The UUIDs of the selected entities."]
+    pub entity_ids: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for SelectGet {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SelectGet {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.entity_ids).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_ids".into()]
+    }
+}
+
+#[doc = "The response from the `SelectWithPoint` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SelectWithPoint {
+    #[doc = "The UUID of the entity that was selected."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_id: Option<uuid::Uuid>,
+}
+
+impl std::fmt::Display for SelectWithPoint {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SelectWithPoint {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![if let Some(entity_id) = &self.entity_id {
+            format!("{:?}", entity_id).into()
+        } else {
+            String::new().into()
+        }]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_id".into()]
+    }
+}
+
 #[doc = "An authentication session.\n\nFor our UIs, these are automatically created by Next.js."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9851,16 +10179,159 @@ impl tabled::Tabled for Session {
     }
 }
 
-#[doc = "Serde serializes Result into JSON as \"Ok\" and \"Err\", but we want \"ok\" and \"err\". \
-         So, create a new enum that serializes as lowercase."]
+#[doc = "The response from the `Solid3dGetAllEdgeFaces` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub enum SnakeCaseResult {
-    Err {
-        #[doc = "A list of errors."]
-        errors: Vec<EngineError>,
-    },
+pub struct Solid3DGetAllEdgeFaces {
+    #[doc = "The UUIDs of the faces."]
+    pub faces: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for Solid3DGetAllEdgeFaces {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DGetAllEdgeFaces {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.faces).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["faces".into()]
+    }
+}
+
+#[doc = "The response from the `Solid3dGetAllOppositeEdges` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DGetAllOppositeEdges {
+    #[doc = "The UUIDs of the edges."]
+    pub edges: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for Solid3DGetAllOppositeEdges {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DGetAllOppositeEdges {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.edges).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["edges".into()]
+    }
+}
+
+#[doc = "The response from the `Solid3dGetNextAdjacentEdge` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DGetNextAdjacentEdge {
+    #[doc = "The UUID of the edge."]
+    pub edge: uuid::Uuid,
+}
+
+impl std::fmt::Display for Solid3DGetNextAdjacentEdge {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DGetNextAdjacentEdge {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.edge).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["edge".into()]
+    }
+}
+
+#[doc = "The response from the `Solid3dGetOppositeEdge` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DGetOppositeEdge {
+    #[doc = "The UUID of the edge."]
+    pub edge: uuid::Uuid,
+}
+
+impl std::fmt::Display for Solid3DGetOppositeEdge {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DGetOppositeEdge {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.edge).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["edge".into()]
+    }
+}
+
+#[doc = "The response from the `Solid3dGetPrevAdjacentEdge` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DGetPrevAdjacentEdge {
+    #[doc = "The UUID of the edge."]
+    pub edge: uuid::Uuid,
+}
+
+impl std::fmt::Display for Solid3DGetPrevAdjacentEdge {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DGetPrevAdjacentEdge {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.edge).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["edge".into()]
+    }
 }
 
 #[doc = "Describes the storage format of a glTF 2.0 scene."]
@@ -10055,6 +10526,37 @@ pub enum SystemInfoIsolationEnum {
     #[serde(rename = "process")]
     #[display("process")]
     Process,
+}
+
+#[doc = "The response from the `TakeSnapshot` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct TakeSnapshot {
+    #[doc = "Contents of the image."]
+    pub contents: Vec<u8>,
+}
+
+impl std::fmt::Display for TakeSnapshot {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for TakeSnapshot {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.contents).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["contents".into()]
+    }
 }
 
 #[doc = "The valid types of angle formats."]
@@ -12373,26 +12875,6 @@ pub enum WebSocketMessages {
         cmd: ModelingCmd,
         cmd_id: uuid::Uuid,
     },
-}
-
-#[doc = "The websocket messages this server sends."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[serde(tag = "type")]
-pub enum WebSocketResponses {
-    #[serde(rename = "trickle_ice")]
-    TrickleIce { candidate: RtcIceCandidate },
-    #[serde(rename = "sdp_answer")]
-    SdpAnswer { answer: RtcSessionDescription },
-    #[serde(rename = "ice_server_info")]
-    IceServerInfo { ice_servers: Vec<IceServer> },
-    #[serde(rename = "modeling")]
-    Modeling {
-        cmd_id: uuid::Uuid,
-        result: SnakeCaseResult,
-    },
-    #[serde(rename = "export")]
-    Export { files: Vec<RawFile> },
+    #[serde(rename = "ping")]
+    Ping {},
 }

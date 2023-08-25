@@ -817,16 +817,6 @@ impl TypeSpace {
                             compare_inner_schema = item_schema.clone();
                         }
                     }
-                    if prop == "emails" {
-                        println!(
-                            "RENDERED {:?}\nINNER SCHEMA {:?}",
-                            rendered, compare_inner_schema
-                        );
-                        println!(
-                            "RENDERED KIND {:?}\nINNER SCHEMA KIND {:?}",
-                            rendered.schema_kind, compare_inner_schema.schema_kind
-                        );
-                    }
                     if *rendered != *compare_inner_schema {
                         // The name is already taken, so we need to make a new name.
                         t = proper_name(&format!("{} {}", struct_name, prop));
@@ -1172,6 +1162,7 @@ impl TypeSpace {
                     let n = format_ident!("{}", p);
 
                     if let Some(content) = &tag_result.content {
+                        let content_type_name = proper_name(&format!("{}_{}", tag_name, content));
                         // Get the value of the content.
                         let content_schema = match o.properties.get(content) {
                             Some(v) => v,
@@ -1184,10 +1175,18 @@ impl TypeSpace {
                             }
                         };
 
+                        let mut enum_object_internal = None;
+
                         // Get the single value from the enum.
                         let content_name = if let openapiv3::ReferenceOr::Item(i) = content_schema {
                             let s = &**i;
-                            get_type_name_for_schema(&name, s, &self.spec, true)?
+                            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
+                                &s.schema_kind
+                            {
+                                enum_object_internal =
+                                    Some(render_enum_object_internal(&p, o, &self.spec, tag)?);
+                            }
+                            get_type_name_for_schema(&content_type_name, s, &self.spec, true)?
                         } else {
                             get_type_name_from_reference(
                                 &content_schema.reference()?,
@@ -1199,20 +1198,37 @@ impl TypeSpace {
                         // Get the type name for this value.
                         values.insert(p.to_string(), one_of.clone());
 
-                        if p != tag_name {
-                            // Rename serde to the correct tag name.
-                            rendered_value = quote!(
-                                #rendered_value
+                        if let Some(enum_object_internal) = enum_object_internal {
+                            if p != tag_name {
+                                rendered_value = quote!(
+                                    #rendered_value
 
-                                #[serde(rename = #tag_name)]
-                                #n(#content_name),
-                            );
+                                    #[serde(rename = #tag_name)]
+                                    #enum_object_internal,
+                                );
+                            } else {
+                                rendered_value = quote!(
+                                    #rendered_value
+
+                                    #enum_object_internal,
+                                );
+                            }
                         } else {
-                            rendered_value = quote!(
-                                #rendered_value
+                            if p != tag_name {
+                                // Rename serde to the correct tag name.
+                                rendered_value = quote!(
+                                    #rendered_value
 
-                                #n(#content_name),
-                            );
+                                    #[serde(rename = #tag_name)]
+                                    #n(#content_name),
+                                );
+                            } else {
+                                rendered_value = quote!(
+                                    #rendered_value
+
+                                    #n(#content_name),
+                                );
+                            }
                         }
                     } else {
                         // Render this object.
