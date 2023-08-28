@@ -2084,6 +2084,10 @@ impl tabled::Tabled for InstanceResultsPage {
 )]
 pub struct InstanceSerialConsoleData {
     #[doc = "The bytes starting from the requested offset up to either the end of the buffer or the request's `max_bytes`. Provided as a u8 array rather than a string, as it may not be UTF-8."]
+    #[serde(
+        serialize_with = "serde_bytes::serialize",
+        deserialize_with = "serde_bytes::deserialize"
+    )]
     pub data: Vec<u8>,
     #[doc = "The absolute offset since boot (suitable for use as `byte_offset` in a subsequent request) of the last byte returned in `data`."]
     pub last_byte_offset: u64,
