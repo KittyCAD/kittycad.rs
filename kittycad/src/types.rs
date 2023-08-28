@@ -1532,73 +1532,6 @@ impl tabled::Tabled for ApiTokenResultsPage {
     }
 }
 
-#[doc = "Websocket responses can either be successful or unsuccessful. Slightly different schemas \
-         in either case."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct WebSocketResponse {
-    #[doc = "The errors that occurred. If `success` is true, this is empty. If `success` is \
-             false, this should be non-empty."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub errors: Option<Vec<ApiError>>,
-    #[doc = "Which request this is a response to. If the request was a modeling command, this is \
-             the modeling command ID. If no request ID was sent, this will be null."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<uuid::Uuid>,
-    #[doc = "The data sent with a successful response. This will be flattened into a 'type' and \
-             'data' field. If `success` is true, this is non-empty. If `success` is false, this \
-             is empty."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub resp: Option<OkWebSocketResponseData>,
-    #[doc = "Always false"]
-    pub success: bool,
-}
-
-impl std::fmt::Display for WebSocketResponse {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for WebSocketResponse {
-    const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(errors) = &self.errors {
-                format!("{:?}", errors).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(request_id) = &self.request_id {
-                format!("{:?}", request_id).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(resp) = &self.resp {
-                format!("{:?}", resp).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.success).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "errors".into(),
-            "request_id".into(),
-            "resp".into(),
-            "success".into(),
-        ]
-    }
-}
-
 #[doc = "Information about a third party app client."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -6390,6 +6323,76 @@ impl tabled::Tabled for ExtendedUserResultsPage {
     }
 }
 
+#[doc = "Unsuccessful Websocket response."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FailureWebSocketResponse {
+    #[doc = "The errors that occurred."]
+    pub errors: Vec<ApiError>,
+    #[doc = "Which request this is a response to. If the request was a modeling command, this is \
+             the modeling command ID. If no request ID was sent, this will be null."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub request_id: Option<uuid::Uuid>,
+    #[doc = "Always false"]
+    pub success: bool,
+}
+
+impl std::fmt::Display for FailureWebSocketResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FailureWebSocketResponse {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.errors).into(),
+            if let Some(request_id) = &self.request_id {
+                format!("{:?}", request_id).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.success).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["errors".into(), "request_id".into(), "success".into()]
+    }
+}
+
+#[doc = "Describes the storage format of an FBX file."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum FbxStorage {
+    #[doc = "ASCII FBX encoding."]
+    #[serde(rename = "ascii")]
+    #[display("ascii")]
+    Ascii,
+    #[doc = "Binary FBX encoding."]
+    #[serde(rename = "binary")]
+    #[display("binary")]
+    Binary,
+}
+
 #[doc = "A file center of mass result."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -6748,6 +6751,10 @@ impl tabled::Tabled for FileDensity {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum FileExportFormat {
+    #[doc = "Autodesk Filmbox (FBX) format. <https://en.wikipedia.org/wiki/FBX>"]
+    #[serde(rename = "fbx")]
+    #[display("fbx")]
+    Fbx,
     #[doc = "Binary glTF 2.0.\n\nThis is a single binary with .glb extension.\n\nThis is better \
              if you want a compressed format as opposed to the human readable glTF that lacks \
              compression."]
@@ -6796,6 +6803,10 @@ pub enum FileExportFormat {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum FileImportFormat {
+    #[doc = "Autodesk Filmbox (FBX) format. <https://en.wikipedia.org/wiki/FBX>"]
+    #[serde(rename = "fbx")]
+    #[display("fbx")]
+    Fbx,
     #[doc = "glTF 2.0."]
     #[serde(rename = "gltf")]
     #[display("gltf")]
@@ -7272,6 +7283,62 @@ impl tabled::Tabled for GetEntityType {
     }
 }
 
+#[doc = "Describes the presentation style of the glTF JSON."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum GltfPresentation {
+    #[doc = "Condense the JSON into the smallest possible size."]
+    #[serde(rename = "compact")]
+    #[display("compact")]
+    Compact,
+    #[doc = "Expand the JSON into a more human readable format.\n\nThis is the default setting."]
+    #[serde(rename = "pretty")]
+    #[display("pretty")]
+    Pretty,
+}
+
+#[doc = "Describes the storage format of a glTF 2.0 scene."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum GltfStorage {
+    #[doc = "Binary glTF 2.0.\n\nThis is a single binary with .glb extension."]
+    #[serde(rename = "binary")]
+    #[display("binary")]
+    Binary,
+    #[doc = "Standard glTF 2.0.\n\nThis is a JSON file with .gltf extension paired with a \
+             separate binary blob file with .bin extension."]
+    #[serde(rename = "standard")]
+    #[display("standard")]
+    Standard,
+    #[doc = "Embedded glTF 2.0.\n\nSingle JSON file with .gltf extension binary data encoded as \
+             base64 data URIs.\n\nThis is the default setting."]
+    #[serde(rename = "embedded")]
+    #[display("embedded")]
+    Embedded,
+}
+
 #[doc = "The response from the `HighlightSetEntity` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -7496,6 +7563,8 @@ impl tabled::Tabled for IndexInfo {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum InputFormat {
+    #[serde(rename = "fbx")]
+    Fbx {},
     #[serde(rename = "gltf")]
     Gltf {},
     #[serde(rename = "step")]
@@ -8633,6 +8702,8 @@ pub enum ModelingCmd {
     CurveGetControlPoints { curve_id: uuid::Uuid },
     #[serde(rename = "take_snapshot")]
     TakeSnapshot { format: ImageFormat },
+    #[serde(rename = "make_axes_gizmo")]
+    MakeAxesGizmo { clobber: bool, gizmo_mode: bool },
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -9196,19 +9267,21 @@ impl tabled::Tabled for OutputFile {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum OutputFormat {
+    #[serde(rename = "fbx")]
+    Fbx { storage: FbxStorage },
     #[serde(rename = "gltf")]
     Gltf {
-        presentation: Presentation,
-        storage: Storage,
+        presentation: GltfPresentation,
+        storage: GltfStorage,
     },
     #[serde(rename = "obj")]
     Obj { coords: System },
     #[serde(rename = "ply")]
-    Ply { coords: System, storage: Storage },
+    Ply { coords: System, storage: PlyStorage },
     #[serde(rename = "step")]
     Step { coords: System },
     #[serde(rename = "stl")]
-    Stl { coords: System, storage: Storage },
+    Stl { coords: System, storage: StlStorage },
 }
 
 #[doc = "A segment of a path. Paths are composed of many segments."]
@@ -9500,6 +9573,36 @@ impl tabled::Tabled for PluginsInfo {
     }
 }
 
+#[doc = "The storage for the output PLY file."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum PlyStorage {
+    #[doc = "Write numbers in their ascii representation (e.g. -13, 6.28, etc.). Properties are \
+             separated by spaces and elements are separated by line breaks."]
+    #[serde(rename = "ascii")]
+    #[display("ascii")]
+    Ascii,
+    #[doc = "Encode payload as binary using little endian."]
+    #[serde(rename = "binary_little_endian")]
+    #[display("binary_little_endian")]
+    BinaryLittleEndian,
+    #[doc = "Encode payload as binary using big endian."]
+    #[serde(rename = "binary_big_endian")]
+    #[display("binary_big_endian")]
+    BinaryBigEndian,
+}
+
 #[doc = "A point in 2D space"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9631,31 +9734,6 @@ impl tabled::Tabled for Pong {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["message".into()]
     }
-}
-
-#[doc = "Describes the presentation style of the glTF JSON."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum Presentation {
-    #[doc = "Condense the JSON into the smallest possible size.\n\nThis is the default setting."]
-    #[serde(rename = "compact")]
-    #[display("compact")]
-    Compact,
-    #[doc = "Expand the JSON into a more human readable format."]
-    #[serde(rename = "pretty")]
-    #[display("pretty")]
-    Pretty,
 }
 
 #[doc = "A raw file with unencoded contents to be passed over binary websockets."]
@@ -10334,7 +10412,7 @@ impl tabled::Tabled for Solid3DGetPrevAdjacentEdge {
     }
 }
 
-#[doc = "Describes the storage format of a glTF 2.0 scene."]
+#[doc = "Export storage."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -10348,22 +10426,61 @@ impl tabled::Tabled for Solid3DGetPrevAdjacentEdge {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum Storage {
-    #[doc = "Binary glTF 2.0.\n\nThis is a single binary with .glb extension.\n\nThis is the \
-             default setting."]
+pub enum StlStorage {
+    #[doc = "Plaintext encoding."]
+    #[serde(rename = "ascii")]
+    #[display("ascii")]
+    Ascii,
+    #[doc = "Binary STL encoding.\n\nThis is the default setting."]
     #[serde(rename = "binary")]
     #[display("binary")]
     Binary,
-    #[doc = "Standard glTF 2.0.\n\nThis is a JSON file with .gltf extension paired with a \
-             separate binary blob file with .bin extension."]
-    #[serde(rename = "standard")]
-    #[display("standard")]
-    Standard,
-    #[doc = "Embedded glTF 2.0.\n\nSingle JSON file with .gltf extension binary data encoded as \
-             base64 data URIs."]
-    #[serde(rename = "embedded")]
-    #[display("embedded")]
-    Embedded,
+}
+
+#[doc = "Successful Websocket response."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SuccessWebSocketResponse {
+    #[doc = "Which request this is a response to. If the request was a modeling command, this is \
+             the modeling command ID. If no request ID was sent, this will be null."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub request_id: Option<uuid::Uuid>,
+    #[doc = "The data sent with a successful response. This will be flattened into a 'type' and \
+             'data' field."]
+    pub resp: OkWebSocketResponseData,
+    #[doc = "Always true"]
+    pub success: bool,
+}
+
+impl std::fmt::Display for SuccessWebSocketResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SuccessWebSocketResponse {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(request_id) = &self.request_id {
+                format!("{:?}", request_id).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.resp).into(),
+            format!("{:?}", self.success).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["request_id".into(), "resp".into(), "success".into()]
+    }
 }
 
 #[doc = "Co-ordinate system definition.\n\nThe `up` axis must be orthogonal to the `forward` axis.\n\nSee [cglearn.eu] for background reading.\n\n[cglearn.eu](https://cglearn.eu/pub/computer-graphics/introduction-to-geometry#material-coordinate-systems-1)"]
@@ -12877,4 +12994,74 @@ pub enum WebSocketRequest {
     },
     #[serde(rename = "ping")]
     Ping {},
+}
+
+#[doc = "Websocket responses can either be successful or unsuccessful. Slightly different schemas \
+         in either case."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct WebSocketResponse {
+    #[doc = "Which request this is a response to. If the request was a modeling command, this is \
+             the modeling command ID. If no request ID was sent, this will be null."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub request_id: Option<uuid::Uuid>,
+    #[doc = "The data sent with a successful response. This will be flattened into a 'type' and \
+             'data' field."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub resp: Option<OkWebSocketResponseData>,
+    #[doc = "Always false"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub success: Option<bool>,
+    #[doc = "The errors that occurred."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub errors: Option<Vec<ApiError>>,
+}
+
+impl std::fmt::Display for WebSocketResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for WebSocketResponse {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(request_id) = &self.request_id {
+                format!("{:?}", request_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(resp) = &self.resp {
+                format!("{:?}", resp).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(success) = &self.success {
+                format!("{:?}", success).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(errors) = &self.errors {
+                format!("{:?}", errors).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "request_id".into(),
+            "resp".into(),
+            "success".into(),
+            "errors".into(),
+        ]
+    }
 }
