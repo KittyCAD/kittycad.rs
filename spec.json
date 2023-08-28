@@ -722,41 +722,6 @@
         ],
         "type": "object"
       },
-      "WebSocketResponse": {
-        "description": "Websocket responses can either be successful or unsuccessful. Slightly different schemas in either case.",
-        "properties": {
-          "errors": {
-            "description": "The errors that occurred. If `success` is true, this is empty. If `success` is false, this should be non-empty.",
-            "items": {
-              "$ref": "#/components/schemas/ApiError"
-            },
-            "type": "array"
-          },
-          "request_id": {
-            "description": "Which request this is a response to. If the request was a modeling command, this is the modeling command ID. If no request ID was sent, this will be null.",
-            "format": "uuid",
-            "nullable": true,
-            "type": "string"
-          },
-          "resp": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/OkWebSocketResponseData"
-              }
-            ],
-            "description": "The data sent with a successful response. This will be flattened into a 'type' and 'data' field. If `success` is true, this is non-empty. If `success` is false, this is empty.",
-            "nullable": true
-          },
-          "success": {
-            "description": "Always false",
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "success"
-        ],
-        "type": "object"
-      },
       "AppClientInfo": {
         "description": "Information about a third party app client.",
         "properties": {
@@ -5998,6 +5963,52 @@
         ],
         "type": "object"
       },
+      "FailureWebSocketResponse": {
+        "description": "Unsuccessful Websocket response.",
+        "properties": {
+          "errors": {
+            "description": "The errors that occurred.",
+            "items": {
+              "$ref": "#/components/schemas/ApiError"
+            },
+            "type": "array"
+          },
+          "request_id": {
+            "description": "Which request this is a response to. If the request was a modeling command, this is the modeling command ID. If no request ID was sent, this will be null.",
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "success": {
+            "description": "Always false",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "errors",
+          "success"
+        ],
+        "type": "object"
+      },
+      "FbxStorage": {
+        "description": "Describes the storage format of an FBX file.",
+        "oneOf": [
+          {
+            "description": "ASCII FBX encoding.",
+            "enum": [
+              "ascii"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Binary FBX encoding.",
+            "enum": [
+              "binary"
+            ],
+            "type": "string"
+          }
+        ]
+      },
       "FileCenterOfMass": {
         "description": "A file center of mass result.",
         "properties": {
@@ -6310,6 +6321,13 @@
         "description": "The valid types of output file formats.",
         "oneOf": [
           {
+            "description": "Autodesk Filmbox (FBX) format. <https://en.wikipedia.org/wiki/FBX>",
+            "enum": [
+              "fbx"
+            ],
+            "type": "string"
+          },
+          {
             "description": "Binary glTF 2.0.\n\nThis is a single binary with .glb extension.\n\nThis is better if you want a compressed format as opposed to the human readable glTF that lacks compression.",
             "enum": [
               "glb"
@@ -6356,6 +6374,13 @@
       "FileImportFormat": {
         "description": "The valid types of source file formats.",
         "oneOf": [
+          {
+            "description": "Autodesk Filmbox (FBX) format. <https://en.wikipedia.org/wiki/FBX>",
+            "enum": [
+              "fbx"
+            ],
+            "type": "string"
+          },
           {
             "description": "glTF 2.0.",
             "enum": [
@@ -6733,6 +6758,51 @@
         ],
         "type": "object"
       },
+      "GltfPresentation": {
+        "description": "Describes the presentation style of the glTF JSON.",
+        "oneOf": [
+          {
+            "description": "Condense the JSON into the smallest possible size.",
+            "enum": [
+              "compact"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Expand the JSON into a more human readable format.\n\nThis is the default setting.",
+            "enum": [
+              "pretty"
+            ],
+            "type": "string"
+          }
+        ]
+      },
+      "GltfStorage": {
+        "description": "Describes the storage format of a glTF 2.0 scene.",
+        "oneOf": [
+          {
+            "description": "Binary glTF 2.0.\n\nThis is a single binary with .glb extension.",
+            "enum": [
+              "binary"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Standard glTF 2.0.\n\nThis is a JSON file with .gltf extension paired with a separate binary blob file with .bin extension.",
+            "enum": [
+              "standard"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Embedded glTF 2.0.\n\nSingle JSON file with .gltf extension binary data encoded as base64 data URIs.\n\nThis is the default setting.",
+            "enum": [
+              "embedded"
+            ],
+            "type": "string"
+          }
+        ]
+      },
       "HighlightSetEntity": {
         "description": "The response from the `HighlightSetEntity` command.",
         "properties": {
@@ -6829,6 +6899,21 @@
       "InputFormat": {
         "description": "Input format specifier.",
         "oneOf": [
+          {
+            "description": "Autodesk Filmbox (FBX) format.",
+            "properties": {
+              "type": {
+                "enum": [
+                  "fbx"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          },
           {
             "description": "Binary glTF 2.0. We refer to this as glTF since that is how our customers refer to it, but this can also import binary glTF (glb).",
             "properties": {
@@ -8941,6 +9026,31 @@
               "type"
             ],
             "type": "object"
+          },
+          {
+            "description": "Add a gizmo showing the axes.",
+            "properties": {
+              "clobber": {
+                "description": "If true, any existing drawables within the obj will be replaced (the object will be reset)",
+                "type": "boolean"
+              },
+              "gizmo_mode": {
+                "description": "If true, axes gizmo will be placed in the corner of the screen. If false, it will be placed at the origin of the scene.",
+                "type": "boolean"
+              },
+              "type": {
+                "enum": [
+                  "make_axes_gizmo"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "clobber",
+              "gizmo_mode",
+              "type"
+            ],
+            "type": "object"
           }
         ]
       },
@@ -9753,12 +9863,36 @@
         "description": "Output format specifier.",
         "oneOf": [
           {
+            "description": "Autodesk Filmbox (FBX) format.",
+            "properties": {
+              "storage": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FbxStorage"
+                  }
+                ],
+                "description": "Specifies which kind of FBX will be exported."
+              },
+              "type": {
+                "enum": [
+                  "fbx"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "storage",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
             "description": "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, although by default it will be in binary format and thus technically (glb). If you prefer ascii output, you can set that option for the export.",
             "properties": {
               "presentation": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Presentation"
+                    "$ref": "#/components/schemas/GltfPresentation"
                   }
                 ],
                 "description": "Specifies how the JSON will be presented."
@@ -9766,7 +9900,7 @@
               "storage": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Storage"
+                    "$ref": "#/components/schemas/GltfStorage"
                   }
                 ],
                 "description": "Specifies which kind of glTF 2.0 will be exported."
@@ -9823,7 +9957,7 @@
               "storage": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Storage"
+                    "$ref": "#/components/schemas/PlyStorage"
                   }
                 ],
                 "description": "The storage for the output PLY file."
@@ -9880,7 +10014,7 @@
               "storage": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Storage"
+                    "$ref": "#/components/schemas/StlStorage"
                   }
                 ],
                 "description": "Export storage."
@@ -10144,6 +10278,32 @@
         },
         "type": "object"
       },
+      "PlyStorage": {
+        "description": "The storage for the output PLY file.",
+        "oneOf": [
+          {
+            "description": "Write numbers in their ascii representation (e.g. -13, 6.28, etc.). Properties are separated by spaces and elements are separated by line breaks.",
+            "enum": [
+              "ascii"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Encode payload as binary using little endian.",
+            "enum": [
+              "binary_little_endian"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Encode payload as binary using big endian.",
+            "enum": [
+              "binary_big_endian"
+            ],
+            "type": "string"
+          }
+        ]
+      },
       "Point2d": {
         "description": "A point in 2D space",
         "properties": {
@@ -10210,25 +10370,6 @@
           "message"
         ],
         "type": "object"
-      },
-      "Presentation": {
-        "description": "Describes the presentation style of the glTF JSON.",
-        "oneOf": [
-          {
-            "description": "Condense the JSON into the smallest possible size.\n\nThis is the default setting.",
-            "enum": [
-              "compact"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Expand the JSON into a more human readable format.",
-            "enum": [
-              "pretty"
-            ],
-            "type": "string"
-          }
-        ]
       },
       "RawFile": {
         "description": "A raw file with unencoded contents to be passed over binary websockets.",
@@ -10592,31 +10733,52 @@
         ],
         "type": "object"
       },
-      "Storage": {
-        "description": "Describes the storage format of a glTF 2.0 scene.",
+      "StlStorage": {
+        "description": "Export storage.",
         "oneOf": [
           {
-            "description": "Binary glTF 2.0.\n\nThis is a single binary with .glb extension.\n\nThis is the default setting.",
+            "description": "Plaintext encoding.",
+            "enum": [
+              "ascii"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Binary STL encoding.\n\nThis is the default setting.",
             "enum": [
               "binary"
             ],
             "type": "string"
-          },
-          {
-            "description": "Standard glTF 2.0.\n\nThis is a JSON file with .gltf extension paired with a separate binary blob file with .bin extension.",
-            "enum": [
-              "standard"
-            ],
-            "type": "string"
-          },
-          {
-            "description": "Embedded glTF 2.0.\n\nSingle JSON file with .gltf extension binary data encoded as base64 data URIs.",
-            "enum": [
-              "embedded"
-            ],
-            "type": "string"
           }
         ]
+      },
+      "SuccessWebSocketResponse": {
+        "description": "Successful Websocket response.",
+        "properties": {
+          "request_id": {
+            "description": "Which request this is a response to. If the request was a modeling command, this is the modeling command ID. If no request ID was sent, this will be null.",
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "resp": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OkWebSocketResponseData"
+              }
+            ],
+            "description": "The data sent with a successful response. This will be flattened into a 'type' and 'data' field."
+          },
+          "success": {
+            "description": "Always true",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "resp",
+          "success"
+        ],
+        "type": "object"
       },
       "System": {
         "description": "Co-ordinate system definition.\n\nThe `up` axis must be orthogonal to the `forward` axis.\n\nSee [cglearn.eu] for background reading.\n\n[cglearn.eu](https://cglearn.eu/pub/computer-graphics/introduction-to-geometry#material-coordinate-systems-1)",
@@ -12780,6 +12942,27 @@
             "type": "object"
           }
         ]
+      },
+      "WebSocketResponse": {
+        "anyOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SuccessWebSocketResponse"
+              }
+            ],
+            "description": "Response sent when a request succeeded."
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FailureWebSocketResponse"
+              }
+            ],
+            "description": "Response sent when a request did not succeed."
+          }
+        ],
+        "description": "Websocket responses can either be successful or unsuccessful. Slightly different schemas in either case."
       }
     }
   },
