@@ -982,6 +982,7 @@ dependencies = [
  "reqwest-tracing",
  "schemars",
  "serde",
+ "serde_bytes",
  "serde_json",
  "serde_urlencoded",
  "tabled",
@@ -1879,6 +1880,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f5db24220c009de9bd45e69fb2938f4b6d2df856aa9304ce377b3180f83b7c1"
 dependencies = [
  "serde_derive",
+]
+
+[[package]]
+name = "serde_bytes"
+version = "0.11.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ab33ec92f677585af6d88c65593ae2375adde54efdbf16d597f2cbc7a6d368ff"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

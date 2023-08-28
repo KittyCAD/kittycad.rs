@@ -9742,6 +9742,10 @@ impl tabled::Tabled for Pong {
 )]
 pub struct RawFile {
     #[doc = "The contents of the file."]
+    #[serde(
+        serialize_with = "serde_bytes::serialize",
+        deserialize_with = "serde_bytes::deserialize"
+    )]
     pub contents: Vec<u8>,
     #[doc = "The name of the file."]
     pub name: String,
@@ -10651,6 +10655,10 @@ pub enum SystemInfoIsolationEnum {
 )]
 pub struct TakeSnapshot {
     #[doc = "Contents of the image."]
+    #[serde(
+        serialize_with = "serde_bytes::serialize",
+        deserialize_with = "serde_bytes::deserialize"
+    )]
     pub contents: Vec<u8>,
 }
 

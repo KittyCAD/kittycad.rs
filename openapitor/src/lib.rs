@@ -591,6 +591,7 @@ reqwest-retry = {{ version = "0.2.2", optional = true }}
 reqwest-tracing = {{ version = "0.4.4", features = ["opentelemetry_0_17"], optional = true }}
 schemars = {{ version = "0.8", features = ["bytes", "chrono", "url", "uuid1"] }}
 serde = {{ version = "1", features = ["derive"] }}
+serde_bytes = "0.11"
 serde_json = "1"
 serde_urlencoded = {{ version = "^0.7", optional = true }}
 tabled = {{ version = "0.14.0", features = ["color"], optional = true }}

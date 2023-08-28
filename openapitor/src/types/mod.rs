@@ -869,6 +869,13 @@ impl TypeSpace {
                 serde_props.push(quote!(skip_serializing_if = "Option::is_none"));
             }
 
+            if type_name.rendered()? == "Vec<u8>" {
+                serde_props.push(quote!(
+                    serialize_with = "serde_bytes::serialize",
+                    deserialize_with = "serde_bytes::deserialize"
+                ));
+            }
+
             // If we have a custom date format  and this is a datetime we need to override deserialize_with
             if self.opts.date_time_format.is_some() {
                 if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
