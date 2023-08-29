@@ -10853,12 +10853,9 @@
         "properties": {
           "contents": {
             "description": "Contents of the image.",
-            "items": {
-              "format": "uint8",
-              "minimum": 0,
-              "type": "integer"
-            },
-            "type": "array"
+            "format": "byte",
+            "title": "String",
+            "type": "string"
           }
         },
         "required": [
