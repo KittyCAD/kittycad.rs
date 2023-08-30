@@ -7449,16 +7449,16 @@ impl tabled::Tabled for IceServer {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[derive(Default)]
 pub enum ImageFormat {
     #[doc = ".png format"]
     #[serde(rename = "png")]
     #[display("png")]
-    #[default]
     Png,
+    #[doc = ".jpeg format"]
+    #[serde(rename = "jpeg")]
+    #[display("jpeg")]
+    Jpeg,
 }
-
-
 
 #[doc = "An enumeration."]
 #[derive(
@@ -8704,6 +8704,14 @@ pub enum ModelingCmd {
     TakeSnapshot { format: ImageFormat },
     #[serde(rename = "make_axes_gizmo")]
     MakeAxesGizmo { clobber: bool, gizmo_mode: bool },
+    #[serde(rename = "path_get_info")]
+    PathGetInfo { path_id: uuid::Uuid },
+    #[serde(rename = "handle_mouse_drag_start")]
+    HandleMouseDragStart { window: Point2D },
+    #[serde(rename = "handle_mouse_drag_move")]
+    HandleMouseDragMove { window: Point2D },
+    #[serde(rename = "handle_mouse_drag_end")]
+    HandleMouseDragEnd { window: Point2D },
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -9129,6 +9137,8 @@ pub enum OkModelingCmdResponse {
     CurveGetControlPoints { data: CurveGetControlPoints },
     #[serde(rename = "take_snapshot")]
     TakeSnapshot { data: TakeSnapshot },
+    #[serde(rename = "path_get_info")]
+    PathGetInfo { data: PathGetInfo },
 }
 
 #[doc = "The websocket messages this server sends."]
@@ -9284,6 +9294,69 @@ pub enum OutputFormat {
     Stl { coords: System, storage: StlStorage },
 }
 
+#[doc = "The path component command type (within a Path)"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum PathCommand {
+    #[serde(rename = "move_to")]
+    #[display("move_to")]
+    MoveTo,
+    #[serde(rename = "line_to")]
+    #[display("line_to")]
+    LineTo,
+    #[serde(rename = "bez_curve_to")]
+    #[display("bez_curve_to")]
+    BezCurveTo,
+    #[serde(rename = "nurbs_curve_to")]
+    #[display("nurbs_curve_to")]
+    NurbsCurveTo,
+    #[serde(rename = "add_arc")]
+    #[display("add_arc")]
+    AddArc,
+}
+
+#[doc = "The response from the `PathGetInfo` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PathGetInfo {
+    #[doc = "All segments in the path, in the order they were added."]
+    pub segments: Vec<PathSegmentInfo>,
+}
+
+impl std::fmt::Display for PathGetInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PathGetInfo {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.segments).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["segments".into()]
+    }
+}
+
 #[doc = "A segment of a path. Paths are composed of many segments."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9306,6 +9379,48 @@ pub enum PathSegment {
         control2: Point3D,
         end: Point3D,
     },
+}
+
+#[doc = "Info about a path segment"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PathSegmentInfo {
+    #[doc = "What is the path segment?"]
+    pub command: PathCommand,
+    #[doc = "Which command created this path? This field is absent if the path command is not \
+             actually creating a path segment, e.g. moving the pen doesn't create a path segment."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub command_id: Option<uuid::Uuid>,
+}
+
+impl std::fmt::Display for PathSegmentInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PathSegmentInfo {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.command).into(),
+            if let Some(command_id) = &self.command_id {
+                format!("{:?}", command_id).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["command".into(), "command_id".into()]
+    }
 }
 
 #[doc = "A payment intent response."]
