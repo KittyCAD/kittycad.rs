@@ -10655,11 +10655,7 @@ pub enum SystemInfoIsolationEnum {
 )]
 pub struct TakeSnapshot {
     #[doc = "Contents of the image."]
-    #[serde(
-        serialize_with = "serde_bytes::serialize",
-        deserialize_with = "serde_bytes::deserialize"
-    )]
-    pub contents: Vec<u8>,
+    pub contents: base64::Base64Data,
 }
 
 impl std::fmt::Display for TakeSnapshot {
