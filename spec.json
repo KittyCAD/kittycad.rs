@@ -6857,6 +6857,13 @@
               "png"
             ],
             "type": "string"
+          },
+          {
+            "description": ".jpeg format",
+            "enum": [
+              "jpeg"
+            ],
+            "type": "string"
           }
         ]
       },
@@ -9051,6 +9058,99 @@
               "type"
             ],
             "type": "object"
+          },
+          {
+            "description": "Query the given path",
+            "properties": {
+              "path_id": {
+                "description": "Which path to query",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "path_get_info"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "path_id",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Start dragging mouse.",
+            "properties": {
+              "type": {
+                "enum": [
+                  "handle_mouse_drag_start"
+                ],
+                "type": "string"
+              },
+              "window": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ],
+                "description": "The mouse position."
+              }
+            },
+            "required": [
+              "type",
+              "window"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Continue dragging mouse.",
+            "properties": {
+              "type": {
+                "enum": [
+                  "handle_mouse_drag_move"
+                ],
+                "type": "string"
+              },
+              "window": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ],
+                "description": "The mouse position."
+              }
+            },
+            "required": [
+              "type",
+              "window"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Stop dragging mouse.",
+            "properties": {
+              "type": {
+                "enum": [
+                  "handle_mouse_drag_end"
+                ],
+                "type": "string"
+              },
+              "window": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ],
+                "description": "The mouse position."
+              }
+            },
+            "required": [
+              "type",
+              "window"
+            ],
+            "type": "object"
           }
         ]
       },
@@ -9659,6 +9759,25 @@
               "type"
             ],
             "type": "object"
+          },
+          {
+            "description": "The response from the `Path Get Info` command.",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/PathGetInfo"
+              },
+              "type": {
+                "enum": [
+                  "path_get_info"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
           }
         ]
       },
@@ -10035,6 +10154,33 @@
           }
         ]
       },
+      "PathCommand": {
+        "description": "The path component command type (within a Path)",
+        "enum": [
+          "move_to",
+          "line_to",
+          "bez_curve_to",
+          "nurbs_curve_to",
+          "add_arc"
+        ],
+        "type": "string"
+      },
+      "PathGetInfo": {
+        "description": "The response from the `PathGetInfo` command.",
+        "properties": {
+          "segments": {
+            "description": "All segments in the path, in the order they were added.",
+            "items": {
+              "$ref": "#/components/schemas/PathSegmentInfo"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "segments"
+        ],
+        "type": "object"
+      },
       "PathSegment": {
         "description": "A segment of a path. Paths are composed of many segments.",
         "oneOf": [
@@ -10147,6 +10293,32 @@
             "type": "object"
           }
         ]
+      },
+      "PathSegmentInfo": {
+        "description": "Info about a path segment",
+        "properties": {
+          "command": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PathCommand"
+              }
+            ],
+            "description": "What is the path segment?"
+          },
+          "command_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ModelingCmdId"
+              }
+            ],
+            "description": "Which command created this path? This field is absent if the path command is not actually creating a path segment, e.g. moving the pen doesn't create a path segment.",
+            "nullable": true
+          }
+        },
+        "required": [
+          "command"
+        ],
+        "type": "object"
       },
       "PaymentIntent": {
         "description": "A payment intent response.",
