@@ -6403,6 +6403,13 @@
             "type": "string"
           },
           {
+            "description": "SolidWorks part (SLDPRT) format.",
+            "enum": [
+              "sldprt"
+            ],
+            "type": "string"
+          },
+          {
             "description": "The STEP file format. <https://en.wikipedia.org/wiki/ISO_10303-21>",
             "enum": [
               "step"
@@ -6937,21 +6944,6 @@
             "type": "object"
           },
           {
-            "description": "ISO 10303-21 (STEP) format.",
-            "properties": {
-              "type": {
-                "enum": [
-                  "step"
-                ],
-                "type": "string"
-              }
-            },
-            "required": [
-              "type"
-            ],
-            "type": "object"
-          },
-          {
             "description": "Wavefront OBJ format.",
             "properties": {
               "coords": {
@@ -7014,6 +7006,36 @@
               "coords",
               "type",
               "units"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "SolidWorks part (SLDPRT) format.",
+            "properties": {
+              "type": {
+                "enum": [
+                  "sldprt"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "ISO 10303-21 (STEP) format.",
+            "properties": {
+              "type": {
+                "enum": [
+                  "step"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
             ],
             "type": "object"
           },
@@ -8877,6 +8899,13 @@
           {
             "description": "Send a mouse move event.",
             "properties": {
+              "sequence": {
+                "description": "Logical timestamp. The client should increment this with every event in the current mouse drag. That way, if the events are being sent over an unordered channel, the API can ignore the older events.",
+                "format": "uint32",
+                "minimum": 0,
+                "nullable": true,
+                "type": "integer"
+              },
               "type": {
                 "enum": [
                   "mouse_move"
@@ -9107,6 +9136,13 @@
           {
             "description": "Continue dragging mouse.",
             "properties": {
+              "sequence": {
+                "description": "Logical timestamp. The client should increment this with every event in the current mouse drag. That way, if the events are being sent over an unordered channel, the API can ignore the older events.",
+                "format": "uint32",
+                "minimum": 0,
+                "nullable": true,
+                "type": "integer"
+              },
               "type": {
                 "enum": [
                   "handle_mouse_drag_move"
