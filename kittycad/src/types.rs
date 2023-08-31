@@ -6821,6 +6821,10 @@ pub enum FileImportFormat {
     #[serde(rename = "ply")]
     #[display("ply")]
     Ply,
+    #[doc = "SolidWorks part (SLDPRT) format."]
+    #[serde(rename = "sldprt")]
+    #[display("sldprt")]
+    Sldprt,
     #[doc = "The STEP file format. <https://en.wikipedia.org/wiki/ISO_10303-21>"]
     #[serde(rename = "step")]
     #[display("step")]
@@ -7567,12 +7571,14 @@ pub enum InputFormat {
     Fbx {},
     #[serde(rename = "gltf")]
     Gltf {},
-    #[serde(rename = "step")]
-    Step {},
     #[serde(rename = "obj")]
     Obj { coords: System, units: UnitLength },
     #[serde(rename = "ply")]
     Ply { coords: System, units: UnitLength },
+    #[serde(rename = "sldprt")]
+    Sldprt {},
+    #[serde(rename = "step")]
+    Step {},
     #[serde(rename = "stl")]
     Stl { coords: System, units: UnitLength },
 }
@@ -8685,7 +8691,10 @@ pub enum ModelingCmd {
     #[serde(rename = "set_tool")]
     SetTool { tool: SceneToolType },
     #[serde(rename = "mouse_move")]
-    MouseMove { window: Point2D },
+    MouseMove {
+        sequence: Option<u32>,
+        window: Point2D,
+    },
     #[serde(rename = "mouse_click")]
     MouseClick { window: Point2D },
     #[serde(rename = "sketch_mode_enable")]
@@ -8709,7 +8718,10 @@ pub enum ModelingCmd {
     #[serde(rename = "handle_mouse_drag_start")]
     HandleMouseDragStart { window: Point2D },
     #[serde(rename = "handle_mouse_drag_move")]
-    HandleMouseDragMove { window: Point2D },
+    HandleMouseDragMove {
+        sequence: Option<u32>,
+        window: Point2D,
+    },
     #[serde(rename = "handle_mouse_drag_end")]
     HandleMouseDragEnd { window: Point2D },
 }
