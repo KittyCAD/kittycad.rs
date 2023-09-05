@@ -15,7 +15,7 @@ jobs:
     name: update-spec
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install latest stable/nightly
         shell: bash
         run: |
@@ -46,7 +46,7 @@ jobs:
             echo "No files changed, proceeding";
           fi
       # Checkout the docs repo since we will want to update the files there.
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: 'kittycad/website'
           path: 'website'
