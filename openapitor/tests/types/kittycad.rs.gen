@@ -8580,6 +8580,8 @@ pub enum ModelingCmd {
     },
     #[serde(rename = "handle_mouse_drag_end")]
     HandleMouseDragEnd { window: Point2D },
+    #[serde(rename = "remove_scene_objects")]
+    RemoveSceneObjects { object_ids: Vec<uuid::Uuid> },
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
