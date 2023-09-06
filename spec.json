@@ -848,14 +848,6 @@
                 ],
                 "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
               },
-              "output": {
-                "deprecated": true,
-                "description": "The converted file (if single file conversion), if completed, base64 encoded. This field is deprecated, and will be removed in a future release. Use `outputs` instead.",
-                "format": "byte",
-                "nullable": true,
-                "title": "String",
-                "type": "string"
-              },
               "output_format": {
                 "allOf": [
                   {
@@ -6127,14 +6119,6 @@
               }
             ],
             "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID."
-          },
-          "output": {
-            "deprecated": true,
-            "description": "The converted file (if single file conversion), if completed, base64 encoded. This field is deprecated, and will be removed in a future release. Use `outputs` instead.",
-            "format": "byte",
-            "nullable": true,
-            "title": "String",
-            "type": "string"
           },
           "output_format": {
             "allOf": [
