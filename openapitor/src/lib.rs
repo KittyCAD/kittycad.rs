@@ -606,7 +606,7 @@ futures-util = "^0.3.26"
 pretty_assertions = "1"
 rand = "0.8"
 tokio = {{ version = "1.20.0", features = ["rt", "macros"] }}
-tokio-tungstenite = "0.19"
+tokio-tungstenite = "0.20"
 
 [features]
 default = ["requests", "retry"]
