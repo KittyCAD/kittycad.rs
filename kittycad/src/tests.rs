@@ -24,7 +24,8 @@ async fn test_create_file_conversion() {
         .await
         .unwrap();
 
-    assert!(conversion.output.is_some());
+    assert!(conversion.outputs.is_some());
+    assert!(!conversion.outputs.unwrap().is_empty());
 
     assert_eq!(conversion.src_format, crate::types::FileImportFormat::Obj);
     assert_eq!(conversion.status, crate::types::ApiCallStatus::Completed);

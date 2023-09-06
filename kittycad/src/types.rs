@@ -1696,7 +1696,6 @@ pub enum AsyncApiCallOutput {
         created_at: chrono::DateTime<chrono::Utc>,
         error: Option<String>,
         id: uuid::Uuid,
-        output: Option<base64::Base64Data>,
         output_format: FileExportFormat,
         output_format_options: Option<OutputFormat>,
         outputs: Option<std::collections::HashMap<String, base64::Base64Data>>,
@@ -6508,11 +6507,6 @@ pub struct FileConversion {
     pub error: Option<String>,
     #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
-    #[doc = "The converted file (if single file conversion), if completed, base64 encoded. This \
-             field is deprecated, and will be removed in a future release. Use `outputs` instead."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[deprecated]
-    pub output: Option<base64::Base64Data>,
     #[doc = "The output format of the file conversion."]
     pub output_format: FileExportFormat,
     #[doc = "The output format options of the file conversion."]
@@ -6551,7 +6545,7 @@ impl std::fmt::Display for FileConversion {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FileConversion {
-    const LENGTH: usize = 14;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -6566,11 +6560,6 @@ impl tabled::Tabled for FileConversion {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
-            if let Some(output) = &self.output {
-                format!("{:?}", output).into()
-            } else {
-                String::new().into()
-            },
             format!("{:?}", self.output_format).into(),
             if let Some(output_format_options) = &self.output_format_options {
                 format!("{:?}", output_format_options).into()
@@ -6609,7 +6598,6 @@ impl tabled::Tabled for FileConversion {
             "created_at".into(),
             "error".into(),
             "id".into(),
-            "output".into(),
             "output_format".into(),
             "output_format_options".into(),
             "outputs".into(),
