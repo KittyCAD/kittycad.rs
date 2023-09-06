@@ -9187,6 +9187,31 @@
               "window"
             ],
             "type": "object"
+          },
+          {
+            "description": "Remove scene objects.",
+            "properties": {
+              "object_ids": {
+                "description": "Objects to remove.",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "type": {
+                "enum": [
+                  "remove_scene_objects"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "object_ids",
+              "type"
+            ],
+            "type": "object"
           }
         ]
       },
