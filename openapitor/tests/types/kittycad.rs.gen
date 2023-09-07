@@ -2159,6 +2159,69 @@ impl tabled::Tabled for CardDetails {
     }
 }
 
+#[doc = "ClientMetrics contains information regarding the state of the peer."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ClientMetrics {
+    #[doc = "Counter of the number of WebRTC frames that the client has decoded during this session."]
+    pub rtc_frames_decoded: u64,
+    #[doc = "Counter of the number of WebRTC frames the client has dropped during this session."]
+    pub rtc_frames_dropped: u32,
+    #[doc = "Current number of frames being rendered per second. A good target is 60 frames per second, but it can fluctuate depending on network conditions."]
+    pub rtc_frames_per_second: u8,
+    #[doc = "Counter of the number of WebRTC frames that the client has received during this session."]
+    pub rtc_frames_received: u64,
+    #[doc = "Number of times the WebRTC playback has frozen. This is usually due to network conditions."]
+    pub rtc_freeze_count: u32,
+    #[doc = "Amount of \"jitter\" in the WebRTC session. Network latency is the time it takes a packet to traverse the network. The amount that the latency varies is the jitter. Video latency is the time it takes to render a frame sent by the server (including network latency). A low jitter means the video latency can be reduced without impacting smooth playback. High jitter means clients will increase video latency to ensure smooth playback."]
+    pub rtc_jitter_sec: f64,
+    #[doc = "Number of \"key frames\" decoded in the underlying h.264 stream. A key frame is an expensive (bandwidth-wise) \"full image\" of the video frame. Data after the keyframe become -- effectively -- \"diff\" operations on that key frame. The Engine will only send a keyframe if required, which is an indication that some of the \"diffs\" have been lost, usually an indication of poor network conditions. We like this metric to understand times when the connection has had to recover."]
+    pub rtc_keyframes_decoded: u32,
+    #[doc = "Number of seconds of frozen video the user has been subjected to."]
+    pub rtc_total_freezes_duration_sec: f64,
+}
+
+impl std::fmt::Display for ClientMetrics {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ClientMetrics {
+    const LENGTH: usize = 8;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.rtc_frames_decoded).into(),
+            format!("{:?}", self.rtc_frames_dropped).into(),
+            format!("{:?}", self.rtc_frames_per_second).into(),
+            format!("{:?}", self.rtc_frames_received).into(),
+            format!("{:?}", self.rtc_freeze_count).into(),
+            format!("{:?}", self.rtc_jitter_sec).into(),
+            format!("{:?}", self.rtc_keyframes_decoded).into(),
+            format!("{:?}", self.rtc_total_freezes_duration_sec).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "rtc_frames_decoded".into(),
+            "rtc_frames_dropped".into(),
+            "rtc_frames_per_second".into(),
+            "rtc_frames_received".into(),
+            "rtc_freeze_count".into(),
+            "rtc_jitter_sec".into(),
+            "rtc_keyframes_decoded".into(),
+            "rtc_total_freezes_duration_sec".into(),
+        ]
+    }
+}
+
 #[doc = "Cluster information."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9015,6 +9078,8 @@ pub enum OkWebSocketResponseData {
     },
     #[serde(rename = "export")]
     Export { files: Vec<RawFile> },
+    #[serde(rename = "metrics_request")]
+    MetricsRequest {},
 }
 
 #[doc = "Onboarding details"]
@@ -12926,6 +12991,8 @@ pub enum WebSocketRequest {
     },
     #[serde(rename = "ping")]
     Ping {},
+    #[serde(rename = "metrics_response")]
+    MetricsResponse { metrics: ClientMetrics },
 }
 
 #[doc = "Websocket responses can either be successful or unsuccessful. Slightly different schemas in either case."]
