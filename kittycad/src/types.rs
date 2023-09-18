@@ -726,6 +726,42 @@ impl tabled::Tabled for AiPluginManifest {
     }
 }
 
+#[doc = "An angle, with a specific unit."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Angle {
+    #[doc = "What unit is the measurement?"]
+    pub unit: UnitAngle,
+    #[doc = "The size of the angle, measured in the chosen unit."]
+    pub value: f64,
+}
+
+impl std::fmt::Display for Angle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Angle {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.unit).into(),
+            format!("{:?}", self.value).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["unit".into(), "value".into()]
+    }
+}
+
 #[doc = "Annotation line end type"]
 #[derive(
     serde :: Serialize,
@@ -3044,6 +3080,42 @@ impl tabled::Tabled for CurveGetControlPoints {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["control_points".into()]
+    }
+}
+
+#[doc = "Endpoints of a curve"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CurveGetEndPoints {
+    #[doc = "End"]
+    pub end: Point3D,
+    #[doc = "Start"]
+    pub start: Point3D,
+}
+
+impl std::fmt::Display for CurveGetEndPoints {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CurveGetEndPoints {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.end).into(),
+            format!("{:?}", self.start).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["end".into(), "start".into()]
     }
 }
 
@@ -7197,6 +7269,11 @@ pub enum ModelingCmd {
     MakeAxesGizmo { clobber: bool, gizmo_mode: bool },
     #[serde(rename = "path_get_info")]
     PathGetInfo { path_id: uuid::Uuid },
+    #[serde(rename = "path_get_curve_uuids_for_vertices")]
+    PathGetCurveUuidsForVertices {
+        path_id: uuid::Uuid,
+        vertex_ids: Vec<uuid::Uuid>,
+    },
     #[serde(rename = "handle_mouse_drag_start")]
     HandleMouseDragStart { window: Point2D },
     #[serde(rename = "handle_mouse_drag_move")]
@@ -7208,6 +7285,20 @@ pub enum ModelingCmd {
     HandleMouseDragEnd { window: Point2D },
     #[serde(rename = "remove_scene_objects")]
     RemoveSceneObjects { object_ids: Vec<uuid::Uuid> },
+    #[serde(rename = "path_tangential_arc_to")]
+    PathTangentialArcTo {
+        angle_snap_increment: Option<Angle>,
+        to: Point3D,
+    },
+    #[serde(rename = "path_tangential_arc")]
+    PathTangentialArc { offset: Angle, radius: f64 },
+    #[serde(rename = "plane_intersect_and_project")]
+    PlaneIntersectAndProject {
+        plane_id: uuid::Uuid,
+        window: Point2D,
+    },
+    #[serde(rename = "curve_get_end_points")]
+    CurveGetEndPoints { curve_id: uuid::Uuid },
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -7635,6 +7726,12 @@ pub enum OkModelingCmdResponse {
     TakeSnapshot { data: TakeSnapshot },
     #[serde(rename = "path_get_info")]
     PathGetInfo { data: PathGetInfo },
+    #[serde(rename = "path_get_curve_uuids_for_vertices")]
+    PathGetCurveUuidsForVertices { data: PathGetCurveUuidsForVertices },
+    #[serde(rename = "plane_intersect_and_project")]
+    PlaneIntersectAndProject { data: PlaneIntersectAndProject },
+    #[serde(rename = "curve_get_end_points")]
+    CurveGetEndPoints { data: CurveGetEndPoints },
 }
 
 #[doc = "The websocket messages this server sends."]
@@ -7822,6 +7919,37 @@ pub enum PathCommand {
     #[serde(rename = "add_arc")]
     #[display("add_arc")]
     AddArc,
+}
+
+#[doc = "The response from the `PathGetCurveUuidsForVertices` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PathGetCurveUuidsForVertices {
+    #[doc = "The UUIDs of the curve entities."]
+    pub curve_ids: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for PathGetCurveUuidsForVertices {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PathGetCurveUuidsForVertices {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.curve_ids).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["curve_ids".into()]
+    }
 }
 
 #[doc = "The response from the `PathGetInfo` command."]
@@ -8116,6 +8244,42 @@ pub enum PaymentMethodType {
 }
 
 
+
+#[doc = "Corresponding coordinates of given window coordinates, intersected on given plane."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PlaneIntersectAndProject {
+    #[doc = "Corresponding coordinates of given window coordinates, intersected on given plane."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub plane_coordinates: Option<Point2D>,
+}
+
+impl std::fmt::Display for PlaneIntersectAndProject {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PlaneIntersectAndProject {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![if let Some(plane_coordinates) = &self.plane_coordinates {
+            format!("{:?}", plane_coordinates).into()
+        } else {
+            String::new().into()
+        }]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["plane_coordinates".into()]
+    }
+}
 
 #[doc = "Available plugins per type.\n\n**Note**: Only unmanaged (V1) plugins are included in this \
          list. V1 plugins are \\\"lazily\\\" loaded, and are not returned in this list if there is \

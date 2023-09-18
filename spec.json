@@ -211,6 +211,29 @@
         ],
         "type": "object"
       },
+      "Angle": {
+        "description": "An angle, with a specific unit.",
+        "properties": {
+          "unit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitAngle"
+              }
+            ],
+            "description": "What unit is the measurement?"
+          },
+          "value": {
+            "description": "The size of the angle, measured in the chosen unit.",
+            "format": "double",
+            "type": "number"
+          }
+        },
+        "required": [
+          "unit",
+          "value"
+        ],
+        "type": "object"
+      },
       "AnnotationLineEnd": {
         "description": "Annotation line end type",
         "enum": [
@@ -2261,6 +2284,32 @@
         },
         "required": [
           "control_points"
+        ],
+        "type": "object"
+      },
+      "CurveGetEndPoints": {
+        "description": "Endpoints of a curve",
+        "properties": {
+          "end": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ],
+            "description": "End"
+          },
+          "start": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ],
+            "description": "Start"
+          }
+        },
+        "required": [
+          "end",
+          "start"
         ],
         "type": "object"
       },
@@ -6135,7 +6184,7 @@
               },
               "size": {
                 "description": "What should the plane's span/extent? When rendered visually, this is both the width and height along X and Y axis respectively.",
-                "format": "float",
+                "format": "double",
                 "type": "number"
               },
               "type": {
@@ -6439,6 +6488,36 @@
             "type": "object"
           },
           {
+            "description": "Get curves for vertices within a path",
+            "properties": {
+              "path_id": {
+                "description": "Which path to query",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "path_get_curve_uuids_for_vertices"
+                ],
+                "type": "string"
+              },
+              "vertex_ids": {
+                "description": "IDs of the vertices for which to obtain curve ids from",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "path_id",
+              "type",
+              "vertex_ids"
+            ],
+            "type": "object"
+          },
+          {
             "description": "Start dragging mouse.",
             "properties": {
               "type": {
@@ -6538,6 +6617,120 @@
             },
             "required": [
               "object_ids",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Adds a tangent arc from current pen position to the new position.",
+            "properties": {
+              "angle_snap_increment": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Angle"
+                  }
+                ],
+                "description": "0 will be interpreted as none/null.",
+                "nullable": true
+              },
+              "to": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ],
+                "description": "Where the arc should end. Must lie in the same plane as the current path pen position. Must not be colinear with current path pen position."
+              },
+              "type": {
+                "enum": [
+                  "path_tangential_arc_to"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "to",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Adds a tangent arc from current pen position with the given radius and angle.",
+            "properties": {
+              "offset": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Angle"
+                  }
+                ],
+                "description": "Offset of the arc."
+              },
+              "radius": {
+                "description": "Radius of the arc. Not to be confused with Raiders of the Lost Ark.",
+                "format": "double",
+                "type": "number"
+              },
+              "type": {
+                "enum": [
+                  "path_tangential_arc"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "offset",
+              "radius",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Utility method. Performs both a ray cast and projection to plane-local coordinates. Returns the plane coordinates for the given window coordinates.",
+            "properties": {
+              "plane_id": {
+                "description": "The plane you're intersecting against.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "plane_intersect_and_project"
+                ],
+                "type": "string"
+              },
+              "window": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ],
+                "description": "Window coordinates where the ray cast should be aimed."
+              }
+            },
+            "required": [
+              "plane_id",
+              "type",
+              "window"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Find the start and end of a curve.",
+            "properties": {
+              "curve_id": {
+                "description": "ID of the curve being queried.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "curve_get_end_points"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "curve_id",
               "type"
             ],
             "type": "object"
@@ -7168,6 +7361,63 @@
               "type"
             ],
             "type": "object"
+          },
+          {
+            "description": "The response from the `Path Get Curve UUIDs for Vertices` command.",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/PathGetCurveUuidsForVertices"
+              },
+              "type": {
+                "enum": [
+                  "path_get_curve_uuids_for_vertices"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `PlaneIntersectAndProject` command.",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/PlaneIntersectAndProject"
+              },
+              "type": {
+                "enum": [
+                  "plane_intersect_and_project"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `CurveGetEndPoints` command.",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/CurveGetEndPoints"
+              },
+              "type": {
+                "enum": [
+                  "curve_get_end_points"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
           }
         ]
       },
@@ -7574,6 +7824,23 @@
         ],
         "type": "string"
       },
+      "PathGetCurveUuidsForVertices": {
+        "description": "The response from the `PathGetCurveUuidsForVertices` command.",
+        "properties": {
+          "curve_ids": {
+            "description": "The UUIDs of the curve entities.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "curve_ids"
+        ],
+        "type": "object"
+      },
       "PathGetInfo": {
         "description": "The response from the `PathGetInfo` command.",
         "properties": {
@@ -7622,12 +7889,12 @@
             "properties": {
               "angle_end": {
                 "description": "Start of the arc along circle's perimeter.",
-                "format": "float",
+                "format": "double",
                 "type": "number"
               },
               "angle_start": {
                 "description": "Start of the arc along circle's perimeter.",
-                "format": "float",
+                "format": "double",
                 "type": "number"
               },
               "center": {
@@ -7640,7 +7907,7 @@
               },
               "radius": {
                 "description": "Radius of the circle",
-                "format": "float",
+                "format": "double",
                 "type": "number"
               },
               "type": {
@@ -7825,6 +8092,21 @@
           }
         ]
       },
+      "PlaneIntersectAndProject": {
+        "description": "Corresponding coordinates of given window coordinates, intersected on given plane.",
+        "properties": {
+          "plane_coordinates": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point2d"
+              }
+            ],
+            "description": "Corresponding coordinates of given window coordinates, intersected on given plane.",
+            "nullable": true
+          }
+        },
+        "type": "object"
+      },
       "PluginsInfo": {
         "description": "Available plugins per type.\n\n**Note**: Only unmanaged (V1) plugins are included in this list. V1 plugins are \\\"lazily\\\" loaded, and are not returned in this list if there is no resource using the plugin.",
         "properties": {
@@ -7889,11 +8171,11 @@
         "description": "A point in 2D space",
         "properties": {
           "x": {
-            "format": "float",
+            "format": "double",
             "type": "number"
           },
           "y": {
-            "format": "float",
+            "format": "double",
             "type": "number"
           }
         },
