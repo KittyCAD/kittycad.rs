@@ -571,6 +571,7 @@ license = "MIT"
 anyhow = "1"
 async-trait = {{ version = "^0.1.53", optional = true }}
 base64 = "0.21"
+bigdecimal = {{ version = "0.4", features = ["serde"] }}
 bytes = {{ version = "1", features = ["serde"] }}
 clap = {{ version = "4.2.4", features = ["cargo", "derive", "env", "unicode"], optional = true }}
 chrono = {{ version = "0.4", default-features = false, features = ["serde", "std"] }}
@@ -589,7 +590,7 @@ reqwest-conditional-middleware = {{ version = "0.2.1", optional = true }}
 reqwest-middleware = {{ version = "0.2.2", optional = true }}
 reqwest-retry = {{ version = "0.2.2", optional = true }}
 reqwest-tracing = {{ version = "0.4.4", features = ["opentelemetry_0_17"], optional = true }}
-schemars = {{ version = "0.8", features = ["bytes", "chrono", "url", "uuid1"] }}
+schemars = {{ version = "0.8.15", features = ["bigdecimal", "bytes", "chrono", "url", "uuid1"] }}
 serde = {{ version = "1", features = ["derive"] }}
 serde_bytes = "0.11"
 serde_json = "1"
