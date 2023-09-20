@@ -1509,6 +1509,7 @@ fn get_type_name_for_string(
             "date" => quote!(chrono::NaiveDate),
             "date-time" => quote!(chrono::DateTime<chrono::Utc>),
             "partial-date-time" => quote!(chrono::NaiveDateTime),
+            "money-usd" => quote!(bigdecimal::BigDecimal),
             f => {
                 anyhow::bail!("XXX unknown string format {}", f)
             }

@@ -1165,7 +1165,7 @@ pub struct ApiCallWithPrice {
     pub origin: Option<String>,
     #[doc = "The price of the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub price: Option<f64>,
+    pub price: Option<bigdecimal::BigDecimal>,
     #[doc = "The request body sent by the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub request_body: Option<String>,
@@ -2490,53 +2490,6 @@ impl tabled::Tabled for Color {
     }
 }
 
-#[doc = "Commit holds the Git-commit (SHA1) that a binary was built from, as reported in the \
-         version-string of external tools, such as `containerd`, or `runC`."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Commit {
-    #[doc = "Commit ID of external tool expected by dockerd as set at build time."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub expected: Option<String>,
-    #[doc = "Actual commit ID of external tool."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub id: Option<String>,
-}
-
-impl std::fmt::Display for Commit {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for Commit {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(expected) = &self.expected {
-                format!("{:?}", expected).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(id) = &self.id {
-                format!("{:?}", id).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["expected".into(), "id".into()]
-    }
-}
-
 #[doc = "Metadata about a pub-sub connection.\n\nThis is mostly used for internal purposes and \
          debugging."]
 #[derive(
@@ -2557,6 +2510,7 @@ pub struct Connection {
     #[doc = "The CPU core usage of the server."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cores: Option<i64>,
+    #[doc = "The CPU usage of the server."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cpu: Option<f64>,
     #[doc = "Information about the gateway."]
@@ -2582,6 +2536,7 @@ pub struct Connection {
     #[doc = "The http port of the server."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub http_port: Option<i64>,
+    #[doc = "HTTP request statistics."]
     pub http_req_stats: std::collections::HashMap<String, i64>,
     #[doc = "The https port of the server."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2964,7 +2919,7 @@ pub struct Coupon {
     #[doc = "Amount (in the `currency` specified) that will be taken off the subtotal of any \
              invoices for this customer."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub amount_off: Option<f64>,
+    pub amount_off: Option<bigdecimal::BigDecimal>,
     #[doc = "Always true for a deleted object."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub deleted: Option<bool>,
@@ -3191,7 +3146,7 @@ pub struct Customer {
              have yet to be successfully applied to any invoice. This balance is only taken into \
              account as invoices are finalized."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub balance: Option<f64>,
+    pub balance: Option<bigdecimal::BigDecimal>,
     #[doc = "Time at which the object was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "Three-letter ISO code for the currency the customer can be charged in for recurring \
@@ -3310,7 +3265,7 @@ pub struct CustomerBalance {
     #[doc = "The monthy credits remaining in the balance. This gets re-upped every month, but if \
              the credits are not used for a month they do not carry over to the next month. It is \
              a stable amount granted to the user per month."]
-    pub monthly_credits_remaining: f64,
+    pub monthly_credits_remaining: bigdecimal::BigDecimal,
     #[doc = "The amount of pre-pay cash remaining in the balance. This number goes down as the \
              user uses their pre-paid credits. The reason we track this amount is if a user ever \
              wants to withdraw their pre-pay cash, we can use this amount to determine how much \
@@ -3320,15 +3275,15 @@ pub struct CustomerBalance {
              `pre_pay_credits_remaining` will be subtracted by 50 to pay the bill. This way if \
              they want to withdraw money after, they can only withdraw $50 since that is the \
              amount of cash they have remaining."]
-    pub pre_pay_cash_remaining: f64,
+    pub pre_pay_cash_remaining: bigdecimal::BigDecimal,
     #[doc = "The amount of credits remaining in the balance. This is typically the amount of cash \
              * some multiplier they get for pre-paying their account. This number lowers every \
              time a bill is paid with the balance. This number increases every time a user adds \
              funds to their balance. This may be through a subscription or a one off payment."]
-    pub pre_pay_credits_remaining: f64,
+    pub pre_pay_credits_remaining: bigdecimal::BigDecimal,
     #[doc = "This includes any outstanding, draft, or open invoices and any pending invoice \
              items. This does not include any credits the user has on their account."]
-    pub total_due: f64,
+    pub total_due: bigdecimal::BigDecimal,
     #[doc = "The date and time the balance was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID the balance belongs to."]
@@ -3542,628 +3497,6 @@ impl tabled::Tabled for Discount {
     }
 }
 
-#[doc = "Docker system info."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DockerSystemInfo {
-    #[doc = "Hardware architecture of the host, as returned by the Go runtime (`GOARCH`).  A full list of possible values can be found in the [Go documentation](https://golang.org/doc/install/source#environment)."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub architecture: Option<String>,
-    #[doc = "Indicates if `bridge-nf-call-ip6tables` is available on the host."]
-    #[serde(
-        rename = "bridge_nf_ip6tables",
-        default,
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub bridge_nf_ip_6tables: Option<bool>,
-    #[doc = "Indicates if `bridge-nf-call-iptables` is available on the host."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub bridge_nf_iptables: Option<bool>,
-    #[doc = "The driver to use for managing cgroups."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cgroup_driver: Option<SystemInfoCgroupDriverEnum>,
-    #[doc = "The version of the cgroup."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cgroup_version: Option<SystemInfoCgroupVersionEnum>,
-    #[doc = "The network endpoint that the Engine advertises for the purpose of node discovery. \
-             ClusterAdvertise is a `host:port` combination on which the daemon is reachable by \
-             other hosts.\n\n**Deprecated**: This field is only propagated when using standalone \
-             Swarm mode, and overlay networking using an external k/v store. Overlay networks \
-             with Swarm mode enabled use the built-in raft store, and this field will be empty."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cluster_advertise: Option<String>,
-    #[doc = "URL of the distributed storage backend.   The storage backend is used for multihost \
-             networking (to store network and endpoint information) and by the node discovery \
-             mechanism.\n\n**Deprecated**: This field is only propagated when using standalone \
-             Swarm mode, and overlay networking using an external k/v store. Overlay networks \
-             with Swarm mode enabled use the built-in raft store, and this field will be empty."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cluster_store: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub containerd_commit: Option<Commit>,
-    #[doc = "Total number of containers on the host."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub containers: Option<i64>,
-    #[doc = "Number of containers with status `\\\"paused\\\"`."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub containers_paused: Option<i64>,
-    #[doc = "Number of containers with status `\\\"running\\\"`."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub containers_running: Option<i64>,
-    #[doc = "Number of containers with status `\\\"stopped\\\"`."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub containers_stopped: Option<i64>,
-    #[doc = "Indicates if CPU CFS(Completely Fair Scheduler) period is supported by the host."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cpu_cfs_period: Option<bool>,
-    #[doc = "Indicates if CPU CFS(Completely Fair Scheduler) quota is supported by the host."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cpu_cfs_quota: Option<bool>,
-    #[doc = "Indicates if CPUsets (cpuset.cpus, cpuset.mems) are supported by the host.  See [cpuset(7)](https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt)"]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cpu_set: Option<bool>,
-    #[doc = "Indicates if CPU Shares limiting is supported by the host."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cpu_shares: Option<bool>,
-    #[doc = "Indicates if the daemon is running in debug-mode / with debug-level logging enabled."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub debug: Option<bool>,
-    #[doc = "List of custom default address pools for local networks, which can be specified in \
-             the daemon.json file or dockerd option.  Example: a Base \\\"10.10.0.0/16\\\" with \
-             Size 24 will define the set of 256 10.10.[0-255].0/24 address pools."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub default_address_pools: Option<Vec<SystemInfoDefaultAddressPools>>,
-    #[doc = "Name of the default OCI runtime that is used when starting containers.  The default \
-             can be overridden per-container at create time."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub default_runtime: Option<String>,
-    #[doc = "Root directory of persistent Docker state.  Defaults to `/var/lib/docker` on Linux, \
-             and `C:\\\\ProgramData\\\\docker` on Windows."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub docker_root_dir: Option<String>,
-    #[doc = "Name of the storage driver in use."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub driver: Option<String>,
-    #[doc = "Information specific to the storage driver, provided as \\\"label\\\" / \
-             \\\"value\\\" pairs.  This information is provided by the storage driver, and \
-             formatted in a way consistent with the output of `docker info` on the command \
-             line.\n\n**Note**: The information returned in this field, including the formatting \
-             of values and labels, should not be considered stable, and may change without notice."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub driver_status: Option<Vec<Vec<String>>>,
-    #[doc = "Indicates if experimental features are enabled on the daemon."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub experimental_build: Option<bool>,
-    #[doc = "HTTP-proxy configured for the daemon. This value is obtained from the [`HTTP_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable. Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL are masked in the API response.  Containers do not automatically inherit this configuration."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub http_proxy: Option<String>,
-    #[doc = "HTTPS-proxy configured for the daemon. This value is obtained from the [`HTTPS_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable. Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL are masked in the API response.  Containers do not automatically inherit this configuration."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub https_proxy: Option<String>,
-    #[doc = "Unique identifier of the daemon.\n\n**Note**: The format of the ID itself is not \
-             part of the API, and should not be considered stable."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub id: Option<String>,
-    #[doc = "Total number of images on the host. Both _tagged_ and _untagged_ (dangling) images \
-             are counted."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub images: Option<i64>,
-    #[doc = "Address / URL of the index server that is used for image search, and as a default \
-             for user authentication for Docker Hub and Docker Cloud."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub index_server_address: Option<String>,
-    #[doc = "Name and, optional, path of the `docker-init` binary.  If the path is omitted, the \
-             daemon searches the host's `$PATH` for the binary and uses the first result."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub init_binary: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub init_commit: Option<Commit>,
-    #[doc = "Indicates IPv4 forwarding is enabled."]
-    #[serde(
-        rename = "ipv4_forwarding",
-        default,
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub ipv_4_forwarding: Option<bool>,
-    #[doc = "Represents the isolation technology to use as a default for containers. The \
-             supported values are platform-specific.  If no isolation value is specified on \
-             daemon start, on Windows client, the default is `hyperv`, and on Windows server, the \
-             default is `process`.  This option is currently not used on other platforms."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub isolation: Option<SystemInfoIsolationEnum>,
-    #[doc = "Indicates if the host has kernel memory limit support enabled.\n\n**Deprecated**: \
-             This field is deprecated as the kernel 5.4 deprecated `kmem.limit_in_bytes`."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub kernel_memory: Option<bool>,
-    #[doc = "Indicates if the host has kernel memory TCP limit support enabled.  Kernel memory \
-             TCP limits are not supported when using cgroups v2, which does not support the \
-             corresponding `memory.kmem.tcp.limit_in_bytes` cgroup."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub kernel_memory_tcp: Option<bool>,
-    #[doc = "Kernel version of the host.  On Linux, this information obtained from `uname`. On \
-             Windows this information is queried from the \
-             <kbd>HKEY_LOCAL_MACHINE\\\\\\\\SOFTWARE\\\\\\\\Microsoft\\\\\\\\Windows \
-             NT\\\\\\\\CurrentVersion\\\\\\\\</kbd> registry value, for example _\\\"10.0 14393 \
-             (14393.1198.amd64fre.rs1_release_sec.170427-1353)\\\"_."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub kernel_version: Option<String>,
-    #[doc = "User-defined labels (key/value metadata) as set on the daemon.\n\n**Note**: When \
-             part of a Swarm, nodes can both have _daemon_ labels, set through the daemon \
-             configuration, and _node_ labels, set from a manager node in the Swarm. Node labels \
-             are not included in this field. Node labels can be retrieved using the `/nodes/(id)` \
-             endpoint on a manager node in the Swarm."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub labels: Option<Vec<String>>,
-    #[doc = "Indicates if live restore is enabled.  If enabled, containers are kept running when \
-             the daemon is shutdown or upon daemon start if running containers are detected."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub live_restore_enabled: Option<bool>,
-    #[doc = "The logging driver to use as a default for new containers."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub logging_driver: Option<String>,
-    #[doc = "Total amount of physical memory available on the host, in bytes."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub mem_total: Option<i64>,
-    #[doc = "Indicates if the host has memory limit support enabled."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub memory_limit: Option<bool>,
-    #[doc = "Number of event listeners subscribed."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub n_events_listener: Option<i64>,
-    #[doc = "The total number of file Descriptors in use by the daemon process.  This information \
-             is only returned if debug-mode is enabled."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub n_fd: Option<i64>,
-    #[doc = "Hostname of the host."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
-    #[doc = "The number of logical CPUs usable by the daemon.  The number of available CPUs is \
-             checked by querying the operating system when the daemon starts. Changes to \
-             operating system CPU allocation after the daemon is started are not reflected."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub ncpu: Option<i64>,
-    #[doc = "Comma-separated list of domain extensions for which no proxy should be used. This value is obtained from the [`NO_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable.  Containers do not automatically inherit this configuration."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub no_proxy: Option<String>,
-    #[doc = "Indicates if OOM killer disable is supported on the host."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub oom_kill_disable: Option<bool>,
-    #[doc = "Name of the host's operating system, for example: \\\"Ubuntu 16.04.2 LTS\\\" or \
-             \\\"Windows Server 2016 Datacenter\\\""]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub operating_system: Option<String>,
-    #[doc = "Generic type of the operating system of the host, as returned by the Go runtime (`GOOS`).  Currently returned values are \\\"linux\\\" and \\\"windows\\\". A full list of possible values can be found in the [Go documentation](https://golang.org/doc/install/source#environment)."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub os_type: Option<String>,
-    #[doc = "Version of the host's operating system\n\n**Note**: The information returned in this \
-             field, including its very existence, and the formatting of values, should not be \
-             considered stable, and may change without notice."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub os_version: Option<String>,
-    #[doc = "Indicates if the host kernel has PID limit support enabled."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pids_limit: Option<bool>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub plugins: Option<PluginsInfo>,
-    #[doc = "Reports a summary of the product license on the daemon.  If a commercial license has \
-             been applied to the daemon, information such as number of nodes, and expiration are \
-             included."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub product_license: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub registry_config: Option<RegistryServiceConfig>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub runc_commit: Option<Commit>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub runtimes: Option<std::collections::HashMap<String, Runtime>>,
-    #[doc = "List of security features that are enabled on the daemon, such as apparmor, seccomp, \
-             SELinux, user-namespaces (userns), and rootless.  Additional configuration options \
-             for each security feature may be present, and are included as a comma-separated list \
-             of key/value pairs."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub security_options: Option<Vec<String>>,
-    #[doc = "Version string of the daemon. **Note**: the [standalone Swarm API](https://docs.docker.com/swarm/swarm-api/) returns the Swarm version instead of the daemon  version, for example `swarm/1.2.8`."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub server_version: Option<String>,
-    #[doc = "Indicates if the host has memory swap limit support enabled."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub swap_limit: Option<bool>,
-    #[doc = "The  number of goroutines that currently exist.  This information is only returned \
-             if debug-mode is enabled."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub system_time: Option<String>,
-    #[doc = "List of warnings / informational messages about missing features, or issues related \
-             to the daemon configuration.  These messages can be printed by the client as \
-             information to the user."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub warnings: Option<Vec<String>>,
-}
-
-impl std::fmt::Display for DockerSystemInfo {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for DockerSystemInfo {
-    const LENGTH: usize = 60;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(architecture) = &self.architecture {
-                format!("{:?}", architecture).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(bridge_nf_ip_6tables) = &self.bridge_nf_ip_6tables {
-                format!("{:?}", bridge_nf_ip_6tables).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(bridge_nf_iptables) = &self.bridge_nf_iptables {
-                format!("{:?}", bridge_nf_iptables).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(cgroup_driver) = &self.cgroup_driver {
-                format!("{:?}", cgroup_driver).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(cgroup_version) = &self.cgroup_version {
-                format!("{:?}", cgroup_version).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(cluster_advertise) = &self.cluster_advertise {
-                format!("{:?}", cluster_advertise).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(cluster_store) = &self.cluster_store {
-                format!("{:?}", cluster_store).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(containerd_commit) = &self.containerd_commit {
-                format!("{:?}", containerd_commit).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(containers) = &self.containers {
-                format!("{:?}", containers).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(containers_paused) = &self.containers_paused {
-                format!("{:?}", containers_paused).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(containers_running) = &self.containers_running {
-                format!("{:?}", containers_running).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(containers_stopped) = &self.containers_stopped {
-                format!("{:?}", containers_stopped).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(cpu_cfs_period) = &self.cpu_cfs_period {
-                format!("{:?}", cpu_cfs_period).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(cpu_cfs_quota) = &self.cpu_cfs_quota {
-                format!("{:?}", cpu_cfs_quota).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(cpu_set) = &self.cpu_set {
-                format!("{:?}", cpu_set).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(cpu_shares) = &self.cpu_shares {
-                format!("{:?}", cpu_shares).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(debug) = &self.debug {
-                format!("{:?}", debug).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(default_address_pools) = &self.default_address_pools {
-                format!("{:?}", default_address_pools).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(default_runtime) = &self.default_runtime {
-                format!("{:?}", default_runtime).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(docker_root_dir) = &self.docker_root_dir {
-                format!("{:?}", docker_root_dir).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(driver) = &self.driver {
-                format!("{:?}", driver).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(driver_status) = &self.driver_status {
-                format!("{:?}", driver_status).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(experimental_build) = &self.experimental_build {
-                format!("{:?}", experimental_build).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(http_proxy) = &self.http_proxy {
-                format!("{:?}", http_proxy).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(https_proxy) = &self.https_proxy {
-                format!("{:?}", https_proxy).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(id) = &self.id {
-                format!("{:?}", id).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(images) = &self.images {
-                format!("{:?}", images).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(index_server_address) = &self.index_server_address {
-                format!("{:?}", index_server_address).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(init_binary) = &self.init_binary {
-                format!("{:?}", init_binary).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(init_commit) = &self.init_commit {
-                format!("{:?}", init_commit).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(ipv_4_forwarding) = &self.ipv_4_forwarding {
-                format!("{:?}", ipv_4_forwarding).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(isolation) = &self.isolation {
-                format!("{:?}", isolation).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(kernel_memory) = &self.kernel_memory {
-                format!("{:?}", kernel_memory).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(kernel_memory_tcp) = &self.kernel_memory_tcp {
-                format!("{:?}", kernel_memory_tcp).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(kernel_version) = &self.kernel_version {
-                format!("{:?}", kernel_version).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(labels) = &self.labels {
-                format!("{:?}", labels).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(live_restore_enabled) = &self.live_restore_enabled {
-                format!("{:?}", live_restore_enabled).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(logging_driver) = &self.logging_driver {
-                format!("{:?}", logging_driver).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(mem_total) = &self.mem_total {
-                format!("{:?}", mem_total).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(memory_limit) = &self.memory_limit {
-                format!("{:?}", memory_limit).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(n_events_listener) = &self.n_events_listener {
-                format!("{:?}", n_events_listener).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(n_fd) = &self.n_fd {
-                format!("{:?}", n_fd).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(name) = &self.name {
-                format!("{:?}", name).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(ncpu) = &self.ncpu {
-                format!("{:?}", ncpu).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(no_proxy) = &self.no_proxy {
-                format!("{:?}", no_proxy).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(oom_kill_disable) = &self.oom_kill_disable {
-                format!("{:?}", oom_kill_disable).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(operating_system) = &self.operating_system {
-                format!("{:?}", operating_system).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(os_type) = &self.os_type {
-                format!("{:?}", os_type).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(os_version) = &self.os_version {
-                format!("{:?}", os_version).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(pids_limit) = &self.pids_limit {
-                format!("{:?}", pids_limit).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(plugins) = &self.plugins {
-                format!("{:?}", plugins).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(product_license) = &self.product_license {
-                format!("{:?}", product_license).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(registry_config) = &self.registry_config {
-                format!("{:?}", registry_config).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(runc_commit) = &self.runc_commit {
-                format!("{:?}", runc_commit).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(runtimes) = &self.runtimes {
-                format!("{:?}", runtimes).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(security_options) = &self.security_options {
-                format!("{:?}", security_options).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(server_version) = &self.server_version {
-                format!("{:?}", server_version).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(swap_limit) = &self.swap_limit {
-                format!("{:?}", swap_limit).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(system_time) = &self.system_time {
-                format!("{:?}", system_time).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(warnings) = &self.warnings {
-                format!("{:?}", warnings).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "architecture".into(),
-            "bridge_nf_ip_6tables".into(),
-            "bridge_nf_iptables".into(),
-            "cgroup_driver".into(),
-            "cgroup_version".into(),
-            "cluster_advertise".into(),
-            "cluster_store".into(),
-            "containerd_commit".into(),
-            "containers".into(),
-            "containers_paused".into(),
-            "containers_running".into(),
-            "containers_stopped".into(),
-            "cpu_cfs_period".into(),
-            "cpu_cfs_quota".into(),
-            "cpu_set".into(),
-            "cpu_shares".into(),
-            "debug".into(),
-            "default_address_pools".into(),
-            "default_runtime".into(),
-            "docker_root_dir".into(),
-            "driver".into(),
-            "driver_status".into(),
-            "experimental_build".into(),
-            "http_proxy".into(),
-            "https_proxy".into(),
-            "id".into(),
-            "images".into(),
-            "index_server_address".into(),
-            "init_binary".into(),
-            "init_commit".into(),
-            "ipv_4_forwarding".into(),
-            "isolation".into(),
-            "kernel_memory".into(),
-            "kernel_memory_tcp".into(),
-            "kernel_version".into(),
-            "labels".into(),
-            "live_restore_enabled".into(),
-            "logging_driver".into(),
-            "mem_total".into(),
-            "memory_limit".into(),
-            "n_events_listener".into(),
-            "n_fd".into(),
-            "name".into(),
-            "ncpu".into(),
-            "no_proxy".into(),
-            "oom_kill_disable".into(),
-            "operating_system".into(),
-            "os_type".into(),
-            "os_version".into(),
-            "pids_limit".into(),
-            "plugins".into(),
-            "product_license".into(),
-            "registry_config".into(),
-            "runc_commit".into(),
-            "runtimes".into(),
-            "security_options".into(),
-            "server_version".into(),
-            "swap_limit".into(),
-            "system_time".into(),
-            "warnings".into(),
-        ]
-    }
-}
-
 #[doc = "The body of the form for email authentication."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4202,62 +3535,6 @@ impl tabled::Tabled for EmailAuthenticationForm {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["callback_url".into(), "email".into()]
-    }
-}
-
-#[doc = "Metadata about our currently running server.\n\nThis is mostly used for internal purposes \
-         and debugging."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct EngineMetadata {
-    #[doc = "If any async job is currently running."]
-    pub async_jobs_running: bool,
-    #[doc = "Metadata about our cache."]
-    pub cache: CacheMetadata,
-    #[doc = "The environment we are running in."]
-    pub environment: Environment,
-    #[doc = "Metadata about our file system."]
-    pub fs: FileSystemMetadata,
-    #[doc = "The git hash of the server."]
-    pub git_hash: String,
-    #[doc = "Metadata about our pub-sub connection."]
-    pub pubsub: Connection,
-}
-
-impl std::fmt::Display for EngineMetadata {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for EngineMetadata {
-    const LENGTH: usize = 6;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.async_jobs_running).into(),
-            format!("{:?}", self.cache).into(),
-            format!("{:?}", self.environment).into(),
-            format!("{:?}", self.fs).into(),
-            self.git_hash.clone().into(),
-            format!("{:?}", self.pubsub).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "async_jobs_running".into(),
-            "cache".into(),
-            "environment".into(),
-            "fs".into(),
-            "git_hash".into(),
-            "pubsub".into(),
-        ]
     }
 }
 
@@ -4546,50 +3823,6 @@ pub enum ErrorCode {
     #[serde(rename = "message_type_not_accepted_for_web_r_t_c")]
     #[display("message_type_not_accepted_for_web_r_t_c")]
     MessageTypeNotAcceptedForWebRTC,
-}
-
-#[doc = "Metadata about our currently running server.\n\nThis is mostly used for internal purposes \
-         and debugging."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ExecutorMetadata {
-    #[doc = "Information about the docker daemon."]
-    pub docker_info: DockerSystemInfo,
-    #[doc = "The environment we are running in."]
-    pub environment: Environment,
-    #[doc = "The git hash of the server."]
-    pub git_hash: String,
-}
-
-impl std::fmt::Display for ExecutorMetadata {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ExecutorMetadata {
-    const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.docker_info).into(),
-            format!("{:?}", self.environment).into(),
-            self.git_hash.clone().into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "docker_info".into(),
-            "environment".into(),
-            "git_hash".into(),
-        ]
-    }
 }
 
 #[doc = "The response from the `Export` endpoint."]
@@ -6041,79 +5274,6 @@ pub enum ImageType {
     Jpg,
 }
 
-#[doc = "IndexInfo contains information about a registry."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct IndexInfo {
-    #[doc = "List of mirrors, expressed as URIs."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub mirrors: Option<Vec<String>>,
-    #[doc = "Name of the registry, such as \\\"docker.io\\\"."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
-    #[doc = "Indicates whether this is an official registry (i.e., Docker Hub / docker.io)"]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub official: Option<bool>,
-    #[doc = "Indicates if the registry is part of the list of insecure registries.  If `false`, \
-             the registry is insecure. Insecure registries accept un-encrypted (HTTP) and/or \
-             untrusted (HTTPS with certificates from unknown CAs) communication.\n\n**Warning**: \
-             Insecure registries can be useful when running a local registry. However, because \
-             its use creates security vulnerabilities it should ONLY be enabled for testing \
-             purposes. For increased security, users should add their CA to their system's list \
-             of trusted CAs instead of enabling this option."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub secure: Option<bool>,
-}
-
-impl std::fmt::Display for IndexInfo {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for IndexInfo {
-    const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(mirrors) = &self.mirrors {
-                format!("{:?}", mirrors).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(name) = &self.name {
-                format!("{:?}", name).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(official) = &self.official {
-                format!("{:?}", official).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(secure) = &self.secure {
-                format!("{:?}", secure).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "mirrors".into(),
-            "name".into(),
-            "official".into(),
-            "secure".into(),
-        ]
-    }
-}
-
 #[doc = "Input format specifier."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -6149,13 +5309,13 @@ pub struct Invoice {
              also take that into account. The charge that gets generated for the invoice will be \
              for the amount specified in `amount_due`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub amount_due: Option<f64>,
+    pub amount_due: Option<bigdecimal::BigDecimal>,
     #[doc = "The amount, in USD, that was paid."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub amount_paid: Option<f64>,
+    pub amount_paid: Option<bigdecimal::BigDecimal>,
     #[doc = "The amount remaining, in USD, that is due."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub amount_remaining: Option<f64>,
+    pub amount_remaining: Option<bigdecimal::BigDecimal>,
     #[doc = "Number of payment attempts made for this invoice, from the perspective of the \
              payment retry schedule.\n\nAny payment attempt counts as the first attempt, and \
              subsequently only automatic retries increment the attempt count. In other words, \
@@ -6225,14 +5385,14 @@ pub struct Invoice {
     #[doc = "Total of all subscriptions, invoice items, and prorations on the invoice before any \
              invoice level discount or tax is applied.\n\nItem discounts are already incorporated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub subtotal: Option<f64>,
+    pub subtotal: Option<bigdecimal::BigDecimal>,
     #[doc = "The amount of tax on this invoice.\n\nThis is the sum of all the tax amounts on this \
              invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub tax: Option<f64>,
+    pub tax: Option<bigdecimal::BigDecimal>,
     #[doc = "Total after discounts and taxes."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub total: Option<f64>,
+    pub total: Option<bigdecimal::BigDecimal>,
     #[doc = "The URL for the hosted invoice page, which allows customers to view and pay an \
              invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -6416,7 +5576,7 @@ impl tabled::Tabled for Invoice {
 pub struct InvoiceLineItem {
     #[doc = "The amount, in USD."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub amount: Option<f64>,
+    pub amount: Option<bigdecimal::BigDecimal>,
     #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), \
              in lowercase."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -6964,12 +6124,8 @@ impl tabled::Tabled for MetaClusterInfo {
 pub struct Metadata {
     #[doc = "Metadata about our cache."]
     pub cache: CacheMetadata,
-    #[doc = "Metadata about our engine API connection."]
-    pub engine: EngineMetadata,
     #[doc = "The environment we are running in."]
     pub environment: Environment,
-    #[doc = "Metadata about our executor API connection."]
-    pub executor: ExecutorMetadata,
     #[doc = "Metadata about our file system."]
     pub fs: FileSystemMetadata,
     #[doc = "The git hash of the server."]
@@ -6992,13 +6148,11 @@ impl std::fmt::Display for Metadata {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Metadata {
-    const LENGTH: usize = 8;
+    const LENGTH: usize = 6;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.cache).into(),
-            format!("{:?}", self.engine).into(),
             format!("{:?}", self.environment).into(),
-            format!("{:?}", self.executor).into(),
             format!("{:?}", self.fs).into(),
             self.git_hash.clone().into(),
             format!("{:?}", self.point_e).into(),
@@ -7009,9 +6163,7 @@ impl tabled::Tabled for Metadata {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "cache".into(),
-            "engine".into(),
             "environment".into(),
-            "executor".into(),
             "fs".into(),
             "git_hash".into(),
             "point_e".into(),
@@ -7299,170 +6451,6 @@ pub enum ModelingCmd {
     },
     #[serde(rename = "curve_get_end_points")]
     CurveGetEndPoints { curve_id: uuid::Uuid },
-}
-
-#[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ModelingCmdReq {
-    #[doc = "Which command to submit to the Kittycad engine."]
-    pub cmd: ModelingCmd,
-    #[doc = "ID of command being submitted."]
-    pub cmd_id: uuid::Uuid,
-}
-
-impl std::fmt::Display for ModelingCmdReq {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ModelingCmdReq {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.cmd).into(),
-            format!("{:?}", self.cmd_id).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["cmd".into(), "cmd_id".into()]
-    }
-}
-
-#[doc = "A batch set of graphics commands submitted to the KittyCAD engine via the Modeling API."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ModelingCmdReqBatch {
-    pub cmds: std::collections::HashMap<String, ModelingCmdReq>,
-}
-
-impl std::fmt::Display for ModelingCmdReqBatch {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ModelingCmdReqBatch {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.cmds).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["cmds".into()]
-    }
-}
-
-#[doc = "Why a command submitted to the Modeling API failed."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ModelingError {
-    #[doc = "A string error code which refers to a family of errors. E.g. \"InvalidInput\"."]
-    pub error_code: String,
-    #[doc = "Describe the specific error which occurred. Will be shown to users, not logged."]
-    pub external_message: String,
-    #[doc = "Describe the specific error which occurred. Will be logged, not shown to users."]
-    pub internal_message: String,
-    #[doc = "A HTTP status code."]
-    pub status_code: u16,
-}
-
-impl std::fmt::Display for ModelingError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ModelingError {
-    const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            self.error_code.clone().into(),
-            self.external_message.clone().into(),
-            self.internal_message.clone().into(),
-            format!("{:?}", self.status_code).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "error_code".into(),
-            "external_message".into(),
-            "internal_message".into(),
-            "status_code".into(),
-        ]
-    }
-}
-
-#[doc = "The result from one modeling command in a batch."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub enum ModelingOutcome {
-    Error {
-        #[doc = "A string error code which refers to a family of errors. E.g. \"InvalidInput\"."]
-        error_code: String,
-        #[doc = "Describe the specific error which occurred. Will be shown to users, not logged."]
-        external_message: String,
-        #[doc = "Describe the specific error which occurred. Will be logged, not shown to users."]
-        internal_message: String,
-        #[doc = "A HTTP status code."]
-        status_code: u16,
-    },
-    Cancelled {
-        #[doc = "The ID of the command that failed, cancelling this command."]
-        what_failed: uuid::Uuid,
-    },
-}
-
-#[doc = "The result from a batch of modeling commands."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ModelingOutcomes {
-    pub outcomes: std::collections::HashMap<String, ModelingOutcome>,
-}
-
-impl std::fmt::Display for ModelingOutcomes {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ModelingOutcomes {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.outcomes).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["outcomes".into()]
-    }
 }
 
 #[doc = "The response from the `MouseClick` command."]
@@ -8281,75 +7269,6 @@ impl tabled::Tabled for PlaneIntersectAndProject {
     }
 }
 
-#[doc = "Available plugins per type.\n\n**Note**: Only unmanaged (V1) plugins are included in this \
-         list. V1 plugins are \\\"lazily\\\" loaded, and are not returned in this list if there is \
-         no resource using the plugin."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct PluginsInfo {
-    #[doc = "Names of available authorization plugins."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub authorization: Option<Vec<String>>,
-    #[doc = "Names of available logging-drivers, and logging-driver plugins."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub log: Option<Vec<String>>,
-    #[doc = "Names of available network-drivers, and network-driver plugins."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub network: Option<Vec<String>>,
-    #[doc = "Names of available volume-drivers, and network-driver plugins."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub volume: Option<Vec<String>>,
-}
-
-impl std::fmt::Display for PluginsInfo {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for PluginsInfo {
-    const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(authorization) = &self.authorization {
-                format!("{:?}", authorization).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(log) = &self.log {
-                format!("{:?}", log).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(network) = &self.network {
-                format!("{:?}", network).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(volume) = &self.volume {
-                format!("{:?}", volume).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "authorization".into(),
-            "log".into(),
-            "network".into(),
-            "volume".into(),
-        ]
-    }
-}
-
 #[doc = "The storage for the output PLY file."]
 #[derive(
     serde :: Serialize,
@@ -8553,96 +7472,6 @@ impl tabled::Tabled for RawFile {
     }
 }
 
-#[doc = "RegistryServiceConfig stores daemon registry services configuration."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct RegistryServiceConfig {
-    #[doc = "List of IP ranges to which nondistributable artifacts can be pushed, using the CIDR syntax [RFC 4632](https://tools.ietf.org/html/4632).  Some images (for example, Windows base images) contain artifacts whose distribution is restricted by license. When these images are pushed to a registry, restricted artifacts are not included.  This configuration override this behavior, and enables the daemon to push nondistributable artifacts to all registries whose resolved IP address is within the subnet described by the CIDR syntax.  This option is useful when pushing images containing nondistributable artifacts to a registry on an air-gapped network so hosts on that network can pull the images without connecting to another server.\n\n**Warning**: Nondistributable artifacts typically have restrictions on how and where they can be distributed and shared. Only use this feature to push artifacts to private registries and ensure that you are in compliance with any terms that cover redistributing nondistributable artifacts."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub allow_nondistributable_artifacts_cid_rs: Option<Vec<String>>,
-    #[doc = "List of registry hostnames to which nondistributable artifacts can be pushed, using \
-             the format `<hostname>[:<port>]` or `<IP address>[:<port>]`.  Some images (for \
-             example, Windows base images) contain artifacts whose distribution is restricted by \
-             license. When these images are pushed to a registry, restricted artifacts are not \
-             included.  This configuration override this behavior for the specified registries.  \
-             This option is useful when pushing images containing nondistributable artifacts to a \
-             registry on an air-gapped network so hosts on that network can pull the images \
-             without connecting to another server.\n\n**Warning**: Nondistributable artifacts \
-             typically have restrictions on how and where they can be distributed and shared. \
-             Only use this feature to push artifacts to private registries and ensure that you \
-             are in compliance with any terms that cover redistributing nondistributable \
-             artifacts."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub allow_nondistributable_artifacts_hostnames: Option<Vec<String>>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub index_configs: Option<std::collections::HashMap<String, IndexInfo>>,
-    #[doc = "List of IP ranges of insecure registries, using the CIDR syntax ([RFC 4632](https://tools.ietf.org/html/4632)). Insecure registries accept un-encrypted (HTTP) and/or untrusted (HTTPS with certificates from unknown CAs) communication.  By default, local registries (`127.0.0.0/8`) are configured as insecure. All other registries are secure. Communicating with an insecure registry is not possible if the daemon assumes that registry is secure.  This configuration override this behavior, insecure communication with registries whose resolved IP address is within the subnet described by the CIDR syntax.  Registries can also be marked insecure by hostname. Those registries are listed under `IndexConfigs` and have their `Secure` field set to `false`.\n\n**Warning**: Using this option can be useful when running a local  registry, but introduces security vulnerabilities. This option should therefore ONLY be used for testing purposes. For increased security, users should add their CA to their system's list of trusted CAs instead of enabling this option."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub insecure_registry_cid_rs: Option<Vec<String>>,
-    #[doc = "List of registry URLs that act as a mirror for the official (`docker.io`) registry."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub mirrors: Option<Vec<String>>,
-}
-
-impl std::fmt::Display for RegistryServiceConfig {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for RegistryServiceConfig {
-    const LENGTH: usize = 5;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(allow_nondistributable_artifacts_cid_rs) =
-                &self.allow_nondistributable_artifacts_cid_rs
-            {
-                format!("{:?}", allow_nondistributable_artifacts_cid_rs).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(allow_nondistributable_artifacts_hostnames) =
-                &self.allow_nondistributable_artifacts_hostnames
-            {
-                format!("{:?}", allow_nondistributable_artifacts_hostnames).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(index_configs) = &self.index_configs {
-                format!("{:?}", index_configs).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(insecure_registry_cid_rs) = &self.insecure_registry_cid_rs {
-                format!("{:?}", insecure_registry_cid_rs).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(mirrors) = &self.mirrors {
-                format!("{:?}", mirrors).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "allow_nondistributable_artifacts_cid_rs".into(),
-            "allow_nondistributable_artifacts_hostnames".into(),
-            "index_configs".into(),
-            "insecure_registry_cid_rs".into(),
-            "mirrors".into(),
-        ]
-    }
-}
-
 #[doc = "ICECandidateInit is used to serialize ice candidates"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8790,55 +7619,6 @@ impl tabled::Tabled for RtcSessionDescription {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["sdp".into(), "type_".into()]
-    }
-}
-
-#[doc = "Runtime describes an [OCI compliant](https://github.com/opencontainers/runtime-spec) \
-         runtime.  The runtime is invoked by the daemon via the `containerd` daemon. OCI runtimes \
-         act as an interface to the Linux kernel namespaces, cgroups, and SELinux."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Runtime {
-    #[doc = "Name and, optional, path, of the OCI executable binary.  If the path is omitted, the \
-             daemon searches the host's `$PATH` for the binary and uses the first result."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub path: Option<String>,
-    #[doc = "List of command-line arguments to pass to the runtime when invoked."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub runtime_args: Option<Vec<String>>,
-}
-
-impl std::fmt::Display for Runtime {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for Runtime {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(path) = &self.path {
-                format!("{:?}", path).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(runtime_args) = &self.runtime_args {
-                format!("{:?}", runtime_args).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["path".into(), "runtime_args".into()]
     }
 }
 
@@ -9298,132 +8078,6 @@ impl tabled::Tabled for System {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["forward".into(), "up".into()]
     }
-}
-
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum SystemInfoCgroupDriverEnum {
-    #[serde(rename = "")]
-    #[display("")]
-    Empty,
-    #[serde(rename = "cgroupfs")]
-    #[display("cgroupfs")]
-    Cgroupfs,
-    #[serde(rename = "systemd")]
-    #[display("systemd")]
-    Systemd,
-    #[serde(rename = "none")]
-    #[display("none")]
-    None,
-}
-
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum SystemInfoCgroupVersionEnum {
-    #[serde(rename = "")]
-    #[display("")]
-    Empty,
-    #[serde(rename = "1")]
-    #[display("1")]
-    One,
-    #[serde(rename = "2")]
-    #[display("2")]
-    Two,
-}
-
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct SystemInfoDefaultAddressPools {
-    #[doc = "The network address in CIDR format"]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub base: Option<String>,
-    #[doc = "The network pool size"]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub size: Option<i64>,
-}
-
-impl std::fmt::Display for SystemInfoDefaultAddressPools {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for SystemInfoDefaultAddressPools {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(base) = &self.base {
-                format!("{:?}", base).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(size) = &self.size {
-                format!("{:?}", size).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["base".into(), "size".into()]
-    }
-}
-
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum SystemInfoIsolationEnum {
-    #[serde(rename = "")]
-    #[display("")]
-    Empty,
-    #[serde(rename = "default")]
-    #[display("default")]
-    Default,
-    #[serde(rename = "hyperv")]
-    #[display("hyperv")]
-    Hyperv,
-    #[serde(rename = "process")]
-    #[display("process")]
-    Process,
 }
 
 #[doc = "The response from the `TakeSnapshot` command."]

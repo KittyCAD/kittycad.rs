@@ -2,7 +2,7 @@ use futures::TryStreamExt;
 use pretty_assertions::assert_eq;
 use tokio_tungstenite::tungstenite::Message as WsMsg;
 
-use crate::types::{ModelingCmd, ModelingCmdReq, PathSegment, Point3D};
+use crate::types::{ModelingCmdReq, PathSegment, Point3D, WebSocketRequest::ModelingCmd};
 
 fn test_client() -> crate::Client {
     crate::Client::new_from_env()
@@ -207,7 +207,6 @@ async fn test_modeling_websocket() {
             serde_json::to_string(&ModelingCmdReq {
                 cmd: ModelingCmd::StartPath {},
                 cmd_id: path_id,
-                file_id: Default::default(),
             })
             .unwrap(),
         ))
@@ -241,7 +240,6 @@ async fn test_modeling_websocket() {
                         segment: PathSegment::Line { end: point },
                     },
                     cmd_id: Uuid::new_v4(),
-                    file_id: Default::default(),
                 })
                 .unwrap(),
             ))

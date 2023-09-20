@@ -569,8 +569,9 @@
             "description": "The price of the API call.",
             "format": "money-usd",
             "nullable": true,
-            "title": "Number",
-            "type": "number"
+            "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+            "title": "Decimal",
+            "type": "string"
           },
           "request_body": {
             "description": "The request body sent by the API call.",
@@ -1753,6 +1754,7 @@
         "description": "Cluster information.",
         "properties": {
           "addr": {
+            "default": null,
             "description": "The IP address of the cluster.",
             "nullable": true,
             "type": "string"
@@ -1781,6 +1783,7 @@
             "type": "integer"
           },
           "urls": {
+            "default": [],
             "description": "The urls of the cluster.",
             "items": {
               "type": "string"
@@ -1871,22 +1874,6 @@
         ],
         "type": "object"
       },
-      "Commit": {
-        "description": "Commit holds the Git-commit (SHA1) that a binary was built from, as reported in the version-string of external tools, such as `containerd`, or `runC`.",
-        "properties": {
-          "expected": {
-            "description": "Commit ID of external tool expected by dockerd as set at build time.",
-            "nullable": true,
-            "type": "string"
-          },
-          "id": {
-            "description": "Actual commit ID of external tool.",
-            "nullable": true,
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
       "Connection": {
         "description": "Metadata about a pub-sub connection.\n\nThis is mostly used for internal purposes and debugging.",
         "properties": {
@@ -1903,10 +1890,12 @@
               }
             ],
             "default": {
+              "addr": null,
               "auth_timeout": 0,
               "cluster_port": 0,
               "name": "",
-              "tls_timeout": 0
+              "tls_timeout": 0,
+              "urls": []
             },
             "description": "Information about the cluster."
           },
@@ -1928,8 +1917,9 @@
             "type": "integer"
           },
           "cpu": {
+            "default": 0.0,
+            "description": "The CPU usage of the server.",
             "format": "double",
-            "nullable": true,
             "type": "number"
           },
           "gateway": {
@@ -1989,6 +1979,7 @@
               "format": "int64",
               "type": "integer"
             },
+            "description": "HTTP request statistics.",
             "type": "object"
           },
           "https_port": {
@@ -2227,8 +2218,9 @@
             "description": "Amount (in the `currency` specified) that will be taken off the subtotal of any invoices for this customer.",
             "format": "money-usd",
             "nullable": true,
-            "title": "Number",
-            "type": "number"
+            "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+            "title": "Decimal",
+            "type": "string"
           },
           "deleted": {
             "default": false,
@@ -2355,8 +2347,9 @@
             "default": 0.0,
             "description": "Current balance, if any, being stored on the customer in the payments service.\n\nIf negative, the customer has credit to apply to their next invoice. If positive, the customer has an amount owed that will be added to their next invoice. The balance does not refer to any unpaid invoices; it solely takes into account amounts that have yet to be successfully applied to any invoice. This balance is only taken into account as invoices are finalized.",
             "format": "money-usd",
-            "title": "Number",
-            "type": "number"
+            "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+            "title": "Decimal",
+            "type": "string"
           },
           "created_at": {
             "description": "Time at which the object was created.",
@@ -2431,26 +2424,30 @@
           "monthly_credits_remaining": {
             "description": "The monthy credits remaining in the balance. This gets re-upped every month, but if the credits are not used for a month they do not carry over to the next month. It is a stable amount granted to the user per month.",
             "format": "money-usd",
-            "title": "Number",
-            "type": "number"
+            "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+            "title": "Decimal",
+            "type": "string"
           },
           "pre_pay_cash_remaining": {
             "description": "The amount of pre-pay cash remaining in the balance. This number goes down as the user uses their pre-paid credits. The reason we track this amount is if a user ever wants to withdraw their pre-pay cash, we can use this amount to determine how much to give them. Say a user has $100 in pre-paid cash, their bill is worth, $50 after subtracting any other credits (like monthly etc.) Their bill is $50, their pre-pay cash remaining will be subtracted by 50 to pay the bill and their `pre_pay_credits_remaining` will be subtracted by 50 to pay the bill. This way if they want to withdraw money after, they can only withdraw $50 since that is the amount of cash they have remaining.",
             "format": "money-usd",
-            "title": "Number",
-            "type": "number"
+            "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+            "title": "Decimal",
+            "type": "string"
           },
           "pre_pay_credits_remaining": {
             "description": "The amount of credits remaining in the balance. This is typically the amount of cash * some multiplier they get for pre-paying their account. This number lowers every time a bill is paid with the balance. This number increases every time a user adds funds to their balance. This may be through a subscription or a one off payment.",
             "format": "money-usd",
-            "title": "Number",
-            "type": "number"
+            "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+            "title": "Decimal",
+            "type": "string"
           },
           "total_due": {
             "description": "This includes any outstanding, draft, or open invoices and any pending invoice items. This does not include any credits the user has on their account.",
             "format": "money-usd",
-            "title": "Number",
-            "type": "number"
+            "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+            "title": "Decimal",
+            "type": "string"
           },
           "updated_at": {
             "description": "The date and time the balance was last updated.",
@@ -2566,362 +2563,6 @@
         ],
         "type": "object"
       },
-      "DockerSystemInfo": {
-        "description": "Docker system info.",
-        "properties": {
-          "architecture": {
-            "description": "Hardware architecture of the host, as returned by the Go runtime (`GOARCH`).  A full list of possible values can be found in the [Go documentation](https://golang.org/doc/install/source#environment).",
-            "nullable": true,
-            "type": "string"
-          },
-          "bridge_nf_ip6tables": {
-            "description": "Indicates if `bridge-nf-call-ip6tables` is available on the host.",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "bridge_nf_iptables": {
-            "description": "Indicates if `bridge-nf-call-iptables` is available on the host.",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "cgroup_driver": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/SystemInfoCgroupDriverEnum"
-              }
-            ],
-            "description": "The driver to use for managing cgroups.",
-            "nullable": true
-          },
-          "cgroup_version": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/SystemInfoCgroupVersionEnum"
-              }
-            ],
-            "description": "The version of the cgroup.",
-            "nullable": true
-          },
-          "cluster_advertise": {
-            "description": "The network endpoint that the Engine advertises for the purpose of node discovery. ClusterAdvertise is a `host:port` combination on which the daemon is reachable by other hosts.\n\n**Deprecated**: This field is only propagated when using standalone Swarm mode, and overlay networking using an external k/v store. Overlay networks with Swarm mode enabled use the built-in raft store, and this field will be empty.",
-            "nullable": true,
-            "type": "string"
-          },
-          "cluster_store": {
-            "description": "URL of the distributed storage backend.   The storage backend is used for multihost networking (to store network and endpoint information) and by the node discovery mechanism.\n\n**Deprecated**: This field is only propagated when using standalone Swarm mode, and overlay networking using an external k/v store. Overlay networks with Swarm mode enabled use the built-in raft store, and this field will be empty.",
-            "nullable": true,
-            "type": "string"
-          },
-          "containerd_commit": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Commit"
-              }
-            ],
-            "nullable": true
-          },
-          "containers": {
-            "description": "Total number of containers on the host.",
-            "format": "int64",
-            "nullable": true,
-            "type": "integer"
-          },
-          "containers_paused": {
-            "description": "Number of containers with status `\\\"paused\\\"`.",
-            "format": "int64",
-            "nullable": true,
-            "type": "integer"
-          },
-          "containers_running": {
-            "description": "Number of containers with status `\\\"running\\\"`.",
-            "format": "int64",
-            "nullable": true,
-            "type": "integer"
-          },
-          "containers_stopped": {
-            "description": "Number of containers with status `\\\"stopped\\\"`.",
-            "format": "int64",
-            "nullable": true,
-            "type": "integer"
-          },
-          "cpu_cfs_period": {
-            "description": "Indicates if CPU CFS(Completely Fair Scheduler) period is supported by the host.",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "cpu_cfs_quota": {
-            "description": "Indicates if CPU CFS(Completely Fair Scheduler) quota is supported by the host.",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "cpu_set": {
-            "description": "Indicates if CPUsets (cpuset.cpus, cpuset.mems) are supported by the host.  See [cpuset(7)](https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt)",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "cpu_shares": {
-            "description": "Indicates if CPU Shares limiting is supported by the host.",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "debug": {
-            "description": "Indicates if the daemon is running in debug-mode / with debug-level logging enabled.",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "default_address_pools": {
-            "description": "List of custom default address pools for local networks, which can be specified in the daemon.json file or dockerd option.  Example: a Base \\\"10.10.0.0/16\\\" with Size 24 will define the set of 256 10.10.[0-255].0/24 address pools.",
-            "items": {
-              "$ref": "#/components/schemas/SystemInfoDefaultAddressPools"
-            },
-            "type": "array"
-          },
-          "default_runtime": {
-            "description": "Name of the default OCI runtime that is used when starting containers.  The default can be overridden per-container at create time.",
-            "nullable": true,
-            "type": "string"
-          },
-          "docker_root_dir": {
-            "description": "Root directory of persistent Docker state.  Defaults to `/var/lib/docker` on Linux, and `C:\\\\ProgramData\\\\docker` on Windows.",
-            "nullable": true,
-            "type": "string"
-          },
-          "driver": {
-            "description": "Name of the storage driver in use.",
-            "nullable": true,
-            "type": "string"
-          },
-          "driver_status": {
-            "description": "Information specific to the storage driver, provided as \\\"label\\\" / \\\"value\\\" pairs.  This information is provided by the storage driver, and formatted in a way consistent with the output of `docker info` on the command line.\n\n**Note**: The information returned in this field, including the formatting of values and labels, should not be considered stable, and may change without notice.",
-            "items": {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            "type": "array"
-          },
-          "experimental_build": {
-            "description": "Indicates if experimental features are enabled on the daemon.",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "http_proxy": {
-            "description": "HTTP-proxy configured for the daemon. This value is obtained from the [`HTTP_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable. Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL are masked in the API response.  Containers do not automatically inherit this configuration.",
-            "nullable": true,
-            "type": "string"
-          },
-          "https_proxy": {
-            "description": "HTTPS-proxy configured for the daemon. This value is obtained from the [`HTTPS_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable. Credentials ([user info component](https://tools.ietf.org/html/rfc3986#section-3.2.1)) in the proxy URL are masked in the API response.  Containers do not automatically inherit this configuration.",
-            "nullable": true,
-            "type": "string"
-          },
-          "id": {
-            "description": "Unique identifier of the daemon.\n\n**Note**: The format of the ID itself is not part of the API, and should not be considered stable.",
-            "nullable": true,
-            "type": "string"
-          },
-          "images": {
-            "description": "Total number of images on the host. Both _tagged_ and _untagged_ (dangling) images are counted.",
-            "format": "int64",
-            "nullable": true,
-            "type": "integer"
-          },
-          "index_server_address": {
-            "description": "Address / URL of the index server that is used for image search, and as a default for user authentication for Docker Hub and Docker Cloud.",
-            "nullable": true,
-            "type": "string"
-          },
-          "init_binary": {
-            "description": "Name and, optional, path of the `docker-init` binary.  If the path is omitted, the daemon searches the host's `$PATH` for the binary and uses the first result.",
-            "nullable": true,
-            "type": "string"
-          },
-          "init_commit": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Commit"
-              }
-            ],
-            "nullable": true
-          },
-          "ipv4_forwarding": {
-            "description": "Indicates IPv4 forwarding is enabled.",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "isolation": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/SystemInfoIsolationEnum"
-              }
-            ],
-            "description": "Represents the isolation technology to use as a default for containers. The supported values are platform-specific.  If no isolation value is specified on daemon start, on Windows client, the default is `hyperv`, and on Windows server, the default is `process`.  This option is currently not used on other platforms.",
-            "nullable": true
-          },
-          "kernel_memory": {
-            "description": "Indicates if the host has kernel memory limit support enabled.\n\n**Deprecated**: This field is deprecated as the kernel 5.4 deprecated `kmem.limit_in_bytes`.",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "kernel_memory_tcp": {
-            "description": "Indicates if the host has kernel memory TCP limit support enabled.  Kernel memory TCP limits are not supported when using cgroups v2, which does not support the corresponding `memory.kmem.tcp.limit_in_bytes` cgroup.",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "kernel_version": {
-            "description": "Kernel version of the host.  On Linux, this information obtained from `uname`. On Windows this information is queried from the <kbd>HKEY_LOCAL_MACHINE\\\\\\\\SOFTWARE\\\\\\\\Microsoft\\\\\\\\Windows NT\\\\\\\\CurrentVersion\\\\\\\\</kbd> registry value, for example _\\\"10.0 14393 (14393.1198.amd64fre.rs1_release_sec.170427-1353)\\\"_.",
-            "nullable": true,
-            "type": "string"
-          },
-          "labels": {
-            "description": "User-defined labels (key/value metadata) as set on the daemon.\n\n**Note**: When part of a Swarm, nodes can both have _daemon_ labels, set through the daemon configuration, and _node_ labels, set from a manager node in the Swarm. Node labels are not included in this field. Node labels can be retrieved using the `/nodes/(id)` endpoint on a manager node in the Swarm.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "live_restore_enabled": {
-            "description": "Indicates if live restore is enabled.  If enabled, containers are kept running when the daemon is shutdown or upon daemon start if running containers are detected.",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "logging_driver": {
-            "description": "The logging driver to use as a default for new containers.",
-            "nullable": true,
-            "type": "string"
-          },
-          "mem_total": {
-            "description": "Total amount of physical memory available on the host, in bytes.",
-            "format": "int64",
-            "nullable": true,
-            "type": "integer"
-          },
-          "memory_limit": {
-            "description": "Indicates if the host has memory limit support enabled.",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "n_events_listener": {
-            "description": "Number of event listeners subscribed.",
-            "format": "int64",
-            "nullable": true,
-            "type": "integer"
-          },
-          "n_fd": {
-            "description": "The total number of file Descriptors in use by the daemon process.  This information is only returned if debug-mode is enabled.",
-            "format": "int64",
-            "nullable": true,
-            "type": "integer"
-          },
-          "name": {
-            "description": "Hostname of the host.",
-            "nullable": true,
-            "type": "string"
-          },
-          "ncpu": {
-            "description": "The number of logical CPUs usable by the daemon.  The number of available CPUs is checked by querying the operating system when the daemon starts. Changes to operating system CPU allocation after the daemon is started are not reflected.",
-            "format": "int64",
-            "nullable": true,
-            "type": "integer"
-          },
-          "no_proxy": {
-            "description": "Comma-separated list of domain extensions for which no proxy should be used. This value is obtained from the [`NO_PROXY`](https://www.gnu.org/software/wget/manual/html_node/Proxies.html) environment variable.  Containers do not automatically inherit this configuration.",
-            "nullable": true,
-            "type": "string"
-          },
-          "oom_kill_disable": {
-            "description": "Indicates if OOM killer disable is supported on the host.",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "operating_system": {
-            "description": "Name of the host's operating system, for example: \\\"Ubuntu 16.04.2 LTS\\\" or \\\"Windows Server 2016 Datacenter\\\"",
-            "nullable": true,
-            "type": "string"
-          },
-          "os_type": {
-            "description": "Generic type of the operating system of the host, as returned by the Go runtime (`GOOS`).  Currently returned values are \\\"linux\\\" and \\\"windows\\\". A full list of possible values can be found in the [Go documentation](https://golang.org/doc/install/source#environment).",
-            "nullable": true,
-            "type": "string"
-          },
-          "os_version": {
-            "description": "Version of the host's operating system\n\n**Note**: The information returned in this field, including its very existence, and the formatting of values, should not be considered stable, and may change without notice.",
-            "nullable": true,
-            "type": "string"
-          },
-          "pids_limit": {
-            "description": "Indicates if the host kernel has PID limit support enabled.",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "plugins": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PluginsInfo"
-              }
-            ],
-            "nullable": true
-          },
-          "product_license": {
-            "description": "Reports a summary of the product license on the daemon.  If a commercial license has been applied to the daemon, information such as number of nodes, and expiration are included.",
-            "nullable": true,
-            "type": "string"
-          },
-          "registry_config": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RegistryServiceConfig"
-              }
-            ],
-            "nullable": true
-          },
-          "runc_commit": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Commit"
-              }
-            ],
-            "nullable": true
-          },
-          "runtimes": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/Runtime"
-            },
-            "type": "object"
-          },
-          "security_options": {
-            "description": "List of security features that are enabled on the daemon, such as apparmor, seccomp, SELinux, user-namespaces (userns), and rootless.  Additional configuration options for each security feature may be present, and are included as a comma-separated list of key/value pairs.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "server_version": {
-            "description": "Version string of the daemon. **Note**: the [standalone Swarm API](https://docs.docker.com/swarm/swarm-api/) returns the Swarm version instead of the daemon  version, for example `swarm/1.2.8`.",
-            "nullable": true,
-            "type": "string"
-          },
-          "swap_limit": {
-            "description": "Indicates if the host has memory swap limit support enabled.",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "system_time": {
-            "description": "The  number of goroutines that currently exist.  This information is only returned if debug-mode is enabled.",
-            "nullable": true,
-            "type": "string"
-          },
-          "warnings": {
-            "description": "List of warnings / informational messages about missing features, or issues related to the daemon configuration.  These messages can be printed by the client as information to the user.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          }
-        },
-        "type": "object"
-      },
       "EmailAuthenticationForm": {
         "description": "The body of the form for email authentication.",
         "properties": {
@@ -2939,60 +2580,6 @@
         },
         "required": [
           "email"
-        ],
-        "type": "object"
-      },
-      "EngineMetadata": {
-        "description": "Metadata about our currently running server.\n\nThis is mostly used for internal purposes and debugging.",
-        "properties": {
-          "async_jobs_running": {
-            "description": "If any async job is currently running.",
-            "type": "boolean"
-          },
-          "cache": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CacheMetadata"
-              }
-            ],
-            "description": "Metadata about our cache."
-          },
-          "environment": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Environment"
-              }
-            ],
-            "description": "The environment we are running in."
-          },
-          "fs": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/FileSystemMetadata"
-              }
-            ],
-            "description": "Metadata about our file system."
-          },
-          "git_hash": {
-            "description": "The git hash of the server.",
-            "type": "string"
-          },
-          "pubsub": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Connection"
-              }
-            ],
-            "description": "Metadata about our pub-sub connection."
-          }
-        },
-        "required": [
-          "async_jobs_running",
-          "cache",
-          "environment",
-          "fs",
-          "git_hash",
-          "pubsub"
         ],
         "type": "object"
       },
@@ -3169,37 +2756,6 @@
             "type": "string"
           }
         ]
-      },
-      "ExecutorMetadata": {
-        "description": "Metadata about our currently running server.\n\nThis is mostly used for internal purposes and debugging.",
-        "properties": {
-          "docker_info": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DockerSystemInfo"
-              }
-            ],
-            "description": "Information about the docker daemon."
-          },
-          "environment": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Environment"
-              }
-            ],
-            "description": "The environment we are running in."
-          },
-          "git_hash": {
-            "description": "The git hash of the server.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "docker_info",
-          "environment",
-          "git_hash"
-        ],
-        "type": "object"
       },
       "Export": {
         "description": "The response from the `Export` endpoint.",
@@ -4260,34 +3816,6 @@
         ],
         "type": "string"
       },
-      "IndexInfo": {
-        "description": "IndexInfo contains information about a registry.",
-        "properties": {
-          "mirrors": {
-            "description": "List of mirrors, expressed as URIs.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "name": {
-            "description": "Name of the registry, such as \\\"docker.io\\\".",
-            "nullable": true,
-            "type": "string"
-          },
-          "official": {
-            "description": "Indicates whether this is an official registry (i.e., Docker Hub / docker.io)",
-            "nullable": true,
-            "type": "boolean"
-          },
-          "secure": {
-            "description": "Indicates if the registry is part of the list of insecure registries.  If `false`, the registry is insecure. Insecure registries accept un-encrypted (HTTP) and/or untrusted (HTTPS with certificates from unknown CAs) communication.\n\n**Warning**: Insecure registries can be useful when running a local registry. However, because its use creates security vulnerabilities it should ONLY be enabled for testing purposes. For increased security, users should add their CA to their system's list of trusted CAs instead of enabling this option.",
-            "nullable": true,
-            "type": "boolean"
-          }
-        },
-        "type": "object"
-      },
       "InputFormat": {
         "description": "Input format specifier.",
         "oneOf": [
@@ -4459,22 +3987,25 @@
             "default": 0.0,
             "description": "Final amount due at this time for this invoice.\n\nIf the invoice's total is smaller than the minimum charge amount, for example, or if there is account credit that can be applied to the invoice, the `amount_due` may be 0. If there is a positive `starting_balance` for the invoice (the customer owes money), the `amount_due` will also take that into account. The charge that gets generated for the invoice will be for the amount specified in `amount_due`.",
             "format": "money-usd",
-            "title": "Number",
-            "type": "number"
+            "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+            "title": "Decimal",
+            "type": "string"
           },
           "amount_paid": {
             "default": 0.0,
             "description": "The amount, in USD, that was paid.",
             "format": "money-usd",
-            "title": "Number",
-            "type": "number"
+            "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+            "title": "Decimal",
+            "type": "string"
           },
           "amount_remaining": {
             "default": 0.0,
             "description": "The amount remaining, in USD, that is due.",
             "format": "money-usd",
-            "title": "Number",
-            "type": "number"
+            "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+            "title": "Decimal",
+            "type": "string"
           },
           "attempt_count": {
             "default": 0,
@@ -4581,22 +4112,25 @@
             "default": 0.0,
             "description": "Total of all subscriptions, invoice items, and prorations on the invoice before any invoice level discount or tax is applied.\n\nItem discounts are already incorporated.",
             "format": "money-usd",
-            "title": "Number",
-            "type": "number"
+            "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+            "title": "Decimal",
+            "type": "string"
           },
           "tax": {
             "default": 0.0,
             "description": "The amount of tax on this invoice.\n\nThis is the sum of all the tax amounts on this invoice.",
             "format": "money-usd",
-            "title": "Number",
-            "type": "number"
+            "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+            "title": "Decimal",
+            "type": "string"
           },
           "total": {
             "default": 0.0,
             "description": "Total after discounts and taxes.",
             "format": "money-usd",
-            "title": "Number",
-            "type": "number"
+            "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+            "title": "Decimal",
+            "type": "string"
           },
           "url": {
             "description": "The URL for the hosted invoice page, which allows customers to view and pay an invoice.",
@@ -4617,8 +4151,9 @@
             "default": 0.0,
             "description": "The amount, in USD.",
             "format": "money-usd",
-            "title": "Number",
-            "type": "number"
+            "pattern": "^-?[0-9]+(\\.[0-9]+)?$",
+            "title": "Decimal",
+            "type": "string"
           },
           "currency": {
             "allOf": [
@@ -4933,14 +4468,6 @@
             ],
             "description": "Metadata about our cache."
           },
-          "engine": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/EngineMetadata"
-              }
-            ],
-            "description": "Metadata about our engine API connection."
-          },
           "environment": {
             "allOf": [
               {
@@ -4948,14 +4475,6 @@
               }
             ],
             "description": "The environment we are running in."
-          },
-          "executor": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ExecutorMetadata"
-              }
-            ],
-            "description": "Metadata about our executor API connection."
           },
           "fs": {
             "allOf": [
@@ -4988,9 +4507,7 @@
         },
         "required": [
           "cache",
-          "engine",
           "environment",
-          "executor",
           "fs",
           "git_hash",
           "point_e",
@@ -6742,149 +6259,6 @@
         "format": "uuid",
         "type": "string"
       },
-      "ModelingCmdReq": {
-        "description": "A graphics command submitted to the KittyCAD engine via the Modeling API.",
-        "properties": {
-          "cmd": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ModelingCmd"
-              }
-            ],
-            "description": "Which command to submit to the Kittycad engine."
-          },
-          "cmd_id": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ModelingCmdId"
-              }
-            ],
-            "description": "ID of command being submitted."
-          }
-        },
-        "required": [
-          "cmd",
-          "cmd_id"
-        ],
-        "type": "object"
-      },
-      "ModelingCmdReqBatch": {
-        "description": "A batch set of graphics commands submitted to the KittyCAD engine via the Modeling API.",
-        "properties": {
-          "cmds": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/ModelingCmdReq"
-            },
-            "type": "object"
-          }
-        },
-        "required": [
-          "cmds"
-        ],
-        "type": "object"
-      },
-      "ModelingError": {
-        "description": "Why a command submitted to the Modeling API failed.",
-        "properties": {
-          "error_code": {
-            "description": "A string error code which refers to a family of errors. E.g. \"InvalidInput\".",
-            "type": "string"
-          },
-          "external_message": {
-            "description": "Describe the specific error which occurred. Will be shown to users, not logged.",
-            "type": "string"
-          },
-          "internal_message": {
-            "description": "Describe the specific error which occurred. Will be logged, not shown to users.",
-            "type": "string"
-          },
-          "status_code": {
-            "description": "A HTTP status code.",
-            "format": "uint16",
-            "minimum": 0,
-            "type": "integer"
-          }
-        },
-        "required": [
-          "error_code",
-          "external_message",
-          "internal_message",
-          "status_code"
-        ],
-        "type": "object"
-      },
-      "ModelingOutcome": {
-        "description": "The result from one modeling command in a batch.",
-        "oneOf": [
-          {
-            "additionalProperties": false,
-            "description": "Each successful command has some result.",
-            "properties": {
-              "success": {
-                "$ref": "#/components/schemas/OkModelingCmdResponse"
-              }
-            },
-            "required": [
-              "success"
-            ],
-            "type": "object"
-          },
-          {
-            "additionalProperties": false,
-            "description": "It failed. Why? See 'struct Error' above.",
-            "properties": {
-              "error": {
-                "$ref": "#/components/schemas/ModelingError"
-              }
-            },
-            "required": [
-              "error"
-            ],
-            "type": "object"
-          },
-          {
-            "additionalProperties": false,
-            "description": "Cancelled because it required the output of a previous command, which failed.",
-            "properties": {
-              "cancelled": {
-                "properties": {
-                  "what_failed": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/ModelingCmdId"
-                      }
-                    ],
-                    "description": "The ID of the command that failed, cancelling this command."
-                  }
-                },
-                "required": [
-                  "what_failed"
-                ],
-                "type": "object"
-              }
-            },
-            "required": [
-              "cancelled"
-            ],
-            "type": "object"
-          }
-        ]
-      },
-      "ModelingOutcomes": {
-        "description": "The result from a batch of modeling commands.",
-        "properties": {
-          "outcomes": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/ModelingOutcome"
-            },
-            "type": "object"
-          }
-        },
-        "required": [
-          "outcomes"
-        ],
-        "type": "object"
-      },
       "MouseClick": {
         "description": "The response from the `MouseClick` command.",
         "properties": {
@@ -8107,40 +7481,6 @@
         },
         "type": "object"
       },
-      "PluginsInfo": {
-        "description": "Available plugins per type.\n\n**Note**: Only unmanaged (V1) plugins are included in this list. V1 plugins are \\\"lazily\\\" loaded, and are not returned in this list if there is no resource using the plugin.",
-        "properties": {
-          "authorization": {
-            "description": "Names of available authorization plugins.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "log": {
-            "description": "Names of available logging-drivers, and logging-driver plugins.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "network": {
-            "description": "Names of available network-drivers, and network-driver plugins.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "volume": {
-            "description": "Names of available volume-drivers, and network-driver plugins.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          }
-        },
-        "type": "object"
-      },
       "PlyStorage": {
         "description": "The storage for the output PLY file.",
         "oneOf": [
@@ -8257,46 +7597,6 @@
         ],
         "type": "object"
       },
-      "RegistryServiceConfig": {
-        "description": "RegistryServiceConfig stores daemon registry services configuration.",
-        "properties": {
-          "allow_nondistributable_artifacts_cid_rs": {
-            "description": "List of IP ranges to which nondistributable artifacts can be pushed, using the CIDR syntax [RFC 4632](https://tools.ietf.org/html/4632).  Some images (for example, Windows base images) contain artifacts whose distribution is restricted by license. When these images are pushed to a registry, restricted artifacts are not included.  This configuration override this behavior, and enables the daemon to push nondistributable artifacts to all registries whose resolved IP address is within the subnet described by the CIDR syntax.  This option is useful when pushing images containing nondistributable artifacts to a registry on an air-gapped network so hosts on that network can pull the images without connecting to another server.\n\n**Warning**: Nondistributable artifacts typically have restrictions on how and where they can be distributed and shared. Only use this feature to push artifacts to private registries and ensure that you are in compliance with any terms that cover redistributing nondistributable artifacts.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "allow_nondistributable_artifacts_hostnames": {
-            "description": "List of registry hostnames to which nondistributable artifacts can be pushed, using the format `<hostname>[:<port>]` or `<IP address>[:<port>]`.  Some images (for example, Windows base images) contain artifacts whose distribution is restricted by license. When these images are pushed to a registry, restricted artifacts are not included.  This configuration override this behavior for the specified registries.  This option is useful when pushing images containing nondistributable artifacts to a registry on an air-gapped network so hosts on that network can pull the images without connecting to another server.\n\n**Warning**: Nondistributable artifacts typically have restrictions on how and where they can be distributed and shared. Only use this feature to push artifacts to private registries and ensure that you are in compliance with any terms that cover redistributing nondistributable artifacts.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "index_configs": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/IndexInfo"
-            },
-            "type": "object"
-          },
-          "insecure_registry_cid_rs": {
-            "description": "List of IP ranges of insecure registries, using the CIDR syntax ([RFC 4632](https://tools.ietf.org/html/4632)). Insecure registries accept un-encrypted (HTTP) and/or untrusted (HTTPS with certificates from unknown CAs) communication.  By default, local registries (`127.0.0.0/8`) are configured as insecure. All other registries are secure. Communicating with an insecure registry is not possible if the daemon assumes that registry is secure.  This configuration override this behavior, insecure communication with registries whose resolved IP address is within the subnet described by the CIDR syntax.  Registries can also be marked insecure by hostname. Those registries are listed under `IndexConfigs` and have their `Secure` field set to `false`.\n\n**Warning**: Using this option can be useful when running a local  registry, but introduces security vulnerabilities. This option should therefore ONLY be used for testing purposes. For increased security, users should add their CA to their system's list of trusted CAs instead of enabling this option.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "mirrors": {
-            "description": "List of registry URLs that act as a mirror for the official (`docker.io`) registry.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          }
-        },
-        "type": "object"
-      },
       "RtcIceCandidateInit": {
         "description": "ICECandidateInit is used to serialize ice candidates",
         "properties": {
@@ -8387,24 +7687,6 @@
           "sdp",
           "type"
         ],
-        "type": "object"
-      },
-      "Runtime": {
-        "description": "Runtime describes an [OCI compliant](https://github.com/opencontainers/runtime-spec) runtime.  The runtime is invoked by the daemon via the `containerd` daemon. OCI runtimes act as an interface to the Linux kernel namespaces, cgroups, and SELinux.",
-        "properties": {
-          "path": {
-            "description": "Name and, optional, path, of the OCI executable binary.  If the path is omitted, the daemon searches the host's `$PATH` for the binary and uses the first result.",
-            "nullable": true,
-            "type": "string"
-          },
-          "runtime_args": {
-            "description": "List of command-line arguments to pass to the runtime when invoked.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          }
-        },
         "type": "object"
       },
       "SceneSelectionType": {
@@ -8668,48 +7950,6 @@
           "up"
         ],
         "type": "object"
-      },
-      "SystemInfoCgroupDriverEnum": {
-        "enum": [
-          "",
-          "cgroupfs",
-          "systemd",
-          "none"
-        ],
-        "type": "string"
-      },
-      "SystemInfoCgroupVersionEnum": {
-        "enum": [
-          "",
-          "1",
-          "2"
-        ],
-        "type": "string"
-      },
-      "SystemInfoDefaultAddressPools": {
-        "properties": {
-          "base": {
-            "description": "The network address in CIDR format",
-            "nullable": true,
-            "type": "string"
-          },
-          "size": {
-            "description": "The network pool size",
-            "format": "int64",
-            "nullable": true,
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
-      "SystemInfoIsolationEnum": {
-        "enum": [
-          "",
-          "default",
-          "hyperv",
-          "process"
-        ],
-        "type": "string"
       },
       "TakeSnapshot": {
         "description": "The response from the `TakeSnapshot` command.",
@@ -13523,257 +12763,6 @@
         },
         "summary": "This endpoint removes the session cookie for a user.",
         "tags": [
-          "hidden"
-        ]
-      }
-    },
-    "/modeling/cmd": {
-      "options": {
-        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_cmd",
-        "responses": {
-          "204": {
-            "description": "successful operation, no content",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "summary": "OPTIONS endpoint.",
-        "tags": [
-          "hidden"
-        ]
-      },
-      "post": {
-        "description": "Response depends on which command was submitted, so unfortunately the OpenAPI schema can't generate the right response type.",
-        "operationId": "cmd",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ModelingCmdReq"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OkModelingCmdResponse"
-                }
-              }
-            },
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "summary": "Submit one modeling operation.",
-        "tags": [
-          "modeling",
-          "hidden"
-        ]
-      }
-    },
-    "/modeling/cmd-batch": {
-      "options": {
-        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_cmd_batch",
-        "responses": {
-          "204": {
-            "description": "successful operation, no content",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "summary": "OPTIONS endpoint.",
-        "tags": [
-          "hidden"
-        ]
-      },
-      "post": {
-        "operationId": "cmd_batch",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ModelingCmdReqBatch"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ModelingOutcomes"
-                }
-              }
-            },
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                },
-                "style": "simple"
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "summary": "Submit many modeling operations.",
-        "tags": [
-          "modeling",
           "hidden"
         ]
       }

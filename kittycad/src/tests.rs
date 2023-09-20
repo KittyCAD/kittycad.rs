@@ -3,7 +3,7 @@ use futures::TryStreamExt;
 use pretty_assertions::assert_eq;
 use tokio_tungstenite::tungstenite::Message as WsMsg;
 
-use crate::types::{ModelingCmd, ModelingCmdReq, PathSegment, Point3D};
+use crate::types::{ModelingCmd, PathSegment, Point3D, WebSocketRequest::ModelingCmdReq};
 
 fn test_client() -> crate::Client {
     crate::Client::new_from_env()

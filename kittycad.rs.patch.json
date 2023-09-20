@@ -193,22 +193,6 @@
   },
   {
     "op": "add",
-    "path": "/paths/~1modeling~1cmd/post/x-rust",
-    "value": {
-      "example": "/// Submit one modeling operation.\n/// \n/// Response depends on which command was submitted, so unfortunately the OpenAPI schema can't generate the right response type.\nuse std::str::FromStr;\nasync fn example_modeling_cmd() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OkModelingCmdResponse = client\n        .modeling()\n        .cmd(&kittycad::types::ModelingCmdReq {\n            cmd: kittycad::types::ModelingCmd::CameraDragEnd {\n                interaction: kittycad::types::CameraDragInteractionType::Zoom,\n                window: kittycad::types::Point2D {\n                    x: 3.14 as f64,\n                    y: 3.14 as f64,\n                },\n            },\n            cmd_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/modeling/struct.Modeling.html#method.cmd"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1modeling~1cmd-batch/post/x-rust",
-    "value": {
-      "example": "/// Submit many modeling operations.\nuse std::str::FromStr;\nasync fn example_modeling_cmd_batch() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ModelingOutcomes = client\n        .modeling()\n        .cmd_batch(&kittycad::types::ModelingCmdReqBatch {\n            cmds: std::collections::HashMap::from([(\n                \"some-key\".to_string(),\n                kittycad::types::ModelingCmdReq {\n                    cmd: kittycad::types::ModelingCmd::CameraDragEnd {\n                        interaction: kittycad::types::CameraDragInteractionType::Zoom,\n                        window: kittycad::types::Point2D {\n                            x: 3.14 as f64,\n                            y: 3.14 as f64,\n                        },\n                    },\n                    cmd_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                },\n            )]),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/modeling/struct.Modeling.html#method.cmd_batch"
-    }
-  },
-  {
-    "op": "add",
     "path": "/paths/~1oauth2~1device~1auth/post/x-rust",
     "value": {
       "example": "/// Start an OAuth 2.0 Device Authorization Grant.\n/// \n/// This endpoint is designed to be accessed from an *unauthenticated* API client. It generates and records a `device_code` and `user_code` which must be verified and confirmed prior to a token being granted.\nuse std::str::FromStr;\nasync fn example_oauth2_device_auth_request() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_auth_request(&kittycad::types::DeviceAuthRequestForm {\n            client_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        })\n        .await?;\n    Ok(())\n}\n",
