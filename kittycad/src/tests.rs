@@ -244,7 +244,10 @@ async fn test_modeling_websocket() {
                 serde_json::to_string(&ModelingCmdReq {
                     cmd: ModelingCmd::ExtendPath {
                         path: path_id,
-                        segment: PathSegment::Line { end: point },
+                        segment: PathSegment::Line {
+                            end: point,
+                            relative: false,
+                        },
                     },
                     cmd_id: Uuid::new_v4(),
                 })

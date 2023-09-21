@@ -7245,6 +7245,10 @@
                 ],
                 "description": "End point of the line."
               },
+              "relative": {
+                "description": "Whether or not this line is a relative offset",
+                "type": "boolean"
+              },
               "type": {
                 "enum": [
                   "line"
@@ -7254,6 +7258,7 @@
             },
             "required": [
               "end",
+              "relative",
               "type"
             ],
             "type": "object"
@@ -7284,6 +7289,10 @@
                 "format": "double",
                 "type": "number"
               },
+              "relative": {
+                "description": "Whether or not this arc is a relative offset",
+                "type": "boolean"
+              },
               "type": {
                 "enum": [
                   "arc"
@@ -7296,6 +7305,7 @@
               "angle_start",
               "center",
               "radius",
+              "relative",
               "type"
             ],
             "type": "object"
@@ -7327,6 +7337,10 @@
                 ],
                 "description": "Final control point."
               },
+              "relative": {
+                "description": "Whether or not this bezier is a relative offset",
+                "type": "boolean"
+              },
               "type": {
                 "enum": [
                   "bezier"
@@ -7338,6 +7352,7 @@
               "control1",
               "control2",
               "end",
+              "relative",
               "type"
             ],
             "type": "object"
@@ -7363,10 +7378,15 @@
             ],
             "description": "Which command created this path? This field is absent if the path command is not actually creating a path segment, e.g. moving the pen doesn't create a path segment.",
             "nullable": true
+          },
+          "relative": {
+            "description": "Whether or not this segment is a relative offset",
+            "type": "boolean"
           }
         },
         "required": [
-          "command"
+          "command",
+          "relative"
         ],
         "type": "object"
       },

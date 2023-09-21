@@ -6979,19 +6979,21 @@ impl tabled::Tabled for PathGetInfo {
 #[serde(tag = "type")]
 pub enum PathSegment {
     #[serde(rename = "line")]
-    Line { end: Point3D },
+    Line { end: Point3D, relative: bool },
     #[serde(rename = "arc")]
     Arc {
         angle_end: f64,
         angle_start: f64,
         center: Point2D,
         radius: f64,
+        relative: bool,
     },
     #[serde(rename = "bezier")]
     Bezier {
         control1: Point3D,
         control2: Point3D,
         end: Point3D,
+        relative: bool,
     },
 }
 
@@ -7006,6 +7008,8 @@ pub struct PathSegmentInfo {
              actually creating a path segment, e.g. moving the pen doesn't create a path segment."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub command_id: Option<uuid::Uuid>,
+    #[doc = "Whether or not this segment is a relative offset"]
+    pub relative: bool,
 }
 
 impl std::fmt::Display for PathSegmentInfo {
@@ -7020,7 +7024,7 @@ impl std::fmt::Display for PathSegmentInfo {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for PathSegmentInfo {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.command).into(),
@@ -7029,11 +7033,12 @@ impl tabled::Tabled for PathSegmentInfo {
             } else {
                 String::new().into()
             },
+            format!("{:?}", self.relative).into(),
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["command".into(), "command_id".into()]
+        vec!["command".into(), "command_id".into(), "relative".into()]
     }
 }
 
