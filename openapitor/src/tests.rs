@@ -207,7 +207,7 @@ fn test_remote_generation(ctx: &mut TestContext) {
     let test_file = include_str!("../tests/library/remote.tests.rs");
     // Write our temporary file.
     let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
-    std::fs::write(&test_file_path, test_file).unwrap();
+    std::fs::write(test_file_path, test_file).unwrap();
 
     // Generate the library.
     crate::generate(&spec, &opts).unwrap();
@@ -240,7 +240,7 @@ fn test_twilio_generation(ctx: &mut TestContext) {
     let test_file = include_str!("../tests/library/twilio.tests.rs");
     // Write our temporary file.
     let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
-    std::fs::write(&test_file_path, test_file).unwrap();
+    std::fs::write(test_file_path, test_file).unwrap();
 
     // Generate the library.
     crate::generate(&spec, &opts).unwrap();
@@ -351,7 +351,7 @@ fn test_commonroom_generation(ctx: &mut TestContext) {
     let test_file = include_str!("../tests/library/commonroom.tests.rs");
     // Write our temporary file.
     let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
-    std::fs::write(&test_file_path, test_file).unwrap();
+    std::fs::write(test_file_path, test_file).unwrap();
 
     // Generate the library.
     crate::generate(&spec, &opts).unwrap();

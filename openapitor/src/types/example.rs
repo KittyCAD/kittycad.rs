@@ -683,19 +683,18 @@ pub fn generate_example_rust_from_schema(
                 let (values, _) = ts.get_one_of_values(name, one_of, &tag_result, false)?;
 
                 if let Some((mut k, v)) = values.into_iter().next() {
-                    match &v {
-                        openapiv3::ReferenceOr::Item(i) => match &i.schema_kind {
+                    if let openapiv3::ReferenceOr::Item(i) = &v {
+                        match &i.schema_kind {
                             openapiv3::SchemaKind::Type(Type::Object(o))
                                 if o.properties.len() == 1 =>
                             {
                                 // Enum variants should be named after their nested object.
                                 // E.g. instead of ModelingCmd::ModelingCmd, it should be
                                 // ModelingCmd::ModelingCmdCameraDragStart.
-                                k.push_str(o.properties.first().clone().unwrap().0);
+                                k.push_str(o.properties.first().unwrap().0);
                             }
                             _ => {}
-                        },
-                        _ => {}
+                        }
                     };
 
                     let enum_name: proc_macro2::TokenStream =

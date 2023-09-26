@@ -599,10 +599,7 @@ fn get_args(
     let path_params = get_path_params(type_space, op, global_params)?;
     let query_params = get_query_params(type_space, op, global_params)?;
 
-    Ok(path_params
-        .into_iter()
-        .chain(query_params.into_iter())
-        .collect())
+    Ok(path_params.into_iter().chain(query_params).collect())
 }
 
 /// Return the request body type for the operation.

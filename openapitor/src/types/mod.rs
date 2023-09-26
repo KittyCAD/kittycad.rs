@@ -24,7 +24,7 @@ use crate::types::exts::{
 /// Regex to detect weird descriptions in OpenAPI specs.
 /// Rustdoc interprets the indented lines as a code block, and tries to run them
 /// as code. They aren't always code though.
-static LEADING_SPACES: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\n +"#).unwrap());
+static LEADING_SPACES: Lazy<Regex> = Lazy::new(|| Regex::new(r"\n +").unwrap());
 
 /// Collapse leading spaces at the beginning of lines.
 pub fn sanitize_indents(s: &str) -> std::borrow::Cow<'_, str> {
@@ -1220,22 +1220,20 @@ impl TypeSpace {
                                     #enum_object_internal,
                                 );
                             }
+                        } else if p != tag_name {
+                            // Rename serde to the correct tag name.
+                            rendered_value = quote!(
+                                #rendered_value
+
+                                #[serde(rename = #tag_name)]
+                                #n(#content_name),
+                            );
                         } else {
-                            if p != tag_name {
-                                // Rename serde to the correct tag name.
-                                rendered_value = quote!(
-                                    #rendered_value
+                            rendered_value = quote!(
+                                #rendered_value
 
-                                    #[serde(rename = #tag_name)]
-                                    #n(#content_name),
-                                );
-                            } else {
-                                rendered_value = quote!(
-                                    #rendered_value
-
-                                    #n(#content_name),
-                                );
-                            }
+                                #n(#content_name),
+                            );
                         }
                     } else {
                         // Render this object.
@@ -1791,6 +1789,21 @@ fn render_enum_object_internal(
             get_type_name_from_reference(&v.reference()?, spec, true)?
         };
 
+        // Get the schema for the property.
+        let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
+            let s = &**i;
+            s.clone()
+        } else {
+            v.get_schema_from_reference(spec, true)?
+        };
+
+        let description = if let Some(d) = &inner_schema.schema_data.description {
+            let d_sanitized = sanitize_indents(d);
+            quote!(#[doc = #d_sanitized])
+        } else {
+            quote!()
+        };
+
         // Check if this type is required.
         if !o.required.contains(k) && !type_name.is_option()? {
             // Make the type optional.
@@ -1805,6 +1818,7 @@ fn render_enum_object_internal(
         values = quote!(
             #values
 
+            #description
             #prop_value
         );
     }
@@ -2048,10 +2062,10 @@ fn get_type_name(name: &str, data: &openapiv3::SchemaData) -> Result<proc_macro2
 fn clean_text(s: &str) -> String {
     // Add newlines after end-braces at <= two levels of indentation.
     if cfg!(not(windows)) {
-        let regex = regex::Regex::new(r#"(})(\n\s{0,8}[^} ])"#).unwrap();
+        let regex = regex::Regex::new(r"(})(\n\s{0,8}[^} ])").unwrap();
         regex.replace_all(s, "$1\n$2").to_string()
     } else {
-        let regex = regex::Regex::new(r#"(})(\r\n\s{0,8}[^} ])"#).unwrap();
+        let regex = regex::Regex::new(r"(})(\r\n\s{0,8}[^} ])").unwrap();
         regex.replace_all(s, "$1\r\n$2").to_string()
     }
 }
@@ -2486,7 +2500,7 @@ mod test {
 
     #[test]
     fn test_schema_parsing_one_of_enum_needs_gen() {
-        let schema = r##"{
+        let schema = r#"{
         "oneOf": [
           {
             "type": "object",
@@ -2507,7 +2521,7 @@ mod test {
             ]
           }
         ]
-        }"##;
+        }"#;
 
         let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
 
