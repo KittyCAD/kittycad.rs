@@ -1126,6 +1126,13 @@ impl TypeSpace {
             for one_of in one_ofs {
                 // Get the schema for this OneOf.
                 let schema = one_of.get_schema_from_reference(&self.spec, true)?;
+                let mut description = if let Some(d) = &schema.schema_data.description {
+                    let d_sanitized = sanitize_indents(d);
+                    quote!(#[doc = #d_sanitized])
+                } else {
+                    quote!()
+                };
+
                 if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind
                 {
                     // Get the value of this tag.
@@ -1147,12 +1154,14 @@ impl TypeSpace {
                         tag_schema.get_schema_from_reference(&self.spec, true)?
                     };
 
-                    let description = if let Some(d) = &inner_schema.schema_data.description {
-                        let d_sanitized = sanitize_indents(d);
-                        quote!(#[doc = #d_sanitized])
-                    } else {
-                        quote!()
-                    };
+                    if description.is_empty() {
+                        description = if let Some(d) = &inner_schema.schema_data.description {
+                            let d_sanitized = sanitize_indents(d);
+                            quote!(#[doc = #d_sanitized])
+                        } else {
+                            quote!()
+                        };
+                    }
 
                     let tag_name = if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
                         inner_schema.schema_kind
