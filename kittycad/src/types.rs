@@ -1728,92 +1728,165 @@ impl tabled::Tabled for AsyncApiCall {
 pub enum AsyncApiCallOutput {
     #[serde(rename = "file_conversion")]
     FileConversion {
+        #[doc = "The time and date the API call was completed."]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
         error: Option<String>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
+        #[doc = "The output format of the file conversion."]
         output_format: FileExportFormat,
+        #[doc = "The output format options of the file conversion."]
         output_format_options: Option<OutputFormat>,
+        #[doc = "The converted files (if multiple file conversion), if completed, base64 encoded. \
+                 The key of the map is the path of the output file."]
         outputs: Option<std::collections::HashMap<String, base64::Base64Data>>,
+        #[doc = "The source format of the file conversion."]
         src_format: FileImportFormat,
+        #[doc = "The source format options of the file conversion."]
         src_format_options: Option<InputFormat>,
+        #[doc = "The time and date the API call was started."]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
         status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
         user_id: Option<String>,
     },
     #[serde(rename = "file_center_of_mass")]
     FileCenterOfMass {
+        #[doc = "The resulting center of mass."]
         center_of_mass: Option<Point3D>,
+        #[doc = "The time and date the API call was completed."]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
         error: Option<String>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
+        #[doc = "The output unit for the center of mass."]
         output_unit: UnitLength,
+        #[doc = "The source format of the file."]
         src_format: FileImportFormat,
+        #[doc = "The time and date the API call was started."]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
         status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
         user_id: Option<String>,
     },
     #[serde(rename = "file_mass")]
     FileMass {
+        #[doc = "The time and date the API call was completed."]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
         error: Option<String>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
+        #[doc = "The resulting mass."]
         mass: Option<f64>,
+        #[doc = "The material density as denoted by the user."]
         material_density: Option<f64>,
+        #[doc = "The material density unit."]
         material_density_unit: UnitDensity,
+        #[doc = "The output unit for the mass."]
         output_unit: UnitMass,
+        #[doc = "The source format of the file."]
         src_format: FileImportFormat,
+        #[doc = "The time and date the API call was started."]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
         status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
         user_id: Option<String>,
     },
     #[serde(rename = "file_volume")]
     FileVolume {
+        #[doc = "The time and date the API call was completed."]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
         error: Option<String>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
+        #[doc = "The output unit for the volume."]
         output_unit: UnitVolume,
+        #[doc = "The source format of the file."]
         src_format: FileImportFormat,
+        #[doc = "The time and date the API call was started."]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
         status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
         user_id: Option<String>,
+        #[doc = "The resulting volume."]
         volume: Option<f64>,
     },
     #[serde(rename = "file_density")]
     FileDensity {
+        #[doc = "The time and date the API call was completed."]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The resulting density."]
         density: Option<f64>,
+        #[doc = "The error the function returned, if any."]
         error: Option<String>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
+        #[doc = "The material mass as denoted by the user."]
         material_mass: Option<f64>,
+        #[doc = "The material mass unit."]
         material_mass_unit: UnitMass,
+        #[doc = "The output unit for the density."]
         output_unit: UnitDensity,
+        #[doc = "The source format of the file."]
         src_format: FileImportFormat,
+        #[doc = "The time and date the API call was started."]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
         status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
         user_id: Option<String>,
     },
     #[serde(rename = "file_surface_area")]
     FileSurfaceArea {
+        #[doc = "The time and date the API call was completed."]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
         error: Option<String>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
+        #[doc = "The output unit for the surface area."]
         output_unit: UnitArea,
+        #[doc = "The source format of the file."]
         src_format: FileImportFormat,
+        #[doc = "The time and date the API call was started."]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
         status: ApiCallStatus,
+        #[doc = "The resulting surface area."]
         surface_area: Option<f64>,
+        #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
         user_id: Option<String>,
     },
 }
@@ -5434,15 +5507,36 @@ pub enum InputFormat {
     #[serde(rename = "gltf")]
     Gltf {},
     #[serde(rename = "obj")]
-    Obj { coords: System, units: UnitLength },
+    Obj {
+        #[doc = "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
+        coords: System,
+        #[doc = "The units of the input data. This is very important for correct scaling and when \
+                 calculating physics properties like mass, etc.\n\nDefaults to meters."]
+        units: UnitLength,
+    },
     #[serde(rename = "ply")]
-    Ply { coords: System, units: UnitLength },
+    Ply {
+        #[doc = "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
+        coords: System,
+        #[doc = "The units of the input data. This is very important for correct scaling and when \
+                 calculating physics properties like mass, etc."]
+        units: UnitLength,
+    },
     #[serde(rename = "sldprt")]
     Sldprt {},
     #[serde(rename = "step")]
     Step {},
     #[serde(rename = "stl")]
-    Stl { coords: System, units: UnitLength },
+    Stl {
+        #[doc = "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
+        coords: System,
+        #[doc = "The units of the input data. This is very important for correct scaling and when \
+                 calculating physics properties like mass, etc."]
+        units: UnitLength,
+    },
 }
 
 #[doc = "An invoice."]
@@ -6423,249 +6517,469 @@ pub enum ModelingCmd {
     #[serde(rename = "start_path")]
     StartPath {},
     #[serde(rename = "move_path_pen")]
-    MovePathPen { path: uuid::Uuid, to: Point3D },
+    MovePathPen {
+        #[doc = "The ID of the command which created the path."]
+        path: uuid::Uuid,
+        #[doc = "Where the path's pen should be."]
+        to: Point3D,
+    },
     #[serde(rename = "extend_path")]
     ExtendPath {
+        #[doc = "The ID of the command which created the path."]
         path: uuid::Uuid,
+        #[doc = "Segment to append to the path. This segment will implicitly begin at the current \
+                 \"pen\" location."]
         segment: PathSegment,
     },
     #[serde(rename = "extrude")]
     Extrude {
+        #[doc = "Whether to cap the extrusion with a face, or not. If true, the resulting solid \
+                 will be closed on all sides, like a dice. If false, it will be open on one side, \
+                 like a drinking glass."]
         cap: bool,
+        #[doc = "How far off the plane to extrude"]
         distance: f64,
+        #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
         target: uuid::Uuid,
     },
     #[serde(rename = "close_path")]
-    ClosePath { path_id: uuid::Uuid },
+    ClosePath {
+        #[doc = "Which path to close."]
+        path_id: uuid::Uuid,
+    },
     #[serde(rename = "camera_drag_start")]
     CameraDragStart {
+        #[doc = "The type of camera drag interaction."]
         interaction: CameraDragInteractionType,
+        #[doc = "The initial mouse position."]
         window: Point2D,
     },
     #[serde(rename = "camera_drag_move")]
     CameraDragMove {
+        #[doc = "The type of camera drag interaction."]
         interaction: CameraDragInteractionType,
+        #[doc = "Logical timestamp. The client should increment this with every event in the \
+                 current mouse drag. That way, if the events are being sent over an unordered \
+                 channel, the API can ignore the older events."]
         sequence: Option<u32>,
+        #[doc = "The current mouse position."]
         window: Point2D,
     },
     #[serde(rename = "camera_drag_end")]
     CameraDragEnd {
+        #[doc = "The type of camera drag interaction."]
         interaction: CameraDragInteractionType,
+        #[doc = "The final mouse position."]
         window: Point2D,
     },
     #[serde(rename = "default_camera_look_at")]
     DefaultCameraLookAt {
+        #[doc = "What the camera is looking at. Center of the camera's field of vision"]
         center: Point3D,
+        #[doc = "Which way is \"up\", from the camera's point of view."]
         up: Point3D,
+        #[doc = "Where the camera is positioned"]
         vantage: Point3D,
     },
     #[serde(rename = "default_camera_zoom")]
-    DefaultCameraZoom { magnitude: f64 },
+    DefaultCameraZoom {
+        #[doc = "Move the camera forward along the vector it's looking at, by this \
+                 magnitudedefaultCameraZoom. Basically, how much should the camera move forward \
+                 by."]
+        magnitude: f64,
+    },
     #[serde(rename = "default_camera_enable_sketch_mode")]
     DefaultCameraEnableSketchMode {
+        #[doc = "Should we animate or snap for the camera transition?"]
         animated: bool,
+        #[doc = "How far to the sketching plane?"]
         distance_to_plane: f64,
+        #[doc = "What's the origin of the sketching plane?"]
         origin: Point3D,
+        #[doc = "Should the camera use orthographic projection? In other words, should an \
+                 object's size in the rendered image stay constant regardless of its distance \
+                 from the camera."]
         ortho: bool,
+        #[doc = "Which 3D axis of the scene should be the X axis of the sketching plane?"]
         x_axis: Point3D,
+        #[doc = "Which 3D axis of the scene should be the Y axis of the sketching plane?"]
         y_axis: Point3D,
     },
     #[serde(rename = "default_camera_disable_sketch_mode")]
     DefaultCameraDisableSketchMode {},
     #[serde(rename = "export")]
     Export {
+        #[doc = "IDs of the entities to be exported. If this is empty, then all entities are \
+                 exported."]
         entity_ids: Vec<uuid::Uuid>,
+        #[doc = "The file format to export to."]
         format: OutputFormat,
     },
     #[serde(rename = "entity_get_parent_id")]
-    EntityGetParentId { entity_id: uuid::Uuid },
+    EntityGetParentId {
+        #[doc = "ID of the entity being queried."]
+        entity_id: uuid::Uuid,
+    },
     #[serde(rename = "entity_get_num_children")]
-    EntityGetNumChildren { entity_id: uuid::Uuid },
+    EntityGetNumChildren {
+        #[doc = "ID of the entity being queried."]
+        entity_id: uuid::Uuid,
+    },
     #[serde(rename = "entity_get_child_uuid")]
     EntityGetChildUuid {
+        #[doc = "Index into the entity's list of children."]
         child_index: u32,
+        #[doc = "ID of the entity being queried."]
         entity_id: uuid::Uuid,
     },
     #[serde(rename = "entity_get_all_child_uuids")]
-    EntityGetAllChildUuids { entity_id: uuid::Uuid },
+    EntityGetAllChildUuids {
+        #[doc = "ID of the entity being queried."]
+        entity_id: uuid::Uuid,
+    },
     #[serde(rename = "edit_mode_enter")]
-    EditModeEnter { target: uuid::Uuid },
+    EditModeEnter {
+        #[doc = "The edit target"]
+        target: uuid::Uuid,
+    },
     #[serde(rename = "edit_mode_exit")]
     EditModeExit {},
     #[serde(rename = "select_with_point")]
     SelectWithPoint {
+        #[doc = "Where in the window was selected"]
         selected_at_window: Point2D,
+        #[doc = "What entity was selected?"]
         selection_type: SceneSelectionType,
     },
     #[serde(rename = "select_clear")]
     SelectClear {},
     #[serde(rename = "select_add")]
-    SelectAdd { entities: Vec<uuid::Uuid> },
+    SelectAdd {
+        #[doc = "Which entities to select"]
+        entities: Vec<uuid::Uuid>,
+    },
     #[serde(rename = "select_remove")]
-    SelectRemove { entities: Vec<uuid::Uuid> },
+    SelectRemove {
+        #[doc = "Which entities to unselect"]
+        entities: Vec<uuid::Uuid>,
+    },
     #[serde(rename = "select_replace")]
-    SelectReplace { entities: Vec<uuid::Uuid> },
+    SelectReplace {
+        #[doc = "Which entities to select"]
+        entities: Vec<uuid::Uuid>,
+    },
     #[serde(rename = "select_get")]
     SelectGet {},
     #[serde(rename = "highlight_set_entity")]
     HighlightSetEntity {
+        #[doc = "Coordinates of the window being clicked"]
         selected_at_window: Point2D,
+        #[doc = "Logical timestamp. The client should increment this with every event in the \
+                 current mouse drag. That way, if the events are being sent over an unordered \
+                 channel, the API can ignore the older events."]
         sequence: Option<u32>,
     },
     #[serde(rename = "highlight_set_entities")]
-    HighlightSetEntities { entities: Vec<uuid::Uuid> },
+    HighlightSetEntities {
+        #[doc = "Highlight these entities."]
+        entities: Vec<uuid::Uuid>,
+    },
     #[serde(rename = "new_annotation")]
     NewAnnotation {
+        #[doc = "What type of annotation to create."]
         annotation_type: AnnotationType,
+        #[doc = "If true, any existing drawables within the obj will be replaced (the object will \
+                 be reset)"]
         clobber: bool,
+        #[doc = "What should the annotation contain?"]
         options: AnnotationOptions,
     },
     #[serde(rename = "update_annotation")]
     UpdateAnnotation {
+        #[doc = "Which annotation to update"]
         annotation_id: uuid::Uuid,
+        #[doc = "If any of these fields are set, they will overwrite the previous options for the \
+                 annotation."]
         options: AnnotationOptions,
     },
     #[serde(rename = "object_visible")]
-    ObjectVisible { hidden: bool, object_id: uuid::Uuid },
+    ObjectVisible {
+        #[doc = "Whether or not the object should be hidden."]
+        hidden: bool,
+        #[doc = "Which object to change"]
+        object_id: uuid::Uuid,
+    },
     #[serde(rename = "get_entity_type")]
-    GetEntityType { entity_id: uuid::Uuid },
+    GetEntityType {
+        #[doc = "ID of the entity being queried."]
+        entity_id: uuid::Uuid,
+    },
     #[serde(rename = "solid3d_get_all_edge_faces")]
     Solid3DGetAllEdgeFaces {
+        #[doc = "Which edge you want the faces of."]
         edge_id: uuid::Uuid,
+        #[doc = "Which object is being queried."]
         object_id: uuid::Uuid,
     },
     #[serde(rename = "solid3d_get_all_opposite_edges")]
     Solid3DGetAllOppositeEdges {
+        #[doc = "If given, ohnly faces parallel to this vector will be considered."]
         along_vector: Option<Point3D>,
+        #[doc = "Which edge you want the opposites of."]
         edge_id: uuid::Uuid,
+        #[doc = "Which object is being queried."]
         object_id: uuid::Uuid,
     },
     #[serde(rename = "solid3d_get_opposite_edge")]
     Solid3DGetOppositeEdge {
+        #[doc = "Which edge you want the opposite of."]
         edge_id: uuid::Uuid,
+        #[doc = "Which face is used to figure out the opposite edge?"]
         face_id: uuid::Uuid,
+        #[doc = "Which object is being queried."]
         object_id: uuid::Uuid,
     },
     #[serde(rename = "solid3d_get_next_adjacent_edge")]
     Solid3DGetNextAdjacentEdge {
+        #[doc = "Which edge you want the opposite of."]
         edge_id: uuid::Uuid,
+        #[doc = "Which face is used to figure out the opposite edge?"]
         face_id: uuid::Uuid,
+        #[doc = "Which object is being queried."]
         object_id: uuid::Uuid,
     },
     #[serde(rename = "solid3d_get_prev_adjacent_edge")]
     Solid3DGetPrevAdjacentEdge {
+        #[doc = "Which edge you want the opposite of."]
         edge_id: uuid::Uuid,
+        #[doc = "Which face is used to figure out the opposite edge?"]
         face_id: uuid::Uuid,
+        #[doc = "Which object is being queried."]
         object_id: uuid::Uuid,
     },
     #[serde(rename = "send_object")]
-    SendObject { front: bool, object_id: uuid::Uuid },
+    SendObject {
+        #[doc = "Bring to front = true, send to back = false."]
+        front: bool,
+        #[doc = "Which object is being changed."]
+        object_id: uuid::Uuid,
+    },
     #[serde(rename = "entity_set_opacity")]
-    EntitySetOpacity { entity_id: uuid::Uuid, opacity: f64 },
+    EntitySetOpacity {
+        #[doc = "Which entity is being changed."]
+        entity_id: uuid::Uuid,
+        #[doc = "How transparent should it be? 0 or lower is totally transparent. 1 or greater is \
+                 totally opaque."]
+        opacity: f64,
+    },
     #[serde(rename = "entity_fade")]
     EntityFade {
+        #[doc = "How many seconds the animation should take."]
         duration_seconds: Option<f64>,
+        #[doc = "Which entity is being changed."]
         entity_id: uuid::Uuid,
+        #[doc = "Fade in = true, fade out = false."]
         fade_in: bool,
     },
     #[serde(rename = "make_plane")]
     MakePlane {
+        #[doc = "If true, any existing drawables within the obj will be replaced (the object will \
+                 be reset)"]
         clobber: bool,
+        #[doc = "Origin of the plane"]
         origin: Point3D,
+        #[doc = "What should the plane's span/extent? When rendered visually, this is both the \
+                 width and height along X and Y axis respectively."]
         size: f64,
+        #[doc = "What should the plane's X axis be?"]
         x_axis: Point3D,
+        #[doc = "What should the plane's Y axis be?"]
         y_axis: Point3D,
     },
     #[serde(rename = "plane_set_color")]
-    PlaneSetColor { color: Color, plane_id: uuid::Uuid },
+    PlaneSetColor {
+        #[doc = "What color it should be."]
+        color: Color,
+        #[doc = "Which plane is being changed."]
+        plane_id: uuid::Uuid,
+    },
     #[serde(rename = "set_tool")]
-    SetTool { tool: SceneToolType },
+    SetTool {
+        #[doc = "What tool should be active."]
+        tool: SceneToolType,
+    },
     #[serde(rename = "mouse_move")]
     MouseMove {
+        #[doc = "Logical timestamp. The client should increment this with every event in the \
+                 current mouse drag. That way, if the events are being sent over an unordered \
+                 channel, the API can ignore the older events."]
         sequence: Option<u32>,
+        #[doc = "Where the mouse is"]
         window: Point2D,
     },
     #[serde(rename = "mouse_click")]
-    MouseClick { window: Point2D },
+    MouseClick {
+        #[doc = "Where the mouse is"]
+        window: Point2D,
+    },
     #[serde(rename = "sketch_mode_enable")]
     SketchModeEnable {
+        #[doc = "Animate the transition to sketch mode."]
         animated: bool,
+        #[doc = "Use an orthographic camera."]
         ortho: bool,
+        #[doc = "Sketch on this plane."]
         plane_id: uuid::Uuid,
     },
     #[serde(rename = "sketch_mode_disable")]
     SketchModeDisable {},
     #[serde(rename = "curve_get_type")]
-    CurveGetType { curve_id: uuid::Uuid },
+    CurveGetType {
+        #[doc = "Which curve to query."]
+        curve_id: uuid::Uuid,
+    },
     #[serde(rename = "curve_get_control_points")]
-    CurveGetControlPoints { curve_id: uuid::Uuid },
+    CurveGetControlPoints {
+        #[doc = "Which curve to query."]
+        curve_id: uuid::Uuid,
+    },
     #[serde(rename = "take_snapshot")]
-    TakeSnapshot { format: ImageFormat },
+    TakeSnapshot {
+        #[doc = "What image format to return."]
+        format: ImageFormat,
+    },
     #[serde(rename = "make_axes_gizmo")]
-    MakeAxesGizmo { clobber: bool, gizmo_mode: bool },
+    MakeAxesGizmo {
+        #[doc = "If true, any existing drawables within the obj will be replaced (the object will \
+                 be reset)"]
+        clobber: bool,
+        #[doc = "If true, axes gizmo will be placed in the corner of the screen. If false, it \
+                 will be placed at the origin of the scene."]
+        gizmo_mode: bool,
+    },
     #[serde(rename = "path_get_info")]
-    PathGetInfo { path_id: uuid::Uuid },
+    PathGetInfo {
+        #[doc = "Which path to query"]
+        path_id: uuid::Uuid,
+    },
     #[serde(rename = "path_get_curve_uuids_for_vertices")]
     PathGetCurveUuidsForVertices {
+        #[doc = "Which path to query"]
         path_id: uuid::Uuid,
+        #[doc = "IDs of the vertices for which to obtain curve ids from"]
         vertex_ids: Vec<uuid::Uuid>,
     },
     #[serde(rename = "handle_mouse_drag_start")]
-    HandleMouseDragStart { window: Point2D },
+    HandleMouseDragStart {
+        #[doc = "The mouse position."]
+        window: Point2D,
+    },
     #[serde(rename = "handle_mouse_drag_move")]
     HandleMouseDragMove {
+        #[doc = "Logical timestamp. The client should increment this with every event in the \
+                 current mouse drag. That way, if the events are being sent over an unordered \
+                 channel, the API can ignore the older events."]
         sequence: Option<u32>,
+        #[doc = "The mouse position."]
         window: Point2D,
     },
     #[serde(rename = "handle_mouse_drag_end")]
-    HandleMouseDragEnd { window: Point2D },
+    HandleMouseDragEnd {
+        #[doc = "The mouse position."]
+        window: Point2D,
+    },
     #[serde(rename = "remove_scene_objects")]
-    RemoveSceneObjects { object_ids: Vec<uuid::Uuid> },
+    RemoveSceneObjects {
+        #[doc = "Objects to remove."]
+        object_ids: Vec<uuid::Uuid>,
+    },
     #[serde(rename = "path_tangential_arc_to")]
     PathTangentialArcTo {
+        #[doc = "0 will be interpreted as none/null."]
         angle_snap_increment: Option<Angle>,
+        #[doc = "Where the arc should end. Must lie in the same plane as the current path pen \
+                 position. Must not be colinear with current path pen position."]
         to: Point3D,
     },
     #[serde(rename = "path_tangential_arc")]
-    PathTangentialArc { offset: Angle, radius: f64 },
+    PathTangentialArc {
+        #[doc = "Offset of the arc."]
+        offset: Angle,
+        #[doc = "Radius of the arc. Not to be confused with Raiders of the Lost Ark."]
+        radius: f64,
+    },
     #[serde(rename = "plane_intersect_and_project")]
     PlaneIntersectAndProject {
+        #[doc = "The plane you're intersecting against."]
         plane_id: uuid::Uuid,
+        #[doc = "Window coordinates where the ray cast should be aimed."]
         window: Point2D,
     },
     #[serde(rename = "curve_get_end_points")]
-    CurveGetEndPoints { curve_id: uuid::Uuid },
+    CurveGetEndPoints {
+        #[doc = "ID of the curve being queried."]
+        curve_id: uuid::Uuid,
+    },
     #[serde(rename = "reconfigure_stream")]
-    ReconfigureStream { fps: u32, height: u32, width: u32 },
+    ReconfigureStream {
+        #[doc = "Frames per second."]
+        fps: u32,
+        #[doc = "Height of the stream."]
+        height: u32,
+        #[doc = "Width of the stream."]
+        width: u32,
+    },
     #[serde(rename = "import_files")]
-    ImportFiles { files: Vec<ImportFile> },
+    ImportFiles {
+        #[doc = "Files to import"]
+        files: Vec<ImportFile>,
+    },
     #[serde(rename = "mass")]
     Mass {
+        #[doc = "IDs of the entities to get the mass of. If this is empty, then the default scene \
+                 is included in the mass."]
         entity_ids: Vec<uuid::Uuid>,
+        #[doc = "The material density."]
         material_density: f64,
+        #[doc = "The material density unit."]
         material_density_unit: UnitDensity,
+        #[doc = "The output unit for the mass."]
         output_unit: UnitMass,
     },
     #[serde(rename = "density")]
     Density {
+        #[doc = "IDs of the entities to get the density of. If this is empty, then the default \
+                 scene is included in the density."]
         entity_ids: Vec<uuid::Uuid>,
+        #[doc = "The material mass."]
         material_mass: f64,
+        #[doc = "The material mass unit."]
         material_mass_unit: UnitMass,
+        #[doc = "The output unit for the density."]
         output_unit: UnitDensity,
     },
     #[serde(rename = "volume")]
     Volume {
+        #[doc = "IDs of the entities to get the volume of. If this is empty, then the default \
+                 scene is included in the volume."]
         entity_ids: Vec<uuid::Uuid>,
+        #[doc = "The output unit for the volume."]
         output_unit: UnitVolume,
     },
     #[serde(rename = "center_of_mass")]
     CenterOfMass {
+        #[doc = "IDs of the entities to get the center of mass of. If this is empty, then the \
+                 default scene is included in the center of mass."]
         entity_ids: Vec<uuid::Uuid>,
+        #[doc = "The output unit for the center of mass."]
         output_unit: UnitLength,
     },
     #[serde(rename = "surface_area")]
     SurfaceArea {
+        #[doc = "IDs of the entities to get the surface area of. If this is empty, then the \
+                 default scene is included in the surface area."]
         entity_ids: Vec<uuid::Uuid>,
+        #[doc = "The output unit for the surface area."]
         output_unit: UnitArea,
     },
 }
@@ -6894,61 +7208,146 @@ pub enum OkModelingCmdResponse {
     #[serde(rename = "empty")]
     Empty {},
     #[serde(rename = "export")]
-    Export { data: Export },
+    Export {
+        #[doc = "The response from the `Export` endpoint."]
+        data: Export,
+    },
     #[serde(rename = "select_with_point")]
-    SelectWithPoint { data: SelectWithPoint },
+    SelectWithPoint {
+        #[doc = "The response from the `SelectWithPoint` command."]
+        data: SelectWithPoint,
+    },
     #[serde(rename = "highlight_set_entity")]
-    HighlightSetEntity { data: HighlightSetEntity },
+    HighlightSetEntity {
+        #[doc = "The response from the `HighlightSetEntity` command."]
+        data: HighlightSetEntity,
+    },
     #[serde(rename = "entity_get_child_uuid")]
-    EntityGetChildUuid { data: EntityGetChildUuid },
+    EntityGetChildUuid {
+        #[doc = "The response from the `EntityGetChildUuid` command."]
+        data: EntityGetChildUuid,
+    },
     #[serde(rename = "entity_get_num_children")]
-    EntityGetNumChildren { data: EntityGetNumChildren },
+    EntityGetNumChildren {
+        #[doc = "The response from the `EntityGetNumChildren` command."]
+        data: EntityGetNumChildren,
+    },
     #[serde(rename = "entity_get_parent_id")]
-    EntityGetParentId { data: EntityGetParentId },
+    EntityGetParentId {
+        #[doc = "The response from the `EntityGetParentId` command."]
+        data: EntityGetParentId,
+    },
     #[serde(rename = "entity_get_all_child_uuids")]
-    EntityGetAllChildUuids { data: EntityGetAllChildUuids },
+    EntityGetAllChildUuids {
+        #[doc = "The response from the `EntityGetAllChildUuids` command."]
+        data: EntityGetAllChildUuids,
+    },
     #[serde(rename = "select_get")]
-    SelectGet { data: SelectGet },
+    SelectGet {
+        #[doc = "The response from the `SelectGet` command."]
+        data: SelectGet,
+    },
     #[serde(rename = "get_entity_type")]
-    GetEntityType { data: GetEntityType },
+    GetEntityType {
+        #[doc = "The response from the `GetEntityType` command."]
+        data: GetEntityType,
+    },
     #[serde(rename = "solid3d_get_all_edge_faces")]
-    Solid3DGetAllEdgeFaces { data: Solid3DGetAllEdgeFaces },
+    Solid3DGetAllEdgeFaces {
+        #[doc = "The response from the `Solid3dGetAllEdgeFaces` command."]
+        data: Solid3DGetAllEdgeFaces,
+    },
     #[serde(rename = "solid3d_get_all_opposite_edges")]
-    Solid3DGetAllOppositeEdges { data: Solid3DGetAllOppositeEdges },
+    Solid3DGetAllOppositeEdges {
+        #[doc = "The response from the `Solid3dGetAllOppositeEdges` command."]
+        data: Solid3DGetAllOppositeEdges,
+    },
     #[serde(rename = "solid3d_get_opposite_edge")]
-    Solid3DGetOppositeEdge { data: Solid3DGetOppositeEdge },
+    Solid3DGetOppositeEdge {
+        #[doc = "The response from the `Solid3dGetOppositeEdge` command."]
+        data: Solid3DGetOppositeEdge,
+    },
     #[serde(rename = "solid3d_get_prev_adjacent_edge")]
-    Solid3DGetPrevAdjacentEdge { data: Solid3DGetPrevAdjacentEdge },
+    Solid3DGetPrevAdjacentEdge {
+        #[doc = "The response from the `Solid3dGetPrevAdjacentEdge` command."]
+        data: Solid3DGetPrevAdjacentEdge,
+    },
     #[serde(rename = "solid3d_get_next_adjacent_edge")]
-    Solid3DGetNextAdjacentEdge { data: Solid3DGetNextAdjacentEdge },
+    Solid3DGetNextAdjacentEdge {
+        #[doc = "The response from the `Solid3dGetNextAdjacentEdge` command."]
+        data: Solid3DGetNextAdjacentEdge,
+    },
     #[serde(rename = "mouse_click")]
-    MouseClick { data: MouseClick },
+    MouseClick {
+        #[doc = "The response from the `MouseClick` command."]
+        data: MouseClick,
+    },
     #[serde(rename = "curve_get_type")]
-    CurveGetType { data: CurveGetType },
+    CurveGetType {
+        #[doc = "The response from the `CurveGetType` command."]
+        data: CurveGetType,
+    },
     #[serde(rename = "curve_get_control_points")]
-    CurveGetControlPoints { data: CurveGetControlPoints },
+    CurveGetControlPoints {
+        #[doc = "The response from the `CurveGetControlPoints` command."]
+        data: CurveGetControlPoints,
+    },
     #[serde(rename = "take_snapshot")]
-    TakeSnapshot { data: TakeSnapshot },
+    TakeSnapshot {
+        #[doc = "The response from the `TakeSnapshot` command."]
+        data: TakeSnapshot,
+    },
     #[serde(rename = "path_get_info")]
-    PathGetInfo { data: PathGetInfo },
+    PathGetInfo {
+        #[doc = "The response from the `PathGetInfo` command."]
+        data: PathGetInfo,
+    },
     #[serde(rename = "path_get_curve_uuids_for_vertices")]
-    PathGetCurveUuidsForVertices { data: PathGetCurveUuidsForVertices },
+    PathGetCurveUuidsForVertices {
+        #[doc = "The response from the `PathGetCurveUuidsForVertices` command."]
+        data: PathGetCurveUuidsForVertices,
+    },
     #[serde(rename = "plane_intersect_and_project")]
-    PlaneIntersectAndProject { data: PlaneIntersectAndProject },
+    PlaneIntersectAndProject {
+        #[doc = "Corresponding coordinates of given window coordinates, intersected on given \
+                 plane."]
+        data: PlaneIntersectAndProject,
+    },
     #[serde(rename = "curve_get_end_points")]
-    CurveGetEndPoints { data: CurveGetEndPoints },
+    CurveGetEndPoints {
+        #[doc = "Endpoints of a curve"]
+        data: CurveGetEndPoints,
+    },
     #[serde(rename = "import_files")]
-    ImportFiles { data: ImportFiles },
+    ImportFiles {
+        #[doc = "Data from importing the files"]
+        data: ImportFiles,
+    },
     #[serde(rename = "mass")]
-    Mass { data: Mass },
+    Mass {
+        #[doc = "The mass response."]
+        data: Mass,
+    },
     #[serde(rename = "volume")]
-    Volume { data: Volume },
+    Volume {
+        #[doc = "The volume response."]
+        data: Volume,
+    },
     #[serde(rename = "density")]
-    Density { data: Density },
+    Density {
+        #[doc = "The density response."]
+        data: Density,
+    },
     #[serde(rename = "surface_area")]
-    SurfaceArea { data: SurfaceArea },
+    SurfaceArea {
+        #[doc = "The surface area response."]
+        data: SurfaceArea,
+    },
     #[serde(rename = "center_of_mass")]
-    CenterOfMass { data: CenterOfMass },
+    CenterOfMass {
+        #[doc = "The center of mass response."]
+        data: CenterOfMass,
+    },
 }
 
 #[doc = "The websocket messages this server sends."]
@@ -6959,17 +7358,30 @@ pub enum OkModelingCmdResponse {
 #[serde(tag = "type", content = "data")]
 pub enum OkWebSocketResponseData {
     #[serde(rename = "ice_server_info")]
-    IceServerInfo { ice_servers: Vec<IceServer> },
+    IceServerInfo {
+        #[doc = "Information about the ICE servers."]
+        ice_servers: Vec<IceServer>,
+    },
     #[serde(rename = "trickle_ice")]
-    TrickleIce { candidate: RtcIceCandidateInit },
+    TrickleIce {
+        #[doc = "Information about the ICE candidate."]
+        candidate: RtcIceCandidateInit,
+    },
     #[serde(rename = "sdp_answer")]
-    SdpAnswer { answer: RtcSessionDescription },
+    SdpAnswer {
+        #[doc = "The session description."]
+        answer: RtcSessionDescription,
+    },
     #[serde(rename = "modeling")]
     Modeling {
+        #[doc = "The result of the command."]
         modeling_response: OkModelingCmdResponse,
     },
     #[serde(rename = "export")]
-    Export { files: Vec<RawFile> },
+    Export {
+        #[doc = "The exported files"]
+        files: Vec<RawFile>,
+    },
     #[serde(rename = "metrics_request")]
     MetricsRequest {},
 }
@@ -7090,22 +7502,47 @@ impl tabled::Tabled for OutputFile {
 #[serde(tag = "type")]
 pub enum OutputFormat {
     #[serde(rename = "fbx")]
-    Fbx { storage: FbxStorage },
+    Fbx {
+        #[doc = "Specifies which kind of FBX will be exported."]
+        storage: FbxStorage,
+    },
     #[serde(rename = "gltf")]
     Gltf {
+        #[doc = "Specifies how the JSON will be presented."]
         presentation: GltfPresentation,
+        #[doc = "Specifies which kind of glTF 2.0 will be exported."]
         storage: GltfStorage,
     },
     #[serde(rename = "obj")]
-    Obj { coords: System, units: UnitLength },
+    Obj {
+        #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
+        coords: System,
+        #[doc = "Export length unit.\n\nDefaults to meters."]
+        units: UnitLength,
+    },
     #[serde(rename = "ply")]
-    Ply { coords: System, storage: PlyStorage },
+    Ply {
+        #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
+        coords: System,
+        #[doc = "The storage for the output PLY file."]
+        storage: PlyStorage,
+    },
     #[serde(rename = "step")]
-    Step { coords: System },
+    Step {
+        #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
+        coords: System,
+    },
     #[serde(rename = "stl")]
     Stl {
+        #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
+        #[doc = "Export storage."]
         storage: StlStorage,
+        #[doc = "Export length unit.\n\nDefaults to meters."]
         units: UnitLength,
     },
 }
@@ -7212,20 +7649,34 @@ impl tabled::Tabled for PathGetInfo {
 #[serde(tag = "type")]
 pub enum PathSegment {
     #[serde(rename = "line")]
-    Line { end: Point3D, relative: bool },
+    Line {
+        #[doc = "End point of the line."]
+        end: Point3D,
+        #[doc = "Whether or not this line is a relative offset"]
+        relative: bool,
+    },
     #[serde(rename = "arc")]
     Arc {
+        #[doc = "Start of the arc along circle's perimeter."]
         angle_end: f64,
+        #[doc = "Start of the arc along circle's perimeter."]
         angle_start: f64,
+        #[doc = "Center of the circle"]
         center: Point2D,
+        #[doc = "Radius of the circle"]
         radius: f64,
+        #[doc = "Whether or not this arc is a relative offset"]
         relative: bool,
     },
     #[serde(rename = "bezier")]
     Bezier {
+        #[doc = "First control point."]
         control1: Point3D,
+        #[doc = "Second control point."]
         control2: Point3D,
+        #[doc = "Final control point."]
         end: Point3D,
+        #[doc = "Whether or not this bezier is a relative offset"]
         relative: bool,
     },
 }
@@ -10729,18 +11180,29 @@ impl tabled::Tabled for Volume {
 #[serde(tag = "type")]
 pub enum WebSocketRequest {
     #[serde(rename = "trickle_ice")]
-    TrickleIce { candidate: RtcIceCandidateInit },
+    TrickleIce {
+        #[doc = "Information about the ICE candidate."]
+        candidate: RtcIceCandidateInit,
+    },
     #[serde(rename = "sdp_offer")]
-    SdpOffer { offer: RtcSessionDescription },
+    SdpOffer {
+        #[doc = "The session description."]
+        offer: RtcSessionDescription,
+    },
     #[serde(rename = "modeling_cmd_req")]
     ModelingCmdReq {
+        #[doc = "Which command to submit to the Kittycad engine."]
         cmd: ModelingCmd,
+        #[doc = "ID of command being submitted."]
         cmd_id: uuid::Uuid,
     },
     #[serde(rename = "ping")]
     Ping {},
     #[serde(rename = "metrics_response")]
-    MetricsResponse { metrics: ClientMetrics },
+    MetricsResponse {
+        #[doc = "Collected metrics from the Client's end of the engine connection."]
+        metrics: ClientMetrics,
+    },
 }
 
 #[doc = "Websocket responses can either be successful or unsuccessful. Slightly different schemas \

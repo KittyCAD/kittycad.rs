@@ -1147,6 +1147,13 @@ impl TypeSpace {
                         tag_schema.get_schema_from_reference(&self.spec, true)?
                     };
 
+                    let description = if let Some(d) = &inner_schema.schema_data.description {
+                        let d_sanitized = sanitize_indents(d);
+                        quote!(#[doc = #d_sanitized])
+                    } else {
+                        quote!()
+                    };
+
                     let tag_name = if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
                         inner_schema.schema_kind
                     {
@@ -1210,6 +1217,7 @@ impl TypeSpace {
                                 rendered_value = quote!(
                                     #rendered_value
 
+                                    #description
                                     #[serde(rename = #tag_name)]
                                     #enum_object_internal,
                                 );
@@ -1217,6 +1225,7 @@ impl TypeSpace {
                                 rendered_value = quote!(
                                     #rendered_value
 
+                                    #description
                                     #enum_object_internal,
                                 );
                             }
@@ -1225,6 +1234,7 @@ impl TypeSpace {
                             rendered_value = quote!(
                                 #rendered_value
 
+                                #description
                                 #[serde(rename = #tag_name)]
                                 #n(#content_name),
                             );
@@ -1232,6 +1242,7 @@ impl TypeSpace {
                             rendered_value = quote!(
                                 #rendered_value
 
+                                #description
                                 #n(#content_name),
                             );
                         }
@@ -1247,6 +1258,7 @@ impl TypeSpace {
                             rendered_value = quote!(
                                 #rendered_value
 
+                                #description
                                 #[serde(rename = #tag_name)]
                                 #content_name,
                             );
@@ -1254,6 +1266,7 @@ impl TypeSpace {
                             rendered_value = quote!(
                                 #rendered_value
 
+                                #description
                                 #content_name,
                             );
                         }
