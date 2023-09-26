@@ -6262,69 +6262,6 @@
             "type": "object"
           },
           {
-            "description": "Adds a tangent arc from current pen position to the new position.",
-            "properties": {
-              "angle_snap_increment": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Angle"
-                  }
-                ],
-                "description": "0 will be interpreted as none/null.",
-                "nullable": true
-              },
-              "to": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Point3d"
-                  }
-                ],
-                "description": "Where the arc should end. Must lie in the same plane as the current path pen position. Must not be colinear with current path pen position."
-              },
-              "type": {
-                "enum": [
-                  "path_tangential_arc_to"
-                ],
-                "type": "string"
-              }
-            },
-            "required": [
-              "to",
-              "type"
-            ],
-            "type": "object"
-          },
-          {
-            "description": "Adds a tangent arc from current pen position with the given radius and angle.",
-            "properties": {
-              "offset": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Angle"
-                  }
-                ],
-                "description": "Offset of the arc."
-              },
-              "radius": {
-                "description": "Radius of the arc. Not to be confused with Raiders of the Lost Ark.",
-                "format": "double",
-                "type": "number"
-              },
-              "type": {
-                "enum": [
-                  "path_tangential_arc"
-                ],
-                "type": "string"
-              }
-            },
-            "required": [
-              "offset",
-              "radius",
-              "type"
-            ],
-            "type": "object"
-          },
-          {
             "description": "Utility method. Performs both a ray cast and projection to plane-local coordinates. Returns the plane coordinates for the given window coordinates.",
             "properties": {
               "plane_id": {
@@ -7862,6 +7799,69 @@
               "control2",
               "end",
               "relative",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Adds a tangent arc from current pen position with the given radius and angle.",
+            "properties": {
+              "offset": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Angle"
+                  }
+                ],
+                "description": "Offset of the arc."
+              },
+              "radius": {
+                "description": "Radius of the arc. Not to be confused with Raiders of the Lost Ark.",
+                "format": "double",
+                "type": "number"
+              },
+              "type": {
+                "enum": [
+                  "path_tangential_arc"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "offset",
+              "radius",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Adds a tangent arc from current pen position to the new position.",
+            "properties": {
+              "angle_snap_increment": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Angle"
+                  }
+                ],
+                "description": "0 will be interpreted as none/null.",
+                "nullable": true
+              },
+              "to": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ],
+                "description": "Where the arc should end. Must lie in the same plane as the current path pen position. Must not be colinear with current path pen position."
+              },
+              "type": {
+                "enum": [
+                  "path_tangential_arc_to"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "to",
               "type"
             ],
             "type": "object"
