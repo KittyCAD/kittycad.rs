@@ -5,79 +5,148 @@
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
+    #[doc = "A file conversion."]
     FileConversion {
+        #[doc = "The time and date the API call was completed."]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
         error: Option<String>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
+        #[doc = "The converted file, if completed, base64 encoded."]
         output: Option<base64::Base64Data>,
+        #[doc = "The output format of the file conversion."]
         output_format: FileExportFormat,
+        #[doc = "The source format of the file conversion."]
         src_format: FileImportFormat,
+        #[doc = "The time and date the API call was started."]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
         status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
         user_id: Option<String>,
     },
+    #[doc = "File center of mass."]
     FileCenterOfMass {
+        #[doc = "The resulting center of mass."]
         center_of_mass: Option<Vec<f64>>,
+        #[doc = "The time and date the API call was completed."]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
         error: Option<String>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
+        #[doc = "The source format of the file."]
         src_format: FileImportFormat,
+        #[doc = "The time and date the API call was started."]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
         status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
         user_id: Option<String>,
     },
+    #[doc = "A file mass."]
     FileMass {
+        #[doc = "The time and date the API call was completed."]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
         error: Option<String>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
+        #[doc = "The resulting mass."]
         mass: Option<f64>,
+        #[doc = "The material density as denoted by the user."]
         material_density: Option<f64>,
+        #[doc = "The source format of the file."]
         src_format: FileImportFormat,
+        #[doc = "The time and date the API call was started."]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
         status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
         user_id: Option<String>,
     },
+    #[doc = "A file volume."]
     FileVolume {
+        #[doc = "The time and date the API call was completed."]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
         error: Option<String>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
+        #[doc = "The source format of the file."]
         src_format: FileImportFormat,
+        #[doc = "The time and date the API call was started."]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
         status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
         user_id: Option<String>,
+        #[doc = "The resulting volume."]
         volume: Option<f64>,
     },
+    #[doc = "A file density."]
     FileDensity {
+        #[doc = "The time and date the API call was completed."]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The resulting density."]
         density: Option<f64>,
+        #[doc = "The error the function returned, if any."]
         error: Option<String>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
+        #[doc = "The material mass as denoted by the user."]
         material_mass: Option<f64>,
+        #[doc = "The source format of the file."]
         src_format: FileImportFormat,
+        #[doc = "The time and date the API call was started."]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
         status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
         user_id: Option<String>,
     },
+    #[doc = "A file surface area."]
     FileSurfaceArea {
+        #[doc = "The time and date the API call was completed."]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
         error: Option<String>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
+        #[doc = "The source format of the file."]
         src_format: FileImportFormat,
+        #[doc = "The time and date the API call was started."]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
         status: ApiCallStatus,
+        #[doc = "The resulting surface area."]
         surface_area: Option<f64>,
+        #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
         user_id: Option<String>,
     },
 }

@@ -5,14 +5,19 @@
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type", content = "value")]
 pub enum VpcFirewallRuleTarget {
+    #[doc = "The rule applies to all instances in the VPC"]
     #[serde(rename = "vpc")]
     Vpc(String),
+    #[doc = "The rule applies to all instances in the VPC Subnet"]
     #[serde(rename = "subnet")]
     Subnet(String),
+    #[doc = "The rule applies to this specific instance"]
     #[serde(rename = "instance")]
     Instance(String),
+    #[doc = "The rule applies to a specific IP address"]
     #[serde(rename = "ip")]
     Ip(std::net::IpAddr),
+    #[doc = "The rule applies to a specific IP subnet"]
     #[serde(rename = "ip_net")]
     IpNet(IpNet),
 }

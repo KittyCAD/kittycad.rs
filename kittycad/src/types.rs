@@ -6968,23 +6968,6 @@ pub enum ModelingCmd {
         #[doc = "Objects to remove."]
         object_ids: Vec<uuid::Uuid>,
     },
-    #[doc = "Adds a tangent arc from current pen position to the new position."]
-    #[serde(rename = "path_tangential_arc_to")]
-    PathTangentialArcTo {
-        #[doc = "0 will be interpreted as none/null."]
-        angle_snap_increment: Option<Angle>,
-        #[doc = "Where the arc should end. Must lie in the same plane as the current path pen \
-                 position. Must not be colinear with current path pen position."]
-        to: Point3D,
-    },
-    #[doc = "Adds a tangent arc from current pen position with the given radius and angle."]
-    #[serde(rename = "path_tangential_arc")]
-    PathTangentialArc {
-        #[doc = "Offset of the arc."]
-        offset: Angle,
-        #[doc = "Radius of the arc. Not to be confused with Raiders of the Lost Ark."]
-        radius: f64,
-    },
     #[doc = "Utility method. Performs both a ray cast and projection to plane-local coordinates. \
              Returns the plane coordinates for the given window coordinates."]
     #[serde(rename = "plane_intersect_and_project")]
@@ -7815,6 +7798,23 @@ pub enum PathSegment {
         end: Point3D,
         #[doc = "Whether or not this bezier is a relative offset"]
         relative: bool,
+    },
+    #[doc = "Adds a tangent arc from current pen position with the given radius and angle."]
+    #[serde(rename = "path_tangential_arc")]
+    PathTangentialArc {
+        #[doc = "Offset of the arc."]
+        offset: Angle,
+        #[doc = "Radius of the arc. Not to be confused with Raiders of the Lost Ark."]
+        radius: f64,
+    },
+    #[doc = "Adds a tangent arc from current pen position to the new position."]
+    #[serde(rename = "path_tangential_arc_to")]
+    PathTangentialArcTo {
+        #[doc = "0 will be interpreted as none/null."]
+        angle_snap_increment: Option<Angle>,
+        #[doc = "Where the arc should end. Must lie in the same plane as the current path pen \
+                 position. Must not be colinear with current path pen position."]
+        to: Point3D,
     },
 }
 
