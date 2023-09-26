@@ -7821,7 +7821,7 @@
               },
               "type": {
                 "enum": [
-                  "path_tangential_arc"
+                  "tangential_arc"
                 ],
                 "type": "string"
               }
@@ -7855,7 +7855,7 @@
               },
               "type": {
                 "enum": [
-                  "path_tangential_arc_to"
+                  "tangential_arc_to"
                 ],
                 "type": "string"
               }
