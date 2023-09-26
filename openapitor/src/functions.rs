@@ -675,13 +675,6 @@ fn get_request_body_example(
                             &type_space.spec,
                             true,
                         )?;
-                        if name.rendered()? == "UpdateTeammate" {
-                            println!(
-                                "REQUEST BODY EXPANDED name: {} {:?}",
-                                name,
-                                s.expand(&type_space.spec)?
-                            );
-                        }
                         crate::types::example::generate_example_rust_from_schema(
                             type_space,
                             &name.rendered()?,
