@@ -1688,6 +1688,32 @@
         },
         "type": "object"
       },
+      "CenterOfMass": {
+        "description": "The center of mass response.",
+        "properties": {
+          "center_of_mass": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ],
+            "description": "The center of mass."
+          },
+          "output_unit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitLength"
+              }
+            ],
+            "description": "The output unit for the center of mass."
+          }
+        },
+        "required": [
+          "center_of_mass",
+          "output_unit"
+        ],
+        "type": "object"
+      },
       "ClientMetrics": {
         "description": "ClientMetrics contains information regarding the state of the peer.",
         "properties": {
@@ -2471,6 +2497,29 @@
         ],
         "type": "object"
       },
+      "Density": {
+        "description": "The density response.",
+        "properties": {
+          "density": {
+            "description": "The density.",
+            "format": "double",
+            "type": "number"
+          },
+          "output_unit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitDensity"
+              }
+            ],
+            "description": "The output unit for the density."
+          }
+        },
+        "required": [
+          "density",
+          "output_unit"
+        ],
+        "type": "object"
+      },
       "DeviceAccessTokenRequestForm": {
         "description": "The form for a device access token request.",
         "properties": {
@@ -2731,6 +2780,20 @@
             "description": "Client sent invalid JSON.",
             "enum": [
               "invalid_json"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Client sent invalid BSON.",
+            "enum": [
+              "invalid_bson"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "Client sent a message which is not accepted over this protocol.",
+            "enum": [
+              "wrong_protocol"
             ],
             "type": "string"
           },
@@ -3816,6 +3879,43 @@
         ],
         "type": "string"
       },
+      "ImportFile": {
+        "description": "File to import into the current model",
+        "properties": {
+          "data": {
+            "description": "The raw bytes of the file",
+            "items": {
+              "format": "uint8",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "path": {
+            "description": "The file's full path, including file extension.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "path"
+        ],
+        "type": "object"
+      },
+      "ImportFiles": {
+        "description": "Data from importing the files",
+        "properties": {
+          "object_id": {
+            "description": "ID of the imported 3D models within the scene.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "object_id"
+        ],
+        "type": "object"
+      },
       "InputFormat": {
         "description": "Input format specifier.",
         "oneOf": [
@@ -3872,7 +3972,7 @@
                     "$ref": "#/components/schemas/UnitLength"
                   }
                 ],
-                "description": "The units of the input data. This is very important for correct scaling and when calculating physics properties like mass, etc."
+                "description": "The units of the input data. This is very important for correct scaling and when calculating physics properties like mass, etc.\n\nDefaults to meters."
               }
             },
             "required": [
@@ -4422,6 +4522,29 @@
             "type": "integer"
           }
         },
+        "type": "object"
+      },
+      "Mass": {
+        "description": "The mass response.",
+        "properties": {
+          "mass": {
+            "description": "The mass.",
+            "format": "double",
+            "type": "number"
+          },
+          "output_unit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitMass"
+              }
+            ],
+            "description": "The output unit for the mass."
+          }
+        },
+        "required": [
+          "mass",
+          "output_unit"
+        ],
         "type": "object"
       },
       "Mesh": {
@@ -6251,6 +6374,260 @@
               "type"
             ],
             "type": "object"
+          },
+          {
+            "description": "Reconfigure the stream.",
+            "properties": {
+              "fps": {
+                "description": "Frames per second.",
+                "format": "uint32",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "height": {
+                "description": "Height of the stream.",
+                "format": "uint32",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "type": {
+                "enum": [
+                  "reconfigure_stream"
+                ],
+                "type": "string"
+              },
+              "width": {
+                "description": "Width of the stream.",
+                "format": "uint32",
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "fps",
+              "height",
+              "type",
+              "width"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Import files to the current model.",
+            "properties": {
+              "files": {
+                "description": "Files to import",
+                "items": {
+                  "$ref": "#/components/schemas/ImportFile"
+                },
+                "type": "array"
+              },
+              "type": {
+                "enum": [
+                  "import_files"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "files",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Get the mass of entities in the scene or the default scene.",
+            "properties": {
+              "entity_ids": {
+                "description": "IDs of the entities to get the mass of. If this is empty, then the default scene is included in the mass.",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "material_density": {
+                "description": "The material density.",
+                "format": "double",
+                "type": "number"
+              },
+              "material_density_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitDensity"
+                  }
+                ],
+                "description": "The material density unit."
+              },
+              "output_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitMass"
+                  }
+                ],
+                "description": "The output unit for the mass."
+              },
+              "type": {
+                "enum": [
+                  "mass"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_ids",
+              "material_density",
+              "material_density_unit",
+              "output_unit",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Get the density of entities in the scene or the default scene.",
+            "properties": {
+              "entity_ids": {
+                "description": "IDs of the entities to get the density of. If this is empty, then the default scene is included in the density.",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "material_mass": {
+                "description": "The material mass.",
+                "format": "double",
+                "type": "number"
+              },
+              "material_mass_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitMass"
+                  }
+                ],
+                "description": "The material mass unit."
+              },
+              "output_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitDensity"
+                  }
+                ],
+                "description": "The output unit for the density."
+              },
+              "type": {
+                "enum": [
+                  "density"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_ids",
+              "material_mass",
+              "material_mass_unit",
+              "output_unit",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Get the volume of entities in the scene or the default scene.",
+            "properties": {
+              "entity_ids": {
+                "description": "IDs of the entities to get the volume of. If this is empty, then the default scene is included in the volume.",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "output_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitVolume"
+                  }
+                ],
+                "description": "The output unit for the volume."
+              },
+              "type": {
+                "enum": [
+                  "volume"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_ids",
+              "output_unit",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Get the center of mass of entities in the scene or the default scene.",
+            "properties": {
+              "entity_ids": {
+                "description": "IDs of the entities to get the center of mass of. If this is empty, then the default scene is included in the center of mass.",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "output_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ],
+                "description": "The output unit for the center of mass."
+              },
+              "type": {
+                "enum": [
+                  "center_of_mass"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_ids",
+              "output_unit",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "Get the surface area of entities in the scene or the default scene.",
+            "properties": {
+              "entity_ids": {
+                "description": "IDs of the entities to get the surface area of. If this is empty, then the default scene is included in the surface area.",
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "output_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitArea"
+                  }
+                ],
+                "description": "The output unit for the surface area."
+              },
+              "type": {
+                "enum": [
+                  "surface_area"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "entity_ids",
+              "output_unit",
+              "type"
+            ],
+            "type": "object"
           }
         ]
       },
@@ -6792,6 +7169,120 @@
               "type"
             ],
             "type": "object"
+          },
+          {
+            "description": "The response from the `ImportFiles` command.",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ImportFiles"
+              },
+              "type": {
+                "enum": [
+                  "import_files"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `Mass` command.",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Mass"
+              },
+              "type": {
+                "enum": [
+                  "mass"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `Volume` command.",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Volume"
+              },
+              "type": {
+                "enum": [
+                  "volume"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `Density` command.",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Density"
+              },
+              "type": {
+                "enum": [
+                  "density"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `SurfaceArea` command.",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SurfaceArea"
+              },
+              "type": {
+                "enum": [
+                  "surface_area"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "description": "The response from the `CenterOfMass` command.",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/CenterOfMass"
+              },
+              "type": {
+                "enum": [
+                  "center_of_mass"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ],
+            "type": "object"
           }
         ]
       },
@@ -7087,11 +7578,20 @@
                   "obj"
                 ],
                 "type": "string"
+              },
+              "units": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ],
+                "description": "Export length unit.\n\nDefaults to meters."
               }
             },
             "required": [
               "coords",
-              "type"
+              "type",
+              "units"
             ],
             "type": "object"
           },
@@ -7176,12 +7676,21 @@
                   "stl"
                 ],
                 "type": "string"
+              },
+              "units": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ],
+                "description": "Export length unit.\n\nDefaults to meters."
               }
             },
             "required": [
               "coords",
               "storage",
-              "type"
+              "type",
+              "units"
             ],
             "type": "object"
           }
@@ -7942,6 +8451,29 @@
         "required": [
           "resp",
           "success"
+        ],
+        "type": "object"
+      },
+      "SurfaceArea": {
+        "description": "The surface area response.",
+        "properties": {
+          "output_unit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitArea"
+              }
+            ],
+            "description": "The output unit for the surface area."
+          },
+          "surface_area": {
+            "description": "The surface area.",
+            "format": "double",
+            "type": "number"
+          }
+        },
+        "required": [
+          "output_unit",
+          "surface_area"
         ],
         "type": "object"
       },
@@ -9959,6 +10491,29 @@
           "created_at",
           "expires",
           "updated_at"
+        ],
+        "type": "object"
+      },
+      "Volume": {
+        "description": "The volume response.",
+        "properties": {
+          "output_unit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitVolume"
+              }
+            ],
+            "description": "The output unit for the volume."
+          },
+          "volume": {
+            "description": "The volume.",
+            "format": "double",
+            "type": "number"
+          }
+        },
+        "required": [
+          "output_unit",
+          "volume"
         ],
         "type": "object"
       },
