@@ -2203,6 +2203,42 @@ impl tabled::Tabled for CardDetails {
     }
 }
 
+#[doc = "The center of mass response."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CenterOfMass {
+    #[doc = "The center of mass."]
+    pub center_of_mass: Point3D,
+    #[doc = "The output unit for the center of mass."]
+    pub output_unit: UnitLength,
+}
+
+impl std::fmt::Display for CenterOfMass {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CenterOfMass {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.center_of_mass).into(),
+            format!("{:?}", self.output_unit).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["center_of_mass".into(), "output_unit".into()]
+    }
+}
+
 #[doc = "ClientMetrics contains information regarding the state of the peer."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -3335,6 +3371,42 @@ impl tabled::Tabled for CustomerBalance {
     }
 }
 
+#[doc = "The density response."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Density {
+    #[doc = "The density."]
+    pub density: f64,
+    #[doc = "The output unit for the density."]
+    pub output_unit: UnitDensity,
+}
+
+impl std::fmt::Display for Density {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Density {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.density).into(),
+            format!("{:?}", self.output_unit).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["density".into(), "output_unit".into()]
+    }
+}
+
 #[doc = "The form for a device access token request."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -3810,6 +3882,14 @@ pub enum ErrorCode {
     #[serde(rename = "invalid_json")]
     #[display("invalid_json")]
     InvalidJson,
+    #[doc = "Client sent invalid BSON."]
+    #[serde(rename = "invalid_bson")]
+    #[display("invalid_bson")]
+    InvalidBson,
+    #[doc = "Client sent a message which is not accepted over this protocol."]
+    #[serde(rename = "wrong_protocol")]
+    #[display("wrong_protocol")]
+    WrongProtocol,
     #[doc = "Problem sending data between client and KittyCAD API."]
     #[serde(rename = "connection_problem")]
     #[display("connection_problem")]
@@ -5274,6 +5354,74 @@ pub enum ImageType {
     Jpg,
 }
 
+#[doc = "File to import into the current model"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ImportFile {
+    #[doc = "The raw bytes of the file"]
+    #[serde(
+        serialize_with = "serde_bytes::serialize",
+        deserialize_with = "serde_bytes::deserialize"
+    )]
+    pub data: Vec<u8>,
+    #[doc = "The file's full path, including file extension."]
+    pub path: String,
+}
+
+impl std::fmt::Display for ImportFile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ImportFile {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.data).into(), self.path.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["data".into(), "path".into()]
+    }
+}
+
+#[doc = "Data from importing the files"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ImportFiles {
+    #[doc = "ID of the imported 3D models within the scene."]
+    pub object_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for ImportFiles {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ImportFiles {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.object_id).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["object_id".into()]
+    }
+}
+
 #[doc = "Input format specifier."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -6033,6 +6181,42 @@ impl tabled::Tabled for LeafNode {
     }
 }
 
+#[doc = "The mass response."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Mass {
+    #[doc = "The mass."]
+    pub mass: f64,
+    #[doc = "The output unit for the mass."]
+    pub output_unit: UnitMass,
+}
+
+impl std::fmt::Display for Mass {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Mass {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.mass).into(),
+            format!("{:?}", self.output_unit).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["mass".into(), "output_unit".into()]
+    }
+}
+
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -6451,6 +6635,39 @@ pub enum ModelingCmd {
     },
     #[serde(rename = "curve_get_end_points")]
     CurveGetEndPoints { curve_id: uuid::Uuid },
+    #[serde(rename = "reconfigure_stream")]
+    ReconfigureStream { fps: u32, height: u32, width: u32 },
+    #[serde(rename = "import_files")]
+    ImportFiles { files: Vec<ImportFile> },
+    #[serde(rename = "mass")]
+    Mass {
+        entity_ids: Vec<uuid::Uuid>,
+        material_density: f64,
+        material_density_unit: UnitDensity,
+        output_unit: UnitMass,
+    },
+    #[serde(rename = "density")]
+    Density {
+        entity_ids: Vec<uuid::Uuid>,
+        material_mass: f64,
+        material_mass_unit: UnitMass,
+        output_unit: UnitDensity,
+    },
+    #[serde(rename = "volume")]
+    Volume {
+        entity_ids: Vec<uuid::Uuid>,
+        output_unit: UnitVolume,
+    },
+    #[serde(rename = "center_of_mass")]
+    CenterOfMass {
+        entity_ids: Vec<uuid::Uuid>,
+        output_unit: UnitLength,
+    },
+    #[serde(rename = "surface_area")]
+    SurfaceArea {
+        entity_ids: Vec<uuid::Uuid>,
+        output_unit: UnitArea,
+    },
 }
 
 #[doc = "The response from the `MouseClick` command."]
@@ -6720,6 +6937,18 @@ pub enum OkModelingCmdResponse {
     PlaneIntersectAndProject { data: PlaneIntersectAndProject },
     #[serde(rename = "curve_get_end_points")]
     CurveGetEndPoints { data: CurveGetEndPoints },
+    #[serde(rename = "import_files")]
+    ImportFiles { data: ImportFiles },
+    #[serde(rename = "mass")]
+    Mass { data: Mass },
+    #[serde(rename = "volume")]
+    Volume { data: Volume },
+    #[serde(rename = "density")]
+    Density { data: Density },
+    #[serde(rename = "surface_area")]
+    SurfaceArea { data: SurfaceArea },
+    #[serde(rename = "center_of_mass")]
+    CenterOfMass { data: CenterOfMass },
 }
 
 #[doc = "The websocket messages this server sends."]
@@ -6868,13 +7097,17 @@ pub enum OutputFormat {
         storage: GltfStorage,
     },
     #[serde(rename = "obj")]
-    Obj { coords: System },
+    Obj { coords: System, units: UnitLength },
     #[serde(rename = "ply")]
     Ply { coords: System, storage: PlyStorage },
     #[serde(rename = "step")]
     Step { coords: System },
     #[serde(rename = "stl")]
-    Stl { coords: System, storage: StlStorage },
+    Stl {
+        coords: System,
+        storage: StlStorage,
+        units: UnitLength,
+    },
 }
 
 #[doc = "The path component command type (within a Path)"]
@@ -8046,6 +8279,42 @@ impl tabled::Tabled for SuccessWebSocketResponse {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["request_id".into(), "resp".into(), "success".into()]
+    }
+}
+
+#[doc = "The surface area response."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SurfaceArea {
+    #[doc = "The output unit for the surface area."]
+    pub output_unit: UnitArea,
+    #[doc = "The surface area."]
+    pub surface_area: f64,
+}
+
+impl std::fmt::Display for SurfaceArea {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SurfaceArea {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.output_unit).into(),
+            format!("{:?}", self.surface_area).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["output_unit".into(), "surface_area".into()]
     }
 }
 
@@ -10413,6 +10682,42 @@ impl tabled::Tabled for VerificationToken {
             "identifier".into(),
             "updated_at".into(),
         ]
+    }
+}
+
+#[doc = "The volume response."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Volume {
+    #[doc = "The output unit for the volume."]
+    pub output_unit: UnitVolume,
+    #[doc = "The volume."]
+    pub volume: f64,
+}
+
+impl std::fmt::Display for Volume {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Volume {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.output_unit).into(),
+            format!("{:?}", self.volume).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["output_unit".into(), "volume".into()]
     }
 }
 
