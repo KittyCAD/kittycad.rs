@@ -7800,16 +7800,16 @@ pub enum PathSegment {
         relative: bool,
     },
     #[doc = "Adds a tangent arc from current pen position with the given radius and angle."]
-    #[serde(rename = "path_tangential_arc")]
-    PathTangentialArc {
+    #[serde(rename = "tangential_arc")]
+    TangentialArc {
         #[doc = "Offset of the arc."]
         offset: Angle,
         #[doc = "Radius of the arc. Not to be confused with Raiders of the Lost Ark."]
         radius: f64,
     },
     #[doc = "Adds a tangent arc from current pen position to the new position."]
-    #[serde(rename = "path_tangential_arc_to")]
-    PathTangentialArcTo {
+    #[serde(rename = "tangential_arc_to")]
+    TangentialArcTo {
         #[doc = "0 will be interpreted as none/null."]
         angle_snap_increment: Option<Angle>,
         #[doc = "Where the arc should end. Must lie in the same plane as the current path pen \
