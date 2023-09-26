@@ -888,12 +888,19 @@ impl tabled::Tabled for DiskResultsPage {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum DiskSource {
+    #[doc = "Create a blank disk"]
     #[serde(rename = "blank")]
-    Blank { block_size: i64 },
+    Blank {
+        #[doc = "size of blocks for this Disk. valid values are: 512, 2048, or 4096"]
+        block_size: i64,
+    },
+    #[doc = "Create a disk from a disk snapshot"]
     #[serde(rename = "snapshot")]
     Snapshot { snapshot_id: uuid::Uuid },
+    #[doc = "Create a disk from a project image"]
     #[serde(rename = "image")]
     Image { image_id: uuid::Uuid },
+    #[doc = "Create a disk from a global image"]
     #[serde(rename = "global_image")]
     GlobalImage { image_id: uuid::Uuid },
 }
@@ -905,18 +912,25 @@ pub enum DiskSource {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "state")]
 pub enum DiskState {
+    #[doc = "Disk is being initialized"]
     #[serde(rename = "creating")]
     Creating {},
+    #[doc = "Disk is ready but detached from any Instance"]
     #[serde(rename = "detached")]
     Detached {},
+    #[doc = "Disk is being attached to the given Instance"]
     #[serde(rename = "attaching")]
     Attaching { instance: uuid::Uuid },
+    #[doc = "Disk is attached to the given Instance"]
     #[serde(rename = "attached")]
     Attached { instance: uuid::Uuid },
+    #[doc = "Disk is being detached from the given Instance"]
     #[serde(rename = "detaching")]
     Detaching { instance: uuid::Uuid },
+    #[doc = "Disk has been destroyed"]
     #[serde(rename = "destroyed")]
     Destroyed {},
+    #[doc = "Disk is unavailable"]
     #[serde(rename = "faulted")]
     Faulted {},
 }
@@ -1792,6 +1806,7 @@ pub enum ImageSource {
     Url { url: String },
     #[serde(rename = "snapshot")]
     Snapshot { id: uuid::Uuid },
+    #[doc = "Boot the Alpine ISO that ships with the Propolis zone. Intended for development purposes only."]
     #[serde(rename = "you_can_boot_anything_as_long_as_its_alpine")]
     YouCanBootAnythingAsLongAsItsAlpine {},
 }
@@ -1953,15 +1968,23 @@ impl tabled::Tabled for InstanceCreate {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum InstanceDiskAttachment {
+    #[doc = "During instance creation, create and attach disks"]
     #[serde(rename = "create")]
     Create {
         description: String,
+        #[doc = "initial source for this disk"]
         disk_source: DiskSource,
+        #[doc = "Names must begin with a lower case ASCII letter, be composed exclusively of lowercase ASCII, uppercase ASCII, numbers, and '-', and may not end with a '-'. Names cannot be a UUID though they may contain a UUID."]
         name: String,
+        #[doc = "total size of the Disk in bytes"]
         size: u64,
     },
+    #[doc = "During instance creation, attach this disk"]
     #[serde(rename = "attach")]
-    Attach { name: String },
+    Attach {
+        #[doc = "A disk name to attach"]
+        name: String,
+    },
 }
 
 #[doc = "Migration parameters for an [`Instance`](omicron_common::api::external::Instance)"]
@@ -2001,10 +2024,13 @@ impl tabled::Tabled for InstanceMigrate {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum InstanceNetworkInterfaceAttachment {
+    #[doc = "Create one or more `NetworkInterface`s for the `Instance`.\n\nIf more than one interface is provided, then the first will be designated the primary interface for the instance."]
     #[serde(rename = "create")]
     Create { params: Vec<NetworkInterfaceCreate> },
+    #[doc = "The default networking configuration for an instance is to create a single primary interface with an automatically-assigned IP address. The IP will be pulled from the Project's default VPC / VPC Subnet."]
     #[serde(rename = "default")]
     Default {},
+    #[doc = "No network interfaces at all will be created for the instance."]
     #[serde(rename = "none")]
     None {},
 }
@@ -3607,12 +3633,16 @@ impl tabled::Tabled for RoleResultsPage {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type", content = "value")]
 pub enum RouteDestination {
+    #[doc = "Route applies to traffic destined for a specific IP address"]
     #[serde(rename = "ip")]
     Ip(std::net::IpAddr),
+    #[doc = "Route applies to traffic destined for a specific IP subnet"]
     #[serde(rename = "ip_net")]
     IpNet(IpNet),
+    #[doc = "Route applies to traffic destined for the given VPC."]
     #[serde(rename = "vpc")]
     Vpc(String),
+    #[doc = "Route applies to traffic"]
     #[serde(rename = "subnet")]
     Subnet(String),
 }
@@ -3624,14 +3654,19 @@ pub enum RouteDestination {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type", content = "value")]
 pub enum RouteTarget {
+    #[doc = "Forward traffic to a particular IP address."]
     #[serde(rename = "ip")]
     Ip(std::net::IpAddr),
+    #[doc = "Forward traffic to a VPC"]
     #[serde(rename = "vpc")]
     Vpc(String),
+    #[doc = "Forward traffic to a VPC Subnet"]
     #[serde(rename = "subnet")]
     Subnet(String),
+    #[doc = "Forward traffic to a specific instance"]
     #[serde(rename = "instance")]
     Instance(String),
+    #[doc = "Forward traffic to an internet gateway"]
     #[serde(rename = "internet_gateway")]
     InternetGateway(String),
 }
@@ -5606,14 +5641,19 @@ impl tabled::Tabled for VpcFirewallRuleFilter {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type", content = "value")]
 pub enum VpcFirewallRuleHostFilter {
+    #[doc = "The rule applies to traffic from/to all instances in the VPC"]
     #[serde(rename = "vpc")]
     Vpc(String),
+    #[doc = "The rule applies to traffic from/to all instances in the VPC Subnet"]
     #[serde(rename = "subnet")]
     Subnet(String),
+    #[doc = "The rule applies to traffic from/to this specific instance"]
     #[serde(rename = "instance")]
     Instance(String),
+    #[doc = "The rule applies to traffic from/to a specific IP address"]
     #[serde(rename = "ip")]
     Ip(std::net::IpAddr),
+    #[doc = "The rule applies to traffic from/to a specific IP subnet"]
     #[serde(rename = "ip_net")]
     IpNet(IpNet),
 }
@@ -5673,14 +5713,19 @@ pub enum VpcFirewallRuleStatus {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type", content = "value")]
 pub enum VpcFirewallRuleTarget {
+    #[doc = "The rule applies to all instances in the VPC"]
     #[serde(rename = "vpc")]
     Vpc(String),
+    #[doc = "The rule applies to all instances in the VPC Subnet"]
     #[serde(rename = "subnet")]
     Subnet(String),
+    #[doc = "The rule applies to this specific instance"]
     #[serde(rename = "instance")]
     Instance(String),
+    #[doc = "The rule applies to a specific IP address"]
     #[serde(rename = "ip")]
     Ip(std::net::IpAddr),
+    #[doc = "The rule applies to a specific IP subnet"]
     #[serde(rename = "ip_net")]
     IpNet(IpNet),
 }
