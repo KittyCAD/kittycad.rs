@@ -5114,6 +5114,14 @@
                 ],
                 "description": "The file format to export to."
               },
+              "source_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ],
+                "description": "Select the unit interpretation of exported objects.\n\nThis is not the same as the export units. Setting export units is part of the format options."
+              },
               "type": {
                 "enum": [
                   "export"
@@ -5124,6 +5132,7 @@
             "required": [
               "entity_ids",
               "format",
+              "source_unit",
               "type"
             ],
             "type": "object"
@@ -6403,6 +6412,14 @@
                 ],
                 "description": "The output unit for the mass."
               },
+              "source_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ],
+                "description": "Select the unit interpretation of distances in the scene."
+              },
               "type": {
                 "enum": [
                   "mass"
@@ -6415,6 +6432,7 @@
               "material_density",
               "material_density_unit",
               "output_unit",
+              "source_unit",
               "type"
             ],
             "type": "object"
@@ -6451,6 +6469,14 @@
                 ],
                 "description": "The output unit for the density."
               },
+              "source_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ],
+                "description": "Select the unit interpretation of distances in the scene."
+              },
               "type": {
                 "enum": [
                   "density"
@@ -6463,6 +6489,7 @@
               "material_mass",
               "material_mass_unit",
               "output_unit",
+              "source_unit",
               "type"
             ],
             "type": "object"
@@ -6486,6 +6513,14 @@
                 ],
                 "description": "The output unit for the volume."
               },
+              "source_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ],
+                "description": "Select the unit interpretation of distances in the scene."
+              },
               "type": {
                 "enum": [
                   "volume"
@@ -6496,6 +6531,7 @@
             "required": [
               "entity_ids",
               "output_unit",
+              "source_unit",
               "type"
             ],
             "type": "object"
@@ -6519,6 +6555,14 @@
                 ],
                 "description": "The output unit for the center of mass."
               },
+              "source_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ],
+                "description": "Select the unit interpretation of distances in the scene."
+              },
               "type": {
                 "enum": [
                   "center_of_mass"
@@ -6529,6 +6573,7 @@
             "required": [
               "entity_ids",
               "output_unit",
+              "source_unit",
               "type"
             ],
             "type": "object"
@@ -6552,6 +6597,14 @@
                 ],
                 "description": "The output unit for the surface area."
               },
+              "source_unit": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ],
+                "description": "Select the unit interpretation of distances in the scene."
+              },
               "type": {
                 "enum": [
                   "surface_area"
@@ -6562,6 +6615,7 @@
             "required": [
               "entity_ids",
               "output_unit",
+              "source_unit",
               "type"
             ],
             "type": "object"
@@ -8634,14 +8688,14 @@
         "description": "The valid types of area units.",
         "oneOf": [
           {
-            "description": "Square centimetres <https://en.wikipedia.org/wiki/Square_centimetre>",
+            "description": "Square centimeters <https://en.wikipedia.org/wiki/Square_centimeter>",
             "enum": [
               "cm2"
             ],
             "type": "string"
           },
           {
-            "description": "Square decimetres <https://en.wikipedia.org/wiki/Square_decimetre>",
+            "description": "Square decimeters <https://en.wikipedia.org/wiki/Square_decimeter>",
             "enum": [
               "dm2"
             ],
@@ -8662,21 +8716,21 @@
             "type": "string"
           },
           {
-            "description": "Square kilometres <https://en.wikipedia.org/wiki/Square_kilometre>",
+            "description": "Square kilometers <https://en.wikipedia.org/wiki/Square_kilometer>",
             "enum": [
               "km2"
             ],
             "type": "string"
           },
           {
-            "description": "Square metres <https://en.wikipedia.org/wiki/Square_metre>",
+            "description": "Square meters <https://en.wikipedia.org/wiki/Square_meter>",
             "enum": [
               "m2"
             ],
             "type": "string"
           },
           {
-            "description": "Square millimetres <https://en.wikipedia.org/wiki/Square_millimetre>",
+            "description": "Square millimeters <https://en.wikipedia.org/wiki/Square_millimeter>",
             "enum": [
               "mm2"
             ],
@@ -9374,7 +9428,7 @@
         "description": "The valid types of length units.",
         "oneOf": [
           {
-            "description": "Centimetres <https://en.wikipedia.org/wiki/Centimetre>",
+            "description": "Centimeters <https://en.wikipedia.org/wiki/Centimeter>",
             "enum": [
               "cm"
             ],
@@ -9395,14 +9449,14 @@
             "type": "string"
           },
           {
-            "description": "Metres <https://en.wikipedia.org/wiki/Metre>",
+            "description": "Meters <https://en.wikipedia.org/wiki/Meter>",
             "enum": [
               "m"
             ],
             "type": "string"
           },
           {
-            "description": "Millimetres <https://en.wikipedia.org/wiki/Millimetre>",
+            "description": "Millimeters <https://en.wikipedia.org/wiki/Millimeter>",
             "enum": [
               "mm"
             ],
@@ -10165,7 +10219,7 @@
         "description": "The valid types of volume units.",
         "oneOf": [
           {
-            "description": "Cubic centimetres (cc or cm³) <https://en.wikipedia.org/wiki/Cubic_centimetre>",
+            "description": "Cubic centimeters (cc or cm³) <https://en.wikipedia.org/wiki/Cubic_centimeter>",
             "enum": [
               "cm3"
             ],
@@ -10186,7 +10240,7 @@
             "type": "string"
           },
           {
-            "description": "Cubic metres (m³) <https://en.wikipedia.org/wiki/Cubic_metre>",
+            "description": "Cubic meters (m³) <https://en.wikipedia.org/wiki/Cubic_meter>",
             "enum": [
               "m3"
             ],
