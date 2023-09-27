@@ -6643,6 +6643,9 @@ pub enum ModelingCmd {
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The file format to export to."]
         format: OutputFormat,
+        #[doc = "Select the unit interpretation of exported objects.\n\nThis is not the same as \
+                 the export units. Setting export units is part of the format options."]
+        source_unit: UnitLength,
     },
     #[doc = "What is this entity's parent?"]
     #[serde(rename = "entity_get_parent_id")]
@@ -7011,6 +7014,8 @@ pub enum ModelingCmd {
         material_density_unit: UnitDensity,
         #[doc = "The output unit for the mass."]
         output_unit: UnitMass,
+        #[doc = "Select the unit interpretation of distances in the scene."]
+        source_unit: UnitLength,
     },
     #[doc = "Get the density of entities in the scene or the default scene."]
     #[serde(rename = "density")]
@@ -7024,6 +7029,8 @@ pub enum ModelingCmd {
         material_mass_unit: UnitMass,
         #[doc = "The output unit for the density."]
         output_unit: UnitDensity,
+        #[doc = "Select the unit interpretation of distances in the scene."]
+        source_unit: UnitLength,
     },
     #[doc = "Get the volume of entities in the scene or the default scene."]
     #[serde(rename = "volume")]
@@ -7033,6 +7040,8 @@ pub enum ModelingCmd {
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The output unit for the volume."]
         output_unit: UnitVolume,
+        #[doc = "Select the unit interpretation of distances in the scene."]
+        source_unit: UnitLength,
     },
     #[doc = "Get the center of mass of entities in the scene or the default scene."]
     #[serde(rename = "center_of_mass")]
@@ -7042,6 +7051,8 @@ pub enum ModelingCmd {
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The output unit for the center of mass."]
         output_unit: UnitLength,
+        #[doc = "Select the unit interpretation of distances in the scene."]
+        source_unit: UnitLength,
     },
     #[doc = "Get the surface area of entities in the scene or the default scene."]
     #[serde(rename = "surface_area")]
@@ -7051,6 +7062,8 @@ pub enum ModelingCmd {
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The output unit for the surface area."]
         output_unit: UnitArea,
+        #[doc = "Select the unit interpretation of distances in the scene."]
+        source_unit: UnitLength,
     },
 }
 
@@ -9122,11 +9135,11 @@ impl tabled::Tabled for UnitAngleConversion {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitArea {
-    #[doc = "Square centimetres <https://en.wikipedia.org/wiki/Square_centimetre>"]
+    #[doc = "Square centimeters <https://en.wikipedia.org/wiki/Square_centimeter>"]
     #[serde(rename = "cm2")]
     #[display("cm2")]
     Cm2,
-    #[doc = "Square decimetres <https://en.wikipedia.org/wiki/Square_decimetre>"]
+    #[doc = "Square decimeters <https://en.wikipedia.org/wiki/Square_decimeter>"]
     #[serde(rename = "dm2")]
     #[display("dm2")]
     Dm2,
@@ -9138,15 +9151,15 @@ pub enum UnitArea {
     #[serde(rename = "in2")]
     #[display("in2")]
     In2,
-    #[doc = "Square kilometres <https://en.wikipedia.org/wiki/Square_kilometre>"]
+    #[doc = "Square kilometers <https://en.wikipedia.org/wiki/Square_kilometer>"]
     #[serde(rename = "km2")]
     #[display("km2")]
     Km2,
-    #[doc = "Square metres <https://en.wikipedia.org/wiki/Square_metre>"]
+    #[doc = "Square meters <https://en.wikipedia.org/wiki/Square_meter>"]
     #[serde(rename = "m2")]
     #[display("m2")]
     M2,
-    #[doc = "Square millimetres <https://en.wikipedia.org/wiki/Square_millimetre>"]
+    #[doc = "Square millimeters <https://en.wikipedia.org/wiki/Square_millimeter>"]
     #[serde(rename = "mm2")]
     #[display("mm2")]
     Mm2,
@@ -9909,7 +9922,7 @@ impl tabled::Tabled for UnitFrequencyConversion {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitLength {
-    #[doc = "Centimetres <https://en.wikipedia.org/wiki/Centimetre>"]
+    #[doc = "Centimeters <https://en.wikipedia.org/wiki/Centimeter>"]
     #[serde(rename = "cm")]
     #[display("cm")]
     Cm,
@@ -9921,11 +9934,11 @@ pub enum UnitLength {
     #[serde(rename = "in")]
     #[display("in")]
     In,
-    #[doc = "Metres <https://en.wikipedia.org/wiki/Metre>"]
+    #[doc = "Meters <https://en.wikipedia.org/wiki/Meter>"]
     #[serde(rename = "m")]
     #[display("m")]
     M,
-    #[doc = "Millimetres <https://en.wikipedia.org/wiki/Millimetre>"]
+    #[doc = "Millimeters <https://en.wikipedia.org/wiki/Millimeter>"]
     #[serde(rename = "mm")]
     #[display("mm")]
     Mm,
@@ -10781,7 +10794,7 @@ impl tabled::Tabled for UnitTorqueConversion {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitVolume {
-    #[doc = "Cubic centimetres (cc or cm³) <https://en.wikipedia.org/wiki/Cubic_centimetre>"]
+    #[doc = "Cubic centimeters (cc or cm³) <https://en.wikipedia.org/wiki/Cubic_centimeter>"]
     #[serde(rename = "cm3")]
     #[display("cm3")]
     Cm3,
@@ -10793,7 +10806,7 @@ pub enum UnitVolume {
     #[serde(rename = "in3")]
     #[display("in3")]
     In3,
-    #[doc = "Cubic metres (m³) <https://en.wikipedia.org/wiki/Cubic_metre>"]
+    #[doc = "Cubic meters (m³) <https://en.wikipedia.org/wiki/Cubic_meter>"]
     #[serde(rename = "m3")]
     #[display("m3")]
     M3,
