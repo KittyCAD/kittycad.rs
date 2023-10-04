@@ -1165,7 +1165,7 @@ pub struct ApiCallWithPrice {
     pub origin: Option<String>,
     #[doc = "The price of the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub price: Option<bigdecimal::BigDecimal>,
+    pub price: Option<f64>,
     #[doc = "The request body sent by the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub request_body: Option<String>,
@@ -3034,7 +3034,7 @@ pub struct Coupon {
     #[doc = "Amount (in the `currency` specified) that will be taken off the subtotal of any \
              invoices for this customer."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub amount_off: Option<bigdecimal::BigDecimal>,
+    pub amount_off: Option<f64>,
     #[doc = "Always true for a deleted object."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub deleted: Option<bool>,
@@ -3261,7 +3261,7 @@ pub struct Customer {
              have yet to be successfully applied to any invoice. This balance is only taken into \
              account as invoices are finalized."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub balance: Option<bigdecimal::BigDecimal>,
+    pub balance: Option<f64>,
     #[doc = "Time at which the object was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "Three-letter ISO code for the currency the customer can be charged in for recurring \
@@ -3380,7 +3380,7 @@ pub struct CustomerBalance {
     #[doc = "The monthy credits remaining in the balance. This gets re-upped every month, but if \
              the credits are not used for a month they do not carry over to the next month. It is \
              a stable amount granted to the user per month."]
-    pub monthly_credits_remaining: bigdecimal::BigDecimal,
+    pub monthly_credits_remaining: f64,
     #[doc = "The amount of pre-pay cash remaining in the balance. This number goes down as the \
              user uses their pre-paid credits. The reason we track this amount is if a user ever \
              wants to withdraw their pre-pay cash, we can use this amount to determine how much \
@@ -3390,15 +3390,15 @@ pub struct CustomerBalance {
              `pre_pay_credits_remaining` will be subtracted by 50 to pay the bill. This way if \
              they want to withdraw money after, they can only withdraw $50 since that is the \
              amount of cash they have remaining."]
-    pub pre_pay_cash_remaining: bigdecimal::BigDecimal,
+    pub pre_pay_cash_remaining: f64,
     #[doc = "The amount of credits remaining in the balance. This is typically the amount of cash \
              * some multiplier they get for pre-paying their account. This number lowers every \
              time a bill is paid with the balance. This number increases every time a user adds \
              funds to their balance. This may be through a subscription or a one off payment."]
-    pub pre_pay_credits_remaining: bigdecimal::BigDecimal,
+    pub pre_pay_credits_remaining: f64,
     #[doc = "This includes any outstanding, draft, or open invoices and any pending invoice \
              items. This does not include any credits the user has on their account."]
-    pub total_due: bigdecimal::BigDecimal,
+    pub total_due: f64,
     #[doc = "The date and time the balance was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID the balance belongs to."]
@@ -5233,6 +5233,45 @@ impl tabled::Tabled for GetEntityType {
     }
 }
 
+#[doc = "The plane for sketch mode."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct GetSketchModePlane {
+    #[doc = "The x axis."]
+    pub x_axis: Point3D,
+    #[doc = "The y axis."]
+    pub y_axis: Point3D,
+    #[doc = "The z axis (normal)."]
+    pub z_axis: Point3D,
+}
+
+impl std::fmt::Display for GetSketchModePlane {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for GetSketchModePlane {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.x_axis).into(),
+            format!("{:?}", self.y_axis).into(),
+            format!("{:?}", self.z_axis).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["x_axis".into(), "y_axis".into(), "z_axis".into()]
+    }
+}
+
 #[doc = "Describes the presentation style of the glTF JSON."]
 #[derive(
     serde :: Serialize,
@@ -5565,13 +5604,13 @@ pub struct Invoice {
              also take that into account. The charge that gets generated for the invoice will be \
              for the amount specified in `amount_due`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub amount_due: Option<bigdecimal::BigDecimal>,
+    pub amount_due: Option<f64>,
     #[doc = "The amount, in USD, that was paid."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub amount_paid: Option<bigdecimal::BigDecimal>,
+    pub amount_paid: Option<f64>,
     #[doc = "The amount remaining, in USD, that is due."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub amount_remaining: Option<bigdecimal::BigDecimal>,
+    pub amount_remaining: Option<f64>,
     #[doc = "Number of payment attempts made for this invoice, from the perspective of the \
              payment retry schedule.\n\nAny payment attempt counts as the first attempt, and \
              subsequently only automatic retries increment the attempt count. In other words, \
@@ -5641,14 +5680,14 @@ pub struct Invoice {
     #[doc = "Total of all subscriptions, invoice items, and prorations on the invoice before any \
              invoice level discount or tax is applied.\n\nItem discounts are already incorporated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub subtotal: Option<bigdecimal::BigDecimal>,
+    pub subtotal: Option<f64>,
     #[doc = "The amount of tax on this invoice.\n\nThis is the sum of all the tax amounts on this \
              invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub tax: Option<bigdecimal::BigDecimal>,
+    pub tax: Option<f64>,
     #[doc = "Total after discounts and taxes."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub total: Option<bigdecimal::BigDecimal>,
+    pub total: Option<f64>,
     #[doc = "The URL for the hosted invoice page, which allows customers to view and pay an \
              invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -5832,7 +5871,7 @@ impl tabled::Tabled for Invoice {
 pub struct InvoiceLineItem {
     #[doc = "The amount, in USD."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub amount: Option<bigdecimal::BigDecimal>,
+    pub amount: Option<f64>,
     #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), \
              in lowercase."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -6893,6 +6932,9 @@ pub enum ModelingCmd {
     SketchModeEnable {
         #[doc = "Animate the transition to sketch mode."]
         animated: bool,
+        #[doc = "Disable the camera entirely for sketch mode and sketch on a plane (this would be \
+                 the normal of that plane)."]
+        disable_camera_with_plane: Option<Point3D>,
         #[doc = "Use an orthographic camera."]
         ortho: bool,
         #[doc = "Sketch on this plane."]
@@ -7065,6 +7107,10 @@ pub enum ModelingCmd {
         #[doc = "Select the unit interpretation of distances in the scene."]
         source_unit: UnitLength,
     },
+    #[doc = "Get the plane of the sketch mode. This is useful for getting the normal of the plane \
+             after a user selects a plane."]
+    #[serde(rename = "get_sketch_mode_plane")]
+    GetSketchModePlane {},
 }
 
 #[doc = "The response from the `MouseClick` command."]
@@ -7462,6 +7508,12 @@ pub enum OkModelingCmdResponse {
     CenterOfMass {
         #[doc = "The center of mass response."]
         data: CenterOfMass,
+    },
+    #[doc = "The response from the `GetSketchModePlane` command."]
+    #[serde(rename = "get_sketch_mode_plane")]
+    GetSketchModePlane {
+        #[doc = "The plane for sketch mode."]
+        data: GetSketchModePlane,
     },
 }
 
@@ -8725,7 +8777,8 @@ impl tabled::Tabled for Solid3DGetAllOppositeEdges {
 )]
 pub struct Solid3DGetNextAdjacentEdge {
     #[doc = "The UUID of the edge."]
-    pub edge: uuid::Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edge: Option<uuid::Uuid>,
 }
 
 impl std::fmt::Display for Solid3DGetNextAdjacentEdge {
@@ -8742,7 +8795,11 @@ impl std::fmt::Display for Solid3DGetNextAdjacentEdge {
 impl tabled::Tabled for Solid3DGetNextAdjacentEdge {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.edge).into()]
+        vec![if let Some(edge) = &self.edge {
+            format!("{:?}", edge).into()
+        } else {
+            String::new().into()
+        }]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
@@ -8787,7 +8844,8 @@ impl tabled::Tabled for Solid3DGetOppositeEdge {
 )]
 pub struct Solid3DGetPrevAdjacentEdge {
     #[doc = "The UUID of the edge."]
-    pub edge: uuid::Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edge: Option<uuid::Uuid>,
 }
 
 impl std::fmt::Display for Solid3DGetPrevAdjacentEdge {
@@ -8804,7 +8862,11 @@ impl std::fmt::Display for Solid3DGetPrevAdjacentEdge {
 impl tabled::Tabled for Solid3DGetPrevAdjacentEdge {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.edge).into()]
+        vec![if let Some(edge) = &self.edge {
+            format!("{:?}", edge).into()
+        } else {
+            String::new().into()
+        }]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
