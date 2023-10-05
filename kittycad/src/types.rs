@@ -6887,6 +6887,8 @@ pub enum ModelingCmd {
         #[doc = "If true, any existing drawables within the obj will be replaced (the object will \
                  be reset)"]
         clobber: bool,
+        #[doc = "If true, the plane will be created but hidden initially."]
+        hide: bool,
         #[doc = "Origin of the plane"]
         origin: Point3D,
         #[doc = "What should the plane's span/extent? When rendered visually, this is both the \
