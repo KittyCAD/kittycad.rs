@@ -5846,6 +5846,7 @@
               },
               "hide": {
                 "description": "If true, the plane will be created but hidden initially.",
+                "nullable": true,
                 "type": "boolean"
               },
               "origin": {
@@ -5886,7 +5887,6 @@
             },
             "required": [
               "clobber",
-              "hide",
               "origin",
               "size",
               "type",
