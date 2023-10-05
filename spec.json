@@ -5844,6 +5844,10 @@
                 "description": "If true, any existing drawables within the obj will be replaced (the object will be reset)",
                 "type": "boolean"
               },
+              "hide": {
+                "description": "If true, the plane will be created but hidden initially.",
+                "type": "boolean"
+              },
               "origin": {
                 "allOf": [
                   {
@@ -5882,6 +5886,7 @@
             },
             "required": [
               "clobber",
+              "hide",
               "origin",
               "size",
               "type",
