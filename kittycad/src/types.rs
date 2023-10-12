@@ -6800,6 +6800,12 @@ pub enum ModelingCmd {
         #[doc = "Which object to change"]
         object_id: uuid::Uuid,
     },
+    #[doc = "Bring an object to the front of the scene"]
+    #[serde(rename = "object_bring_to_front")]
+    ObjectBringToFront {
+        #[doc = "Which object to change"]
+        object_id: uuid::Uuid,
+    },
     #[doc = "What type of entity is this?"]
     #[serde(rename = "get_entity_type")]
     GetEntityType {
