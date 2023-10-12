@@ -12560,6 +12560,33 @@
             ]
           },
           {
+            "description": "Add a hole to a Solid2d object before extruding it.",
+            "type": "object",
+            "properties": {
+              "hole_id": {
+                "description": "The id of the path to use as the inner profile (hole).",
+                "type": "string",
+                "format": "uuid"
+              },
+              "object_id": {
+                "description": "Which object to add the hole to.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid2d_add_hole"
+                ]
+              }
+            },
+            "required": [
+              "hole_id",
+              "object_id",
+              "type"
+            ]
+          },
+          {
             "description": "Gets all faces which use the given edge.",
             "type": "object",
             "properties": {
@@ -13645,6 +13672,32 @@
         "description": "All commands have unique IDs. These should be randomly generated.",
         "type": "string",
         "format": "uuid"
+      },
+      "ModelingCmdReq": {
+        "description": "A graphics command submitted to the KittyCAD engine via the Modeling API.",
+        "type": "object",
+        "properties": {
+          "cmd": {
+            "description": "Which command to submit to the Kittycad engine.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ModelingCmd"
+              }
+            ]
+          },
+          "cmd_id": {
+            "description": "ID of command being submitted.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ModelingCmdId"
+              }
+            ]
+          }
+        },
+        "required": [
+          "cmd",
+          "cmd_id"
+        ]
       },
       "MouseClick": {
         "description": "The response from the `MouseClick` command.",
@@ -17686,6 +17739,29 @@
             "required": [
               "cmd",
               "cmd_id",
+              "type"
+            ]
+          },
+          {
+            "description": "A sequence of modeling requests. If any request fails, following requests will not be tried.",
+            "type": "object",
+            "properties": {
+              "requests": {
+                "description": "A sequence of modeling requests. If any request fails, following requests will not be tried.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ModelingCmdReq"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "modeling_cmd_batch_req"
+                ]
+              }
+            },
+            "required": [
+              "requests",
               "type"
             ]
           },

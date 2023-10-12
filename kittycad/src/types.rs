@@ -6812,6 +6812,14 @@ pub enum ModelingCmd {
         #[doc = "ID of the entity being queried."]
         entity_id: uuid::Uuid,
     },
+    #[doc = "Add a hole to a Solid2d object before extruding it."]
+    #[serde(rename = "solid2d_add_hole")]
+    Solid2DAddHole {
+        #[doc = "The id of the path to use as the inner profile (hole)."]
+        hole_id: uuid::Uuid,
+        #[doc = "Which object to add the hole to."]
+        object_id: uuid::Uuid,
+    },
     #[doc = "Gets all faces which use the given edge."]
     #[serde(rename = "solid3d_get_all_edge_faces")]
     Solid3DGetAllEdgeFaces {
@@ -7119,6 +7127,42 @@ pub enum ModelingCmd {
              after a user selects a plane."]
     #[serde(rename = "get_sketch_mode_plane")]
     GetSketchModePlane {},
+}
+
+#[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ModelingCmdReq {
+    #[doc = "Which command to submit to the Kittycad engine."]
+    pub cmd: ModelingCmd,
+    #[doc = "ID of command being submitted."]
+    pub cmd_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for ModelingCmdReq {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ModelingCmdReq {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.cmd).into(),
+            format!("{:?}", self.cmd_id).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["cmd".into(), "cmd_id".into()]
+    }
 }
 
 #[doc = "The response from the `MouseClick` command."]
@@ -11418,6 +11462,14 @@ pub enum WebSocketRequest {
         cmd: ModelingCmd,
         #[doc = "ID of command being submitted."]
         cmd_id: uuid::Uuid,
+    },
+    #[doc = "A sequence of modeling requests. If any request fails, following requests will not \
+             be tried."]
+    #[serde(rename = "modeling_cmd_batch_req")]
+    ModelingCmdBatchReq {
+        #[doc = "A sequence of modeling requests. If any request fails, following requests will \
+                 not be tried."]
+        requests: Vec<ModelingCmdReq>,
     },
     #[doc = "The client-to-server Ping to ensure the WebSocket stays alive."]
     #[serde(rename = "ping")]
