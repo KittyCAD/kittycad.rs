@@ -8621,6 +8621,9 @@ pub enum SceneToolType {
     #[serde(rename = "sketch_line")]
     #[display("sketch_line")]
     SketchLine,
+    #[serde(rename = "sketch_tangential_arc")]
+    #[display("sketch_tangential_arc")]
+    SketchTangentialArc,
     #[serde(rename = "sketch_curve")]
     #[display("sketch_curve")]
     SketchCurve,
