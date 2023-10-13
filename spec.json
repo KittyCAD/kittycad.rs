@@ -15397,6 +15397,7 @@
           "select",
           "move",
           "sketch_line",
+          "sketch_tangential_arc",
           "sketch_curve",
           "sketch_curve_mod"
         ]
