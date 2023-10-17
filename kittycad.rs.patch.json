@@ -33,18 +33,10 @@
   },
   {
     "op": "add",
-    "path": "/paths/~1ai~1image-to-3d~1{input_format}~1{output_format}/post/x-rust",
+    "path": "/paths/~1ai~1text-to-cad~1{output_format}/post/x-rust",
     "value": {
-      "example": "/// Generate a 3D model from an image.\n/// \n/// This is an alpha endpoint. It will change in the future. The current output is honestly pretty bad. So if you find this endpoint, you get what you pay for, which currently is nothing. But in the future will be made a lot better.\n/// \n/// **Parameters:**\n/// \n/// - `input_format: crate::types::ImageType`: The format of the image being converted. (required)\n/// - `output_format: crate::types::FileExportFormat`: The format the output file should be converted to. (required)\nasync fn example_ai_create_image_to_3d() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Mesh = client\n        .ai()\n        .create_image_to_3d(\n            kittycad::types::ImageType::Jpg,\n            kittycad::types::FileExportFormat::Stl,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ai/struct.Ai.html#method.create_image_to_3d"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1ai~1text-to-3d~1{output_format}/post/x-rust",
-    "value": {
-      "example": "/// Generate a 3D model from text.\n/// \n/// This is an alpha endpoint. It will change in the future. The current output is honestly pretty bad. So if you find this endpoint, you get what you pay for, which currently is nothing. But in the future will be made a lot better.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::FileExportFormat`: The format the output file should be converted to. (required)\n/// - `prompt: &'astr`: The prompt for the model. (required)\nasync fn example_ai_create_text_to_3d() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Mesh = client\n        .ai()\n        .create_text_to_3d(kittycad::types::FileExportFormat::Stl, \"some-string\")\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ai/struct.Ai.html#method.create_text_to_3d"
+      "example": "/// Generate a CAD model from text.\n/// \n/// This operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// This is an alpha endpoint. It will change in the future. The current output is honestly pretty bad. So if you find this endpoint, you get what you pay for, which currently is nothing. But in the future will be made a lot better.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::FileExportFormat`: The format the output file should be converted to. (required)\nasync fn example_ai_create_text_to_cad() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCad = client\n        .ai()\n        .create_text_to_cad(\n            kittycad::types::FileExportFormat::Stl,\n            &kittycad::types::TextToCadCreateBody {\n                prompt: \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ai/struct.Ai.html#method.create_text_to_cad"
     }
   },
   {
@@ -541,6 +533,22 @@
     "value": {
       "example": "/// Get a session for your user.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.\n/// \n/// **Parameters:**\n/// \n/// - `token: uuid::Uuid`: The API token. (required)\nuse std::str::FromStr;\nasync fn example_users_get_session_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Session = client\n        .users()\n        .get_session_for(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_session_for"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1text-to-cad/get/x-rust",
+    "value": {
+      "example": "/// List text-to-CAD models you've generated.\n/// \n/// This endpoint requires authentication by any KittyCAD user. It returns the text-to-CAD models for the authenticated user.\n/// The text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_ai_list_text_to_cad_models_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadResultsPage = client\n        .ai()\n        .list_text_to_cad_models_for_user(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_text_to_cad_models_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_text_to_cad_models_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ai/struct.Ai.html#method.list_text_to_cad_models_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1text-to-cad~1{id}/post/x-rust",
+    "value": {
+      "example": "/// Give feedback to a specific text-to-CAD response.\n/// \n/// This endpoint requires authentication by any KittyCAD user. The user must be the owner of the text-to-CAD model, in order to give feedback.\n/// \n/// **Parameters:**\n/// \n/// - `feedback: crate::types::AiFeedback`: The feedback. (required)\n/// - `id: uuid::Uuid`: The id of the model to give feedback to. (required)\nuse std::str::FromStr;\nasync fn example_ai_create_text_to_cad_model_feedback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .ai()\n        .create_text_to_cad_model_feedback(\n            kittycad::types::AiFeedback::ThumbsDown,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ai/struct.Ai.html#method.create_text_to_cad_model_feedback"
     }
   },
   {
