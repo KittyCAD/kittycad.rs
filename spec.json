@@ -6332,15 +6332,6 @@
           },
           {
             "in": "query",
-            "name": "no_contents",
-            "description": "Do not return the model contents only return the metadata. By default, the model contents are returned.",
-            "schema": {
-              "nullable": true,
-              "type": "boolean"
-            }
-          },
-          {
-            "in": "query",
             "name": "page_token",
             "description": "Token returned by previous call to retrieve the subsequent page",
             "schema": {
