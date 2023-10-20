@@ -34,7 +34,11 @@ impl Meta {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -59,7 +63,11 @@ impl Meta {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -90,7 +98,11 @@ impl Meta {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -129,7 +141,11 @@ impl Meta {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -159,7 +175,11 @@ impl Meta {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -185,7 +205,11 @@ impl Meta {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 }

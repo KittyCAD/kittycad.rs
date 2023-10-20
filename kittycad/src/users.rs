@@ -36,7 +36,11 @@ impl Users {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -63,7 +67,11 @@ impl Users {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -85,7 +93,11 @@ impl Users {
         if status.is_success() {
             Ok(())
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -110,7 +122,11 @@ impl Users {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -138,7 +154,11 @@ impl Users {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -168,7 +188,11 @@ impl Users {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -206,7 +230,11 @@ impl Users {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -248,7 +276,11 @@ impl Users {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -292,7 +324,11 @@ impl Users {
                                         )
                                     })
                                 } else {
-                                    Err(crate::types::error::Error::UnexpectedResponse(resp))
+                                    let text = resp.text().await.unwrap_or_default();
+                                    Err(crate::types::error::Error::Server {
+                                        body: text.to_string(),
+                                        status,
+                                    })
                                 }
                             }
                             .map_ok(|result: crate::types::UserResultsPage| {
@@ -351,7 +387,11 @@ impl Users {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -396,7 +436,11 @@ impl Users {
                                         )
                                     })
                                 } else {
-                                    Err(crate::types::error::Error::UnexpectedResponse(resp))
+                                    let text = resp.text().await.unwrap_or_default();
+                                    Err(crate::types::error::Error::Server {
+                                        body: text.to_string(),
+                                        status,
+                                    })
                                 }
                             }
                             .map_ok(|result: crate::types::ExtendedUserResultsPage| {
@@ -452,7 +496,11 @@ impl Users {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -482,7 +530,11 @@ impl Users {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 }

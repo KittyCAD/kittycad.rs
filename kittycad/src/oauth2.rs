@@ -37,7 +37,11 @@ impl Oauth2 {
         if status.is_success() {
             Ok(())
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -66,7 +70,11 @@ impl Oauth2 {
         if status.is_success() {
             Ok(())
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -87,7 +95,11 @@ impl Oauth2 {
         if status.is_success() {
             Ok(())
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -116,7 +128,11 @@ impl Oauth2 {
         if status.is_success() {
             Ok(())
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -162,7 +178,11 @@ impl Oauth2 {
         if status.is_success() {
             Ok(())
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -209,7 +229,11 @@ impl Oauth2 {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 }

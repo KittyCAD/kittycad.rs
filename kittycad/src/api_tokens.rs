@@ -50,7 +50,11 @@ impl ApiTokens {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -95,7 +99,11 @@ impl ApiTokens {
                                         )
                                     })
                                 } else {
-                                    Err(crate::types::error::Error::UnexpectedResponse(resp))
+                                    let text = resp.text().await.unwrap_or_default();
+                                    Err(crate::types::error::Error::Server {
+                                        body: text.to_string(),
+                                        status,
+                                    })
                                 }
                             }
                             .map_ok(|result: crate::types::ApiTokenResultsPage| {
@@ -137,7 +145,11 @@ impl ApiTokens {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -167,7 +179,11 @@ impl ApiTokens {
                 )
             })
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 
@@ -201,7 +217,11 @@ impl ApiTokens {
         if status.is_success() {
             Ok(())
         } else {
-            Err(crate::types::error::Error::UnexpectedResponse(resp))
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
         }
     }
 }

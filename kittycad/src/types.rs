@@ -329,6 +329,13 @@ pub mod error {
             #[doc = " The full response."]
             response: reqwest::Response,
         },
+        #[doc = " An error from the server."]
+        Server {
+            #[doc = " The text from the body."]
+            body: String,
+            #[doc = " The response status."]
+            status: reqwest::StatusCode,
+        },
         #[doc = " A response not listed in the API description. This may represent a"]
         #[doc = " success or failure response; check `status().is_success()`."]
         UnexpectedResponse(reqwest::Response),
@@ -346,6 +353,7 @@ pub mod error {
                 Error::CommunicationError(reqwest_middleware::Error::Middleware(_)) => None,
                 Error::SerdeError { error: _, status } => Some(*status),
                 Error::InvalidResponsePayload { error: _, response } => Some(response.status()),
+                Error::Server { body: _, status } => Some(*status),
                 Error::UnexpectedResponse(r) => Some(r.status()),
             }
         }
@@ -390,6 +398,9 @@ pub mod error {
                 }
                 Error::InvalidResponsePayload { error, response: _ } => {
                     write!(f, "Invalid Response Payload: {}", error)
+                }
+                Error::Server { body, status } => {
+                    write!(f, "Server Error: {} {}", status, body)
                 }
                 Error::UnexpectedResponse(r) => {
                     write!(f, "Unexpected Response: {:?}", r)
