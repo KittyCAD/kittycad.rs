@@ -6,7 +6,7 @@ VERSION = $(shell cat VERSION.txt)
 
 generate: kittycad
 	cargo clippy --all
-	cargo nextest run --no-capture --all-features
+	cargo nextest run --no-capture --all-features --no-fail-fast
 
 target/debug/openapitor: openapitor/src/*.rs openapitor/src/*/*.rs openapitor/Cargo.toml spec.json
 	cargo build --bin openapitor

@@ -94,6 +94,45 @@ impl Meta {
         }
     }
 
+    #[doc = "Get an API token for a user by their discord id.\n\nThis endpoint allows us to run \
+             API calls from our discord bot on behalf of a user. The user must have a discord \
+             account linked to their KittyCAD Account via oauth2 for this to work.\nYou must be a \
+             KittyCAD employee to use this endpoint.\n\n**Parameters:**\n\n- `discord_id: &'astr`: \
+             The user's discord ID. (required)\n\n```rust,no_run\nasync fn \
+             example_meta_internal_get_api_token_for_discord_user() -> anyhow::Result<()> {\n    \
+             let client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::ApiToken = client\n        .meta()\n        \
+             .internal_get_api_token_for_discord_user(\"some-string\")\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn internal_get_api_token_for_discord_user<'a>(
+        &'a self,
+        discord_id: &'a str,
+    ) -> Result<crate::types::ApiToken, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "internal/discord/api-token/{discord_id}".replace("{discord_id}", discord_id)
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
+        }
+    }
+
     #[doc = "Get AI plugin OpenAPI schema.\n\nThis is the same as the OpenAPI schema, BUT it has \
              some modifications to make it compatible with OpenAI. For example, descriptions must \
              be < 300 chars.\n\n```rust,no_run\nasync fn example_meta_get_openai_schema() -> \

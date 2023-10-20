@@ -56,8 +56,8 @@ impl Payments {
              Some(\"some-string\".to_string()),\n                street_1: \
              Some(\"some-string\".to_string()),\n                street_2: \
              Some(\"some-string\".to_string()),\n                user_id: \
-             Some(\"some-string\".to_string()),\n                zip: \
-             Some(\"some-string\".to_string()),\n            }),\n            name: \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                \
+             zip: Some(\"some-string\".to_string()),\n            }),\n            name: \
              Some(\"some-string\".to_string()),\n            phone: \
              kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        \
              })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
@@ -100,8 +100,8 @@ impl Payments {
              Some(\"some-string\".to_string()),\n                street_1: \
              Some(\"some-string\".to_string()),\n                street_2: \
              Some(\"some-string\".to_string()),\n                user_id: \
-             Some(\"some-string\".to_string()),\n                zip: \
-             Some(\"some-string\".to_string()),\n            }),\n            name: \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                \
+             zip: Some(\"some-string\".to_string()),\n            }),\n            name: \
              Some(\"some-string\".to_string()),\n            phone: \
              kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        \
              })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]

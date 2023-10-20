@@ -436,6 +436,10 @@ pub mod error {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum AccountProvider {
+    #[doc = "The Discord account provider."]
+    #[serde(rename = "discord")]
+    #[display("discord")]
+    Discord,
     #[doc = "The Google account provider."]
     #[serde(rename = "google")]
     #[display("google")]
@@ -1217,8 +1221,7 @@ pub struct ApiCallWithPrice {
     #[doc = "The user agent of the request."]
     pub user_agent: String,
     #[doc = "The ID of the user that made the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for ApiCallWithPrice {
@@ -1317,11 +1320,7 @@ impl tabled::Tabled for ApiCallWithPrice {
             format!("{:?}", self.token).into(),
             format!("{:?}", self.updated_at).into(),
             self.user_agent.clone().into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -1466,8 +1465,7 @@ pub struct ApiToken {
     #[doc = "The date and time the API token was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The unique identifier for the API token."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub id: Option<String>,
+    pub id: uuid::Uuid,
     #[doc = "If the token is valid. We never delete API tokens, but we can mark them as invalid. \
              We save them for ever to preserve the history of the API token."]
     pub is_valid: bool,
@@ -1476,8 +1474,7 @@ pub struct ApiToken {
     #[doc = "The date and time the API token was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The ID of the user that owns the API token."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for ApiToken {
@@ -1496,19 +1493,11 @@ impl tabled::Tabled for ApiToken {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.created_at).into(),
-            if let Some(id) = &self.id {
-                format!("{:?}", id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.id).into(),
             format!("{:?}", self.is_valid).into(),
             format!("{:?}", self.token).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -1661,8 +1650,7 @@ pub struct AsyncApiCall {
     #[doc = "The time and date the async API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the async API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
     #[doc = "The worker node that is performing or performed the async API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub worker: Option<String>,
@@ -1713,11 +1701,7 @@ impl tabled::Tabled for AsyncApiCall {
             format!("{:?}", self.status).into(),
             format!("{:?}", self.type_).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
             if let Some(worker) = &self.worker {
                 format!("{:?}", worker).into()
             } else {
@@ -1780,7 +1764,7 @@ pub enum AsyncApiCallOutput {
         #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The user ID of the user who created the API call."]
-        user_id: Option<String>,
+        user_id: uuid::Uuid,
     },
     #[doc = "File center of mass."]
     #[serde(rename = "file_center_of_mass")]
@@ -1806,7 +1790,7 @@ pub enum AsyncApiCallOutput {
         #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The user ID of the user who created the API call."]
-        user_id: Option<String>,
+        user_id: uuid::Uuid,
     },
     #[doc = "A file mass."]
     #[serde(rename = "file_mass")]
@@ -1836,7 +1820,7 @@ pub enum AsyncApiCallOutput {
         #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The user ID of the user who created the API call."]
-        user_id: Option<String>,
+        user_id: uuid::Uuid,
     },
     #[doc = "A file volume."]
     #[serde(rename = "file_volume")]
@@ -1860,7 +1844,7 @@ pub enum AsyncApiCallOutput {
         #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The user ID of the user who created the API call."]
-        user_id: Option<String>,
+        user_id: uuid::Uuid,
         #[doc = "The resulting volume."]
         volume: Option<f64>,
     },
@@ -1892,7 +1876,7 @@ pub enum AsyncApiCallOutput {
         #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The user ID of the user who created the API call."]
-        user_id: Option<String>,
+        user_id: uuid::Uuid,
     },
     #[doc = "A file surface area."]
     #[serde(rename = "file_surface_area")]
@@ -1918,7 +1902,7 @@ pub enum AsyncApiCallOutput {
         #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The user ID of the user who created the API call."]
-        user_id: Option<String>,
+        user_id: uuid::Uuid,
     },
     #[doc = "Text to CAD."]
     #[serde(rename = "text_to_cad")]
@@ -1949,7 +1933,7 @@ pub enum AsyncApiCallOutput {
         #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The user ID of the user who created the API call."]
-        user_id: Option<String>,
+        user_id: uuid::Uuid,
     },
 }
 
@@ -3462,8 +3446,7 @@ pub struct CustomerBalance {
     #[doc = "The date and time the balance was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID the balance belongs to."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for CustomerBalance {
@@ -3488,11 +3471,7 @@ impl tabled::Tabled for CustomerBalance {
             format!("{:?}", self.pre_pay_credits_remaining).into(),
             format!("{:?}", self.total_due).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -4142,8 +4121,7 @@ pub struct ExtendedUser {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub github: Option<String>,
     #[doc = "The unique identifier for the user."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub id: Option<String>,
+    pub id: uuid::Uuid,
     #[doc = "The image avatar for the user. This is a URL."]
     pub image: String,
     #[doc = "The user's last name."]
@@ -4218,11 +4196,7 @@ impl tabled::Tabled for ExtendedUser {
             } else {
                 String::new().into()
             },
-            if let Some(id) = &self.id {
-                format!("{:?}", id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.id).into(),
             self.image.clone().into(),
             if let Some(last_name) = &self.last_name {
                 format!("{:?}", last_name).into()
@@ -4440,8 +4414,7 @@ pub struct FileCenterOfMass {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for FileCenterOfMass {
@@ -4485,11 +4458,7 @@ impl tabled::Tabled for FileCenterOfMass {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -4547,8 +4516,7 @@ pub struct FileConversion {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for FileConversion {
@@ -4602,11 +4570,7 @@ impl tabled::Tabled for FileConversion {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -4664,8 +4628,7 @@ pub struct FileDensity {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for FileDensity {
@@ -4715,11 +4678,7 @@ impl tabled::Tabled for FileDensity {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -4876,8 +4835,7 @@ pub struct FileMass {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for FileMass {
@@ -4927,11 +4885,7 @@ impl tabled::Tabled for FileMass {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -4984,8 +4938,7 @@ pub struct FileSurfaceArea {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for FileSurfaceArea {
@@ -5029,11 +4982,7 @@ impl tabled::Tabled for FileSurfaceArea {
                 String::new().into()
             },
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -5113,8 +5062,7 @@ pub struct FileVolume {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
     #[doc = "The resulting volume."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub volume: Option<f64>,
@@ -5156,11 +5104,7 @@ impl tabled::Tabled for FileVolume {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
             if let Some(volume) = &self.volume {
                 format!("{:?}", volume).into()
             } else {
@@ -7232,8 +7176,7 @@ pub struct NewAddress {
     #[serde(rename = "street2", default, skip_serializing_if = "Option::is_none")]
     pub street_2: Option<String>,
     #[doc = "The user ID that this address belongs to."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
     #[doc = "The zip component."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub zip: Option<String>,
@@ -7275,11 +7218,7 @@ impl tabled::Tabled for NewAddress {
             } else {
                 String::new().into()
             },
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
             if let Some(zip) = &self.zip {
                 format!("{:?}", zip).into()
             } else {
@@ -8732,15 +8671,13 @@ pub struct Session {
     #[doc = "The date and time the session expires."]
     pub expires: chrono::DateTime<chrono::Utc>,
     #[doc = "The unique identifier for the session."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub id: Option<String>,
+    pub id: uuid::Uuid,
     #[doc = "The session token."]
     pub session_token: uuid::Uuid,
     #[doc = "The date and time the session was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user that the session belongs to."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for Session {
@@ -8760,18 +8697,10 @@ impl tabled::Tabled for Session {
         vec![
             format!("{:?}", self.created_at).into(),
             format!("{:?}", self.expires).into(),
-            if let Some(id) = &self.id {
-                format!("{:?}", id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.id).into(),
             format!("{:?}", self.session_token).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -9162,8 +9091,7 @@ pub struct TextToCad {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for TextToCad {
@@ -9213,11 +9141,7 @@ impl tabled::Tabled for TextToCad {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -9398,8 +9322,7 @@ pub struct UnitAngleConversion {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for UnitAngleConversion {
@@ -9448,11 +9371,7 @@ impl tabled::Tabled for UnitAngleConversion {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -9556,8 +9475,7 @@ pub struct UnitAreaConversion {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for UnitAreaConversion {
@@ -9606,11 +9524,7 @@ impl tabled::Tabled for UnitAreaConversion {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -9698,8 +9612,7 @@ pub struct UnitCurrentConversion {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for UnitCurrentConversion {
@@ -9748,11 +9661,7 @@ impl tabled::Tabled for UnitCurrentConversion {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -9873,8 +9782,7 @@ pub struct UnitEnergyConversion {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for UnitEnergyConversion {
@@ -9923,11 +9831,7 @@ impl tabled::Tabled for UnitEnergyConversion {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -10027,8 +9931,7 @@ pub struct UnitForceConversion {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for UnitForceConversion {
@@ -10077,11 +9980,7 @@ impl tabled::Tabled for UnitForceConversion {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -10185,8 +10084,7 @@ pub struct UnitFrequencyConversion {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for UnitFrequencyConversion {
@@ -10235,11 +10133,7 @@ impl tabled::Tabled for UnitFrequencyConversion {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -10335,8 +10229,7 @@ pub struct UnitLengthConversion {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for UnitLengthConversion {
@@ -10385,11 +10278,7 @@ impl tabled::Tabled for UnitLengthConversion {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -10473,8 +10362,7 @@ pub struct UnitMassConversion {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for UnitMassConversion {
@@ -10523,11 +10411,7 @@ impl tabled::Tabled for UnitMassConversion {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -10627,8 +10511,7 @@ pub struct UnitPowerConversion {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for UnitPowerConversion {
@@ -10677,11 +10560,7 @@ impl tabled::Tabled for UnitPowerConversion {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -10781,8 +10660,7 @@ pub struct UnitPressureConversion {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for UnitPressureConversion {
@@ -10831,11 +10709,7 @@ impl tabled::Tabled for UnitPressureConversion {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -10923,8 +10797,7 @@ pub struct UnitTemperatureConversion {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for UnitTemperatureConversion {
@@ -10973,11 +10846,7 @@ impl tabled::Tabled for UnitTemperatureConversion {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -11057,8 +10926,7 @@ pub struct UnitTorqueConversion {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for UnitTorqueConversion {
@@ -11107,11 +10975,7 @@ impl tabled::Tabled for UnitTorqueConversion {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -11219,8 +11083,7 @@ pub struct UnitVolumeConversion {
     #[doc = "The time and date the API call was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: uuid::Uuid,
 }
 
 impl std::fmt::Display for UnitVolumeConversion {
@@ -11269,11 +11132,7 @@ impl tabled::Tabled for UnitVolumeConversion {
             },
             format!("{:?}", self.status).into(),
             format!("{:?}", self.updated_at).into(),
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.user_id).into(),
         ]
     }
 
@@ -11402,8 +11261,7 @@ pub struct User {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub github: Option<String>,
     #[doc = "The unique identifier for the user."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub id: Option<String>,
+    pub id: uuid::Uuid,
     #[doc = "The image avatar for the user. This is a URL."]
     pub image: String,
     #[doc = "The user's last name."]
@@ -11467,11 +11325,7 @@ impl tabled::Tabled for User {
             } else {
                 String::new().into()
             },
-            if let Some(id) = &self.id {
-                format!("{:?}", id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.id).into(),
             self.image.clone().into(),
             if let Some(last_name) = &self.last_name {
                 format!("{:?}", last_name).into()
@@ -11588,8 +11442,7 @@ pub struct VerificationToken {
     pub expires: chrono::DateTime<chrono::Utc>,
     #[doc = "The token used for verification. This is used as the id for the table since it is \
              unique per record."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub id: Option<String>,
+    pub id: uuid::Uuid,
     #[doc = "The identifier for the user. This is typically the user's email address since that \
              is what we are verifying."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -11615,11 +11468,7 @@ impl tabled::Tabled for VerificationToken {
         vec![
             format!("{:?}", self.created_at).into(),
             format!("{:?}", self.expires).into(),
-            if let Some(id) = &self.id {
-                format!("{:?}", id).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.id).into(),
             if let Some(identifier) = &self.identifier {
                 format!("{:?}", identifier).into()
             } else {

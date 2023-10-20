@@ -45,11 +45,12 @@ impl Ai {
         }
     }
 
-    #[doc = "List text-to-CAD models you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by any KittyCAD user. It returns the text-to-CAD models for the authenticated user.\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_text_to_cad_models_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_text_to_cad_models_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List text-to-CAD models you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by any KittyCAD user. It returns the text-to-CAD models for the authenticated user.\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `no_contents: Option<bool>`: Do not return the model contents only return the metadata. By default, the model contents are returned.\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_text_to_cad_models_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_text_to_cad_models_for_user_stream(\n        Some(4 as u32),\n        Some(false),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list_text_to_cad_models_for_user<'a>(
         &'a self,
         limit: Option<u32>,
+        no_contents: Option<bool>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> Result<crate::types::TextToCadResultsPage, crate::types::error::Error> {
@@ -61,6 +62,10 @@ impl Ai {
         let mut query_params = vec![];
         if let Some(p) = limit {
             query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = no_contents {
+            query_params.push(("no_contents", format!("{}", p)));
         }
 
         if let Some(p) = page_token {
@@ -87,12 +92,13 @@ impl Ai {
         }
     }
 
-    #[doc = "List text-to-CAD models you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by any KittyCAD user. It returns the text-to-CAD models for the authenticated user.\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_text_to_cad_models_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_text_to_cad_models_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List text-to-CAD models you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by any KittyCAD user. It returns the text-to-CAD models for the authenticated user.\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `no_contents: Option<bool>`: Do not return the model contents only return the metadata. By default, the model contents are returned.\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_text_to_cad_models_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_text_to_cad_models_for_user_stream(\n        Some(4 as u32),\n        Some(false),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     #[cfg(not(feature = "js"))]
     pub fn list_text_to_cad_models_for_user_stream<'a>(
         &'a self,
         limit: Option<u32>,
+        no_contents: Option<bool>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> impl futures::Stream<Item = Result<crate::types::TextToCad, crate::types::error::Error>>
            + Unpin
@@ -100,7 +106,7 @@ impl Ai {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
-        self.list_text_to_cad_models_for_user(limit, None, sort_by)
+        self.list_text_to_cad_models_for_user(limit, no_contents, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages =
@@ -147,6 +153,45 @@ impl Ai {
             })
             .try_flatten_stream()
             .boxed()
+    }
+
+    #[doc = "Get a text-to-CAD response.\n\nThis endpoint requires authentication by any KittyCAD \
+             user. The user must be the owner of the text-to-CAD model.\n\n**Parameters:**\n\n- \
+             `id: uuid::Uuid`: The id of the model to give feedback to. \
+             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_ai_get_text_to_cad_model_for_user() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCad = \
+             client\n        .ai()\n        \
+             .get_text_to_cad_model_for_user(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_text_to_cad_model_for_user<'a>(
+        &'a self,
+        id: uuid::Uuid,
+    ) -> Result<crate::types::TextToCad, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/text-to-cad/{id}".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            Err(crate::types::error::Error::UnexpectedResponse(resp))
+        }
     }
 
     #[doc = "Give feedback to a specific text-to-CAD response.\n\nThis endpoint requires \

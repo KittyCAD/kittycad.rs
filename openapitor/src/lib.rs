@@ -599,7 +599,7 @@ tabled = {{ version = "0.14.0", features = ["color"], optional = true }}
 thiserror = "1"
 tracing = {{ version = "^0.1", optional = true }}
 url = {{ version = "2", features = ["serde"] }}
-uuid = {{ version = "1", features = ["serde", "v4"] }}
+uuid = {{ version = "1", features = ["serde", "v4", "v7"] }}
 
 [dev-dependencies]
 expectorate = "1"
