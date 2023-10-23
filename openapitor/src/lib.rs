@@ -84,8 +84,12 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
         if module == "tests" {
             a("#[cfg(test)]");
         }
-        a("#[cfg(feature = \"requests\")]");
-        a(&format!("mod {};", module));
+        a(&format!("mod {module};"));
+        // Ensure that if there's no file, an empty file is created.
+        std::process::Command::new("touch")
+            .arg(format!("{}/src/{module}.rs", opts.output.display()))
+            .spawn()?
+            .wait()?;
     }
 
     // Hopefully there is never a "tag" named after these reserved libs.
