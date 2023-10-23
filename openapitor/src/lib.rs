@@ -294,7 +294,7 @@ pub fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
             .to_string();
 
         let persistent_modules = persistent_modules();
-        if persistent_modules.contains(&file_name) {
+        if persistent_modules.contains(&file_name.as_str()) {
             continue;
         }
 
@@ -536,8 +536,8 @@ impl Default for Opts {
 
 /// Return a list of the persistent modules.
 /// These are modules we do not nuke at generation time.
-fn persistent_modules() -> Vec<String> {
-    vec!["tests".to_string()]
+fn persistent_modules() -> Vec<&'static str> {
+    vec!["tests", "methods"]
 }
 
 fn generate_cargo_toml(opts: &Opts) -> String {
