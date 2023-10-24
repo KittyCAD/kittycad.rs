@@ -29,7 +29,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! kittycad = "0.2.39"
+//! kittycad = "0.2.40"
 //! ```
 //!
 //! ## Basic example
