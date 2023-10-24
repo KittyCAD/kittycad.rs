@@ -10,6 +10,12 @@ impl Copy for Point2D {}
 impl Copy for Point3D {}
 
 impl Angle {
+    /// An angle of size 0.
+    pub const ZERO: Self = Self {
+        unit: UnitAngle::Degrees,
+        value: 0.0,
+    };
+
     /// Make a new angle in degrees
     pub fn from_degrees(size: f64) -> Self {
         Self {
