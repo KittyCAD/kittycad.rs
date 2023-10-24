@@ -29,7 +29,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! kittycad = "0.2.38"
+//! kittycad = "0.2.39"
 //! ```
 //!
 //! ## Basic example
@@ -99,7 +99,6 @@ pub mod hidden;
 /// FROM: <https://docs.kittycad.io/api/meta>
 #[cfg(feature = "requests")]
 pub mod meta;
-#[cfg(feature = "requests")]
 mod methods;
 /// Modeling API for updating your 3D files using the KittyCAD engine.
 ///
@@ -117,7 +116,6 @@ pub mod oauth2;
 #[cfg(feature = "requests")]
 pub mod payments;
 #[cfg(test)]
-#[cfg(feature = "requests")]
 mod tests;
 pub mod types;
 /// Unit conversion operations.
