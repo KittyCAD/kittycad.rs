@@ -521,6 +521,7 @@ impl TypeSpace {
             #description
             #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema)]
             #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+            #[cfg_attr(feature = "ts-rs", derive(ts_rs::TS))]
             #serde_options
             pub enum #one_of_name {
                 #values

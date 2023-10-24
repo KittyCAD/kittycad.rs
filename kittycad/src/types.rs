@@ -1744,6 +1744,7 @@ impl tabled::Tabled for AsyncApiCall {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[cfg_attr(feature = "ts-rs", derive(ts_rs::TS))]
 #[serde(tag = "type")]
 pub enum AsyncApiCallOutput {
     #[doc = "A file conversion."]
@@ -5537,6 +5538,7 @@ impl tabled::Tabled for ImportFiles {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[cfg_attr(feature = "ts-rs", derive(ts_rs::TS))]
 #[serde(tag = "type")]
 pub enum InputFormat {
     #[doc = "Autodesk Filmbox (FBX) format."]
@@ -6524,6 +6526,7 @@ pub enum Method {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[cfg_attr(feature = "ts-rs", derive(ts_rs::TS))]
 #[serde(tag = "type")]
 pub enum ModelingCmd {
     #[doc = "Start a path."]
@@ -7344,6 +7347,7 @@ pub enum Oauth2GrantType {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[cfg_attr(feature = "ts-rs", derive(ts_rs::TS))]
 #[serde(tag = "type")]
 pub enum OkModelingCmdResponse {
     #[doc = "An empty response, used for any command that does not explicitly have a response \
@@ -7540,6 +7544,7 @@ pub enum OkModelingCmdResponse {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[cfg_attr(feature = "ts-rs", derive(ts_rs::TS))]
 #[serde(tag = "type", content = "data")]
 pub enum OkWebSocketResponseData {
     #[doc = "Information about the ICE servers."]
@@ -7690,6 +7695,7 @@ impl tabled::Tabled for OutputFile {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[cfg_attr(feature = "ts-rs", derive(ts_rs::TS))]
 #[serde(tag = "type")]
 pub enum OutputFormat {
     #[doc = "Autodesk Filmbox (FBX) format."]
@@ -7876,6 +7882,7 @@ impl tabled::Tabled for PathGetVertexUuids {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[cfg_attr(feature = "ts-rs", derive(ts_rs::TS))]
 #[serde(tag = "type")]
 pub enum PathSegment {
     #[doc = "A straight line segment. Goes from the current path \"pen\" to the given endpoint."]
@@ -11541,6 +11548,7 @@ impl tabled::Tabled for Volume {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[cfg_attr(feature = "ts-rs", derive(ts_rs::TS))]
 #[serde(tag = "type")]
 pub enum WebSocketRequest {
     #[doc = "The trickle ICE candidate request."]
