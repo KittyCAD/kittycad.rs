@@ -42,6 +42,25 @@ impl Angle {
     }
 }
 
+impl From<[f64; 2]> for Point2D {
+    fn from([x, y]: [f64; 2]) -> Self {
+        Self { x, y }
+    }
+}
+
+impl From<&[f64; 2]> for Point2D {
+    fn from(p: &[f64; 2]) -> Self {
+        let [x, y] = *p;
+        Self { x, y }
+    }
+}
+
+impl From<Point2D> for [f64; 2] {
+    fn from(Point2D { x, y }: Point2D) -> Self {
+        [x, y]
+    }
+}
+
 impl Add<f64> for Point2D {
     type Output = Self;
 
@@ -129,6 +148,24 @@ impl Div for Point2D {
     }
 }
 
+impl From<[f64; 3]> for Point3D {
+    fn from([x, y, z]: [f64; 3]) -> Self {
+        Self { x, y, z }
+    }
+}
+
+impl From<&[f64; 3]> for Point3D {
+    fn from(p: &[f64; 3]) -> Self {
+        let [x, y, z] = *p;
+        Self { x, y, z }
+    }
+}
+
+impl From<Point3D> for [f64; 3] {
+    fn from(Point3D { x, y, z }: Point3D) -> Self {
+        [x, y, z]
+    }
+}
 impl Add for Point3D {
     type Output = Self;
 
@@ -247,5 +284,15 @@ impl Point2D {
 impl From<Point3D> for Point2D {
     fn from(Point3D { x, y, .. }: Point3D) -> Self {
         Point2D { x, y }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn scaling_points() {
+        assert_eq!(Point2D { x: 1.0, y: 1.0 } * 3.0, Point2D { x: 3.0, y: 3.0 });
     }
 }
