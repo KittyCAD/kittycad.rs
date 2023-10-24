@@ -84,8 +84,12 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
         if module == "tests" {
             a("#[cfg(test)]");
         }
-        a("#[cfg(feature = \"requests\")]");
-        a(&format!("mod {};", module));
+        a(&format!("mod {module};"));
+        // Ensure that if there's no file, an empty file is created.
+        std::process::Command::new("touch")
+            .arg(format!("{}/src/{module}.rs", opts.output.display()))
+            .spawn()?
+            .wait()?;
     }
 
     // Hopefully there is never a "tag" named after these reserved libs.
@@ -294,7 +298,7 @@ pub fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
             .to_string();
 
         let persistent_modules = persistent_modules();
-        if persistent_modules.contains(&file_name) {
+        if persistent_modules.contains(&file_name.as_str()) {
             continue;
         }
 
@@ -536,8 +540,8 @@ impl Default for Opts {
 
 /// Return a list of the persistent modules.
 /// These are modules we do not nuke at generation time.
-fn persistent_modules() -> Vec<String> {
-    vec!["tests".to_string()]
+fn persistent_modules() -> Vec<&'static str> {
+    vec!["tests", "methods"]
 }
 
 fn generate_cargo_toml(opts: &Opts) -> String {
