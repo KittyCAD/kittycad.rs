@@ -761,6 +761,220 @@ impl tabled::Tabled for AiPluginManifest {
     }
 }
 
+#[doc = "An AI prompt."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AiPrompt {
+    #[doc = "When the prompt was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The date and time the AI prompt was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error message if the prompt failed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "Feedback from the user, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub feedback: Option<AiFeedback>,
+    #[doc = "The unique identifier for the AI Prompt."]
+    pub id: uuid::Uuid,
+    #[doc = "The metadata for the prompt."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<serde_json::Value>,
+    #[doc = "The version of the model."]
+    pub model_version: String,
+    #[doc = "The output file. In the case of TextToCad this is a link to a file in a GCP bucket."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output_file: Option<String>,
+    #[doc = "The prompt."]
+    pub prompt: String,
+    #[doc = "When the prompt was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the prompt."]
+    pub status: ApiCallStatus,
+    #[doc = "The type of prompt."]
+    #[serde(rename = "type")]
+    pub type_: AiPromptType,
+    #[doc = "The date and time the AI prompt was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the AI Prompt."]
+    pub user_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for AiPrompt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AiPrompt {
+    const LENGTH: usize = 14;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.created_at).into(),
+            if let Some(error) = &self.error {
+                format!("{:?}", error).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(feedback) = &self.feedback {
+                format!("{:?}", feedback).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.id).into(),
+            if let Some(metadata) = &self.metadata {
+                format!("{:?}", metadata).into()
+            } else {
+                String::new().into()
+            },
+            self.model_version.clone().into(),
+            if let Some(output_file) = &self.output_file {
+                format!("{:?}", output_file).into()
+            } else {
+                String::new().into()
+            },
+            self.prompt.clone().into(),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.status).into(),
+            format!("{:?}", self.type_).into(),
+            format!("{:?}", self.updated_at).into(),
+            format!("{:?}", self.user_id).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "completed_at".into(),
+            "created_at".into(),
+            "error".into(),
+            "feedback".into(),
+            "id".into(),
+            "metadata".into(),
+            "model_version".into(),
+            "output_file".into(),
+            "prompt".into(),
+            "started_at".into(),
+            "status".into(),
+            "type_".into(),
+            "updated_at".into(),
+            "user_id".into(),
+        ]
+    }
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AiPromptResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<AiPrompt>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for AiPromptResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for AiPromptResultsPage {
+    type Item = AiPrompt;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AiPromptResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "A type of AI prompt."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum AiPromptType {
+    #[doc = "Text to CAD."]
+    #[serde(rename = "text_to_cad")]
+    #[display("text_to_cad")]
+    TextToCad,
+}
+
+impl std::default::Default for AiPromptType {
+    fn default() -> Self {
+        AiPromptType::TextToCad
+    }
+}
+
 #[doc = "An angle, with a specific unit."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -6883,8 +7097,10 @@ pub enum ModelingCmd {
     #[doc = "Import files to the current model."]
     #[serde(rename = "import_files")]
     ImportFiles {
-        #[doc = "Files to import"]
+        #[doc = "Files to import."]
         files: Vec<ImportFile>,
+        #[doc = "Input file format."]
+        format: InputFormat,
     },
     #[doc = "Get the mass of entities in the scene or the default scene."]
     #[serde(rename = "mass")]
@@ -7564,8 +7780,12 @@ pub enum OutputFormat {
     Ply {
         #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
+        #[doc = "Export selection."]
+        selection: Selection,
         #[doc = "The storage for the output PLY file."]
         storage: PlyStorage,
+        #[doc = "Export length unit.\n\nDefaults to meters."]
+        units: UnitLength,
     },
     #[doc = "ISO 10303-21 (STEP) format."]
     #[serde(rename = "step")]
@@ -8487,6 +8707,42 @@ impl tabled::Tabled for SelectWithPoint {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["entity_id".into()]
     }
+}
+
+#[doc = "Data item selection."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum Selection {
+    #[doc = "Visit the default scene."]
+    #[serde(rename = "default_scene")]
+    DefaultScene {},
+    #[doc = "Visit the indexed scene."]
+    #[serde(rename = "scene_by_index")]
+    SceneByIndex {
+        #[doc = "The index."]
+        index: u32,
+    },
+    #[doc = "Visit the first scene with the given name."]
+    #[serde(rename = "scene_by_name")]
+    SceneByName {
+        #[doc = "The name."]
+        name: String,
+    },
+    #[doc = "Visit the indexed mesh."]
+    #[serde(rename = "mesh_by_index")]
+    MeshByIndex {
+        #[doc = "The index."]
+        index: u32,
+    },
+    #[doc = "Visit the first mesh with the given name."]
+    #[serde(rename = "mesh_by_name")]
+    MeshByName {
+        #[doc = "The name."]
+        name: String,
+    },
 }
 
 #[doc = "An authentication session.\n\nFor our UIs, these are automatically created by Next.js."]
