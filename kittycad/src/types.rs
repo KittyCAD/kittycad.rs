@@ -7957,6 +7957,8 @@ pub enum OutputFormat {
         #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate \
                  system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
+        #[doc = "Export selection."]
+        selection: Selection,
         #[doc = "Export storage."]
         storage: StlStorage,
         #[doc = "Export length unit.\n\nDefaults to meters."]
