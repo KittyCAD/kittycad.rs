@@ -15553,6 +15553,14 @@
                   }
                 ]
               },
+              "selection": {
+                "description": "Export selection.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Selection"
+                  }
+                ]
+              },
               "storage": {
                 "description": "Export storage.",
                 "allOf": [
@@ -15578,6 +15586,7 @@
             },
             "required": [
               "coords",
+              "selection",
               "storage",
               "type",
               "units"
