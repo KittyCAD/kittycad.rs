@@ -7163,6 +7163,16 @@ pub enum ModelingCmd {
     #[doc = "Get the plane of the sketch mode. This is useful for getting the normal of the plane after a user selects a plane."]
     #[serde(rename = "get_sketch_mode_plane")]
     GetSketchModePlane {},
+    #[doc = "Constrain a curve."]
+    #[serde(rename = "curve_set_constraint")]
+    CurveSetConstraint {
+        #[doc = "Which constraint to apply."]
+        constraint_bound: PathComponentConstraintBound,
+        #[doc = "What part of the curve should be constrained."]
+        constraint_type: PathComponentConstraintType,
+        #[doc = "Which curve to constrain."]
+        object_id: uuid::Uuid,
+    },
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -7798,8 +7808,6 @@ pub enum OutputFormat {
     Stl {
         #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
-        #[doc = "Export selection."]
-        selection: Selection,
         #[doc = "Export storage."]
         storage: StlStorage,
         #[doc = "Export length unit.\n\nDefaults to meters."]
@@ -7837,6 +7845,67 @@ pub enum PathCommand {
     #[serde(rename = "add_arc")]
     #[display("add_arc")]
     AddArc,
+}
+
+#[doc = "The path component constraint bounds type"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum PathComponentConstraintBound {
+    #[serde(rename = "unconstrained")]
+    #[display("unconstrained")]
+    Unconstrained,
+    #[serde(rename = "partially_constrained")]
+    #[display("partially_constrained")]
+    PartiallyConstrained,
+    #[serde(rename = "fully_constrained")]
+    #[display("fully_constrained")]
+    FullyConstrained,
+}
+
+#[doc = "The path component constraint type"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum PathComponentConstraintType {
+    #[serde(rename = "unconstrained")]
+    #[display("unconstrained")]
+    Unconstrained,
+    #[serde(rename = "vertical")]
+    #[display("vertical")]
+    Vertical,
+    #[serde(rename = "horizontal")]
+    #[display("horizontal")]
+    Horizontal,
+    #[serde(rename = "equal_length")]
+    #[display("equal_length")]
+    EqualLength,
+    #[serde(rename = "parallel")]
+    #[display("parallel")]
+    Parallel,
+    #[serde(rename = "angle_between")]
+    #[display("angle_between")]
+    AngleBetween,
 }
 
 #[doc = "The response from the `PathGetCurveUuidsForVertices` command."]
