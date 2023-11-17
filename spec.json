@@ -14430,6 +14430,45 @@
             "required": [
               "type"
             ]
+          },
+          {
+            "description": "Constrain a curve.",
+            "type": "object",
+            "properties": {
+              "constraint_bound": {
+                "description": "Which constraint to apply.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PathComponentConstraintBound"
+                  }
+                ]
+              },
+              "constraint_type": {
+                "description": "What part of the curve should be constrained.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PathComponentConstraintType"
+                  }
+                ]
+              },
+              "object_id": {
+                "description": "Which curve to constrain.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "curve_set_constraint"
+                ]
+              }
+            },
+            "required": [
+              "constraint_bound",
+              "constraint_type",
+              "object_id",
+              "type"
+            ]
           }
         ]
       },
@@ -15553,14 +15592,6 @@
                   }
                 ]
               },
-              "selection": {
-                "description": "Export selection.",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Selection"
-                  }
-                ]
-              },
               "storage": {
                 "description": "Export storage.",
                 "allOf": [
@@ -15586,7 +15617,6 @@
             },
             "required": [
               "coords",
-              "selection",
               "storage",
               "type",
               "units"
@@ -15603,6 +15633,27 @@
           "bez_curve_to",
           "nurbs_curve_to",
           "add_arc"
+        ]
+      },
+      "PathComponentConstraintBound": {
+        "description": "The path component constraint bounds type",
+        "type": "string",
+        "enum": [
+          "unconstrained",
+          "partially_constrained",
+          "fully_constrained"
+        ]
+      },
+      "PathComponentConstraintType": {
+        "description": "The path component constraint type",
+        "type": "string",
+        "enum": [
+          "unconstrained",
+          "vertical",
+          "horizontal",
+          "equal_length",
+          "parallel",
+          "angle_between"
         ]
       },
       "PathGetCurveUuidsForVertices": {
