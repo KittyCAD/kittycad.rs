@@ -1149,7 +1149,7 @@ impl tabled::Tabled for AnnotationOptions {
     }
 }
 
-#[doc = "Horizontal Text aligment"]
+#[doc = "Horizontal Text alignment"]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -1175,7 +1175,7 @@ pub enum AnnotationTextAlignmentX {
     Right,
 }
 
-#[doc = "Vertical Text aligment"]
+#[doc = "Vertical Text alignment"]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -1407,7 +1407,7 @@ pub struct ApiCallWithPrice {
     #[doc = "If the API call was spawned from the litterbox or not."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub litterbox: Option<bool>,
-    #[doc = "The HTTP method requsted by the API call."]
+    #[doc = "The HTTP method requested by the API call."]
     pub method: Method,
     #[doc = "The number of minutes the API call was billed for."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -6845,6 +6845,12 @@ pub enum ModelingCmd {
     #[doc = "Disable sketch mode, from the default camera."]
     #[serde(rename = "default_camera_disable_sketch_mode")]
     DefaultCameraDisableSketchMode {},
+    #[doc = "Focus default camera on object."]
+    #[serde(rename = "default_camera_focus_on")]
+    DefaultCameraFocusOn {
+        #[doc = "UUID of object to focus on."]
+        uuid: uuid::Uuid,
+    },
     #[doc = "Export the scene to a file."]
     #[serde(rename = "export")]
     Export {
@@ -7967,6 +7973,8 @@ pub enum OutputFormat {
         #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate \
                  system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
+        #[doc = "Export selection."]
+        selection: Selection,
         #[doc = "Export storage."]
         storage: StlStorage,
         #[doc = "Export length unit.\n\nDefaults to meters."]
