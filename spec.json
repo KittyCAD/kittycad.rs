@@ -7821,7 +7821,7 @@
         }
       },
       "AnnotationTextAlignmentX": {
-        "description": "Horizontal Text aligment",
+        "description": "Horizontal Text alignment",
         "type": "string",
         "enum": [
           "left",
@@ -7830,7 +7830,7 @@
         ]
       },
       "AnnotationTextAlignmentY": {
-        "description": "Vertical Text aligment",
+        "description": "Vertical Text alignment",
         "type": "string",
         "enum": [
           "bottom",
@@ -8053,7 +8053,7 @@
             "type": "boolean"
           },
           "method": {
-            "description": "The HTTP method requsted by the API call.",
+            "description": "The HTTP method requested by the API call.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Method"
@@ -12800,6 +12800,27 @@
             ]
           },
           {
+            "description": "Focus default camera on object.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_focus_on"
+                ]
+              },
+              "uuid": {
+                "description": "UUID of object to focus on.",
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "type",
+              "uuid"
+            ]
+          },
+          {
             "description": "Export the scene to a file.",
             "type": "object",
             "properties": {
@@ -15592,6 +15613,14 @@
                   }
                 ]
               },
+              "selection": {
+                "description": "Export selection.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Selection"
+                  }
+                ]
+              },
               "storage": {
                 "description": "Export storage.",
                 "allOf": [
@@ -15617,6 +15646,7 @@
             },
             "required": [
               "coords",
+              "selection",
               "storage",
               "type",
               "units"
