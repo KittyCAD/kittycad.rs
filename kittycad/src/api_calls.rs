@@ -157,18 +157,18 @@ impl ApiCalls {
             .boxed()
     }
 
-    #[doc = "Get details of an API call.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\nIf the user is not authenticated to view the specified API call, then it is not returned.\nOnly KittyCAD employees can view API calls for other users.\n\n**Parameters:**\n\n- `id: &'astr`: The ID of the API call. (required)\n\n```rust,no_run\nasync fn example_api_calls_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPrice = client.api_calls().get(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get details of an API call.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\nIf the user is not authenticated to view the specified API call, then it is not returned.\nOnly KittyCAD employees can view API calls for other users.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The ID of the API call. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_api_calls_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPrice = client\n        .api_calls()\n        .get(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get<'a>(
         &'a self,
-        id: &'a str,
+        id: uuid::Uuid,
     ) -> Result<crate::types::ApiCallWithPrice, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "api-calls/{id}".replace("{id}", id)
+                "api-calls/{id}".replace("{id}", &format!("{}", id))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -466,25 +466,18 @@ impl ApiCalls {
             .boxed()
     }
 
-    #[doc = "Get an API call for a user.\n\nThis endpoint requires authentication by any KittyCAD \
-             user. It returns details of the requested API call for the \
-             user.\n\n**Parameters:**\n\n- `id: &'astr`: The ID of the API call. \
-             (required)\n\n```rust,no_run\nasync fn example_api_calls_get_for_user() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::ApiCallWithPrice =\n        \
-             client.api_calls().get_for_user(\"some-string\").await?;\n    println!(\"{:?}\", \
-             result);\n    Ok(())\n}\n```"]
+    #[doc = "Get an API call for a user.\n\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The ID of the API call. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_api_calls_get_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPrice = client\n        .api_calls()\n        .get_for_user(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_for_user<'a>(
         &'a self,
-        id: &'a str,
+        id: uuid::Uuid,
     ) -> Result<crate::types::ApiCallWithPrice, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/api-calls/{id}".replace("{id}", id)
+                "user/api-calls/{id}".replace("{id}", &format!("{}", id))
             ),
         );
         req = req.bearer_auth(&self.client.token);
