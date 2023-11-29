@@ -702,7 +702,8 @@
             "description": "The ID of the API call.",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -1407,7 +1408,7 @@
           "beta"
         ],
         "summary": "Get CAD file center of mass.",
-        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint returns the cartesian co-ordinate in world space measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint returns the cartesian coordinate in world space measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_center_of_mass",
         "parameters": [
           {
@@ -4941,7 +4942,8 @@
             "description": "The ID of the API call.",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -7612,7 +7614,7 @@
             "description": "The unique identifier for the AI Prompt.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/UuidBinary"
+                "$ref": "#/components/schemas/Uuid"
               }
             ]
           },
@@ -18839,12 +18841,7 @@
         ]
       },
       "Uuid": {
-        "description": "A uuid stored as a varchar(191).\n\nA Version 4 UUID is a universally unique identifier that is generated using random numbers.",
-        "type": "string",
-        "format": "uuid"
-      },
-      "UuidBinary": {
-        "description": "A uuid stored as binary(16).\n\nMysql binary(16) storage for UUIDs. Uses Version 7 UUID by default, a universally unique identifier that is generated using random numbers and a timestamp. UUIDv7 are recommended for database ids/primary keys because they are sequential and this helps with efficient indexing, especially on MySQL. For other uses cases, like API tokens, UUIDv4 makes more sense because it's completely random.\n\nHowever, both should be stored as binary on MySQL! Both versions use the same data format, so they can be used interchangeably with this data type.",
+        "description": "A UUID usually v4 or v7",
         "type": "string",
         "format": "uuid"
       },
