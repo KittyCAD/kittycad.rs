@@ -72,12 +72,11 @@ impl Meta {
     }
 
     #[doc = "Get the metadata about our currently running server.\n\nThis includes information on \
-             any of our other distributed systems it is connected to.\nYou must be a KittyCAD \
-             employee to perform this request.\n\n```rust,no_run\nasync fn \
-             example_meta_get_metadata() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::Metadata = \
-             client.meta().get_metadata().await?;\n    println!(\"{:?}\", result);\n    \
-             Ok(())\n}\n```"]
+             any of our other distributed systems it is connected to.\nYou must be a Zoo employee \
+             to perform this request.\n\n```rust,no_run\nasync fn example_meta_get_metadata() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::Metadata = client.meta().get_metadata().await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_metadata<'a>(
         &'a self,
@@ -108,9 +107,9 @@ impl Meta {
 
     #[doc = "Get an API token for a user by their discord id.\n\nThis endpoint allows us to run \
              API calls from our discord bot on behalf of a user. The user must have a discord \
-             account linked to their KittyCAD Account via oauth2 for this to work.\nYou must be a \
-             KittyCAD employee to use this endpoint.\n\n**Parameters:**\n\n- `discord_id: &'astr`: \
-             The user's discord ID. (required)\n\n```rust,no_run\nasync fn \
+             account linked to their Zoo Account via oauth2 for this to work.\nYou must be a Zoo \
+             employee to use this endpoint.\n\n**Parameters:**\n\n- `discord_id: &'astr`: The \
+             user's discord ID. (required)\n\n```rust,no_run\nasync fn \
              example_meta_internal_get_api_token_for_discord_user() -> anyhow::Result<()> {\n    \
              let client = kittycad::Client::new_from_env();\n    let result: \
              kittycad::types::ApiToken = client\n        .meta()\n        \

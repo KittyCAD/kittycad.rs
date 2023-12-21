@@ -12,7 +12,7 @@ impl Executor {
         Self { client }
     }
 
-    #[doc = "Execute a KittyCAD program in a specific language.\n\n**Parameters:**\n\n- `lang: \
+    #[doc = "Execute a Zoo program in a specific language.\n\n**Parameters:**\n\n- `lang: \
              crate::types::CodeLanguage`: The language of the code. (required)\n- `output: \
              Option<String>`: The output file we want to get the contents for (the paths are \
              relative to where in litterbox it is being run). You can denote more than one file \

@@ -3910,6 +3910,24 @@ impl tabled::Tabled for Discount {
     }
 }
 
+#[doc = "The type of distance Distances can vary depending on the objects used as input."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum DistanceType {
+    #[doc = "Euclidean Distance."]
+    #[serde(rename = "euclidean")]
+    Euclidean {},
+    #[doc = "The distance between objects along the specified axis"]
+    #[serde(rename = "on_axis")]
+    OnAxis {
+        #[doc = "Global axis"]
+        axis: GlobalAxis,
+    },
+}
+
 #[doc = "The body of the form for email authentication."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4013,6 +4031,42 @@ impl tabled::Tabled for EntityGetChildUuid {
     }
 }
 
+#[doc = "The response from the `EntitiesGetDistance` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityGetDistance {
+    #[doc = "The maximum distance between the input entities."]
+    pub max_distance: f64,
+    #[doc = "The minimum distance between the input entities."]
+    pub min_distance: f64,
+}
+
+impl std::fmt::Display for EntityGetDistance {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityGetDistance {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.max_distance).into(),
+            format!("{:?}", self.min_distance).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["max_distance".into(), "min_distance".into()]
+    }
+}
+
 #[doc = "The response from the `EntityGetNumChildren` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4072,6 +4126,37 @@ impl tabled::Tabled for EntityGetParentId {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["entity_id".into()]
+    }
+}
+
+#[doc = "The response from the `EntityLinearPattern` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityLinearPattern {
+    #[doc = "The UUIDs of the entities that were created."]
+    pub entity_ids: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for EntityLinearPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityLinearPattern {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.entity_ids).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_ids".into()]
     }
 }
 
@@ -5499,6 +5584,35 @@ impl tabled::Tabled for GetSketchModePlane {
     }
 }
 
+#[doc = "An enum that contains the three global axes."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum GlobalAxis {
+    #[doc = "The X axis"]
+    #[serde(rename = "x")]
+    #[display("x")]
+    X,
+    #[doc = "The Y axis"]
+    #[serde(rename = "y")]
+    #[display("y")]
+    Y,
+    #[doc = "The Z axis"]
+    #[serde(rename = "z")]
+    #[display("z")]
+    Z,
+}
+
 #[doc = "Describes the presentation style of the glTF JSON."]
 #[derive(
     serde :: Serialize,
@@ -5676,7 +5790,8 @@ pub enum ImageFormat {
     Jpeg,
 }
 
-#[doc = "File to import into the current model"]
+#[doc = "File to import into the current model If you are sending binary data for a file, be sure \
+         to send the WebSocketRequest as binary/bson, not text/json."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -6859,8 +6974,7 @@ pub enum ModelingCmd {
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The file format to export to."]
         format: OutputFormat,
-        #[doc = "Select the unit interpretation of exported objects.\n\nThis is not the same as \
-                 the export units. Setting export units is part of the format options."]
+        #[doc = "Select the unit interpretation of exported objects."]
         source_unit: UnitLength,
     },
     #[doc = "What is this entity's parent?"]
@@ -7322,6 +7436,54 @@ pub enum ModelingCmd {
         #[doc = "Which curve to constrain."]
         object_id: uuid::Uuid,
     },
+    #[doc = "Sketch on some entity (e.g. a plane, a face)"]
+    #[serde(rename = "enable_sketch_mode")]
+    EnableSketchMode {
+        #[doc = "Should we animate or snap for the camera transition?"]
+        animated: bool,
+        #[doc = "Which entity to sketch on."]
+        entity_id: uuid::Uuid,
+        #[doc = "Should the camera use orthographic projection? In other words, should an \
+                 object's size in the rendered image stay constant regardless of its distance \
+                 from the camera."]
+        ortho: bool,
+    },
+    #[doc = "Set the material properties of an object"]
+    #[serde(rename = "object_set_material_params_pbr")]
+    ObjectSetMaterialParamsPbr {
+        #[doc = "Ambient Occlusion of the new material"]
+        ambient_occlusion: f64,
+        #[doc = "Color of the new material"]
+        color: Color,
+        #[doc = "Metalness of the new material"]
+        metalness: f64,
+        #[doc = "Which object to change"]
+        object_id: uuid::Uuid,
+        #[doc = "Roughness of the new material"]
+        roughness: f64,
+    },
+    #[doc = "What is the distance between these two entities?"]
+    #[serde(rename = "entity_get_distance")]
+    EntityGetDistance {
+        #[doc = "Type of distance to be measured."]
+        distance_type: DistanceType,
+        #[doc = "ID of the first entity being queried."]
+        entity_id1: uuid::Uuid,
+        #[doc = "ID of the second entity being queried."]
+        entity_id2: uuid::Uuid,
+    },
+    #[doc = "Duplicate the given entity, evenly spaced along the chosen axis."]
+    #[serde(rename = "entity_linear_pattern")]
+    EntityLinearPattern {
+        #[doc = "Axis along which to make the copites"]
+        axis: Point3D,
+        #[doc = "ID of the entity being copied."]
+        entity_id: uuid::Uuid,
+        #[doc = "Number of repetitions to make."]
+        num_repetitions: u32,
+        #[doc = "Spacing between repetitions."]
+        spacing: f64,
+    },
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -7580,184 +7742,194 @@ pub enum OkModelingCmdResponse {
              defined here."]
     #[serde(rename = "empty")]
     Empty {},
-    #[doc = "The response from the `Export` command. When this is being performed over a \
-             websocket, this is sent as binary not JSON. The binary data can be deserialized as \
-             `bincode` into a `Vec<ExportFile>`."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "export")]
     Export {
         #[doc = "The response from the `Export` endpoint."]
         data: Export,
     },
-    #[doc = "The response from the `SelectWithPoint` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "select_with_point")]
     SelectWithPoint {
         #[doc = "The response from the `SelectWithPoint` command."]
         data: SelectWithPoint,
     },
-    #[doc = "The response from the `HighlightSetEntity` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "highlight_set_entity")]
     HighlightSetEntity {
         #[doc = "The response from the `HighlightSetEntity` command."]
         data: HighlightSetEntity,
     },
-    #[doc = "The response from the `EntityGetChildUuid` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "entity_get_child_uuid")]
     EntityGetChildUuid {
         #[doc = "The response from the `EntityGetChildUuid` command."]
         data: EntityGetChildUuid,
     },
-    #[doc = "The response from the `EntityGetNumChildren` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "entity_get_num_children")]
     EntityGetNumChildren {
         #[doc = "The response from the `EntityGetNumChildren` command."]
         data: EntityGetNumChildren,
     },
-    #[doc = "The response from the `EntityGetParentId` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "entity_get_parent_id")]
     EntityGetParentId {
         #[doc = "The response from the `EntityGetParentId` command."]
         data: EntityGetParentId,
     },
-    #[doc = "The response from the `EntityGetAllChildUuids` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "entity_get_all_child_uuids")]
     EntityGetAllChildUuids {
         #[doc = "The response from the `EntityGetAllChildUuids` command."]
         data: EntityGetAllChildUuids,
     },
-    #[doc = "The response from the `SelectGet` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "select_get")]
     SelectGet {
         #[doc = "The response from the `SelectGet` command."]
         data: SelectGet,
     },
-    #[doc = "The response from the `GetEntityType` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "get_entity_type")]
     GetEntityType {
         #[doc = "The response from the `GetEntityType` command."]
         data: GetEntityType,
     },
-    #[doc = "The response from the `Solid3dGetAllEdgeFaces` command."]
+    #[doc = "The response from the ` ` command."]
+    #[serde(rename = "entity_get_distance")]
+    EntityGetDistance {
+        #[doc = "The response from the `EntitiesGetDistance` command."]
+        data: EntityGetDistance,
+    },
+    #[doc = "The response from the ` ` command."]
+    #[serde(rename = "entity_linear_pattern")]
+    EntityLinearPattern {
+        #[doc = "The response from the `EntityLinearPattern` command."]
+        data: EntityLinearPattern,
+    },
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "solid3d_get_all_edge_faces")]
     Solid3DGetAllEdgeFaces {
         #[doc = "The response from the `Solid3dGetAllEdgeFaces` command."]
         data: Solid3DGetAllEdgeFaces,
     },
-    #[doc = "The response from the `Solid3dGetAllOppositeEdges` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "solid3d_get_all_opposite_edges")]
     Solid3DGetAllOppositeEdges {
         #[doc = "The response from the `Solid3dGetAllOppositeEdges` command."]
         data: Solid3DGetAllOppositeEdges,
     },
-    #[doc = "The response from the `Solid3dGetOppositeEdge` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "solid3d_get_opposite_edge")]
     Solid3DGetOppositeEdge {
         #[doc = "The response from the `Solid3dGetOppositeEdge` command."]
         data: Solid3DGetOppositeEdge,
     },
-    #[doc = "The response from the `Solid3dGetPrevAdjacentEdge` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "solid3d_get_prev_adjacent_edge")]
     Solid3DGetPrevAdjacentEdge {
         #[doc = "The response from the `Solid3dGetPrevAdjacentEdge` command."]
         data: Solid3DGetPrevAdjacentEdge,
     },
-    #[doc = "The response from the `Solid3dGetNextAdjacentEdge` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "solid3d_get_next_adjacent_edge")]
     Solid3DGetNextAdjacentEdge {
         #[doc = "The response from the `Solid3dGetNextAdjacentEdge` command."]
         data: Solid3DGetNextAdjacentEdge,
     },
-    #[doc = "The response from the `MouseClick` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "mouse_click")]
     MouseClick {
         #[doc = "The response from the `MouseClick` command."]
         data: MouseClick,
     },
-    #[doc = "The response from the `CurveGetType` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "curve_get_type")]
     CurveGetType {
         #[doc = "The response from the `CurveGetType` command."]
         data: CurveGetType,
     },
-    #[doc = "The response from the `CurveGetControlPoints` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "curve_get_control_points")]
     CurveGetControlPoints {
         #[doc = "The response from the `CurveGetControlPoints` command."]
         data: CurveGetControlPoints,
     },
-    #[doc = "The response from the `Take Snapshot` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "take_snapshot")]
     TakeSnapshot {
         #[doc = "The response from the `TakeSnapshot` command."]
         data: TakeSnapshot,
     },
-    #[doc = "The response from the `Path Get Info` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "path_get_info")]
     PathGetInfo {
         #[doc = "The response from the `PathGetInfo` command."]
         data: PathGetInfo,
     },
-    #[doc = "The response from the `Path Get Curve UUIDs for Vertices` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "path_get_curve_uuids_for_vertices")]
     PathGetCurveUuidsForVertices {
         #[doc = "The response from the `PathGetCurveUuidsForVertices` command."]
         data: PathGetCurveUuidsForVertices,
     },
-    #[doc = "The response from the `Path Get Vertex UUIDs` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "path_get_vertex_uuids")]
     PathGetVertexUuids {
         #[doc = "The response from the `PathGetVertexUuids` command."]
         data: PathGetVertexUuids,
     },
-    #[doc = "The response from the `PlaneIntersectAndProject` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "plane_intersect_and_project")]
     PlaneIntersectAndProject {
         #[doc = "Corresponding coordinates of given window coordinates, intersected on given \
                  plane."]
         data: PlaneIntersectAndProject,
     },
-    #[doc = "The response from the `CurveGetEndPoints` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "curve_get_end_points")]
     CurveGetEndPoints {
         #[doc = "Endpoints of a curve"]
         data: CurveGetEndPoints,
     },
-    #[doc = "The response from the `ImportFiles` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "import_files")]
     ImportFiles {
         #[doc = "Data from importing the files"]
         data: ImportFiles,
     },
-    #[doc = "The response from the `Mass` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "mass")]
     Mass {
         #[doc = "The mass response."]
         data: Mass,
     },
-    #[doc = "The response from the `Volume` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "volume")]
     Volume {
         #[doc = "The volume response."]
         data: Volume,
     },
-    #[doc = "The response from the `Density` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "density")]
     Density {
         #[doc = "The density response."]
         data: Density,
     },
-    #[doc = "The response from the `SurfaceArea` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "surface_area")]
     SurfaceArea {
         #[doc = "The surface area response."]
         data: SurfaceArea,
     },
-    #[doc = "The response from the `CenterOfMass` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "center_of_mass")]
     CenterOfMass {
         #[doc = "The center of mass response."]
         data: CenterOfMass,
     },
-    #[doc = "The response from the `GetSketchModePlane` command."]
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "get_sketch_mode_plane")]
     GetSketchModePlane {
         #[doc = "The plane for sketch mode."]
@@ -7812,14 +7984,20 @@ pub enum OkWebSocketResponseData {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Onboarding {
+    #[doc = "When the user first used the modeling app."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_call_from_modeling_app_date: Option<String>,
+    #[doc = "When the user first used text-to-CAD."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_call_from_text_to_cad_date: Option<String>,
     #[doc = "When the user first called an endpoint from their machine (i.e. not a litterbox \
-             execution)"]
+             execution)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub first_call_from_their_machine_date: Option<String>,
-    #[doc = "When the user first used the litterbox"]
+    #[doc = "When the user first used the litterbox."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub first_litterbox_execute_date: Option<String>,
-    #[doc = "When the user created their first token"]
+    #[doc = "When the user created their first token."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub first_token_date: Option<String>,
 }
@@ -7836,9 +8014,20 @@ impl std::fmt::Display for Onboarding {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Onboarding {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 5;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(first_call_from_modeling_app_date) = &self.first_call_from_modeling_app_date
+            {
+                format!("{:?}", first_call_from_modeling_app_date).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(first_call_from_text_to_cad_date) = &self.first_call_from_text_to_cad_date {
+                format!("{:?}", first_call_from_text_to_cad_date).into()
+            } else {
+                String::new().into()
+            },
             if let Some(first_call_from_their_machine_date) =
                 &self.first_call_from_their_machine_date
             {
@@ -7861,6 +8050,8 @@ impl tabled::Tabled for Onboarding {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "first_call_from_modeling_app_date".into(),
+            "first_call_from_text_to_cad_date".into(),
             "first_call_from_their_machine_date".into(),
             "first_litterbox_execute_date".into(),
             "first_token_date".into(),
@@ -7930,7 +8121,7 @@ pub enum OutputFormat {
     },
     #[doc = "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, \
              although by default it will be in binary format and thus technically (glb). If you \
-             prefer ascii output, you can set that option for the export."]
+             prefer ASCII output, you can set that option for the export."]
     #[serde(rename = "gltf")]
     Gltf {
         #[doc = "Specifies how the JSON will be presented."]
@@ -8186,24 +8377,16 @@ pub enum PathSegment {
     #[doc = "A circular arc segment."]
     #[serde(rename = "arc")]
     Arc {
-        #[doc = "End of the arc along circle's perimeter, in degrees. Deprecated: use `end` \
-                 instead."]
-        angle_end: f64,
-        #[doc = "Start of the arc along circle's perimeter, in degrees. Deprecated: use `start` \
-                 instead."]
-        angle_start: f64,
         #[doc = "Center of the circle"]
         center: Point2D,
-        #[doc = "End of the arc along circle's perimeter. If not given, this will use \
-                 `degrees_end` instead."]
-        end: Option<Angle>,
+        #[doc = "End of the arc along circle's perimeter."]
+        end: Angle,
         #[doc = "Radius of the circle"]
         radius: f64,
         #[doc = "Whether or not this arc is a relative offset"]
         relative: bool,
-        #[doc = "Start of the arc along circle's perimeter. If not given, this will use \
-                 `degrees_start` instead."]
-        start: Option<Angle>,
+        #[doc = "Start of the arc along circle's perimeter."]
+        start: Angle,
     },
     #[doc = "A cubic bezier curve segment. Start at the end of the current line, go through \
              control point 1 and 2, then end at a given point."]
@@ -8645,7 +8828,8 @@ impl tabled::Tabled for Pong {
     }
 }
 
-#[doc = "A raw file with unencoded contents to be passed over binary websockets."]
+#[doc = "A raw file with unencoded contents to be passed over binary websockets. When raw files \
+         come back for exports it is sent as binary/bson, not text/json."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
