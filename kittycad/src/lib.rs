@@ -4,7 +4,7 @@
 //!
 //! ## API Details
 //!
-//! API server for KittyCAD
+//! API server for Zoo
 //!
 //!
 //!
@@ -13,7 +13,7 @@
 //!
 //! | url | email |
 //! |----|----|
-//! | <https://kittycad.io> | api@kittycad.io |
+//! | <https://zoo.dev> | api@zoo.dev |
 //!
 //!
 //!

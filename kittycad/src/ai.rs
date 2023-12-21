@@ -12,7 +12,7 @@ impl Ai {
         Self { client }
     }
 
-    #[doc = "List all AI prompts.\n\nFor text-to-cad prompts, this will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by a KittyCAD employee.\nThe AI prompts are returned in order of creation, with the most recently created AI prompts first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_prompts_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_prompts_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List all AI prompts.\n\nFor text-to-cad prompts, this will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by a Zoo employee.\nThe AI prompts are returned in order of creation, with the most recently created AI prompts first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_prompts_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_prompts_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list_prompts<'a>(
         &'a self,
@@ -58,7 +58,7 @@ impl Ai {
         }
     }
 
-    #[doc = "List all AI prompts.\n\nFor text-to-cad prompts, this will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by a KittyCAD employee.\nThe AI prompts are returned in order of creation, with the most recently created AI prompts first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_prompts_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_prompts_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List all AI prompts.\n\nFor text-to-cad prompts, this will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by a Zoo employee.\nThe AI prompts are returned in order of creation, with the most recently created AI prompts first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_prompts_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_prompts_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     #[cfg(not(feature = "js"))]
     pub fn list_prompts_stream<'a>(
@@ -124,7 +124,7 @@ impl Ai {
             .boxed()
     }
 
-    #[doc = "Get an AI prompt.\n\nThis endpoint requires authentication by a KittyCAD \
+    #[doc = "Get an AI prompt.\n\nThis endpoint requires authentication by a Zoo \
              employee.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The id of the model to give \
              feedback to. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
              example_ai_get_prompt() -> anyhow::Result<()> {\n    let client = \
@@ -202,7 +202,7 @@ impl Ai {
         }
     }
 
-    #[doc = "List text-to-CAD models you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by any KittyCAD user. It returns the text-to-CAD models for the authenticated user.\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_text_to_cad_models_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_text_to_cad_models_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List text-to-CAD models you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD models for the authenticated user.\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_text_to_cad_models_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_text_to_cad_models_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list_text_to_cad_models_for_user<'a>(
         &'a self,
@@ -248,7 +248,7 @@ impl Ai {
         }
     }
 
-    #[doc = "List text-to-CAD models you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by any KittyCAD user. It returns the text-to-CAD models for the authenticated user.\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_text_to_cad_models_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_text_to_cad_models_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List text-to-CAD models you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD models for the authenticated user.\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_text_to_cad_models_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_text_to_cad_models_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     #[cfg(not(feature = "js"))]
     pub fn list_text_to_cad_models_for_user_stream<'a>(
@@ -314,9 +314,9 @@ impl Ai {
             .boxed()
     }
 
-    #[doc = "Get a text-to-CAD response.\n\nThis endpoint requires authentication by any KittyCAD \
-             user. The user must be the owner of the text-to-CAD model.\n\n**Parameters:**\n\n- \
-             `id: uuid::Uuid`: The id of the model to give feedback to. \
+    #[doc = "Get a text-to-CAD response.\n\nThis endpoint requires authentication by any Zoo user. \
+             The user must be the owner of the text-to-CAD model.\n\n**Parameters:**\n\n- `id: \
+             uuid::Uuid`: The id of the model to give feedback to. \
              (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
              example_ai_get_text_to_cad_model_for_user() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCad = \
@@ -358,8 +358,8 @@ impl Ai {
     }
 
     #[doc = "Give feedback to a specific text-to-CAD response.\n\nThis endpoint requires \
-             authentication by any KittyCAD user. The user must be the owner of the text-to-CAD \
-             model, in order to give feedback.\n\n**Parameters:**\n\n- `feedback: \
+             authentication by any Zoo user. The user must be the owner of the text-to-CAD model, \
+             in order to give feedback.\n\n**Parameters:**\n\n- `feedback: \
              crate::types::AiFeedback`: The feedback. (required)\n- `id: uuid::Uuid`: The id of \
              the model to give feedback to. (required)\n\n```rust,no_run\nuse \
              std::str::FromStr;\nasync fn example_ai_create_text_to_cad_model_feedback() -> \

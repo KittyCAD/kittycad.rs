@@ -6,7 +6,7 @@ A fully generated & opinionated API client for the KittyCAD API.
 
 ## API Details
 
-API server for KittyCAD
+API server for Zoo
 
 
 
@@ -15,7 +15,7 @@ API server for KittyCAD
 
 | url | email |
 |----|----|
-| <https://kittycad.io> | api@kittycad.io |
+| <https://zoo.dev> | api@zoo.dev |
 
 
 

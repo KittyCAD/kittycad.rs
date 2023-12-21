@@ -1,11 +1,11 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "KittyCAD API",
-    "description": "API server for KittyCAD",
+    "title": "Zoo API",
+    "description": "API server for Zoo",
     "contact": {
-      "url": "https://kittycad.io",
-      "email": "api@kittycad.io"
+      "url": "https://zoo.dev",
+      "email": "api@zoo.dev"
     },
     "version": "0.1.0"
   },
@@ -138,7 +138,7 @@
           "hidden"
         ],
         "summary": "Get the metadata about our currently running server.",
-        "description": "This includes information on any of our other distributed systems it is connected to.\nYou must be a KittyCAD employee to perform this request.",
+        "description": "This includes information on any of our other distributed systems it is connected to.\nYou must be a Zoo employee to perform this request.",
         "operationId": "get_metadata",
         "responses": {
           "200": {
@@ -201,7 +201,7 @@
           "hidden"
         ],
         "summary": "List all AI prompts.",
-        "description": "For text-to-cad prompts, this will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by a KittyCAD employee.\nThe AI prompts are returned in order of creation, with the most recently created AI prompts first.",
+        "description": "For text-to-cad prompts, this will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by a Zoo employee.\nThe AI prompts are returned in order of creation, with the most recently created AI prompts first.",
         "operationId": "list_ai_prompts",
         "parameters": [
           {
@@ -296,7 +296,7 @@
           "hidden"
         ],
         "summary": "Get an AI prompt.",
-        "description": "This endpoint requires authentication by a KittyCAD employee.",
+        "description": "This endpoint requires authentication by a Zoo employee.",
         "operationId": "get_ai_prompt",
         "parameters": [
           {
@@ -368,8 +368,7 @@
       "post": {
         "tags": [
           "ai",
-          "beta",
-          "hidden"
+          "beta"
         ],
         "summary": "Generate a CAD model from text.",
         "description": "Because our source of truth for the resulting model is a STEP file, you will always have STEP file contents when you list your generated models. Any other formats you request here will also be returned when you list your generated models.\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nOne thing to note, if you hit the cache, this endpoint will return right away. So you only have to wait if the status is not `Completed` or `Failed`.\nThis is an alpha endpoint. It will change in the future. The current output is honestly pretty bad. So if you find this endpoint, you get what you pay for, which currently is nothing. But in the future will be made a lot better.",
@@ -520,7 +519,7 @@
           "hidden"
         ],
         "summary": "Get API call metrics.",
-        "description": "This endpoint requires authentication by a KittyCAD employee. The API calls are grouped by the parameter passed.",
+        "description": "This endpoint requires authentication by a Zoo employee. The API calls are grouped by the parameter passed.",
         "operationId": "get_api_call_metrics",
         "parameters": [
           {
@@ -598,7 +597,7 @@
           "hidden"
         ],
         "summary": "List API calls.",
-        "description": "This endpoint requires authentication by a KittyCAD employee. The API calls are returned in order of creation, with the most recently created API calls first.",
+        "description": "This endpoint requires authentication by a Zoo employee. The API calls are returned in order of creation, with the most recently created API calls first.",
         "operationId": "list_api_calls",
         "parameters": [
           {
@@ -693,7 +692,7 @@
           "hidden"
         ],
         "summary": "Get details of an API call.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.\nIf the user is not authenticated to view the specified API call, then it is not returned.\nOnly KittyCAD employees can view API calls for other users.",
+        "description": "This endpoint requires authentication by any Zoo user. It returns details of the requested API call for the user.\nIf the user is not authenticated to view the specified API call, then it is not returned.\nOnly Zoo employees can view API calls for other users.",
         "operationId": "get_api_call",
         "parameters": [
           {
@@ -768,7 +767,7 @@
           "hidden"
         ],
         "summary": "Listen for callbacks to GitHub app authentication.",
-        "description": "This is different than OAuth 2.0 authentication for users. This endpoint grants access for KittyCAD to access user's repos.\nThe user doesn't need KittyCAD OAuth authorization for this endpoint, this is purely for the GitHub permissions to access repos.",
+        "description": "This is different than OAuth 2.0 authentication for users. This endpoint grants access for Zoo to access user's repos.\nThe user doesn't need Zoo OAuth authorization for this endpoint, this is purely for the GitHub permissions to access repos.",
         "operationId": "apps_github_callback",
         "requestBody": {
           "content": {
@@ -832,7 +831,7 @@
           "hidden"
         ],
         "summary": "Get the consent URL for GitHub app authentication.",
-        "description": "This is different than OAuth 2.0 authentication for users. This endpoint grants access for KittyCAD to access user's repos.\nThe user doesn't need KittyCAD OAuth authorization for this endpoint, this is purely for the GitHub permissions to access repos.",
+        "description": "This is different than OAuth 2.0 authentication for users. This endpoint grants access for Zoo to access user's repos.\nThe user doesn't need Zoo OAuth authorization for this endpoint, this is purely for the GitHub permissions to access repos.",
         "operationId": "apps_github_consent",
         "responses": {
           "200": {
@@ -1015,7 +1014,7 @@
           "hidden"
         ],
         "summary": "List async operations.",
-        "description": "For async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\nThis endpoint requires authentication by a KittyCAD employee.",
+        "description": "For async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\nThis endpoint requires authentication by a Zoo employee.",
         "operationId": "list_async_operations",
         "parameters": [
           {
@@ -1117,7 +1116,7 @@
           "api-calls"
         ],
         "summary": "Get an async operation.",
-        "description": "Get the status and output of an async operation.\nThis endpoint requires authentication by any KittyCAD user. It returns details of the requested async operation for the user.\nIf the user is not authenticated to view the specified async operation, then it is not returned.\nOnly KittyCAD employees with the proper access can view async operations for other users.",
+        "description": "Get the status and output of an async operation.\nThis endpoint requires authentication by any Zoo user. It returns details of the requested async operation for the user.\nIf the user is not authenticated to view the specified async operation, then it is not returned.\nOnly Zoo employees with the proper access can view async operations for other users.",
         "operationId": "get_async_operation",
         "parameters": [
           {
@@ -1883,7 +1882,7 @@
           "executor",
           "hidden"
         ],
-        "summary": "Execute a KittyCAD program in a specific language.",
+        "summary": "Execute a Zoo program in a specific language.",
         "operationId": "create_file_execution",
         "parameters": [
           {
@@ -2568,7 +2567,7 @@
           "hidden"
         ],
         "summary": "Get an API token for a user by their discord id.",
-        "description": "This endpoint allows us to run API calls from our discord bot on behalf of a user. The user must have a discord account linked to their KittyCAD Account via oauth2 for this to work.\nYou must be a KittyCAD employee to use this endpoint.",
+        "description": "This endpoint allows us to run API calls from our discord bot on behalf of a user. The user must have a discord account linked to their Zoo Account via oauth2 for this to work.\nYou must be a Zoo employee to use this endpoint.",
         "operationId": "internal_get_api_token_for_discord_user",
         "parameters": [
           {
@@ -4661,7 +4660,7 @@
           "users"
         ],
         "summary": "Update your user.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It updates information about the authenticated user.",
+        "description": "This endpoint requires authentication by any Zoo user. It updates information about the authenticated user.",
         "operationId": "update_user_self",
         "requestBody": {
           "content": {
@@ -4731,7 +4730,7 @@
           "users"
         ],
         "summary": "Delete your user.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It deletes the authenticated user from KittyCAD's database.\nThis call will only succeed if all invoices associated with the user have been paid in full and there is no outstanding balance.",
+        "description": "This endpoint requires authentication by any Zoo user. It deletes the authenticated user from Zoo's database.\nThis call will only succeed if all invoices associated with the user have been paid in full and there is no outstanding balance.",
         "operationId": "delete_user_self",
         "responses": {
           "204": {
@@ -4839,7 +4838,7 @@
           "api-calls"
         ],
         "summary": "List API calls for your user.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user.\nThe API calls are returned in order of creation, with the most recently created API calls first.",
+        "description": "This endpoint requires authentication by any Zoo user. It returns the API calls for the authenticated user.\nThe API calls are returned in order of creation, with the most recently created API calls first.",
         "operationId": "user_list_api_calls",
         "parameters": [
           {
@@ -4933,7 +4932,7 @@
           "api-calls"
         ],
         "summary": "Get an API call for a user.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It returns details of the requested API call for the user.",
+        "description": "This endpoint requires authentication by any Zoo user. It returns details of the requested API call for the user.",
         "operationId": "get_api_call_for_user",
         "parameters": [
           {
@@ -5007,7 +5006,7 @@
           "api-tokens"
         ],
         "summary": "List API tokens for your user.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first.",
+        "description": "This endpoint requires authentication by any Zoo user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first.",
         "operationId": "list_api_tokens_for_user",
         "parameters": [
           {
@@ -5099,7 +5098,7 @@
           "api-tokens"
         ],
         "summary": "Create a new API token for your user.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It creates a new API token for the authenticated user.",
+        "description": "This endpoint requires authentication by any Zoo user. It creates a new API token for the authenticated user.",
         "operationId": "create_api_token_for_user",
         "responses": {
           "201": {
@@ -5214,7 +5213,7 @@
           "api-tokens"
         ],
         "summary": "Get an API token for your user.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.",
+        "description": "This endpoint requires authentication by any Zoo user. It returns details of the requested API token for the user.",
         "operationId": "get_api_token_for_user",
         "parameters": [
           {
@@ -5286,7 +5285,7 @@
           "api-tokens"
         ],
         "summary": "Delete an API token for your user.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It deletes the requested API token for the user.\nThis endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.",
+        "description": "This endpoint requires authentication by any Zoo user. It deletes the requested API token for the user.\nThis endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.",
         "operationId": "delete_api_token_for_user",
         "parameters": [
           {
@@ -5474,70 +5473,6 @@
         }
       }
     },
-    "/user/front-hash": {
-      "get": {
-        "tags": [
-          "users",
-          "hidden"
-        ],
-        "summary": "Get your user's front verification hash.",
-        "description": "This info is sent to front when initialing the front chat, it prevents impersonations using js hacks in the browser",
-        "operationId": "get_user_front_hash_self",
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "title": "String",
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
     "/user/onboarding": {
       "get": {
         "tags": [
@@ -5607,7 +5542,7 @@
           "payments"
         ],
         "summary": "Get payment info about your user.",
-        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It gets the payment information for the authenticated user.",
+        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by any Zoo user. It gets the payment information for the authenticated user.",
         "operationId": "get_payment_information_for_user",
         "responses": {
           "200": {
@@ -5667,7 +5602,7 @@
           "payments"
         ],
         "summary": "Update payment info for your user.",
-        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It updates the payment information for the authenticated user.",
+        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by any Zoo user. It updates the payment information for the authenticated user.",
         "operationId": "update_payment_information_for_user",
         "requestBody": {
           "content": {
@@ -5737,7 +5672,7 @@
           "payments"
         ],
         "summary": "Create payment info for your user.",
-        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It creates the payment information for the authenticated user.",
+        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by any Zoo user. It creates the payment information for the authenticated user.",
         "operationId": "create_payment_information_for_user",
         "requestBody": {
           "content": {
@@ -5807,7 +5742,7 @@
           "payments"
         ],
         "summary": "Delete payment info for your user.",
-        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by any KittyCAD user. It deletes the payment information for the authenticated user.",
+        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by any Zoo user. It deletes the payment information for the authenticated user.",
         "operationId": "delete_payment_information_for_user",
         "responses": {
           "204": {
@@ -5915,7 +5850,7 @@
           "payments"
         ],
         "summary": "Get balance for your user.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It gets the balance information for the authenticated user.",
+        "description": "This endpoint requires authentication by any Zoo user. It gets the balance information for the authenticated user.",
         "operationId": "get_payment_balance_for_user",
         "responses": {
           "200": {
@@ -5978,7 +5913,7 @@
           "hidden"
         ],
         "summary": "Create a payment intent for your user.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It creates a new payment intent for the authenticated user.",
+        "description": "This endpoint requires authentication by any Zoo user. It creates a new payment intent for the authenticated user.",
         "operationId": "create_payment_intent_for_user",
         "responses": {
           "201": {
@@ -6093,7 +6028,7 @@
           "payments"
         ],
         "summary": "List invoices for your user.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It lists invoices for the authenticated user.",
+        "description": "This endpoint requires authentication by any Zoo user. It lists invoices for the authenticated user.",
         "operationId": "list_invoices_for_user",
         "responses": {
           "200": {
@@ -6159,7 +6094,7 @@
           "payments"
         ],
         "summary": "List payment methods for your user.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It lists payment methods for the authenticated user.",
+        "description": "This endpoint requires authentication by any Zoo user. It lists payment methods for the authenticated user.",
         "operationId": "list_payment_methods_for_user",
         "responses": {
           "200": {
@@ -6226,7 +6161,7 @@
           "hidden"
         ],
         "summary": "Delete a payment method for your user.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It deletes the specified payment method for the authenticated user.",
+        "description": "This endpoint requires authentication by any Zoo user. It deletes the specified payment method for the authenticated user.",
         "operationId": "delete_payment_method_for_user",
         "parameters": [
           {
@@ -6357,7 +6292,7 @@
           "hidden"
         ],
         "summary": "Validate a customer's information is correct and valid for automatic tax.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It will return an error if the customer's information is not valid for automatic tax. Otherwise, it will return an empty successful response.",
+        "description": "This endpoint requires authentication by any Zoo user. It will return an error if the customer's information is not valid for automatic tax. Otherwise, it will return an empty successful response.",
         "operationId": "validate_customer_tax_information_for_user",
         "responses": {
           "204": {
@@ -6412,7 +6347,7 @@
           "users"
         ],
         "summary": "Get a session for your user.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It returns details of the requested API token for the user.",
+        "description": "This endpoint requires authentication by any Zoo user. It returns details of the requested API token for the user.",
         "operationId": "get_session_for_user",
         "parameters": [
           {
@@ -6484,11 +6419,10 @@
       "get": {
         "tags": [
           "ai",
-          "beta",
-          "hidden"
+          "beta"
         ],
         "summary": "List text-to-CAD models you've generated.",
-        "description": "This will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by any KittyCAD user. It returns the text-to-CAD models for the authenticated user.\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.",
+        "description": "This will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD models for the authenticated user.\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.",
         "operationId": "list_text_to_cad_models_for_user",
         "parameters": [
           {
@@ -6580,11 +6514,10 @@
       "get": {
         "tags": [
           "ai",
-          "beta",
-          "hidden"
+          "beta"
         ],
         "summary": "Get a text-to-CAD response.",
-        "description": "This endpoint requires authentication by any KittyCAD user. The user must be the owner of the text-to-CAD model.",
+        "description": "This endpoint requires authentication by any Zoo user. The user must be the owner of the text-to-CAD model.",
         "operationId": "get_text_to_cad_model_for_user",
         "parameters": [
           {
@@ -6654,11 +6587,10 @@
       "post": {
         "tags": [
           "ai",
-          "beta",
-          "hidden"
+          "beta"
         ],
         "summary": "Give feedback to a specific text-to-CAD response.",
-        "description": "This endpoint requires authentication by any KittyCAD user. The user must be the owner of the text-to-CAD model, in order to give feedback.",
+        "description": "This endpoint requires authentication by any Zoo user. The user must be the owner of the text-to-CAD model, in order to give feedback.",
         "operationId": "create_text_to_cad_model_feedback",
         "parameters": [
           {
@@ -6800,7 +6732,7 @@
           "hidden"
         ],
         "summary": "List users.",
-        "description": "This endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.",
+        "description": "This endpoint required authentication by a Zoo employee. The users are returned in order of creation, with the most recently created users first.",
         "operationId": "list_users",
         "parameters": [
           {
@@ -6895,7 +6827,7 @@
           "hidden"
         ],
         "summary": "List users with extended information.",
-        "description": "This endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.",
+        "description": "This endpoint required authentication by a Zoo employee. The users are returned in order of creation, with the most recently created users first.",
         "operationId": "list_users_extended",
         "parameters": [
           {
@@ -6990,7 +6922,7 @@
           "hidden"
         ],
         "summary": "Get extended information about a user.",
-        "description": "To get information about yourself, use `/users-extended/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user/extended` endpoint.\nTo get information about any KittyCAD user, you must be a KittyCAD employee.",
+        "description": "To get information about yourself, use `/users-extended/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user/extended` endpoint.\nTo get information about any Zoo user, you must be a Zoo employee.",
         "operationId": "get_user_extended",
         "parameters": [
           {
@@ -7064,7 +6996,7 @@
           "hidden"
         ],
         "summary": "Get a user.",
-        "description": "To get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user` endpoint.\nTo get information about any KittyCAD user, you must be a KittyCAD employee.",
+        "description": "To get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user` endpoint.\nTo get information about any Zoo user, you must be a Zoo employee.",
         "operationId": "get_user",
         "parameters": [
           {
@@ -7138,7 +7070,7 @@
           "hidden"
         ],
         "summary": "List API calls for a user.",
-        "description": "This endpoint requires authentication by any KittyCAD user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\nAlternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\nIf the authenticated user is a KittyCAD employee, then the API calls are returned for the user specified by the user id.\nThe API calls are returned in order of creation, with the most recently created API calls first.",
+        "description": "This endpoint requires authentication by any Zoo user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\nAlternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\nIf the authenticated user is a Zoo employee, then the API calls are returned for the user specified by the user id.\nThe API calls are returned in order of creation, with the most recently created API calls first.",
         "operationId": "list_api_calls_for_user",
         "parameters": [
           {
@@ -10283,6 +10215,50 @@
           "coupon"
         ]
       },
+      "DistanceType": {
+        "description": "The type of distance Distances can vary depending on the objects used as input.",
+        "oneOf": [
+          {
+            "description": "Euclidean Distance.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "euclidean"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
+            "description": "The distance between objects along the specified axis",
+            "type": "object",
+            "properties": {
+              "axis": {
+                "description": "Global axis",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/GlobalAxis"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "on_axis"
+                ]
+              }
+            },
+            "required": [
+              "axis",
+              "type"
+            ]
+          }
+        ]
+      },
       "EmailAuthenticationForm": {
         "description": "The body of the form for email authentication.",
         "type": "object",
@@ -10334,6 +10310,26 @@
           "entity_id"
         ]
       },
+      "EntityGetDistance": {
+        "description": "The response from the `EntitiesGetDistance` command.",
+        "type": "object",
+        "properties": {
+          "max_distance": {
+            "description": "The maximum distance between the input entities.",
+            "type": "number",
+            "format": "double"
+          },
+          "min_distance": {
+            "description": "The minimum distance between the input entities.",
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "max_distance",
+          "min_distance"
+        ]
+      },
       "EntityGetNumChildren": {
         "description": "The response from the `EntityGetNumChildren` command.",
         "type": "object",
@@ -10361,6 +10357,23 @@
         },
         "required": [
           "entity_id"
+        ]
+      },
+      "EntityLinearPattern": {
+        "description": "The response from the `EntityLinearPattern` command.",
+        "type": "object",
+        "properties": {
+          "entity_ids": {
+            "description": "The UUIDs of the entities that were created.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "entity_ids"
         ]
       },
       "EntityType": {
@@ -11503,6 +11516,32 @@
           "z_axis"
         ]
       },
+      "GlobalAxis": {
+        "description": "An enum that contains the three global axes.",
+        "oneOf": [
+          {
+            "description": "The X axis",
+            "type": "string",
+            "enum": [
+              "x"
+            ]
+          },
+          {
+            "description": "The Y axis",
+            "type": "string",
+            "enum": [
+              "y"
+            ]
+          },
+          {
+            "description": "The Z axis",
+            "type": "string",
+            "enum": [
+              "z"
+            ]
+          }
+        ]
+      },
       "GltfPresentation": {
         "description": "Describes the presentation style of the glTF JSON.",
         "oneOf": [
@@ -11613,7 +11652,7 @@
         ]
       },
       "ImportFile": {
-        "description": "File to import into the current model",
+        "description": "File to import into the current model If you are sending binary data for a file, be sure to send the WebSocketRequest as binary/bson, not text/json.",
         "type": "object",
         "properties": {
           "data": {
@@ -12843,7 +12882,7 @@
                 ]
               },
               "source_unit": {
-                "description": "Select the unit interpretation of exported objects.\n\nThis is not the same as the export units. Setting export units is part of the format options.",
+                "description": "Select the unit interpretation of exported objects.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/UnitLength"
@@ -14492,6 +14531,164 @@
               "object_id",
               "type"
             ]
+          },
+          {
+            "description": "Sketch on some entity (e.g. a plane, a face)",
+            "type": "object",
+            "properties": {
+              "animated": {
+                "description": "Should we animate or snap for the camera transition?",
+                "type": "boolean"
+              },
+              "entity_id": {
+                "description": "Which entity to sketch on.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "ortho": {
+                "description": "Should the camera use orthographic projection? In other words, should an object's size in the rendered image stay constant regardless of its distance from the camera.",
+                "type": "boolean"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "enable_sketch_mode"
+                ]
+              }
+            },
+            "required": [
+              "animated",
+              "entity_id",
+              "ortho",
+              "type"
+            ]
+          },
+          {
+            "description": "Set the material properties of an object",
+            "type": "object",
+            "properties": {
+              "ambient_occlusion": {
+                "description": "Ambient Occlusion of the new material",
+                "type": "number",
+                "format": "float"
+              },
+              "color": {
+                "description": "Color of the new material",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Color"
+                  }
+                ]
+              },
+              "metalness": {
+                "description": "Metalness of the new material",
+                "type": "number",
+                "format": "float"
+              },
+              "object_id": {
+                "description": "Which object to change",
+                "type": "string",
+                "format": "uuid"
+              },
+              "roughness": {
+                "description": "Roughness of the new material",
+                "type": "number",
+                "format": "float"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "object_set_material_params_pbr"
+                ]
+              }
+            },
+            "required": [
+              "ambient_occlusion",
+              "color",
+              "metalness",
+              "object_id",
+              "roughness",
+              "type"
+            ]
+          },
+          {
+            "description": "What is the distance between these two entities?",
+            "type": "object",
+            "properties": {
+              "distance_type": {
+                "description": "Type of distance to be measured.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/DistanceType"
+                  }
+                ]
+              },
+              "entity_id1": {
+                "description": "ID of the first entity being queried.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "entity_id2": {
+                "description": "ID of the second entity being queried.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_get_distance"
+                ]
+              }
+            },
+            "required": [
+              "distance_type",
+              "entity_id1",
+              "entity_id2",
+              "type"
+            ]
+          },
+          {
+            "description": "Duplicate the given entity, evenly spaced along the chosen axis.",
+            "type": "object",
+            "properties": {
+              "axis": {
+                "description": "Axis along which to make the copites",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "entity_id": {
+                "description": "ID of the entity being copied.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "num_repetitions": {
+                "description": "Number of repetitions to make.",
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              },
+              "spacing": {
+                "description": "Spacing between repetitions.",
+                "type": "number",
+                "format": "double"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_linear_pattern"
+                ]
+              }
+            },
+            "required": [
+              "axis",
+              "entity_id",
+              "num_repetitions",
+              "spacing",
+              "type"
+            ]
           }
         ]
       },
@@ -14648,7 +14845,7 @@
             ]
           },
           {
-            "description": "The response from the `Export` command. When this is being performed over a websocket, this is sent as binary not JSON. The binary data can be deserialized as `bincode` into a `Vec<ExportFile>`.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14667,7 +14864,7 @@
             ]
           },
           {
-            "description": "The response from the `SelectWithPoint` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14686,7 +14883,7 @@
             ]
           },
           {
-            "description": "The response from the `HighlightSetEntity` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14705,7 +14902,7 @@
             ]
           },
           {
-            "description": "The response from the `EntityGetChildUuid` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14724,7 +14921,7 @@
             ]
           },
           {
-            "description": "The response from the `EntityGetNumChildren` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14743,7 +14940,7 @@
             ]
           },
           {
-            "description": "The response from the `EntityGetParentId` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14762,7 +14959,7 @@
             ]
           },
           {
-            "description": "The response from the `EntityGetAllChildUuids` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14781,7 +14978,7 @@
             ]
           },
           {
-            "description": "The response from the `SelectGet` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14800,7 +14997,7 @@
             ]
           },
           {
-            "description": "The response from the `GetEntityType` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14819,7 +15016,45 @@
             ]
           },
           {
-            "description": "The response from the `Solid3dGetAllEdgeFaces` command.",
+            "description": "The response from the ` ` command.",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityGetDistance"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_get_distance"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response from the ` ` command.",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityLinearPattern"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_linear_pattern"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14838,7 +15073,7 @@
             ]
           },
           {
-            "description": "The response from the `Solid3dGetAllOppositeEdges` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14857,7 +15092,7 @@
             ]
           },
           {
-            "description": "The response from the `Solid3dGetOppositeEdge` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14876,7 +15111,7 @@
             ]
           },
           {
-            "description": "The response from the `Solid3dGetPrevAdjacentEdge` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14895,7 +15130,7 @@
             ]
           },
           {
-            "description": "The response from the `Solid3dGetNextAdjacentEdge` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14914,7 +15149,7 @@
             ]
           },
           {
-            "description": "The response from the `MouseClick` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14933,7 +15168,7 @@
             ]
           },
           {
-            "description": "The response from the `CurveGetType` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14952,7 +15187,7 @@
             ]
           },
           {
-            "description": "The response from the `CurveGetControlPoints` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14971,7 +15206,7 @@
             ]
           },
           {
-            "description": "The response from the `Take Snapshot` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -14990,7 +15225,7 @@
             ]
           },
           {
-            "description": "The response from the `Path Get Info` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -15009,7 +15244,7 @@
             ]
           },
           {
-            "description": "The response from the `Path Get Curve UUIDs for Vertices` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -15028,7 +15263,7 @@
             ]
           },
           {
-            "description": "The response from the `Path Get Vertex UUIDs` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -15047,7 +15282,7 @@
             ]
           },
           {
-            "description": "The response from the `PlaneIntersectAndProject` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -15066,7 +15301,7 @@
             ]
           },
           {
-            "description": "The response from the `CurveGetEndPoints` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -15085,7 +15320,7 @@
             ]
           },
           {
-            "description": "The response from the `ImportFiles` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -15104,7 +15339,7 @@
             ]
           },
           {
-            "description": "The response from the `Mass` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -15123,7 +15358,7 @@
             ]
           },
           {
-            "description": "The response from the `Volume` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -15142,7 +15377,7 @@
             ]
           },
           {
-            "description": "The response from the `Density` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -15161,7 +15396,7 @@
             ]
           },
           {
-            "description": "The response from the `SurfaceArea` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -15180,7 +15415,7 @@
             ]
           },
           {
-            "description": "The response from the `CenterOfMass` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -15199,7 +15434,7 @@
             ]
           },
           {
-            "description": "The response from the `GetSketchModePlane` command.",
+            "description": "The response from the ` ` command.",
             "type": "object",
             "properties": {
               "data": {
@@ -15405,16 +15640,24 @@
         "description": "Onboarding details",
         "type": "object",
         "properties": {
+          "first_call_from_modeling_app_date": {
+            "description": "When the user first used the modeling app.",
+            "type": "string"
+          },
+          "first_call_from_text_to_cad_date": {
+            "description": "When the user first used text-to-CAD.",
+            "type": "string"
+          },
           "first_call_from_their_machine_date": {
-            "description": "When the user first called an endpoint from their machine (i.e. not a litterbox execution)",
+            "description": "When the user first called an endpoint from their machine (i.e. not a litterbox execution).",
             "type": "string"
           },
           "first_litterbox_execute_date": {
-            "description": "When the user first used the litterbox",
+            "description": "When the user first used the litterbox.",
             "type": "string"
           },
           "first_token_date": {
-            "description": "When the user created their first token",
+            "description": "When the user created their first token.",
             "type": "string"
           }
         }
@@ -15463,7 +15706,7 @@
             ]
           },
           {
-            "description": "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, although by default it will be in binary format and thus technically (glb). If you prefer ascii output, you can set that option for the export.",
+            "description": "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, although by default it will be in binary format and thus technically (glb). If you prefer ASCII output, you can set that option for the export.",
             "type": "object",
             "properties": {
               "presentation": {
@@ -15774,18 +16017,6 @@
             "description": "A circular arc segment.",
             "type": "object",
             "properties": {
-              "angle_end": {
-                "deprecated": true,
-                "description": "End of the arc along circle's perimeter, in degrees. Deprecated: use `end` instead.",
-                "type": "number",
-                "format": "double"
-              },
-              "angle_start": {
-                "deprecated": true,
-                "description": "Start of the arc along circle's perimeter, in degrees. Deprecated: use `start` instead.",
-                "type": "number",
-                "format": "double"
-              },
               "center": {
                 "description": "Center of the circle",
                 "allOf": [
@@ -15795,8 +16026,7 @@
                 ]
               },
               "end": {
-                "nullable": true,
-                "description": "End of the arc along circle's perimeter. If not given, this will use `degrees_end` instead.",
+                "description": "End of the arc along circle's perimeter.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Angle"
@@ -15813,8 +16043,7 @@
                 "type": "boolean"
               },
               "start": {
-                "nullable": true,
-                "description": "Start of the arc along circle's perimeter. If not given, this will use `degrees_start` instead.",
+                "description": "Start of the arc along circle's perimeter.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Angle"
@@ -15829,11 +16058,11 @@
               }
             },
             "required": [
-              "angle_end",
-              "angle_start",
               "center",
+              "end",
               "radius",
               "relative",
+              "start",
               "type"
             ]
           },
@@ -16172,7 +16401,7 @@
         ]
       },
       "RawFile": {
-        "description": "A raw file with unencoded contents to be passed over binary websockets.",
+        "description": "A raw file with unencoded contents to be passed over binary websockets. When raw files come back for exports it is sent as binary/bson, not text/json.",
         "type": "object",
         "properties": {
           "contents": {

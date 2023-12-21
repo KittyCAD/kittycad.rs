@@ -44,7 +44,7 @@ impl Users {
         }
     }
 
-    #[doc = "Update your user.\n\nThis endpoint requires authentication by any KittyCAD user. It updates information about the authenticated user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_users_update_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client\n        .users()\n        .update_self(&kittycad::types::UpdateUser {\n            company: Some(\"some-string\".to_string()),\n            discord: Some(\"some-string\".to_string()),\n            first_name: Some(\"some-string\".to_string()),\n            github: Some(\"some-string\".to_string()),\n            last_name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update your user.\n\nThis endpoint requires authentication by any Zoo user. It updates information about the authenticated user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_users_update_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client\n        .users()\n        .update_self(&kittycad::types::UpdateUser {\n            company: Some(\"some-string\".to_string()),\n            discord: Some(\"some-string\".to_string()),\n            first_name: Some(\"some-string\".to_string()),\n            github: Some(\"some-string\".to_string()),\n            last_name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_self<'a>(
         &'a self,
@@ -75,9 +75,9 @@ impl Users {
         }
     }
 
-    #[doc = "Delete your user.\n\nThis endpoint requires authentication by any KittyCAD user. It \
-             deletes the authenticated user from KittyCAD's database.\nThis call will only succeed \
-             if all invoices associated with the user have been paid in full and there is no \
+    #[doc = "Delete your user.\n\nThis endpoint requires authentication by any Zoo user. It \
+             deletes the authenticated user from Zoo's database.\nThis call will only succeed if \
+             all invoices associated with the user have been paid in full and there is no \
              outstanding balance.\n\n```rust,no_run\nasync fn example_users_delete_self() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
              client.users().delete_self().await?;\n    Ok(())\n}\n```"]
@@ -109,38 +109,6 @@ impl Users {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!("{}/{}", self.client.base_url, "user/extended"),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            return Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            });
-        }
-    }
-
-    #[doc = "Get your user's front verification hash.\n\nThis info is sent to front when \
-             initialing the front chat, it prevents impersonations using js hacks in the \
-             browser\n\n```rust,no_run\nasync fn example_users_get_front_hash_self() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: String = client.users().get_front_hash_self().await?;\n    println!(\"{:?}\", \
-             result);\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn get_front_hash_self<'a>(&'a self) -> Result<String, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!("{}/{}", self.client.base_url, "user/front-hash"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -196,7 +164,7 @@ impl Users {
         }
     }
 
-    #[doc = "Get a session for your user.\n\nThis endpoint requires authentication by any KittyCAD \
+    #[doc = "Get a session for your user.\n\nThis endpoint requires authentication by any Zoo \
              user. It returns details of the requested API token for the \
              user.\n\n**Parameters:**\n\n- `token: uuid::Uuid`: The API token. \
              (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
@@ -238,7 +206,7 @@ impl Users {
         }
     }
 
-    #[doc = "List users.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List users.\n\nThis endpoint required authentication by a Zoo employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list<'a>(
         &'a self,
@@ -284,7 +252,7 @@ impl Users {
         }
     }
 
-    #[doc = "List users.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List users.\n\nThis endpoint required authentication by a Zoo employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     #[cfg(not(feature = "js"))]
     pub fn list_stream<'a>(
@@ -349,7 +317,7 @@ impl Users {
             .boxed()
     }
 
-    #[doc = "List users with extended information.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List users with extended information.\n\nThis endpoint required authentication by a Zoo employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list_extended<'a>(
         &'a self,
@@ -395,7 +363,7 @@ impl Users {
         }
     }
 
-    #[doc = "List users with extended information.\n\nThis endpoint required authentication by a KittyCAD employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List users with extended information.\n\nThis endpoint required authentication by a Zoo employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     #[cfg(not(feature = "js"))]
     pub fn list_extended_stream<'a>(
@@ -464,9 +432,9 @@ impl Users {
     #[doc = "Get extended information about a user.\n\nTo get information about yourself, use \
              `/users-extended/me` as the endpoint. By doing so you will get the user information \
              for the authenticated user.\nAlternatively, to get information about the \
-             authenticated user, use `/user/extended` endpoint.\nTo get information about any \
-             KittyCAD user, you must be a KittyCAD employee.\n\n**Parameters:**\n\n- `id: &'astr`: \
-             The user ID. (required)\n\n```rust,no_run\nasync fn example_users_get_extended() -> \
+             authenticated user, use `/user/extended` endpoint.\nTo get information about any Zoo \
+             user, you must be a Zoo employee.\n\n**Parameters:**\n\n- `id: &'astr`: The user ID. \
+             (required)\n\n```rust,no_run\nasync fn example_users_get_extended() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::ExtendedUser = \
              client.users().get_extended(\"some-string\").await?;\n    println!(\"{:?}\", \
@@ -504,7 +472,7 @@ impl Users {
         }
     }
 
-    #[doc = "Get a user.\n\nTo get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user` endpoint.\nTo get information about any KittyCAD user, you must be a KittyCAD employee.\n\n**Parameters:**\n\n- `id: &'astr`: The user ID. (required)\n\n```rust,no_run\nasync fn example_users_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client.users().get(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get a user.\n\nTo get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user` endpoint.\nTo get information about any Zoo user, you must be a Zoo employee.\n\n**Parameters:**\n\n- `id: &'astr`: The user ID. (required)\n\n```rust,no_run\nasync fn example_users_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client.users().get(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get<'a>(
         &'a self,

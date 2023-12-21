@@ -13,8 +13,8 @@ impl Payments {
     }
 
     #[doc = "Get payment info about your user.\n\nThis includes billing address, phone, and \
-             name.\nThis endpoint requires authentication by any KittyCAD user. It gets the \
-             payment information for the authenticated user.\n\n```rust,no_run\nasync fn \
+             name.\nThis endpoint requires authentication by any Zoo user. It gets the payment \
+             information for the authenticated user.\n\n```rust,no_run\nasync fn \
              example_payments_get_information_for_user() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = \
              client.payments().get_information_for_user().await?;\n    println!(\"{:?}\", \
@@ -48,8 +48,8 @@ impl Payments {
     }
 
     #[doc = "Update payment info for your user.\n\nThis includes billing address, phone, and \
-             name.\nThis endpoint requires authentication by any KittyCAD user. It updates the \
-             payment information for the authenticated user.\n\n```rust,no_run\nuse \
+             name.\nThis endpoint requires authentication by any Zoo user. It updates the payment \
+             information for the authenticated user.\n\n```rust,no_run\nuse \
              std::str::FromStr;\nasync fn example_payments_update_information_for_user() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::Customer = client\n        .payments()\n        \
@@ -96,8 +96,8 @@ impl Payments {
     }
 
     #[doc = "Create payment info for your user.\n\nThis includes billing address, phone, and \
-             name.\nThis endpoint requires authentication by any KittyCAD user. It creates the \
-             payment information for the authenticated user.\n\n```rust,no_run\nuse \
+             name.\nThis endpoint requires authentication by any Zoo user. It creates the payment \
+             information for the authenticated user.\n\n```rust,no_run\nuse \
              std::str::FromStr;\nasync fn example_payments_create_information_for_user() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::Customer = client\n        .payments()\n        \
@@ -144,8 +144,8 @@ impl Payments {
     }
 
     #[doc = "Delete payment info for your user.\n\nThis includes billing address, phone, and \
-             name.\nThis endpoint requires authentication by any KittyCAD user. It deletes the \
-             payment information for the authenticated user.\n\n```rust,no_run\nasync fn \
+             name.\nThis endpoint requires authentication by any Zoo user. It deletes the payment \
+             information for the authenticated user.\n\n```rust,no_run\nasync fn \
              example_payments_delete_information_for_user() -> anyhow::Result<()> {\n    let \
              client = kittycad::Client::new_from_env();\n    \
              client.payments().delete_information_for_user().await?;\n    Ok(())\n}\n```"]
@@ -171,7 +171,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Get balance for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It gets the balance information for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_get_balance_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client.payments().get_balance_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get balance for your user.\n\nThis endpoint requires authentication by any Zoo user. It gets the balance information for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_get_balance_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client.payments().get_balance_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_balance_for_user<'a>(
         &'a self,
@@ -200,7 +200,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Create a payment intent for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It creates a new payment intent for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_create_intent_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PaymentIntent = client.payments().create_intent_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create a payment intent for your user.\n\nThis endpoint requires authentication by any Zoo user. It creates a new payment intent for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_create_intent_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PaymentIntent = client.payments().create_intent_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_intent_for_user<'a>(
         &'a self,
@@ -229,7 +229,7 @@ impl Payments {
         }
     }
 
-    #[doc = "List invoices for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It lists invoices for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_list_invoices_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::Invoice> = client.payments().list_invoices_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "List invoices for your user.\n\nThis endpoint requires authentication by any Zoo user. It lists invoices for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_list_invoices_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::Invoice> = client.payments().list_invoices_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list_invoices_for_user<'a>(
         &'a self,
@@ -258,7 +258,7 @@ impl Payments {
         }
     }
 
-    #[doc = "List payment methods for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It lists payment methods for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_list_methods_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::PaymentMethod> =\n        client.payments().list_methods_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "List payment methods for your user.\n\nThis endpoint requires authentication by any Zoo user. It lists payment methods for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_list_methods_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::PaymentMethod> =\n        client.payments().list_methods_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list_methods_for_user<'a>(
         &'a self,
@@ -287,7 +287,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Delete a payment method for your user.\n\nThis endpoint requires authentication by any KittyCAD user. It deletes the specified payment method for the authenticated user.\n\n**Parameters:**\n\n- `id: &'astr`: The ID of the payment method. (required)\n\n```rust,no_run\nasync fn example_payments_delete_method_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_method_for_user(\"some-string\")\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Delete a payment method for your user.\n\nThis endpoint requires authentication by any Zoo user. It deletes the specified payment method for the authenticated user.\n\n**Parameters:**\n\n- `id: &'astr`: The ID of the payment method. (required)\n\n```rust,no_run\nasync fn example_payments_delete_method_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_method_for_user(\"some-string\")\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn delete_method_for_user<'a>(
         &'a self,
@@ -316,7 +316,7 @@ impl Payments {
     }
 
     #[doc = "Validate a customer's information is correct and valid for automatic tax.\n\nThis \
-             endpoint requires authentication by any KittyCAD user. It will return an error if the \
+             endpoint requires authentication by any Zoo user. It will return an error if the \
              customer's information is not valid for automatic tax. Otherwise, it will return an \
              empty successful response.\n\n```rust,no_run\nasync fn \
              example_payments_validate_customer_tax_information_for_user() -> anyhow::Result<()> \
