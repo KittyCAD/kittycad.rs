@@ -1403,8 +1403,7 @@
     "/file/center-of-mass": {
       "post": {
         "tags": [
-          "file",
-          "beta"
+          "file"
         ],
         "summary": "Get CAD file center of mass.",
         "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint returns the cartesian coordinate in world space measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
@@ -1715,8 +1714,7 @@
     "/file/density": {
       "post": {
         "tags": [
-          "file",
-          "beta"
+          "file"
         ],
         "summary": "Get CAD file density.",
         "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint assumes if you are giving a material mass in a specific mass units, we return a density in mass unit per cubic measure unit.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
@@ -2036,8 +2034,7 @@
     "/file/mass": {
       "post": {
         "tags": [
-          "file",
-          "beta"
+          "file"
         ],
         "summary": "Get CAD file mass.",
         "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint assumes if you are giving a material density in a specific mass unit per cubic measure unit, we return a mass in mass units. The same mass units as passed in the material density.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
@@ -2200,8 +2197,7 @@
     "/file/surface-area": {
       "post": {
         "tags": [
-          "file",
-          "beta"
+          "file"
         ],
         "summary": "Get CAD file surface area.",
         "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint returns the square measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the surface area of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
@@ -2346,8 +2342,7 @@
     "/file/volume": {
       "post": {
         "tags": [
-          "file",
-          "beta"
+          "file"
         ],
         "summary": "Get CAD file volume.",
         "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint returns the cubic measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
@@ -6418,8 +6413,7 @@
     "/user/text-to-cad": {
       "get": {
         "tags": [
-          "ai",
-          "beta"
+          "ai"
         ],
         "summary": "List text-to-CAD models you've generated.",
         "description": "This will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD models for the authenticated user.\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.",
@@ -6513,8 +6507,7 @@
     "/user/text-to-cad/{id}": {
       "get": {
         "tags": [
-          "ai",
-          "beta"
+          "ai"
         ],
         "summary": "Get a text-to-CAD response.",
         "description": "This endpoint requires authentication by any Zoo user. The user must be the owner of the text-to-CAD model.",
@@ -10388,7 +10381,8 @@
           "solid3d",
           "edge",
           "face",
-          "plane"
+          "plane",
+          "vertex"
         ]
       },
       "Environment": {
@@ -10541,7 +10535,7 @@
         ]
       },
       "ExtendedUser": {
-        "description": "Extended user information.\n\nThis is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp, Stripe, and Front",
+        "description": "Extended user information.\n\nThis is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp | Stripe",
         "type": "object",
         "properties": {
           "company": {
@@ -14689,6 +14683,53 @@
               "spacing",
               "type"
             ]
+          },
+          {
+            "description": "When you select some entity with the current tool, what should happen to the entity?",
+            "type": "object",
+            "properties": {
+              "selection_type": {
+                "description": "What type of selection should occur when you select something?",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SceneSelectionType"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_selection_type"
+                ]
+              }
+            },
+            "required": [
+              "selection_type",
+              "type"
+            ]
+          },
+          {
+            "description": "What kind of entities can be selected?",
+            "type": "object",
+            "properties": {
+              "filter": {
+                "description": "If vector is empty, clear all filters. If vector is non-empty, only the given entity types will be selectable.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EntityType"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_selection_filter"
+                ]
+              }
+            },
+            "required": [
+              "filter",
+              "type"
+            ]
           }
         ]
       },
@@ -15641,24 +15682,25 @@
         "type": "object",
         "properties": {
           "first_call_from_modeling_app_date": {
+            "nullable": true,
+            "title": "DateTime",
             "description": "When the user first used the modeling app.",
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
           },
           "first_call_from_text_to_cad_date": {
+            "nullable": true,
+            "title": "DateTime",
             "description": "When the user first used text-to-CAD.",
-            "type": "string"
-          },
-          "first_call_from_their_machine_date": {
-            "description": "When the user first called an endpoint from their machine (i.e. not a litterbox execution).",
-            "type": "string"
-          },
-          "first_litterbox_execute_date": {
-            "description": "When the user first used the litterbox.",
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
           },
           "first_token_date": {
+            "nullable": true,
+            "title": "DateTime",
             "description": "When the user created their first token.",
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -19313,7 +19355,7 @@
   "tags": [
     {
       "name": "ai",
-      "description": "AI uses machine learning to generate 3D meshes.",
+      "description": "AI uses machine learning to generate CAD models.",
       "externalDocs": {
         "url": "https://docs.kittycad.io/api/ai"
       }
