@@ -59,7 +59,7 @@
 #![allow(clippy::needless_lifetimes)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
-/// AI uses machine learning to generate 3D meshes.
+/// AI uses machine learning to generate CAD models.
 ///
 /// FROM: <https://docs.kittycad.io/api/ai>
 #[cfg(feature = "requests")]
@@ -361,7 +361,7 @@ impl Client {
         Ok(RequestBuilder(req))
     }
 
-    /// AI uses machine learning to generate 3D meshes.
+    /// AI uses machine learning to generate CAD models.
     ///
     /// FROM: <https://docs.kittycad.io/api/ai>
     pub fn ai(&self) -> ai::Ai {

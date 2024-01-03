@@ -4202,6 +4202,9 @@ pub enum EntityType {
     #[serde(rename = "plane")]
     #[display("plane")]
     Plane,
+    #[serde(rename = "vertex")]
+    #[display("vertex")]
+    Vertex,
 }
 
 #[doc = "The environment the server is running in."]
@@ -4400,7 +4403,7 @@ impl tabled::Tabled for ExportFile {
 
 #[doc = "Extended user information.\n\nThis is mostly used for internal purposes. It returns a \
          mapping of the user's information, including that of our third party services we use for \
-         users: MailChimp, Stripe, and Front"]
+         users: MailChimp | Stripe"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -7484,6 +7487,19 @@ pub enum ModelingCmd {
         #[doc = "Spacing between repetitions."]
         spacing: f64,
     },
+    #[doc = "When you select some entity with the current tool, what should happen to the entity?"]
+    #[serde(rename = "set_selection_type")]
+    SetSelectionType {
+        #[doc = "What type of selection should occur when you select something?"]
+        selection_type: SceneSelectionType,
+    },
+    #[doc = "What kind of entities can be selected?"]
+    #[serde(rename = "set_selection_filter")]
+    SetSelectionFilter {
+        #[doc = "If vector is empty, clear all filters. If vector is non-empty, only the given \
+                 entity types will be selectable."]
+        filter: Vec<EntityType>,
+    },
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -7986,20 +8002,13 @@ pub enum OkWebSocketResponseData {
 pub struct Onboarding {
     #[doc = "When the user first used the modeling app."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub first_call_from_modeling_app_date: Option<String>,
+    pub first_call_from_modeling_app_date: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "When the user first used text-to-CAD."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub first_call_from_text_to_cad_date: Option<String>,
-    #[doc = "When the user first called an endpoint from their machine (i.e. not a litterbox \
-             execution)."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub first_call_from_their_machine_date: Option<String>,
-    #[doc = "When the user first used the litterbox."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub first_litterbox_execute_date: Option<String>,
+    pub first_call_from_text_to_cad_date: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "When the user created their first token."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub first_token_date: Option<String>,
+    pub first_token_date: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 impl std::fmt::Display for Onboarding {
@@ -8014,7 +8023,7 @@ impl std::fmt::Display for Onboarding {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Onboarding {
-    const LENGTH: usize = 5;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(first_call_from_modeling_app_date) = &self.first_call_from_modeling_app_date
@@ -8025,18 +8034,6 @@ impl tabled::Tabled for Onboarding {
             },
             if let Some(first_call_from_text_to_cad_date) = &self.first_call_from_text_to_cad_date {
                 format!("{:?}", first_call_from_text_to_cad_date).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(first_call_from_their_machine_date) =
-                &self.first_call_from_their_machine_date
-            {
-                format!("{:?}", first_call_from_their_machine_date).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(first_litterbox_execute_date) = &self.first_litterbox_execute_date {
-                format!("{:?}", first_litterbox_execute_date).into()
             } else {
                 String::new().into()
             },
@@ -8052,8 +8049,6 @@ impl tabled::Tabled for Onboarding {
         vec![
             "first_call_from_modeling_app_date".into(),
             "first_call_from_text_to_cad_date".into(),
-            "first_call_from_their_machine_date".into(),
-            "first_litterbox_execute_date".into(),
             "first_token_date".into(),
         ]
     }
