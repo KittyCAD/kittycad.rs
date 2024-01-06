@@ -42,35 +42,6 @@ impl Meta {
         }
     }
 
-    #[doc = "Get AI plugin manifest.\n\n```rust,no_run\nasync fn example_meta_get_ai_plugin_manifest() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AiPluginManifest = client.meta().get_ai_plugin_manifest().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn get_ai_plugin_manifest<'a>(
-        &'a self,
-    ) -> Result<crate::types::AiPluginManifest, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!("{}/{}", self.client.base_url, ".well-known/ai-plugin.json"),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            return Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            });
-        }
-    }
-
     #[doc = "Get the metadata about our currently running server.\n\nThis includes information on \
              any of our other distributed systems it is connected to.\nYou must be a Zoo employee \
              to perform this request.\n\n```rust,no_run\nasync fn example_meta_get_metadata() -> \
@@ -127,40 +98,6 @@ impl Meta {
                 self.client.base_url,
                 "internal/discord/api-token/{discord_id}".replace("{discord_id}", discord_id)
             ),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            return Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            });
-        }
-    }
-
-    #[doc = "Get AI plugin OpenAPI schema.\n\nThis is the same as the OpenAPI schema, BUT it has \
-             some modifications to make it compatible with OpenAI. For example, descriptions must \
-             be < 300 chars.\n\n```rust,no_run\nasync fn example_meta_get_openai_schema() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: serde_json::Value = client.meta().get_openai_schema().await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn get_openai_schema<'a>(
-        &'a self,
-    ) -> Result<serde_json::Value, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!("{}/{}", self.client.base_url, "openai/openapi.json"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;

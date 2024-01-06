@@ -17,14 +17,6 @@
   },
   {
     "op": "add",
-    "path": "/paths/~1.well-known~1ai-plugin.json/get/x-rust",
-    "value": {
-      "example": "/// Get AI plugin manifest.\nasync fn example_meta_get_ai_plugin_manifest() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AiPluginManifest = client.meta().get_ai_plugin_manifest().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.get_ai_plugin_manifest"
-    }
-  },
-  {
-    "op": "add",
     "path": "/paths/~1_meta~1info/get/x-rust",
     "value": {
       "example": "/// Get the metadata about our currently running server.\n/// \n/// This includes information on any of our other distributed systems it is connected to.\n/// You must be a Zoo employee to perform this request.\nasync fn example_meta_get_metadata() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Metadata = client.meta().get_metadata().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
@@ -253,14 +245,6 @@
     "value": {
       "example": "/// Get the consent URL and other information for the OAuth 2.0 provider.\n/// \n/// **Parameters:**\n/// \n/// - `callback_url: Option<String>`: The URL to redirect back to after we have authenticated.\n/// - `provider: crate::types::AccountProvider`: The provider. (required)\nasync fn example_oauth2_oauth_2_provider_consent() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo = client\n        .oauth2()\n        .oauth_2_provider_consent(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Github,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.oauth_2_provider_consent"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1openai~1openapi.json/get/x-rust",
-    "value": {
-      "example": "/// Get AI plugin OpenAPI schema.\n/// \n/// This is the same as the OpenAPI schema, BUT it has some modifications to make it compatible with OpenAI. For example, descriptions must be < 300 chars.\nasync fn example_meta_get_openai_schema() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: serde_json::Value = client.meta().get_openai_schema().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.get_openai_schema"
     }
   },
   {
@@ -555,7 +539,7 @@
     "op": "add",
     "path": "/paths/~1user~1text-to-cad/get/x-rust",
     "value": {
-      "example": "/// List text-to-CAD models you've generated.\n/// \n/// This will always return the STEP file contents as well as the format the user originally requested.\n/// This endpoint requires authentication by any Zoo user. It returns the text-to-CAD models for the authenticated user.\n/// The text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_ai_list_text_to_cad_models_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadResultsPage = client\n        .ai()\n        .list_text_to_cad_models_for_user(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_text_to_cad_models_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_text_to_cad_models_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "example": "/// List text-to-CAD models you've generated.\n/// \n/// This will always return the STEP file contents as well as the format the user originally requested.\n/// This endpoint requires authentication by any Zoo user. It returns the text-to-CAD models for the authenticated user.\n/// The text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `no_models: Option<bool>`: If we should return the model file contents or just the metadata.\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_ai_list_text_to_cad_models_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadResultsPage = client\n        .ai()\n        .list_text_to_cad_models_for_user(\n            Some(4 as u32),\n            Some(false),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_text_to_cad_models_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_text_to_cad_models_for_user_stream(\n        Some(4 as u32),\n        Some(false),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ai/struct.Ai.html#method.list_text_to_cad_models_for_user"
     }
   },

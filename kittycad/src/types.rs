@@ -486,286 +486,6 @@ pub enum AiFeedback {
     ThumbsDown,
 }
 
-#[doc = "AI plugin api information."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct AiPluginApi {
-    #[doc = "If the API is authenticated."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub is_user_authenticated: Option<bool>,
-    #[doc = "The type of API."]
-    #[serde(rename = "type", default, skip_serializing_if = "Option::is_none")]
-    pub type_: Option<AiPluginApiType>,
-    #[doc = "The url to the API's schema."]
-    pub url: String,
-}
-
-impl std::fmt::Display for AiPluginApi {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for AiPluginApi {
-    const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(is_user_authenticated) = &self.is_user_authenticated {
-                format!("{:?}", is_user_authenticated).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(type_) = &self.type_ {
-                format!("{:?}", type_).into()
-            } else {
-                String::new().into()
-            },
-            self.url.clone().into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["is_user_authenticated".into(), "type_".into(), "url".into()]
-    }
-}
-
-#[doc = "AI plugin api type."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[derive(Default)]
-pub enum AiPluginApiType {
-    #[doc = "An OpenAPI specification."]
-    #[serde(rename = "openapi")]
-    #[display("openapi")]
-    #[default]
-    Openapi,
-}
-
-
-
-#[doc = "AI plugin auth information."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct AiPluginAuth {
-    #[doc = "The type of http authorization."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub authorization_type: Option<AiPluginHttpAuthType>,
-    #[doc = "The type of authentication."]
-    #[serde(rename = "type", default, skip_serializing_if = "Option::is_none")]
-    pub type_: Option<AiPluginAuthType>,
-}
-
-impl std::fmt::Display for AiPluginAuth {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for AiPluginAuth {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(authorization_type) = &self.authorization_type {
-                format!("{:?}", authorization_type).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(type_) = &self.type_ {
-                format!("{:?}", type_).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["authorization_type".into(), "type_".into()]
-    }
-}
-
-#[doc = "AI plugin auth type."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum AiPluginAuthType {
-    #[doc = "None."]
-    #[serde(rename = "none")]
-    #[display("none")]
-    None,
-    #[doc = "User http."]
-    #[serde(rename = "user_http")]
-    #[display("user_http")]
-    UserHttp,
-    #[doc = "Service http."]
-    #[serde(rename = "service_http")]
-    #[display("service_http")]
-    ServiceHttp,
-    #[doc = "OAuth."]
-    #[serde(rename = "oauth")]
-    #[display("oauth")]
-    Oauth,
-}
-
-#[doc = "AI plugin http auth type."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum AiPluginHttpAuthType {
-    #[doc = "Basic."]
-    #[serde(rename = "basic")]
-    #[display("basic")]
-    Basic,
-    #[doc = "Bearer."]
-    #[serde(rename = "bearer")]
-    #[display("bearer")]
-    Bearer,
-}
-
-#[doc = "AI plugin manifest.\n\nThis is used for OpenAI's ChatGPT plugins. You can read more about them [here](https://platform.openai.com/docs/plugins/getting-started/plugin-manifest)."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct AiPluginManifest {
-    #[doc = "API specification."]
-    pub api: AiPluginApi,
-    #[doc = "Authentication schema."]
-    pub auth: AiPluginAuth,
-    #[doc = "Email contact for safety/moderation reachout, support, and deactivation."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub contact_email: Option<String>,
-    #[doc = "Human-readable description of the plugin."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub description_for_human: Option<String>,
-    #[doc = "Description better tailored to the model, such as token context length \
-             considerations or keyword usage for improved plugin prompting."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub description_for_model: Option<String>,
-    #[doc = "Redirect URL for users to view plugin information."]
-    pub legal_info_url: String,
-    #[doc = "URL used to fetch the plugin's logo."]
-    pub logo_url: String,
-    #[doc = "Human-readable name, such as the full company name."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub name_for_human: Option<String>,
-    #[doc = "Name the model will used to target the plugin."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub name_for_model: Option<String>,
-    #[doc = "Manifest schema version."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub schema_version: Option<String>,
-}
-
-impl std::fmt::Display for AiPluginManifest {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for AiPluginManifest {
-    const LENGTH: usize = 10;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.api).into(),
-            format!("{:?}", self.auth).into(),
-            if let Some(contact_email) = &self.contact_email {
-                format!("{:?}", contact_email).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(description_for_human) = &self.description_for_human {
-                format!("{:?}", description_for_human).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(description_for_model) = &self.description_for_model {
-                format!("{:?}", description_for_model).into()
-            } else {
-                String::new().into()
-            },
-            self.legal_info_url.clone().into(),
-            self.logo_url.clone().into(),
-            if let Some(name_for_human) = &self.name_for_human {
-                format!("{:?}", name_for_human).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(name_for_model) = &self.name_for_model {
-                format!("{:?}", name_for_model).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(schema_version) = &self.schema_version {
-                format!("{:?}", schema_version).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "api".into(),
-            "auth".into(),
-            "contact_email".into(),
-            "description_for_human".into(),
-            "description_for_model".into(),
-            "legal_info_url".into(),
-            "logo_url".into(),
-            "name_for_human".into(),
-            "name_for_model".into(),
-            "schema_version".into(),
-        ]
-    }
-}
-
 #[doc = "An AI prompt."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -2385,6 +2105,32 @@ impl tabled::Tabled for BillingInfo {
     }
 }
 
+#[doc = "The reason for blocking a user."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum BlockReason {
+    #[doc = "The user is missing a payment method and has exceeded their free API call credits \
+             for the month."]
+    #[serde(rename = "missing_payment_method")]
+    #[display("missing_payment_method")]
+    MissingPaymentMethod,
+    #[doc = "The users payment method has failed."]
+    #[serde(rename = "payment_method_failed")]
+    #[display("payment_method_failed")]
+    PaymentMethodFailed,
+}
+
 #[doc = "Metadata about our cache.\n\nThis is mostly used for internal purposes and debugging."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -3308,6 +3054,13 @@ pub struct Coupon {
     #[doc = "Unique identifier for the object."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
+    #[doc = "Set of key-value pairs."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<std::collections::HashMap<String, String>>,
+    #[doc = "Name of the coupon displayed to customers on, for instance invoices, or \
+             receipts.\n\nBy default the `id` is shown if `name` is not set."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
     #[doc = "Percent that will be taken off the subtotal of any invoices for this customer for \
              the duration of the coupon.\n\nFor example, a coupon with percent_off of 50 will \
              make a %s100 invoice %s50 instead."]
@@ -3327,7 +3080,7 @@ impl std::fmt::Display for Coupon {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Coupon {
-    const LENGTH: usize = 4;
+    const LENGTH: usize = 6;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(amount_off) = &self.amount_off {
@@ -3345,6 +3098,16 @@ impl tabled::Tabled for Coupon {
             } else {
                 String::new().into()
             },
+            if let Some(metadata) = &self.metadata {
+                format!("{:?}", metadata).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(name) = &self.name {
+                format!("{:?}", name).into()
+            } else {
+                String::new().into()
+            },
             if let Some(percent_off) = &self.percent_off {
                 format!("{:?}", percent_off).into()
             } else {
@@ -3358,6 +3121,8 @@ impl tabled::Tabled for Coupon {
             "amount_off".into(),
             "deleted".into(),
             "id".into(),
+            "metadata".into(),
+            "name".into(),
             "percent_off".into(),
         ]
     }
@@ -4408,6 +4173,9 @@ impl tabled::Tabled for ExportFile {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ExtendedUser {
+    #[doc = "If the user should be blocked and the reason why."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub block: Option<BlockReason>,
     #[doc = "The user's company."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub company: Option<String>,
@@ -4468,9 +4236,14 @@ impl std::fmt::Display for ExtendedUser {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ExtendedUser {
-    const LENGTH: usize = 16;
+    const LENGTH: usize = 17;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(block) = &self.block {
+                format!("{:?}", block).into()
+            } else {
+                String::new().into()
+            },
             if let Some(company) = &self.company {
                 format!("{:?}", company).into()
             } else {
@@ -4536,6 +4309,7 @@ impl tabled::Tabled for ExtendedUser {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "block".into(),
             "company".into(),
             "created_at".into(),
             "discord".into(),
@@ -6288,10 +6062,6 @@ impl tabled::Tabled for InvoiceLineItem {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum InvoiceStatus {
-    #[doc = "Deleted."]
-    #[serde(rename = "deleted")]
-    #[display("deleted")]
-    Deleted,
     #[doc = "Draft."]
     #[serde(rename = "draft")]
     #[display("draft")]
@@ -7500,6 +7270,16 @@ pub enum ModelingCmd {
                  entity types will be selectable."]
         filter: Vec<EntityType>,
     },
+    #[doc = "Use orthographic projection."]
+    #[serde(rename = "default_camera_set_orthographic")]
+    DefaultCameraSetOrthographic {},
+    #[doc = "Use perspective projection."]
+    #[serde(rename = "default_camera_set_perspective")]
+    DefaultCameraSetPerspective {
+        #[doc = "If this is not given, use the same parameters as last time the perspective \
+                 camera was used."]
+        parameters: Option<PerspectiveCameraParameters>,
+    },
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -8655,6 +8435,45 @@ pub enum PaymentMethodType {
 }
 
 
+
+#[doc = "Defines a perspective view."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PerspectiveCameraParameters {
+    #[doc = "Camera frustum vertical field of view."]
+    pub fov_y: f64,
+    #[doc = "Camera frustum far plane."]
+    pub z_far: f64,
+    #[doc = "Camera frustum near plane."]
+    pub z_near: f64,
+}
+
+impl std::fmt::Display for PerspectiveCameraParameters {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PerspectiveCameraParameters {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.fov_y).into(),
+            format!("{:?}", self.z_far).into(),
+            format!("{:?}", self.z_near).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["fov_y".into(), "z_far".into(), "z_near".into()]
+    }
+}
 
 #[doc = "Corresponding coordinates of given window coordinates, intersected on given plane."]
 #[derive(
@@ -11763,6 +11582,9 @@ impl tabled::Tabled for UpdateUser {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct User {
+    #[doc = "If the user should be blocked and the reason why."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub block: Option<BlockReason>,
     #[doc = "The user's company."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub company: Option<String>,
@@ -11814,9 +11636,14 @@ impl std::fmt::Display for User {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for User {
-    const LENGTH: usize = 13;
+    const LENGTH: usize = 14;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(block) = &self.block {
+                format!("{:?}", block).into()
+            } else {
+                String::new().into()
+            },
             if let Some(company) = &self.company {
                 format!("{:?}", company).into()
             } else {
@@ -11867,6 +11694,7 @@ impl tabled::Tabled for User {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "block".into(),
             "company".into(),
             "created_at".into(),
             "discord".into(),
