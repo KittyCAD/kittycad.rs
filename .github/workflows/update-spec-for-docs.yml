@@ -15,6 +15,13 @@ jobs:
     name: update-spec
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          # required
+          app-id: ${{ secrets.GH_ORG_APP_ID }}
+          private-key: ${{ secrets.GH_ORG_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
       - uses: actions/checkout@v4
       - name: Install latest stable/nightly
         shell: bash
@@ -50,7 +57,7 @@ jobs:
         with:
           repository: 'kittycad/website'
           path: 'website'
-          token: ${{secrets.GLOBAL_PAT}}
+          token: ${{ steps.app-token.outputs.token }}
       - name: move json patch file to docs
         shell: bash
         run: |
@@ -75,6 +82,6 @@ jobs:
               --head "$NEW_BRANCH" \
               --base main || true
         env:
-          GITHUB_TOKEN: ${{secrets.GLOBAL_PAT}}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
 
