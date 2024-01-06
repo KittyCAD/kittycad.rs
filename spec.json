@@ -69,68 +69,6 @@
         }
       }
     },
-    "/.well-known/ai-plugin.json": {
-      "get": {
-        "tags": [
-          "meta",
-          "hidden"
-        ],
-        "summary": "Get AI plugin manifest.",
-        "operationId": "get_ai_plugin_manifest",
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AiPluginManifest"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
     "/_meta/info": {
       "get": {
         "tags": [
@@ -3271,67 +3209,6 @@
         }
       }
     },
-    "/openai/openapi.json": {
-      "get": {
-        "tags": [
-          "meta",
-          "hidden"
-        ],
-        "summary": "Get AI plugin OpenAPI schema.",
-        "description": "This is the same as the OpenAPI schema, BUT it has some modifications to make it compatible with OpenAI. For example, descriptions must be < 300 chars.",
-        "operationId": "get_openai_schema",
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
     "/ping": {
       "get": {
         "tags": [
@@ -6445,6 +6322,15 @@
             "schema": {
               "$ref": "#/components/schemas/CreatedAtSortMode"
             }
+          },
+          {
+            "in": "query",
+            "name": "no_models",
+            "description": "If we should return the model file contents or just the metadata.",
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -7323,185 +7209,6 @@
               "thumbs_down"
             ]
           }
-        ]
-      },
-      "AiPluginApi": {
-        "description": "AI plugin api information.",
-        "type": "object",
-        "properties": {
-          "is_user_authenticated": {
-            "description": "If the API is authenticated.",
-            "default": false,
-            "type": "boolean"
-          },
-          "type": {
-            "description": "The type of API.",
-            "default": "openapi",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AiPluginApiType"
-              }
-            ]
-          },
-          "url": {
-            "description": "The url to the API's schema.",
-            "type": "string",
-            "format": "uri"
-          }
-        },
-        "required": [
-          "url"
-        ]
-      },
-      "AiPluginApiType": {
-        "description": "AI plugin api type.",
-        "oneOf": [
-          {
-            "description": "An OpenAPI specification.",
-            "type": "string",
-            "enum": [
-              "openapi"
-            ]
-          }
-        ]
-      },
-      "AiPluginAuth": {
-        "description": "AI plugin auth information.",
-        "type": "object",
-        "properties": {
-          "authorization_type": {
-            "nullable": true,
-            "description": "The type of http authorization.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AiPluginHttpAuthType"
-              }
-            ]
-          },
-          "type": {
-            "description": "The type of authentication.",
-            "default": "none",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AiPluginAuthType"
-              }
-            ]
-          }
-        }
-      },
-      "AiPluginAuthType": {
-        "description": "AI plugin auth type.",
-        "oneOf": [
-          {
-            "description": "None.",
-            "type": "string",
-            "enum": [
-              "none"
-            ]
-          },
-          {
-            "description": "User http.",
-            "type": "string",
-            "enum": [
-              "user_http"
-            ]
-          },
-          {
-            "description": "Service http.",
-            "type": "string",
-            "enum": [
-              "service_http"
-            ]
-          },
-          {
-            "description": "OAuth.",
-            "type": "string",
-            "enum": [
-              "oauth"
-            ]
-          }
-        ]
-      },
-      "AiPluginHttpAuthType": {
-        "description": "AI plugin http auth type.",
-        "oneOf": [
-          {
-            "description": "Basic.",
-            "type": "string",
-            "enum": [
-              "basic"
-            ]
-          },
-          {
-            "description": "Bearer.",
-            "type": "string",
-            "enum": [
-              "bearer"
-            ]
-          }
-        ]
-      },
-      "AiPluginManifest": {
-        "description": "AI plugin manifest.\n\nThis is used for OpenAI's ChatGPT plugins. You can read more about them [here](https://platform.openai.com/docs/plugins/getting-started/plugin-manifest).",
-        "type": "object",
-        "properties": {
-          "api": {
-            "description": "API specification.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AiPluginApi"
-              }
-            ]
-          },
-          "auth": {
-            "description": "Authentication schema.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AiPluginAuth"
-              }
-            ]
-          },
-          "contact_email": {
-            "description": "Email contact for safety/moderation reachout, support, and deactivation.",
-            "type": "string",
-            "format": "email"
-          },
-          "description_for_human": {
-            "description": "Human-readable description of the plugin.",
-            "type": "string"
-          },
-          "description_for_model": {
-            "description": "Description better tailored to the model, such as token context length considerations or keyword usage for improved plugin prompting.",
-            "type": "string"
-          },
-          "legal_info_url": {
-            "description": "Redirect URL for users to view plugin information.",
-            "type": "string",
-            "format": "uri"
-          },
-          "logo_url": {
-            "description": "URL used to fetch the plugin's logo.",
-            "type": "string",
-            "format": "uri"
-          },
-          "name_for_human": {
-            "description": "Human-readable name, such as the full company name.",
-            "type": "string"
-          },
-          "name_for_model": {
-            "description": "Name the model will used to target the plugin.",
-            "type": "string"
-          },
-          "schema_version": {
-            "description": "Manifest schema version.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "api",
-          "auth",
-          "legal_info_url",
-          "logo_url"
         ]
       },
       "AiPrompt": {
@@ -9200,6 +8907,25 @@
           }
         }
       },
+      "BlockReason": {
+        "description": "The reason for blocking a user.",
+        "oneOf": [
+          {
+            "description": "The user is missing a payment method and has exceeded their free API call credits for the month.",
+            "type": "string",
+            "enum": [
+              "missing_payment_method"
+            ]
+          },
+          {
+            "description": "The users payment method has failed.",
+            "type": "string",
+            "enum": [
+              "payment_method_failed"
+            ]
+          }
+        ]
+      },
       "CacheMetadata": {
         "description": "Metadata about our cache.\n\nThis is mostly used for internal purposes and debugging.",
         "type": "object",
@@ -9852,6 +9578,19 @@
           },
           "id": {
             "description": "Unique identifier for the object.",
+            "type": "string"
+          },
+          "metadata": {
+            "description": "Set of key-value pairs.",
+            "default": {},
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "nullable": true,
+            "description": "Name of the coupon displayed to customers on, for instance invoices, or receipts.\n\nBy default the `id` is shown if `name` is not set.",
             "type": "string"
           },
           "percent_off": {
@@ -10538,6 +10277,15 @@
         "description": "Extended user information.\n\nThis is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp | Stripe",
         "type": "object",
         "properties": {
+          "block": {
+            "nullable": true,
+            "description": "If the user should be blocked and the reason why.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BlockReason"
+              }
+            ]
+          },
           "company": {
             "description": "The user's company.",
             "type": "string"
@@ -12049,13 +11797,6 @@
       "InvoiceStatus": {
         "description": "An enum representing the possible values of an `Invoice`'s `status` field.",
         "oneOf": [
-          {
-            "description": "Deleted.",
-            "type": "string",
-            "enum": [
-              "deleted"
-            ]
-          },
           {
             "description": "Draft.",
             "type": "string",
@@ -14730,6 +14471,45 @@
               "filter",
               "type"
             ]
+          },
+          {
+            "description": "Use orthographic projection.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_set_orthographic"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
+            "description": "Use perspective projection.",
+            "type": "object",
+            "properties": {
+              "parameters": {
+                "nullable": true,
+                "description": "If this is not given, use the same parameters as last time the perspective camera was used.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PerspectiveCameraParameters"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_set_perspective"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
           }
         ]
       },
@@ -16345,6 +16125,32 @@
               "card"
             ]
           }
+        ]
+      },
+      "PerspectiveCameraParameters": {
+        "description": "Defines a perspective view.",
+        "type": "object",
+        "properties": {
+          "fov_y": {
+            "description": "Camera frustum vertical field of view.",
+            "type": "number",
+            "format": "float"
+          },
+          "z_far": {
+            "description": "Camera frustum far plane.",
+            "type": "number",
+            "format": "float"
+          },
+          "z_near": {
+            "description": "Camera frustum near plane.",
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "required": [
+          "fov_y",
+          "z_far",
+          "z_near"
         ]
       },
       "PlaneIntersectAndProject": {
@@ -19013,6 +18819,15 @@
         "description": "A user.",
         "type": "object",
         "properties": {
+          "block": {
+            "nullable": true,
+            "description": "If the user should be blocked and the reason why.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BlockReason"
+              }
+            ]
+          },
           "company": {
             "description": "The user's company.",
             "type": "string"
