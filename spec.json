@@ -19172,105 +19172,105 @@
       "name": "ai",
       "description": "AI uses machine learning to generate CAD models.",
       "externalDocs": {
-        "url": "https://docs.kittycad.io/api/ai"
+        "url": "https://zoo.dev/docs/api/ai"
       }
     },
     {
       "name": "api-calls",
       "description": "API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.",
       "externalDocs": {
-        "url": "https://docs.kittycad.io/api/api-calls"
+        "url": "https://zoo.dev/docs/api/api-calls"
       }
     },
     {
       "name": "api-tokens",
       "description": "API tokens allow users to call the API outside of their session token that is used as a cookie in the user interface. Users can create, delete, and list their API tokens. But, of course, you need an API token to do this, so first be sure to generate one in the account UI.",
       "externalDocs": {
-        "url": "https://docs.kittycad.io/api/api-tokens"
+        "url": "https://zoo.dev/docs/api/api-tokens"
       }
     },
     {
       "name": "apps",
       "description": "Endpoints for third party app grant flows.",
       "externalDocs": {
-        "url": "https://docs.kittycad.io/api/apps"
+        "url": "https://zoo.dev/docs/api/apps"
       }
     },
     {
       "name": "beta",
       "description": "Beta API endpoints. We will not charge for these endpoints while they are in beta.",
       "externalDocs": {
-        "url": "https://docs.kittycad.io/api/beta"
+        "url": "https://zoo.dev/docs/api/beta"
       }
     },
     {
       "name": "constant",
       "description": "Constants. These are helpful as helpers.",
       "externalDocs": {
-        "url": "https://docs.kittycad.io/api/constant"
+        "url": "https://zoo.dev/docs/api/constant"
       }
     },
     {
       "name": "executor",
       "description": "Endpoints that allow for code execution or creation of code execution environments.",
       "externalDocs": {
-        "url": "https://docs.kittycad.io/api/executor"
+        "url": "https://zoo.dev/docs/api/executor"
       }
     },
     {
       "name": "file",
       "description": "CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.",
       "externalDocs": {
-        "url": "https://docs.kittycad.io/api/file"
+        "url": "https://zoo.dev/docs/api/file"
       }
     },
     {
       "name": "hidden",
       "description": "Hidden API endpoints that should not show up in the docs.",
       "externalDocs": {
-        "url": "https://docs.kittycad.io/api/hidden"
+        "url": "https://zoo.dev/docs/api/hidden"
       }
     },
     {
       "name": "meta",
       "description": "Meta information about the API.",
       "externalDocs": {
-        "url": "https://docs.kittycad.io/api/meta"
+        "url": "https://zoo.dev/docs/api/meta"
       }
     },
     {
       "name": "modeling",
-      "description": "Modeling API for updating your 3D files using the KittyCAD engine.",
+      "description": "Modeling API for updating your 3D files using the Zoo engine.",
       "externalDocs": {
-        "url": "https://docs.kittycad.io/api/modeling"
+        "url": "https://zoo.dev/docs/api/modeling"
       }
     },
     {
       "name": "oauth2",
       "description": "Endpoints that implement OAuth 2.0 grant flows.",
       "externalDocs": {
-        "url": "https://docs.kittycad.io/api/oauth2"
+        "url": "https://zoo.dev/docs/api/oauth2"
       }
     },
     {
       "name": "payments",
       "description": "Operations around payments and billing.",
       "externalDocs": {
-        "url": "https://docs.kittycad.io/api/payments"
+        "url": "https://zoo.dev/docs/api/payments"
       }
     },
     {
       "name": "unit",
       "description": "Unit conversion operations.",
       "externalDocs": {
-        "url": "https://docs.kittycad.io/api/file"
+        "url": "https://zoo.dev/docs/api/file"
       }
     },
     {
       "name": "users",
-      "description": "A user is someone who uses the KittyCAD API. Here, we can create, delete, and list users. We can also get information about a user. Operations will only be authorized if the user is requesting information about themselves.",
+      "description": "A user is someone who uses the Zoo API. Here, we can create, delete, and list users. We can also get information about a user. Operations will only be authorized if the user is requesting information about themselves.",
       "externalDocs": {
-        "url": "https://docs.kittycad.io/api/users"
+        "url": "https://zoo.dev/docs/api/users"
       }
     }
   ]
