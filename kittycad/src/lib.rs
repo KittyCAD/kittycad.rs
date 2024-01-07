@@ -19,7 +19,7 @@
 //!
 //! ## Client Details
 //!
-//! This client is generated from the [OpenAPI specs](https://api.kittycad.io) based on API spec version `0.1.0`. This way it will remain up to date as features are added.
+//! This client is generated from the [OpenAPI specs](https://api.zoo.dev) based on API spec version `0.1.0`. This way it will remain up to date as features are added.
 //!
 //! The documentation for the crate is generated
 //! along with the code to make this library easy to use.
@@ -61,58 +61,58 @@
 
 /// AI uses machine learning to generate CAD models.
 ///
-/// FROM: <https://docs.kittycad.io/api/ai>
+/// FROM: <https://zoo.dev/docs/api/ai>
 #[cfg(feature = "requests")]
 pub mod ai;
 /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
 ///
-/// FROM: <https://docs.kittycad.io/api/api-calls>
+/// FROM: <https://zoo.dev/docs/api/api-calls>
 #[cfg(feature = "requests")]
 pub mod api_calls;
 /// API tokens allow users to call the API outside of their session token that is used as a cookie in the user interface. Users can create, delete, and list their API tokens. But, of course, you need an API token to do this, so first be sure to generate one in the account UI.
 ///
-/// FROM: <https://docs.kittycad.io/api/api-tokens>
+/// FROM: <https://zoo.dev/docs/api/api-tokens>
 #[cfg(feature = "requests")]
 pub mod api_tokens;
 /// Endpoints for third party app grant flows.
 ///
-/// FROM: <https://docs.kittycad.io/api/apps>
+/// FROM: <https://zoo.dev/docs/api/apps>
 #[cfg(feature = "requests")]
 pub mod apps;
 /// Endpoints that allow for code execution or creation of code execution environments.
 ///
-/// FROM: <https://docs.kittycad.io/api/executor>
+/// FROM: <https://zoo.dev/docs/api/executor>
 #[cfg(feature = "requests")]
 pub mod executor;
 /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
 ///
-/// FROM: <https://docs.kittycad.io/api/file>
+/// FROM: <https://zoo.dev/docs/api/file>
 #[cfg(feature = "requests")]
 pub mod file;
 /// Hidden API endpoints that should not show up in the docs.
 ///
-/// FROM: <https://docs.kittycad.io/api/hidden>
+/// FROM: <https://zoo.dev/docs/api/hidden>
 #[cfg(feature = "requests")]
 pub mod hidden;
 /// Meta information about the API.
 ///
-/// FROM: <https://docs.kittycad.io/api/meta>
+/// FROM: <https://zoo.dev/docs/api/meta>
 #[cfg(feature = "requests")]
 pub mod meta;
 mod methods;
-/// Modeling API for updating your 3D files using the KittyCAD engine.
+/// Modeling API for updating your 3D files using the Zoo engine.
 ///
-/// FROM: <https://docs.kittycad.io/api/modeling>
+/// FROM: <https://zoo.dev/docs/api/modeling>
 #[cfg(feature = "requests")]
 pub mod modeling;
 /// Endpoints that implement OAuth 2.0 grant flows.
 ///
-/// FROM: <https://docs.kittycad.io/api/oauth2>
+/// FROM: <https://zoo.dev/docs/api/oauth2>
 #[cfg(feature = "requests")]
 pub mod oauth2;
 /// Operations around payments and billing.
 ///
-/// FROM: <https://docs.kittycad.io/api/payments>
+/// FROM: <https://zoo.dev/docs/api/payments>
 #[cfg(feature = "requests")]
 pub mod payments;
 #[cfg(test)]
@@ -120,12 +120,12 @@ mod tests;
 pub mod types;
 /// Unit conversion operations.
 ///
-/// FROM: <https://docs.kittycad.io/api/file>
+/// FROM: <https://zoo.dev/docs/api/file>
 #[cfg(feature = "requests")]
 pub mod unit;
-/// A user is someone who uses the KittyCAD API. Here, we can create, delete, and list users. We can also get information about a user. Operations will only be authorized if the user is requesting information about themselves.
+/// A user is someone who uses the Zoo API. Here, we can create, delete, and list users. We can also get information about a user. Operations will only be authorized if the user is requesting information about themselves.
 ///
-/// FROM: <https://docs.kittycad.io/api/users>
+/// FROM: <https://zoo.dev/docs/api/users>
 #[cfg(feature = "requests")]
 pub mod users;
 
@@ -308,7 +308,7 @@ impl Client {
         Self::new_from_reqwest(token, client)
     }
 
-    /// Set the base URL for the client to something other than the default: <https://api.kittycad.io>.
+    /// Set the base URL for the client to something other than the default: <https://api.zoo.dev>.
     #[tracing::instrument]
     pub fn set_base_url<H>(&mut self, base_url: H)
     where
@@ -363,91 +363,91 @@ impl Client {
 
     /// AI uses machine learning to generate CAD models.
     ///
-    /// FROM: <https://docs.kittycad.io/api/ai>
+    /// FROM: <https://zoo.dev/docs/api/ai>
     pub fn ai(&self) -> ai::Ai {
         ai::Ai::new(self.clone())
     }
 
     /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
     ///
-    /// FROM: <https://docs.kittycad.io/api/api-calls>
+    /// FROM: <https://zoo.dev/docs/api/api-calls>
     pub fn api_calls(&self) -> api_calls::ApiCalls {
         api_calls::ApiCalls::new(self.clone())
     }
 
     /// API tokens allow users to call the API outside of their session token that is used as a cookie in the user interface. Users can create, delete, and list their API tokens. But, of course, you need an API token to do this, so first be sure to generate one in the account UI.
     ///
-    /// FROM: <https://docs.kittycad.io/api/api-tokens>
+    /// FROM: <https://zoo.dev/docs/api/api-tokens>
     pub fn api_tokens(&self) -> api_tokens::ApiTokens {
         api_tokens::ApiTokens::new(self.clone())
     }
 
     /// Endpoints for third party app grant flows.
     ///
-    /// FROM: <https://docs.kittycad.io/api/apps>
+    /// FROM: <https://zoo.dev/docs/api/apps>
     pub fn apps(&self) -> apps::Apps {
         apps::Apps::new(self.clone())
     }
 
     /// Endpoints that allow for code execution or creation of code execution environments.
     ///
-    /// FROM: <https://docs.kittycad.io/api/executor>
+    /// FROM: <https://zoo.dev/docs/api/executor>
     pub fn executor(&self) -> executor::Executor {
         executor::Executor::new(self.clone())
     }
 
     /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
     ///
-    /// FROM: <https://docs.kittycad.io/api/file>
+    /// FROM: <https://zoo.dev/docs/api/file>
     pub fn file(&self) -> file::File {
         file::File::new(self.clone())
     }
 
     /// Hidden API endpoints that should not show up in the docs.
     ///
-    /// FROM: <https://docs.kittycad.io/api/hidden>
+    /// FROM: <https://zoo.dev/docs/api/hidden>
     pub fn hidden(&self) -> hidden::Hidden {
         hidden::Hidden::new(self.clone())
     }
 
     /// Meta information about the API.
     ///
-    /// FROM: <https://docs.kittycad.io/api/meta>
+    /// FROM: <https://zoo.dev/docs/api/meta>
     pub fn meta(&self) -> meta::Meta {
         meta::Meta::new(self.clone())
     }
 
-    /// Modeling API for updating your 3D files using the KittyCAD engine.
+    /// Modeling API for updating your 3D files using the Zoo engine.
     ///
-    /// FROM: <https://docs.kittycad.io/api/modeling>
+    /// FROM: <https://zoo.dev/docs/api/modeling>
     pub fn modeling(&self) -> modeling::Modeling {
         modeling::Modeling::new(self.clone())
     }
 
     /// Endpoints that implement OAuth 2.0 grant flows.
     ///
-    /// FROM: <https://docs.kittycad.io/api/oauth2>
+    /// FROM: <https://zoo.dev/docs/api/oauth2>
     pub fn oauth2(&self) -> oauth2::Oauth2 {
         oauth2::Oauth2::new(self.clone())
     }
 
     /// Operations around payments and billing.
     ///
-    /// FROM: <https://docs.kittycad.io/api/payments>
+    /// FROM: <https://zoo.dev/docs/api/payments>
     pub fn payments(&self) -> payments::Payments {
         payments::Payments::new(self.clone())
     }
 
     /// Unit conversion operations.
     ///
-    /// FROM: <https://docs.kittycad.io/api/file>
+    /// FROM: <https://zoo.dev/docs/api/file>
     pub fn unit(&self) -> unit::Unit {
         unit::Unit::new(self.clone())
     }
 
-    /// A user is someone who uses the KittyCAD API. Here, we can create, delete, and list users. We can also get information about a user. Operations will only be authorized if the user is requesting information about themselves.
+    /// A user is someone who uses the Zoo API. Here, we can create, delete, and list users. We can also get information about a user. Operations will only be authorized if the user is requesting information about themselves.
     ///
-    /// FROM: <https://docs.kittycad.io/api/users>
+    /// FROM: <https://zoo.dev/docs/api/users>
     pub fn users(&self) -> users::Users {
         users::Users::new(self.clone())
     }

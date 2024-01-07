@@ -21,7 +21,7 @@ API server for Zoo
 
 ## Client Details
 
-This client is generated from the [OpenAPI specs](https://api.kittycad.io) based on API spec version `0.1.0`. This way it will remain up to date as features are added.
+This client is generated from the [OpenAPI specs](https://api.zoo.dev) based on API spec version `0.1.0`. This way it will remain up to date as features are added.
 
 The documentation for the crate is generated
 along with the code to make this library easy to use.
