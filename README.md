@@ -1,5 +1,3 @@
-![image](https://user-images.githubusercontent.com/19377312/165883233-3bdbc9fb-ddf9-4173-8cf2-d1b70ab7127d.png)
-
 # kittycad.rs 
 
 The Rust API client for KittyCAD.
