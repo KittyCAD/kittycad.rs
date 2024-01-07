@@ -3,7 +3,7 @@
 The Rust API client for KittyCAD.
 
 - [Rust docs](https://docs.rs/kittycad)
-- [KittyCAD API Docs](https://docs.kittycad.io/api?lang=rust)
+- [KittyCAD API Docs](https://zoo.dev/docs/api?lang=rust)
 
 ## Generating
 
