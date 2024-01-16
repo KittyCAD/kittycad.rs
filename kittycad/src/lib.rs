@@ -110,6 +110,11 @@ pub mod modeling;
 /// FROM: <https://zoo.dev/docs/api/oauth2>
 #[cfg(feature = "requests")]
 pub mod oauth2;
+/// An organization is a group of users of the Zoo API. Here, we can add users to an org and perform operations on orgs.
+///
+/// FROM: <https://zoo.dev/docs/api/orgs>
+#[cfg(feature = "requests")]
+pub mod orgs;
 /// Operations around payments and billing.
 ///
 /// FROM: <https://zoo.dev/docs/api/payments>
@@ -429,6 +434,13 @@ impl Client {
     /// FROM: <https://zoo.dev/docs/api/oauth2>
     pub fn oauth2(&self) -> oauth2::Oauth2 {
         oauth2::Oauth2::new(self.clone())
+    }
+
+    /// An organization is a group of users of the Zoo API. Here, we can add users to an org and perform operations on orgs.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/orgs>
+    pub fn orgs(&self) -> orgs::Orgs {
+        orgs::Orgs::new(self.clone())
     }
 
     /// Operations around payments and billing.
