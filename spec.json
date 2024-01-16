@@ -305,8 +305,7 @@
     "/ai/text-to-cad/{output_format}": {
       "post": {
         "tags": [
-          "ai",
-          "beta"
+          "ai"
         ],
         "summary": "Generate a CAD model from text.",
         "description": "Because our source of truth for the resulting model is a STEP file, you will always have STEP file contents when you list your generated models. Any other formats you request here will also be returned when you list your generated models.\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nOne thing to note, if you hit the cache, this endpoint will return right away. So you only have to wait if the status is not `Completed` or `Failed`.\nThis is an alpha endpoint. It will change in the future. The current output is honestly pretty bad. So if you find this endpoint, you get what you pay for, which currently is nothing. But in the future will be made a lot better.",
@@ -3209,6 +3208,1795 @@
         }
       }
     },
+    "/org": {
+      "get": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Get an org.",
+        "description": "This endpoint requires authentication by an org admin. It gets the authenticated user's org.",
+        "operationId": "get_org",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Org"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Update an org.",
+        "description": "This endpoint requires authentication by an org admin. It updates the authenticated user's org.",
+        "operationId": "update_org",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrgDetails"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Org"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Create an org.",
+        "description": "This endpoint requires authentication by a Zoo user that is not already in an org. It creates a new org for the authenticated user and makes them an admin.",
+        "operationId": "create_org",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrgDetails"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Org"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "orgs",
+          "hidden"
+        ],
+        "summary": "Delete an org.",
+        "description": "In order to delete an org, you must first delete all of its members, except yourself.\nYou must also have no outstanding invoices or unpaid balances.\nThis endpoint requires authentication by an org admin. It deletes the authenticated user's org.",
+        "operationId": "delete_org",
+        "responses": {
+          "204": {
+            "description": "successful deletion",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_create_org",
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/api-calls": {
+      "get": {
+        "tags": [
+          "api-calls"
+        ],
+        "summary": "List API calls for your org.",
+        "description": "This includes all API calls that were made by users in the org.\nThis endpoint requires authentication by an org admin. It returns the API calls for the authenticated user's org.\nThe API calls are returned in order of creation, with the most recently created API calls first.",
+        "operationId": "org_list_api_calls",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "schema": {
+              "$ref": "#/components/schemas/CreatedAtSortMode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiCallWithPriceResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      }
+    },
+    "/org/api-calls/{id}": {
+      "get": {
+        "tags": [
+          "api-calls"
+        ],
+        "summary": "Get an API call for an org.",
+        "description": "This endpoint requires authentication by an org admin. It returns details of the requested API call for the user's org.",
+        "operationId": "get_api_call_for_org",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The ID of the API call.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiCallWithPrice"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/members": {
+      "get": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "List members of your org.",
+        "description": "This endpoint requires authentication by an org admin. It lists the members of the authenticated user's org.",
+        "operationId": "list_org_members",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "schema": {
+              "$ref": "#/components/schemas/CreatedAtSortMode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "role",
+            "description": "The organization role to filter by.",
+            "schema": {
+              "$ref": "#/components/schemas/OrgRole"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgMemberResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      },
+      "post": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Add a member to your org.",
+        "description": "This endpoint requires authentication by an org admin. It adds the specified member to the authenticated user's org.",
+        "operationId": "create_org_member",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddOrgMember"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgMember"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_create_org_member",
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/members/{user_id}": {
+      "get": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Get a member of your org.",
+        "description": "This endpoint requires authentication by an org admin. It gets the specified member of the authenticated user's org.",
+        "operationId": "get_org_member",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "description": "The user id of the org member.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgMember"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Update a member of your org.",
+        "description": "This endpoint requires authentication by an org admin. It updates the specified member of the authenticated user's org.",
+        "operationId": "update_org_member",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "description": "The user id of the org member.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberToOrgBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgMember"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Remove a member from your org.",
+        "description": "This endpoint requires authentication by an org admin. It removes the specified member from the authenticated user's org.",
+        "operationId": "delete_org_member",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "description": "The user id of the org member.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful deletion",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_update_org_member",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "description": "The user id of the org member.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/payment": {
+      "get": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Get payment info about your org.",
+        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by an org admin. It gets the payment information for the authenticated user's org.",
+        "operationId": "get_payment_information_for_org",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Update payment info for your org.",
+        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by an org admin. It updates the payment information for the authenticated user's org.",
+        "operationId": "update_payment_information_for_org",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BillingInfo"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Create payment info for your org.",
+        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by the org admin. It creates the payment information for the authenticated user's org.",
+        "operationId": "create_payment_information_for_org",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BillingInfo"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Delete payment info for your org.",
+        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by an org admin. It deletes the payment information for the authenticated user's org.",
+        "operationId": "delete_payment_information_for_org",
+        "responses": {
+          "204": {
+            "description": "successful deletion",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_payment_information_for_org",
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/payment/balance": {
+      "get": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Get balance for your org.",
+        "description": "This endpoint requires authentication by an org admin. It gets the balance information for the authenticated user's org.",
+        "operationId": "get_payment_balance_for_org",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerBalance"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/payment/intent": {
+      "post": {
+        "tags": [
+          "payments",
+          "hidden"
+        ],
+        "summary": "Create a payment intent for your org.",
+        "description": "This endpoint requires authentication by the org admin. It creates a new payment intent for the authenticated user's org's org.",
+        "operationId": "create_payment_intent_for_org",
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntent"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_create_payment_intent_for_org",
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/payment/invoices": {
+      "get": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "List invoices for your org.",
+        "description": "This endpoint requires authentication by an org admin. It lists invoices for the authenticated user's org.",
+        "operationId": "list_invoices_for_org",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Array_of_Invoice",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Invoice"
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/payment/methods": {
+      "get": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "List payment methods for your org.",
+        "description": "This endpoint requires authentication by an org admin. It lists payment methods for the authenticated user's org.",
+        "operationId": "list_payment_methods_for_org",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Array_of_PaymentMethod",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentMethod"
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/payment/methods/{id}": {
+      "delete": {
+        "tags": [
+          "payments",
+          "hidden"
+        ],
+        "summary": "Delete a payment method for your org.",
+        "description": "This endpoint requires authentication by an org admin. It deletes the specified payment method for the authenticated user's org.",
+        "operationId": "delete_payment_method_for_org",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The ID of the payment method.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful deletion",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_payment_methods_for_org",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The ID of the payment method.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/payment/tax": {
+      "get": {
+        "tags": [
+          "payments",
+          "hidden"
+        ],
+        "summary": "Validate an orgs's information is correct and valid for automatic tax.",
+        "description": "This endpoint requires authentication by an org admin. It will return an error if the org's information is not valid for automatic tax. Otherwise, it will return an empty successful response.",
+        "operationId": "validate_customer_tax_information_for_org",
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/ping": {
       "get": {
         "tags": [
@@ -4972,6 +6760,17 @@
         "summary": "Create a new API token for your user.",
         "description": "This endpoint requires authentication by any Zoo user. It creates a new API token for the authenticated user.",
         "operationId": "create_api_token_for_user",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "label",
+            "description": "An optional label for the API token.",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "successful creation",
@@ -5395,6 +7194,69 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Onboarding"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/user/org": {
+      "get": {
+        "tags": [
+          "orgs",
+          "users"
+        ],
+        "summary": "Get a user's org.",
+        "description": "This endpoint requires authentication by any Zoo user. It gets the authenticated user's org.\nIf the user is not a member of an org, this endpoint will return a 404.",
+        "operationId": "get_user_org",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserOrgInfo"
                 }
               }
             }
@@ -6163,8 +8025,8 @@
           "payments",
           "hidden"
         ],
-        "summary": "Validate a customer's information is correct and valid for automatic tax.",
-        "description": "This endpoint requires authentication by any Zoo user. It will return an error if the customer's information is not valid for automatic tax. Otherwise, it will return an empty successful response.",
+        "summary": "Validate a user's information is correct and valid for automatic tax.",
+        "description": "This endpoint requires authentication by any Zoo user. It will return an error if the user's information is not valid for automatic tax. Otherwise, it will return an empty successful response.",
         "operationId": "validate_customer_tax_information_for_user",
         "responses": {
           "204": {
@@ -6465,8 +8327,7 @@
       },
       "post": {
         "tags": [
-          "ai",
-          "beta"
+          "ai"
         ],
         "summary": "Give feedback to a specific text-to-CAD response.",
         "description": "This endpoint requires authentication by any Zoo user. The user must be the owner of the text-to-CAD model, in order to give feedback.",
@@ -7153,18 +9014,6 @@
     }
   },
   "components": {
-    "responses": {
-      "Error": {
-        "description": "Error",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            }
-          }
-        }
-      }
-    },
     "schemas": {
       "AccountProvider": {
         "description": "An account provider.",
@@ -7190,6 +9039,66 @@
               "github"
             ]
           }
+        ]
+      },
+      "AddOrgMember": {
+        "description": "Data for adding a member to an org.",
+        "type": "object",
+        "properties": {
+          "email": {
+            "description": "The email address of the user to add to the org.",
+            "type": "string",
+            "format": "email"
+          },
+          "role": {
+            "description": "The organization role to give the user.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrgRole"
+              }
+            ]
+          }
+        },
+        "required": [
+          "email",
+          "role"
+        ]
+      },
+      "AddressDetails": {
+        "description": "Address details.",
+        "type": "object",
+        "properties": {
+          "city": {
+            "description": "The city component.",
+            "type": "string"
+          },
+          "country": {
+            "description": "The country component. This is a two-letter ISO country code.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CountryCode"
+              }
+            ]
+          },
+          "state": {
+            "description": "The state component.",
+            "type": "string"
+          },
+          "street1": {
+            "description": "The first street component.",
+            "type": "string"
+          },
+          "street2": {
+            "description": "The second street component.",
+            "type": "string"
+          },
+          "zip": {
+            "description": "The zip component.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "country"
         ]
       },
       "AiFeedback": {
@@ -7700,6 +9609,15 @@
             "type": "integer",
             "format": "int32"
           },
+          "org_id": {
+            "nullable": true,
+            "description": "The organization ID of the API call if it is billable through an organization.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
           "origin": {
             "description": "The origin of the API call.",
             "type": "string"
@@ -7844,6 +9762,11 @@
           "is_valid": {
             "description": "If the token is valid. We never delete API tokens, but we can mark them as invalid. We save them for ever to preserve the history of the API token.",
             "type": "boolean"
+          },
+          "label": {
+            "nullable": true,
+            "description": "An optional label for the API token.",
+            "type": "string"
           },
           "token": {
             "description": "The API token itself.",
@@ -8890,7 +10813,7 @@
             "description": "The address of the customer.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/NewAddress"
+                "$ref": "#/components/schemas/AddressDetails"
               }
             ]
           },
@@ -9143,7 +11066,7 @@
         }
       },
       "CodeLanguage": {
-        "description": "The language code is written in.",
+        "description": "The language code is written in.\n\n<details><summary>JSON schema</summary>\n\n```json { \"description\": \"The language code is written in.\", \"oneOf\": [ { \"description\": \"The `go` programming language.\", \"type\": \"string\", \"enum\": [ \"go\" ] }, { \"description\": \"The `python` programming language.\", \"type\": \"string\", \"enum\": [ \"python\" ] }, { \"description\": \"The `node` programming language.\", \"type\": \"string\", \"enum\": [ \"node\" ] } ] } ``` </details>",
         "oneOf": [
           {
             "description": "The `go` programming language.",
@@ -9169,7 +11092,7 @@
         ]
       },
       "CodeOutput": {
-        "description": "Output of the code being executed.",
+        "description": "Output of the code being executed.\n\n<details><summary>JSON schema</summary>\n\n```json { \"description\": \"Output of the code being executed.\", \"type\": \"object\", \"properties\": { \"output_files\": { \"description\": \"The contents of the files requested if they were passed.\", \"type\": \"array\", \"items\": { \"$ref\": \"#/components/schemas/OutputFile\" } }, \"stderr\": { \"description\": \"The stderr of the code.\", \"default\": \"\", \"type\": \"string\" }, \"stdout\": { \"description\": \"The stdout of the code.\", \"default\": \"\", \"type\": \"string\" } } } ``` </details>",
         "type": "object",
         "properties": {
           "output_files": {
@@ -9701,7 +11624,7 @@
             "description": "The customer's address.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/NewAddress"
+                "$ref": "#/components/schemas/AddressDetails"
               }
             ]
           },
@@ -9765,7 +11688,7 @@
         ]
       },
       "CustomerBalance": {
-        "description": "A balance for a user.\n\nThis holds information about the financial balance for the user.",
+        "description": "A balance for a customer.\n\nThis holds information about the financial balance for the customer.",
         "type": "object",
         "properties": {
           "created_at": {
@@ -9782,27 +11705,35 @@
               }
             ]
           },
+          "map_id": {
+            "description": "The mapping id of the user or org.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
           "monthly_credits_remaining": {
             "title": "double",
-            "description": "The monthy credits remaining in the balance. This gets re-upped every month, but if the credits are not used for a month they do not carry over to the next month. It is a stable amount granted to the user per month.",
+            "description": "The monthy credits remaining in the balance. This gets re-upped every month, but if the credits are not used for a month they do not carry over to the next month. It is a stable amount granted to the customer per month.",
             "type": "number",
             "format": "money-usd"
           },
           "pre_pay_cash_remaining": {
             "title": "double",
-            "description": "The amount of pre-pay cash remaining in the balance. This number goes down as the user uses their pre-paid credits. The reason we track this amount is if a user ever wants to withdraw their pre-pay cash, we can use this amount to determine how much to give them. Say a user has $100 in pre-paid cash, their bill is worth, $50 after subtracting any other credits (like monthly etc.) Their bill is $50, their pre-pay cash remaining will be subtracted by 50 to pay the bill and their `pre_pay_credits_remaining` will be subtracted by 50 to pay the bill. This way if they want to withdraw money after, they can only withdraw $50 since that is the amount of cash they have remaining.",
+            "description": "The amount of pre-pay cash remaining in the balance. This number goes down as the customer uses their pre-paid credits. The reason we track this amount is if a customer ever wants to withdraw their pre-pay cash, we can use this amount to determine how much to give them. Say a customer has $100 in pre-paid cash, their bill is worth, $50 after subtracting any other credits (like monthly etc.) Their bill is $50, their pre-pay cash remaining will be subtracted by 50 to pay the bill and their `pre_pay_credits_remaining` will be subtracted by 50 to pay the bill. This way if they want to withdraw money after, they can only withdraw $50 since that is the amount of cash they have remaining.",
             "type": "number",
             "format": "money-usd"
           },
           "pre_pay_credits_remaining": {
             "title": "double",
-            "description": "The amount of credits remaining in the balance. This is typically the amount of cash * some multiplier they get for pre-paying their account. This number lowers every time a bill is paid with the balance. This number increases every time a user adds funds to their balance. This may be through a subscription or a one off payment.",
+            "description": "The amount of credits remaining in the balance. This is typically the amount of cash * some multiplier they get for pre-paying their account. This number lowers every time a bill is paid with the balance. This number increases every time a customer adds funds to their balance. This may be through a subscription or a one off payment.",
             "type": "number",
             "format": "money-usd"
           },
           "total_due": {
             "title": "double",
-            "description": "This includes any outstanding, draft, or open invoices and any pending invoice items. This does not include any credits the user has on their account.",
+            "description": "This includes any outstanding, draft, or open invoices and any pending invoice items. This does not include any credits the customer has on their account.",
             "type": "number",
             "format": "money-usd"
           },
@@ -9811,25 +11742,17 @@
             "description": "The date and time the balance was last updated.",
             "type": "string",
             "format": "date-time"
-          },
-          "user_id": {
-            "description": "The user ID the balance belongs to.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
           }
         },
         "required": [
           "created_at",
           "id",
+          "map_id",
           "monthly_credits_remaining",
           "pre_pay_cash_remaining",
           "pre_pay_credits_remaining",
           "total_due",
-          "updated_at",
-          "user_id"
+          "updated_at"
         ]
       },
       "Density": {
@@ -14570,52 +16493,6 @@
           "entities_selected"
         ]
       },
-      "NewAddress": {
-        "description": "The struct that is used to create a new record. This is automatically generated and has all the same fields as the main struct only it is missing the `id`.",
-        "type": "object",
-        "properties": {
-          "city": {
-            "description": "The city component.",
-            "type": "string"
-          },
-          "country": {
-            "description": "The country component. This is a two-letter ISO country code.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CountryCode"
-              }
-            ]
-          },
-          "state": {
-            "description": "The state component.",
-            "type": "string"
-          },
-          "street1": {
-            "description": "The first street component.",
-            "type": "string"
-          },
-          "street2": {
-            "description": "The second street component.",
-            "type": "string"
-          },
-          "user_id": {
-            "description": "The user ID that this address belongs to.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "zip": {
-            "description": "The zip component.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "country",
-          "user_id"
-        ]
-      },
       "OAuth2ClientInfo": {
         "description": "Information about an OAuth 2.0 client.",
         "type": "object",
@@ -15484,8 +17361,262 @@
           }
         }
       },
+      "Org": {
+        "description": "An organization.",
+        "type": "object",
+        "properties": {
+          "allow_users_in_domain_to_auto_join": {
+            "nullable": true,
+            "description": "If we should allow all future users who are created with email addresses from this domain to join the org.",
+            "type": "boolean"
+          },
+          "billing_email": {
+            "description": "The billing email address of the org.",
+            "type": "string",
+            "format": "email"
+          },
+          "billing_email_verified": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The date and time the billing email address was verified.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "block": {
+            "nullable": true,
+            "description": "If the org should be blocked and the reason why.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BlockReason"
+              }
+            ]
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "The date and time the org was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "domain": {
+            "nullable": true,
+            "description": "The org's domain.",
+            "type": "string"
+          },
+          "id": {
+            "description": "The unique identifier for the org.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "image": {
+            "nullable": true,
+            "title": "String",
+            "description": "The image for the org. This is a URL.",
+            "type": "string",
+            "format": "uri"
+          },
+          "name": {
+            "description": "The name of the org.",
+            "type": "string"
+          },
+          "phone": {
+            "title": "String",
+            "description": "The org's phone number.",
+            "default": "",
+            "type": "string",
+            "format": "phone"
+          },
+          "stripe_id": {
+            "nullable": true,
+            "description": "The org's stripe id.",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The date and time the org was last updated.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "updated_at"
+        ]
+      },
+      "OrgDetails": {
+        "description": "The user-modifiable parts of an organization.",
+        "type": "object",
+        "properties": {
+          "allow_users_in_domain_to_auto_join": {
+            "nullable": true,
+            "description": "If we should allow all future users who are created with email addresses from this domain to join the org.",
+            "type": "boolean"
+          },
+          "billing_email": {
+            "description": "The billing email address of the org.",
+            "type": "string",
+            "format": "email"
+          },
+          "domain": {
+            "nullable": true,
+            "description": "The org's domain.",
+            "type": "string"
+          },
+          "image": {
+            "nullable": true,
+            "title": "String",
+            "description": "The image for the org. This is a URL.",
+            "type": "string",
+            "format": "uri"
+          },
+          "name": {
+            "description": "The name of the org.",
+            "type": "string"
+          },
+          "phone": {
+            "title": "String",
+            "description": "The org's phone number.",
+            "default": "",
+            "type": "string",
+            "format": "phone"
+          }
+        }
+      },
+      "OrgMember": {
+        "description": "A member of an organization.",
+        "type": "object",
+        "properties": {
+          "company": {
+            "description": "The user's company.",
+            "type": "string"
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "The date and time the user was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "discord": {
+            "description": "The user's Discord handle.",
+            "type": "string"
+          },
+          "email": {
+            "description": "The email address of the user.",
+            "type": "string",
+            "format": "email"
+          },
+          "email_verified": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The date and time the email address was verified.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "first_name": {
+            "description": "The user's first name.",
+            "type": "string"
+          },
+          "github": {
+            "description": "The user's GitHub handle.",
+            "type": "string"
+          },
+          "id": {
+            "description": "The unique identifier for the user.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "image": {
+            "title": "String",
+            "description": "The image avatar for the user. This is a URL.",
+            "type": "string",
+            "format": "uri"
+          },
+          "last_name": {
+            "description": "The user's last name.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the user. This is auto populated at first from the authentication provider (if there was a name). It can be updated by the user by updating their `first_name` and `last_name` fields.",
+            "type": "string"
+          },
+          "phone": {
+            "title": "String",
+            "description": "The user's phone number.",
+            "default": "",
+            "type": "string",
+            "format": "phone"
+          },
+          "role": {
+            "description": "The user's role in the org.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrgRole"
+              }
+            ]
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The date and time the user was last updated.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "image",
+          "role",
+          "updated_at"
+        ]
+      },
+      "OrgMemberResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrgMember"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "OrgRole": {
+        "description": "The roles for users in an organization.",
+        "oneOf": [
+          {
+            "description": "Admins can do anything in the org.",
+            "type": "string",
+            "enum": [
+              "admin"
+            ]
+          },
+          {
+            "description": "Members of an org can not modify an org, but they belong in the org.",
+            "type": "string",
+            "enum": [
+              "member"
+            ]
+          }
+        ]
+      },
       "OutputFile": {
-        "description": "Output file contents.",
+        "description": "Output file contents.\n\n<details><summary>JSON schema</summary>\n\n```json { \"description\": \"Output file contents.\", \"type\": \"object\", \"properties\": { \"contents\": { \"description\": \"The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for JSON.\", \"type\": \"string\" }, \"name\": { \"description\": \"The name of the file.\", \"default\": \"\", \"type\": \"string\" } } } ``` </details>",
         "type": "object",
         "properties": {
           "contents": {
@@ -18782,6 +20913,23 @@
           "user_id"
         ]
       },
+      "UpdateMemberToOrgBody": {
+        "description": "Data for updating a member of an org.",
+        "type": "object",
+        "properties": {
+          "role": {
+            "description": "The organization role to give the user.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrgRole"
+              }
+            ]
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
       "UpdateUser": {
         "description": "The user-modifiable parts of a User.",
         "type": "object",
@@ -18902,6 +21050,100 @@
           "created_at",
           "id",
           "image",
+          "updated_at"
+        ]
+      },
+      "UserOrgInfo": {
+        "description": "A user's information about an org, including their role.",
+        "type": "object",
+        "properties": {
+          "allow_users_in_domain_to_auto_join": {
+            "nullable": true,
+            "description": "If we should allow all future users who are created with email addresses from this domain to join the org.",
+            "type": "boolean"
+          },
+          "billing_email": {
+            "description": "The billing email address of the org.",
+            "type": "string",
+            "format": "email"
+          },
+          "billing_email_verified": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The date and time the billing email address was verified.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "block": {
+            "nullable": true,
+            "description": "If the org should be blocked and the reason why.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BlockReason"
+              }
+            ]
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "The date and time the org was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "domain": {
+            "nullable": true,
+            "description": "The org's domain.",
+            "type": "string"
+          },
+          "id": {
+            "description": "The unique identifier for the org.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "image": {
+            "nullable": true,
+            "title": "String",
+            "description": "The image for the org. This is a URL.",
+            "type": "string",
+            "format": "uri"
+          },
+          "name": {
+            "description": "The name of the org.",
+            "type": "string"
+          },
+          "phone": {
+            "title": "String",
+            "description": "The org's phone number.",
+            "default": "",
+            "type": "string",
+            "format": "phone"
+          },
+          "role": {
+            "description": "The user's role in the org.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrgRole"
+              }
+            ]
+          },
+          "stripe_id": {
+            "nullable": true,
+            "description": "The org's stripe id.",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The date and time the org was last updated.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "role",
           "updated_at"
         ]
       },
@@ -19165,6 +21407,18 @@
           }
         ]
       }
+    },
+    "responses": {
+      "Error": {
+        "description": "Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
     }
   },
   "tags": [
@@ -19250,6 +21504,13 @@
       "description": "Endpoints that implement OAuth 2.0 grant flows.",
       "externalDocs": {
         "url": "https://zoo.dev/docs/api/oauth2"
+      }
+    },
+    {
+      "name": "orgs",
+      "description": "An organization is a group of users of the Zoo API. Here, we can add users to an org and perform operations on orgs.",
+      "externalDocs": {
+        "url": "https://zoo.dev/docs/api/orgs"
       }
     },
     {
