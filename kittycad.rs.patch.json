@@ -25,6 +25,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1_meta~1ipinfo/get/x-rust",
+    "value": {
+      "example": "/// Get ip address information.\nasync fn example_meta_get_ipinfo() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::IpAddrInfo = client.meta().get_ipinfo().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.get_ipinfo"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1ai-prompts/get/x-rust",
     "value": {
       "example": "/// List all AI prompts.\n/// \n/// For text-to-cad prompts, this will always return the STEP file contents as well as the format the user originally requested.\n/// This endpoint requires authentication by a Zoo employee.\n/// The AI prompts are returned in order of creation, with the most recently created AI prompts first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_ai_list_prompts() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AiPromptResultsPage = client\n        .ai()\n        .list_prompts(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_ai_list_prompts_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ai = client.ai();\n    let mut stream = ai.list_prompts_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
@@ -235,15 +243,23 @@
     "op": "add",
     "path": "/paths/~1oauth2~1provider~1{provider}~1callback/get/x-rust",
     "value": {
-      "example": "/// Listen for callbacks for the OAuth 2.0 provider.\n/// \n/// **Parameters:**\n/// \n/// - `code: Option<String>`: The authorization code.\n/// - `provider: crate::types::AccountProvider`: The provider. (required)\n/// - `state: Option<String>`: The state that we had passed in through the user consent URL.\nasync fn example_oauth2_oauth_2_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .oauth_2_provider_callback(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Github,\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n",
+      "example": "/// Listen for callbacks for the OAuth 2.0 provider.\n/// \n/// **Parameters:**\n/// \n/// - `code: Option<String>`: The authorization code.\n/// - `id_token: Option<String>`: For Apple only, a JSON web token containing the user’s identity information.\n/// - `provider: crate::types::AccountProvider`: The provider. (required)\n/// - `state: Option<String>`: The state that we had passed in through the user consent URL.\n/// - `user: Option<String>`: For Apple only, a JSON string containing the data requested in the scope property. The returned data is in the following format: `{ \"name\": { \"firstName\": string, \"lastName\": string }, \"email\": string }`\nasync fn example_oauth2_oauth_2_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .oauth_2_provider_callback(\n            Some(\"some-string\".to_string()),\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Tencent,\n            Some(\"some-string\".to_string()),\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.oauth_2_provider_callback"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1oauth2~1provider~1{provider}~1callback/post/x-rust",
+    "value": {
+      "example": "/// Listen for callbacks for the OAuth 2.0 provider.\n/// \n/// This specific endpoint listens for posts of form data.\n/// \n/// **Parameters:**\n/// \n/// - `provider: crate::types::AccountProvider`: The provider. (required)\nasync fn example_oauth2_oauth_2_provider_callback_post() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .oauth_2_provider_callback_post(\n            kittycad::types::AccountProvider::Tencent,\n            &kittycad::types::AuthCallback {\n                code: Some(\"some-string\".to_string()),\n                id_token: Some(\"some-string\".to_string()),\n                state: Some(\"some-string\".to_string()),\n                user: Some(\"some-string\".to_string()),\n            },\n        )\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.oauth_2_provider_callback_post"
     }
   },
   {
     "op": "add",
     "path": "/paths/~1oauth2~1provider~1{provider}~1consent/get/x-rust",
     "value": {
-      "example": "/// Get the consent URL and other information for the OAuth 2.0 provider.\n/// \n/// **Parameters:**\n/// \n/// - `callback_url: Option<String>`: The URL to redirect back to after we have authenticated.\n/// - `provider: crate::types::AccountProvider`: The provider. (required)\nasync fn example_oauth2_oauth_2_provider_consent() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo = client\n        .oauth2()\n        .oauth_2_provider_consent(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Github,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get the consent URL and other information for the OAuth 2.0 provider.\n/// \n/// **Parameters:**\n/// \n/// - `callback_url: Option<String>`: The URL to redirect back to after we have authenticated.\n/// - `provider: crate::types::AccountProvider`: The provider. (required)\nasync fn example_oauth2_oauth_2_provider_consent() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo = client\n        .oauth2()\n        .oauth_2_provider_consent(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Tencent,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.oauth_2_provider_consent"
     }
   },
@@ -307,7 +323,7 @@
     "op": "add",
     "path": "/paths/~1org~1members/post/x-rust",
     "value": {
-      "example": "/// Add a member to your org.\n/// \n/// This endpoint requires authentication by an org admin. It adds the specified member to the authenticated user's org.\nasync fn example_orgs_create_member() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgMember = client\n        .orgs()\n        .create_member(&kittycad::types::AddOrgMember {\n            email: \"email@example.com\".to_string(),\n            role: kittycad::types::OrgRole::Member,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Add a member to your org.\n/// \n/// If the user exists, this will add them to your org. If they do not exist, this will create a new user and add them to your org.\n/// In both cases the user gets an email that they have been added to the org.\n/// If the user is already in your org, this will return a 400 and a message.\n/// If the user is already in a different org, this will return a 400 and a message.\n/// This endpoint requires authentication by an org admin. It adds the specified member to the authenticated user's org.\nasync fn example_orgs_create_member() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgMember = client\n        .orgs()\n        .create_member(&kittycad::types::AddOrgMember {\n            email: \"email@example.com\".to_string(),\n            role: kittycad::types::OrgRole::Member,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.create_member"
     }
   },
@@ -605,6 +621,14 @@
     "value": {
       "example": "/// Get extended information about your user.\n/// \n/// Get the user information for the authenticated user.\n/// Alternatively, you can also use the `/users-extended/me` endpoint.\nasync fn example_users_get_self_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUser = client.users().get_self_extended().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_self_extended"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1oauth2~1providers/get/x-rust",
+    "value": {
+      "example": "/// Get the OAuth2 providers for your user.\n/// \n/// If this returns an empty array, then the user has not connected any OAuth2 providers and uses raw email authentication.\n/// This endpoint requires authentication by any Zoo user. It gets the providers for the authenticated user.\nasync fn example_users_get_oauth_2_providers_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::AccountProvider> =\n        client.users().get_oauth_2_providers_for().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_oauth_2_providers_for"
     }
   },
   {

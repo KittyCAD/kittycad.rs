@@ -249,11 +249,15 @@ impl Orgs {
             .boxed()
     }
 
-    #[doc = "Add a member to your org.\n\nThis endpoint requires authentication by an org admin. \
-             It adds the specified member to the authenticated user's \
-             org.\n\n```rust,no_run\nasync fn example_orgs_create_member() -> anyhow::Result<()> \
-             {\n    let client = kittycad::Client::new_from_env();\n    let result: \
-             kittycad::types::OrgMember = client\n        .orgs()\n        \
+    #[doc = "Add a member to your org.\n\nIf the user exists, this will add them to your org. If \
+             they do not exist, this will create a new user and add them to your org.\nIn both \
+             cases the user gets an email that they have been added to the org.\nIf the user is \
+             already in your org, this will return a 400 and a message.\nIf the user is already in \
+             a different org, this will return a 400 and a message.\nThis endpoint requires \
+             authentication by an org admin. It adds the specified member to the authenticated \
+             user's org.\n\n```rust,no_run\nasync fn example_orgs_create_member() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::OrgMember = client\n        .orgs()\n        \
              .create_member(&kittycad::types::AddOrgMember {\n            email: \
              \"email@example.com\".to_string(),\n            role: \
              kittycad::types::OrgRole::Member,\n        })\n        .await?;\n    \
