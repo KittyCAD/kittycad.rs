@@ -132,6 +132,68 @@
         }
       }
     },
+    "/_meta/ipinfo": {
+      "get": {
+        "tags": [
+          "meta",
+          "hidden"
+        ],
+        "summary": "Get ip address information.",
+        "operationId": "get_ipinfo",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IpAddrInfo"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/ai-prompts": {
       "get": {
         "tags": [
@@ -3064,9 +3126,27 @@
           },
           {
             "in": "query",
+            "name": "id_token",
+            "description": "For Apple only, a JSON web token containing the user’s identity information.",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "state",
             "description": "The state that we had passed in through the user consent URL.",
             "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "user",
+            "description": "For Apple only, a JSON string containing the data requested in the scope property. The returned data is in the following format: `{ \"name\": { \"firstName\": string, \"lastName\": string }, \"email\": string }`",
+            "schema": {
+              "nullable": true,
               "type": "string"
             }
           }
@@ -3109,6 +3189,153 @@
               },
               "Set-Cookie": {
                 "description": "Set-Cookie header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "oauth2",
+          "hidden"
+        ],
+        "summary": "Listen for callbacks for the OAuth 2.0 provider.",
+        "description": "This specific endpoint listens for posts of form data.",
+        "operationId": "oauth2_provider_callback_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider",
+            "description": "The provider.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AccountProvider"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthCallback"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "302": {
+            "description": "Temporary Redirect",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_oauth2_provider_callback",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider",
+            "description": "The provider.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AccountProvider"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
                 "style": "simple",
                 "required": true,
                 "schema": {
@@ -3791,7 +4018,7 @@
           "orgs"
         ],
         "summary": "Add a member to your org.",
-        "description": "This endpoint requires authentication by an org admin. It adds the specified member to the authenticated user's org.",
+        "description": "If the user exists, this will add them to your org. If they do not exist, this will create a new user and add them to your org.\nIn both cases the user gets an email that they have been added to the org.\nIf the user is already in your org, this will return a 400 and a message.\nIf the user is already in a different org, this will return a 400 and a message.\nThis endpoint requires authentication by an org admin. It adds the specified member to the authenticated user's org.",
         "operationId": "create_org_member",
         "requestBody": {
           "content": {
@@ -7144,6 +7371,72 @@
         }
       }
     },
+    "/user/oauth2/providers": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Get the OAuth2 providers for your user.",
+        "description": "If this returns an empty array, then the user has not connected any OAuth2 providers and uses raw email authentication.\nThis endpoint requires authentication by any Zoo user. It gets the providers for the authenticated user.",
+        "operationId": "get_oauth2_providers_for_user",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Array_of_AccountProvider",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountProvider"
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/user/onboarding": {
       "get": {
         "tags": [
@@ -9019,6 +9312,13 @@
         "description": "An account provider.",
         "oneOf": [
           {
+            "description": "The Apple account provider.",
+            "type": "string",
+            "enum": [
+              "apple"
+            ]
+          },
+          {
             "description": "The Discord account provider.",
             "type": "string",
             "enum": [
@@ -9037,6 +9337,20 @@
             "type": "string",
             "enum": [
               "github"
+            ]
+          },
+          {
+            "description": "The Microsoft account provider.",
+            "type": "string",
+            "enum": [
+              "microsoft"
+            ]
+          },
+          {
+            "description": "The Tencent QQ account provider.",
+            "type": "string",
+            "enum": [
+              "tencent"
             ]
           }
         ]
@@ -10758,6 +11072,30 @@
             ]
           }
         ]
+      },
+      "AuthCallback": {
+        "description": "The authentication callback from the OAuth 2.0 client. This is typically posted to the redirect URL as query params after authenticating.",
+        "type": "object",
+        "properties": {
+          "code": {
+            "description": "The authorization code.",
+            "type": "string"
+          },
+          "id_token": {
+            "nullable": true,
+            "description": "For Apple only, a JSON web token containing the user’s identity information.",
+            "type": "string"
+          },
+          "state": {
+            "description": "The state that we had passed in through the user consent URL.",
+            "type": "string"
+          },
+          "user": {
+            "nullable": true,
+            "description": "For Apple only, a JSON string containing the data requested in the scope property. The returned data is in the following format: `{ \"name\": { \"firstName\": string, \"lastName\": string }, \"email\": string }`",
+            "type": "string"
+          }
+        }
       },
       "Axis": {
         "description": "Co-ordinate axis specifier.\n\nSee [cglearn.eu] for background reading.\n\n[cglearn.eu]: https://cglearn.eu/pub/computer-graphics/introduction-to-geometry#material-coordinate-systems-1",
@@ -13756,6 +14094,102 @@
             ]
           }
         ]
+      },
+      "IpAddrInfo": {
+        "description": "Information about an ip address. Represents geographical and network-related information.",
+        "type": "object",
+        "properties": {
+          "asn": {
+            "nullable": true,
+            "description": "Autonomous System Number.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "city": {
+            "nullable": true,
+            "description": "City name.",
+            "type": "string"
+          },
+          "continent_code": {
+            "nullable": true,
+            "description": "Continent code (e.g., \"EU\" for Europe).",
+            "type": "string"
+          },
+          "country": {
+            "nullable": true,
+            "description": "Country name.",
+            "type": "string"
+          },
+          "country_code": {
+            "nullable": true,
+            "description": "Two-letter country code (e.g., \"NL\" for Netherlands).",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CountryCode"
+              }
+            ]
+          },
+          "country_code3": {
+            "nullable": true,
+            "description": "Three-letter country code (e.g., \"NLD\" for Netherlands).",
+            "type": "string"
+          },
+          "ip": {
+            "title": "String",
+            "description": "IP address of the user.",
+            "default": "",
+            "type": "string",
+            "format": "ip"
+          },
+          "is_in_european_union": {
+            "nullable": true,
+            "description": "Flag indicating whether the country is in the European Union.",
+            "type": "boolean"
+          },
+          "latitude": {
+            "nullable": true,
+            "description": "Geographic latitude.",
+            "type": "number",
+            "format": "double"
+          },
+          "longitude": {
+            "nullable": true,
+            "description": "Geographic longitude.",
+            "type": "number",
+            "format": "double"
+          },
+          "offset": {
+            "nullable": true,
+            "description": "Time offset in seconds from UTC.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "organization": {
+            "nullable": true,
+            "description": "Organization name (e.g., \"RIPE NCC\").",
+            "type": "string"
+          },
+          "postal_code": {
+            "nullable": true,
+            "description": "Postal code.",
+            "type": "string"
+          },
+          "region": {
+            "nullable": true,
+            "description": "Name of the region (e.g., \"North Holland\").",
+            "type": "string"
+          },
+          "region_code": {
+            "nullable": true,
+            "description": "Region code (e.g., \"NH\" for North Holland).",
+            "type": "string"
+          },
+          "timezone": {
+            "nullable": true,
+            "description": "Timezone (e.g., \"Europe/Amsterdam\").",
+            "type": "string"
+          }
+        }
       },
       "Jetstream": {
         "description": "Jetstream information.",
@@ -18667,7 +19101,7 @@
         ]
       },
       "Session": {
-        "description": "An authentication session.\n\nFor our UIs, these are automatically created by Next.js.",
+        "description": "An authentication session.",
         "type": "object",
         "properties": {
           "created_at": {

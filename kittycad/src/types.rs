@@ -447,6 +447,10 @@ pub mod error {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum AccountProvider {
+    #[doc = "The Apple account provider."]
+    #[serde(rename = "apple")]
+    #[display("apple")]
+    Apple,
     #[doc = "The Discord account provider."]
     #[serde(rename = "discord")]
     #[display("discord")]
@@ -459,6 +463,14 @@ pub enum AccountProvider {
     #[serde(rename = "github")]
     #[display("github")]
     Github,
+    #[doc = "The Microsoft account provider."]
+    #[serde(rename = "microsoft")]
+    #[display("microsoft")]
+    Microsoft,
+    #[doc = "The Tencent QQ account provider."]
+    #[serde(rename = "tencent")]
+    #[display("tencent")]
+    Tencent,
 }
 
 #[doc = "Data for adding a member to an org."]
@@ -2123,6 +2135,76 @@ pub enum AsyncApiCallType {
     #[serde(rename = "text_to_cad")]
     #[display("text_to_cad")]
     TextToCad,
+}
+
+#[doc = "The authentication callback from the OAuth 2.0 client. This is typically posted to the \
+         redirect URL as query params after authenticating."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AuthCallback {
+    #[doc = "The authorization code."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
+    #[doc = "For Apple only, a JSON web token containing the user’s identity information."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id_token: Option<String>,
+    #[doc = "The state that we had passed in through the user consent URL."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub state: Option<String>,
+    #[doc = "For Apple only, a JSON string containing the data requested in the scope property. \
+             The returned data is in the following format: `{ \"name\": { \"firstName\": string, \
+             \"lastName\": string }, \"email\": string }`"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user: Option<String>,
+}
+
+impl std::fmt::Display for AuthCallback {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AuthCallback {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(code) = &self.code {
+                format!("{:?}", code).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(id_token) = &self.id_token {
+                format!("{:?}", id_token).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(state) = &self.state {
+                format!("{:?}", state).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(user) = &self.user {
+                format!("{:?}", user).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "code".into(),
+            "id_token".into(),
+            "state".into(),
+            "user".into(),
+        ]
+    }
 }
 
 #[doc = "Co-ordinate axis specifier.\n\nSee [cglearn.eu] for background reading.\n\n[cglearn.eu]: https://cglearn.eu/pub/computer-graphics/introduction-to-geometry#material-coordinate-systems-1"]
@@ -6227,6 +6309,185 @@ pub enum InvoiceStatus {
     Void,
 }
 
+#[doc = "Information about an ip address. Represents geographical and network-related information."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct IpAddrInfo {
+    #[doc = "Autonomous System Number."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub asn: Option<i64>,
+    #[doc = "City name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub city: Option<String>,
+    #[doc = "Continent code (e.g., \"EU\" for Europe)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub continent_code: Option<String>,
+    #[doc = "Country name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub country: Option<String>,
+    #[doc = "Two-letter country code (e.g., \"NL\" for Netherlands)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub country_code: Option<String>,
+    #[doc = "Three-letter country code (e.g., \"NLD\" for Netherlands)."]
+    #[serde(
+        rename = "country_code3",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub country_code_3: Option<String>,
+    #[doc = "IP address of the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ip: Option<std::net::IpAddr>,
+    #[doc = "Flag indicating whether the country is in the European Union."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub is_in_european_union: Option<bool>,
+    #[doc = "Geographic latitude."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub latitude: Option<f64>,
+    #[doc = "Geographic longitude."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub longitude: Option<f64>,
+    #[doc = "Time offset in seconds from UTC."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub offset: Option<i64>,
+    #[doc = "Organization name (e.g., \"RIPE NCC\")."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub organization: Option<String>,
+    #[doc = "Postal code."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub postal_code: Option<String>,
+    #[doc = "Name of the region (e.g., \"North Holland\")."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub region: Option<String>,
+    #[doc = "Region code (e.g., \"NH\" for North Holland)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub region_code: Option<String>,
+    #[doc = "Timezone (e.g., \"Europe/Amsterdam\")."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub timezone: Option<String>,
+}
+
+impl std::fmt::Display for IpAddrInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for IpAddrInfo {
+    const LENGTH: usize = 16;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(asn) = &self.asn {
+                format!("{:?}", asn).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(city) = &self.city {
+                format!("{:?}", city).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(continent_code) = &self.continent_code {
+                format!("{:?}", continent_code).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(country) = &self.country {
+                format!("{:?}", country).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(country_code) = &self.country_code {
+                format!("{:?}", country_code).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(country_code_3) = &self.country_code_3 {
+                format!("{:?}", country_code_3).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(ip) = &self.ip {
+                format!("{:?}", ip).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(is_in_european_union) = &self.is_in_european_union {
+                format!("{:?}", is_in_european_union).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(latitude) = &self.latitude {
+                format!("{:?}", latitude).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(longitude) = &self.longitude {
+                format!("{:?}", longitude).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(offset) = &self.offset {
+                format!("{:?}", offset).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(organization) = &self.organization {
+                format!("{:?}", organization).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(postal_code) = &self.postal_code {
+                format!("{:?}", postal_code).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(region) = &self.region {
+                format!("{:?}", region).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(region_code) = &self.region_code {
+                format!("{:?}", region_code).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(timezone) = &self.timezone {
+                format!("{:?}", timezone).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "asn".into(),
+            "city".into(),
+            "continent_code".into(),
+            "country".into(),
+            "country_code".into(),
+            "country_code_3".into(),
+            "ip".into(),
+            "is_in_european_union".into(),
+            "latitude".into(),
+            "longitude".into(),
+            "offset".into(),
+            "organization".into(),
+            "postal_code".into(),
+            "region".into(),
+            "region_code".into(),
+            "timezone".into(),
+        ]
+    }
+}
+
 #[doc = "Jetstream information."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9496,7 +9757,7 @@ pub enum Selection {
     },
 }
 
-#[doc = "An authentication session.\n\nFor our UIs, these are automatically created by Next.js."]
+#[doc = "An authentication session."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]

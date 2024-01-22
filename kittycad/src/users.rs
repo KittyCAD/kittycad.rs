@@ -130,6 +130,35 @@ impl Users {
         }
     }
 
+    #[doc = "Get the OAuth2 providers for your user.\n\nIf this returns an empty array, then the user has not connected any OAuth2 providers and uses raw email authentication.\nThis endpoint requires authentication by any Zoo user. It gets the providers for the authenticated user.\n\n```rust,no_run\nasync fn example_users_get_oauth_2_providers_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::AccountProvider> =\n        client.users().get_oauth_2_providers_for().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_oauth_2_providers_for<'a>(
+        &'a self,
+    ) -> Result<Vec<crate::types::AccountProvider>, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "user/oauth2/providers"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
     #[doc = "Get your user's onboarding status.\n\nChecks key part of their api usage to determine \
              their onboarding progress\n\n```rust,no_run\nasync fn \
              example_users_get_onboarding_self() -> anyhow::Result<()> {\n    let client = \

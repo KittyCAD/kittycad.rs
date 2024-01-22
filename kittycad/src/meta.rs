@@ -76,6 +76,38 @@ impl Meta {
         }
     }
 
+    #[doc = "Get ip address information.\n\n```rust,no_run\nasync fn example_meta_get_ipinfo() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::IpAddrInfo = client.meta().get_ipinfo().await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_ipinfo<'a>(
+        &'a self,
+    ) -> Result<crate::types::IpAddrInfo, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "_meta/ipinfo"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
     #[doc = "Get an API token for a user by their discord id.\n\nThis endpoint allows us to run \
              API calls from our discord bot on behalf of a user. The user must have a discord \
              account linked to their Zoo Account via oauth2 for this to work.\nYou must be a Zoo \

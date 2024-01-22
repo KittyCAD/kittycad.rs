@@ -136,22 +136,15 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Listen for callbacks for the OAuth 2.0 provider.\n\n**Parameters:**\n\n- `code: \
-             Option<String>`: The authorization code.\n- `provider: \
-             crate::types::AccountProvider`: The provider. (required)\n- `state: Option<String>`: \
-             The state that we had passed in through the user consent \
-             URL.\n\n```rust,no_run\nasync fn example_oauth2_oauth_2_provider_callback() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
-             client\n        .oauth2()\n        .oauth_2_provider_callback(\n            \
-             Some(\"some-string\".to_string()),\n            \
-             kittycad::types::AccountProvider::Github,\n            \
-             Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Listen for callbacks for the OAuth 2.0 provider.\n\n**Parameters:**\n\n- `code: Option<String>`: The authorization code.\n- `id_token: Option<String>`: For Apple only, a JSON web token containing the user’s identity information.\n- `provider: crate::types::AccountProvider`: The provider. (required)\n- `state: Option<String>`: The state that we had passed in through the user consent URL.\n- `user: Option<String>`: For Apple only, a JSON string containing the data requested in the scope property. The returned data is in the following format: `{ \"name\": { \"firstName\": string, \"lastName\": string }, \"email\": string }`\n\n```rust,no_run\nasync fn example_oauth2_oauth_2_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .oauth_2_provider_callback(\n            Some(\"some-string\".to_string()),\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Tencent,\n            Some(\"some-string\".to_string()),\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn oauth_2_provider_callback<'a>(
         &'a self,
         code: Option<String>,
+        id_token: Option<String>,
         provider: crate::types::AccountProvider,
         state: Option<String>,
+        user: Option<String>,
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
@@ -168,11 +161,62 @@ impl Oauth2 {
             query_params.push(("code", p));
         }
 
+        if let Some(p) = id_token {
+            query_params.push(("id_token", p));
+        }
+
         if let Some(p) = state {
             query_params.push(("state", p));
         }
 
+        if let Some(p) = user {
+            query_params.push(("user", p));
+        }
+
         req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Listen for callbacks for the OAuth 2.0 provider.\n\nThis specific endpoint listens \
+             for posts of form data.\n\n**Parameters:**\n\n- `provider: \
+             crate::types::AccountProvider`: The provider. (required)\n\n```rust,no_run\nasync fn \
+             example_oauth2_oauth_2_provider_callback_post() -> anyhow::Result<()> {\n    let \
+             client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        \
+             .oauth_2_provider_callback_post(\n            \
+             kittycad::types::AccountProvider::Tencent,\n            \
+             &kittycad::types::AuthCallback {\n                code: \
+             Some(\"some-string\".to_string()),\n                id_token: \
+             Some(\"some-string\".to_string()),\n                state: \
+             Some(\"some-string\".to_string()),\n                user: \
+             Some(\"some-string\".to_string()),\n            },\n        )\n        .await?;\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn oauth_2_provider_callback_post<'a>(
+        &'a self,
+        provider: crate::types::AccountProvider,
+        body: &crate::types::AuthCallback,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "oauth2/provider/{provider}/callback"
+                    .replace("{provider}", &format!("{}", provider))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.form(body);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
@@ -194,7 +238,7 @@ impl Oauth2 {
              kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo \
              = client\n        .oauth2()\n        .oauth_2_provider_consent(\n            \
              Some(\"some-string\".to_string()),\n            \
-             kittycad::types::AccountProvider::Github,\n        )\n        .await?;\n    \
+             kittycad::types::AccountProvider::Tencent,\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn oauth_2_provider_consent<'a>(
