@@ -140,6 +140,8 @@ pub mod paginate {
         type Item: serde::de::DeserializeOwned;
         #[doc = " Returns true if the response has more pages."]
         fn has_more_pages(&self) -> bool;
+        #[doc = " Returns the next page token."]
+        fn next_page_token(&self) -> Option<String>;
         #[doc = " Modify a request to get the next page."]
         fn next_page(
             &self,
@@ -852,6 +854,10 @@ impl crate::types::paginate::Pagination for DiskResultsPage {
         self.next_page.is_some()
     }
 
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
     fn next_page(
         &self,
         req: reqwest::Request,
@@ -1374,6 +1380,10 @@ impl crate::types::paginate::Pagination for GlobalImageResultsPage {
         self.next_page.is_some()
     }
 
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
     fn next_page(
         &self,
         req: reqwest::Request,
@@ -1496,6 +1506,10 @@ impl crate::types::paginate::Pagination for IdentityProviderResultsPage {
     type Item = IdentityProvider;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
@@ -1764,6 +1778,10 @@ impl crate::types::paginate::Pagination for ImageResultsPage {
     type Item = Image;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
@@ -2075,6 +2093,10 @@ impl crate::types::paginate::Pagination for InstanceResultsPage {
         self.next_page.is_some()
     }
 
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
     fn next_page(
         &self,
         req: reqwest::Request,
@@ -2358,6 +2380,10 @@ impl crate::types::paginate::Pagination for IpPoolRangeResultsPage {
         self.next_page.is_some()
     }
 
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
     fn next_page(
         &self,
         req: reqwest::Request,
@@ -2425,6 +2451,10 @@ impl crate::types::paginate::Pagination for IpPoolResultsPage {
     type Item = IpPool;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
@@ -2747,6 +2777,10 @@ impl crate::types::paginate::Pagination for NetworkInterfaceResultsPage {
         self.next_page.is_some()
     }
 
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
     fn next_page(
         &self,
         req: reqwest::Request,
@@ -2949,6 +2983,10 @@ impl crate::types::paginate::Pagination for OrganizationResultsPage {
     type Item = Organization;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
@@ -3247,6 +3285,10 @@ impl crate::types::paginate::Pagination for ProjectResultsPage {
         self.next_page.is_some()
     }
 
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
     fn next_page(
         &self,
         req: reqwest::Request,
@@ -3496,6 +3538,10 @@ impl crate::types::paginate::Pagination for RackResultsPage {
         self.next_page.is_some()
     }
 
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
     fn next_page(
         &self,
         req: reqwest::Request,
@@ -3595,6 +3641,10 @@ impl crate::types::paginate::Pagination for RoleResultsPage {
     type Item = Role;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
@@ -3853,6 +3903,10 @@ impl crate::types::paginate::Pagination for RouterRouteResultsPage {
         self.next_page.is_some()
     }
 
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
     fn next_page(
         &self,
         req: reqwest::Request,
@@ -4026,6 +4080,10 @@ impl crate::types::paginate::Pagination for SagaResultsPage {
     type Item = Saga;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
@@ -4369,6 +4427,10 @@ impl crate::types::paginate::Pagination for SiloResultsPage {
         self.next_page.is_some()
     }
 
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
     fn next_page(
         &self,
         req: reqwest::Request,
@@ -4581,6 +4643,10 @@ impl crate::types::paginate::Pagination for SledResultsPage {
         self.next_page.is_some()
     }
 
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
     fn next_page(
         &self,
         req: reqwest::Request,
@@ -4747,6 +4813,10 @@ impl crate::types::paginate::Pagination for SnapshotResultsPage {
     type Item = Snapshot;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
@@ -4944,6 +5014,10 @@ impl crate::types::paginate::Pagination for SshKeyResultsPage {
         self.next_page.is_some()
     }
 
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
     fn next_page(
         &self,
         req: reqwest::Request,
@@ -5056,6 +5130,10 @@ impl crate::types::paginate::Pagination for TimeseriesSchemaResultsPage {
     type Item = TimeseriesSchema;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
@@ -5213,6 +5291,10 @@ impl crate::types::paginate::Pagination for UserBuiltinResultsPage {
         self.next_page.is_some()
     }
 
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
     fn next_page(
         &self,
         req: reqwest::Request,
@@ -5303,6 +5385,10 @@ impl crate::types::paginate::Pagination for UserResultsPage {
     type Item = User;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
@@ -5893,6 +5979,10 @@ impl crate::types::paginate::Pagination for VpcResultsPage {
         self.next_page.is_some()
     }
 
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
     fn next_page(
         &self,
         req: reqwest::Request,
@@ -6072,6 +6162,10 @@ impl crate::types::paginate::Pagination for VpcRouterResultsPage {
     type Item = VpcRouter;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
@@ -6306,6 +6400,10 @@ impl crate::types::paginate::Pagination for VpcSubnetResultsPage {
     type Item = VpcSubnet;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
