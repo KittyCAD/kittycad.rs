@@ -298,7 +298,7 @@ impl Users {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages =
                     futures::stream::try_unfold(result, move |new_result| async move {
-                        if new_result.has_more_pages() {
+                        if new_result.has_more_pages() && !new_result.items().is_empty() {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
@@ -410,7 +410,7 @@ impl Users {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages =
                     futures::stream::try_unfold(result, move |new_result| async move {
-                        if new_result.has_more_pages() {
+                        if new_result.has_more_pages() && !new_result.items().is_empty() {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,

@@ -55,14 +55,14 @@ fn test_kittycad_generation(ctx: &mut TestContext) {
     let test_file = include_str!("../tests/library/kittycad.tests.rs");
     // Write our temporary file.
     let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
-    std::fs::write(&test_file_path, test_file).unwrap();
+    std::fs::write(test_file_path, test_file).unwrap();
 
     // Move the assets directory over so we have files to run.
     let assets_dir = ctx.tmp_dir.join("assets");
     std::fs::create_dir_all(&assets_dir).unwrap();
     // Get the current contents of the assets directory.
     let mut assets_dir_contents =
-        std::fs::read_dir(&std::env::current_dir().unwrap().join("../assets")).unwrap();
+        std::fs::read_dir(std::env::current_dir().unwrap().join("../assets")).unwrap();
     // Move each file over.
     while let Some(Ok(entry)) = assets_dir_contents.next() {
         let dest = assets_dir.join(entry.file_name());

@@ -9,6 +9,32 @@ fn test_client() -> crate::Client {
     crate::Client::new_from_env()
 }
 
+#[cfg(not(feature = "js"))]
+#[tokio::test]
+async fn test_list_org_members_stream() {
+    let client = test_client();
+
+    let orgs = client.orgs();
+    let mut stream = orgs.list_members_stream(None, None, None);
+
+    let mut members: Vec<crate::types::OrgMember> = Default::default();
+    loop {
+        match stream.try_next().await {
+            Ok(Some(item)) => {
+                members.push(item);
+            }
+            Ok(None) => {
+                break;
+            }
+            Err(err) => {
+                panic!("{}", err);
+            }
+        }
+    }
+
+    assert!(!members.is_empty());
+}
+
 #[tokio::test]
 async fn test_create_file_conversion() {
     let client = test_client();

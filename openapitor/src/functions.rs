@@ -318,7 +318,7 @@ pub fn generate_files(
                                     let next_pages = futures::stream::try_unfold(
                                         result,
                                         move |new_result| async move {
-                                            if new_result.has_more_pages() {
+                                            if new_result.has_more_pages() && !new_result.items().is_empty() {
                                                 // Get the next page, we modify the request directly,
                                                 // so that if we want to generate an API that uses
                                                 // Link headers or any other weird shit it works.

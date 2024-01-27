@@ -34,6 +34,7 @@ jobs:
         shell: bash
         run: |
           cargo llvm-cov nextest --all --lcov --output-path lcov.info --all-features
+          cargo llvm-cov nextest --all --lcov --output-path lcov.info
         env:
           KITTYCAD_API_TOKEN: ${{secrets.KITTYCAD_API_TOKEN}}
 
