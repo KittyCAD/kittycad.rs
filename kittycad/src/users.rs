@@ -296,9 +296,13 @@ impl Users {
         self.list(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
-                let next_pages =
-                    futures::stream::try_unfold(result, move |new_result| async move {
-                        if new_result.has_more_pages() && !new_result.items().is_empty() {
+                let next_pages = futures::stream::try_unfold(
+                    (None, result),
+                    move |(prev_page_token, new_result)| async move {
+                        if new_result.has_more_pages()
+                            && !new_result.items().is_empty()
+                            && prev_page_token != new_result.next_page_token()
+                        {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
@@ -331,15 +335,16 @@ impl Users {
                             .map_ok(|result: crate::types::UserResultsPage| {
                                 Some((
                                     futures::stream::iter(result.items().into_iter().map(Ok)),
-                                    result,
+                                    (new_result.next_page_token(), result),
                                 ))
                             })
                             .await
                         } else {
                             Ok(None)
                         }
-                    })
-                    .try_flatten();
+                    },
+                )
+                .try_flatten();
                 items.chain(next_pages)
             })
             .try_flatten_stream()
@@ -408,9 +413,13 @@ impl Users {
         self.list_extended(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
-                let next_pages =
-                    futures::stream::try_unfold(result, move |new_result| async move {
-                        if new_result.has_more_pages() && !new_result.items().is_empty() {
+                let next_pages = futures::stream::try_unfold(
+                    (None, result),
+                    move |(prev_page_token, new_result)| async move {
+                        if new_result.has_more_pages()
+                            && !new_result.items().is_empty()
+                            && prev_page_token != new_result.next_page_token()
+                        {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
@@ -443,15 +452,16 @@ impl Users {
                             .map_ok(|result: crate::types::ExtendedUserResultsPage| {
                                 Some((
                                     futures::stream::iter(result.items().into_iter().map(Ok)),
-                                    result,
+                                    (new_result.next_page_token(), result),
                                 ))
                             })
                             .await
                         } else {
                             Ok(None)
                         }
-                    })
-                    .try_flatten();
+                    },
+                )
+                .try_flatten();
                 items.chain(next_pages)
             })
             .try_flatten_stream()

@@ -648,7 +648,11 @@ impl TypeSpace {
                     type Item = #page_item;
 
                     fn has_more_pages(&self) -> bool {
-                        self.next_page.is_some()
+                        self.#next_page_ident.is_some()
+                    }
+
+                    fn next_page_token(&self) -> Option<String> {
+                        self.#next_page_ident.clone()
                     }
 
                     fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {

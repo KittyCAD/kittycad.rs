@@ -10,6 +10,9 @@ pub trait Pagination {
     /// Returns true if the response has more pages.
     fn has_more_pages(&self) -> bool;
 
+    /// Returns the next page token.
+    fn next_page_token(&self) -> Option<String>;
+
     /// Modify a request to get the next page.
     fn next_page(
         &self,

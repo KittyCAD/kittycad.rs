@@ -143,6 +143,8 @@ pub mod paginate {
         type Item: serde::de::DeserializeOwned;
         #[doc = " Returns true if the response has more pages."]
         fn has_more_pages(&self) -> bool;
+        #[doc = " Returns the next page token."]
+        fn next_page_token(&self) -> Option<String>;
         #[doc = " Modify a request to get the next page."]
         fn next_page(
             &self,
@@ -756,6 +758,10 @@ impl crate::types::paginate::Pagination for AiPromptResultsPage {
     type Item = AiPrompt;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
@@ -1458,6 +1464,10 @@ impl crate::types::paginate::Pagination for ApiCallWithPriceResultsPage {
         self.next_page.is_some()
     }
 
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
     fn next_page(
         &self,
         req: reqwest::Request,
@@ -1626,6 +1636,10 @@ impl crate::types::paginate::Pagination for ApiTokenResultsPage {
     type Item = ApiToken;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
@@ -2050,6 +2064,10 @@ impl crate::types::paginate::Pagination for AsyncApiCallResultsPage {
     type Item = AsyncApiCall;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
@@ -4582,6 +4600,10 @@ impl crate::types::paginate::Pagination for ExtendedUserResultsPage {
     type Item = ExtendedUser;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
@@ -8519,6 +8541,10 @@ impl crate::types::paginate::Pagination for OrgMemberResultsPage {
         self.next_page.is_some()
     }
 
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
     fn next_page(
         &self,
         req: reqwest::Request,
@@ -10318,6 +10344,10 @@ impl crate::types::paginate::Pagination for TextToCadResultsPage {
     type Item = TextToCad;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
@@ -12651,6 +12681,10 @@ impl crate::types::paginate::Pagination for UserResultsPage {
     type Item = User;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
     }
 
     fn next_page(
