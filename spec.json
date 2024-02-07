@@ -452,7 +452,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_create_text_to_cad",
+        "operationId": "options_text_to_cad",
         "parameters": [
           {
             "in": "path",
@@ -1239,7 +1239,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VerificationToken"
+                  "$ref": "#/components/schemas/VerificationTokenResponse"
                 }
               }
             }
@@ -1399,6 +1399,228 @@
         }
       }
     },
+    "/auth/saml/provider/{provider_id}/login": {
+      "get": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "Get a redirect straight to the SAML IdP.",
+        "description": "The UI uses this to avoid having to ask the API anything about the IdP. It already knows the SAML IdP ID from the path, so it can just link to this path and rely on the API to redirect to the actual IdP.",
+        "operationId": "get_auth_saml",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider_id",
+            "description": "The ID of the identity provider.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "callback_url",
+            "description": "The URL to redirect back to after we have authenticated.",
+            "schema": {
+              "nullable": true,
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Temporary Redirect",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "Authenticate a user via SAML",
+        "operationId": "post_auth_saml",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider_id",
+            "description": "The ID of the identity provider.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "302": {
+            "description": "Temporary Redirect",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_auth_saml",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider_id",
+            "description": "The ID of the identity provider.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/file/center-of-mass": {
       "post": {
         "tags": [
@@ -1496,7 +1718,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_create_file_center_of_mass",
+        "operationId": "options_file_center_of_mass",
         "responses": {
           "204": {
             "description": "successful operation, no content",
@@ -1642,7 +1864,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_create_file_conversion",
+        "operationId": "options_file_conversion",
         "parameters": [
           {
             "in": "path",
@@ -1825,7 +2047,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_create_file_density",
+        "operationId": "options_file_density",
         "responses": {
           "204": {
             "description": "successful operation, no content",
@@ -1971,7 +2193,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_create_file_execution",
+        "operationId": "options_file_execution",
         "parameters": [
           {
             "in": "path",
@@ -2145,7 +2367,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_create_file_mass",
+        "operationId": "options_file_mass",
         "responses": {
           "204": {
             "description": "successful operation, no content",
@@ -2290,7 +2512,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_create_file_surface_area",
+        "operationId": "options_file_surface_area",
         "responses": {
           "204": {
             "description": "successful operation, no content",
@@ -2435,7 +2657,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_create_file_volume",
+        "operationId": "options_file_volume",
         "responses": {
           "204": {
             "description": "successful operation, no content",
@@ -3696,7 +3918,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_create_org",
+        "operationId": "options_org",
         "responses": {
           "204": {
             "description": "successful operation, no content",
@@ -4089,7 +4311,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_create_org_member",
+        "operationId": "options_org_member",
         "responses": {
           "204": {
             "description": "successful operation, no content",
@@ -4857,7 +5079,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_create_payment_intent_for_org",
+        "operationId": "options_payment_intent_for_org",
         "responses": {
           "204": {
             "description": "successful operation, no content",
@@ -5177,6 +5399,314 @@
         "summary": "Validate an orgs's information is correct and valid for automatic tax.",
         "description": "This endpoint requires authentication by an org admin. It will return an error if the org's information is not valid for automatic tax. Otherwise, it will return an empty successful response.",
         "operationId": "validate_customer_tax_information_for_org",
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/saml/idp": {
+      "get": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Get the SAML identity provider.",
+        "description": "This endpoint requires authentication by an org admin.",
+        "operationId": "get_org_saml_idp",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SamlIdentityProvider"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Update the SAML identity provider.",
+        "description": "This endpoint requires authentication by an org admin.",
+        "operationId": "update_org_saml_idp",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SamlIdentityProviderCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SamlIdentityProvider"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Create a SAML identity provider.",
+        "description": "This endpoint requires authentication by an org admin.",
+        "operationId": "create_org_saml_idp",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SamlIdentityProviderCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SamlIdentityProvider"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Delete an SAML identity provider.",
+        "description": "This endpoint requires authentication by an org admin.",
+        "operationId": "delete_org_saml_idp",
+        "responses": {
+          "204": {
+            "description": "successful deletion",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_org_saml_idp",
         "responses": {
           "204": {
             "description": "successful operation, no content",
@@ -8001,7 +8531,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_create_payment_intent_for_user",
+        "operationId": "options_payment_intent_for_user",
         "responses": {
           "204": {
             "description": "successful operation, no content",
@@ -8698,7 +9228,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_create_text_to_cad_model_feedback",
+        "operationId": "options_text_to_cad_model_feedback",
         "parameters": [
           {
             "in": "path",
@@ -9344,6 +9874,13 @@
             "type": "string",
             "enum": [
               "microsoft"
+            ]
+          },
+          {
+            "description": "The SAML account provider.",
+            "type": "string",
+            "enum": [
+              "saml"
             ]
           },
           {
@@ -12116,6 +12653,28 @@
           "output_unit"
         ]
       },
+      "DerEncodedKeyPair": {
+        "description": "The DER encoded key pair.",
+        "type": "object",
+        "properties": {
+          "private_key": {
+            "title": "String",
+            "description": "The request signing private key (pem file).",
+            "type": "string",
+            "format": "byte"
+          },
+          "public_cert": {
+            "title": "String",
+            "description": "The request signing public certificate (pem file).",
+            "type": "string",
+            "format": "byte"
+          }
+        },
+        "required": [
+          "private_key",
+          "public_cert"
+        ]
+      },
       "DeviceAccessTokenRequestForm": {
         "description": "The form for a device access token request.",
         "type": "object",
@@ -12270,6 +12829,23 @@
         },
         "required": [
           "email"
+        ]
+      },
+      "EntityCircularPattern": {
+        "description": "The response from the `EntityCircularPattern` command.",
+        "type": "object",
+        "properties": {
+          "entity_ids": {
+            "description": "The UUIDs of the entities that were created.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "entity_ids"
         ]
       },
       "EntityGetAllChildUuids": {
@@ -12658,6 +13234,61 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "ExtrusionFaceCapType": {
+        "description": "Possible types of faces which can be extruded from a 3D solid.",
+        "oneOf": [
+          {
+            "description": "Uncapped.",
+            "type": "string",
+            "enum": [
+              "none"
+            ]
+          },
+          {
+            "description": "Capped on top.",
+            "type": "string",
+            "enum": [
+              "top"
+            ]
+          },
+          {
+            "description": "Capped below.",
+            "type": "string",
+            "enum": [
+              "bottom"
+            ]
+          }
+        ]
+      },
+      "ExtrusionFaceInfo": {
+        "description": "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces)",
+        "type": "object",
+        "properties": {
+          "cap": {
+            "description": "Whether or not this extrusion face is a top/bottom cap face or not. Note that top/bottom cap faces will not have associated curve IDs.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExtrusionFaceCapType"
+              }
+            ]
+          },
+          "curve_id": {
+            "nullable": true,
+            "description": "Path component (curve) UUID.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "face_id": {
+            "nullable": true,
+            "description": "Face uuid.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "cap"
         ]
       },
       "FailureWebSocketResponse": {
@@ -13520,7 +14151,7 @@
         ]
       },
       "GlobalAxis": {
-        "description": "An enum that contains the three global axes.",
+        "description": "The global axes.",
         "oneOf": [
           {
             "description": "The X axis",
@@ -13633,6 +14264,55 @@
         },
         "required": [
           "urls"
+        ]
+      },
+      "IdpMetadataSource": {
+        "description": "The source of an identity provider metadata descriptor.",
+        "oneOf": [
+          {
+            "description": "A URL to the identity provider metadata descriptor.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "url"
+                ]
+              },
+              "url": {
+                "title": "String",
+                "description": "The URL of the identity provider metadata descriptor.",
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "required": [
+              "type",
+              "url"
+            ]
+          },
+          {
+            "description": "A base64 encoded XML document containing the identity provider metadata descriptor.",
+            "type": "object",
+            "properties": {
+              "data": {
+                "title": "String",
+                "description": "The base64 encoded XML document containing the identity provider metadata descriptor.",
+                "type": "string",
+                "format": "byte"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "base64_encoded_xml"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          }
         ]
       },
       "ImageFormat": {
@@ -15638,6 +16318,39 @@
             ]
           },
           {
+            "description": "Fillets the specified edge with the given radius.",
+            "type": "object",
+            "properties": {
+              "edge_id": {
+                "description": "Which edge you want to fillet.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "object_id": {
+                "description": "Which object is being filletted.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "radius": {
+                "description": "The radius of the fillet. Measured in length (using the same units that the current sketch uses). Must be positive (i.e. greater than zero).",
+                "type": "number",
+                "format": "double"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_fillet_edge"
+                ]
+              }
+            },
+            "required": [
+              "edge_id",
+              "object_id",
+              "radius",
+              "type"
+            ]
+          },
+          {
             "description": "Sends object to front or back.",
             "type": "object",
             "properties": {
@@ -16744,7 +17457,7 @@
             "type": "object",
             "properties": {
               "axis": {
-                "description": "Axis along which to make the copites",
+                "description": "Axis along which to make the copies",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Point3d"
@@ -16779,6 +17492,63 @@
               "entity_id",
               "num_repetitions",
               "spacing",
+              "type"
+            ]
+          },
+          {
+            "description": "Duplicate the given entity, evenly spaced around the specified axis, spanning the arc.",
+            "type": "object",
+            "properties": {
+              "arc_degrees": {
+                "description": "Arc angle (in degrees) to place repetitions along.",
+                "type": "number",
+                "format": "double"
+              },
+              "axis": {
+                "description": "Axis around which to make the copies",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "center": {
+                "description": "Point around which to make the copies",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "entity_id": {
+                "description": "ID of the entity being copied.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "num_repetitions": {
+                "description": "Number of repetitions to make.",
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              },
+              "rotate_duplicates": {
+                "description": "Whether or not to rotate the objects as they are copied.",
+                "type": "boolean"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_circular_pattern"
+                ]
+              }
+            },
+            "required": [
+              "arc_degrees",
+              "axis",
+              "center",
+              "entity_id",
+              "num_repetitions",
+              "rotate_duplicates",
               "type"
             ]
           },
@@ -16865,6 +17635,33 @@
               }
             },
             "required": [
+              "type"
+            ]
+          },
+          {
+            "description": "Get a concise description of all of an extrusion's faces",
+            "type": "object",
+            "properties": {
+              "edge_id": {
+                "description": "Any edge that lies on the extrusion base path.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "object_id": {
+                "description": "The Solid3d object whose extrusion is being queried.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_get_extrusion_face_info"
+                ]
+              }
+            },
+            "required": [
+              "edge_id",
+              "object_id",
               "type"
             ]
           }
@@ -17177,6 +17974,25 @@
                 "type": "string",
                 "enum": [
                   "entity_linear_pattern"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response from the ` ` command.",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityCircularPattern"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_circular_pattern"
                 ]
               }
             },
@@ -17557,6 +18373,25 @@
                 "type": "string",
                 "enum": [
                   "center_of_mass"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response from the ` ` command.",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Solid3dGetExtrusionFaceInfo"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_get_extrusion_face_info"
                 ]
               }
             },
@@ -18928,6 +19763,122 @@
           "type"
         ]
       },
+      "SamlIdentityProvider": {
+        "description": "A SAML identity provider.",
+        "type": "object",
+        "properties": {
+          "acs_url": {
+            "title": "String",
+            "description": "The ACS (Assertion Consumer Service) url.",
+            "type": "string",
+            "format": "uri"
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "The date and time the SAML identity provider was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "description": "The unique identifier for the SAML identity provider.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "idp_entity_id": {
+            "description": "The entity ID of the SAML identity provider.",
+            "type": "string"
+          },
+          "idp_metadata_document_string": {
+            "description": "The metadata document as a string.",
+            "type": "string"
+          },
+          "org_id": {
+            "description": "The organization ID the SAML identity provider belongs to.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "private_key": {
+            "nullable": true,
+            "title": "String",
+            "description": "The private key for the SAML identity provider. This is the PEM corresponding to the X509 pair.",
+            "type": "string",
+            "format": "byte"
+          },
+          "public_cert": {
+            "nullable": true,
+            "title": "String",
+            "description": "The public certificate for the SAML identity provider. This is the PEM corresponding to the X509 pair.",
+            "type": "string",
+            "format": "byte"
+          },
+          "slo_url": {
+            "title": "String",
+            "description": "The SLO (Single Logout) url.",
+            "type": "string",
+            "format": "uri"
+          },
+          "technical_contact_email": {
+            "description": "The technical contact email address for the SAML identity provider.",
+            "type": "string",
+            "format": "email"
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The date and time the SAML identity provider was last updated.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "acs_url",
+          "created_at",
+          "id",
+          "org_id",
+          "slo_url",
+          "updated_at"
+        ]
+      },
+      "SamlIdentityProviderCreate": {
+        "description": "Parameters for creating a SAML identity provider.",
+        "type": "object",
+        "properties": {
+          "idp_entity_id": {
+            "description": "The entity ID of the SAML identity provider.",
+            "type": "string"
+          },
+          "idp_metadata_source": {
+            "description": "The source of an identity provider metadata descriptor.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IdpMetadataSource"
+              }
+            ]
+          },
+          "signing_keypair": {
+            "nullable": true,
+            "description": "The request signing key pair.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DerEncodedKeyPair"
+              }
+            ]
+          },
+          "technical_contact_email": {
+            "description": "The technical contact email address for the SAML identity provider.",
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "idp_metadata_source"
+        ]
+      },
       "SceneSelectionType": {
         "description": "The type of scene selection change",
         "oneOf": [
@@ -19188,6 +20139,22 @@
         },
         "required": [
           "edges"
+        ]
+      },
+      "Solid3dGetExtrusionFaceInfo": {
+        "description": "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces)",
+        "type": "object",
+        "properties": {
+          "faces": {
+            "description": "Details of each face.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExtrusionFaceInfo"
+            }
+          }
+        },
+        "required": [
+          "faces"
         ]
       },
       "Solid3dGetNextAdjacentEdge": {
@@ -21384,6 +22351,12 @@
             "description": "The user's GitHub handle.",
             "type": "string"
           },
+          "image": {
+            "title": "String",
+            "description": "The image URL for the user. NOTE: If the user uses an OAuth2 provider, this will be overwritten by the provider's image URL when the user logs in next.",
+            "type": "string",
+            "format": "uri"
+          },
           "last_name": {
             "description": "The user's last name.",
             "type": "string"
@@ -21395,7 +22368,10 @@
             "type": "string",
             "format": "phone"
           }
-        }
+        },
+        "required": [
+          "image"
+        ]
       },
       "User": {
         "description": "A user.",
@@ -21607,8 +22583,8 @@
         "type": "string",
         "format": "uuid"
       },
-      "VerificationToken": {
-        "description": "A verification token for a user.\n\nThis is typically used to verify a user's email address.",
+      "VerificationTokenResponse": {
+        "description": "A verification token response.",
         "type": "object",
         "properties": {
           "created_at": {
@@ -21634,6 +22610,13 @@
           "identifier": {
             "description": "The identifier for the user. This is typically the user's email address since that is what we are verifying.",
             "type": "string"
+          },
+          "saml_redirect_url": {
+            "nullable": true,
+            "title": "String",
+            "description": "The URL to redirect to if the user requires SAML authentication.",
+            "type": "string",
+            "format": "uri"
           },
           "updated_at": {
             "title": "DateTime",
