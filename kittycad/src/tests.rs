@@ -160,6 +160,7 @@ fn test_empty_phone_number() {
         company: Some("Example Company".to_string()),
         github: Some("@example-company".to_string()),
         discord: Some("@example-company".to_string()),
+        image: "".to_string(),
     };
 
     assert_eq!(
@@ -169,11 +170,12 @@ fn test_empty_phone_number() {
   "discord": "@example-company",
   "first_name": "John",
   "github": "@example-company",
+  "image": "",
   "last_name": "Doe"
 }"#
     );
 
-    let user_info_str = r#"{"first_name":"John","last_name":"Doe","company":"Example Company","github":"@example-company","discord":"@example-company"}"#;
+    let user_info_str = r#"{"first_name":"John","last_name":"Doe","company":"Example Company","github":"@example-company","discord":"@example-company","image": ""}"#;
     assert_eq!(
         serde_json::from_str::<crate::types::UpdateUser>(user_info_str).unwrap(),
         user_info

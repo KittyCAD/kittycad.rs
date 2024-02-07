@@ -421,6 +421,125 @@ impl Orgs {
         }
     }
 
+    #[doc = "Get the SAML identity provider.\n\nThis endpoint requires authentication by an org \
+             admin.\n\n```rust,no_run\nasync fn example_orgs_get_saml_idp() -> anyhow::Result<()> \
+             {\n    let client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::SamlIdentityProvider = client.orgs().get_saml_idp().await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_saml_idp<'a>(
+        &'a self,
+    ) -> Result<crate::types::SamlIdentityProvider, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "org/saml/idp"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Update the SAML identity provider.\n\nThis endpoint requires authentication by an org admin.\n\n```rust,no_run\nasync fn example_orgs_update_saml_idp() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::SamlIdentityProvider = client\n        .orgs()\n        .update_saml_idp(&kittycad::types::SamlIdentityProviderCreate {\n            idp_entity_id: Some(\"some-string\".to_string()),\n            idp_metadata_source: kittycad::types::IdpMetadataSource::Base64EncodedXml {\n                data: kittycad::types::base64::Base64Data(\n                    \"some-base64-encoded-string\".as_bytes().to_vec(),\n                ),\n            },\n            signing_keypair: Some(kittycad::types::DerEncodedKeyPair {\n                private_key: kittycad::types::base64::Base64Data(\n                    \"some-base64-encoded-string\".as_bytes().to_vec(),\n                ),\n                public_cert: kittycad::types::base64::Base64Data(\n                    \"some-base64-encoded-string\".as_bytes().to_vec(),\n                ),\n            }),\n            technical_contact_email: Some(\"email@example.com\".to_string()),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn update_saml_idp<'a>(
+        &'a self,
+        body: &crate::types::SamlIdentityProviderCreate,
+    ) -> Result<crate::types::SamlIdentityProvider, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!("{}/{}", self.client.base_url, "org/saml/idp"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Create a SAML identity provider.\n\nThis endpoint requires authentication by an org admin.\n\n```rust,no_run\nasync fn example_orgs_create_saml_idp() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::SamlIdentityProvider = client\n        .orgs()\n        .create_saml_idp(&kittycad::types::SamlIdentityProviderCreate {\n            idp_entity_id: Some(\"some-string\".to_string()),\n            idp_metadata_source: kittycad::types::IdpMetadataSource::Base64EncodedXml {\n                data: kittycad::types::base64::Base64Data(\n                    \"some-base64-encoded-string\".as_bytes().to_vec(),\n                ),\n            },\n            signing_keypair: Some(kittycad::types::DerEncodedKeyPair {\n                private_key: kittycad::types::base64::Base64Data(\n                    \"some-base64-encoded-string\".as_bytes().to_vec(),\n                ),\n                public_cert: kittycad::types::base64::Base64Data(\n                    \"some-base64-encoded-string\".as_bytes().to_vec(),\n                ),\n            }),\n            technical_contact_email: Some(\"email@example.com\".to_string()),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn create_saml_idp<'a>(
+        &'a self,
+        body: &crate::types::SamlIdentityProviderCreate,
+    ) -> Result<crate::types::SamlIdentityProvider, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!("{}/{}", self.client.base_url, "org/saml/idp"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Delete an SAML identity provider.\n\nThis endpoint requires authentication by an org \
+             admin.\n\n```rust,no_run\nasync fn example_orgs_delete_saml_idp() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
+             client.orgs().delete_saml_idp().await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn delete_saml_idp<'a>(&'a self) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::DELETE,
+            format!("{}/{}", self.client.base_url, "org/saml/idp"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
     #[doc = "Get a user's org.\n\nThis endpoint requires authentication by any Zoo user. It gets \
              the authenticated user's org.\nIf the user is not a member of an org, this endpoint \
              will return a 404.\n\n```rust,no_run\nasync fn example_orgs_get_user() -> \

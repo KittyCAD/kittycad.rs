@@ -463,6 +463,10 @@ pub enum AccountProvider {
     #[serde(rename = "microsoft")]
     #[display("microsoft")]
     Microsoft,
+    #[doc = "The SAML account provider."]
+    #[serde(rename = "saml")]
+    #[display("saml")]
+    Saml,
     #[doc = "The Tencent QQ account provider."]
     #[serde(rename = "tencent")]
     #[display("tencent")]
@@ -3687,6 +3691,42 @@ impl tabled::Tabled for Density {
     }
 }
 
+#[doc = "The DER encoded key pair."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DerEncodedKeyPair {
+    #[doc = "The request signing private key (pem file)."]
+    pub private_key: base64::Base64Data,
+    #[doc = "The request signing public certificate (pem file)."]
+    pub public_cert: base64::Base64Data,
+}
+
+impl std::fmt::Display for DerEncodedKeyPair {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DerEncodedKeyPair {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.private_key).into(),
+            format!("{:?}", self.public_cert).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["private_key".into(), "public_cert".into()]
+    }
+}
+
 #[doc = "The form for a device access token request."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -3904,6 +3944,37 @@ impl tabled::Tabled for EmailAuthenticationForm {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["callback_url".into(), "email".into()]
+    }
+}
+
+#[doc = "The response from the `EntityCircularPattern` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityCircularPattern {
+    #[doc = "The UUIDs of the entities that were created."]
+    pub entity_ids: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for EntityCircularPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityCircularPattern {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.entity_ids).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_ids".into()]
     }
 }
 
@@ -4565,6 +4636,84 @@ impl tabled::Tabled for ExtendedUserResultsPage {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "Possible types of faces which can be extruded from a 3D solid."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ExtrusionFaceCapType {
+    #[doc = "Uncapped."]
+    #[serde(rename = "none")]
+    #[display("none")]
+    None,
+    #[doc = "Capped on top."]
+    #[serde(rename = "top")]
+    #[display("top")]
+    Top,
+    #[doc = "Capped below."]
+    #[serde(rename = "bottom")]
+    #[display("bottom")]
+    Bottom,
+}
+
+#[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces)"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ExtrusionFaceInfo {
+    #[doc = "Whether or not this extrusion face is a top/bottom cap face or not. Note that top/bottom cap faces will not have associated curve IDs."]
+    pub cap: ExtrusionFaceCapType,
+    #[doc = "Path component (curve) UUID."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub curve_id: Option<uuid::Uuid>,
+    #[doc = "Face uuid."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub face_id: Option<uuid::Uuid>,
+}
+
+impl std::fmt::Display for ExtrusionFaceInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ExtrusionFaceInfo {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.cap).into(),
+            if let Some(curve_id) = &self.curve_id {
+                format!("{:?}", curve_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(face_id) = &self.face_id {
+                format!("{:?}", face_id).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["cap".into(), "curve_id".into(), "face_id".into()]
     }
 }
 
@@ -5518,7 +5667,7 @@ impl tabled::Tabled for GetSketchModePlane {
     }
 }
 
-#[doc = "An enum that contains the three global axes."]
+#[doc = "The global axes."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -5694,6 +5843,27 @@ impl tabled::Tabled for IceServer {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["credential".into(), "urls".into(), "username".into()]
     }
+}
+
+#[doc = "The source of an identity provider metadata descriptor."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum IdpMetadataSource {
+    #[doc = "A URL to the identity provider metadata descriptor."]
+    #[serde(rename = "url")]
+    Url {
+        #[doc = "The URL of the identity provider metadata descriptor."]
+        url: String,
+    },
+    #[doc = "A base64 encoded XML document containing the identity provider metadata descriptor."]
+    #[serde(rename = "base64_encoded_xml")]
+    Base64EncodedXml {
+        #[doc = "The base64 encoded XML document containing the identity provider metadata descriptor."]
+        data: base64::Base64Data,
+    },
 }
 
 #[doc = "Enum containing the variety of image formats snapshots may be exported to."]
@@ -7214,6 +7384,16 @@ pub enum ModelingCmd {
         #[doc = "Which object is being queried."]
         object_id: uuid::Uuid,
     },
+    #[doc = "Fillets the specified edge with the given radius."]
+    #[serde(rename = "solid3d_fillet_edge")]
+    Solid3DFilletEdge {
+        #[doc = "Which edge you want to fillet."]
+        edge_id: uuid::Uuid,
+        #[doc = "Which object is being filletted."]
+        object_id: uuid::Uuid,
+        #[doc = "The radius of the fillet. Measured in length (using the same units that the current sketch uses). Must be positive (i.e. greater than zero)."]
+        radius: f64,
+    },
     #[doc = "Sends object to front or back."]
     #[serde(rename = "send_object")]
     SendObject {
@@ -7511,7 +7691,7 @@ pub enum ModelingCmd {
     #[doc = "Duplicate the given entity, evenly spaced along the chosen axis."]
     #[serde(rename = "entity_linear_pattern")]
     EntityLinearPattern {
-        #[doc = "Axis along which to make the copites"]
+        #[doc = "Axis along which to make the copies"]
         axis: Point3D,
         #[doc = "ID of the entity being copied."]
         entity_id: uuid::Uuid,
@@ -7519,6 +7699,22 @@ pub enum ModelingCmd {
         num_repetitions: u32,
         #[doc = "Spacing between repetitions."]
         spacing: f64,
+    },
+    #[doc = "Duplicate the given entity, evenly spaced around the specified axis, spanning the arc."]
+    #[serde(rename = "entity_circular_pattern")]
+    EntityCircularPattern {
+        #[doc = "Arc angle (in degrees) to place repetitions along."]
+        arc_degrees: f64,
+        #[doc = "Axis around which to make the copies"]
+        axis: Point3D,
+        #[doc = "Point around which to make the copies"]
+        center: Point3D,
+        #[doc = "ID of the entity being copied."]
+        entity_id: uuid::Uuid,
+        #[doc = "Number of repetitions to make."]
+        num_repetitions: u32,
+        #[doc = "Whether or not to rotate the objects as they are copied."]
+        rotate_duplicates: bool,
     },
     #[doc = "When you select some entity with the current tool, what should happen to the entity?"]
     #[serde(rename = "set_selection_type")]
@@ -7540,6 +7736,14 @@ pub enum ModelingCmd {
     DefaultCameraSetPerspective {
         #[doc = "If this is not given, use the same parameters as last time the perspective camera was used."]
         parameters: Option<PerspectiveCameraParameters>,
+    },
+    #[doc = "Get a concise description of all of an extrusion's faces"]
+    #[serde(rename = "solid3d_get_extrusion_face_info")]
+    Solid3DGetExtrusionFaceInfo {
+        #[doc = "Any edge that lies on the extrusion base path."]
+        edge_id: uuid::Uuid,
+        #[doc = "The Solid3d object whose extrusion is being queried."]
+        object_id: uuid::Uuid,
     },
 }
 
@@ -7777,6 +7981,12 @@ pub enum OkModelingCmdResponse {
         data: EntityLinearPattern,
     },
     #[doc = "The response from the ` ` command."]
+    #[serde(rename = "entity_circular_pattern")]
+    EntityCircularPattern {
+        #[doc = "The response from the `EntityCircularPattern` command."]
+        data: EntityCircularPattern,
+    },
+    #[doc = "The response from the ` ` command."]
     #[serde(rename = "solid3d_get_all_edge_faces")]
     Solid3DGetAllEdgeFaces {
         #[doc = "The response from the `Solid3dGetAllEdgeFaces` command."]
@@ -7895,6 +8105,12 @@ pub enum OkModelingCmdResponse {
     CenterOfMass {
         #[doc = "The center of mass response."]
         data: CenterOfMass,
+    },
+    #[doc = "The response from the ` ` command."]
+    #[serde(rename = "solid3d_get_extrusion_face_info")]
+    Solid3DGetExtrusionFaceInfo {
+        #[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces)"]
+        data: Solid3DGetExtrusionFaceInfo,
     },
     #[doc = "The response from the ` ` command."]
     #[serde(rename = "get_sketch_mode_plane")]
@@ -9409,6 +9625,168 @@ impl tabled::Tabled for RtcSessionDescription {
     }
 }
 
+#[doc = "A SAML identity provider."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SamlIdentityProvider {
+    #[doc = "The ACS (Assertion Consumer Service) url."]
+    pub acs_url: String,
+    #[doc = "The date and time the SAML identity provider was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The unique identifier for the SAML identity provider."]
+    pub id: uuid::Uuid,
+    #[doc = "The entity ID of the SAML identity provider."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub idp_entity_id: Option<String>,
+    #[doc = "The metadata document as a string."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub idp_metadata_document_string: Option<String>,
+    #[doc = "The organization ID the SAML identity provider belongs to."]
+    pub org_id: uuid::Uuid,
+    #[doc = "The private key for the SAML identity provider. This is the PEM corresponding to the X509 pair."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub private_key: Option<base64::Base64Data>,
+    #[doc = "The public certificate for the SAML identity provider. This is the PEM corresponding to the X509 pair."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub public_cert: Option<base64::Base64Data>,
+    #[doc = "The SLO (Single Logout) url."]
+    pub slo_url: String,
+    #[doc = "The technical contact email address for the SAML identity provider."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub technical_contact_email: Option<String>,
+    #[doc = "The date and time the SAML identity provider was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Display for SamlIdentityProvider {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SamlIdentityProvider {
+    const LENGTH: usize = 11;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.acs_url.clone().into(),
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.id).into(),
+            if let Some(idp_entity_id) = &self.idp_entity_id {
+                format!("{:?}", idp_entity_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(idp_metadata_document_string) = &self.idp_metadata_document_string {
+                format!("{:?}", idp_metadata_document_string).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.org_id).into(),
+            if let Some(private_key) = &self.private_key {
+                format!("{:?}", private_key).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(public_cert) = &self.public_cert {
+                format!("{:?}", public_cert).into()
+            } else {
+                String::new().into()
+            },
+            self.slo_url.clone().into(),
+            if let Some(technical_contact_email) = &self.technical_contact_email {
+                format!("{:?}", technical_contact_email).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.updated_at).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "acs_url".into(),
+            "created_at".into(),
+            "id".into(),
+            "idp_entity_id".into(),
+            "idp_metadata_document_string".into(),
+            "org_id".into(),
+            "private_key".into(),
+            "public_cert".into(),
+            "slo_url".into(),
+            "technical_contact_email".into(),
+            "updated_at".into(),
+        ]
+    }
+}
+
+#[doc = "Parameters for creating a SAML identity provider."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SamlIdentityProviderCreate {
+    #[doc = "The entity ID of the SAML identity provider."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub idp_entity_id: Option<String>,
+    #[doc = "The source of an identity provider metadata descriptor."]
+    pub idp_metadata_source: IdpMetadataSource,
+    #[doc = "The request signing key pair."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub signing_keypair: Option<DerEncodedKeyPair>,
+    #[doc = "The technical contact email address for the SAML identity provider."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub technical_contact_email: Option<String>,
+}
+
+impl std::fmt::Display for SamlIdentityProviderCreate {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SamlIdentityProviderCreate {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(idp_entity_id) = &self.idp_entity_id {
+                format!("{:?}", idp_entity_id).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.idp_metadata_source).into(),
+            if let Some(signing_keypair) = &self.signing_keypair {
+                format!("{:?}", signing_keypair).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(technical_contact_email) = &self.technical_contact_email {
+                format!("{:?}", technical_contact_email).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "idp_entity_id".into(),
+            "idp_metadata_source".into(),
+            "signing_keypair".into(),
+            "technical_contact_email".into(),
+        ]
+    }
+}
+
 #[doc = "The type of scene selection change"]
 #[derive(
     serde :: Serialize,
@@ -9693,6 +10071,37 @@ impl tabled::Tabled for Solid3DGetAllOppositeEdges {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["edges".into()]
+    }
+}
+
+#[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces)"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DGetExtrusionFaceInfo {
+    #[doc = "Details of each face."]
+    pub faces: Vec<ExtrusionFaceInfo>,
+}
+
+impl std::fmt::Display for Solid3DGetExtrusionFaceInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DGetExtrusionFaceInfo {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.faces).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["faces".into()]
     }
 }
 
@@ -12121,6 +12530,8 @@ pub struct UpdateUser {
     #[doc = "The user's GitHub handle."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub github: Option<String>,
+    #[doc = "The image URL for the user. NOTE: If the user uses an OAuth2 provider, this will be overwritten by the provider's image URL when the user logs in next."]
+    pub image: String,
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,
@@ -12141,7 +12552,7 @@ impl std::fmt::Display for UpdateUser {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UpdateUser {
-    const LENGTH: usize = 6;
+    const LENGTH: usize = 7;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(company) = &self.company {
@@ -12164,6 +12575,7 @@ impl tabled::Tabled for UpdateUser {
             } else {
                 String::new().into()
             },
+            self.image.clone().into(),
             if let Some(last_name) = &self.last_name {
                 format!("{:?}", last_name).into()
             } else {
@@ -12179,6 +12591,7 @@ impl tabled::Tabled for UpdateUser {
             "discord".into(),
             "first_name".into(),
             "github".into(),
+            "image".into(),
             "last_name".into(),
             "phone".into(),
         ]
@@ -12517,11 +12930,11 @@ impl tabled::Tabled for UserResultsPage {
     }
 }
 
-#[doc = "A verification token for a user.\n\nThis is typically used to verify a user's email address."]
+#[doc = "A verification token response."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct VerificationToken {
+pub struct VerificationTokenResponse {
     #[doc = "The date and time the verification token was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The date and time the verification token expires."]
@@ -12531,11 +12944,14 @@ pub struct VerificationToken {
     #[doc = "The identifier for the user. This is typically the user's email address since that is what we are verifying."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub identifier: Option<String>,
+    #[doc = "The URL to redirect to if the user requires SAML authentication."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub saml_redirect_url: Option<String>,
     #[doc = "The date and time the verification token was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
-impl std::fmt::Display for VerificationToken {
+impl std::fmt::Display for VerificationTokenResponse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -12546,8 +12962,8 @@ impl std::fmt::Display for VerificationToken {
 }
 
 #[cfg(feature = "tabled")]
-impl tabled::Tabled for VerificationToken {
-    const LENGTH: usize = 5;
+impl tabled::Tabled for VerificationTokenResponse {
+    const LENGTH: usize = 6;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.created_at).into(),
@@ -12555,6 +12971,11 @@ impl tabled::Tabled for VerificationToken {
             format!("{:?}", self.id).into(),
             if let Some(identifier) = &self.identifier {
                 format!("{:?}", identifier).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(saml_redirect_url) = &self.saml_redirect_url {
+                format!("{:?}", saml_redirect_url).into()
             } else {
                 String::new().into()
             },
@@ -12568,6 +12989,7 @@ impl tabled::Tabled for VerificationToken {
             "expires".into(),
             "id".into(),
             "identifier".into(),
+            "saml_redirect_url".into(),
             "updated_at".into(),
         ]
     }
