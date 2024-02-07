@@ -175,7 +175,7 @@ fn test_empty_phone_number() {
 }"#
     );
 
-    let user_info_str = r#"{"first_name":"John","last_name":"Doe","company":"Example Company","github":"@example-company","discord":"@example-company"}"#;
+    let user_info_str = r#"{"first_name":"John","last_name":"Doe","company":"Example Company","github":"@example-company","discord":"@example-company","image": ""}"#;
     assert_eq!(
         serde_json::from_str::<crate::types::UpdateUser>(user_info_str).unwrap(),
         user_info
