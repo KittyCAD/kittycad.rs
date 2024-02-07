@@ -4,7 +4,7 @@
     "path": "/info/x-rust",
     "value": {
       "client": "// Authenticate via an API token.\nlet client = kittycad::Client::new(\"$TOKEN\");\n\n// - OR -\n\n// Authenticate with your token and host parsed from the environment variables:\n// `KITTYCAD_API_TOKEN`.\nlet client = kittycad::Client::new_from_env();",
-      "install": "[dependencies]\nkittycad = \"0.2.49\""
+      "install": "[dependencies]\nkittycad = \"0.2.50\""
     }
   },
   {
@@ -123,7 +123,7 @@
     "op": "add",
     "path": "/paths/~1auth~1email/post/x-rust",
     "value": {
-      "example": "/// Create an email verification request for a user.\nasync fn example_hidden_auth_email() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::VerificationToken = client\n        .hidden()\n        .auth_email(&kittycad::types::EmailAuthenticationForm {\n            callback_url: Some(\"https://example.com/foo/bar\".to_string()),\n            email: \"email@example.com\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Create an email verification request for a user.\nasync fn example_hidden_auth_email() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::VerificationTokenResponse = client\n        .hidden()\n        .auth_email(&kittycad::types::EmailAuthenticationForm {\n            callback_url: Some(\"https://example.com/foo/bar\".to_string()),\n            email: \"email@example.com\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.auth_email"
     }
   },
@@ -133,6 +133,22 @@
     "value": {
       "example": "/// Listen for callbacks for email verification for users.\n/// \n/// **Parameters:**\n/// \n/// - `callback_url: Option<String>`: The URL to redirect back to after we have authenticated.\n/// - `email: &'astr`: The user's email. (required)\n/// - `token: &'astr`: The verification token. (required)\nasync fn example_hidden_auth_email_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .auth_email_callback(\n            Some(\"https://example.com/foo/bar\".to_string()),\n            \"email@example.com\",\n            \"some-string\",\n        )\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.auth_email_callback"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1auth~1saml~1provider~1{provider_id}~1login/get/x-rust",
+    "value": {
+      "example": "/// Get a redirect straight to the SAML IdP.\n/// \n/// The UI uses this to avoid having to ask the API anything about the IdP. It already knows the SAML IdP ID from the path, so it can just link to this path and rely on the API to redirect to the actual IdP.\n/// \n/// **Parameters:**\n/// \n/// - `callback_url: Option<String>`: The URL to redirect back to after we have authenticated.\n/// - `provider_id: uuid::Uuid`: The ID of the identity provider. (required)\nuse std::str::FromStr;\nasync fn example_hidden_get_auth_saml() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .get_auth_saml(\n            Some(\"https://example.com/foo/bar\".to_string()),\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.get_auth_saml"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1auth~1saml~1provider~1{provider_id}~1login/post/x-rust",
+    "value": {
+      "example": "/// Authenticate a user via SAML\n/// \n/// **Parameters:**\n/// \n/// - `provider_id: uuid::Uuid`: The ID of the identity provider. (required)\nuse std::str::FromStr;\nasync fn example_hidden_post_auth_saml() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .post_auth_saml(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.post_auth_saml"
     }
   },
   {
@@ -433,6 +449,38 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1org~1saml~1idp/delete/x-rust",
+    "value": {
+      "example": "/// Delete an SAML identity provider.\n/// \n/// This endpoint requires authentication by an org admin.\nasync fn example_orgs_delete_saml_idp() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.orgs().delete_saml_idp().await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.delete_saml_idp"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1saml~1idp/get/x-rust",
+    "value": {
+      "example": "/// Get the SAML identity provider.\n/// \n/// This endpoint requires authentication by an org admin.\nasync fn example_orgs_get_saml_idp() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::SamlIdentityProvider = client.orgs().get_saml_idp().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.get_saml_idp"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1saml~1idp/post/x-rust",
+    "value": {
+      "example": "/// Create a SAML identity provider.\n/// \n/// This endpoint requires authentication by an org admin.\nasync fn example_orgs_create_saml_idp() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::SamlIdentityProvider = client\n        .orgs()\n        .create_saml_idp(&kittycad::types::SamlIdentityProviderCreate {\n            idp_entity_id: Some(\"some-string\".to_string()),\n            idp_metadata_source: kittycad::types::IdpMetadataSource::Base64EncodedXml {\n                data: kittycad::types::base64::Base64Data(\n                    \"some-base64-encoded-string\".as_bytes().to_vec(),\n                ),\n            },\n            signing_keypair: Some(kittycad::types::DerEncodedKeyPair {\n                private_key: kittycad::types::base64::Base64Data(\n                    \"some-base64-encoded-string\".as_bytes().to_vec(),\n                ),\n                public_cert: kittycad::types::base64::Base64Data(\n                    \"some-base64-encoded-string\".as_bytes().to_vec(),\n                ),\n            }),\n            technical_contact_email: Some(\"email@example.com\".to_string()),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.create_saml_idp"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1saml~1idp/put/x-rust",
+    "value": {
+      "example": "/// Update the SAML identity provider.\n/// \n/// This endpoint requires authentication by an org admin.\nasync fn example_orgs_update_saml_idp() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::SamlIdentityProvider = client\n        .orgs()\n        .update_saml_idp(&kittycad::types::SamlIdentityProviderCreate {\n            idp_entity_id: Some(\"some-string\".to_string()),\n            idp_metadata_source: kittycad::types::IdpMetadataSource::Base64EncodedXml {\n                data: kittycad::types::base64::Base64Data(\n                    \"some-base64-encoded-string\".as_bytes().to_vec(),\n                ),\n            },\n            signing_keypair: Some(kittycad::types::DerEncodedKeyPair {\n                private_key: kittycad::types::base64::Base64Data(\n                    \"some-base64-encoded-string\".as_bytes().to_vec(),\n                ),\n                public_cert: kittycad::types::base64::Base64Data(\n                    \"some-base64-encoded-string\".as_bytes().to_vec(),\n                ),\n            }),\n            technical_contact_email: Some(\"email@example.com\".to_string()),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.update_saml_idp"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1ping/get/x-rust",
     "value": {
       "example": "/// Return pong.\nasync fn example_meta_ping() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Pong = client.meta().ping().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
@@ -563,7 +611,7 @@
     "op": "add",
     "path": "/paths/~1user/put/x-rust",
     "value": {
-      "example": "/// Update your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates information about the authenticated user.\nuse std::str::FromStr;\nasync fn example_users_update_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client\n        .users()\n        .update_self(&kittycad::types::UpdateUser {\n            company: Some(\"some-string\".to_string()),\n            discord: Some(\"some-string\".to_string()),\n            first_name: Some(\"some-string\".to_string()),\n            github: Some(\"some-string\".to_string()),\n            last_name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Update your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates information about the authenticated user.\nuse std::str::FromStr;\nasync fn example_users_update_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client\n        .users()\n        .update_self(&kittycad::types::UpdateUser {\n            company: Some(\"some-string\".to_string()),\n            discord: Some(\"some-string\".to_string()),\n            first_name: Some(\"some-string\".to_string()),\n            github: Some(\"some-string\".to_string()),\n            image: \"https://example.com/foo/bar\".to_string(),\n            last_name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.update_self"
     }
   },

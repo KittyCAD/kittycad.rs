@@ -160,6 +160,7 @@ fn test_empty_phone_number() {
         company: Some("Example Company".to_string()),
         github: Some("@example-company".to_string()),
         discord: Some("@example-company".to_string()),
+        image: "".to_string(),
     };
 
     assert_eq!(
@@ -169,6 +170,7 @@ fn test_empty_phone_number() {
   "discord": "@example-company",
   "first_name": "John",
   "github": "@example-company",
+  "image": "",
   "last_name": "Doe"
 }"#
     );
