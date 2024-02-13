@@ -15488,6 +15488,13 @@
                   }
                 ]
               },
+              "sequence": {
+                "nullable": true,
+                "description": "Logical timestamp. The client should increment this with every event in the current mouse drag. That way, if the events are being sent over an unordered channel, the API can ignore the older events.",
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -15516,6 +15523,73 @@
               "type",
               "up",
               "vantage"
+            ]
+          },
+          {
+            "description": "Change all perspective camera settings",
+            "type": "object",
+            "properties": {
+              "center": {
+                "description": "What the camera is looking at. Center of the camera's field of vision",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "fov_y": {
+                "description": "The field of view angle in the y direction, in degrees.",
+                "type": "number",
+                "format": "float"
+              },
+              "sequence": {
+                "nullable": true,
+                "description": "Logical timestamp. The client should increment this with every event in the current mouse drag. That way, if the events are being sent over an unordered channel, the API can ignore the older events.",
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_perspective_settings"
+                ]
+              },
+              "up": {
+                "description": "Which way is \"up\", from the camera's point of view.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "vantage": {
+                "description": "Where the camera is positioned",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "z_far": {
+                "description": "The distance to the far clipping plane.",
+                "type": "number",
+                "format": "float"
+              },
+              "z_near": {
+                "description": "The distance to the near clipping plane.",
+                "type": "number",
+                "format": "float"
+              }
+            },
+            "required": [
+              "center",
+              "fov_y",
+              "type",
+              "up",
+              "vantage",
+              "z_far",
+              "z_near"
             ]
           },
           {
