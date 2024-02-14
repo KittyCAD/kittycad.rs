@@ -364,13 +364,138 @@
         }
       }
     },
+    "/ai/kcl/completions": {
+      "post": {
+        "tags": [
+          "ai",
+          "beta"
+        ],
+        "summary": "Generate code completions for KCL.",
+        "operationId": "create_kcl_code_completions",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KclCodeCompletionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KclCodeCompletionResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_kcl_code_completions",
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/ai/text-to-cad/{output_format}": {
       "post": {
         "tags": [
           "ai"
         ],
         "summary": "Generate a CAD model from text.",
-        "description": "Because our source of truth for the resulting model is a STEP file, you will always have STEP file contents when you list your generated models. Any other formats you request here will also be returned when you list your generated models.\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nOne thing to note, if you hit the cache, this endpoint will return right away. So you only have to wait if the status is not `Completed` or `Failed`.\nThis is an alpha endpoint. It will change in the future. The current output is honestly pretty bad. So if you find this endpoint, you get what you pay for, which currently is nothing. But in the future will be made a lot better.",
+        "description": "Because our source of truth for the resulting model is a STEP file, you will always have STEP file contents when you list your generated models. Any other formats you request here will also be returned when you list your generated models.\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nOne thing to note, if you hit the cache, this endpoint will return right away. So you only have to wait if the status is not `Completed` or `Failed`.",
         "operationId": "create_text_to_cad",
         "parameters": [
           {
@@ -15031,6 +15156,127 @@
             "format": "int64"
           }
         }
+      },
+      "KclCodeCompletionParams": {
+        "description": "Extra params for the completions.",
+        "type": "object",
+        "properties": {
+          "language": {
+            "description": "The language of the code.",
+            "type": "string"
+          },
+          "next_indent": {
+            "description": "The next indent of the code.",
+            "type": "integer",
+            "format": "int8"
+          },
+          "prompt_tokens": {
+            "description": "The prompt tokens for the completions.",
+            "type": "integer",
+            "format": "int32"
+          },
+          "suffix_tokens": {
+            "description": "The suffix tokens for the completions.",
+            "type": "integer",
+            "format": "int32"
+          },
+          "trim_by_indentation": {
+            "description": "If we should trim by indentation.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "language",
+          "next_indent",
+          "prompt_tokens",
+          "suffix_tokens",
+          "trim_by_indentation"
+        ]
+      },
+      "KclCodeCompletionRequest": {
+        "description": "A request to generate KCL code completions.",
+        "type": "object",
+        "properties": {
+          "extra": {
+            "description": "Extra parameters for the completions.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclCodeCompletionParams"
+              }
+            ]
+          },
+          "max_tokens": {
+            "description": "The maximum number of tokens that can be generated for the completions. The total length of input tokens and generated tokens is limited by the model’s context length.",
+            "type": "integer",
+            "format": "int32"
+          },
+          "n": {
+            "description": "How many completion choices to generate for each input message.",
+            "type": "integer",
+            "format": "int16"
+          },
+          "nwo": {
+            "description": "New workflows. This does not do anything yet. But we wanted the same API as GitHub Copilot.",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "The prompt for the model.",
+            "type": "string"
+          },
+          "stop": {
+            "description": "Up to 4 sequences where the API will stop generating further tokens.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "stream": {
+            "description": "If set, partial message deltas will be sent, like in ChatGPT or OpenAPI. Tokens will be sent as data-only server-sent events as they become available, with the stream terminated by a data: [DONE] message.",
+            "type": "boolean"
+          },
+          "suffix": {
+            "description": "The suffix for the model.",
+            "type": "string"
+          },
+          "temperature": {
+            "description": "The temperature for the model.",
+            "type": "number",
+            "format": "float"
+          },
+          "top_p": {
+            "description": "The top p for the model.",
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "required": [
+          "extra",
+          "max_tokens",
+          "n",
+          "nwo",
+          "prompt",
+          "stop",
+          "stream",
+          "suffix",
+          "temperature",
+          "top_p"
+        ]
+      },
+      "KclCodeCompletionResponse": {
+        "description": "A response with KCL code completions.",
+        "type": "object",
+        "properties": {
+          "completions": {
+            "description": "The completions.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "completions"
+        ]
       },
       "LeafNode": {
         "description": "Leaf node information.",
