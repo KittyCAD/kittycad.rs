@@ -7846,6 +7846,8 @@ pub enum ModelingCmd {
     #[doc = "Sketch on some entity (e.g. a plane, a face)"]
     #[serde(rename = "enable_sketch_mode")]
     EnableSketchMode {
+        #[doc = "Should the camera move at all?"]
+        adjust_camera: bool,
         #[doc = "Should we animate or snap for the camera transition?"]
         animated: bool,
         #[doc = "Which entity to sketch on."]
