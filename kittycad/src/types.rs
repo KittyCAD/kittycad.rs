@@ -6952,6 +6952,163 @@ impl tabled::Tabled for JetstreamStats {
     }
 }
 
+#[doc = "Extra params for the completions."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct KclCodeCompletionParams {
+    #[doc = "The language of the code."]
+    pub language: String,
+    #[doc = "The next indent of the code."]
+    pub next_indent: i8,
+    #[doc = "The prompt tokens for the completions."]
+    pub prompt_tokens: i32,
+    #[doc = "The suffix tokens for the completions."]
+    pub suffix_tokens: i32,
+    #[doc = "If we should trim by indentation."]
+    pub trim_by_indentation: bool,
+}
+
+impl std::fmt::Display for KclCodeCompletionParams {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for KclCodeCompletionParams {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.language.clone().into(),
+            format!("{:?}", self.next_indent).into(),
+            format!("{:?}", self.prompt_tokens).into(),
+            format!("{:?}", self.suffix_tokens).into(),
+            format!("{:?}", self.trim_by_indentation).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "language".into(),
+            "next_indent".into(),
+            "prompt_tokens".into(),
+            "suffix_tokens".into(),
+            "trim_by_indentation".into(),
+        ]
+    }
+}
+
+#[doc = "A request to generate KCL code completions."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct KclCodeCompletionRequest {
+    #[doc = "Extra parameters for the completions."]
+    pub extra: KclCodeCompletionParams,
+    #[doc = "The maximum number of tokens that can be generated for the completions. The total \
+             length of input tokens and generated tokens is limited by the model’s context length."]
+    pub max_tokens: i32,
+    #[doc = "How many completion choices to generate for each input message."]
+    pub n: i16,
+    #[doc = "New workflows. This does not do anything yet. But we wanted the same API as GitHub \
+             Copilot."]
+    pub nwo: String,
+    #[doc = "The prompt for the model."]
+    pub prompt: String,
+    #[doc = "Up to 4 sequences where the API will stop generating further tokens."]
+    pub stop: Vec<String>,
+    #[doc = "If set, partial message deltas will be sent, like in ChatGPT or OpenAPI. Tokens will \
+             be sent as data-only server-sent events as they become available, with the stream \
+             terminated by a data: [DONE] message."]
+    pub stream: bool,
+    #[doc = "The suffix for the model."]
+    pub suffix: String,
+    #[doc = "The temperature for the model."]
+    pub temperature: f64,
+    #[doc = "The top p for the model."]
+    pub top_p: f64,
+}
+
+impl std::fmt::Display for KclCodeCompletionRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for KclCodeCompletionRequest {
+    const LENGTH: usize = 10;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.extra).into(),
+            format!("{:?}", self.max_tokens).into(),
+            format!("{:?}", self.n).into(),
+            self.nwo.clone().into(),
+            self.prompt.clone().into(),
+            format!("{:?}", self.stop).into(),
+            format!("{:?}", self.stream).into(),
+            self.suffix.clone().into(),
+            format!("{:?}", self.temperature).into(),
+            format!("{:?}", self.top_p).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "extra".into(),
+            "max_tokens".into(),
+            "n".into(),
+            "nwo".into(),
+            "prompt".into(),
+            "stop".into(),
+            "stream".into(),
+            "suffix".into(),
+            "temperature".into(),
+            "top_p".into(),
+        ]
+    }
+}
+
+#[doc = "A response with KCL code completions."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct KclCodeCompletionResponse {
+    #[doc = "The completions."]
+    pub completions: Vec<String>,
+}
+
+impl std::fmt::Display for KclCodeCompletionResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for KclCodeCompletionResponse {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.completions).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["completions".into()]
+    }
+}
+
 #[doc = "Leaf node information."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
