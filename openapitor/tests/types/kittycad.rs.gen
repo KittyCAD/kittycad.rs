@@ -6831,15 +6831,20 @@ impl tabled::Tabled for JetstreamStats {
 )]
 pub struct KclCodeCompletionParams {
     #[doc = "The language of the code."]
-    pub language: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub language: Option<String>,
     #[doc = "The next indent of the code."]
-    pub next_indent: i8,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_indent: Option<u8>,
     #[doc = "The prompt tokens for the completions."]
-    pub prompt_tokens: i32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt_tokens: Option<u32>,
     #[doc = "The suffix tokens for the completions."]
-    pub suffix_tokens: i32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub suffix_tokens: Option<u32>,
     #[doc = "If we should trim by indentation."]
-    pub trim_by_indentation: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trim_by_indentation: Option<bool>,
 }
 
 impl std::fmt::Display for KclCodeCompletionParams {
@@ -6857,11 +6862,31 @@ impl tabled::Tabled for KclCodeCompletionParams {
     const LENGTH: usize = 5;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.language.clone().into(),
-            format!("{:?}", self.next_indent).into(),
-            format!("{:?}", self.prompt_tokens).into(),
-            format!("{:?}", self.suffix_tokens).into(),
-            format!("{:?}", self.trim_by_indentation).into(),
+            if let Some(language) = &self.language {
+                format!("{:?}", language).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(next_indent) = &self.next_indent {
+                format!("{:?}", next_indent).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(prompt_tokens) = &self.prompt_tokens {
+                format!("{:?}", prompt_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(suffix_tokens) = &self.suffix_tokens {
+                format!("{:?}", suffix_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(trim_by_indentation) = &self.trim_by_indentation {
+                format!("{:?}", trim_by_indentation).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
@@ -6882,25 +6907,35 @@ impl tabled::Tabled for KclCodeCompletionParams {
 )]
 pub struct KclCodeCompletionRequest {
     #[doc = "Extra parameters for the completions."]
-    pub extra: KclCodeCompletionParams,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub extra: Option<KclCodeCompletionParams>,
     #[doc = "The maximum number of tokens that can be generated for the completions. The total length of input tokens and generated tokens is limited by the model’s context length."]
-    pub max_tokens: i32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_tokens: Option<u16>,
     #[doc = "How many completion choices to generate for each input message."]
-    pub n: i16,
-    #[doc = "New workflows. This does not do anything yet. But we wanted the same API as GitHub Copilot."]
-    pub nwo: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub n: Option<u8>,
+    #[doc = "For GitHub copilot this is the `{org}/{repo}`. This does not do anything yet. But we wanted the same API as GitHub Copilot. It might be used in the future."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub nwo: Option<String>,
     #[doc = "The prompt for the model."]
-    pub prompt: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt: Option<String>,
     #[doc = "Up to 4 sequences where the API will stop generating further tokens."]
-    pub stop: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stop: Option<Vec<String>>,
     #[doc = "If set, partial message deltas will be sent, like in ChatGPT or OpenAPI. Tokens will be sent as data-only server-sent events as they become available, with the stream terminated by a data: [DONE] message."]
-    pub stream: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stream: Option<bool>,
     #[doc = "The suffix for the model."]
-    pub suffix: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub suffix: Option<String>,
     #[doc = "The temperature for the model."]
-    pub temperature: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub temperature: Option<f64>,
     #[doc = "The top p for the model."]
-    pub top_p: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub top_p: Option<f64>,
 }
 
 impl std::fmt::Display for KclCodeCompletionRequest {
@@ -6918,16 +6953,56 @@ impl tabled::Tabled for KclCodeCompletionRequest {
     const LENGTH: usize = 10;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.extra).into(),
-            format!("{:?}", self.max_tokens).into(),
-            format!("{:?}", self.n).into(),
-            self.nwo.clone().into(),
-            self.prompt.clone().into(),
-            format!("{:?}", self.stop).into(),
-            format!("{:?}", self.stream).into(),
-            self.suffix.clone().into(),
-            format!("{:?}", self.temperature).into(),
-            format!("{:?}", self.top_p).into(),
+            if let Some(extra) = &self.extra {
+                format!("{:?}", extra).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(max_tokens) = &self.max_tokens {
+                format!("{:?}", max_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(n) = &self.n {
+                format!("{:?}", n).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(nwo) = &self.nwo {
+                format!("{:?}", nwo).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(prompt) = &self.prompt {
+                format!("{:?}", prompt).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(stop) = &self.stop {
+                format!("{:?}", stop).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(stream) = &self.stream {
+                format!("{:?}", stream).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(suffix) = &self.suffix {
+                format!("{:?}", suffix).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(temperature) = &self.temperature {
+                format!("{:?}", temperature).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(top_p) = &self.top_p {
+                format!("{:?}", top_p).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 

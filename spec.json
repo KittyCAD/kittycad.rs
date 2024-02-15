@@ -15163,35 +15163,36 @@
         "properties": {
           "language": {
             "description": "The language of the code.",
+            "default": "",
             "type": "string"
           },
           "next_indent": {
+            "nullable": true,
             "description": "The next indent of the code.",
             "type": "integer",
-            "format": "int8"
+            "format": "uint8",
+            "minimum": 0
           },
           "prompt_tokens": {
+            "nullable": true,
             "description": "The prompt tokens for the completions.",
             "type": "integer",
-            "format": "int32"
+            "format": "uint32",
+            "minimum": 0
           },
           "suffix_tokens": {
+            "nullable": true,
             "description": "The suffix tokens for the completions.",
             "type": "integer",
-            "format": "int32"
+            "format": "uint32",
+            "minimum": 0
           },
           "trim_by_indentation": {
             "description": "If we should trim by indentation.",
+            "default": false,
             "type": "boolean"
           }
-        },
-        "required": [
-          "language",
-          "next_indent",
-          "prompt_tokens",
-          "suffix_tokens",
-          "trim_by_indentation"
-        ]
+        }
       },
       "KclCodeCompletionRequest": {
         "description": "A request to generate KCL code completions.",
@@ -15199,6 +15200,10 @@
         "properties": {
           "extra": {
             "description": "Extra parameters for the completions.",
+            "default": {
+              "language": "",
+              "trim_by_indentation": false
+            },
             "allOf": [
               {
                 "$ref": "#/components/schemas/KclCodeCompletionParams"
@@ -15206,21 +15211,27 @@
             ]
           },
           "max_tokens": {
+            "nullable": true,
             "description": "The maximum number of tokens that can be generated for the completions. The total length of input tokens and generated tokens is limited by the model’s context length.",
             "type": "integer",
-            "format": "int32"
+            "format": "uint16",
+            "minimum": 0
           },
           "n": {
+            "nullable": true,
             "description": "How many completion choices to generate for each input message.",
             "type": "integer",
-            "format": "int16"
+            "format": "uint8",
+            "minimum": 0
           },
           "nwo": {
-            "description": "New workflows. This does not do anything yet. But we wanted the same API as GitHub Copilot.",
+            "nullable": true,
+            "description": "For GitHub copilot this is the `{org}/{repo}`. This does not do anything yet. But we wanted the same API as GitHub Copilot. It might be used in the future.",
             "type": "string"
           },
           "prompt": {
             "description": "The prompt for the model.",
+            "default": "",
             "type": "string"
           },
           "stop": {
@@ -15232,35 +15243,27 @@
           },
           "stream": {
             "description": "If set, partial message deltas will be sent, like in ChatGPT or OpenAPI. Tokens will be sent as data-only server-sent events as they become available, with the stream terminated by a data: [DONE] message.",
+            "default": false,
             "type": "boolean"
           },
           "suffix": {
             "description": "The suffix for the model.",
+            "default": "",
             "type": "string"
           },
           "temperature": {
+            "nullable": true,
             "description": "The temperature for the model.",
             "type": "number",
             "format": "float"
           },
           "top_p": {
+            "nullable": true,
             "description": "The top p for the model.",
             "type": "number",
             "format": "float"
           }
-        },
-        "required": [
-          "extra",
-          "max_tokens",
-          "n",
-          "nwo",
-          "prompt",
-          "stop",
-          "stream",
-          "suffix",
-          "temperature",
-          "top_p"
-        ]
+        }
       },
       "KclCodeCompletionResponse": {
         "description": "A response with KCL code completions.",
