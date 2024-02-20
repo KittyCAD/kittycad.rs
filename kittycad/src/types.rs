@@ -7674,6 +7674,13 @@ pub enum ModelingCmd {
     #[doc = "Find all IDs of selected entities"]
     #[serde(rename = "select_get")]
     SelectGet {},
+    #[doc = "Set the units of the scene. For all following commands, the units will be \
+             interpreted as the given units."]
+    #[serde(rename = "set_scene_units")]
+    SetSceneUnits {
+        #[doc = "Which units the scene uses."]
+        unit: UnitLength,
+    },
     #[doc = "Changes the current highlighted entity to whichever one is at the given window \
              coordinate. If there's no entity at this location, clears the highlight."]
     #[serde(rename = "highlight_set_entity")]
@@ -7750,7 +7757,7 @@ pub enum ModelingCmd {
     #[doc = "Gets all edges which are opposite the given edge, across all possible faces."]
     #[serde(rename = "solid3d_get_all_opposite_edges")]
     Solid3DGetAllOppositeEdges {
-        #[doc = "If given, ohnly faces parallel to this vector will be considered."]
+        #[doc = "If given, only faces parallel to this vector will be considered."]
         along_vector: Option<Point3D>,
         #[doc = "Which edge you want the opposites of."]
         edge_id: uuid::Uuid,

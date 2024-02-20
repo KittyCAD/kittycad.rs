@@ -13010,13 +13010,19 @@
         "properties": {
           "max_distance": {
             "description": "The maximum distance between the input entities.",
-            "type": "number",
-            "format": "double"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LengthUnit"
+              }
+            ]
           },
           "min_distance": {
             "description": "The minimum distance between the input entities.",
-            "type": "number",
-            "format": "double"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LengthUnit"
+              }
+            ]
           }
         },
         "required": [
@@ -15310,6 +15316,10 @@
           }
         }
       },
+      "LengthUnit": {
+        "type": "number",
+        "format": "double"
+      },
       "Mass": {
         "description": "The mass response.",
         "type": "object",
@@ -15573,8 +15583,11 @@
               },
               "distance": {
                 "description": "How far off the plane to extrude",
-                "type": "number",
-                "format": "double"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
               },
               "target": {
                 "description": "Which sketch to extrude. Must be a closed 2D solid.",
@@ -16261,6 +16274,30 @@
             ]
           },
           {
+            "description": "Set the units of the scene. For all following commands, the units will be interpreted as the given units.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_scene_units"
+                ]
+              },
+              "unit": {
+                "description": "Which units the scene uses.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "type",
+              "unit"
+            ]
+          },
+          {
             "description": "Changes the current highlighted entity to whichever one is at the given window coordinate. If there's no entity at this location, clears the highlight.",
             "type": "object",
             "properties": {
@@ -16511,7 +16548,7 @@
             "properties": {
               "along_vector": {
                 "nullable": true,
-                "description": "If given, ohnly faces parallel to this vector will be considered.",
+                "description": "If given, only faces parallel to this vector will be considered.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Point3d"
@@ -16656,8 +16693,11 @@
               },
               "radius": {
                 "description": "The radius of the fillet. Measured in length (using the same units that the current sketch uses). Must be positive (i.e. greater than zero).",
-                "type": "number",
-                "format": "double"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
               },
               "type": {
                 "type": "string",
@@ -16781,8 +16821,11 @@
               },
               "size": {
                 "description": "What should the plane's span/extent? When rendered visually, this is both the width and height along X and Y axis respectively.",
-                "type": "number",
-                "format": "double"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
               },
               "type": {
                 "type": "string",
@@ -17805,8 +17848,11 @@
               },
               "spacing": {
                 "description": "Spacing between repetitions.",
-                "type": "number",
-                "format": "double"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
               },
               "type": {
                 "type": "string",
@@ -19585,8 +19631,11 @@
               },
               "radius": {
                 "description": "Radius of the circle",
-                "type": "number",
-                "format": "double"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
               },
               "relative": {
                 "description": "Whether or not this arc is a relative offset",
@@ -19677,8 +19726,11 @@
               },
               "radius": {
                 "description": "Radius of the arc. Not to be confused with Raiders of the Lost Ark.",
-                "type": "number",
-                "format": "double"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
               },
               "type": {
                 "type": "string",
@@ -19927,12 +19979,10 @@
         "type": "object",
         "properties": {
           "x": {
-            "type": "number",
-            "format": "double"
+            "$ref": "#/components/schemas/LengthUnit"
           },
           "y": {
-            "type": "number",
-            "format": "double"
+            "$ref": "#/components/schemas/LengthUnit"
           }
         },
         "required": [
