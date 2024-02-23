@@ -487,7 +487,7 @@ pub struct AddOrgMember {
     #[doc = "The email address of the user to add to the org."]
     pub email: String,
     #[doc = "The organization role to give the user."]
-    pub role: OrgRole,
+    pub role: UserOrgRole,
 }
 
 impl std::fmt::Display for AddOrgMember {
@@ -3658,6 +3658,10 @@ pub struct CustomerBalance {
     pub id: uuid::Uuid,
     #[doc = "The mapping id of the user or org."]
     pub map_id: uuid::Uuid,
+    #[doc = "The enterprise price for the Modeling App subscription, if they are on the \
+             enterprise plan."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub modeling_app_enterprise_price: Option<SubscriptionTierPrice>,
     #[doc = "The monthy credits remaining in the balance. This gets re-upped every month, but if \
              the credits are not used for a month they do not carry over to the next month. It is \
              a stable amount granted to the customer per month."]
@@ -3677,6 +3681,12 @@ pub struct CustomerBalance {
              time a bill is paid with the balance. This number increases every time a customer \
              adds funds to their balance. This may be through a subscription or a one off payment."]
     pub pre_pay_credits_remaining: f64,
+    #[doc = "Details about the subscription."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub subscription_details: Option<ZooProductSubscriptions>,
+    #[doc = "The subscription ID for the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub subscription_id: Option<String>,
     #[doc = "This includes any outstanding, draft, or open invoices and any pending invoice \
              items. This does not include any credits the customer has on their account."]
     pub total_due: f64,
@@ -3696,15 +3706,30 @@ impl std::fmt::Display for CustomerBalance {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CustomerBalance {
-    const LENGTH: usize = 8;
+    const LENGTH: usize = 11;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.created_at).into(),
             format!("{:?}", self.id).into(),
             format!("{:?}", self.map_id).into(),
+            if let Some(modeling_app_enterprise_price) = &self.modeling_app_enterprise_price {
+                format!("{:?}", modeling_app_enterprise_price).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.monthly_credits_remaining).into(),
             format!("{:?}", self.pre_pay_cash_remaining).into(),
             format!("{:?}", self.pre_pay_credits_remaining).into(),
+            if let Some(subscription_details) = &self.subscription_details {
+                format!("{:?}", subscription_details).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(subscription_id) = &self.subscription_id {
+                format!("{:?}", subscription_id).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.total_due).into(),
             format!("{:?}", self.updated_at).into(),
         ]
@@ -3715,9 +3740,12 @@ impl tabled::Tabled for CustomerBalance {
             "created_at".into(),
             "id".into(),
             "map_id".into(),
+            "modeling_app_enterprise_price".into(),
             "monthly_credits_remaining".into(),
             "pre_pay_cash_remaining".into(),
             "pre_pay_credits_remaining".into(),
+            "subscription_details".into(),
+            "subscription_id".into(),
             "total_due".into(),
             "updated_at".into(),
         ]
@@ -4490,6 +4518,10 @@ pub struct ExtendedUser {
     #[doc = "If the user should be blocked and the reason why."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub block: Option<BlockReason>,
+    #[doc = "If we can train on the user's data. If the user is a member of an organization, the \
+             organization's setting will override this."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub can_train_on_data: Option<bool>,
     #[doc = "The user's company."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub company: Option<String>,
@@ -4517,6 +4549,9 @@ pub struct ExtendedUser {
     pub id: uuid::Uuid,
     #[doc = "The image avatar for the user. This is a URL."]
     pub image: String,
+    #[doc = "If the user is tied to a service account."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub is_service_account: Option<bool>,
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,
@@ -4550,11 +4585,16 @@ impl std::fmt::Display for ExtendedUser {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ExtendedUser {
-    const LENGTH: usize = 17;
+    const LENGTH: usize = 19;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(block) = &self.block {
                 format!("{:?}", block).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(can_train_on_data) = &self.can_train_on_data {
+                format!("{:?}", can_train_on_data).into()
             } else {
                 String::new().into()
             },
@@ -4596,6 +4636,11 @@ impl tabled::Tabled for ExtendedUser {
             },
             format!("{:?}", self.id).into(),
             self.image.clone().into(),
+            if let Some(is_service_account) = &self.is_service_account {
+                format!("{:?}", is_service_account).into()
+            } else {
+                String::new().into()
+            },
             if let Some(last_name) = &self.last_name {
                 format!("{:?}", last_name).into()
             } else {
@@ -4624,6 +4669,7 @@ impl tabled::Tabled for ExtendedUser {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "block".into(),
+            "can_train_on_data".into(),
             "company".into(),
             "created_at".into(),
             "discord".into(),
@@ -4634,6 +4680,7 @@ impl tabled::Tabled for ExtendedUser {
             "github".into(),
             "id".into(),
             "image".into(),
+            "is_service_account".into(),
             "last_name".into(),
             "mailchimp_id".into(),
             "name".into(),
@@ -5987,7 +6034,7 @@ pub enum ImageFormat {
     Jpeg,
 }
 
-#[doc = "File to import into the current model If you are sending binary data for a file, be sure \
+#[doc = "File to import into the current model. If you are sending binary data for a file, be sure \
          to send the WebSocketRequest as binary/bson, not text/json."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -6190,7 +6237,8 @@ pub struct Invoice {
     #[doc = "Extra information about an invoice for the customer's credit card statement."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub statement_descriptor: Option<String>,
-    #[doc = "The status of the invoice, one of `draft`, `open`, `paid`, `uncollectible`, or `void`.\n\n[Learn more](https://stripe.com/docs/billing/invoices/workflow#workflow-overview)."]
+    #[doc = "The status of the invoice, one of `draft`, `open`, `paid`, `uncollectible`, or \
+             `void`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status: Option<InvoiceStatus>,
     #[doc = "Total of all subscriptions, invoice items, and prorations on the invoice before any \
@@ -6401,8 +6449,7 @@ pub struct InvoiceLineItem {
     #[doc = "The ID of the invoice item associated with this line item if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub invoice_item: Option<String>,
-    #[doc = "Set of [key-value pairs](https://stripe.com/docs/api/metadata) that you can attach \
-             to an object.\n\nSet of key-value pairs."]
+    #[doc = "Set of key-value pairs."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub metadata: Option<std::collections::HashMap<String, String>>,
 }
@@ -7450,6 +7497,120 @@ pub enum Method {
     Extension,
 }
 
+#[doc = "A subscription tier we offer for the Modeling App."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ModelingAppSubscriptionTier {
+    #[doc = "A description of the tier."]
+    pub description: String,
+    #[doc = "Features that are included in the subscription."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub features: Option<Vec<SubscriptionTierFeature>>,
+    #[doc = "The name of the tier."]
+    pub name: ModelingAppSubscriptionTierName,
+    #[doc = "The amount of pay-as-you-go credits the individual or org gets outside the modeling \
+             app."]
+    pub pay_as_you_go_credits: f64,
+    #[doc = "The price of the tier per month. If this is for an individual, this is the price \
+             they pay. If this is for an organization, this is the price the organization pays \
+             per member in the org. This is in USD."]
+    pub price: SubscriptionTierPrice,
+    #[doc = "The support tier the subscription provides."]
+    pub support_tier: SupportTier,
+    #[doc = "The behavior of the users data (can it be used for training, etc)."]
+    pub training_data_behavior: SubscriptionTrainingDataBehavior,
+    #[doc = "If the tier is offered for an individual or an org."]
+    #[serde(rename = "type")]
+    pub type_: SubscriptionTierType,
+    #[doc = "The Zoo tools that you can call unlimited times with this tier."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub zoo_tools_included: Option<Vec<ZooTool>>,
+}
+
+impl std::fmt::Display for ModelingAppSubscriptionTier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ModelingAppSubscriptionTier {
+    const LENGTH: usize = 9;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.description.clone().into(),
+            if let Some(features) = &self.features {
+                format!("{:?}", features).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.name).into(),
+            format!("{:?}", self.pay_as_you_go_credits).into(),
+            format!("{:?}", self.price).into(),
+            format!("{:?}", self.support_tier).into(),
+            format!("{:?}", self.training_data_behavior).into(),
+            format!("{:?}", self.type_).into(),
+            if let Some(zoo_tools_included) = &self.zoo_tools_included {
+                format!("{:?}", zoo_tools_included).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "description".into(),
+            "features".into(),
+            "name".into(),
+            "pay_as_you_go_credits".into(),
+            "price".into(),
+            "support_tier".into(),
+            "training_data_behavior".into(),
+            "type_".into(),
+            "zoo_tools_included".into(),
+        ]
+    }
+}
+
+#[doc = "An enum representing a Modeling App subscription tier name."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ModelingAppSubscriptionTierName {
+    #[doc = "The free tier."]
+    #[serde(rename = "free")]
+    #[display("free")]
+    Free,
+    #[doc = "The pro tier."]
+    #[serde(rename = "pro")]
+    #[display("pro")]
+    Pro,
+    #[doc = "The team tier."]
+    #[serde(rename = "team")]
+    #[display("team")]
+    Team,
+    #[doc = "The enterprise tier."]
+    #[serde(rename = "enterprise")]
+    #[display("enterprise")]
+    Enterprise,
+}
+
 #[doc = "Commands that the KittyCAD engine can execute."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -7457,7 +7618,7 @@ pub enum Method {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum ModelingCmd {
-    #[doc = "Start a path."]
+    #[doc = "Start a new path."]
     #[serde(rename = "start_path")]
     StartPath {},
     #[doc = "Move the path's \"pen\"."]
@@ -7478,7 +7639,7 @@ pub enum ModelingCmd {
                  \"pen\" location."]
         segment: PathSegment,
     },
-    #[doc = "Extrude a 2D solid."]
+    #[doc = "Command for extruding a solid."]
     #[serde(rename = "extrude")]
     Extrude {
         #[doc = "Whether to cap the extrusion with a face, or not. If true, the resulting solid \
@@ -7516,7 +7677,7 @@ pub enum ModelingCmd {
         #[doc = "The current mouse position."]
         window: Point2D,
     },
-    #[doc = "Camera drag ended."]
+    #[doc = "Camera drag ended"]
     #[serde(rename = "camera_drag_end")]
     CameraDragEnd {
         #[doc = "The type of camera drag interaction."]
@@ -7538,7 +7699,7 @@ pub enum ModelingCmd {
         #[doc = "Where the camera is positioned"]
         vantage: Point3D,
     },
-    #[doc = "Change all perspective camera settings"]
+    #[doc = "Change what the default camera is looking at."]
     #[serde(rename = "default_camera_perspective_settings")]
     DefaultCameraPerspectiveSettings {
         #[doc = "What the camera is looking at. Center of the camera's field of vision"]
@@ -7588,12 +7749,6 @@ pub enum ModelingCmd {
     #[doc = "Disable sketch mode, from the default camera."]
     #[serde(rename = "default_camera_disable_sketch_mode")]
     DefaultCameraDisableSketchMode {},
-    #[doc = "Focus default camera on object."]
-    #[serde(rename = "default_camera_focus_on")]
-    DefaultCameraFocusOn {
-        #[doc = "UUID of object to focus on."]
-        uuid: uuid::Uuid,
-    },
     #[doc = "Export the scene to a file."]
     #[serde(rename = "export")]
     Export {
@@ -7631,15 +7786,50 @@ pub enum ModelingCmd {
         #[doc = "ID of the entity being queried."]
         entity_id: uuid::Uuid,
     },
+    #[doc = "What is the distance between these two entities?"]
+    #[serde(rename = "entity_get_distance")]
+    EntityGetDistance {
+        #[doc = "Type of distance to be measured."]
+        distance_type: DistanceType,
+        #[doc = "ID of the first entity being queried."]
+        entity_id1: uuid::Uuid,
+        #[doc = "ID of the second entity being queried."]
+        entity_id2: uuid::Uuid,
+    },
+    #[doc = "Create a linear pattern using this entity (currently only valid for 3D solids)."]
+    #[serde(rename = "entity_linear_pattern")]
+    EntityLinearPattern {
+        #[doc = "Axis along which to make the copies"]
+        axis: Point3D,
+        #[doc = "ID of the entity being copied."]
+        entity_id: uuid::Uuid,
+        #[doc = "Number of repetitions to make."]
+        num_repetitions: u32,
+        #[doc = "Spacing between repetitions."]
+        spacing: f64,
+    },
+    #[doc = "Create a circular pattern using this entity (currently only valid for 3D solids)."]
+    #[serde(rename = "entity_circular_pattern")]
+    EntityCircularPattern {
+        #[doc = "Arc angle (in degrees) to place repetitions along."]
+        arc_degrees: f64,
+        #[doc = "Axis around which to make the copies"]
+        axis: Point3D,
+        #[doc = "Point around which to make the copies"]
+        center: Point3D,
+        #[doc = "ID of the entity being copied."]
+        entity_id: uuid::Uuid,
+        #[doc = "Number of repetitions to make."]
+        num_repetitions: u32,
+        #[doc = "Whether or not to rotate the objects as they are copied."]
+        rotate_duplicates: bool,
+    },
     #[doc = "Enter edit mode"]
     #[serde(rename = "edit_mode_enter")]
     EditModeEnter {
         #[doc = "The edit target"]
         target: uuid::Uuid,
     },
-    #[doc = "Exit edit mode"]
-    #[serde(rename = "edit_mode_exit")]
-    EditModeExit {},
     #[doc = "Modifies the selection by simulating a \"mouse click\" at the given x,y window \
              coordinate Returns ID of whatever was selected."]
     #[serde(rename = "select_with_point")]
@@ -7649,9 +7839,6 @@ pub enum ModelingCmd {
         #[doc = "What entity was selected?"]
         selection_type: SceneSelectionType,
     },
-    #[doc = "Clear the selection"]
-    #[serde(rename = "select_clear")]
-    SelectClear {},
     #[doc = "Adds one or more entities (by UUID) to the selection."]
     #[serde(rename = "select_add")]
     SelectAdd {
@@ -7664,22 +7851,11 @@ pub enum ModelingCmd {
         #[doc = "Which entities to unselect"]
         entities: Vec<uuid::Uuid>,
     },
-    #[doc = "Replaces the current selection with these new entities (by UUID). Equivalent to \
-             doing SelectClear then SelectAdd."]
+    #[doc = "Replaces current selection with these entities (by UUID)."]
     #[serde(rename = "select_replace")]
     SelectReplace {
         #[doc = "Which entities to select"]
         entities: Vec<uuid::Uuid>,
-    },
-    #[doc = "Find all IDs of selected entities"]
-    #[serde(rename = "select_get")]
-    SelectGet {},
-    #[doc = "Set the units of the scene. For all following commands, the units will be \
-             interpreted as the given units."]
-    #[serde(rename = "set_scene_units")]
-    SetSceneUnits {
-        #[doc = "Which units the scene uses."]
-        unit: UnitLength,
     },
     #[doc = "Changes the current highlighted entity to whichever one is at the given window \
              coordinate. If there's no entity at this location, clears the highlight."]
@@ -7732,19 +7908,25 @@ pub enum ModelingCmd {
         #[doc = "Which object to change"]
         object_id: uuid::Uuid,
     },
+    #[doc = "Set the material properties of an object"]
+    #[serde(rename = "object_set_material_params_pbr")]
+    ObjectSetMaterialParamsPbr {
+        #[doc = "Ambient Occlusion of the new material"]
+        ambient_occlusion: f64,
+        #[doc = "Color of the new material"]
+        color: Color,
+        #[doc = "Metalness of the new material"]
+        metalness: f64,
+        #[doc = "Which object to change"]
+        object_id: uuid::Uuid,
+        #[doc = "Roughness of the new material"]
+        roughness: f64,
+    },
     #[doc = "What type of entity is this?"]
     #[serde(rename = "get_entity_type")]
     GetEntityType {
         #[doc = "ID of the entity being queried."]
         entity_id: uuid::Uuid,
-    },
-    #[doc = "Add a hole to a Solid2d object before extruding it."]
-    #[serde(rename = "solid2d_add_hole")]
-    Solid2DAddHole {
-        #[doc = "The id of the path to use as the inner profile (hole)."]
-        hole_id: uuid::Uuid,
-        #[doc = "Which object to add the hole to."]
-        object_id: uuid::Uuid,
     },
     #[doc = "Gets all faces which use the given edge."]
     #[serde(rename = "solid3d_get_all_edge_faces")]
@@ -7752,6 +7934,14 @@ pub enum ModelingCmd {
         #[doc = "Which edge you want the faces of."]
         edge_id: uuid::Uuid,
         #[doc = "Which object is being queried."]
+        object_id: uuid::Uuid,
+    },
+    #[doc = "Add a hole to a Solid2d object before extruding it."]
+    #[serde(rename = "solid2d_add_hole")]
+    Solid2DAddHole {
+        #[doc = "The id of the path to use as the inner profile (hole)."]
+        hole_id: uuid::Uuid,
+        #[doc = "Which object to add the hole to."]
         object_id: uuid::Uuid,
     },
     #[doc = "Gets all edges which are opposite the given edge, across all possible faces."]
@@ -7794,7 +7984,7 @@ pub enum ModelingCmd {
         #[doc = "Which object is being queried."]
         object_id: uuid::Uuid,
     },
-    #[doc = "Fillets the specified edge with the given radius."]
+    #[doc = "Fillets the given edge with the specified radius."]
     #[serde(rename = "solid3d_fillet_edge")]
     Solid3DFilletEdge {
         #[doc = "Which edge you want to fillet."]
@@ -7805,7 +7995,7 @@ pub enum ModelingCmd {
                  current sketch uses). Must be positive (i.e. greater than zero)."]
         radius: f64,
     },
-    #[doc = "Sends object to front or back."]
+    #[doc = "Send object to front or back."]
     #[serde(rename = "send_object")]
     SendObject {
         #[doc = "Bring to front = true, send to back = false."]
@@ -7822,7 +8012,7 @@ pub enum ModelingCmd {
                  totally opaque."]
         opacity: f64,
     },
-    #[doc = "Fade the entity in or out."]
+    #[doc = "Fade entity in or out."]
     #[serde(rename = "entity_fade")]
     EntityFade {
         #[doc = "How many seconds the animation should take."]
@@ -7832,7 +8022,7 @@ pub enum ModelingCmd {
         #[doc = "Fade in = true, fade out = false."]
         fade_in: bool,
     },
-    #[doc = "Make a plane."]
+    #[doc = "Make a new plane"]
     #[serde(rename = "make_plane")]
     MakePlane {
         #[doc = "If true, any existing drawables within the obj will be replaced (the object will \
@@ -7850,7 +8040,7 @@ pub enum ModelingCmd {
         #[doc = "What should the plane's Y axis be?"]
         y_axis: Point3D,
     },
-    #[doc = "Set the plane's color."]
+    #[doc = "Set the color of a plane."]
     #[serde(rename = "plane_set_color")]
     PlaneSetColor {
         #[doc = "What color it should be."]
@@ -7858,13 +8048,13 @@ pub enum ModelingCmd {
         #[doc = "Which plane is being changed."]
         plane_id: uuid::Uuid,
     },
-    #[doc = "Set the active tool."]
+    #[doc = "Set the current tool."]
     #[serde(rename = "set_tool")]
     SetTool {
         #[doc = "What tool should be active."]
         tool: SceneToolType,
     },
-    #[doc = "Send a mouse move event."]
+    #[doc = "Send a mouse move event"]
     #[serde(rename = "mouse_move")]
     MouseMove {
         #[doc = "Logical timestamp. The client should increment this with every event in the \
@@ -7874,13 +8064,14 @@ pub enum ModelingCmd {
         #[doc = "Where the mouse is"]
         window: Point2D,
     },
-    #[doc = "Send a mouse click event. Updates modified/selected entities."]
+    #[doc = "Send a mouse click event Updates modified/selected entities."]
     #[serde(rename = "mouse_click")]
     MouseClick {
         #[doc = "Where the mouse is"]
         window: Point2D,
     },
-    #[doc = "Enable sketch mode on the given plane."]
+    #[doc = "Enable sketch mode on the given plane. If you want to sketch on a face, use \
+             `enable_sketch_mode` instead."]
     #[serde(rename = "sketch_mode_enable")]
     SketchModeEnable {
         #[doc = "Animate the transition to sketch mode."]
@@ -7893,22 +8084,50 @@ pub enum ModelingCmd {
         #[doc = "Sketch on this plane."]
         plane_id: uuid::Uuid,
     },
-    #[doc = "Disable sketch mode."]
+    #[doc = "Disable sketch mode. If you are sketching on a face, be sure to not disable sketch \
+             mode until you have extruded. Otherwise, your object will not be fused with the face."]
     #[serde(rename = "sketch_mode_disable")]
     SketchModeDisable {},
-    #[doc = "Get type of a given curve."]
+    #[doc = "Get the plane for sketch mode."]
+    #[serde(rename = "get_sketch_mode_plane")]
+    GetSketchModePlane {},
+    #[doc = "Get the plane for sketch mode."]
+    #[serde(rename = "curve_set_constraint")]
+    CurveSetConstraint {
+        #[doc = "Which constraint to apply."]
+        constraint_bound: PathComponentConstraintBound,
+        #[doc = "What part of the curve should be constrained."]
+        constraint_type: PathComponentConstraintType,
+        #[doc = "Which curve to constrain."]
+        object_id: uuid::Uuid,
+    },
+    #[doc = "Sketch on some entity (e.g. a plane, a face)."]
+    #[serde(rename = "enable_sketch_mode")]
+    EnableSketchMode {
+        #[doc = "Should the camera move at all?"]
+        adjust_camera: bool,
+        #[doc = "Should we animate or snap for the camera transition?"]
+        animated: bool,
+        #[doc = "Which entity to sketch on."]
+        entity_id: uuid::Uuid,
+        #[doc = "Should the camera use orthographic projection? In other words, should an \
+                 object's size in the rendered image stay constant regardless of its distance \
+                 from the camera."]
+        ortho: bool,
+    },
+    #[doc = "Get type of the given curve."]
     #[serde(rename = "curve_get_type")]
     CurveGetType {
         #[doc = "Which curve to query."]
         curve_id: uuid::Uuid,
     },
-    #[doc = "Get control points of a given curve."]
+    #[doc = "Get control points of the given curve."]
     #[serde(rename = "curve_get_control_points")]
     CurveGetControlPoints {
         #[doc = "Which curve to query."]
         curve_id: uuid::Uuid,
     },
-    #[doc = "Take a snapshot."]
+    #[doc = "Take a snapshot of the current view."]
     #[serde(rename = "take_snapshot")]
     TakeSnapshot {
         #[doc = "What image format to return."]
@@ -7924,13 +8143,13 @@ pub enum ModelingCmd {
                  will be placed at the origin of the scene."]
         gizmo_mode: bool,
     },
-    #[doc = "Query the given path"]
+    #[doc = "Query the given path."]
     #[serde(rename = "path_get_info")]
     PathGetInfo {
         #[doc = "Which path to query"]
         path_id: uuid::Uuid,
     },
-    #[doc = "Get curves for vertices within a path"]
+    #[doc = "Obtain curve ids for vertex ids"]
     #[serde(rename = "path_get_curve_uuids_for_vertices")]
     PathGetCurveUuidsForVertices {
         #[doc = "Which path to query"]
@@ -7938,19 +8157,19 @@ pub enum ModelingCmd {
         #[doc = "IDs of the vertices for which to obtain curve ids from"]
         vertex_ids: Vec<uuid::Uuid>,
     },
-    #[doc = "Get vertices within a path"]
+    #[doc = "Obtain vertex ids for a path"]
     #[serde(rename = "path_get_vertex_uuids")]
     PathGetVertexUuids {
         #[doc = "Which path to query"]
         path_id: uuid::Uuid,
     },
-    #[doc = "Start dragging mouse."]
+    #[doc = "Start dragging the mouse."]
     #[serde(rename = "handle_mouse_drag_start")]
     HandleMouseDragStart {
         #[doc = "The mouse position."]
         window: Point2D,
     },
-    #[doc = "Continue dragging mouse."]
+    #[doc = "Continue dragging the mouse."]
     #[serde(rename = "handle_mouse_drag_move")]
     HandleMouseDragMove {
         #[doc = "Logical timestamp. The client should increment this with every event in the \
@@ -7960,7 +8179,7 @@ pub enum ModelingCmd {
         #[doc = "The mouse position."]
         window: Point2D,
     },
-    #[doc = "Stop dragging mouse."]
+    #[doc = "Stop dragging the mouse."]
     #[serde(rename = "handle_mouse_drag_end")]
     HandleMouseDragEnd {
         #[doc = "The mouse position."]
@@ -8004,6 +8223,13 @@ pub enum ModelingCmd {
         files: Vec<ImportFile>,
         #[doc = "Input file format."]
         format: InputFormat,
+    },
+    #[doc = "Set the units of the scene. For all following commands, the units will be \
+             interpreted as the given units."]
+    #[serde(rename = "set_scene_units")]
+    SetSceneUnits {
+        #[doc = "Which units the scene uses."]
+        unit: UnitLength,
     },
     #[doc = "Get the mass of entities in the scene or the default scene."]
     #[serde(rename = "mass")]
@@ -8068,86 +8294,11 @@ pub enum ModelingCmd {
         #[doc = "Select the unit interpretation of distances in the scene."]
         source_unit: UnitLength,
     },
-    #[doc = "Get the plane of the sketch mode. This is useful for getting the normal of the plane \
-             after a user selects a plane."]
-    #[serde(rename = "get_sketch_mode_plane")]
-    GetSketchModePlane {},
-    #[doc = "Constrain a curve."]
-    #[serde(rename = "curve_set_constraint")]
-    CurveSetConstraint {
-        #[doc = "Which constraint to apply."]
-        constraint_bound: PathComponentConstraintBound,
-        #[doc = "What part of the curve should be constrained."]
-        constraint_type: PathComponentConstraintType,
-        #[doc = "Which curve to constrain."]
-        object_id: uuid::Uuid,
-    },
-    #[doc = "Sketch on some entity (e.g. a plane, a face)"]
-    #[serde(rename = "enable_sketch_mode")]
-    EnableSketchMode {
-        #[doc = "Should the camera move at all?"]
-        adjust_camera: bool,
-        #[doc = "Should we animate or snap for the camera transition?"]
-        animated: bool,
-        #[doc = "Which entity to sketch on."]
-        entity_id: uuid::Uuid,
-        #[doc = "Should the camera use orthographic projection? In other words, should an \
-                 object's size in the rendered image stay constant regardless of its distance \
-                 from the camera."]
-        ortho: bool,
-    },
-    #[doc = "Set the material properties of an object"]
-    #[serde(rename = "object_set_material_params_pbr")]
-    ObjectSetMaterialParamsPbr {
-        #[doc = "Ambient Occlusion of the new material"]
-        ambient_occlusion: f64,
-        #[doc = "Color of the new material"]
-        color: Color,
-        #[doc = "Metalness of the new material"]
-        metalness: f64,
-        #[doc = "Which object to change"]
-        object_id: uuid::Uuid,
-        #[doc = "Roughness of the new material"]
-        roughness: f64,
-    },
-    #[doc = "What is the distance between these two entities?"]
-    #[serde(rename = "entity_get_distance")]
-    EntityGetDistance {
-        #[doc = "Type of distance to be measured."]
-        distance_type: DistanceType,
-        #[doc = "ID of the first entity being queried."]
-        entity_id1: uuid::Uuid,
-        #[doc = "ID of the second entity being queried."]
-        entity_id2: uuid::Uuid,
-    },
-    #[doc = "Duplicate the given entity, evenly spaced along the chosen axis."]
-    #[serde(rename = "entity_linear_pattern")]
-    EntityLinearPattern {
-        #[doc = "Axis along which to make the copies"]
-        axis: Point3D,
-        #[doc = "ID of the entity being copied."]
-        entity_id: uuid::Uuid,
-        #[doc = "Number of repetitions to make."]
-        num_repetitions: u32,
-        #[doc = "Spacing between repetitions."]
-        spacing: f64,
-    },
-    #[doc = "Duplicate the given entity, evenly spaced around the specified axis, spanning the \
-             arc."]
-    #[serde(rename = "entity_circular_pattern")]
-    EntityCircularPattern {
-        #[doc = "Arc angle (in degrees) to place repetitions along."]
-        arc_degrees: f64,
-        #[doc = "Axis around which to make the copies"]
-        axis: Point3D,
-        #[doc = "Point around which to make the copies"]
-        center: Point3D,
-        #[doc = "ID of the entity being copied."]
-        entity_id: uuid::Uuid,
-        #[doc = "Number of repetitions to make."]
-        num_repetitions: u32,
-        #[doc = "Whether or not to rotate the objects as they are copied."]
-        rotate_duplicates: bool,
+    #[doc = "Focus the default camera upon an object in the scene."]
+    #[serde(rename = "default_camera_focus_on")]
+    DefaultCameraFocusOn {
+        #[doc = "UUID of object to focus on."]
+        uuid: uuid::Uuid,
     },
     #[doc = "When you select some entity with the current tool, what should happen to the entity?"]
     #[serde(rename = "set_selection_type")]
@@ -8172,7 +8323,7 @@ pub enum ModelingCmd {
                  camera was used."]
         parameters: Option<PerspectiveCameraParameters>,
     },
-    #[doc = "Get a concise description of all of an extrusion's faces"]
+    #[doc = "Get a concise description of all of an extrusion's faces."]
     #[serde(rename = "solid3d_get_extrusion_face_info")]
     Solid3DGetExtrusionFaceInfo {
         #[doc = "Any edge that lies on the extrusion base path."]
@@ -8180,6 +8331,15 @@ pub enum ModelingCmd {
         #[doc = "The Solid3d object whose extrusion is being queried."]
         object_id: uuid::Uuid,
     },
+    #[doc = "Exit edit mode"]
+    #[serde(rename = "edit_mode_exit")]
+    EditModeExit {},
+    #[doc = "Clear the selection"]
+    #[serde(rename = "select_clear")]
+    SelectClear {},
+    #[doc = "Find all IDs of selected entities"]
+    #[serde(rename = "select_get")]
+    SelectGet {},
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -8353,211 +8513,224 @@ pub enum OkModelingCmdResponse {
              defined here."]
     #[serde(rename = "empty")]
     Empty {},
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'Export' endpoint"]
     #[serde(rename = "export")]
     Export {
         #[doc = "The response from the `Export` endpoint."]
         data: Export,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'SelectWithPoint' endpoint"]
     #[serde(rename = "select_with_point")]
     SelectWithPoint {
         #[doc = "The response from the `SelectWithPoint` command."]
         data: SelectWithPoint,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'HighlightSetEntity' endpoint"]
     #[serde(rename = "highlight_set_entity")]
     HighlightSetEntity {
         #[doc = "The response from the `HighlightSetEntity` command."]
         data: HighlightSetEntity,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'EntityGetChildUuid' endpoint"]
     #[serde(rename = "entity_get_child_uuid")]
     EntityGetChildUuid {
         #[doc = "The response from the `EntityGetChildUuid` command."]
         data: EntityGetChildUuid,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'EntityGetNumChildren' endpoint"]
     #[serde(rename = "entity_get_num_children")]
     EntityGetNumChildren {
         #[doc = "The response from the `EntityGetNumChildren` command."]
         data: EntityGetNumChildren,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'EntityGetParentId' endpoint"]
     #[serde(rename = "entity_get_parent_id")]
     EntityGetParentId {
         #[doc = "The response from the `EntityGetParentId` command."]
         data: EntityGetParentId,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'EntityGetAllChildUuids' endpoint"]
     #[serde(rename = "entity_get_all_child_uuids")]
     EntityGetAllChildUuids {
         #[doc = "The response from the `EntityGetAllChildUuids` command."]
         data: EntityGetAllChildUuids,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'SelectGet' endpoint"]
     #[serde(rename = "select_get")]
     SelectGet {
         #[doc = "The response from the `SelectGet` command."]
         data: SelectGet,
     },
-    #[doc = "The response from the ` ` command."]
-    #[serde(rename = "get_entity_type")]
-    GetEntityType {
-        #[doc = "The response from the `GetEntityType` command."]
-        data: GetEntityType,
-    },
-    #[doc = "The response from the ` ` command."]
-    #[serde(rename = "entity_get_distance")]
-    EntityGetDistance {
-        #[doc = "The response from the `EntitiesGetDistance` command."]
-        data: EntityGetDistance,
-    },
-    #[doc = "The response from the ` ` command."]
-    #[serde(rename = "entity_linear_pattern")]
-    EntityLinearPattern {
-        #[doc = "The response from the `EntityLinearPattern` command."]
-        data: EntityLinearPattern,
-    },
-    #[doc = "The response from the ` ` command."]
-    #[serde(rename = "entity_circular_pattern")]
-    EntityCircularPattern {
-        #[doc = "The response from the `EntityCircularPattern` command."]
-        data: EntityCircularPattern,
-    },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'Solid3dGetAllEdgeFaces' endpoint"]
     #[serde(rename = "solid3d_get_all_edge_faces")]
     Solid3DGetAllEdgeFaces {
         #[doc = "The response from the `Solid3dGetAllEdgeFaces` command."]
         data: Solid3DGetAllEdgeFaces,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'Solid3dGetAllOppositeEdges' endpoint"]
     #[serde(rename = "solid3d_get_all_opposite_edges")]
     Solid3DGetAllOppositeEdges {
         #[doc = "The response from the `Solid3dGetAllOppositeEdges` command."]
         data: Solid3DGetAllOppositeEdges,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'Solid3dGetOppositeEdge' endpoint"]
     #[serde(rename = "solid3d_get_opposite_edge")]
     Solid3DGetOppositeEdge {
         #[doc = "The response from the `Solid3dGetOppositeEdge` command."]
         data: Solid3DGetOppositeEdge,
     },
-    #[doc = "The response from the ` ` command."]
-    #[serde(rename = "solid3d_get_prev_adjacent_edge")]
-    Solid3DGetPrevAdjacentEdge {
-        #[doc = "The response from the `Solid3dGetPrevAdjacentEdge` command."]
-        data: Solid3DGetPrevAdjacentEdge,
-    },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'Solid3dGetNextAdjacentEdge' endpoint"]
     #[serde(rename = "solid3d_get_next_adjacent_edge")]
     Solid3DGetNextAdjacentEdge {
         #[doc = "The response from the `Solid3dGetNextAdjacentEdge` command."]
         data: Solid3DGetNextAdjacentEdge,
     },
-    #[doc = "The response from the ` ` command."]
-    #[serde(rename = "mouse_click")]
-    MouseClick {
-        #[doc = "The response from the `MouseClick` command."]
-        data: MouseClick,
+    #[doc = "The response to the 'Solid3dGetPrevAdjacentEdge' endpoint"]
+    #[serde(rename = "solid3d_get_prev_adjacent_edge")]
+    Solid3DGetPrevAdjacentEdge {
+        #[doc = "The response from the `Solid3dGetPrevAdjacentEdge` command."]
+        data: Solid3DGetPrevAdjacentEdge,
     },
-    #[doc = "The response from the ` ` command."]
-    #[serde(rename = "curve_get_type")]
-    CurveGetType {
-        #[doc = "The response from the `CurveGetType` command."]
-        data: CurveGetType,
+    #[doc = "The response to the 'GetEntityType' endpoint"]
+    #[serde(rename = "get_entity_type")]
+    GetEntityType {
+        #[doc = "The response from the `GetEntityType` command."]
+        data: GetEntityType,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'CurveGetControlPoints' endpoint"]
     #[serde(rename = "curve_get_control_points")]
     CurveGetControlPoints {
         #[doc = "The response from the `CurveGetControlPoints` command."]
         data: CurveGetControlPoints,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'CurveGetType' endpoint"]
+    #[serde(rename = "curve_get_type")]
+    CurveGetType {
+        #[doc = "The response from the `CurveGetType` command."]
+        data: CurveGetType,
+    },
+    #[doc = "The response to the 'MouseClick' endpoint"]
+    #[serde(rename = "mouse_click")]
+    MouseClick {
+        #[doc = "The response from the `MouseClick` command."]
+        data: MouseClick,
+    },
+    #[doc = "The response to the 'TakeSnapshot' endpoint"]
     #[serde(rename = "take_snapshot")]
     TakeSnapshot {
         #[doc = "The response from the `TakeSnapshot` command."]
         data: TakeSnapshot,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'PathGetInfo' endpoint"]
     #[serde(rename = "path_get_info")]
     PathGetInfo {
         #[doc = "The response from the `PathGetInfo` command."]
         data: PathGetInfo,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'PathSegmentInfo' endpoint"]
+    #[serde(rename = "path_segment_info")]
+    PathSegmentInfo {
+        #[doc = "Info about a path segment"]
+        data: PathSegmentInfo,
+    },
+    #[doc = "The response to the 'PathGetCurveUuidsForVertices' endpoint"]
     #[serde(rename = "path_get_curve_uuids_for_vertices")]
     PathGetCurveUuidsForVertices {
         #[doc = "The response from the `PathGetCurveUuidsForVertices` command."]
         data: PathGetCurveUuidsForVertices,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'PathGetVertexUuids' endpoint"]
     #[serde(rename = "path_get_vertex_uuids")]
     PathGetVertexUuids {
         #[doc = "The response from the `PathGetVertexUuids` command."]
         data: PathGetVertexUuids,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'CurveGetEndPoints' endpoint"]
+    #[serde(rename = "curve_get_end_points")]
+    CurveGetEndPoints {
+        #[doc = "Endpoints of a curve"]
+        data: CurveGetEndPoints,
+    },
+    #[doc = "The response to the 'PlaneIntersectAndProject' endpoint"]
     #[serde(rename = "plane_intersect_and_project")]
     PlaneIntersectAndProject {
         #[doc = "Corresponding coordinates of given window coordinates, intersected on given \
                  plane."]
         data: PlaneIntersectAndProject,
     },
-    #[doc = "The response from the ` ` command."]
-    #[serde(rename = "curve_get_end_points")]
-    CurveGetEndPoints {
-        #[doc = "Endpoints of a curve"]
-        data: CurveGetEndPoints,
-    },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'ImportFiles' endpoint"]
     #[serde(rename = "import_files")]
     ImportFiles {
         #[doc = "Data from importing the files"]
         data: ImportFiles,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'Mass' endpoint"]
     #[serde(rename = "mass")]
     Mass {
         #[doc = "The mass response."]
         data: Mass,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'Volume' endpoint"]
     #[serde(rename = "volume")]
     Volume {
         #[doc = "The volume response."]
         data: Volume,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'Density' endpoint"]
     #[serde(rename = "density")]
     Density {
         #[doc = "The density response."]
         data: Density,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'SurfaceArea' endpoint"]
     #[serde(rename = "surface_area")]
     SurfaceArea {
         #[doc = "The surface area response."]
         data: SurfaceArea,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'CenterOfMass' endpoint"]
     #[serde(rename = "center_of_mass")]
     CenterOfMass {
         #[doc = "The center of mass response."]
         data: CenterOfMass,
     },
-    #[doc = "The response from the ` ` command."]
+    #[doc = "The response to the 'GetSketchModePlane' endpoint"]
+    #[serde(rename = "get_sketch_mode_plane")]
+    GetSketchModePlane {
+        #[doc = "The plane for sketch mode."]
+        data: GetSketchModePlane,
+    },
+    #[doc = "The response to the 'EntityGetDistance' endpoint"]
+    #[serde(rename = "entity_get_distance")]
+    EntityGetDistance {
+        #[doc = "The response from the `EntitiesGetDistance` command."]
+        data: EntityGetDistance,
+    },
+    #[doc = "The response to the 'EntityLinearPattern' endpoint"]
+    #[serde(rename = "entity_linear_pattern")]
+    EntityLinearPattern {
+        #[doc = "The response from the `EntityLinearPattern` command."]
+        data: EntityLinearPattern,
+    },
+    #[doc = "The response to the 'EntityCircularPattern' endpoint"]
+    #[serde(rename = "entity_circular_pattern")]
+    EntityCircularPattern {
+        #[doc = "The response from the `EntityCircularPattern` command."]
+        data: EntityCircularPattern,
+    },
+    #[doc = "The response to the 'Solid3dGetExtrusionFaceInfo' endpoint"]
     #[serde(rename = "solid3d_get_extrusion_face_info")]
     Solid3DGetExtrusionFaceInfo {
         #[doc = "Extrusion face info struct (useful for maintaining mappings between source path \
                  segment ids and extrusion faces)"]
         data: Solid3DGetExtrusionFaceInfo,
     },
-    #[doc = "The response from the ` ` command."]
-    #[serde(rename = "get_sketch_mode_plane")]
-    GetSketchModePlane {
-        #[doc = "The plane for sketch mode."]
-        data: GetSketchModePlane,
+    #[doc = "The response to the 'ExtrusionFaceInfo' endpoint"]
+    #[serde(rename = "extrusion_face_info")]
+    ExtrusionFaceInfo {
+        #[doc = "Extrusion face info struct (useful for maintaining mappings between source path \
+                 segment ids and extrusion faces)"]
+        data: ExtrusionFaceInfo,
     },
 }
 
@@ -8680,6 +8853,10 @@ pub struct Org {
     #[doc = "If the org should be blocked and the reason why."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub block: Option<BlockReason>,
+    #[doc = "If we can train on the orgs's data. This value overrides any individual user's \
+             `can_train_on_data` value if they are a member of the org."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub can_train_on_data: Option<bool>,
     #[doc = "The date and time the org was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The org's domain."]
@@ -8715,7 +8892,7 @@ impl std::fmt::Display for Org {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Org {
-    const LENGTH: usize = 12;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(allow_users_in_domain_to_auto_join) =
@@ -8737,6 +8914,11 @@ impl tabled::Tabled for Org {
             },
             if let Some(block) = &self.block {
                 format!("{:?}", block).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(can_train_on_data) = &self.can_train_on_data {
+                format!("{:?}", can_train_on_data).into()
             } else {
                 String::new().into()
             },
@@ -8773,6 +8955,7 @@ impl tabled::Tabled for Org {
             "billing_email".into(),
             "billing_email_verified".into(),
             "block".into(),
+            "can_train_on_data".into(),
             "created_at".into(),
             "domain".into(),
             "id".into(),
@@ -9072,7 +9255,7 @@ impl tabled::Tabled for OrgMemberResultsPage {
     }
 }
 
-#[doc = "The roles for users in an organization."]
+#[doc = "The roles in an organization."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -9095,6 +9278,10 @@ pub enum OrgRole {
     #[serde(rename = "member")]
     #[display("member")]
     Member,
+    #[doc = "A service account role."]
+    #[serde(rename = "service_account")]
+    #[display("service_account")]
+    ServiceAccount,
 }
 
 #[doc = "Output file contents.\n\n<details><summary>JSON schema</summary>\n\n```json { \
@@ -9742,6 +9929,39 @@ impl tabled::Tabled for PerspectiveCameraParameters {
     }
 }
 
+#[doc = "A plan's interval."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum PlanInterval {
+    #[doc = "Day."]
+    #[serde(rename = "day")]
+    #[display("day")]
+    Day,
+    #[doc = "Month."]
+    #[serde(rename = "month")]
+    #[display("month")]
+    Month,
+    #[doc = "Week."]
+    #[serde(rename = "week")]
+    #[display("week")]
+    Week,
+    #[doc = "Year."]
+    #[serde(rename = "year")]
+    #[display("year")]
+    Year,
+}
+
 #[doc = "Corresponding coordinates of given window coordinates, intersected on given plane."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9906,6 +10126,38 @@ impl tabled::Tabled for Pong {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["message".into()]
+    }
+}
+
+#[doc = "Privacy settings for an org or user."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PrivacySettings {
+    #[doc = "If we can train on the data. If the user is a member of an organization, the \
+             organization's setting will override this. The organization's setting takes priority."]
+    pub can_train_on_data: bool,
+}
+
+impl std::fmt::Display for PrivacySettings {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PrivacySettings {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.can_train_on_data).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["can_train_on_data".into()]
     }
 }
 
@@ -10434,6 +10686,146 @@ pub enum Selection {
     },
 }
 
+#[doc = "A service account.\n\nThese are used to authenticate orgs with Bearer \
+         authentication.\n\nThis works just like an API token, but it is tied to an organization \
+         versus an individual user."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ServiceAccount {
+    #[doc = "The date and time the API token was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The unique identifier for the API token."]
+    pub id: uuid::Uuid,
+    #[doc = "If the token is valid. We never delete API tokens, but we can mark them as invalid. \
+             We save them for ever to preserve the history of the API token."]
+    pub is_valid: bool,
+    #[doc = "An optional label for the API token."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
+    #[doc = "The ID of the organization that owns the API token."]
+    pub org_id: uuid::Uuid,
+    #[doc = "The API token itself."]
+    pub token: uuid::Uuid,
+    #[doc = "The date and time the API token was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Display for ServiceAccount {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ServiceAccount {
+    const LENGTH: usize = 7;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.is_valid).into(),
+            if let Some(label) = &self.label {
+                format!("{:?}", label).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.org_id).into(),
+            format!("{:?}", self.token).into(),
+            format!("{:?}", self.updated_at).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "created_at".into(),
+            "id".into(),
+            "is_valid".into(),
+            "label".into(),
+            "org_id".into(),
+            "token".into(),
+            "updated_at".into(),
+        ]
+    }
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ServiceAccountResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<ServiceAccount>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for ServiceAccountResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for ServiceAccountResultsPage {
+    type Item = ServiceAccount;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ServiceAccountResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
+    }
+}
+
 #[doc = "An authentication session."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -10711,6 +11103,112 @@ pub enum StlStorage {
     Binary,
 }
 
+#[doc = "A subscription tier feature."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SubscriptionTierFeature {
+    #[doc = "Information about the feature."]
+    pub info: String,
+}
+
+impl std::fmt::Display for SubscriptionTierFeature {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SubscriptionTierFeature {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.info.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["info".into()]
+    }
+}
+
+#[doc = "The price for a subscription tier."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum SubscriptionTierPrice {
+    #[doc = "A flat price that we publicly list."]
+    #[serde(rename = "flat")]
+    Flat {
+        #[doc = "The interval the price is charged."]
+        interval: PlanInterval,
+        #[doc = "The price."]
+        price: f64,
+    },
+    #[doc = "A per user price that we publicly list."]
+    #[serde(rename = "per_user")]
+    PerUser {
+        #[doc = "The interval the price is charged."]
+        interval: PlanInterval,
+        #[doc = "The price."]
+        price: f64,
+    },
+    #[doc = "Enterprise: The price is not listed and the user needs to contact sales."]
+    #[serde(rename = "enterprise")]
+    Enterprise {},
+}
+
+#[doc = "An enum representing a subscription tier type."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum SubscriptionTierType {
+    #[doc = "A subscription tier that can be applied to individuals only."]
+    #[serde(rename = "individual")]
+    Individual {},
+    #[doc = "An subscription tier that can be applied to organizations only."]
+    #[serde(rename = "organization")]
+    Organization {
+        #[doc = "Whether or not the subscription type supports SAML SSO."]
+        saml_sso: bool,
+    },
+}
+
+#[doc = "An enum representing a subscription training data behavior."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum SubscriptionTrainingDataBehavior {
+    #[doc = "The data is always used for training and cannot be turned off."]
+    #[serde(rename = "always")]
+    #[display("always")]
+    Always,
+    #[doc = "The data is used for training by default, but can be turned off."]
+    #[serde(rename = "default_on")]
+    #[display("default_on")]
+    DefaultOn,
+    #[doc = "The data is not used for training by default, but can be turned on."]
+    #[serde(rename = "default_off")]
+    #[display("default_off")]
+    DefaultOff,
+}
+
 #[doc = "Successful Websocket response."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -10755,6 +11253,39 @@ impl tabled::Tabled for SuccessWebSocketResponse {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["request_id".into(), "resp".into(), "success".into()]
     }
+}
+
+#[doc = "The support tier the subscription provides."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum SupportTier {
+    #[doc = "Community support."]
+    #[serde(rename = "community")]
+    #[display("community")]
+    Community,
+    #[doc = "Standard support."]
+    #[serde(rename = "standard")]
+    #[display("standard")]
+    Standard,
+    #[doc = "Premium support."]
+    #[serde(rename = "premium")]
+    #[display("premium")]
+    Premium,
+    #[doc = "Priority support."]
+    #[serde(rename = "priority")]
+    #[display("priority")]
+    Priority,
 }
 
 #[doc = "The surface area response."]
@@ -12969,7 +13500,7 @@ impl tabled::Tabled for UnitVolumeConversion {
 )]
 pub struct UpdateMemberToOrgBody {
     #[doc = "The organization role to give the user."]
-    pub role: OrgRole,
+    pub role: UserOrgRole,
 }
 
 impl std::fmt::Display for UpdateMemberToOrgBody {
@@ -13088,6 +13619,10 @@ pub struct User {
     #[doc = "If the user should be blocked and the reason why."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub block: Option<BlockReason>,
+    #[doc = "If we can train on the user's data. If the user is a member of an organization, the \
+             organization's setting will override this."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub can_train_on_data: Option<bool>,
     #[doc = "The user's company."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub company: Option<String>,
@@ -13112,6 +13647,9 @@ pub struct User {
     pub id: uuid::Uuid,
     #[doc = "The image avatar for the user. This is a URL."]
     pub image: String,
+    #[doc = "If the user is tied to a service account."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub is_service_account: Option<bool>,
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,
@@ -13139,11 +13677,16 @@ impl std::fmt::Display for User {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for User {
-    const LENGTH: usize = 14;
+    const LENGTH: usize = 16;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(block) = &self.block {
                 format!("{:?}", block).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(can_train_on_data) = &self.can_train_on_data {
+                format!("{:?}", can_train_on_data).into()
             } else {
                 String::new().into()
             },
@@ -13180,6 +13723,11 @@ impl tabled::Tabled for User {
             },
             format!("{:?}", self.id).into(),
             self.image.clone().into(),
+            if let Some(is_service_account) = &self.is_service_account {
+                format!("{:?}", is_service_account).into()
+            } else {
+                String::new().into()
+            },
             if let Some(last_name) = &self.last_name {
                 format!("{:?}", last_name).into()
             } else {
@@ -13198,6 +13746,7 @@ impl tabled::Tabled for User {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "block".into(),
+            "can_train_on_data".into(),
             "company".into(),
             "created_at".into(),
             "discord".into(),
@@ -13207,6 +13756,7 @@ impl tabled::Tabled for User {
             "github".into(),
             "id".into(),
             "image".into(),
+            "is_service_account".into(),
             "last_name".into(),
             "name".into(),
             "phone".into(),
@@ -13340,6 +13890,31 @@ impl tabled::Tabled for UserOrgInfo {
             "updated_at".into(),
         ]
     }
+}
+
+#[doc = "The roles for users in an organization."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum UserOrgRole {
+    #[doc = "Admins can do anything in the org."]
+    #[serde(rename = "admin")]
+    #[display("admin")]
+    Admin,
+    #[doc = "Members of an org can not modify an org, but they belong in the org."]
+    #[serde(rename = "member")]
+    #[display("member")]
+    Member,
 }
 
 #[doc = "A single page of results"]
@@ -13632,4 +14207,145 @@ impl tabled::Tabled for WebSocketResponse {
             "errors".into(),
         ]
     }
+}
+
+#[doc = "A subscription to the modeling app."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ZooProductSubscription {
+    #[doc = "A description of the tier."]
+    pub description: String,
+    #[doc = "Features that are included in the subscription."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub features: Option<Vec<SubscriptionTierFeature>>,
+    #[doc = "The name of the tier."]
+    pub name: ModelingAppSubscriptionTierName,
+    #[doc = "The amount of pay-as-you-go credits the individual or org gets outside the modeling \
+             app."]
+    pub pay_as_you_go_credits: f64,
+    #[doc = "The price of the tier per month. If this is for an individual, this is the price \
+             they pay. If this is for an organization, this is the price the organization pays \
+             per member in the org. This is in USD."]
+    pub price: SubscriptionTierPrice,
+    #[doc = "The support tier the subscription provides."]
+    pub support_tier: SupportTier,
+    #[doc = "The behavior of the users data (can it be used for training, etc)."]
+    pub training_data_behavior: SubscriptionTrainingDataBehavior,
+    #[doc = "If the tier is offered for an individual or an org."]
+    #[serde(rename = "type")]
+    pub type_: SubscriptionTierType,
+    #[doc = "The Zoo tools that you can call unlimited times with this tier."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub zoo_tools_included: Option<Vec<ZooTool>>,
+}
+
+impl std::fmt::Display for ZooProductSubscription {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ZooProductSubscription {
+    const LENGTH: usize = 9;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.description.clone().into(),
+            if let Some(features) = &self.features {
+                format!("{:?}", features).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.name).into(),
+            format!("{:?}", self.pay_as_you_go_credits).into(),
+            format!("{:?}", self.price).into(),
+            format!("{:?}", self.support_tier).into(),
+            format!("{:?}", self.training_data_behavior).into(),
+            format!("{:?}", self.type_).into(),
+            if let Some(zoo_tools_included) = &self.zoo_tools_included {
+                format!("{:?}", zoo_tools_included).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "description".into(),
+            "features".into(),
+            "name".into(),
+            "pay_as_you_go_credits".into(),
+            "price".into(),
+            "support_tier".into(),
+            "training_data_behavior".into(),
+            "type_".into(),
+            "zoo_tools_included".into(),
+        ]
+    }
+}
+
+#[doc = "A struct of Zoo product subscriptions."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ZooProductSubscriptions {
+    #[doc = "The subscriptions."]
+    pub modeling_app: ModelingAppSubscriptionTier,
+}
+
+impl std::fmt::Display for ZooProductSubscriptions {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ZooProductSubscriptions {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.modeling_app).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["modeling_app".into()]
+    }
+}
+
+#[doc = "The Zoo tools that can make API calls."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ZooTool {
+    #[doc = "The modeling app."]
+    #[serde(rename = "modeling_app")]
+    #[display("modeling_app")]
+    ModelingApp,
+    #[doc = "The Text-to-CAD UI."]
+    #[serde(rename = "text_to_cad")]
+    #[display("text_to_cad")]
+    TextToCad,
+    #[doc = "The Diff Chrome Extension."]
+    #[serde(rename = "diff_chrome_extension")]
+    #[display("diff_chrome_extension")]
+    DiffChromeExtension,
 }

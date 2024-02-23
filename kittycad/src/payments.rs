@@ -325,6 +325,97 @@ impl Payments {
         }
     }
 
+    #[doc = "Get the subscription for an org.\n\nThis endpoint requires authentication by an org admin. It gets the subscription for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_get_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions =\n        client.payments().get_org_subscription().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_org_subscription<'a>(
+        &'a self,
+    ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "org/payment/subscriptions"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Update the subscription for an org.\n\nThis endpoint requires authentication by an org admin. It updates the subscription for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_update_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_org_subscription(&kittycad::types::ZooProductSubscriptions {\n            modeling_app: kittycad::types::ModelingAppSubscriptionTier {\n                description: \"some-string\".to_string(),\n                features: Some(vec![kittycad::types::SubscriptionTierFeature {\n                    info: \"some-string\".to_string(),\n                }]),\n                name: kittycad::types::ModelingAppSubscriptionTierName::Enterprise,\n                pay_as_you_go_credits: 3.14 as f64,\n                price: kittycad::types::SubscriptionTierPrice::Enterprisetype {},\n                support_tier: kittycad::types::SupportTier::Priority,\n                training_data_behavior: kittycad::types::SubscriptionTrainingDataBehavior::DefaultOff,\n                type_: kittycad::types::SubscriptionTierType::Individualtype {},\n                zoo_tools_included: Some(vec![kittycad::types::ZooTool::DiffChromeExtension]),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn update_org_subscription<'a>(
+        &'a self,
+        body: &crate::types::ZooProductSubscriptions,
+    ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!("{}/{}", self.client.base_url, "org/payment/subscriptions"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Create the subscription for an org.\n\nThis endpoint requires authentication by an org admin. It creates the subscription for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_create_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_org_subscription(&kittycad::types::ZooProductSubscriptions {\n            modeling_app: kittycad::types::ModelingAppSubscriptionTier {\n                description: \"some-string\".to_string(),\n                features: Some(vec![kittycad::types::SubscriptionTierFeature {\n                    info: \"some-string\".to_string(),\n                }]),\n                name: kittycad::types::ModelingAppSubscriptionTierName::Enterprise,\n                pay_as_you_go_credits: 3.14 as f64,\n                price: kittycad::types::SubscriptionTierPrice::Enterprisetype {},\n                support_tier: kittycad::types::SupportTier::Priority,\n                training_data_behavior: kittycad::types::SubscriptionTrainingDataBehavior::DefaultOff,\n                type_: kittycad::types::SubscriptionTierType::Individualtype {},\n                zoo_tools_included: Some(vec![kittycad::types::ZooTool::DiffChromeExtension]),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn create_org_subscription<'a>(
+        &'a self,
+        body: &crate::types::ZooProductSubscriptions,
+    ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!("{}/{}", self.client.base_url, "org/payment/subscriptions"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
     #[doc = "Validate an orgs's information is correct and valid for automatic tax.\n\nThis endpoint requires authentication by an org admin. It will return an error if the org's information is not valid for automatic tax. Otherwise, it will return an empty successful response.\n\n```rust,no_run\nasync fn example_payments_validate_customer_tax_information_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .validate_customer_tax_information_for_org()\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn validate_customer_tax_information_for_org<'a>(
@@ -339,6 +430,79 @@ impl Payments {
         let status = resp.status();
         if status.is_success() {
             Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Get the privacy settings for an org.\n\nThis endpoint requires authentication by an \
+             org admin. It gets the privacy settings for the authenticated user's \
+             org.\n\n```rust,no_run\nasync fn example_payments_get_org_privacy_settings() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::PrivacySettings =\n        \
+             client.payments().get_org_privacy_settings().await?;\n    println!(\"{:?}\", \
+             result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_org_privacy_settings<'a>(
+        &'a self,
+    ) -> Result<crate::types::PrivacySettings, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "org/privacy"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Update the privacy settings for an org.\n\nThis endpoint requires authentication by \
+             an org admin. It updates the privacy settings for the authenticated user's \
+             org.\n\n```rust,no_run\nasync fn example_payments_update_org_privacy_settings() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::PrivacySettings = client\n        .payments()\n        \
+             .update_org_privacy_settings(&kittycad::types::PrivacySettings {\n            \
+             can_train_on_data: false,\n        })\n        .await?;\n    println!(\"{:?}\", \
+             result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn update_org_privacy_settings<'a>(
+        &'a self,
+        body: &crate::types::PrivacySettings,
+    ) -> Result<crate::types::PrivacySettings, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!("{}/{}", self.client.base_url, "org/privacy"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
             let text = resp.text().await.unwrap_or_default();
             return Err(crate::types::error::Error::Server {
@@ -649,6 +813,97 @@ impl Payments {
         }
     }
 
+    #[doc = "Get the subscription for a user.\n\nThis endpoint requires authentication by any Zoo user. It gets the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_get_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions =\n        client.payments().get_user_subscription().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_user_subscription<'a>(
+        &'a self,
+    ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "user/payment/subscriptions"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Update the user's subscription.\n\nThis endpoint requires authentication by any Zoo user. It updates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_update_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_user_subscription(&kittycad::types::ZooProductSubscriptions {\n            modeling_app: kittycad::types::ModelingAppSubscriptionTier {\n                description: \"some-string\".to_string(),\n                features: Some(vec![kittycad::types::SubscriptionTierFeature {\n                    info: \"some-string\".to_string(),\n                }]),\n                name: kittycad::types::ModelingAppSubscriptionTierName::Enterprise,\n                pay_as_you_go_credits: 3.14 as f64,\n                price: kittycad::types::SubscriptionTierPrice::Enterprisetype {},\n                support_tier: kittycad::types::SupportTier::Priority,\n                training_data_behavior: kittycad::types::SubscriptionTrainingDataBehavior::DefaultOff,\n                type_: kittycad::types::SubscriptionTierType::Individualtype {},\n                zoo_tools_included: Some(vec![kittycad::types::ZooTool::DiffChromeExtension]),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn update_user_subscription<'a>(
+        &'a self,
+        body: &crate::types::ZooProductSubscriptions,
+    ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!("{}/{}", self.client.base_url, "user/payment/subscriptions"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Create the subscription for a user.\n\nThis endpoint requires authentication by any Zoo user. It creates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_create_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_user_subscription(&kittycad::types::ZooProductSubscriptions {\n            modeling_app: kittycad::types::ModelingAppSubscriptionTier {\n                description: \"some-string\".to_string(),\n                features: Some(vec![kittycad::types::SubscriptionTierFeature {\n                    info: \"some-string\".to_string(),\n                }]),\n                name: kittycad::types::ModelingAppSubscriptionTierName::Enterprise,\n                pay_as_you_go_credits: 3.14 as f64,\n                price: kittycad::types::SubscriptionTierPrice::Enterprisetype {},\n                support_tier: kittycad::types::SupportTier::Priority,\n                training_data_behavior: kittycad::types::SubscriptionTrainingDataBehavior::DefaultOff,\n                type_: kittycad::types::SubscriptionTierType::Individualtype {},\n                zoo_tools_included: Some(vec![kittycad::types::ZooTool::DiffChromeExtension]),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn create_user_subscription<'a>(
+        &'a self,
+        body: &crate::types::ZooProductSubscriptions,
+    ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!("{}/{}", self.client.base_url, "user/payment/subscriptions"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
     #[doc = "Validate a user's information is correct and valid for automatic tax.\n\nThis \
              endpoint requires authentication by any Zoo user. It will return an error if the \
              user's information is not valid for automatic tax. Otherwise, it will return an empty \
@@ -670,6 +925,78 @@ impl Payments {
         let status = resp.status();
         if status.is_success() {
             Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Get the privacy settings for a user.\n\nThis endpoint requires authentication by any \
+             Zoo user. It gets the privacy settings for the user.\n\n```rust,no_run\nasync fn \
+             example_payments_get_user_privacy_settings() -> anyhow::Result<()> {\n    let client \
+             = kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings \
+             =\n        client.payments().get_user_privacy_settings().await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_user_privacy_settings<'a>(
+        &'a self,
+    ) -> Result<crate::types::PrivacySettings, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "user/privacy"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Update the user's privacy settings.\n\nThis endpoint requires authentication by any \
+             Zoo user. It updates the privacy settings for the user.\n\n```rust,no_run\nasync fn \
+             example_payments_update_user_privacy_settings() -> anyhow::Result<()> {\n    let \
+             client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::PrivacySettings = client\n        .payments()\n        \
+             .update_user_privacy_settings(&kittycad::types::PrivacySettings {\n            \
+             can_train_on_data: false,\n        })\n        .await?;\n    println!(\"{:?}\", \
+             result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn update_user_privacy_settings<'a>(
+        &'a self,
+        body: &crate::types::PrivacySettings,
+    ) -> Result<crate::types::PrivacySettings, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!("{}/{}", self.client.base_url, "user/privacy"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
             let text = resp.text().await.unwrap_or_default();
             return Err(crate::types::error::Error::Server {

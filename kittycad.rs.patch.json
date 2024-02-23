@@ -4,7 +4,7 @@
     "path": "/info/x-rust",
     "value": {
       "client": "// Authenticate via an API token.\nlet client = kittycad::Client::new(\"$TOKEN\");\n\n// - OR -\n\n// Authenticate with your token and host parsed from the environment variables:\n// `KITTYCAD_API_TOKEN`.\nlet client = kittycad::Client::new_from_env();",
-      "install": "[dependencies]\nkittycad = \"0.2.54\""
+      "install": "[dependencies]\nkittycad = \"0.2.55\""
     }
   },
   {
@@ -339,7 +339,7 @@
     "op": "add",
     "path": "/paths/~1org~1members/get/x-rust",
     "value": {
-      "example": "/// List members of your org.\n/// \n/// This endpoint requires authentication by an org admin. It lists the members of the authenticated user's org.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `role: Option<crate::types::OrgRole>`: The organization role to filter by.\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_orgs_list_members() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgMemberResultsPage = client\n        .orgs()\n        .list_members(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::OrgRole::Member),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_members_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_members_stream(\n        Some(4 as u32),\n        Some(kittycad::types::OrgRole::Member),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "example": "/// List members of your org.\n/// \n/// This endpoint requires authentication by an org admin. It lists the members of the authenticated user's org.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `role: Option<crate::types::UserOrgRole>`: The organization role to filter by.\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_orgs_list_members() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgMemberResultsPage = client\n        .orgs()\n        .list_members(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::UserOrgRole::Member),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_members_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_members_stream(\n        Some(4 as u32),\n        Some(kittycad::types::UserOrgRole::Member),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.list_members"
     }
   },
@@ -347,7 +347,7 @@
     "op": "add",
     "path": "/paths/~1org~1members/post/x-rust",
     "value": {
-      "example": "/// Add a member to your org.\n/// \n/// If the user exists, this will add them to your org. If they do not exist, this will create a new user and add them to your org.\n/// In both cases the user gets an email that they have been added to the org.\n/// If the user is already in your org, this will return a 400 and a message.\n/// If the user is already in a different org, this will return a 400 and a message.\n/// This endpoint requires authentication by an org admin. It adds the specified member to the authenticated user's org.\nasync fn example_orgs_create_member() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgMember = client\n        .orgs()\n        .create_member(&kittycad::types::AddOrgMember {\n            email: \"email@example.com\".to_string(),\n            role: kittycad::types::OrgRole::Member,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Add a member to your org.\n/// \n/// If the user exists, this will add them to your org. If they do not exist, this will create a new user and add them to your org.\n/// In both cases the user gets an email that they have been added to the org.\n/// If the user is already in your org, this will return a 400 and a message.\n/// If the user is already in a different org, this will return a 400 and a message.\n/// This endpoint requires authentication by an org admin. It adds the specified member to the authenticated user's org.\nasync fn example_orgs_create_member() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgMember = client\n        .orgs()\n        .create_member(&kittycad::types::AddOrgMember {\n            email: \"email@example.com\".to_string(),\n            role: kittycad::types::UserOrgRole::Member,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.create_member"
     }
   },
@@ -371,7 +371,7 @@
     "op": "add",
     "path": "/paths/~1org~1members~1{user_id}/put/x-rust",
     "value": {
-      "example": "/// Update a member of your org.\n/// \n/// This endpoint requires authentication by an org admin. It updates the specified member of the authenticated user's org.\n/// \n/// **Parameters:**\n/// \n/// - `user_id: uuid::Uuid`: The user id of the org member. (required)\nuse std::str::FromStr;\nasync fn example_orgs_update_member() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgMember = client\n        .orgs()\n        .update_member(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateMemberToOrgBody {\n                role: kittycad::types::OrgRole::Member,\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Update a member of your org.\n/// \n/// This endpoint requires authentication by an org admin. It updates the specified member of the authenticated user's org.\n/// \n/// **Parameters:**\n/// \n/// - `user_id: uuid::Uuid`: The user id of the org member. (required)\nuse std::str::FromStr;\nasync fn example_orgs_update_member() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgMember = client\n        .orgs()\n        .update_member(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateMemberToOrgBody {\n                role: kittycad::types::UserOrgRole::Member,\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.update_member"
     }
   },
@@ -449,10 +449,50 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1org~1payment~1subscriptions/get/x-rust",
+    "value": {
+      "example": "/// Get the subscription for an org.\n/// \n/// This endpoint requires authentication by an org admin. It gets the subscription for the authenticated user's org.\nasync fn example_payments_get_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions =\n        client.payments().get_org_subscription().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_org_subscription"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1payment~1subscriptions/post/x-rust",
+    "value": {
+      "example": "/// Create the subscription for an org.\n/// \n/// This endpoint requires authentication by an org admin. It creates the subscription for the authenticated user's org.\nasync fn example_payments_create_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_org_subscription(&kittycad::types::ZooProductSubscriptions {\n            modeling_app: kittycad::types::ModelingAppSubscriptionTier {\n                description: \"some-string\".to_string(),\n                features: Some(vec![kittycad::types::SubscriptionTierFeature {\n                    info: \"some-string\".to_string(),\n                }]),\n                name: kittycad::types::ModelingAppSubscriptionTierName::Enterprise,\n                pay_as_you_go_credits: 3.14 as f64,\n                price: kittycad::types::SubscriptionTierPrice::Enterprisetype {},\n                support_tier: kittycad::types::SupportTier::Priority,\n                training_data_behavior: kittycad::types::SubscriptionTrainingDataBehavior::DefaultOff,\n                type_: kittycad::types::SubscriptionTierType::Individualtype {},\n                zoo_tools_included: Some(vec![kittycad::types::ZooTool::DiffChromeExtension]),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.create_org_subscription"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1payment~1subscriptions/put/x-rust",
+    "value": {
+      "example": "/// Update the subscription for an org.\n/// \n/// This endpoint requires authentication by an org admin. It updates the subscription for the authenticated user's org.\nasync fn example_payments_update_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_org_subscription(&kittycad::types::ZooProductSubscriptions {\n            modeling_app: kittycad::types::ModelingAppSubscriptionTier {\n                description: \"some-string\".to_string(),\n                features: Some(vec![kittycad::types::SubscriptionTierFeature {\n                    info: \"some-string\".to_string(),\n                }]),\n                name: kittycad::types::ModelingAppSubscriptionTierName::Enterprise,\n                pay_as_you_go_credits: 3.14 as f64,\n                price: kittycad::types::SubscriptionTierPrice::Enterprisetype {},\n                support_tier: kittycad::types::SupportTier::Priority,\n                training_data_behavior: kittycad::types::SubscriptionTrainingDataBehavior::DefaultOff,\n                type_: kittycad::types::SubscriptionTierType::Individualtype {},\n                zoo_tools_included: Some(vec![kittycad::types::ZooTool::DiffChromeExtension]),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.update_org_subscription"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1org~1payment~1tax/get/x-rust",
     "value": {
       "example": "/// Validate an orgs's information is correct and valid for automatic tax.\n/// \n/// This endpoint requires authentication by an org admin. It will return an error if the org's information is not valid for automatic tax. Otherwise, it will return an empty successful response.\nasync fn example_payments_validate_customer_tax_information_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .validate_customer_tax_information_for_org()\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.validate_customer_tax_information_for_org"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1privacy/get/x-rust",
+    "value": {
+      "example": "/// Get the privacy settings for an org.\n/// \n/// This endpoint requires authentication by an org admin. It gets the privacy settings for the authenticated user's org.\nasync fn example_payments_get_org_privacy_settings() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings =\n        client.payments().get_org_privacy_settings().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_org_privacy_settings"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1privacy/put/x-rust",
+    "value": {
+      "example": "/// Update the privacy settings for an org.\n/// \n/// This endpoint requires authentication by an org admin. It updates the privacy settings for the authenticated user's org.\nasync fn example_payments_update_org_privacy_settings() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings = client\n        .payments()\n        .update_org_privacy_settings(&kittycad::types::PrivacySettings {\n            can_train_on_data: false,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.update_org_privacy_settings"
     }
   },
   {
@@ -489,10 +529,58 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1org~1service-accounts/get/x-rust",
+    "value": {
+      "example": "/// List service accounts for your org.\n/// \n/// This endpoint requires authentication by an org admin. It returns the service accounts for the organization.\n/// The service accounts are returned in order of creation, with the most recently created service accounts first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_service_accounts_list_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ServiceAccountResultsPage = client\n        .service_accounts()\n        .list_for_org(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_service_accounts_list_for_org_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut service_accounts = client.service_accounts();\n    let mut stream = service_accounts.list_for_org_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/service_accounts/struct.ServiceAccounts.html#method.list_for_org"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1service-accounts/post/x-rust",
+    "value": {
+      "example": "/// Create a new service account for your org.\n/// \n/// This endpoint requires authentication by an org admin. It creates a new service account for the organization.\n/// \n/// **Parameters:**\n/// \n/// - `label: Option<String>`: An optional label for the service account.\nasync fn example_service_accounts_create_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ServiceAccount = client\n        .service_accounts()\n        .create_for_org(Some(\"some-string\".to_string()))\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/service_accounts/struct.ServiceAccounts.html#method.create_for_org"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1service-accounts~1{token}/delete/x-rust",
+    "value": {
+      "example": "/// Delete an service account for your org.\n/// \n/// This endpoint requires authentication by an org admin. It deletes the requested service account for the organization.\n/// This endpoint does not actually delete the service account from the database. It merely marks the token as invalid. We still want to keep the service account in the database for historical purposes.\n/// \n/// **Parameters:**\n/// \n/// - `token: uuid::Uuid`: The service account. (required)\nuse std::str::FromStr;\nasync fn example_service_accounts_delete_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .service_accounts()\n        .delete_for_org(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/service_accounts/struct.ServiceAccounts.html#method.delete_for_org"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1service-accounts~1{token}/get/x-rust",
+    "value": {
+      "example": "/// Get an service account for your org.\n/// \n/// This endpoint requires authentication by an org admin. It returns details of the requested service account for the organization.\n/// \n/// **Parameters:**\n/// \n/// - `token: uuid::Uuid`: The service account. (required)\nuse std::str::FromStr;\nasync fn example_service_accounts_get_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ServiceAccount = client\n        .service_accounts()\n        .get_for_org(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/service_accounts/struct.ServiceAccounts.html#method.get_for_org"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1orgs~1{org_id}~1enterprise~1pricing/put/x-rust",
+    "value": {
+      "example": "/// Set the enterprise price for an organization.\n/// \n/// You must be a Zoo employee to perform this request.\n/// \n/// **Parameters:**\n/// \n/// - `org_id: uuid::Uuid` (required)\nuse std::str::FromStr;\nasync fn example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        .update_enterprise_pricing_for(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::SubscriptionTierPrice::Enterprisetype {},\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.update_enterprise_pricing_for"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1ping/get/x-rust",
     "value": {
       "example": "/// Return pong.\nasync fn example_meta_ping() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Pong = client.meta().ping().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.ping"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1pricing~1subscriptions/get/x-rust",
+    "value": {
+      "example": "/// Get the pricing for our subscriptions.\n/// \n/// This is the ultimate source of truth for the pricing of our subscriptions.\nasync fn example_meta_get_pricing_subscriptions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: std::collections::HashMap<String, Vec<kittycad::types::ZooProductSubscription>> =\n        client.meta().get_pricing_subscriptions().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.get_pricing_subscriptions"
     }
   },
   {
@@ -777,10 +865,50 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1user~1payment~1subscriptions/get/x-rust",
+    "value": {
+      "example": "/// Get the subscription for a user.\n/// \n/// This endpoint requires authentication by any Zoo user. It gets the subscription for the user.\nasync fn example_payments_get_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions =\n        client.payments().get_user_subscription().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_user_subscription"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1payment~1subscriptions/post/x-rust",
+    "value": {
+      "example": "/// Create the subscription for a user.\n/// \n/// This endpoint requires authentication by any Zoo user. It creates the subscription for the user.\nasync fn example_payments_create_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_user_subscription(&kittycad::types::ZooProductSubscriptions {\n            modeling_app: kittycad::types::ModelingAppSubscriptionTier {\n                description: \"some-string\".to_string(),\n                features: Some(vec![kittycad::types::SubscriptionTierFeature {\n                    info: \"some-string\".to_string(),\n                }]),\n                name: kittycad::types::ModelingAppSubscriptionTierName::Enterprise,\n                pay_as_you_go_credits: 3.14 as f64,\n                price: kittycad::types::SubscriptionTierPrice::Enterprisetype {},\n                support_tier: kittycad::types::SupportTier::Priority,\n                training_data_behavior: kittycad::types::SubscriptionTrainingDataBehavior::DefaultOff,\n                type_: kittycad::types::SubscriptionTierType::Individualtype {},\n                zoo_tools_included: Some(vec![kittycad::types::ZooTool::DiffChromeExtension]),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.create_user_subscription"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1payment~1subscriptions/put/x-rust",
+    "value": {
+      "example": "/// Update the user's subscription.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates the subscription for the user.\nasync fn example_payments_update_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_user_subscription(&kittycad::types::ZooProductSubscriptions {\n            modeling_app: kittycad::types::ModelingAppSubscriptionTier {\n                description: \"some-string\".to_string(),\n                features: Some(vec![kittycad::types::SubscriptionTierFeature {\n                    info: \"some-string\".to_string(),\n                }]),\n                name: kittycad::types::ModelingAppSubscriptionTierName::Enterprise,\n                pay_as_you_go_credits: 3.14 as f64,\n                price: kittycad::types::SubscriptionTierPrice::Enterprisetype {},\n                support_tier: kittycad::types::SupportTier::Priority,\n                training_data_behavior: kittycad::types::SubscriptionTrainingDataBehavior::DefaultOff,\n                type_: kittycad::types::SubscriptionTierType::Individualtype {},\n                zoo_tools_included: Some(vec![kittycad::types::ZooTool::DiffChromeExtension]),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.update_user_subscription"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1user~1payment~1tax/get/x-rust",
     "value": {
       "example": "/// Validate a user's information is correct and valid for automatic tax.\n/// \n/// This endpoint requires authentication by any Zoo user. It will return an error if the user's information is not valid for automatic tax. Otherwise, it will return an empty successful response.\nasync fn example_payments_validate_customer_tax_information_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .validate_customer_tax_information_for_user()\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.validate_customer_tax_information_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1privacy/get/x-rust",
+    "value": {
+      "example": "/// Get the privacy settings for a user.\n/// \n/// This endpoint requires authentication by any Zoo user. It gets the privacy settings for the user.\nasync fn example_payments_get_user_privacy_settings() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings =\n        client.payments().get_user_privacy_settings().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_user_privacy_settings"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1privacy/put/x-rust",
+    "value": {
+      "example": "/// Update the user's privacy settings.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates the privacy settings for the user.\nasync fn example_payments_update_user_privacy_settings() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings = client\n        .payments()\n        .update_user_privacy_settings(&kittycad::types::PrivacySettings {\n            can_train_on_data: false,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.update_user_privacy_settings"
     }
   },
   {
