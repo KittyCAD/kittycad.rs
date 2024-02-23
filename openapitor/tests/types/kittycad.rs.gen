@@ -7363,6 +7363,56 @@ pub enum Method {
     Extension,
 }
 
+#[doc = "The subscription tiers we offer for the Modeling App to individuals."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ModelingAppIndividualSubscriptionTier {
+    #[doc = "The free tier."]
+    #[serde(rename = "free")]
+    #[display("free")]
+    Free,
+    #[doc = "The pro tier."]
+    #[serde(rename = "pro")]
+    #[display("pro")]
+    Pro,
+}
+
+#[doc = "The subscription tiers we offer for the Modeling App to organizations."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ModelingAppOrganizationSubscriptionTier {
+    #[doc = "The team tier."]
+    #[serde(rename = "team")]
+    #[display("team")]
+    Team,
+    #[doc = "The enterprise tier."]
+    #[serde(rename = "enterprise")]
+    #[display("enterprise")]
+    Enterprise,
+}
+
 #[doc = "A subscription tier we offer for the Modeling App."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -14045,7 +14095,7 @@ impl tabled::Tabled for ZooProductSubscription {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ZooProductSubscriptions {
-    #[doc = "The subscriptions."]
+    #[doc = "A modeling app subscription."]
     pub modeling_app: ModelingAppSubscriptionTier,
 }
 
@@ -14064,6 +14114,78 @@ impl tabled::Tabled for ZooProductSubscriptions {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![format!("{:?}", self.modeling_app).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["modeling_app".into()]
+    }
+}
+
+#[doc = "A struct of Zoo product subscriptions an organization can request."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ZooProductSubscriptionsOrgRequest {
+    #[doc = "A modeling app subscription."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub modeling_app: Option<ModelingAppOrganizationSubscriptionTier>,
+}
+
+impl std::fmt::Display for ZooProductSubscriptionsOrgRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ZooProductSubscriptionsOrgRequest {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![if let Some(modeling_app) = &self.modeling_app {
+            format!("{:?}", modeling_app).into()
+        } else {
+            String::new().into()
+        }]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["modeling_app".into()]
+    }
+}
+
+#[doc = "A struct of Zoo product subscriptions a user can request."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ZooProductSubscriptionsUserRequest {
+    #[doc = "A modeling app subscription."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub modeling_app: Option<ModelingAppIndividualSubscriptionTier>,
+}
+
+impl std::fmt::Display for ZooProductSubscriptionsUserRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ZooProductSubscriptionsUserRequest {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![if let Some(modeling_app) = &self.modeling_app {
+            format!("{:?}", modeling_app).into()
+        } else {
+            String::new().into()
+        }]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {

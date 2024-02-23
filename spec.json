@@ -5587,7 +5587,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ZooProductSubscriptions"
+                "$ref": "#/components/schemas/ZooProductSubscriptionsOrgRequest"
               }
             }
           },
@@ -5657,7 +5657,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ZooProductSubscriptions"
+                "$ref": "#/components/schemas/ZooProductSubscriptionsOrgRequest"
               }
             }
           },
@@ -10117,7 +10117,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ZooProductSubscriptions"
+                "$ref": "#/components/schemas/ZooProductSubscriptionsUserRequest"
               }
             }
           },
@@ -10187,7 +10187,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ZooProductSubscriptions"
+                "$ref": "#/components/schemas/ZooProductSubscriptionsUserRequest"
               }
             }
           },
@@ -17036,6 +17036,44 @@
             "type": "string",
             "enum": [
               "EXTENSION"
+            ]
+          }
+        ]
+      },
+      "ModelingAppIndividualSubscriptionTier": {
+        "description": "The subscription tiers we offer for the Modeling App to individuals.",
+        "oneOf": [
+          {
+            "description": "The free tier.",
+            "type": "string",
+            "enum": [
+              "free"
+            ]
+          },
+          {
+            "description": "The pro tier.",
+            "type": "string",
+            "enum": [
+              "pro"
+            ]
+          }
+        ]
+      },
+      "ModelingAppOrganizationSubscriptionTier": {
+        "description": "The subscription tiers we offer for the Modeling App to organizations.",
+        "oneOf": [
+          {
+            "description": "The team tier.",
+            "type": "string",
+            "enum": [
+              "team"
+            ]
+          },
+          {
+            "description": "The enterprise tier.",
+            "type": "string",
+            "enum": [
+              "enterprise"
             ]
           }
         ]
@@ -25359,7 +25397,7 @@
         "type": "object",
         "properties": {
           "modeling_app": {
-            "description": "The subscriptions.",
+            "description": "A modeling app subscription.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/ModelingAppSubscriptionTier"
@@ -25370,6 +25408,36 @@
         "required": [
           "modeling_app"
         ]
+      },
+      "ZooProductSubscriptionsOrgRequest": {
+        "description": "A struct of Zoo product subscriptions an organization can request.",
+        "type": "object",
+        "properties": {
+          "modeling_app": {
+            "description": "A modeling app subscription.",
+            "default": "team",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ModelingAppOrganizationSubscriptionTier"
+              }
+            ]
+          }
+        }
+      },
+      "ZooProductSubscriptionsUserRequest": {
+        "description": "A struct of Zoo product subscriptions a user can request.",
+        "type": "object",
+        "properties": {
+          "modeling_app": {
+            "description": "A modeling app subscription.",
+            "default": "free",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ModelingAppIndividualSubscriptionTier"
+              }
+            ]
+          }
+        }
       },
       "ZooTool": {
         "description": "The Zoo tools that can make API calls.",
