@@ -1722,7 +1722,7 @@ fn get_type_name_for_object(
 /// Get the type name for an all of type.
 fn get_type_name_for_all_of(
     name: &str,
-    all_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
+    all_ofs: &[openapiv3::ReferenceOr<openapiv3::Schema>],
     data: &openapiv3::SchemaData,
     spec: &openapiv3::OpenAPI,
     in_crate: bool,
@@ -2654,6 +2654,29 @@ mod test {
 
         expectorate::assert_contents(
             "tests/types/kittycad.drawing-cmd-output.rs.gen",
+            &super::get_text_fmt(&type_space.rendered).unwrap(),
+        );
+    }
+
+    #[test]
+    fn test_render_sum_enum_some_one_some_more() {
+        let schema = include_str!("../../tests/types/input/SubscriptionTierType.json");
+
+        let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
+
+        let mut type_space = super::TypeSpace {
+            types: indexmap::map::IndexMap::new(),
+            spec: crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
+            rendered: quote!(),
+            opts: Default::default(),
+        };
+
+        type_space
+            .render_schema("SubscriptionTierType", &schema)
+            .unwrap();
+
+        expectorate::assert_contents(
+            "tests/types/kittycad.subscription-tier-type.rs.gen",
             &super::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }

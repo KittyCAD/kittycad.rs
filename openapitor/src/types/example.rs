@@ -691,7 +691,10 @@ pub fn generate_example_rust_from_schema(
                                 // Enum variants should be named after their nested object.
                                 // E.g. instead of ModelingCmd::ModelingCmd, it should be
                                 // ModelingCmd::ModelingCmdCameraDragStart.
-                                k.push_str(o.properties.first().unwrap().0);
+                                let variant = o.properties.first().unwrap().0;
+                                if variant != "type" {
+                                    k.push_str(variant);
+                                }
                             }
                             _ => {}
                         }
@@ -740,6 +743,7 @@ pub fn generate_example_rust_from_schema(
                                 additional_properties: o.additional_properties.clone(),
                                 ..Default::default()
                             };
+
                             // Create our schema.
                             let schema = openapiv3::Schema {
                                 schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(

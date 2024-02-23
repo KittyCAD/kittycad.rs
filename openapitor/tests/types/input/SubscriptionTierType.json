@@ -1,0 +1,40 @@
+{
+  "description": "An enum representing a subscription tier type.",
+  "oneOf": [
+    {
+      "description": "A subscription tier that can be applied to individuals only.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "individual"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    {
+      "description": "An subscription tier that can be applied to organizations only.",
+      "type": "object",
+      "properties": {
+        "saml_sso": {
+          "description": "Whether or not the subscription type supports SAML SSO.",
+          "type": "boolean"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "organization"
+          ]
+        }
+      },
+      "required": [
+        "saml_sso",
+        "type"
+      ]
+    }
+  ]
+}

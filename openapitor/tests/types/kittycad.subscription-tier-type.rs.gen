@@ -1,0 +1,17 @@
+#[doc = "An enum representing a subscription tier type."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum SubscriptionTierType {
+    #[doc = "A subscription tier that can be applied to individuals only."]
+    #[serde(rename = "individual")]
+    Individual {},
+    #[doc = "An subscription tier that can be applied to organizations only."]
+    #[serde(rename = "organization")]
+    Organization {
+        #[doc = "Whether or not the subscription type supports SAML SSO."]
+        saml_sso: bool,
+    },
+}
