@@ -5829,7 +5829,7 @@
     "/org/privacy": {
       "get": {
         "tags": [
-          "payments"
+          "orgs"
         ],
         "summary": "Get the privacy settings for an org.",
         "description": "This endpoint requires authentication by an org admin. It gets the privacy settings for the authenticated user's org.",
@@ -5889,7 +5889,7 @@
       },
       "put": {
         "tags": [
-          "payments"
+          "orgs"
         ],
         "summary": "Update the privacy settings for an org.",
         "description": "This endpoint requires authentication by an org admin. It updates the privacy settings for the authenticated user's org.",
@@ -10359,7 +10359,7 @@
     "/user/privacy": {
       "get": {
         "tags": [
-          "payments"
+          "users"
         ],
         "summary": "Get the privacy settings for a user.",
         "description": "This endpoint requires authentication by any Zoo user. It gets the privacy settings for the user.",
@@ -10419,7 +10419,7 @@
       },
       "put": {
         "tags": [
-          "payments"
+          "users"
         ],
         "summary": "Update the user's privacy settings.",
         "description": "This endpoint requires authentication by any Zoo user. It updates the privacy settings for the user.",
