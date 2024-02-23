@@ -180,4 +180,36 @@ impl Meta {
             });
         }
     }
+
+    #[doc = "Get the pricing for our subscriptions.\n\nThis is the ultimate source of truth for the pricing of our subscriptions.\n\n```rust,no_run\nasync fn example_meta_get_pricing_subscriptions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: std::collections::HashMap<String, Vec<kittycad::types::ZooProductSubscription>> =\n        client.meta().get_pricing_subscriptions().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_pricing_subscriptions<'a>(
+        &'a self,
+    ) -> Result<
+        std::collections::HashMap<String, Vec<crate::types::ZooProductSubscription>>,
+        crate::types::error::Error,
+    > {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "pricing/subscriptions"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
 }

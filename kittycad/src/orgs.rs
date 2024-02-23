@@ -131,13 +131,13 @@ impl Orgs {
         }
     }
 
-    #[doc = "List members of your org.\n\nThis endpoint requires authentication by an org admin. It lists the members of the authenticated user's org.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `role: Option<crate::types::OrgRole>`: The organization role to filter by.\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_members_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_members_stream(\n        Some(4 as u32),\n        Some(kittycad::types::OrgRole::Member),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List members of your org.\n\nThis endpoint requires authentication by an org admin. It lists the members of the authenticated user's org.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `role: Option<crate::types::UserOrgRole>`: The organization role to filter by.\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_members_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_members_stream(\n        Some(4 as u32),\n        Some(kittycad::types::UserOrgRole::Member),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list_members<'a>(
         &'a self,
         limit: Option<u32>,
         page_token: Option<String>,
-        role: Option<crate::types::OrgRole>,
+        role: Option<crate::types::UserOrgRole>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> Result<crate::types::OrgMemberResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
@@ -182,13 +182,13 @@ impl Orgs {
         }
     }
 
-    #[doc = "List members of your org.\n\nThis endpoint requires authentication by an org admin. It lists the members of the authenticated user's org.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `role: Option<crate::types::OrgRole>`: The organization role to filter by.\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_members_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_members_stream(\n        Some(4 as u32),\n        Some(kittycad::types::OrgRole::Member),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List members of your org.\n\nThis endpoint requires authentication by an org admin. It lists the members of the authenticated user's org.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `role: Option<crate::types::UserOrgRole>`: The organization role to filter by.\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_members_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_members_stream(\n        Some(4 as u32),\n        Some(kittycad::types::UserOrgRole::Member),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     #[cfg(not(feature = "js"))]
     pub fn list_members_stream<'a>(
         &'a self,
         limit: Option<u32>,
-        role: Option<crate::types::OrgRole>,
+        role: Option<crate::types::UserOrgRole>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> impl futures::Stream<Item = Result<crate::types::OrgMember, crate::types::error::Error>>
            + Unpin
@@ -265,7 +265,7 @@ impl Orgs {
              result: kittycad::types::OrgMember = client\n        .orgs()\n        \
              .create_member(&kittycad::types::AddOrgMember {\n            email: \
              \"email@example.com\".to_string(),\n            role: \
-             kittycad::types::OrgRole::Member,\n        })\n        .await?;\n    \
+             kittycad::types::UserOrgRole::Member,\n        })\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_member<'a>(
@@ -339,17 +339,7 @@ impl Orgs {
         }
     }
 
-    #[doc = "Update a member of your org.\n\nThis endpoint requires authentication by an org \
-             admin. It updates the specified member of the authenticated user's \
-             org.\n\n**Parameters:**\n\n- `user_id: uuid::Uuid`: The user id of the org member. \
-             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
-             example_orgs_update_member() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgMember = \
-             client\n        .orgs()\n        .update_member(\n            \
-             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
-             &kittycad::types::UpdateMemberToOrgBody {\n                role: \
-             kittycad::types::OrgRole::Member,\n            },\n        )\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update a member of your org.\n\nThis endpoint requires authentication by an org admin. It updates the specified member of the authenticated user's org.\n\n**Parameters:**\n\n- `user_id: uuid::Uuid`: The user id of the org member. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_update_member() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgMember = client\n        .orgs()\n        .update_member(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateMemberToOrgBody {\n                role: kittycad::types::UserOrgRole::Member,\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_member<'a>(
         &'a self,
@@ -531,6 +521,51 @@ impl Orgs {
         let status = resp.status();
         if status.is_success() {
             Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Set the enterprise price for an organization.\n\nYou must be a Zoo employee to \
+             perform this request.\n\n**Parameters:**\n\n- `org_id: uuid::Uuid` \
+             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client \
+             = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        \
+             .update_enterprise_pricing_for(\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             &kittycad::types::SubscriptionTierPrice::Enterprisetype {},\n        )\n        \
+             .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn update_enterprise_pricing_for<'a>(
+        &'a self,
+        org_id: uuid::Uuid,
+        body: &crate::types::SubscriptionTierPrice,
+    ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "orgs/{org_id}/enterprise/pricing".replace("{org_id}", &format!("{}", org_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
             let text = resp.text().await.unwrap_or_default();
             return Err(crate::types::error::Error::Server {

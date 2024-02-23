@@ -29,7 +29,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! kittycad = "0.2.54"
+//! kittycad = "0.2.55"
 //! ```
 //!
 //! ## Basic example
@@ -120,6 +120,11 @@ pub mod orgs;
 /// FROM: <https://zoo.dev/docs/api/payments>
 #[cfg(feature = "requests")]
 pub mod payments;
+/// Service accounts allow organizations to call the API. Organization admins can create, delete, and list the service accounts for their org. Service accounts are scoped to an organization not individual users, these are better to use for automations than individual API tokens, since they won't stop working when an individual leaves the company.
+///
+/// FROM: <https://zoo.dev/docs/api/service-accounts>
+#[cfg(feature = "requests")]
+pub mod service_accounts;
 #[cfg(test)]
 mod tests;
 pub mod types;
@@ -448,6 +453,13 @@ impl Client {
     /// FROM: <https://zoo.dev/docs/api/payments>
     pub fn payments(&self) -> payments::Payments {
         payments::Payments::new(self.clone())
+    }
+
+    /// Service accounts allow organizations to call the API. Organization admins can create, delete, and list the service accounts for their org. Service accounts are scoped to an organization not individual users, these are better to use for automations than individual API tokens, since they won't stop working when an individual leaves the company.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/service-accounts>
+    pub fn service_accounts(&self) -> service_accounts::ServiceAccounts {
+        service_accounts::ServiceAccounts::new(self.clone())
     }
 
     /// Unit conversion operations.
