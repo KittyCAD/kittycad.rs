@@ -483,16 +483,16 @@
     "op": "add",
     "path": "/paths/~1org~1privacy/get/x-rust",
     "value": {
-      "example": "/// Get the privacy settings for an org.\n/// \n/// This endpoint requires authentication by an org admin. It gets the privacy settings for the authenticated user's org.\nasync fn example_payments_get_org_privacy_settings() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings =\n        client.payments().get_org_privacy_settings().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_org_privacy_settings"
+      "example": "/// Get the privacy settings for an org.\n/// \n/// This endpoint requires authentication by an org admin. It gets the privacy settings for the authenticated user's org.\nasync fn example_orgs_get_privacy_settings() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings = client.orgs().get_privacy_settings().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.get_privacy_settings"
     }
   },
   {
     "op": "add",
     "path": "/paths/~1org~1privacy/put/x-rust",
     "value": {
-      "example": "/// Update the privacy settings for an org.\n/// \n/// This endpoint requires authentication by an org admin. It updates the privacy settings for the authenticated user's org.\nasync fn example_payments_update_org_privacy_settings() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings = client\n        .payments()\n        .update_org_privacy_settings(&kittycad::types::PrivacySettings {\n            can_train_on_data: false,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.update_org_privacy_settings"
+      "example": "/// Update the privacy settings for an org.\n/// \n/// This endpoint requires authentication by an org admin. It updates the privacy settings for the authenticated user's org.\nasync fn example_orgs_update_privacy_settings() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings = client\n        .orgs()\n        .update_privacy_settings(&kittycad::types::PrivacySettings {\n            can_train_on_data: false,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.update_privacy_settings"
     }
   },
   {
@@ -899,16 +899,16 @@
     "op": "add",
     "path": "/paths/~1user~1privacy/get/x-rust",
     "value": {
-      "example": "/// Get the privacy settings for a user.\n/// \n/// This endpoint requires authentication by any Zoo user. It gets the privacy settings for the user.\nasync fn example_payments_get_user_privacy_settings() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings =\n        client.payments().get_user_privacy_settings().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_user_privacy_settings"
+      "example": "/// Get the privacy settings for a user.\n/// \n/// This endpoint requires authentication by any Zoo user. It gets the privacy settings for the user.\nasync fn example_users_get_privacy_settings() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings = client.users().get_privacy_settings().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_privacy_settings"
     }
   },
   {
     "op": "add",
     "path": "/paths/~1user~1privacy/put/x-rust",
     "value": {
-      "example": "/// Update the user's privacy settings.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates the privacy settings for the user.\nasync fn example_payments_update_user_privacy_settings() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings = client\n        .payments()\n        .update_user_privacy_settings(&kittycad::types::PrivacySettings {\n            can_train_on_data: false,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.update_user_privacy_settings"
+      "example": "/// Update the user's privacy settings.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates the privacy settings for the user.\nasync fn example_users_update_privacy_settings() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings = client\n        .users()\n        .update_privacy_settings(&kittycad::types::PrivacySettings {\n            can_train_on_data: false,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.update_privacy_settings"
     }
   },
   {
