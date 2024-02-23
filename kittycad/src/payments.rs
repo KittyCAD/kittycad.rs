@@ -354,11 +354,11 @@ impl Payments {
         }
     }
 
-    #[doc = "Update the subscription for an org.\n\nThis endpoint requires authentication by an org admin. It updates the subscription for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_update_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_org_subscription(&kittycad::types::ZooProductSubscriptions {\n            modeling_app: kittycad::types::ModelingAppSubscriptionTier {\n                description: \"some-string\".to_string(),\n                features: Some(vec![kittycad::types::SubscriptionTierFeature {\n                    info: \"some-string\".to_string(),\n                }]),\n                name: kittycad::types::ModelingAppSubscriptionTierName::Enterprise,\n                pay_as_you_go_credits: 3.14 as f64,\n                price: kittycad::types::SubscriptionTierPrice::Enterprise {},\n                support_tier: kittycad::types::SupportTier::Priority,\n                training_data_behavior: kittycad::types::SubscriptionTrainingDataBehavior::DefaultOff,\n                type_: kittycad::types::SubscriptionTierType::Individual {},\n                zoo_tools_included: Some(vec![kittycad::types::ZooTool::DiffChromeExtension]),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update the subscription for an org.\n\nThis endpoint requires authentication by an org admin. It updates the subscription for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_update_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_org_subscription(&kittycad::types::ZooProductSubscriptionsOrgRequest {\n            modeling_app: Some(kittycad::types::ModelingAppOrganizationSubscriptionTier::Enterprise),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_org_subscription<'a>(
         &'a self,
-        body: &crate::types::ZooProductSubscriptions,
+        body: &crate::types::ZooProductSubscriptionsOrgRequest,
     ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::PUT,
@@ -385,11 +385,11 @@ impl Payments {
         }
     }
 
-    #[doc = "Create the subscription for an org.\n\nThis endpoint requires authentication by an org admin. It creates the subscription for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_create_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_org_subscription(&kittycad::types::ZooProductSubscriptions {\n            modeling_app: kittycad::types::ModelingAppSubscriptionTier {\n                description: \"some-string\".to_string(),\n                features: Some(vec![kittycad::types::SubscriptionTierFeature {\n                    info: \"some-string\".to_string(),\n                }]),\n                name: kittycad::types::ModelingAppSubscriptionTierName::Enterprise,\n                pay_as_you_go_credits: 3.14 as f64,\n                price: kittycad::types::SubscriptionTierPrice::Enterprise {},\n                support_tier: kittycad::types::SupportTier::Priority,\n                training_data_behavior: kittycad::types::SubscriptionTrainingDataBehavior::DefaultOff,\n                type_: kittycad::types::SubscriptionTierType::Individual {},\n                zoo_tools_included: Some(vec![kittycad::types::ZooTool::DiffChromeExtension]),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create the subscription for an org.\n\nThis endpoint requires authentication by an org admin. It creates the subscription for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_create_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_org_subscription(&kittycad::types::ZooProductSubscriptionsOrgRequest {\n            modeling_app: Some(kittycad::types::ModelingAppOrganizationSubscriptionTier::Enterprise),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_org_subscription<'a>(
         &'a self,
-        body: &crate::types::ZooProductSubscriptions,
+        body: &crate::types::ZooProductSubscriptionsOrgRequest,
     ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
@@ -769,11 +769,11 @@ impl Payments {
         }
     }
 
-    #[doc = "Update the user's subscription.\n\nThis endpoint requires authentication by any Zoo user. It updates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_update_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_user_subscription(&kittycad::types::ZooProductSubscriptions {\n            modeling_app: kittycad::types::ModelingAppSubscriptionTier {\n                description: \"some-string\".to_string(),\n                features: Some(vec![kittycad::types::SubscriptionTierFeature {\n                    info: \"some-string\".to_string(),\n                }]),\n                name: kittycad::types::ModelingAppSubscriptionTierName::Enterprise,\n                pay_as_you_go_credits: 3.14 as f64,\n                price: kittycad::types::SubscriptionTierPrice::Enterprise {},\n                support_tier: kittycad::types::SupportTier::Priority,\n                training_data_behavior: kittycad::types::SubscriptionTrainingDataBehavior::DefaultOff,\n                type_: kittycad::types::SubscriptionTierType::Individual {},\n                zoo_tools_included: Some(vec![kittycad::types::ZooTool::DiffChromeExtension]),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update the user's subscription.\n\nThis endpoint requires authentication by any Zoo user. It updates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_update_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            modeling_app: Some(kittycad::types::ModelingAppIndividualSubscriptionTier::Pro),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_user_subscription<'a>(
         &'a self,
-        body: &crate::types::ZooProductSubscriptions,
+        body: &crate::types::ZooProductSubscriptionsUserRequest,
     ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::PUT,
@@ -800,11 +800,11 @@ impl Payments {
         }
     }
 
-    #[doc = "Create the subscription for a user.\n\nThis endpoint requires authentication by any Zoo user. It creates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_create_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_user_subscription(&kittycad::types::ZooProductSubscriptions {\n            modeling_app: kittycad::types::ModelingAppSubscriptionTier {\n                description: \"some-string\".to_string(),\n                features: Some(vec![kittycad::types::SubscriptionTierFeature {\n                    info: \"some-string\".to_string(),\n                }]),\n                name: kittycad::types::ModelingAppSubscriptionTierName::Enterprise,\n                pay_as_you_go_credits: 3.14 as f64,\n                price: kittycad::types::SubscriptionTierPrice::Enterprise {},\n                support_tier: kittycad::types::SupportTier::Priority,\n                training_data_behavior: kittycad::types::SubscriptionTrainingDataBehavior::DefaultOff,\n                type_: kittycad::types::SubscriptionTierType::Individual {},\n                zoo_tools_included: Some(vec![kittycad::types::ZooTool::DiffChromeExtension]),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create the subscription for a user.\n\nThis endpoint requires authentication by any Zoo user. It creates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_create_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            modeling_app: Some(kittycad::types::ModelingAppIndividualSubscriptionTier::Pro),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_user_subscription<'a>(
         &'a self,
-        body: &crate::types::ZooProductSubscriptions,
+        body: &crate::types::ZooProductSubscriptionsUserRequest,
     ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
