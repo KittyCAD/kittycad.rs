@@ -193,6 +193,78 @@ impl Users {
         }
     }
 
+    #[doc = "Get the privacy settings for a user.\n\nThis endpoint requires authentication by any \
+             Zoo user. It gets the privacy settings for the user.\n\n```rust,no_run\nasync fn \
+             example_users_get_privacy_settings() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings = \
+             client.users().get_privacy_settings().await?;\n    println!(\"{:?}\", result);\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_privacy_settings<'a>(
+        &'a self,
+    ) -> Result<crate::types::PrivacySettings, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "user/privacy"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Update the user's privacy settings.\n\nThis endpoint requires authentication by any \
+             Zoo user. It updates the privacy settings for the user.\n\n```rust,no_run\nasync fn \
+             example_users_update_privacy_settings() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings = \
+             client\n        .users()\n        \
+             .update_privacy_settings(&kittycad::types::PrivacySettings {\n            \
+             can_train_on_data: false,\n        })\n        .await?;\n    println!(\"{:?}\", \
+             result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn update_privacy_settings<'a>(
+        &'a self,
+        body: &crate::types::PrivacySettings,
+    ) -> Result<crate::types::PrivacySettings, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!("{}/{}", self.client.base_url, "user/privacy"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
     #[doc = "Get a session for your user.\n\nThis endpoint requires authentication by any Zoo \
              user. It returns details of the requested API token for the \
              user.\n\n**Parameters:**\n\n- `token: uuid::Uuid`: The API token. \
