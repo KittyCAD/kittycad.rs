@@ -961,7 +961,7 @@ dependencies = [
 
 [[package]]
 name = "kittycad"
-version = "0.2.57"
+version = "0.2.58"
 dependencies = [
  "anyhow",
  "async-trait",

@@ -439,6 +439,84 @@ impl Payments {
         }
     }
 
+    #[doc = "Get balance for an org.\n\nThis endpoint requires authentication by a Zoo employee. \
+             It gets the balance information for the specified org.\n\n**Parameters:**\n\n- `id: \
+             uuid::Uuid`: The organization ID. (required)\n\n```rust,no_run\nuse \
+             std::str::FromStr;\nasync fn example_payments_get_balance_for_any_org() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::CustomerBalance = client\n        .payments()\n        \
+             .get_balance_for_any_org(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_balance_for_any_org<'a>(
+        &'a self,
+        id: uuid::Uuid,
+    ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "orgs/{id}/payment/balance".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Update balance for an org.\n\nThis endpoint requires authentication by a Zoo employee. It updates the balance information for the specified org.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_payments_update_balance_for_any_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client\n        .payments()\n        .update_balance_for_any_org(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdatePaymentBalance {\n                monthly_credits_remaining: Some(3.14 as f64),\n                pre_pay_cash_remaining: Some(3.14 as f64),\n                pre_pay_credits_remaining: Some(3.14 as f64),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn update_balance_for_any_org<'a>(
+        &'a self,
+        id: uuid::Uuid,
+        body: &crate::types::UpdatePaymentBalance,
+    ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "orgs/{id}/payment/balance".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
     #[doc = "Get payment info about your user.\n\nThis includes billing address, phone, and \
              name.\nThis endpoint requires authentication by any Zoo user. It gets the payment \
              information for the authenticated user.\n\n```rust,no_run\nasync fn \
@@ -852,6 +930,84 @@ impl Payments {
         let status = resp.status();
         if status.is_success() {
             Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Get balance for an user.\n\nThis endpoint requires authentication by a Zoo employee. \
+             It gets the balance information for the specified user.\n\n**Parameters:**\n\n- `id: \
+             uuid::Uuid`: The user ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync \
+             fn example_payments_get_balance_for_any_user() -> anyhow::Result<()> {\n    let \
+             client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::CustomerBalance = client\n        .payments()\n        \
+             .get_balance_for_any_user(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_balance_for_any_user<'a>(
+        &'a self,
+        id: uuid::Uuid,
+    ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "users/{id}/payment/balance".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "Update balance for an user.\n\nThis endpoint requires authentication by a Zoo employee. It updates the balance information for the specified user.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The user ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_payments_update_balance_for_any_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client\n        .payments()\n        .update_balance_for_any_user(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdatePaymentBalance {\n                monthly_credits_remaining: Some(3.14 as f64),\n                pre_pay_cash_remaining: Some(3.14 as f64),\n                pre_pay_credits_remaining: Some(3.14 as f64),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn update_balance_for_any_user<'a>(
+        &'a self,
+        id: uuid::Uuid,
+        body: &crate::types::UpdatePaymentBalance,
+    ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "users/{id}/payment/balance".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
             let text = resp.text().await.unwrap_or_default();
             return Err(crate::types::error::Error::Server {

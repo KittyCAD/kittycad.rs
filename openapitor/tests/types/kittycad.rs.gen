@@ -3915,6 +3915,50 @@ impl tabled::Tabled for Discount {
     }
 }
 
+#[doc = "A discount code for a store."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DiscountCode {
+    #[doc = "The code for the discount."]
+    pub code: String,
+    #[doc = "The date the discount code expires."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expires_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The percent off for the discount."]
+    pub percent_off: u32,
+}
+
+impl std::fmt::Display for DiscountCode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DiscountCode {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.code.clone().into(),
+            if let Some(expires_at) = &self.expires_at {
+                format!("{:?}", expires_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.percent_off).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["code".into(), "expires_at".into(), "percent_off".into()]
+    }
+}
+
 #[doc = "The type of distance Distances can vary depending on the objects used as input."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9110,6 +9154,79 @@ impl tabled::Tabled for OrgMemberResultsPage {
     }
 }
 
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrgResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<Org>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for OrgResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for OrgResultsPage {
+    type Item = Org;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrgResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
+    }
+}
+
 #[doc = "The roles in an organization."]
 #[derive(
     serde :: Serialize,
@@ -10919,6 +11036,37 @@ pub enum StlStorage {
     #[serde(rename = "binary")]
     #[display("binary")]
     Binary,
+}
+
+#[doc = "The parameters for a new store coupon."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct StoreCouponParams {
+    #[doc = "The percentage off."]
+    pub percent_off: u32,
+}
+
+impl std::fmt::Display for StoreCouponParams {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for StoreCouponParams {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.percent_off).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["percent_off".into()]
+    }
 }
 
 #[doc = "A subscription tier feature."]
@@ -13337,6 +13485,64 @@ impl tabled::Tabled for UpdateMemberToOrgBody {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["role".into()]
+    }
+}
+
+#[doc = "The data for updating a balance."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UpdatePaymentBalance {
+    #[doc = "The monthy credits remaining in the balance. This gets re-upped every month, but if the credits are not used for a month they do not carry over to the next month. It is a stable amount granted to the user per month."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub monthly_credits_remaining: Option<f64>,
+    #[doc = "The amount of pre-pay cash remaining in the balance. This number goes down as the user uses their pre-paid credits. The reason we track this amount is if a user ever wants to withdraw their pre-pay cash, we can use this amount to determine how much to give them. Say a user has $100 in pre-paid cash, their bill is worth, $50 after subtracting any other credits (like monthly etc.) Their bill is $50, their pre-pay cash remaining will be subtracted by 50 to pay the bill and their `pre_pay_credits_remaining` will be subtracted by 50 to pay the bill. This way if they want to withdraw money after, they can only withdraw $50 since that is the amount of cash they have remaining."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pre_pay_cash_remaining: Option<f64>,
+    #[doc = "The amount of credits remaining in the balance. This is typically the amount of cash * some multiplier they get for pre-paying their account. This number lowers every time a bill is paid with the balance. This number increases every time a user adds funds to their balance. This may be through a subscription or a one off payment."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pre_pay_credits_remaining: Option<f64>,
+}
+
+impl std::fmt::Display for UpdatePaymentBalance {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for UpdatePaymentBalance {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(monthly_credits_remaining) = &self.monthly_credits_remaining {
+                format!("{:?}", monthly_credits_remaining).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(pre_pay_cash_remaining) = &self.pre_pay_cash_remaining {
+                format!("{:?}", pre_pay_cash_remaining).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(pre_pay_credits_remaining) = &self.pre_pay_credits_remaining {
+                format!("{:?}", pre_pay_credits_remaining).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "monthly_credits_remaining".into(),
+            "pre_pay_cash_remaining".into(),
+            "pre_pay_credits_remaining".into(),
+        ]
     }
 }
 

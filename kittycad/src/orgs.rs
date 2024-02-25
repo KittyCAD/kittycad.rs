@@ -603,8 +603,158 @@ impl Orgs {
         }
     }
 
+    #[doc = "List orgs.\n\nThis endpoint requires authentication by a Zoo employee. The orgs are returned in order of creation, with the most recently created orgs first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn list<'a>(
+        &'a self,
+        limit: Option<u32>,
+        page_token: Option<String>,
+        sort_by: Option<crate::types::CreatedAtSortMode>,
+    ) -> Result<crate::types::OrgResultsPage, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "orgs"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        if let Some(p) = sort_by {
+            query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
+    #[doc = "List orgs.\n\nThis endpoint requires authentication by a Zoo employee. The orgs are returned in order of creation, with the most recently created orgs first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    #[cfg(not(feature = "js"))]
+    pub fn list_stream<'a>(
+        &'a self,
+        limit: Option<u32>,
+        sort_by: Option<crate::types::CreatedAtSortMode>,
+    ) -> impl futures::Stream<Item = Result<crate::types::Org, crate::types::error::Error>> + Unpin + '_
+    {
+        use futures::{StreamExt, TryFutureExt, TryStreamExt};
+
+        use crate::types::paginate::Pagination;
+        self.list(limit, None, sort_by)
+            .map_ok(move |result| {
+                let items = futures::stream::iter(result.items().into_iter().map(Ok));
+                let next_pages = futures::stream::try_unfold(
+                    (None, result),
+                    move |(prev_page_token, new_result)| async move {
+                        if new_result.has_more_pages()
+                            && !new_result.items().is_empty()
+                            && prev_page_token != new_result.next_page_token()
+                        {
+                            async {
+                                let mut req = self.client.client.request(
+                                    http::Method::GET,
+                                    format!("{}/{}", self.client.base_url, "orgs"),
+                                );
+                                req = req.bearer_auth(&self.client.token);
+                                let mut request = req.build()?;
+                                request = new_result.next_page(request)?;
+                                let resp = self.client.client.execute(request).await?;
+                                let status = resp.status();
+                                if status.is_success() {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    serde_json::from_str(&text).map_err(|err| {
+                                        crate::types::error::Error::from_serde_error(
+                                            format_serde_error::SerdeError::new(
+                                                text.to_string(),
+                                                err,
+                                            ),
+                                            status,
+                                        )
+                                    })
+                                } else {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    Err(crate::types::error::Error::Server {
+                                        body: text.to_string(),
+                                        status,
+                                    })
+                                }
+                            }
+                            .map_ok(|result: crate::types::OrgResultsPage| {
+                                Some((
+                                    futures::stream::iter(result.items().into_iter().map(Ok)),
+                                    (new_result.next_page_token(), result),
+                                ))
+                            })
+                            .await
+                        } else {
+                            Ok(None)
+                        }
+                    },
+                )
+                .try_flatten();
+                items.chain(next_pages)
+            })
+            .try_flatten_stream()
+            .boxed()
+    }
+
+    #[doc = "Get an org.\n\nThis endpoint requires authentication by a Zoo employee. It gets the information for the specified org.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_get_any() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Org = client\n        .orgs()\n        .get_any(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_any<'a>(
+        &'a self,
+        id: uuid::Uuid,
+    ) -> Result<crate::types::Org, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "orgs/{id}".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
     #[doc = "Set the enterprise price for an organization.\n\nYou must be a Zoo employee to \
-             perform this request.\n\n**Parameters:**\n\n- `org_id: uuid::Uuid` \
+             perform this request.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. \
              (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
              example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client \
              = kittycad::Client::new_from_env();\n    let result: \
@@ -616,7 +766,7 @@ impl Orgs {
     #[tracing::instrument]
     pub async fn update_enterprise_pricing_for<'a>(
         &'a self,
-        org_id: uuid::Uuid,
+        id: uuid::Uuid,
         body: &crate::types::SubscriptionTierPrice,
     ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
         let mut req = self.client.client.request(
@@ -624,7 +774,7 @@ impl Orgs {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "orgs/{org_id}/enterprise/pricing".replace("{org_id}", &format!("{}", org_id))
+                "orgs/{id}/enterprise/pricing".replace("{id}", &format!("{}", id))
             ),
         );
         req = req.bearer_auth(&self.client.token);
