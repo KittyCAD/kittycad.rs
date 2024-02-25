@@ -4,7 +4,7 @@
     "path": "/info/x-rust",
     "value": {
       "client": "// Authenticate via an API token.\nlet client = kittycad::Client::new(\"$TOKEN\");\n\n// - OR -\n\n// Authenticate with your token and host parsed from the environment variables:\n// `KITTYCAD_API_TOKEN`.\nlet client = kittycad::Client::new_from_env();",
-      "install": "[dependencies]\nkittycad = \"0.2.57\""
+      "install": "[dependencies]\nkittycad = \"0.2.58\""
     }
   },
   {
@@ -561,10 +561,42 @@
   },
   {
     "op": "add",
-    "path": "/paths/~1orgs~1{org_id}~1enterprise~1pricing/put/x-rust",
+    "path": "/paths/~1orgs/get/x-rust",
     "value": {
-      "example": "/// Set the enterprise price for an organization.\n/// \n/// You must be a Zoo employee to perform this request.\n/// \n/// **Parameters:**\n/// \n/// - `org_id: uuid::Uuid` (required)\nuse std::str::FromStr;\nasync fn example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        .update_enterprise_pricing_for(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::SubscriptionTierPrice::Enterprise {},\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// List orgs.\n/// \n/// This endpoint requires authentication by a Zoo employee. The orgs are returned in order of creation, with the most recently created orgs first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_orgs_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgResultsPage = client\n        .orgs()\n        .list(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.list"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1orgs~1{id}/get/x-rust",
+    "value": {
+      "example": "/// Get an org.\n/// \n/// This endpoint requires authentication by a Zoo employee. It gets the information for the specified org.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_orgs_get_any() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Org = client\n        .orgs()\n        .get_any(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.get_any"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1orgs~1{id}~1enterprise~1pricing/put/x-rust",
+    "value": {
+      "example": "/// Set the enterprise price for an organization.\n/// \n/// You must be a Zoo employee to perform this request.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        .update_enterprise_pricing_for(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::SubscriptionTierPrice::Enterprise {},\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.update_enterprise_pricing_for"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1orgs~1{id}~1payment~1balance/get/x-rust",
+    "value": {
+      "example": "/// Get balance for an org.\n/// \n/// This endpoint requires authentication by a Zoo employee. It gets the balance information for the specified org.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_payments_get_balance_for_any_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client\n        .payments()\n        .get_balance_for_any_org(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_balance_for_any_org"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1orgs~1{id}~1payment~1balance/put/x-rust",
+    "value": {
+      "example": "/// Update balance for an org.\n/// \n/// This endpoint requires authentication by a Zoo employee. It updates the balance information for the specified org.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_payments_update_balance_for_any_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client\n        .payments()\n        .update_balance_for_any_org(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdatePaymentBalance {\n                monthly_credits_remaining: Some(3.14 as f64),\n                pre_pay_cash_remaining: Some(3.14 as f64),\n                pre_pay_credits_remaining: Some(3.14 as f64),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.update_balance_for_any_org"
     }
   },
   {
@@ -581,6 +613,14 @@
     "value": {
       "example": "/// Get the pricing for our subscriptions.\n/// \n/// This is the ultimate source of truth for the pricing of our subscriptions.\nasync fn example_meta_get_pricing_subscriptions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: std::collections::HashMap<String, Vec<kittycad::types::ZooProductSubscription>> =\n        client.meta().get_pricing_subscriptions().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.get_pricing_subscriptions"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1store~1coupon/post/x-rust",
+    "value": {
+      "example": "/// Create a new store coupon.\n/// \n/// This endpoint requires authentication by a Zoo employee. It creates a new store coupon.\nasync fn example_store_create_coupon() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::DiscountCode = client\n        .store()\n        .create_coupon(&kittycad::types::StoreCouponParams {\n            percent_off: 4 as u32,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/store/struct.Store.html#method.create_coupon"
     }
   },
   {
@@ -947,7 +987,7 @@
     "op": "add",
     "path": "/paths/~1users/get/x-rust",
     "value": {
-      "example": "/// List users.\n/// \n/// This endpoint required authentication by a Zoo employee. The users are returned in order of creation, with the most recently created users first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_users_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserResultsPage = client\n        .users()\n        .list(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "example": "/// List users.\n/// \n/// This endpoint requires authentication by a Zoo employee. The users are returned in order of creation, with the most recently created users first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_users_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserResultsPage = client\n        .users()\n        .list(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.list"
     }
   },
@@ -955,7 +995,7 @@
     "op": "add",
     "path": "/paths/~1users-extended/get/x-rust",
     "value": {
-      "example": "/// List users with extended information.\n/// \n/// This endpoint required authentication by a Zoo employee. The users are returned in order of creation, with the most recently created users first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_users_list_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUserResultsPage = client\n        .users()\n        .list_extended(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "example": "/// List users with extended information.\n/// \n/// This endpoint requires authentication by a Zoo employee. The users are returned in order of creation, with the most recently created users first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_users_list_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUserResultsPage = client\n        .users()\n        .list_extended(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.list_extended"
     }
   },
@@ -981,6 +1021,22 @@
     "value": {
       "example": "/// List API calls for a user.\n/// \n/// This endpoint requires authentication by any Zoo user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\n/// Alternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\n/// If the authenticated user is a Zoo employee, then the API calls are returned for the user specified by the user id.\n/// The API calls are returned in order of creation, with the most recently created API calls first.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The user ID. (required)\n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_api_calls_list_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .list_for_user(\n            \"some-string\",\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_calls_list_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_calls = client.api_calls();\n    let mut stream = api_calls.list_for_user_stream(\n        \"some-string\",\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.list_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1users~1{id}~1payment~1balance/get/x-rust",
+    "value": {
+      "example": "/// Get balance for an user.\n/// \n/// This endpoint requires authentication by a Zoo employee. It gets the balance information for the specified user.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The user ID. (required)\nuse std::str::FromStr;\nasync fn example_payments_get_balance_for_any_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client\n        .payments()\n        .get_balance_for_any_user(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_balance_for_any_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1users~1{id}~1payment~1balance/put/x-rust",
+    "value": {
+      "example": "/// Update balance for an user.\n/// \n/// This endpoint requires authentication by a Zoo employee. It updates the balance information for the specified user.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The user ID. (required)\nuse std::str::FromStr;\nasync fn example_payments_update_balance_for_any_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client\n        .payments()\n        .update_balance_for_any_user(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdatePaymentBalance {\n                monthly_credits_remaining: Some(3.14 as f64),\n                pre_pay_cash_remaining: Some(3.14 as f64),\n                pre_pay_credits_remaining: Some(3.14 as f64),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.update_balance_for_any_user"
     }
   },
   {

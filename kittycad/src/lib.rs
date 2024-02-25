@@ -29,7 +29,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! kittycad = "0.2.57"
+//! kittycad = "0.2.58"
 //! ```
 //!
 //! ## Basic example
@@ -125,6 +125,11 @@ pub mod payments;
 /// FROM: <https://zoo.dev/docs/api/service-accounts>
 #[cfg(feature = "requests")]
 pub mod service_accounts;
+/// Operations involving our swag store.
+///
+/// FROM: <https://zoo.dev/docs/api/store>
+#[cfg(feature = "requests")]
+pub mod store;
 #[cfg(test)]
 mod tests;
 pub mod types;
@@ -460,6 +465,13 @@ impl Client {
     /// FROM: <https://zoo.dev/docs/api/service-accounts>
     pub fn service_accounts(&self) -> service_accounts::ServiceAccounts {
         service_accounts::ServiceAccounts::new(self.clone())
+    }
+
+    /// Operations involving our swag store.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/store>
+    pub fn store(&self) -> store::Store {
+        store::Store::new(self.clone())
     }
 
     /// Unit conversion operations.
