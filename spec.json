@@ -1746,6 +1746,126 @@
         }
       }
     },
+    "/events": {
+      "post": {
+        "tags": [
+          "meta",
+          "hidden"
+        ],
+        "summary": "Creates an internal telemetry event.",
+        "description": "We collect anonymous telemetry data for improving our product.",
+        "operationId": "create_event",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_create_event",
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/file/center-of-mass": {
       "post": {
         "tags": [
@@ -14117,6 +14237,23 @@
           "ok"
         ]
       },
+      "CameraDragEnd": {
+        "description": "The response from the `CameraDragEnd` command.",
+        "type": "object",
+        "properties": {
+          "settings": {
+            "description": "Camera settings",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CameraSettings"
+              }
+            ]
+          }
+        },
+        "required": [
+          "settings"
+        ]
+      },
       "CameraDragInteractionType": {
         "description": "The type of camera drag interaction.",
         "oneOf": [
@@ -14141,6 +14278,75 @@
               "zoom"
             ]
           }
+        ]
+      },
+      "CameraDragMove": {
+        "description": "The response from the `CameraDragMove` command. Note this is an \"unreliable\" channel message, so this data may need more data like a \"sequence\"",
+        "type": "object",
+        "properties": {
+          "settings": {
+            "description": "Camera settings",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CameraSettings"
+              }
+            ]
+          }
+        },
+        "required": [
+          "settings"
+        ]
+      },
+      "CameraSettings": {
+        "description": "Camera settings including position, center, fov etc",
+        "type": "object",
+        "properties": {
+          "center": {
+            "description": "Camera's look-at center (center-pos gives viewing vector)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          },
+          "fov_y": {
+            "nullable": true,
+            "description": "Camera's field-of-view angle (if ortho is false)",
+            "type": "number",
+            "format": "float"
+          },
+          "ortho": {
+            "description": "Whether or not the camera is in ortho mode",
+            "type": "boolean"
+          },
+          "ortho_scale": {
+            "nullable": true,
+            "description": "The camera's ortho scale (derived from viewing distance if ortho is true)",
+            "type": "number",
+            "format": "float"
+          },
+          "pos": {
+            "description": "Camera position (vantage)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          },
+          "up": {
+            "description": "Camera's world-space up vector",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          }
+        },
+        "required": [
+          "center",
+          "ortho",
+          "pos",
+          "up"
         ]
       },
       "CardDetails": {
@@ -15031,6 +15237,40 @@
           "pre_pay_credits_remaining",
           "total_due",
           "updated_at"
+        ]
+      },
+      "DefaultCameraGetSettings": {
+        "description": "The response from the `DefaultCameraGetSettings` command.",
+        "type": "object",
+        "properties": {
+          "settings": {
+            "description": "Camera settings",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CameraSettings"
+              }
+            ]
+          }
+        },
+        "required": [
+          "settings"
+        ]
+      },
+      "DefaultCameraZoom": {
+        "description": "The response from the `DefaultCameraZoom` command.",
+        "type": "object",
+        "properties": {
+          "settings": {
+            "description": "Camera settings",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CameraSettings"
+              }
+            ]
+          }
+        },
+        "required": [
+          "settings"
         ]
       },
       "Density": {
@@ -18205,6 +18445,21 @@
             ]
           },
           {
+            "description": "Gets the default camera's camera settings",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_get_settings"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
             "description": "Change what the default camera is looking at.",
             "type": "object",
             "properties": {
@@ -19262,6 +19517,14 @@
                   }
                 ]
               },
+              "tolerance": {
+                "description": "The maximum acceptable surface gap computed between the filleted surfaces. Must be positive (i.e. greater than zero).",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -19273,6 +19536,7 @@
               "edge_id",
               "object_id",
               "radius",
+              "tolerance",
               "type"
             ]
           },
@@ -20747,6 +21011,82 @@
             ]
           },
           {
+            "description": "The response to the 'CameraDragMove' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/CameraDragMove"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "camera_drag_move"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'CameraDragEnd' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/CameraDragEnd"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "camera_drag_end"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'DefaultCameraGetSettings' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/DefaultCameraGetSettings"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_get_settings"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'DefaultCameraZoom' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/DefaultCameraZoom"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_zoom"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
             "description": "The response to the 'SelectGet' endpoint",
             "type": "object",
             "properties": {
@@ -21471,6 +21811,25 @@
                 "type": "string",
                 "enum": [
                   "metrics_request"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "Pong response to a Ping message.",
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "pong"
                 ]
               }
             },
