@@ -1146,6 +1146,12 @@ fn get_function_body(
                     req = req.body(body.clone());
                 }
             }
+            "multipart/form-data" => {
+                quote! {
+                    // Add the form body.
+                    req = req.form(body);
+                }
+            }
             _ => {
                 if request_body.type_name.is_string()? {
                     quote! {
