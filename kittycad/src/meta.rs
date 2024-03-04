@@ -108,6 +108,36 @@ impl Meta {
         }
     }
 
+    #[doc = "Creates an internal telemetry event.\n\nWe collect anonymous telemetry data for \
+             improving our product.\n\n```rust,no_run\nasync fn example_meta_create_event() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
+             client\n        .meta()\n        \
+             .create_event(&bytes::Bytes::from(\"some-string\"))\n        .await?;\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn create_event<'a>(
+        &'a self,
+        body: &bytes::Bytes,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!("{}/{}", self.client.base_url, "events"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.form(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
     #[doc = "Get an API token for a user by their discord id.\n\nThis endpoint allows us to run \
              API calls from our discord bot on behalf of a user. The user must have a discord \
              account linked to their Zoo Account via oauth2 for this to work.\nYou must be a Zoo \

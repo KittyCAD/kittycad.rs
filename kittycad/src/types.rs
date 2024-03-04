@@ -2397,6 +2397,37 @@ impl tabled::Tabled for CacheMetadata {
     }
 }
 
+#[doc = "The response from the `CameraDragEnd` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CameraDragEnd {
+    #[doc = "Camera settings"]
+    pub settings: CameraSettings,
+}
+
+impl std::fmt::Display for CameraDragEnd {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CameraDragEnd {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.settings).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["settings".into()]
+    }
+}
+
 #[doc = "The type of camera drag interaction."]
 #[derive(
     serde :: Serialize,
@@ -2424,6 +2455,103 @@ pub enum CameraDragInteractionType {
     #[serde(rename = "zoom")]
     #[display("zoom")]
     Zoom,
+}
+
+#[doc = "The response from the `CameraDragMove` command. Note this is an \"unreliable\" channel \
+         message, so this data may need more data like a \"sequence\""]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CameraDragMove {
+    #[doc = "Camera settings"]
+    pub settings: CameraSettings,
+}
+
+impl std::fmt::Display for CameraDragMove {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CameraDragMove {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.settings).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["settings".into()]
+    }
+}
+
+#[doc = "Camera settings including position, center, fov etc"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CameraSettings {
+    #[doc = "Camera's look-at center (center-pos gives viewing vector)"]
+    pub center: Point3D,
+    #[doc = "Camera's field-of-view angle (if ortho is false)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fov_y: Option<f64>,
+    #[doc = "Whether or not the camera is in ortho mode"]
+    pub ortho: bool,
+    #[doc = "The camera's ortho scale (derived from viewing distance if ortho is true)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ortho_scale: Option<f64>,
+    #[doc = "Camera position (vantage)"]
+    pub pos: Point3D,
+    #[doc = "Camera's world-space up vector"]
+    pub up: Point3D,
+}
+
+impl std::fmt::Display for CameraSettings {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CameraSettings {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.center).into(),
+            if let Some(fov_y) = &self.fov_y {
+                format!("{:?}", fov_y).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.ortho).into(),
+            if let Some(ortho_scale) = &self.ortho_scale {
+                format!("{:?}", ortho_scale).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.pos).into(),
+            format!("{:?}", self.up).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "center".into(),
+            "fov_y".into(),
+            "ortho".into(),
+            "ortho_scale".into(),
+            "pos".into(),
+            "up".into(),
+        ]
+    }
 }
 
 #[doc = "The card details of a payment method."]
@@ -3749,6 +3877,68 @@ impl tabled::Tabled for CustomerBalance {
             "total_due".into(),
             "updated_at".into(),
         ]
+    }
+}
+
+#[doc = "The response from the `DefaultCameraGetSettings` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DefaultCameraGetSettings {
+    #[doc = "Camera settings"]
+    pub settings: CameraSettings,
+}
+
+impl std::fmt::Display for DefaultCameraGetSettings {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DefaultCameraGetSettings {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.settings).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["settings".into()]
+    }
+}
+
+#[doc = "The response from the `DefaultCameraZoom` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DefaultCameraZoom {
+    #[doc = "Camera settings"]
+    pub settings: CameraSettings,
+}
+
+impl std::fmt::Display for DefaultCameraZoom {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DefaultCameraZoom {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.settings).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["settings".into()]
     }
 }
 
@@ -7779,6 +7969,9 @@ pub enum ModelingCmd {
         #[doc = "The final mouse position."]
         window: Point2D,
     },
+    #[doc = "Gets the default camera's camera settings"]
+    #[serde(rename = "default_camera_get_settings")]
+    DefaultCameraGetSettings {},
     #[doc = "Change what the default camera is looking at."]
     #[serde(rename = "default_camera_look_at")]
     DefaultCameraLookAt {
@@ -8088,6 +8281,9 @@ pub enum ModelingCmd {
         #[doc = "The radius of the fillet. Measured in length (using the same units that the \
                  current sketch uses). Must be positive (i.e. greater than zero)."]
         radius: f64,
+        #[doc = "The maximum acceptable surface gap computed between the filleted surfaces. Must \
+                 be positive (i.e. greater than zero)."]
+        tolerance: f64,
     },
     #[doc = "Send object to front or back."]
     #[serde(rename = "send_object")]
@@ -8649,6 +8845,31 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `EntityGetAllChildUuids` command."]
         data: EntityGetAllChildUuids,
     },
+    #[doc = "The response to the 'CameraDragMove' endpoint"]
+    #[serde(rename = "camera_drag_move")]
+    CameraDragMove {
+        #[doc = "The response from the `CameraDragMove` command. Note this is an \"unreliable\" \
+                 channel message, so this data may need more data like a \"sequence\""]
+        data: CameraDragMove,
+    },
+    #[doc = "The response to the 'CameraDragEnd' endpoint"]
+    #[serde(rename = "camera_drag_end")]
+    CameraDragEnd {
+        #[doc = "The response from the `CameraDragEnd` command."]
+        data: CameraDragEnd,
+    },
+    #[doc = "The response to the 'DefaultCameraGetSettings' endpoint"]
+    #[serde(rename = "default_camera_get_settings")]
+    DefaultCameraGetSettings {
+        #[doc = "The response from the `DefaultCameraGetSettings` command."]
+        data: DefaultCameraGetSettings,
+    },
+    #[doc = "The response to the 'DefaultCameraZoom' endpoint"]
+    #[serde(rename = "default_camera_zoom")]
+    DefaultCameraZoom {
+        #[doc = "The response from the `DefaultCameraZoom` command."]
+        data: DefaultCameraZoom,
+    },
     #[doc = "The response to the 'SelectGet' endpoint"]
     #[serde(rename = "select_get")]
     SelectGet {
@@ -8868,6 +9089,9 @@ pub enum OkWebSocketResponseData {
     #[doc = "Request a collection of metrics, to include WebRTC."]
     #[serde(rename = "metrics_request")]
     MetricsRequest {},
+    #[doc = "Pong response to a Ping message."]
+    #[serde(rename = "pong")]
+    Pong {},
 }
 
 #[doc = "Onboarding details"]
