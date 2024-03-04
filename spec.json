@@ -15976,6 +15976,100 @@
           "cap"
         ]
       },
+      "FaceGetGradient": {
+        "description": "The gradient (dFdu, dFdv) + normal vector on a brep face",
+        "type": "object",
+        "properties": {
+          "df_du": {
+            "description": "dFdu",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          },
+          "df_dv": {
+            "description": "dFdv",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          },
+          "normal": {
+            "description": "Normal (||dFdu x dFdv||)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          }
+        },
+        "required": [
+          "df_du",
+          "df_dv",
+          "normal"
+        ]
+      },
+      "FaceGetPosition": {
+        "description": "The 3D position on the surface that was evaluated",
+        "type": "object",
+        "properties": {
+          "pos": {
+            "description": "The 3D position on the surface that was evaluated",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          }
+        },
+        "required": [
+          "pos"
+        ]
+      },
+      "FaceIsPlanar": {
+        "description": "Surface-local planar axes (if available)",
+        "type": "object",
+        "properties": {
+          "origin": {
+            "nullable": true,
+            "description": "plane's origin",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          },
+          "x_axis": {
+            "nullable": true,
+            "description": "plane's local x-axis",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          },
+          "y_axis": {
+            "nullable": true,
+            "description": "plane's local y-axis",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          },
+          "z_axis": {
+            "nullable": true,
+            "description": "plane's local z-axis (normal)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          }
+        }
+      },
       "FailureWebSocketResponse": {
         "description": "Unsuccessful Websocket response.",
         "type": "object",
@@ -19541,6 +19635,87 @@
             ]
           },
           {
+            "description": "Determines whether a brep face is planar and returns its surface-local planar axes if so",
+            "type": "object",
+            "properties": {
+              "object_id": {
+                "description": "Which face is being queried.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "face_is_planar"
+                ]
+              }
+            },
+            "required": [
+              "object_id",
+              "type"
+            ]
+          },
+          {
+            "description": "Determines a position on a brep face evaluated by parameters u,v",
+            "type": "object",
+            "properties": {
+              "object_id": {
+                "description": "Which face is being queried.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "face_get_position"
+                ]
+              },
+              "uv": {
+                "description": "The 2D paramter-space u,v position to evaluate the surface at",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "object_id",
+              "type",
+              "uv"
+            ]
+          },
+          {
+            "description": "Determines the gradient (dFdu, dFdv) + normal vector on a brep face evaluated by parameters u,v",
+            "type": "object",
+            "properties": {
+              "object_id": {
+                "description": "Which face is being queried.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "face_get_gradient"
+                ]
+              },
+              "uv": {
+                "description": "The 2D paramter-space u,v position to evaluate the surface at",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "object_id",
+              "type",
+              "uv"
+            ]
+          },
+          {
             "description": "Send object to front or back.",
             "type": "object",
             "properties": {
@@ -21382,6 +21557,63 @@
                 "type": "string",
                 "enum": [
                   "curve_get_end_points"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'FaceIsPlanar' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/FaceIsPlanar"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "face_is_planar"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'FaceGetPosition' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/FaceGetPosition"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "face_get_position"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'FaceGetGradient' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/FaceGetGradient"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "face_get_gradient"
                 ]
               }
             },

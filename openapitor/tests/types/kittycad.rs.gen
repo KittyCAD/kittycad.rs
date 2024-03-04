@@ -2385,6 +2385,37 @@ impl tabled::Tabled for CacheMetadata {
     }
 }
 
+#[doc = "The response from the `CameraDragEnd` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CameraDragEnd {
+    #[doc = "Camera settings"]
+    pub settings: CameraSettings,
+}
+
+impl std::fmt::Display for CameraDragEnd {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CameraDragEnd {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.settings).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["settings".into()]
+    }
+}
+
 #[doc = "The type of camera drag interaction."]
 #[derive(
     serde :: Serialize,
@@ -2412,6 +2443,102 @@ pub enum CameraDragInteractionType {
     #[serde(rename = "zoom")]
     #[display("zoom")]
     Zoom,
+}
+
+#[doc = "The response from the `CameraDragMove` command. Note this is an \"unreliable\" channel message, so this data may need more data like a \"sequence\""]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CameraDragMove {
+    #[doc = "Camera settings"]
+    pub settings: CameraSettings,
+}
+
+impl std::fmt::Display for CameraDragMove {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CameraDragMove {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.settings).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["settings".into()]
+    }
+}
+
+#[doc = "Camera settings including position, center, fov etc"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CameraSettings {
+    #[doc = "Camera's look-at center (center-pos gives viewing vector)"]
+    pub center: Point3D,
+    #[doc = "Camera's field-of-view angle (if ortho is false)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fov_y: Option<f64>,
+    #[doc = "Whether or not the camera is in ortho mode"]
+    pub ortho: bool,
+    #[doc = "The camera's ortho scale (derived from viewing distance if ortho is true)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ortho_scale: Option<f64>,
+    #[doc = "Camera position (vantage)"]
+    pub pos: Point3D,
+    #[doc = "Camera's world-space up vector"]
+    pub up: Point3D,
+}
+
+impl std::fmt::Display for CameraSettings {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CameraSettings {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.center).into(),
+            if let Some(fov_y) = &self.fov_y {
+                format!("{:?}", fov_y).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.ortho).into(),
+            if let Some(ortho_scale) = &self.ortho_scale {
+                format!("{:?}", ortho_scale).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.pos).into(),
+            format!("{:?}", self.up).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "center".into(),
+            "fov_y".into(),
+            "ortho".into(),
+            "ortho_scale".into(),
+            "pos".into(),
+            "up".into(),
+        ]
+    }
 }
 
 #[doc = "The card details of a payment method."]
@@ -3682,6 +3809,68 @@ impl tabled::Tabled for CustomerBalance {
     }
 }
 
+#[doc = "The response from the `DefaultCameraGetSettings` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DefaultCameraGetSettings {
+    #[doc = "Camera settings"]
+    pub settings: CameraSettings,
+}
+
+impl std::fmt::Display for DefaultCameraGetSettings {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DefaultCameraGetSettings {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.settings).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["settings".into()]
+    }
+}
+
+#[doc = "The response from the `DefaultCameraZoom` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DefaultCameraZoom {
+    #[doc = "Camera settings"]
+    pub settings: CameraSettings,
+}
+
+impl std::fmt::Display for DefaultCameraZoom {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DefaultCameraZoom {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.settings).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["settings".into()]
+    }
+}
+
 #[doc = "The density response."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4803,6 +4992,143 @@ impl tabled::Tabled for ExtrusionFaceInfo {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["cap".into(), "curve_id".into(), "face_id".into()]
+    }
+}
+
+#[doc = "The gradient (dFdu, dFdv) + normal vector on a brep face"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FaceGetGradient {
+    #[doc = "dFdu"]
+    pub df_du: Point3D,
+    #[doc = "dFdv"]
+    pub df_dv: Point3D,
+    #[doc = "Normal (||dFdu x dFdv||)"]
+    pub normal: Point3D,
+}
+
+impl std::fmt::Display for FaceGetGradient {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FaceGetGradient {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.df_du).into(),
+            format!("{:?}", self.df_dv).into(),
+            format!("{:?}", self.normal).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["df_du".into(), "df_dv".into(), "normal".into()]
+    }
+}
+
+#[doc = "The 3D position on the surface that was evaluated"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FaceGetPosition {
+    #[doc = "The 3D position on the surface that was evaluated"]
+    pub pos: Point3D,
+}
+
+impl std::fmt::Display for FaceGetPosition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FaceGetPosition {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.pos).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["pos".into()]
+    }
+}
+
+#[doc = "Surface-local planar axes (if available)"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FaceIsPlanar {
+    #[doc = "plane's origin"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub origin: Option<Point3D>,
+    #[doc = "plane's local x-axis"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub x_axis: Option<Point3D>,
+    #[doc = "plane's local y-axis"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub y_axis: Option<Point3D>,
+    #[doc = "plane's local z-axis (normal)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub z_axis: Option<Point3D>,
+}
+
+impl std::fmt::Display for FaceIsPlanar {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FaceIsPlanar {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(origin) = &self.origin {
+                format!("{:?}", origin).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(x_axis) = &self.x_axis {
+                format!("{:?}", x_axis).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(y_axis) = &self.y_axis {
+                format!("{:?}", y_axis).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(z_axis) = &self.z_axis {
+                format!("{:?}", z_axis).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "origin".into(),
+            "x_axis".into(),
+            "y_axis".into(),
+            "z_axis".into(),
+        ]
     }
 }
 
@@ -7636,6 +7962,9 @@ pub enum ModelingCmd {
         #[doc = "The final mouse position."]
         window: Point2D,
     },
+    #[doc = "Gets the default camera's camera settings"]
+    #[serde(rename = "default_camera_get_settings")]
+    DefaultCameraGetSettings {},
     #[doc = "Change what the default camera is looking at."]
     #[serde(rename = "default_camera_look_at")]
     DefaultCameraLookAt {
@@ -7928,6 +8257,30 @@ pub enum ModelingCmd {
         object_id: uuid::Uuid,
         #[doc = "The radius of the fillet. Measured in length (using the same units that the current sketch uses). Must be positive (i.e. greater than zero)."]
         radius: f64,
+        #[doc = "The maximum acceptable surface gap computed between the filleted surfaces. Must be positive (i.e. greater than zero)."]
+        tolerance: f64,
+    },
+    #[doc = "Determines whether a brep face is planar and returns its surface-local planar axes if so"]
+    #[serde(rename = "face_is_planar")]
+    FaceIsPlanar {
+        #[doc = "Which face is being queried."]
+        object_id: uuid::Uuid,
+    },
+    #[doc = "Determines a position on a brep face evaluated by parameters u,v"]
+    #[serde(rename = "face_get_position")]
+    FaceGetPosition {
+        #[doc = "Which face is being queried."]
+        object_id: uuid::Uuid,
+        #[doc = "The 2D paramter-space u,v position to evaluate the surface at"]
+        uv: Point2D,
+    },
+    #[doc = "Determines the gradient (dFdu, dFdv) + normal vector on a brep face evaluated by parameters u,v"]
+    #[serde(rename = "face_get_gradient")]
+    FaceGetGradient {
+        #[doc = "Which face is being queried."]
+        object_id: uuid::Uuid,
+        #[doc = "The 2D paramter-space u,v position to evaluate the surface at"]
+        uv: Point2D,
     },
     #[doc = "Send object to front or back."]
     #[serde(rename = "send_object")]
@@ -8462,6 +8815,30 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `EntityGetAllChildUuids` command."]
         data: EntityGetAllChildUuids,
     },
+    #[doc = "The response to the 'CameraDragMove' endpoint"]
+    #[serde(rename = "camera_drag_move")]
+    CameraDragMove {
+        #[doc = "The response from the `CameraDragMove` command. Note this is an \"unreliable\" channel message, so this data may need more data like a \"sequence\""]
+        data: CameraDragMove,
+    },
+    #[doc = "The response to the 'CameraDragEnd' endpoint"]
+    #[serde(rename = "camera_drag_end")]
+    CameraDragEnd {
+        #[doc = "The response from the `CameraDragEnd` command."]
+        data: CameraDragEnd,
+    },
+    #[doc = "The response to the 'DefaultCameraGetSettings' endpoint"]
+    #[serde(rename = "default_camera_get_settings")]
+    DefaultCameraGetSettings {
+        #[doc = "The response from the `DefaultCameraGetSettings` command."]
+        data: DefaultCameraGetSettings,
+    },
+    #[doc = "The response to the 'DefaultCameraZoom' endpoint"]
+    #[serde(rename = "default_camera_zoom")]
+    DefaultCameraZoom {
+        #[doc = "The response from the `DefaultCameraZoom` command."]
+        data: DefaultCameraZoom,
+    },
     #[doc = "The response to the 'SelectGet' endpoint"]
     #[serde(rename = "select_get")]
     SelectGet {
@@ -8557,6 +8934,24 @@ pub enum OkModelingCmdResponse {
     CurveGetEndPoints {
         #[doc = "Endpoints of a curve"]
         data: CurveGetEndPoints,
+    },
+    #[doc = "The response to the 'FaceIsPlanar' endpoint"]
+    #[serde(rename = "face_is_planar")]
+    FaceIsPlanar {
+        #[doc = "Surface-local planar axes (if available)"]
+        data: FaceIsPlanar,
+    },
+    #[doc = "The response to the 'FaceGetPosition' endpoint"]
+    #[serde(rename = "face_get_position")]
+    FaceGetPosition {
+        #[doc = "The 3D position on the surface that was evaluated"]
+        data: FaceGetPosition,
+    },
+    #[doc = "The response to the 'FaceGetGradient' endpoint"]
+    #[serde(rename = "face_get_gradient")]
+    FaceGetGradient {
+        #[doc = "The gradient (dFdu, dFdv) + normal vector on a brep face"]
+        data: FaceGetGradient,
     },
     #[doc = "The response to the 'PlaneIntersectAndProject' endpoint"]
     #[serde(rename = "plane_intersect_and_project")]
@@ -8678,6 +9073,9 @@ pub enum OkWebSocketResponseData {
     #[doc = "Request a collection of metrics, to include WebRTC."]
     #[serde(rename = "metrics_request")]
     MetricsRequest {},
+    #[doc = "Pong response to a Ping message."]
+    #[serde(rename = "pong")]
+    Pong {},
 }
 
 #[doc = "Onboarding details"]

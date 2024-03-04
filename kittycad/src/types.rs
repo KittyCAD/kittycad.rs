@@ -5078,6 +5078,143 @@ impl tabled::Tabled for ExtrusionFaceInfo {
     }
 }
 
+#[doc = "The gradient (dFdu, dFdv) + normal vector on a brep face"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FaceGetGradient {
+    #[doc = "dFdu"]
+    pub df_du: Point3D,
+    #[doc = "dFdv"]
+    pub df_dv: Point3D,
+    #[doc = "Normal (||dFdu x dFdv||)"]
+    pub normal: Point3D,
+}
+
+impl std::fmt::Display for FaceGetGradient {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FaceGetGradient {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.df_du).into(),
+            format!("{:?}", self.df_dv).into(),
+            format!("{:?}", self.normal).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["df_du".into(), "df_dv".into(), "normal".into()]
+    }
+}
+
+#[doc = "The 3D position on the surface that was evaluated"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FaceGetPosition {
+    #[doc = "The 3D position on the surface that was evaluated"]
+    pub pos: Point3D,
+}
+
+impl std::fmt::Display for FaceGetPosition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FaceGetPosition {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.pos).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["pos".into()]
+    }
+}
+
+#[doc = "Surface-local planar axes (if available)"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FaceIsPlanar {
+    #[doc = "plane's origin"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub origin: Option<Point3D>,
+    #[doc = "plane's local x-axis"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub x_axis: Option<Point3D>,
+    #[doc = "plane's local y-axis"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub y_axis: Option<Point3D>,
+    #[doc = "plane's local z-axis (normal)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub z_axis: Option<Point3D>,
+}
+
+impl std::fmt::Display for FaceIsPlanar {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FaceIsPlanar {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(origin) = &self.origin {
+                format!("{:?}", origin).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(x_axis) = &self.x_axis {
+                format!("{:?}", x_axis).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(y_axis) = &self.y_axis {
+                format!("{:?}", y_axis).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(z_axis) = &self.z_axis {
+                format!("{:?}", z_axis).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "origin".into(),
+            "x_axis".into(),
+            "y_axis".into(),
+            "z_axis".into(),
+        ]
+    }
+}
+
 #[doc = "Unsuccessful Websocket response."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8285,6 +8422,30 @@ pub enum ModelingCmd {
                  be positive (i.e. greater than zero)."]
         tolerance: f64,
     },
+    #[doc = "Determines whether a brep face is planar and returns its surface-local planar axes \
+             if so"]
+    #[serde(rename = "face_is_planar")]
+    FaceIsPlanar {
+        #[doc = "Which face is being queried."]
+        object_id: uuid::Uuid,
+    },
+    #[doc = "Determines a position on a brep face evaluated by parameters u,v"]
+    #[serde(rename = "face_get_position")]
+    FaceGetPosition {
+        #[doc = "Which face is being queried."]
+        object_id: uuid::Uuid,
+        #[doc = "The 2D paramter-space u,v position to evaluate the surface at"]
+        uv: Point2D,
+    },
+    #[doc = "Determines the gradient (dFdu, dFdv) + normal vector on a brep face evaluated by \
+             parameters u,v"]
+    #[serde(rename = "face_get_gradient")]
+    FaceGetGradient {
+        #[doc = "Which face is being queried."]
+        object_id: uuid::Uuid,
+        #[doc = "The 2D paramter-space u,v position to evaluate the surface at"]
+        uv: Point2D,
+    },
     #[doc = "Send object to front or back."]
     #[serde(rename = "send_object")]
     SendObject {
@@ -8965,6 +9126,24 @@ pub enum OkModelingCmdResponse {
     CurveGetEndPoints {
         #[doc = "Endpoints of a curve"]
         data: CurveGetEndPoints,
+    },
+    #[doc = "The response to the 'FaceIsPlanar' endpoint"]
+    #[serde(rename = "face_is_planar")]
+    FaceIsPlanar {
+        #[doc = "Surface-local planar axes (if available)"]
+        data: FaceIsPlanar,
+    },
+    #[doc = "The response to the 'FaceGetPosition' endpoint"]
+    #[serde(rename = "face_get_position")]
+    FaceGetPosition {
+        #[doc = "The 3D position on the surface that was evaluated"]
+        data: FaceGetPosition,
+    },
+    #[doc = "The response to the 'FaceGetGradient' endpoint"]
+    #[serde(rename = "face_get_gradient")]
+    FaceGetGradient {
+        #[doc = "The gradient (dFdu, dFdv) + normal vector on a brep face"]
+        data: FaceGetGradient,
     },
     #[doc = "The response to the 'PlaneIntersectAndProject' endpoint"]
     #[serde(rename = "plane_intersect_and_project")]
