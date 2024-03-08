@@ -2380,8 +2380,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "successful operation",
+          "201": {
+            "description": "successful creation",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -12270,6 +12270,15 @@
               "type": "integer",
               "format": "uint32",
               "minimum": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "pool",
+            "description": "An optional identifier for a pool of engine instances. The 'default' pool is used when none is specified.",
+            "schema": {
+              "nullable": true,
+              "type": "string"
             }
           },
           {
