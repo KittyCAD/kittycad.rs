@@ -15,16 +15,19 @@ impl Modeling {
     #[doc = "Open a websocket which accepts modeling commands.\n\nPass those commands to the \
              engine via websocket, and pass responses back to the client. Basically, this is a \
              websocket proxy between the frontend/client and the engine.\n\n**Parameters:**\n\n- \
-             `fps: Option<u32>`: Frames per second of the video feed.\n- `unlocked_framerate: \
-             Option<bool>`: If true, engine will render video frames as fast as it can.\n- \
-             `video_res_height: Option<u32>`: Height of the video feed. Must be a multiple of \
-             4.\n- `video_res_width: Option<u32>`: Width of the video feed. Must be a multiple of \
-             4.\n- `webrtc: Option<bool>`: If true, will start a webrtc connection."]
+             `fps: Option<u32>`: Frames per second of the video feed.\n- `pool: Option<String>`: \
+             An optional identifier for a pool of engine instances. The 'default' pool is used \
+             when none is specified.\n- `unlocked_framerate: Option<bool>`: If true, engine will \
+             render video frames as fast as it can.\n- `video_res_height: Option<u32>`: Height of \
+             the video feed. Must be a multiple of 4.\n- `video_res_width: Option<u32>`: Width of \
+             the video feed. Must be a multiple of 4.\n- `webrtc: Option<bool>`: If true, will \
+             start a webrtc connection."]
     #[tracing::instrument]
     #[cfg(not(target_arch = "wasm32"))]
     pub async fn commands_ws<'a>(
         &'a self,
         fps: Option<u32>,
+        pool: Option<String>,
         unlocked_framerate: Option<bool>,
         video_res_height: Option<u32>,
         video_res_width: Option<u32>,
@@ -38,6 +41,10 @@ impl Modeling {
         let mut query_params = vec![];
         if let Some(p) = fps {
             query_params.push(("fps", format!("{}", p)));
+        }
+
+        if let Some(p) = pool {
+            query_params.push(("pool", p));
         }
 
         if let Some(p) = unlocked_framerate {
