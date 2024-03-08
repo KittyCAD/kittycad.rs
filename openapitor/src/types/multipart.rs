@@ -27,3 +27,29 @@ impl std::convert::TryFrom<Attachment> for reqwest::multipart::Part {
         Ok(part)
     }
 }
+
+impl std::convert::TryFrom<std::path::PathBuf> for Attachment {
+    type Error = std::io::Error;
+
+    fn try_from(path: std::path::PathBuf) -> Result<Self, Self::Error> {
+        let filename = path
+            .file_name()
+            .ok_or_else(|| {
+                std::io::Error::new(std::io::ErrorKind::InvalidData, "invalid filename")
+            })?
+            .to_str()
+            .ok_or_else(|| {
+                std::io::Error::new(std::io::ErrorKind::InvalidData, "invalid filename")
+            })?
+            .to_string();
+        // Get the mime type of the file.
+        let content_type = mime_guess::from_path(&path).first_raw();
+        let data = std::fs::read(path)?;
+        Ok(Attachment {
+            name: "file".to_string(),
+            filename: Some(filename),
+            content_type: content_type.map(|s| s.to_string()),
+            data,
+        })
+    }
+}

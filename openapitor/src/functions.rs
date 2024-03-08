@@ -601,13 +601,17 @@ fn get_args(
     let path_params = get_path_params(type_space, op, global_params)?;
     let query_params = get_query_params(type_space, op, global_params)?;
 
-    let mut args: BTreeMap<String, proc_macro2::TokenStream> = path_params.into_iter().chain(query_params).collect();
+    let mut args: BTreeMap<String, proc_macro2::TokenStream> =
+        path_params.into_iter().chain(query_params).collect();
 
     // Add attachments if we have a multipart request.
     if let Some(request_body) = get_request_body(type_space, name, method, op)? {
-    if request_body.media_type.as_str()  == "multipart/form-data" {
-        args.insert("attachments".to_string(), quote!(Vec<crate::types::multipart::Attachment>));
-    }
+        if request_body.media_type.as_str() == "multipart/form-data" {
+            args.insert(
+                "attachments".to_string(),
+                quote!(Vec<crate::types::multipart::Attachment>),
+            );
+        }
     }
 
     Ok(args)
@@ -720,6 +724,8 @@ fn get_request_body_example(
 
 /// Return the function arguments for the operation.
 fn get_example_args(
+    name: &str,
+    method: &http::Method,
     type_space: &crate::types::TypeSpace,
     op: &openapiv3::Operation,
     global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
@@ -787,6 +793,23 @@ fn get_example_args(
         }
 
         new_params.insert(name, example);
+    }
+
+    // Add attachments if we have a multipart request.
+    if let Some(request_body) = get_request_body(&mut type_space.clone(), name, method, op)? {
+        if request_body.media_type.as_str() == "multipart/form-data" {
+            new_params.insert(
+                "attachments".to_string(),
+                quote! {
+                    vec![crate::types::multipart::Attachment {
+                        name: "thing".to_string(),
+                        filename: Some("myfile.json".to_string()),
+                        content_type: Some("application/json".to_string()),
+                        data: std::fs::read("myfile.json").unwrap(),
+                    }]
+                },
+            );
+        }
     }
 
     Ok(new_params)
@@ -1159,13 +1182,17 @@ fn get_function_body(
             }
             "multipart/form-data" => {
                 // The json part of multipart data is sent as a file.
-                let type_name = request_body.type_name.rendered()?.replace("crate::types::", "").to_lowercase();
+                let type_name = request_body
+                    .type_name
+                    .rendered()?
+                    .replace("crate::types::", "")
+                    .to_lowercase();
                 quote! {
                     use std::convert::TryInto;
                     // Create the multipart form.
                     let mut form = reqwest::multipart::Form::new();
                     // Add the body to the form.
-                    
+
                     let mut json_part = reqwest::multipart::Part::text(serde_json::to_string(&body)?);
                     json_part = json_part.file_name(format!("{}.json", #type_name));
                     json_part = json_part.mime_str("application/json")?;
@@ -1368,7 +1395,7 @@ fn generate_example_code_fn(
     }
 
     // Get the function args.
-    let raw_args = get_example_args(type_space, op, global_params)?;
+    let raw_args = get_example_args(name, method, type_space, op, global_params)?;
     let args = if raw_args.is_empty() {
         quote!()
     } else {

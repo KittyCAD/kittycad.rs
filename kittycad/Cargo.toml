@@ -23,6 +23,7 @@ futures = { version = "0.3.26", optional = true }
 http = { version = "^0.2.8", optional = true }
 itertools = "^0.10.3"
 log = { version = "^0.4", features = ["serde"], optional = true }
+mime_guess = "2.0.4"
 parse-display = "^0.8.1"
 phonenumber = "0.3.2"
 rand = { version = "0.8", optional = true }

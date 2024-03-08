@@ -6,18 +6,20 @@ license = "MPL-2.0"
 description = "An OpenAPI client generator."
 
 [dependencies]
+Inflector = "^0.11.4"
 anyhow = { version = "1", features = ["backtrace"] }
 chrono = { version = "0.4", features = ["serde", "std"], default-features = false }
 clap = { version = "4.2.2", features = ["cargo", "derive", "env", "unicode", "wrap_help"] }
 data-encoding = "^2.3.2"
-http = "^0.2.8"
 format_serde_error = "^0.3.0"
 futures-util = "^0.3.21"
+http = "^0.2.8"
 indexmap = { version = "2.0.0", features = ["serde"] }
-Inflector = "^0.11.4"
 json-patch = "0.2.6"
 log = { version = "0.4", features = ["serde"] }
+mime_guess = "2.0.4"
 numeral = "1"
+once_cell = "1.17.1"
 openapiv3 = "1"
 phonenumber = "^0.3.1"
 proc-macro2 = "1"
@@ -28,7 +30,7 @@ reqwest = { version = "0.11", default-features = false, features = ["json", "mul
 reqwest-middleware = "0.2.2"
 rustfmt-wrapper = "0.2.1"
 schemars = { version = "0.8", features = ["bigdecimal04", "chrono", "url", "uuid1"] }
-serde = { version = "1", features = [ "derive" ]}
+serde = { version = "1", features = [ "derive" ] }
 serde_json = "1"
 serde_yaml = "^0.9.17"
 slog = "^2.7.0"
@@ -40,7 +42,6 @@ slog-term = "^2.9.0"
 thiserror = "1"
 url = { version = "^2.2.2", features = ["serde"] }
 uuid = { version = "1", features = ["serde", "v4"] }
-once_cell = "1.17.1"
 
 [dev-dependencies]
 async-trait = "^0.1.56"

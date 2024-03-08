@@ -4,9 +4,7 @@ use std::{fmt::Write as _, str::FromStr};
 
 use anyhow::Result;
 use chrono::TimeZone;
-use rand::rngs::SmallRng;
-use rand::SeedableRng;
-use rand::{distributions::Alphanumeric, Rng};
+use rand::{distributions::Alphanumeric, rngs::SmallRng, Rng, SeedableRng};
 
 const SEED: u64 = 123456;
 

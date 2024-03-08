@@ -4,10 +4,10 @@ pub mod base64;
 pub mod error;
 pub mod example;
 pub mod exts;
+pub mod multipart;
 pub mod paginate;
 pub mod phone_number;
 pub mod random;
-pub mod multipart;
 
 use std::{collections::BTreeMap, str::FromStr};
 

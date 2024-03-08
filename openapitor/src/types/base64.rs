@@ -2,10 +2,12 @@
 //! base64 implementations to account for various clients and libraries. Compatible
 //! with serde and JsonSchema.
 
-use serde::de::{Error, Unexpected, Visitor};
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::convert::TryFrom;
-use std::fmt;
+use std::{convert::TryFrom, fmt};
+
+use serde::{
+    de::{Error, Unexpected, Visitor},
+    Deserialize, Deserializer, Serialize, Serializer,
+};
 
 static ALLOWED_DECODING_FORMATS: &[data_encoding::Encoding] = &[
     data_encoding::BASE64,
@@ -127,8 +129,9 @@ impl schemars::JsonSchema for Base64Data {
 
 #[cfg(test)]
 mod tests {
-    use super::Base64Data;
     use std::convert::TryFrom;
+
+    use super::Base64Data;
 
     #[test]
     fn test_base64_try_from() {
