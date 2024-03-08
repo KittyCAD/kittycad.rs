@@ -7,6 +7,7 @@ pub mod exts;
 pub mod paginate;
 pub mod phone_number;
 pub mod random;
+pub mod multipart;
 
 use std::{collections::BTreeMap, str::FromStr};
 
@@ -49,6 +50,9 @@ pub fn generate_types(spec: &openapiv3::OpenAPI, opts: crate::Opts) -> Result<Ty
     // Include the base64 data type for byte data.
     let base64_mod = get_base64_mod()?;
 
+    // Include the multipart type for multipart data.
+    let multipart_mod = get_multipart_mod()?;
+
     // Include the paginate data type for pagination.
     let paginate_mod = get_paginate_mod()?;
 
@@ -71,6 +75,9 @@ pub fn generate_types(spec: &openapiv3::OpenAPI, opts: crate::Opts) -> Result<Ty
             use tabled::Tabled;
 
             #base64_mod
+
+            #[cfg(feature = "requests")]
+            #multipart_mod
 
             #[cfg(feature = "requests")]
             #paginate_mod
@@ -2116,6 +2123,16 @@ fn get_base64_mod() -> Result<proc_macro2::TokenStream> {
     let stream = proc_macro2::TokenStream::from_str(file).map_err(|e| anyhow::anyhow!("{}", e))?;
     Ok(quote!(
         pub mod base64 {
+            #stream
+        }
+    ))
+}
+
+fn get_multipart_mod() -> Result<proc_macro2::TokenStream> {
+    let file = include_str!("multipart.rs");
+    let stream = proc_macro2::TokenStream::from_str(file).map_err(|e| anyhow::anyhow!("{}", e))?;
+    Ok(quote!(
+        pub mod multipart {
             #stream
         }
     ))

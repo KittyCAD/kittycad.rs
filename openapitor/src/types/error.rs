@@ -84,6 +84,15 @@ impl From<reqwest::Error> for Error {
     }
 }
 
+impl From<serde_json::Error> for Error {
+    fn from(e: serde_json::Error) -> Self {
+        Self::SerdeError {
+            error: format_serde_error::SerdeError::new(String::new(), e),
+            status: reqwest::StatusCode::INTERNAL_SERVER_ERROR,
+        }
+    }
+}
+
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

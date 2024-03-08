@@ -134,6 +134,37 @@ pub mod base64 {
 }
 
 #[cfg(feature = "requests")]
+pub mod multipart {
+    #![doc = " Multipart form data types."]
+    #[doc = " An attachement to a multipart form."]
+    #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+    pub struct Attachment {
+        #[doc = " The name of the field."]
+        pub name: String,
+        #[doc = " The filename of the attachment."]
+        pub filename: Option<String>,
+        #[doc = " The content type of the attachment."]
+        pub content_type: Option<String>,
+        #[doc = " The data of the attachment."]
+        pub data: Vec<u8>,
+    }
+
+    impl std::convert::TryFrom<Attachment> for reqwest::multipart::Part {
+        type Error = reqwest::Error;
+        fn try_from(attachment: Attachment) -> Result<Self, Self::Error> {
+            let mut part = reqwest::multipart::Part::bytes(attachment.data);
+            if let Some(filename) = attachment.filename {
+                part = part.file_name(filename);
+            }
+            if let Some(content_type) = attachment.content_type {
+                part = part.mime_str(&content_type)?;
+            }
+            Ok(part)
+        }
+    }
+}
+
+#[cfg(feature = "requests")]
 pub mod paginate {
     #![doc = " Utility functions used for pagination."]
     use anyhow::Result;
@@ -379,6 +410,15 @@ pub mod error {
     impl From<reqwest::Error> for Error {
         fn from(e: reqwest::Error) -> Self {
             Self::RequestError(e)
+        }
+    }
+
+    impl From<serde_json::Error> for Error {
+        fn from(e: serde_json::Error) -> Self {
+            Self::SerdeError {
+                error: format_serde_error::SerdeError::new(String::new(), e),
+                status: reqwest::StatusCode::INTERNAL_SERVER_ERROR,
+            }
         }
     }
 
@@ -4675,6 +4715,111 @@ pub enum ErrorCode {
     MessageTypeNotAcceptedForWebRTC,
 }
 
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[derive(Default)]
+pub enum Type {
+    #[serde(rename = "modeling_app_event")]
+    #[display("modeling_app_event")]
+    #[default]
+    ModelingAppEvent,
+}
+
+
+
+#[doc = "An event related to modeling app files"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Event {
+    #[doc = "Attachment URI for where the attachment is stored."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attachment_uri: Option<String>,
+    #[doc = "Time this event was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The specific event type from the modeling app."]
+    pub event_type: ModelingAppEventType,
+    #[doc = "Time the associated attachment was last compiled."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_compiled_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "Project descriptino as given by the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_description: Option<String>,
+    #[doc = "Project name as given by the user."]
+    pub project_name: String,
+    #[doc = "The source app for this event, uuid that is unique to the app."]
+    pub source_id: uuid::Uuid,
+    #[serde(rename = "type")]
+    pub type_: Type,
+    #[doc = "An anonymous user id generated client-side."]
+    pub user_id: String,
+}
+
+impl std::fmt::Display for Event {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Event {
+    const LENGTH: usize = 9;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(attachment_uri) = &self.attachment_uri {
+                format!("{:?}", attachment_uri).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.event_type).into(),
+            if let Some(last_compiled_at) = &self.last_compiled_at {
+                format!("{:?}", last_compiled_at).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(project_description) = &self.project_description {
+                format!("{:?}", project_description).into()
+            } else {
+                String::new().into()
+            },
+            self.project_name.clone().into(),
+            format!("{:?}", self.source_id).into(),
+            format!("{:?}", self.type_).into(),
+            self.user_id.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "attachment_uri".into(),
+            "created_at".into(),
+            "event_type".into(),
+            "last_compiled_at".into(),
+            "project_description".into(),
+            "project_name".into(),
+            "source_id".into(),
+            "type_".into(),
+            "user_id".into(),
+        ]
+    }
+}
+
 #[doc = "The response from the `Export` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -7867,6 +8012,32 @@ pub enum Method {
     #[display("EXTENSION")]
     Extension,
 }
+
+#[doc = "Type for modeling-app events"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[derive(Default)]
+pub enum ModelingAppEventType {
+    #[doc = "This event is sent before the modeling app or project is closed. The attachment \
+             should contain the contents of the most recent successful compile."]
+    #[serde(rename = "successful_compile_before_close")]
+    #[display("successful_compile_before_close")]
+    #[default]
+    SuccessfulCompileBeforeClose,
+}
+
+
 
 #[doc = "The subscription tiers we offer for the Modeling App to individuals."]
 #[derive(

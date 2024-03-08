@@ -108,23 +108,29 @@ impl Meta {
         }
     }
 
-    #[doc = "Creates an internal telemetry event.\n\nWe collect anonymous telemetry data for \
-             improving our product.\n\n```rust,no_run\nasync fn example_meta_create_event() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
-             client\n        .meta()\n        \
-             .create_event(&bytes::Bytes::from(\"some-string\"))\n        .await?;\n    \
-             Ok(())\n}\n```"]
+    #[doc = "Creates an internal telemetry event.\n\nWe collect anonymous telemetry data for improving our product.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_meta_create_event() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .meta()\n        .create_event(&kittycad::types::Event {\n            attachment_uri: Some(\"some-string\".to_string()),\n            created_at: chrono::Utc::now(),\n            event_type: kittycad::types::ModelingAppEventType::SuccessfulCompileBeforeClose,\n            last_compiled_at: Some(chrono::Utc::now()),\n            project_description: Some(\"some-string\".to_string()),\n            project_name: \"some-string\".to_string(),\n            source_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            type_: kittycad::types::Type::ModelingAppEvent,\n            user_id: \"some-string\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_event<'a>(
         &'a self,
-        body: &bytes::Bytes,
+        attachments: Vec<crate::types::multipart::Attachment>,
+        body: &crate::types::Event,
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
             format!("{}/{}", self.client.base_url, "events"),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.form(body);
+        use std::convert::TryInto;
+        let mut form = reqwest::multipart::Form::new();
+        let mut json_part = reqwest::multipart::Part::text(serde_json::to_string(&body)?);
+        json_part = json_part.file_name(format!("{}.json", "event"));
+        json_part = json_part.mime_str("application/json")?;
+        form = form.part("event", json_part);
+        for attachment in attachments {
+            form = form.part(attachment.name.clone(), attachment.try_into()?);
+        }
+
+        req = req.multipart(form);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {

@@ -31,7 +31,7 @@ fn generate_websocket_fn(
     let fn_name_ident = format_ident!("{}", fn_name);
     let response_type = quote!(reqwest::Upgraded);
     // Get the function args.
-    let raw_args = get_args(type_space, op, global_params)?;
+    let raw_args = get_args(name, method, type_space, op, global_params)?;
     // Make sure if we have args, we start with a comma.
     let args = if raw_args.is_empty() {
         quote!()
@@ -160,7 +160,7 @@ pub fn generate_files(
                     };
 
                 // Get the function args.
-                let raw_args = get_args(type_space, op, global_params)?;
+                let raw_args = get_args(name, method, type_space, op, global_params)?;
                 // Make sure if we have args, we start with a comma.
                 let args = if raw_args.is_empty() {
                     quote!()
@@ -458,7 +458,7 @@ fn generate_docs(
         global_params,
     )?);
 
-    let params_types = get_args(type_space, op, global_params)?;
+    let params_types = get_args(name, method, type_space, op, global_params)?;
 
     if !params.is_empty() {
         docs.push_str("\n\n**Parameters:**\n");
@@ -592,6 +592,8 @@ fn generate_name_for_fn_schema(
 
 /// Return the function arguments for the operation.
 fn get_args(
+    name: &str,
+    method: &http::Method,
     type_space: &mut crate::types::TypeSpace,
     op: &openapiv3::Operation,
     global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
@@ -599,7 +601,16 @@ fn get_args(
     let path_params = get_path_params(type_space, op, global_params)?;
     let query_params = get_query_params(type_space, op, global_params)?;
 
-    Ok(path_params.into_iter().chain(query_params).collect())
+    let mut args: BTreeMap<String, proc_macro2::TokenStream> = path_params.into_iter().chain(query_params).collect();
+
+    // Add attachments if we have a multipart request.
+    if let Some(request_body) = get_request_body(type_space, name, method, op)? {
+    if request_body.media_type.as_str()  == "multipart/form-data" {
+        args.insert("attachments".to_string(), quote!(Vec<crate::types::multipart::Attachment>));
+    }
+    }
+
+    Ok(args)
 }
 
 /// Return the request body type for the operation.
@@ -1147,9 +1158,26 @@ fn get_function_body(
                 }
             }
             "multipart/form-data" => {
+                // The json part of multipart data is sent as a file.
+                let type_name = request_body.type_name.rendered()?.replace("crate::types::", "").to_lowercase();
                 quote! {
-                    // Add the form body.
-                    req = req.form(body);
+                    use std::convert::TryInto;
+                    // Create the multipart form.
+                    let mut form = reqwest::multipart::Form::new();
+                    // Add the body to the form.
+                    
+                    let mut json_part = reqwest::multipart::Part::text(serde_json::to_string(&body)?);
+                    json_part = json_part.file_name(format!("{}.json", #type_name));
+                    json_part = json_part.mime_str("application/json")?;
+                    form = form.part(#type_name, json_part);
+
+                    // For each of the files add them to the form.
+                    for attachment in attachments {
+                        form = form.part(attachment.name.clone(), attachment.try_into()?);
+                    }
+
+                    // Add to the request.
+                    req = req.multipart(form);
                 }
             }
             _ => {

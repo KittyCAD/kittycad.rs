@@ -1756,11 +1756,11 @@
         "description": "We collect anonymous telemetry data for improving our product.",
         "operationId": "create_event",
         "requestBody": {
+          "description": "Telemetry requests",
           "content": {
             "multipart/form-data": {
               "schema": {
-                "type": "string",
-                "format": "binary"
+                "$ref": "#/components/schemas/Event"
               }
             }
           },
@@ -2937,77 +2937,6 @@
                 "required": true,
                 "schema": {
                   "type": "string"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
-    "/hidden/ws/modeling": {
-      "options": {
-        "tags": [
-          "hidden"
-        ],
-        "summary": "Hidden endpoint for defining the modeling websocket types.",
-        "operationId": "hidden_ws_modeling_types",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WebSocketRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WebSocketResponse"
                 }
               }
             }
@@ -15758,6 +15687,73 @@
           }
         ]
       },
+      "Event": {
+        "description": "Telemetry data we are collecting",
+        "oneOf": [
+          {
+            "description": "An event related to modeling app files",
+            "type": "object",
+            "properties": {
+              "attachment_uri": {
+                "nullable": true,
+                "description": "Attachment URI for where the attachment is stored.",
+                "type": "string"
+              },
+              "created_at": {
+                "description": "Time this event was created.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "event_type": {
+                "description": "The specific event type from the modeling app.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ModelingAppEventType"
+                  }
+                ]
+              },
+              "last_compiled_at": {
+                "nullable": true,
+                "description": "Time the associated attachment was last compiled.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "project_description": {
+                "nullable": true,
+                "description": "Project descriptino as given by the user.",
+                "type": "string"
+              },
+              "project_name": {
+                "description": "Project name as given by the user.",
+                "type": "string"
+              },
+              "source_id": {
+                "description": "The source app for this event, uuid that is unique to the app.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "modeling_app_event"
+                ]
+              },
+              "user_id": {
+                "description": "An anonymous user id generated client-side.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "created_at",
+              "event_type",
+              "project_name",
+              "source_id",
+              "type",
+              "user_id"
+            ]
+          }
+        ]
+      },
       "Export": {
         "description": "The response from the `Export` endpoint.",
         "type": "object",
@@ -18142,6 +18138,18 @@
             "type": "string",
             "enum": [
               "EXTENSION"
+            ]
+          }
+        ]
+      },
+      "ModelingAppEventType": {
+        "description": "Type for modeling-app events",
+        "oneOf": [
+          {
+            "description": "This event is sent before the modeling app or project is closed. The attachment should contain the contents of the most recent successful compile.",
+            "type": "string",
+            "enum": [
+              "successful_compile_before_close"
             ]
           }
         ]
