@@ -131,6 +131,37 @@ pub mod base64 {
 }
 
 #[cfg(feature = "requests")]
+pub mod multipart {
+    #![doc = " Multipart form data types."]
+    #[doc = " An attachement to a multipart form."]
+    #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+    pub struct Attachment {
+        #[doc = " The name of the field."]
+        pub name: String,
+        #[doc = " The filename of the attachment."]
+        pub filename: Option<String>,
+        #[doc = " The content type of the attachment."]
+        pub content_type: Option<String>,
+        #[doc = " The data of the attachment."]
+        pub data: Vec<u8>,
+    }
+
+    impl std::convert::TryFrom<Attachment> for reqwest::multipart::Part {
+        type Error = reqwest::Error;
+        fn try_from(attachment: Attachment) -> Result<Self, Self::Error> {
+            let mut part = reqwest::multipart::Part::bytes(attachment.data);
+            if let Some(filename) = attachment.filename {
+                part = part.file_name(filename);
+            }
+            if let Some(content_type) = attachment.content_type {
+                part = part.mime_str(&content_type)?;
+            }
+            Ok(part)
+        }
+    }
+}
+
+#[cfg(feature = "requests")]
 pub mod paginate {
     #![doc = " Utility functions used for pagination."]
     use anyhow::Result;
@@ -373,6 +404,15 @@ pub mod error {
     impl From<reqwest::Error> for Error {
         fn from(e: reqwest::Error) -> Self {
             Self::RequestError(e)
+        }
+    }
+
+    impl From<serde_json::Error> for Error {
+        fn from(e: serde_json::Error) -> Self {
+            Self::SerdeError {
+                error: format_serde_error::SerdeError::new(String::new(), e),
+                status: reqwest::StatusCode::INTERNAL_SERVER_ERROR,
+            }
         }
     }
 
