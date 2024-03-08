@@ -163,7 +163,7 @@
     "op": "add",
     "path": "/paths/~1events/post/x-rust",
     "value": {
-      "example": "/// Creates an internal telemetry event.\n/// \n/// We collect anonymous telemetry data for improving our product.\nasync fn example_meta_create_event() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .meta()\n        .create_event(&bytes::Bytes::from(\"some-string\"))\n        .await?;\n    Ok(())\n}\n",
+      "example": "/// Creates an internal telemetry event.\n/// \n/// We collect anonymous telemetry data for improving our product.\nuse std::str::FromStr;\nasync fn example_meta_create_event() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .meta()\n        .create_event(&kittycad::types::Event {\n            attachment_uri: Some(\"some-string\".to_string()),\n            created_at: chrono::Utc::now(),\n            event_type: kittycad::types::ModelingAppEventType::SuccessfulCompileBeforeClose,\n            last_compiled_at: Some(chrono::Utc::now()),\n            project_description: Some(\"some-string\".to_string()),\n            project_name: \"some-string\".to_string(),\n            source_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            type_: kittycad::types::Type::ModelingAppEvent,\n            user_id: \"some-string\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.create_event"
     }
   },
