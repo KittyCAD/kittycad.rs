@@ -5,10 +5,11 @@ pub mod base64 {
     #![doc = " Base64 data that encodes to url safe base64, but can decode from multiple"]
     #![doc = " base64 implementations to account for various clients and libraries. Compatible"]
     #![doc = " with serde and JsonSchema."]
-    use serde::de::{Error, Unexpected, Visitor};
-    use serde::{Deserialize, Deserializer, Serialize, Serializer};
-    use std::convert::TryFrom;
-    use std::fmt;
+    use serde::{
+        de::{Error, Unexpected, Visitor},
+        Deserialize, Deserializer, Serialize, Serializer,
+    };
+    use std::{convert::TryFrom, fmt};
     static ALLOWED_DECODING_FORMATS: &[data_encoding::Encoding] = &[
         data_encoding::BASE64,
         data_encoding::BASE64URL,
@@ -157,6 +158,30 @@ pub mod multipart {
                 part = part.mime_str(&content_type)?;
             }
             Ok(part)
+        }
+    }
+
+    impl std::convert::TryFrom<std::path::PathBuf> for Attachment {
+        type Error = std::io::Error;
+        fn try_from(path: std::path::PathBuf) -> Result<Self, Self::Error> {
+            let filename = path
+                .file_name()
+                .ok_or_else(|| {
+                    std::io::Error::new(std::io::ErrorKind::InvalidData, "invalid filename")
+                })?
+                .to_str()
+                .ok_or_else(|| {
+                    std::io::Error::new(std::io::ErrorKind::InvalidData, "invalid filename")
+                })?
+                .to_string();
+            let content_type = mime_guess::from_path(&path).first_raw();
+            let data = std::fs::read(path)?;
+            Ok(Attachment {
+                name: "file".to_string(),
+                filename: Some(filename),
+                content_type: content_type.map(|s| s.to_string()),
+                data,
+            })
         }
     }
 }
