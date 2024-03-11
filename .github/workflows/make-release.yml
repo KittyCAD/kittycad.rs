@@ -68,6 +68,6 @@ jobs:
         run: |
           cargo publish -p kittycad --token ${{secrets.CARGO_TOKEN}}
       - name: Create a Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           prerelease: ${{steps.extract_prerelease.outputs.prerelease}}
