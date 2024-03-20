@@ -6307,6 +6307,37 @@ impl tabled::Tabled for GetEntityType {
     }
 }
 
+#[doc = "The response from the `GetNumObjects` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct GetNumObjects {
+    #[doc = "The number of objects in the scene."]
+    pub num_objects: u32,
+}
+
+impl std::fmt::Display for GetNumObjects {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for GetNumObjects {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.num_objects).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["num_objects".into()]
+    }
+}
+
 #[doc = "The plane for sketch mode."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8415,10 +8446,11 @@ pub enum ModelingCmd {
         #[doc = "ID of the second entity being queried."]
         entity_id2: uuid::Uuid,
     },
-    #[doc = "Create a linear pattern using this entity (currently only valid for 3D solids)."]
+    #[doc = "Create a linear pattern using this entity."]
     #[serde(rename = "entity_linear_pattern")]
     EntityLinearPattern {
-        #[doc = "Axis along which to make the copies"]
+        #[doc = "Axis along which to make the copies. For Solid2d patterns, the z component is \
+                 ignored."]
         axis: Point3D,
         #[doc = "ID of the entity being copied."]
         entity_id: uuid::Uuid,
@@ -8427,14 +8459,15 @@ pub enum ModelingCmd {
         #[doc = "Spacing between repetitions."]
         spacing: f64,
     },
-    #[doc = "Create a circular pattern using this entity (currently only valid for 3D solids)."]
+    #[doc = "Create a circular pattern using this entity."]
     #[serde(rename = "entity_circular_pattern")]
     EntityCircularPattern {
         #[doc = "Arc angle (in degrees) to place repetitions along."]
         arc_degrees: f64,
-        #[doc = "Axis around which to make the copies"]
+        #[doc = "Axis around which to make the copies. For Solid2d patterns, this is ignored."]
         axis: Point3D,
-        #[doc = "Point around which to make the copies"]
+        #[doc = "Point around which to make the copies. For Solid2d patterns, the z component is \
+                 ignored."]
         center: Point3D,
         #[doc = "ID of the entity being copied."]
         entity_id: uuid::Uuid,
@@ -8442,6 +8475,20 @@ pub enum ModelingCmd {
         num_repetitions: u32,
         #[doc = "Whether or not to rotate the objects as they are copied."]
         rotate_duplicates: bool,
+    },
+    #[doc = "Create a helix using the input cylinder and other specified parameters."]
+    #[serde(rename = "entity_make_helix")]
+    EntityMakeHelix {
+        #[doc = "ID of the cylinder."]
+        cylinder_id: uuid::Uuid,
+        #[doc = "Is the helix rotation clockwise?"]
+        is_clockwise: bool,
+        #[doc = "Length of the helix."]
+        length: f64,
+        #[doc = "Number of revolutions."]
+        revolutions: f64,
+        #[doc = "Start angle (in degrees)."]
+        start_angle: Angle,
     },
     #[doc = "Enter edit mode"]
     #[serde(rename = "edit_mode_enter")]
@@ -8470,6 +8517,9 @@ pub enum ModelingCmd {
         #[doc = "Which entities to unselect"]
         entities: Vec<uuid::Uuid>,
     },
+    #[doc = "Removes all of the Objects in the scene"]
+    #[serde(rename = "scene_clear_all")]
+    SceneClearAll {},
     #[doc = "Replaces current selection with these entities (by UUID)."]
     #[serde(rename = "select_replace")]
     SelectReplace {
@@ -8761,6 +8811,12 @@ pub enum ModelingCmd {
                  from the camera."]
         ortho: bool,
     },
+    #[doc = "Set the background color of the scene."]
+    #[serde(rename = "set_background_color")]
+    SetBackgroundColor {
+        #[doc = "The color to set the background to."]
+        color: Color,
+    },
     #[doc = "Get type of the given curve."]
     #[serde(rename = "curve_get_type")]
     CurveGetType {
@@ -8986,6 +9042,9 @@ pub enum ModelingCmd {
     #[doc = "Find all IDs of selected entities"]
     #[serde(rename = "select_get")]
     SelectGet {},
+    #[doc = "Get the number of objects in the scene"]
+    #[serde(rename = "get_num_objects")]
+    GetNumObjects {},
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -9225,6 +9284,12 @@ pub enum OkModelingCmdResponse {
     DefaultCameraZoom {
         #[doc = "The response from the `DefaultCameraZoom` command."]
         data: DefaultCameraZoom,
+    },
+    #[doc = "The response to the 'GetNumObjects' endpoint"]
+    #[serde(rename = "get_num_objects")]
+    GetNumObjects {
+        #[doc = "The response from the `GetNumObjects` command."]
+        data: GetNumObjects,
     },
     #[doc = "The response to the 'SelectGet' endpoint"]
     #[serde(rename = "select_get")]
