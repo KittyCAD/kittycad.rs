@@ -16899,6 +16899,21 @@
           "entity_type"
         ]
       },
+      "GetNumObjects": {
+        "description": "The response from the `GetNumObjects` command.",
+        "type": "object",
+        "properties": {
+          "num_objects": {
+            "description": "The number of objects in the scene.",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "num_objects"
+        ]
+      },
       "GetSketchModePlane": {
         "description": "The plane for sketch mode.",
         "type": "object",
@@ -18950,11 +18965,11 @@
             ]
           },
           {
-            "description": "Create a linear pattern using this entity (currently only valid for 3D solids).",
+            "description": "Create a linear pattern using this entity.",
             "type": "object",
             "properties": {
               "axis": {
-                "description": "Axis along which to make the copies",
+                "description": "Axis along which to make the copies. For Solid2d patterns, the z component is ignored.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Point3d"
@@ -18996,7 +19011,7 @@
             ]
           },
           {
-            "description": "Create a circular pattern using this entity (currently only valid for 3D solids).",
+            "description": "Create a circular pattern using this entity.",
             "type": "object",
             "properties": {
               "arc_degrees": {
@@ -19005,7 +19020,7 @@
                 "format": "double"
               },
               "axis": {
-                "description": "Axis around which to make the copies",
+                "description": "Axis around which to make the copies. For Solid2d patterns, this is ignored.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Point3d"
@@ -19013,7 +19028,7 @@
                 ]
               },
               "center": {
-                "description": "Point around which to make the copies",
+                "description": "Point around which to make the copies. For Solid2d patterns, the z component is ignored.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Point3d"
@@ -19049,6 +19064,56 @@
               "entity_id",
               "num_repetitions",
               "rotate_duplicates",
+              "type"
+            ]
+          },
+          {
+            "description": "Create a helix using the input cylinder and other specified parameters.",
+            "type": "object",
+            "properties": {
+              "cylinder_id": {
+                "description": "ID of the cylinder.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "is_clockwise": {
+                "description": "Is the helix rotation clockwise?",
+                "type": "boolean"
+              },
+              "length": {
+                "description": "Length of the helix.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "revolutions": {
+                "description": "Number of revolutions.",
+                "type": "number",
+                "format": "double"
+              },
+              "start_angle": {
+                "description": "Start angle (in degrees).",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Angle"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_make_helix"
+                ]
+              }
+            },
+            "required": [
+              "cylinder_id",
+              "is_clockwise",
+              "length",
+              "revolutions",
+              "start_angle",
               "type"
             ]
           },
@@ -19151,6 +19216,21 @@
             },
             "required": [
               "entities",
+              "type"
+            ]
+          },
+          {
+            "description": "Removes all of the Objects in the scene",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "scene_clear_all"
+                ]
+              }
+            },
+            "required": [
               "type"
             ]
           },
@@ -20133,6 +20213,30 @@
             ]
           },
           {
+            "description": "Set the background color of the scene.",
+            "type": "object",
+            "properties": {
+              "color": {
+                "description": "The color to set the background to.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Color"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_background_color"
+                ]
+              }
+            },
+            "required": [
+              "color",
+              "type"
+            ]
+          },
+          {
             "description": "Get type of the given curve.",
             "type": "object",
             "properties": {
@@ -20960,6 +21064,21 @@
             "required": [
               "type"
             ]
+          },
+          {
+            "description": "Get the number of objects in the scene",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "get_num_objects"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
           }
         ]
       },
@@ -21270,6 +21389,25 @@
                 "type": "string",
                 "enum": [
                   "default_camera_zoom"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'GetNumObjects' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/GetNumObjects"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "get_num_objects"
                 ]
               }
             },
