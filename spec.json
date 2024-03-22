@@ -15177,6 +15177,10 @@
           "updated_at"
         ]
       },
+      "DefaultCameraFocusOn": {
+        "description": "The response from the `DefaultCameraFocusOn` command.",
+        "type": "object"
+      },
       "DefaultCameraGetSettings": {
         "description": "The response from the `DefaultCameraGetSettings` command.",
         "type": "object",
@@ -17170,6 +17174,28 @@
           "object_id"
         ]
       },
+      "ImportedGeometry": {
+        "description": "Data from importing the files",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "ID of the imported 3D models within the scene.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "value": {
+            "description": "The original file paths that held the geometry.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "value"
+        ]
+      },
       "InputFormat": {
         "description": "Input format specifier.",
         "oneOf": [
@@ -18406,7 +18432,7 @@
             ]
           },
           {
-            "description": "Command for extruding a solid.",
+            "description": "Command for extruding a solid 2d.",
             "type": "object",
             "properties": {
               "cap": {
@@ -18439,6 +18465,96 @@
             "required": [
               "cap",
               "distance",
+              "target",
+              "type"
+            ]
+          },
+          {
+            "description": "Command for revolving a solid 2d.",
+            "type": "object",
+            "properties": {
+              "angle": {
+                "description": "The signed angle of revolution (in degrees, must be <= 360 in either direction)",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Angle"
+                  }
+                ]
+              },
+              "axis": {
+                "description": "The axis of the extrusion (taken from the origin)",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "origin": {
+                "description": "The origin of the extrusion axis",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "target": {
+                "description": "Which sketch to revolve. Must be a closed 2D solid.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ModelingCmdId"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "revolve"
+                ]
+              }
+            },
+            "required": [
+              "angle",
+              "axis",
+              "origin",
+              "target",
+              "type"
+            ]
+          },
+          {
+            "description": "Command for revolving a solid 2d about a brep edge",
+            "type": "object",
+            "properties": {
+              "angle": {
+                "description": "The signed angle of revolution (in degrees, must be <= 360 in either direction)",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Angle"
+                  }
+                ]
+              },
+              "edge_id": {
+                "description": "The edge to use as the axis of revolution, must be linear and lie in the plane of the solid",
+                "type": "string",
+                "format": "uuid"
+              },
+              "target": {
+                "description": "Which sketch to revolve. Must be a closed 2D solid.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ModelingCmdId"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "revolve_about_edge"
+                ]
+              }
+            },
+            "required": [
+              "angle",
+              "edge_id",
               "target",
               "type"
             ]
@@ -18815,14 +18931,6 @@
                   }
                 ]
               },
-              "source_unit": {
-                "description": "Select the unit interpretation of exported objects.",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UnitLength"
-                  }
-                ]
-              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -18833,7 +18941,6 @@
             "required": [
               "entity_ids",
               "format",
-              "source_unit",
               "type"
             ]
           },
@@ -20679,14 +20786,6 @@
                   }
                 ]
               },
-              "source_unit": {
-                "description": "Select the unit interpretation of distances in the scene.",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UnitLength"
-                  }
-                ]
-              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -20699,7 +20798,6 @@
               "material_density",
               "material_density_unit",
               "output_unit",
-              "source_unit",
               "type"
             ]
           },
@@ -20736,14 +20834,6 @@
                   }
                 ]
               },
-              "source_unit": {
-                "description": "Select the unit interpretation of distances in the scene.",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UnitLength"
-                  }
-                ]
-              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -20756,7 +20846,6 @@
               "material_mass",
               "material_mass_unit",
               "output_unit",
-              "source_unit",
               "type"
             ]
           },
@@ -20780,14 +20869,6 @@
                   }
                 ]
               },
-              "source_unit": {
-                "description": "Select the unit interpretation of distances in the scene.",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UnitLength"
-                  }
-                ]
-              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -20798,7 +20879,6 @@
             "required": [
               "entity_ids",
               "output_unit",
-              "source_unit",
               "type"
             ]
           },
@@ -20822,14 +20902,6 @@
                   }
                 ]
               },
-              "source_unit": {
-                "description": "Select the unit interpretation of distances in the scene.",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UnitLength"
-                  }
-                ]
-              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -20840,7 +20912,6 @@
             "required": [
               "entity_ids",
               "output_unit",
-              "source_unit",
               "type"
             ]
           },
@@ -20864,14 +20935,6 @@
                   }
                 ]
               },
-              "source_unit": {
-                "description": "Select the unit interpretation of distances in the scene.",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/UnitLength"
-                  }
-                ]
-              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -20882,7 +20945,6 @@
             "required": [
               "entity_ids",
               "output_unit",
-              "source_unit",
               "type"
             ]
           },
@@ -21417,6 +21479,25 @@
             ]
           },
           {
+            "description": "The response to the 'DefaultCameraFocusOn' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/DefaultCameraFocusOn"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_focus_on"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
             "description": "The response to the 'SelectGet' endpoint",
             "type": "object",
             "properties": {
@@ -21807,6 +21888,25 @@
                 "type": "string",
                 "enum": [
                   "import_files"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'ImportedGeometry' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ImportedGeometry"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "imported_geometry"
                 ]
               }
             },
@@ -26797,6 +26897,14 @@
             "description": "A sequence of modeling requests. If any request fails, following requests will not be tried.",
             "type": "object",
             "properties": {
+              "batch_id": {
+                "description": "ID of batch being submitted. Each request has their own individual ModelingCmdId, but this is the ID of the overall batch.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ModelingCmdId"
+                  }
+                ]
+              },
               "requests": {
                 "description": "A sequence of modeling requests. If any request fails, following requests will not be tried.",
                 "type": "array",
@@ -26812,6 +26920,7 @@
               }
             },
             "required": [
+              "batch_id",
               "requests",
               "type"
             ]

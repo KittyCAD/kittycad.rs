@@ -3944,6 +3944,34 @@ impl tabled::Tabled for CustomerBalance {
     }
 }
 
+#[doc = "The response from the `DefaultCameraFocusOn` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DefaultCameraFocusOn {}
+
+impl std::fmt::Display for DefaultCameraFocusOn {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DefaultCameraFocusOn {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "The response from the `DefaultCameraGetSettings` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -6674,6 +6702,42 @@ impl tabled::Tabled for ImportFiles {
     }
 }
 
+#[doc = "Data from importing the files"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ImportedGeometry {
+    #[doc = "ID of the imported 3D models within the scene."]
+    pub id: uuid::Uuid,
+    #[doc = "The original file paths that held the geometry."]
+    pub value: Vec<String>,
+}
+
+impl std::fmt::Display for ImportedGeometry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ImportedGeometry {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.value).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["id".into(), "value".into()]
+    }
+}
+
 #[doc = "Input format specifier."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8286,7 +8350,7 @@ pub enum ModelingCmd {
                  \"pen\" location."]
         segment: PathSegment,
     },
-    #[doc = "Command for extruding a solid."]
+    #[doc = "Command for extruding a solid 2d."]
     #[serde(rename = "extrude")]
     Extrude {
         #[doc = "Whether to cap the extrusion with a face, or not. If true, the resulting solid \
@@ -8296,6 +8360,29 @@ pub enum ModelingCmd {
         #[doc = "How far off the plane to extrude"]
         distance: f64,
         #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
+        target: uuid::Uuid,
+    },
+    #[doc = "Command for revolving a solid 2d."]
+    #[serde(rename = "revolve")]
+    Revolve {
+        #[doc = "The signed angle of revolution (in degrees, must be <= 360 in either direction)"]
+        angle: Angle,
+        #[doc = "The axis of the extrusion (taken from the origin)"]
+        axis: Point3D,
+        #[doc = "The origin of the extrusion axis"]
+        origin: Point3D,
+        #[doc = "Which sketch to revolve. Must be a closed 2D solid."]
+        target: uuid::Uuid,
+    },
+    #[doc = "Command for revolving a solid 2d about a brep edge"]
+    #[serde(rename = "revolve_about_edge")]
+    RevolveAboutEdge {
+        #[doc = "The signed angle of revolution (in degrees, must be <= 360 in either direction)"]
+        angle: Angle,
+        #[doc = "The edge to use as the axis of revolution, must be linear and lie in the plane \
+                 of the solid"]
+        edge_id: uuid::Uuid,
+        #[doc = "Which sketch to revolve. Must be a closed 2D solid."]
         target: uuid::Uuid,
     },
     #[doc = "Closes a path, converting it to a 2D solid."]
@@ -8407,8 +8494,6 @@ pub enum ModelingCmd {
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The file format to export to."]
         format: OutputFormat,
-        #[doc = "Select the unit interpretation of exported objects."]
-        source_unit: UnitLength,
     },
     #[doc = "What is this entity's parent?"]
     #[serde(rename = "entity_get_parent_id")]
@@ -8945,8 +9030,6 @@ pub enum ModelingCmd {
         material_density_unit: UnitDensity,
         #[doc = "The output unit for the mass."]
         output_unit: UnitMass,
-        #[doc = "Select the unit interpretation of distances in the scene."]
-        source_unit: UnitLength,
     },
     #[doc = "Get the density of entities in the scene or the default scene."]
     #[serde(rename = "density")]
@@ -8960,8 +9043,6 @@ pub enum ModelingCmd {
         material_mass_unit: UnitMass,
         #[doc = "The output unit for the density."]
         output_unit: UnitDensity,
-        #[doc = "Select the unit interpretation of distances in the scene."]
-        source_unit: UnitLength,
     },
     #[doc = "Get the volume of entities in the scene or the default scene."]
     #[serde(rename = "volume")]
@@ -8971,8 +9052,6 @@ pub enum ModelingCmd {
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The output unit for the volume."]
         output_unit: UnitVolume,
-        #[doc = "Select the unit interpretation of distances in the scene."]
-        source_unit: UnitLength,
     },
     #[doc = "Get the center of mass of entities in the scene or the default scene."]
     #[serde(rename = "center_of_mass")]
@@ -8982,8 +9061,6 @@ pub enum ModelingCmd {
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The output unit for the center of mass."]
         output_unit: UnitLength,
-        #[doc = "Select the unit interpretation of distances in the scene."]
-        source_unit: UnitLength,
     },
     #[doc = "Get the surface area of entities in the scene or the default scene."]
     #[serde(rename = "surface_area")]
@@ -8993,8 +9070,6 @@ pub enum ModelingCmd {
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The output unit for the surface area."]
         output_unit: UnitArea,
-        #[doc = "Select the unit interpretation of distances in the scene."]
-        source_unit: UnitLength,
     },
     #[doc = "Focus the default camera upon an object in the scene."]
     #[serde(rename = "default_camera_focus_on")]
@@ -9291,6 +9366,12 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `GetNumObjects` command."]
         data: GetNumObjects,
     },
+    #[doc = "The response to the 'DefaultCameraFocusOn' endpoint"]
+    #[serde(rename = "default_camera_focus_on")]
+    DefaultCameraFocusOn {
+        #[doc = "The response from the `DefaultCameraFocusOn` command."]
+        data: DefaultCameraFocusOn,
+    },
     #[doc = "The response to the 'SelectGet' endpoint"]
     #[serde(rename = "select_get")]
     SelectGet {
@@ -9417,6 +9498,12 @@ pub enum OkModelingCmdResponse {
     ImportFiles {
         #[doc = "Data from importing the files"]
         data: ImportFiles,
+    },
+    #[doc = "The response to the 'ImportedGeometry' endpoint"]
+    #[serde(rename = "imported_geometry")]
+    ImportedGeometry {
+        #[doc = "Data from importing the files"]
+        data: ImportedGeometry,
     },
     #[doc = "The response to the 'Mass' endpoint"]
     #[serde(rename = "mass")]
@@ -15056,6 +15143,9 @@ pub enum WebSocketRequest {
              be tried."]
     #[serde(rename = "modeling_cmd_batch_req")]
     ModelingCmdBatchReq {
+        #[doc = "ID of batch being submitted. Each request has their own individual \
+                 ModelingCmdId, but this is the ID of the overall batch."]
+        batch_id: uuid::Uuid,
         #[doc = "A sequence of modeling requests. If any request fails, following requests will \
                  not be tried."]
         requests: Vec<ModelingCmdReq>,
