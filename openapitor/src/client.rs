@@ -278,7 +278,7 @@ impl Client {
                         .build();
                     Client {
                         token: token.to_string(),
-                        base_url: "https://api.kittycad.io".to_string(),
+                        base_url: "BASE_URL".to_string(),
 
                         client,
                         client_http1_only,
@@ -292,7 +292,7 @@ impl Client {
             match (builder_http.build(), builder_websocket.build()) {
                 (Ok(c), Ok(c1)) => Client {
                     token: token.to_string(),
-                    base_url: "https://api.kittycad.io".to_string(),
+                    base_url: "BASE_URL".to_string(),
 
                     client: c,
                     client_http1_only: c1,
@@ -333,7 +333,7 @@ impl Client {
                         .build();
                     Client {
                         token: token.to_string(),
-                        base_url: "https://api.kittycad.io".to_string(),
+                        base_url: "BASE_URL".to_string(),
 
                         client,
                     }
@@ -346,7 +346,7 @@ impl Client {
             match builder_http.build() {
                 Ok(c) => Client {
                     token: token.to_string(),
-                    base_url: "https://api.kittycad.io".to_string(),
+                    base_url: "BASE_URL".to_string(),
 
                     client: c,
                 },
