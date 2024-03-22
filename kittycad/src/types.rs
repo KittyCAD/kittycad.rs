@@ -895,8 +895,6 @@ pub enum AiPromptType {
     TextToCad,
 }
 
-
-
 #[doc = "An angle, with a specific unit."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4760,8 +4758,6 @@ pub enum Type {
     ModelingAppEvent,
 }
 
-
-
 #[doc = "An event related to modeling app files"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8061,8 +8057,6 @@ pub enum ModelingAppEventType {
     SuccessfulCompileBeforeClose,
 }
 
-
-
 #[doc = "The subscription tiers we offer for the Modeling App to individuals."]
 #[derive(
     serde :: Serialize,
@@ -9144,8 +9138,6 @@ pub enum Oauth2GrantType {
     #[default]
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
-
-
 
 #[doc = "A successful response from a modeling command. This can be one of several types of \
          responses, depending on the command."]
@@ -10652,8 +10644,6 @@ pub enum PaymentMethodType {
     #[default]
     Card,
 }
-
-
 
 #[doc = "Defines a perspective view."]
 #[derive(
@@ -14994,6 +14984,8 @@ pub enum WebSocketRequest {
         #[doc = "A sequence of modeling requests. If any request fails, following requests will \
                  not be tried."]
         requests: Vec<ModelingCmdReq>,
+        #[doc = "ID of command being submitted."]
+        cmd_id: uuid::Uuid,
     },
     #[doc = "The client-to-server Ping to ensure the WebSocket stays alive."]
     #[serde(rename = "ping")]
