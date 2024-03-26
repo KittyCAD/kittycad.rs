@@ -31,7 +31,7 @@ To install the library, add the following to your `Cargo.toml` file.
 
 ```toml
 [dependencies]
-kittycad = "0.2.62"
+kittycad = "0.2.63"
 ```
 
 ## Basic example
