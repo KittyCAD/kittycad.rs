@@ -8231,10 +8231,14 @@ pub enum ModelingCmd {
         angle: Angle,
         #[doc = "The axis of the extrusion (taken from the origin)"]
         axis: Point3D,
+        #[doc = "If true, the axis is interpreted within the 2D space of the solid 2D's plane"]
+        axis_is_2d: bool,
         #[doc = "The origin of the extrusion axis"]
         origin: Point3D,
         #[doc = "Which sketch to revolve. Must be a closed 2D solid."]
         target: uuid::Uuid,
+        #[doc = "The maximum acceptable surface gap computed between the revolution surface joints. Must be positive (i.e. greater than zero)."]
+        tolerance: f64,
     },
     #[doc = "Command for revolving a solid 2d about a brep edge"]
     #[serde(rename = "revolve_about_edge")]
@@ -8245,6 +8249,8 @@ pub enum ModelingCmd {
         edge_id: uuid::Uuid,
         #[doc = "Which sketch to revolve. Must be a closed 2D solid."]
         target: uuid::Uuid,
+        #[doc = "The maximum acceptable surface gap computed between the revolution surface joints. Must be positive (i.e. greater than zero)."]
+        tolerance: f64,
     },
     #[doc = "Closes a path, converting it to a 2D solid."]
     #[serde(rename = "close_path")]
