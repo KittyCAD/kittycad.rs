@@ -18489,6 +18489,10 @@
                   }
                 ]
               },
+              "axis_is_2d": {
+                "description": "If true, the axis is interpreted within the 2D space of the solid 2D's plane",
+                "type": "boolean"
+              },
               "origin": {
                 "description": "The origin of the extrusion axis",
                 "allOf": [
@@ -18505,6 +18509,14 @@
                   }
                 ]
               },
+              "tolerance": {
+                "description": "The maximum acceptable surface gap computed between the revolution surface joints. Must be positive (i.e. greater than zero).",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -18515,8 +18527,10 @@
             "required": [
               "angle",
               "axis",
+              "axis_is_2d",
               "origin",
               "target",
+              "tolerance",
               "type"
             ]
           },
@@ -18545,6 +18559,14 @@
                   }
                 ]
               },
+              "tolerance": {
+                "description": "The maximum acceptable surface gap computed between the revolution surface joints. Must be positive (i.e. greater than zero).",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -18556,6 +18578,7 @@
               "angle",
               "edge_id",
               "target",
+              "tolerance",
               "type"
             ]
           },
