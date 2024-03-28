@@ -23966,53 +23966,35 @@
         "type": "object",
         "properties": {
           "created_at": {
-            "title": "DateTime",
             "description": "The date and time the session was created.",
             "type": "string",
             "format": "date-time"
           },
-          "expires": {
-            "title": "DateTime",
+          "expires_at": {
             "description": "The date and time the session expires.",
             "type": "string",
             "format": "date-time"
           },
-          "id": {
-            "description": "The unique identifier for the session.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "session_token": {
+          "token": {
             "description": "The session token.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
+            "type": "string",
+            "format": "uuid"
           },
           "updated_at": {
-            "title": "DateTime",
             "description": "The date and time the session was last updated.",
             "type": "string",
             "format": "date-time"
           },
           "user_id": {
             "description": "The user ID of the user that the session belongs to.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
+            "type": "string",
+            "format": "uuid"
           }
         },
         "required": [
           "created_at",
-          "expires",
-          "id",
-          "session_token",
+          "expires_at",
+          "token",
           "updated_at",
           "user_id"
         ]
