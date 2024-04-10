@@ -1443,8 +1443,13 @@ fn generate_example_code_fn(
     // Get the request body for the function if there is one.
     let request_body = if let Some(rb) = get_request_body_example(type_space, name, method, op)? {
         let t = rb.type_name;
-        // We add the comma at the front, so it works.
-        quote!(&#t)
+        if is_multipart(type_space, name, method, op)? && !multipart_has_body(&t)? {
+            // We don't have a request body, so we'll return nothing.
+            quote!()
+        } else {
+            // We add the comma at the front, so it works.
+            quote!(&#t)
+        }
     } else {
         // We don't have a request body, so we'll return nothing.
         quote!()
@@ -1633,7 +1638,7 @@ fn fmt_external_example_code(t: &proc_macro2::TokenStream, opts: &crate::Opts) -
 }
 
 fn multipart_has_body(request_body: &proc_macro2::TokenStream) -> Result<bool> {
-    Ok(request_body.rendered()? != "bytes::Bytes")
+    Ok(!request_body.rendered()?.starts_with("bytes::Bytes"))
 }
 
 #[cfg(test)]

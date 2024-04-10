@@ -112,13 +112,11 @@ impl Meta {
              here that you don't want to be public.\n\n```rust,no_run\nasync fn \
              example_meta_create_debug_uploads() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: Vec<String> = client\n        \
-             .meta()\n        .create_debug_uploads(\n            \
-             vec![kittycad::types::multipart::Attachment {\n                name: \
-             \"thing\".to_string(),\n                filename: \
-             Some(\"myfile.json\".to_string()),\n                content_type: \
-             Some(\"application/json\".to_string()),\n                data: \
-             std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            \
-             &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
+             .meta()\n        .create_debug_uploads(vec![kittycad::types::multipart::Attachment \
+             {\n            name: \"thing\".to_string(),\n            filename: \
+             Some(\"myfile.json\".to_string()),\n            content_type: \
+             Some(\"application/json\".to_string()),\n            data: \
+             std::fs::read(\"myfile.json\").unwrap(),\n        }])\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_debug_uploads<'a>(
