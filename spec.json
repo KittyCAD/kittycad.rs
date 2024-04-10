@@ -12212,6 +12212,14 @@
           },
           {
             "in": "query",
+            "name": "post_effect",
+            "description": "Engine Post effects (such as SSAO)",
+            "schema": {
+              "$ref": "#/components/schemas/PostEffectType"
+            }
+          },
+          {
+            "in": "query",
             "name": "unlocked_framerate",
             "description": "If true, engine will render video frames as fast as it can.",
             "schema": {
@@ -20367,6 +20375,54 @@
             ]
           },
           {
+            "description": "Set the properties of the tool lines for the scene.",
+            "type": "object",
+            "properties": {
+              "color": {
+                "nullable": true,
+                "description": "The color to set the tool line to.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Color"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_current_tool_properties"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
+            "description": "Set the default system properties used when a specific property isn't set.",
+            "type": "object",
+            "properties": {
+              "color": {
+                "nullable": true,
+                "description": "The default system color.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Color"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_default_system_properties"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
             "description": "Get type of the given curve.",
             "type": "object",
             "properties": {
@@ -23465,6 +23521,15 @@
           "message"
         ]
       },
+      "PostEffectType": {
+        "description": "Post effect type",
+        "type": "string",
+        "enum": [
+          "phosphor",
+          "ssao",
+          "noeffect"
+        ]
+      },
       "PrivacySettings": {
         "description": "Privacy settings for an org or user.",
         "type": "object",
@@ -23966,53 +24031,35 @@
         "type": "object",
         "properties": {
           "created_at": {
-            "title": "DateTime",
             "description": "The date and time the session was created.",
             "type": "string",
             "format": "date-time"
           },
-          "expires": {
-            "title": "DateTime",
+          "expires_at": {
             "description": "The date and time the session expires.",
             "type": "string",
             "format": "date-time"
           },
-          "id": {
-            "description": "The unique identifier for the session.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "session_token": {
+          "token": {
             "description": "The session token.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
+            "type": "string",
+            "format": "uuid"
           },
           "updated_at": {
-            "title": "DateTime",
             "description": "The date and time the session was last updated.",
             "type": "string",
             "format": "date-time"
           },
           "user_id": {
             "description": "The user ID of the user that the session belongs to.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
+            "type": "string",
+            "format": "uuid"
           }
         },
         "required": [
           "created_at",
-          "expires",
-          "id",
-          "session_token",
+          "expires_at",
+          "token",
           "updated_at",
           "user_id"
         ]
@@ -26934,6 +26981,11 @@
                 "items": {
                   "$ref": "#/components/schemas/ModelingCmdReq"
                 }
+              },
+              "responses": {
+                "description": "If false or omitted, responses to each batch command will just be Ok(()). If true, responses will be the actual response data for that modeling command.",
+                "default": false,
+                "type": "boolean"
               },
               "type": {
                 "type": "string",
