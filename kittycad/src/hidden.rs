@@ -85,16 +85,15 @@ impl Hidden {
         callback_url: Option<String>,
         provider_id: uuid::Uuid,
     ) -> Result<(), crate::types::error::Error> {
-        let mut req =
-            self.client.client.request(
-                http::Method::GET,
-                format!(
-                    "{}/{}",
-                    self.client.base_url,
-                    "auth/saml/provider/{provider_id}/login"
-                        .replace("{provider_id}", &format!("{}", provider_id))
-                ),
-            );
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "auth/saml/provider/{provider_id}/login"
+                    .replace("{provider_id}", &format!("{}", provider_id))
+            ),
+        );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = callback_url {
@@ -128,16 +127,15 @@ impl Hidden {
         provider_id: uuid::Uuid,
         body: &bytes::Bytes,
     ) -> Result<(), crate::types::error::Error> {
-        let mut req =
-            self.client.client.request(
-                http::Method::POST,
-                format!(
-                    "{}/{}",
-                    self.client.base_url,
-                    "auth/saml/provider/{provider_id}/login"
-                        .replace("{provider_id}", &format!("{}", provider_id))
-                ),
-            );
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "auth/saml/provider/{provider_id}/login"
+                    .replace("{provider_id}", &format!("{}", provider_id))
+            ),
+        );
         req = req.bearer_auth(&self.client.token);
         req = req.body(body.clone());
         let resp = req.send().await?;

@@ -74,59 +74,55 @@ impl ServiceAccounts {
         self.list_for_org(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
-                let next_pages =
-                    futures::stream::try_unfold(
-                        (None, result),
-                        move |(prev_page_token, new_result)| async move {
-                            if new_result.has_more_pages()
-                                && !new_result.items().is_empty()
-                                && prev_page_token != new_result.next_page_token()
-                            {
-                                async {
-                                    let mut req = self.client.client.request(
-                                        http::Method::GET,
-                                        format!(
-                                            "{}/{}",
-                                            self.client.base_url, "org/service-accounts"
-                                        ),
-                                    );
-                                    req = req.bearer_auth(&self.client.token);
-                                    let mut request = req.build()?;
-                                    request = new_result.next_page(request)?;
-                                    let resp = self.client.client.execute(request).await?;
-                                    let status = resp.status();
-                                    if status.is_success() {
-                                        let text = resp.text().await.unwrap_or_default();
-                                        serde_json::from_str(&text).map_err(|err| {
-                                            crate::types::error::Error::from_serde_error(
-                                                format_serde_error::SerdeError::new(
-                                                    text.to_string(),
-                                                    err,
-                                                ),
-                                                status,
-                                            )
-                                        })
-                                    } else {
-                                        let text = resp.text().await.unwrap_or_default();
-                                        Err(crate::types::error::Error::Server {
-                                            body: text.to_string(),
+                let next_pages = futures::stream::try_unfold(
+                    (None, result),
+                    move |(prev_page_token, new_result)| async move {
+                        if new_result.has_more_pages()
+                            && !new_result.items().is_empty()
+                            && prev_page_token != new_result.next_page_token()
+                        {
+                            async {
+                                let mut req = self.client.client.request(
+                                    http::Method::GET,
+                                    format!("{}/{}", self.client.base_url, "org/service-accounts"),
+                                );
+                                req = req.bearer_auth(&self.client.token);
+                                let mut request = req.build()?;
+                                request = new_result.next_page(request)?;
+                                let resp = self.client.client.execute(request).await?;
+                                let status = resp.status();
+                                if status.is_success() {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    serde_json::from_str(&text).map_err(|err| {
+                                        crate::types::error::Error::from_serde_error(
+                                            format_serde_error::SerdeError::new(
+                                                text.to_string(),
+                                                err,
+                                            ),
                                             status,
-                                        })
-                                    }
+                                        )
+                                    })
+                                } else {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    Err(crate::types::error::Error::Server {
+                                        body: text.to_string(),
+                                        status,
+                                    })
                                 }
-                                .map_ok(|result: crate::types::ServiceAccountResultsPage| {
-                                    Some((
-                                        futures::stream::iter(result.items().into_iter().map(Ok)),
-                                        (new_result.next_page_token(), result),
-                                    ))
-                                })
-                                .await
-                            } else {
-                                Ok(None)
                             }
-                        },
-                    )
-                    .try_flatten();
+                            .map_ok(|result: crate::types::ServiceAccountResultsPage| {
+                                Some((
+                                    futures::stream::iter(result.items().into_iter().map(Ok)),
+                                    (new_result.next_page_token(), result),
+                                ))
+                            })
+                            .await
+                        } else {
+                            Ok(None)
+                        }
+                    },
+                )
+                .try_flatten();
                 items.chain(next_pages)
             })
             .try_flatten_stream()

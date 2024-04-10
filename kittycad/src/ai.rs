@@ -142,15 +142,14 @@ impl Ai {
         &'a self,
         id: uuid::Uuid,
     ) -> Result<crate::types::AiPrompt, crate::types::error::Error> {
-        let mut req =
-            self.client.client.request(
-                http::Method::GET,
-                format!(
-                    "{}/{}",
-                    self.client.base_url,
-                    "ai-prompts/{id}".replace("{id}", &format!("{}", id))
-                ),
-            );
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "ai-prompts/{id}".replace("{id}", &format!("{}", id))
+            ),
+        );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
@@ -209,16 +208,15 @@ impl Ai {
         output_format: crate::types::FileExportFormat,
         body: &crate::types::TextToCadCreateBody,
     ) -> Result<crate::types::TextToCad, crate::types::error::Error> {
-        let mut req =
-            self.client.client.request(
-                http::Method::POST,
-                format!(
-                    "{}/{}",
-                    self.client.base_url,
-                    "ai/text-to-cad/{output_format}"
-                        .replace("{output_format}", &format!("{}", output_format))
-                ),
-            );
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "ai/text-to-cad/{output_format}"
+                    .replace("{output_format}", &format!("{}", output_format))
+            ),
+        );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
         let resp = req.send().await?;

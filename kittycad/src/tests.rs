@@ -40,16 +40,15 @@ async fn test_create_file_conversion() {
     let client = test_client();
     let body = include_bytes!("../../assets/in_obj.obj");
 
-    let conversion =
-        client
-            .file()
-            .create_conversion(
-                crate::types::FileExportFormat::Step,
-                crate::types::FileImportFormat::Obj,
-                &body.to_vec().into(),
-            )
-            .await
-            .unwrap();
+    let conversion = client
+        .file()
+        .create_conversion(
+            crate::types::FileExportFormat::Step,
+            crate::types::FileImportFormat::Obj,
+            &body.to_vec().into(),
+        )
+        .await
+        .unwrap();
 
     assert!(conversion.outputs.is_some());
     assert!(!conversion.outputs.unwrap().is_empty());
@@ -228,14 +227,13 @@ async fn test_modeling_websocket() {
         }
         err => panic!("Failed to connect to modeling websocket: {:?}", err),
     };
-    let (mut write, mut read) =
-        tokio_tungstenite::WebSocketStream::from_raw_socket(
-            ws,
-            tokio_tungstenite::tungstenite::protocol::Role::Client,
-            None,
-        )
-        .await
-        .split();
+    let (mut write, mut read) = tokio_tungstenite::WebSocketStream::from_raw_socket(
+        ws,
+        tokio_tungstenite::tungstenite::protocol::Role::Client,
+        None,
+    )
+    .await
+    .split();
 
     // Start a path
     let path_id = Uuid::new_v4();

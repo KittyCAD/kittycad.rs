@@ -146,16 +146,15 @@ impl Oauth2 {
         state: Option<String>,
         user: Option<String>,
     ) -> Result<(), crate::types::error::Error> {
-        let mut req =
-            self.client.client.request(
-                http::Method::GET,
-                format!(
-                    "{}/{}",
-                    self.client.base_url,
-                    "oauth2/provider/{provider}/callback"
-                        .replace("{provider}", &format!("{}", provider))
-                ),
-            );
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "oauth2/provider/{provider}/callback"
+                    .replace("{provider}", &format!("{}", provider))
+            ),
+        );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = code {
@@ -207,16 +206,15 @@ impl Oauth2 {
         provider: crate::types::AccountProvider,
         body: &crate::types::AuthCallback,
     ) -> Result<(), crate::types::error::Error> {
-        let mut req =
-            self.client.client.request(
-                http::Method::POST,
-                format!(
-                    "{}/{}",
-                    self.client.base_url,
-                    "oauth2/provider/{provider}/callback"
-                        .replace("{provider}", &format!("{}", provider))
-                ),
-            );
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "oauth2/provider/{provider}/callback"
+                    .replace("{provider}", &format!("{}", provider))
+            ),
+        );
         req = req.bearer_auth(&self.client.token);
         req = req.form(body);
         let resp = req.send().await?;
@@ -248,16 +246,15 @@ impl Oauth2 {
         callback_url: Option<String>,
         provider: crate::types::AccountProvider,
     ) -> Result<crate::types::Oauth2ClientInfo, crate::types::error::Error> {
-        let mut req =
-            self.client.client.request(
-                http::Method::GET,
-                format!(
-                    "{}/{}",
-                    self.client.base_url,
-                    "oauth2/provider/{provider}/consent"
-                        .replace("{provider}", &format!("{}", provider))
-                ),
-            );
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "oauth2/provider/{provider}/consent"
+                    .replace("{provider}", &format!("{}", provider))
+            ),
+        );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = callback_url {

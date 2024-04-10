@@ -725,15 +725,14 @@ impl Orgs {
         &'a self,
         id: uuid::Uuid,
     ) -> Result<crate::types::Org, crate::types::error::Error> {
-        let mut req =
-            self.client.client.request(
-                http::Method::GET,
-                format!(
-                    "{}/{}",
-                    self.client.base_url,
-                    "orgs/{id}".replace("{id}", &format!("{}", id))
-                ),
-            );
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "orgs/{id}".replace("{id}", &format!("{}", id))
+            ),
+        );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
