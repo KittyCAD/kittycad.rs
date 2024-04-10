@@ -55,6 +55,7 @@
 //!
 //! let client = Client::new_from_env();
 //! ```
+//!
 #![allow(missing_docs)]
 #![allow(clippy::needless_lifetimes)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
@@ -65,8 +66,6 @@
 #[cfg(feature = "requests")]
 pub mod ai;
 /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
-///
-/// FROM: <https://zoo.dev/docs/api/api-calls>
 #[cfg(feature = "requests")]
 pub mod api_calls;
 /// API tokens allow users to call the API outside of their session token that is used as a cookie in the user interface. Users can create, delete, and list their API tokens. But, of course, you need an API token to do this, so first be sure to generate one in the account UI.
@@ -90,8 +89,6 @@ pub mod executor;
 #[cfg(feature = "requests")]
 pub mod file;
 /// Hidden API endpoints that should not show up in the docs.
-///
-/// FROM: <https://zoo.dev/docs/api/hidden>
 #[cfg(feature = "requests")]
 pub mod hidden;
 /// Meta information about the API.
@@ -384,8 +381,6 @@ impl Client {
     }
 
     /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
-    ///
-    /// FROM: <https://zoo.dev/docs/api/api-calls>
     pub fn api_calls(&self) -> api_calls::ApiCalls {
         api_calls::ApiCalls::new(self.clone())
     }
@@ -419,8 +414,6 @@ impl Client {
     }
 
     /// Hidden API endpoints that should not show up in the docs.
-    ///
-    /// FROM: <https://zoo.dev/docs/api/hidden>
     pub fn hidden(&self) -> hidden::Hidden {
         hidden::Hidden::new(self.clone())
     }

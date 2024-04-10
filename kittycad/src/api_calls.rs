@@ -168,14 +168,15 @@ impl ApiCalls {
         &'a self,
         id: uuid::Uuid,
     ) -> Result<crate::types::ApiCallWithPrice, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!(
-                "{}/{}",
-                self.client.base_url,
-                "api-calls/{id}".replace("{id}", &format!("{}", id))
-            ),
-        );
+        let mut req =
+            self.client.client.request(
+                http::Method::GET,
+                format!(
+                    "{}/{}",
+                    self.client.base_url,
+                    "api-calls/{id}".replace("{id}", &format!("{}", id))
+                ),
+            );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
@@ -335,14 +336,15 @@ impl ApiCalls {
         &'a self,
         id: &'a str,
     ) -> Result<crate::types::AsyncApiCallOutput, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!(
-                "{}/{}",
-                self.client.base_url,
-                "async/operations/{id}".replace("{id}", id)
-            ),
-        );
+        let mut req =
+            self.client.client.request(
+                http::Method::GET,
+                format!(
+                    "{}/{}",
+                    self.client.base_url,
+                    "async/operations/{id}".replace("{id}", id)
+                ),
+            );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
@@ -487,14 +489,15 @@ impl ApiCalls {
         &'a self,
         id: uuid::Uuid,
     ) -> Result<crate::types::ApiCallWithPrice, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!(
-                "{}/{}",
-                self.client.base_url,
-                "org/api-calls/{id}".replace("{id}", &format!("{}", id))
-            ),
-        );
+        let mut req =
+            self.client.client.request(
+                http::Method::GET,
+                format!(
+                    "{}/{}",
+                    self.client.base_url,
+                    "org/api-calls/{id}".replace("{id}", &format!("{}", id))
+                ),
+            );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
@@ -684,14 +687,15 @@ impl ApiCalls {
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
     ) -> Result<crate::types::ApiCallWithPriceResultsPage, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!(
-                "{}/{}",
-                self.client.base_url,
-                "users/{id}/api-calls".replace("{id}", id)
-            ),
-        );
+        let mut req =
+            self.client.client.request(
+                http::Method::GET,
+                format!(
+                    "{}/{}",
+                    self.client.base_url,
+                    "users/{id}/api-calls".replace("{id}", id)
+                ),
+            );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
@@ -744,59 +748,60 @@ impl ApiCalls {
         self.list_for_user(id, limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
-                let next_pages = futures::stream::try_unfold(
-                    (None, result),
-                    move |(prev_page_token, new_result)| async move {
-                        if new_result.has_more_pages()
-                            && !new_result.items().is_empty()
-                            && prev_page_token != new_result.next_page_token()
-                        {
-                            async {
-                                let mut req = self.client.client.request(
-                                    http::Method::GET,
-                                    format!(
-                                        "{}/{}",
-                                        self.client.base_url,
-                                        "users/{id}/api-calls".replace("{id}", id)
-                                    ),
-                                );
-                                req = req.bearer_auth(&self.client.token);
-                                let mut request = req.build()?;
-                                request = new_result.next_page(request)?;
-                                let resp = self.client.client.execute(request).await?;
-                                let status = resp.status();
-                                if status.is_success() {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    serde_json::from_str(&text).map_err(|err| {
-                                        crate::types::error::Error::from_serde_error(
-                                            format_serde_error::SerdeError::new(
-                                                text.to_string(),
-                                                err,
-                                            ),
+                let next_pages =
+                    futures::stream::try_unfold(
+                        (None, result),
+                        move |(prev_page_token, new_result)| async move {
+                            if new_result.has_more_pages()
+                                && !new_result.items().is_empty()
+                                && prev_page_token != new_result.next_page_token()
+                            {
+                                async {
+                                    let mut req = self.client.client.request(
+                                        http::Method::GET,
+                                        format!(
+                                            "{}/{}",
+                                            self.client.base_url,
+                                            "users/{id}/api-calls".replace("{id}", id)
+                                        ),
+                                    );
+                                    req = req.bearer_auth(&self.client.token);
+                                    let mut request = req.build()?;
+                                    request = new_result.next_page(request)?;
+                                    let resp = self.client.client.execute(request).await?;
+                                    let status = resp.status();
+                                    if status.is_success() {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        serde_json::from_str(&text).map_err(|err| {
+                                            crate::types::error::Error::from_serde_error(
+                                                format_serde_error::SerdeError::new(
+                                                    text.to_string(),
+                                                    err,
+                                                ),
+                                                status,
+                                            )
+                                        })
+                                    } else {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        Err(crate::types::error::Error::Server {
+                                            body: text.to_string(),
                                             status,
-                                        )
-                                    })
-                                } else {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    Err(crate::types::error::Error::Server {
-                                        body: text.to_string(),
-                                        status,
-                                    })
+                                        })
+                                    }
                                 }
+                                .map_ok(|result: crate::types::ApiCallWithPriceResultsPage| {
+                                    Some((
+                                        futures::stream::iter(result.items().into_iter().map(Ok)),
+                                        (new_result.next_page_token(), result),
+                                    ))
+                                })
+                                .await
+                            } else {
+                                Ok(None)
                             }
-                            .map_ok(|result: crate::types::ApiCallWithPriceResultsPage| {
-                                Some((
-                                    futures::stream::iter(result.items().into_iter().map(Ok)),
-                                    (new_result.next_page_token(), result),
-                                ))
-                            })
-                            .await
-                        } else {
-                            Ok(None)
-                        }
-                    },
-                )
-                .try_flatten();
+                        },
+                    )
+                    .try_flatten();
                 items.chain(next_pages)
             })
             .try_flatten_stream()

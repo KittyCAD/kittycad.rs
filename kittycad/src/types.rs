@@ -166,16 +166,16 @@ pub mod multipart {
     impl std::convert::TryFrom<std::path::PathBuf> for Attachment {
         type Error = std::io::Error;
         fn try_from(path: std::path::PathBuf) -> Result<Self, Self::Error> {
-            let filename = path
-                .file_name()
-                .ok_or_else(|| {
-                    std::io::Error::new(std::io::ErrorKind::InvalidData, "invalid filename")
-                })?
-                .to_str()
-                .ok_or_else(|| {
-                    std::io::Error::new(std::io::ErrorKind::InvalidData, "invalid filename")
-                })?
-                .to_string();
+            let filename =
+                path.file_name()
+                    .ok_or_else(
+                        || std::io::Error::new(std::io::ErrorKind::InvalidData, "invalid filename")
+                    )?
+                    .to_str()
+                    .ok_or_else(
+                        || std::io::Error::new(std::io::ErrorKind::InvalidData, "invalid filename")
+                    )?
+                    .to_string();
             let content_type = mime_guess::from_path(&path).first_raw();
             let data = std::fs::read(path)?;
             Ok(Attachment {
@@ -277,14 +277,15 @@ pub mod phone_number {
 
     impl std::fmt::Display for PhoneNumber {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            let s = if let Some(phone) = &self.0 {
-                phone
-                    .format()
-                    .mode(phonenumber::Mode::International)
-                    .to_string()
-            } else {
-                String::new()
-            };
+            let s =
+                if let Some(phone) = &self.0 {
+                    phone
+                        .format()
+                        .mode(phonenumber::Mode::International)
+                        .to_string()
+                } else {
+                    String::new()
+                };
             write!(f, "{}", s)
         }
     }
@@ -836,12 +837,12 @@ impl crate::types::paginate::Pagination for AiPromptResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
+        let mut req =
+            req.try_clone().ok_or_else(|| {
+                crate::types::error::Error::InvalidRequest(
+                    format!("failed to clone request: {:?}", req)
+                )
+            })?;
         req.url_mut()
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
@@ -1540,12 +1541,12 @@ impl crate::types::paginate::Pagination for ApiCallWithPriceResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
+        let mut req =
+            req.try_clone().ok_or_else(|| {
+                crate::types::error::Error::InvalidRequest(
+                    format!("failed to clone request: {:?}", req)
+                )
+            })?;
         req.url_mut()
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
@@ -1714,12 +1715,12 @@ impl crate::types::paginate::Pagination for ApiTokenResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
+        let mut req =
+            req.try_clone().ok_or_else(|| {
+                crate::types::error::Error::InvalidRequest(
+                    format!("failed to clone request: {:?}", req)
+                )
+            })?;
         req.url_mut()
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
@@ -2142,12 +2143,12 @@ impl crate::types::paginate::Pagination for AsyncApiCallResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
+        let mut req =
+            req.try_clone().ok_or_else(|| {
+                crate::types::error::Error::InvalidRequest(
+                    format!("failed to clone request: {:?}", req)
+                )
+            })?;
         req.url_mut()
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
@@ -5159,12 +5160,12 @@ impl crate::types::paginate::Pagination for ExtendedUserResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
+        let mut req =
+            req.try_clone().ok_or_else(|| {
+                crate::types::error::Error::InvalidRequest(
+                    format!("failed to clone request: {:?}", req)
+                )
+            })?;
         req.url_mut()
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
@@ -8910,6 +8911,18 @@ pub enum ModelingCmd {
         #[doc = "The color to set the background to."]
         color: Color,
     },
+    #[doc = "Set the properties of the tool lines for the scene."]
+    #[serde(rename = "set_current_tool_properties")]
+    SetCurrentToolProperties {
+        #[doc = "The color to set the tool line to."]
+        color: Option<Color>,
+    },
+    #[doc = "Set the default system properties used when a specific property isn't set."]
+    #[serde(rename = "set_default_system_properties")]
+    SetDefaultSystemProperties {
+        #[doc = "The default system color."]
+        color: Option<Color>,
+    },
     #[doc = "Get type of the given curve."]
     #[serde(rename = "curve_get_type")]
     CurveGetType {
@@ -10071,12 +10084,12 @@ impl crate::types::paginate::Pagination for OrgMemberResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
+        let mut req =
+            req.try_clone().ok_or_else(|| {
+                crate::types::error::Error::InvalidRequest(
+                    format!("failed to clone request: {:?}", req)
+                )
+            })?;
         req.url_mut()
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
@@ -10144,12 +10157,12 @@ impl crate::types::paginate::Pagination for OrgResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
+        let mut req =
+            req.try_clone().ok_or_else(|| {
+                crate::types::error::Error::InvalidRequest(
+                    format!("failed to clone request: {:?}", req)
+                )
+            })?;
         req.url_mut()
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
@@ -11054,6 +11067,32 @@ impl tabled::Tabled for Pong {
     }
 }
 
+#[doc = "Post effect type"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum PostEffectType {
+    #[serde(rename = "phosphor")]
+    #[display("phosphor")]
+    Phosphor,
+    #[serde(rename = "ssao")]
+    #[display("ssao")]
+    Ssao,
+    #[serde(rename = "noeffect")]
+    #[display("noeffect")]
+    Noeffect,
+}
+
 #[doc = "Privacy settings for an org or user."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -11715,12 +11754,12 @@ impl crate::types::paginate::Pagination for ServiceAccountResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
+        let mut req =
+            req.try_clone().ok_or_else(|| {
+                crate::types::error::Error::InvalidRequest(
+                    format!("failed to clone request: {:?}", req)
+                )
+            })?;
         req.url_mut()
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
@@ -11759,11 +11798,9 @@ pub struct Session {
     #[doc = "The date and time the session was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The date and time the session expires."]
-    pub expires: chrono::DateTime<chrono::Utc>,
-    #[doc = "The unique identifier for the session."]
-    pub id: uuid::Uuid,
+    pub expires_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The session token."]
-    pub session_token: uuid::Uuid,
+    pub token: uuid::Uuid,
     #[doc = "The date and time the session was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user that the session belongs to."]
@@ -11782,13 +11819,12 @@ impl std::fmt::Display for Session {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Session {
-    const LENGTH: usize = 6;
+    const LENGTH: usize = 5;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.created_at).into(),
-            format!("{:?}", self.expires).into(),
-            format!("{:?}", self.id).into(),
-            format!("{:?}", self.session_token).into(),
+            format!("{:?}", self.expires_at).into(),
+            format!("{:?}", self.token).into(),
             format!("{:?}", self.updated_at).into(),
             format!("{:?}", self.user_id).into(),
         ]
@@ -11797,9 +11833,8 @@ impl tabled::Tabled for Session {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "created_at".into(),
-            "expires".into(),
-            "id".into(),
-            "session_token".into(),
+            "expires_at".into(),
+            "token".into(),
             "updated_at".into(),
             "user_id".into(),
         ]
@@ -12524,12 +12559,12 @@ impl crate::types::paginate::Pagination for TextToCadResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
+        let mut req =
+            req.try_clone().ok_or_else(|| {
+                crate::types::error::Error::InvalidRequest(
+                    format!("failed to clone request: {:?}", req)
+                )
+            })?;
         req.url_mut()
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
@@ -14981,12 +15016,12 @@ impl crate::types::paginate::Pagination for UserResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
+        let mut req =
+            req.try_clone().ok_or_else(|| {
+                crate::types::error::Error::InvalidRequest(
+                    format!("failed to clone request: {:?}", req)
+                )
+            })?;
         req.url_mut()
             .query_pairs_mut()
             .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
@@ -15157,6 +15192,9 @@ pub enum WebSocketRequest {
         #[doc = "A sequence of modeling requests. If any request fails, following requests will \
                  not be tried."]
         requests: Vec<ModelingCmdReq>,
+        #[doc = "If false or omitted, responses to each batch command will just be Ok(()). If \
+                 true, responses will be the actual response data for that modeling command."]
+        responses: Option<bool>,
     },
     #[doc = "The client-to-server Ping to ensure the WebSocket stays alive."]
     #[serde(rename = "ping")]

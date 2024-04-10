@@ -303,14 +303,15 @@ impl Payments {
         &'a self,
         id: &'a str,
     ) -> Result<(), crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::DELETE,
-            format!(
-                "{}/{}",
-                self.client.base_url,
-                "org/payment/methods/{id}".replace("{id}", id)
-            ),
-        );
+        let mut req =
+            self.client.client.request(
+                http::Method::DELETE,
+                format!(
+                    "{}/{}",
+                    self.client.base_url,
+                    "org/payment/methods/{id}".replace("{id}", id)
+                ),
+            );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
@@ -796,14 +797,15 @@ impl Payments {
         &'a self,
         id: &'a str,
     ) -> Result<(), crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::DELETE,
-            format!(
-                "{}/{}",
-                self.client.base_url,
-                "user/payment/methods/{id}".replace("{id}", id)
-            ),
-        );
+        let mut req =
+            self.client.client.request(
+                http::Method::DELETE,
+                format!(
+                    "{}/{}",
+                    self.client.base_url,
+                    "user/payment/methods/{id}".replace("{id}", id)
+                ),
+            );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();

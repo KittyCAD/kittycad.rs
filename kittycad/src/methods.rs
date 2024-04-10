@@ -275,11 +275,12 @@ impl Point3D {
     }
 
     /// The origin
-    pub const ZERO: Self = Self {
-        x: 0.0,
-        y: 0.0,
-        z: 0.0,
-    };
+    pub const ZERO: Self =
+        Self {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        };
 }
 
 impl Point2D {

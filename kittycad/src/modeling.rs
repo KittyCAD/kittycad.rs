@@ -17,17 +17,19 @@ impl Modeling {
              websocket proxy between the frontend/client and the engine.\n\n**Parameters:**\n\n- \
              `fps: Option<u32>`: Frames per second of the video feed.\n- `pool: Option<String>`: \
              An optional identifier for a pool of engine instances. The 'default' pool is used \
-             when none is specified.\n- `unlocked_framerate: Option<bool>`: If true, engine will \
-             render video frames as fast as it can.\n- `video_res_height: Option<u32>`: Height of \
-             the video feed. Must be a multiple of 4.\n- `video_res_width: Option<u32>`: Width of \
-             the video feed. Must be a multiple of 4.\n- `webrtc: Option<bool>`: If true, will \
-             start a webrtc connection."]
+             when none is specified.\n- `post_effect: Option<crate::types::PostEffectType>`: \
+             Engine Post effects (such as SSAO)\n- `unlocked_framerate: Option<bool>`: If true, \
+             engine will render video frames as fast as it can.\n- `video_res_height: \
+             Option<u32>`: Height of the video feed. Must be a multiple of 4.\n- `video_res_width: \
+             Option<u32>`: Width of the video feed. Must be a multiple of 4.\n- `webrtc: \
+             Option<bool>`: If true, will start a webrtc connection."]
     #[tracing::instrument]
     #[cfg(not(target_arch = "wasm32"))]
     pub async fn commands_ws<'a>(
         &'a self,
         fps: Option<u32>,
         pool: Option<String>,
+        post_effect: Option<crate::types::PostEffectType>,
         unlocked_framerate: Option<bool>,
         video_res_height: Option<u32>,
         video_res_width: Option<u32>,
@@ -45,6 +47,10 @@ impl Modeling {
 
         if let Some(p) = pool {
             query_params.push(("pool", p));
+        }
+
+        if let Some(p) = post_effect {
+            query_params.push(("post_effect", format!("{}", p)));
         }
 
         if let Some(p) = unlocked_framerate {
