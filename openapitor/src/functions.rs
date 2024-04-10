@@ -176,8 +176,14 @@ pub fn generate_files(
                 let request_body = if let Some(rb) = get_request_body(type_space, name, method, op)?
                 {
                     let t = rb.type_name;
-                    // We add the comma at the front, so it works.
-                    quote!(, body: &#t)
+
+                    if is_multipart(type_space, name, method, op)? && !multipart_has_body(&t)? {
+                        // We don't have a request body, so we'll return nothing.
+                        quote!()
+                    } else {
+                        // We add the comma at the front, so it works.
+                        quote!(, body: &#t)
+                    }
                 } else {
                     // We don't have a request body, so we'll return nothing.
                     quote!()
@@ -605,16 +611,29 @@ fn get_args(
         path_params.into_iter().chain(query_params).collect();
 
     // Add attachments if we have a multipart request.
-    if let Some(request_body) = get_request_body(type_space, name, method, op)? {
-        if request_body.media_type.as_str() == "multipart/form-data" {
-            args.insert(
-                "attachments".to_string(),
-                quote!(Vec<crate::types::multipart::Attachment>),
-            );
-        }
+    if is_multipart(type_space, name, method, op)? {
+        args.insert(
+            "attachments".to_string(),
+            quote!(Vec<crate::types::multipart::Attachment>),
+        );
     }
 
     Ok(args)
+}
+
+fn is_multipart(
+    type_space: &mut crate::types::TypeSpace,
+    name: &str,
+    method: &http::Method,
+    op: &openapiv3::Operation,
+) -> Result<bool> {
+    if let Some(request_body) = get_request_body(type_space, name, method, op)? {
+        if request_body.media_type.as_str() == "multipart/form-data" {
+            return Ok(true);
+        }
+    }
+
+    Ok(false)
 }
 
 /// Return the request body type for the operation.
@@ -1187,24 +1206,42 @@ fn get_function_body(
                     .rendered()?
                     .replace("crate::types::", "")
                     .to_lowercase();
-                quote! {
-                    use std::convert::TryInto;
-                    // Create the multipart form.
-                    let mut form = reqwest::multipart::Form::new();
-                    // Add the body to the form.
+                if !multipart_has_body(&request_body.type_name)? {
+                    // We don't add the body to the form.
+                    quote! {
+                        use std::convert::TryInto;
+                        // Create the multipart form.
+                        let mut form = reqwest::multipart::Form::new();
 
-                    let mut json_part = reqwest::multipart::Part::text(serde_json::to_string(&body)?);
-                    json_part = json_part.file_name(format!("{}.json", #type_name));
-                    json_part = json_part.mime_str("application/json")?;
-                    form = form.part(#type_name, json_part);
+                        // For each of the files add them to the form.
+                        for attachment in attachments {
+                            form = form.part(attachment.name.clone(), attachment.try_into()?);
+                        }
 
-                    // For each of the files add them to the form.
-                    for attachment in attachments {
-                        form = form.part(attachment.name.clone(), attachment.try_into()?);
+                        // Add to the request.
+                        req = req.multipart(form);
                     }
+                } else {
+                    // We have an actual type.
+                    quote! {
+                        use std::convert::TryInto;
+                        // Create the multipart form.
+                        let mut form = reqwest::multipart::Form::new();
+                        // Add the body to the form.
 
-                    // Add to the request.
-                    req = req.multipart(form);
+                        let mut json_part = reqwest::multipart::Part::text(serde_json::to_string(&body)?);
+                        json_part = json_part.file_name(format!("{}.json", #type_name));
+                        json_part = json_part.mime_str("application/json")?;
+                        form = form.part(#type_name, json_part);
+
+                        // For each of the files add them to the form.
+                        for attachment in attachments {
+                            form = form.part(attachment.name.clone(), attachment.try_into()?);
+                        }
+
+                        // Add to the request.
+                        req = req.multipart(form);
+                    }
                 }
             }
             _ => {
@@ -1593,6 +1630,10 @@ fn fmt_external_example_code(t: &proc_macro2::TokenStream, opts: &crate::Opts) -
             "crate :: types :: ",
             &format!("{}::types::", opts.code_package_name()),
         ))
+}
+
+fn multipart_has_body(request_body: &proc_macro2::TokenStream) -> Result<bool> {
+    Ok(request_body.rendered()? != "bytes::Bytes")
 }
 
 #[cfg(test)]

@@ -108,6 +108,54 @@ impl Meta {
         }
     }
 
+    #[doc = "Uploads files to public blob storage for debugging purposes.\n\nDo NOT send files \
+             here that you don't want to be public.\n\n```rust,no_run\nasync fn \
+             example_meta_create_debug_uploads() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: Vec<String> = client\n        \
+             .meta()\n        .create_debug_uploads(\n            \
+             vec![kittycad::types::multipart::Attachment {\n                name: \
+             \"thing\".to_string(),\n                filename: \
+             Some(\"myfile.json\".to_string()),\n                content_type: \
+             Some(\"application/json\".to_string()),\n                data: \
+             std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            \
+             &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn create_debug_uploads<'a>(
+        &'a self,
+        attachments: Vec<crate::types::multipart::Attachment>,
+    ) -> Result<Vec<String>, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!("{}/{}", self.client.base_url, "debug/uploads"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        use std::convert::TryInto;
+        let mut form = reqwest::multipart::Form::new();
+        for attachment in attachments {
+            form = form.part(attachment.name.clone(), attachment.try_into()?);
+        }
+
+        req = req.multipart(form);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            return Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            });
+        }
+    }
+
     #[doc = "Creates an internal telemetry event.\n\nWe collect anonymous telemetry data for improving our product.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_meta_create_event() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .meta()\n        .create_event(\n            vec![kittycad::types::multipart::Attachment {\n                name: \"thing\".to_string(),\n                filename: Some(\"myfile.json\".to_string()),\n                content_type: Some(\"application/json\".to_string()),\n                data: std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            &kittycad::types::Event {\n                attachment_uri: Some(\"some-string\".to_string()),\n                created_at: chrono::Utc::now(),\n                event_type: kittycad::types::ModelingAppEventType::SuccessfulCompileBeforeClose,\n                last_compiled_at: Some(chrono::Utc::now()),\n                project_description: Some(\"some-string\".to_string()),\n                project_name: \"some-string\".to_string(),\n                source_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                type_: kittycad::types::Type::ModelingAppEvent,\n                user_id: \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_event<'a>(

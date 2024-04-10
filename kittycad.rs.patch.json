@@ -4,7 +4,7 @@
     "path": "/info/x-rust",
     "value": {
       "client": "// Authenticate via an API token.\nlet client = kittycad::Client::new(\"$TOKEN\");\n\n// - OR -\n\n// Authenticate with your token and host parsed from the environment variables:\n// `KITTYCAD_API_TOKEN`.\nlet client = kittycad::Client::new_from_env();",
-      "install": "[dependencies]\nkittycad = \"0.2.64\""
+      "install": "[dependencies]\nkittycad = \"0.2.65\""
     }
   },
   {
@@ -157,6 +157,14 @@
     "value": {
       "example": "/// Authenticate a user via SAML\n/// \n/// **Parameters:**\n/// \n/// - `provider_id: uuid::Uuid`: The ID of the identity provider. (required)\nuse std::str::FromStr;\nasync fn example_hidden_post_auth_saml() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .post_auth_saml(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.post_auth_saml"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1debug~1uploads/post/x-rust",
+    "value": {
+      "example": "/// Uploads files to public blob storage for debugging purposes.\n/// \n/// Do NOT send files here that you don't want to be public.\nasync fn example_meta_create_debug_uploads() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<String> = client\n        .meta()\n        .create_debug_uploads(\n            vec![kittycad::types::multipart::Attachment {\n                name: \"thing\".to_string(),\n                filename: Some(\"myfile.json\".to_string()),\n                content_type: Some(\"application/json\".to_string()),\n                data: std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.create_debug_uploads"
     }
   },
   {
