@@ -81,7 +81,7 @@ jobs:
               --body "Updating the generated docs for rust" \
               --head "$NEW_BRANCH" \
               --reviewer jessfraz \
-              --reviewer irevdev \
+              --reviewer irev-dev \
               --reviewer franknoirot \
               --base main || true
         env:
