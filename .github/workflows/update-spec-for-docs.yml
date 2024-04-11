@@ -80,9 +80,9 @@ jobs:
           gh pr create --title "Update rust lang spec docs for ${VERSION}" \
               --body "Updating the generated docs for rust" \
               --head "$NEW_BRANCH" \
-              --assignee jessfraz \
-              --assignee irevdev \
-              --assignee franknoirot \
+              --reviewer jessfraz \
+              --reviewer irevdev \
+              --reviewer franknoirot \
               --base main || true
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
