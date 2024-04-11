@@ -3487,8 +3487,8 @@ pub struct Coupon {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub amount_off: Option<f64>,
     #[doc = "Always true for a deleted object."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub deleted: Option<bool>,
+    #[serde(default)]
+    pub deleted: bool,
     #[doc = "Unique identifier for the object."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
@@ -3526,11 +3526,7 @@ impl tabled::Tabled for Coupon {
             } else {
                 String::new().into()
             },
-            if let Some(deleted) = &self.deleted {
-                format!("{:?}", deleted).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.deleted).into(),
             if let Some(id) = &self.id {
                 format!("{:?}", id).into()
             } else {
@@ -3743,8 +3739,8 @@ pub struct Customer {
              invoice is billed by sending an invoice, `delinquent` is `true` if the invoice isn't \
              paid by its due date.  If an invoice is marked uncollectible by dunning, \
              `delinquent` doesn't get reset to `false`."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub delinquent: Option<bool>,
+    #[serde(default)]
+    pub delinquent: bool,
     #[doc = "The customer's email address."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub email: Option<String>,
@@ -3793,11 +3789,7 @@ impl tabled::Tabled for Customer {
             } else {
                 String::new().into()
             },
-            if let Some(delinquent) = &self.delinquent {
-                format!("{:?}", delinquent).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.delinquent).into(),
             if let Some(email) = &self.email {
                 format!("{:?}", email).into()
             } else {
@@ -4951,8 +4943,8 @@ pub struct ExtendedUser {
     pub block: Option<BlockReason>,
     #[doc = "If we can train on the user's data. If the user is a member of an organization, the \
              organization's setting will override this."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub can_train_on_data: Option<bool>,
+    #[serde(default)]
+    pub can_train_on_data: bool,
     #[doc = "The user's company."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub company: Option<String>,
@@ -4981,8 +4973,8 @@ pub struct ExtendedUser {
     #[doc = "The image avatar for the user. This is a URL."]
     pub image: String,
     #[doc = "If the user is tied to a service account."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub is_service_account: Option<bool>,
+    #[serde(default)]
+    pub is_service_account: bool,
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,
@@ -5024,11 +5016,7 @@ impl tabled::Tabled for ExtendedUser {
             } else {
                 String::new().into()
             },
-            if let Some(can_train_on_data) = &self.can_train_on_data {
-                format!("{:?}", can_train_on_data).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.can_train_on_data).into(),
             if let Some(company) = &self.company {
                 format!("{:?}", company).into()
             } else {
@@ -5067,11 +5055,7 @@ impl tabled::Tabled for ExtendedUser {
             },
             format!("{:?}", self.id).into(),
             self.image.clone().into(),
-            if let Some(is_service_account) = &self.is_service_account {
-                format!("{:?}", is_service_account).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.is_service_account).into(),
             if let Some(last_name) = &self.last_name {
                 format!("{:?}", last_name).into()
             } else {
@@ -6818,8 +6802,8 @@ pub struct Invoice {
     #[doc = "Whether an attempt has been made to pay the invoice.\n\nAn invoice is not attempted \
              until 1 hour after the `invoice.created` webhook, for example, so you might not want \
              to display that invoice as unpaid to your users."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub attempted: Option<bool>,
+    #[serde(default)]
+    pub attempted: bool,
     #[doc = "Time at which the object was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), \
@@ -6861,8 +6845,8 @@ pub struct Invoice {
     #[doc = "Whether payment was successfully collected for this invoice.\n\nAn invoice can be \
              paid (most commonly) with a charge or with credit from the customer's account \
              balance."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub paid: Option<bool>,
+    #[serde(default)]
+    pub paid: bool,
     #[doc = "The link to download the PDF for the invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pdf: Option<String>,
@@ -6928,11 +6912,7 @@ impl tabled::Tabled for Invoice {
             } else {
                 String::new().into()
             },
-            if let Some(attempted) = &self.attempted {
-                format!("{:?}", attempted).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.attempted).into(),
             format!("{:?}", self.created_at).into(),
             if let Some(currency) = &self.currency {
                 format!("{:?}", currency).into()
@@ -6984,11 +6964,7 @@ impl tabled::Tabled for Invoice {
             } else {
                 String::new().into()
             },
-            if let Some(paid) = &self.paid {
-                format!("{:?}", paid).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.paid).into(),
             if let Some(pdf) = &self.pdf {
                 format!("{:?}", pdf).into()
             } else {
@@ -7652,8 +7628,8 @@ pub struct KclCodeCompletionParams {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub suffix_tokens: Option<u32>,
     #[doc = "If we should trim by indentation."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub trim_by_indentation: Option<bool>,
+    #[serde(default)]
+    pub trim_by_indentation: bool,
 }
 
 impl std::fmt::Display for KclCodeCompletionParams {
@@ -7691,11 +7667,7 @@ impl tabled::Tabled for KclCodeCompletionParams {
             } else {
                 String::new().into()
             },
-            if let Some(trim_by_indentation) = &self.trim_by_indentation {
-                format!("{:?}", trim_by_indentation).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.trim_by_indentation).into(),
         ]
     }
 
@@ -7738,8 +7710,8 @@ pub struct KclCodeCompletionRequest {
     #[doc = "If set, partial message deltas will be sent, like in ChatGPT or OpenAPI. Tokens will \
              be sent as data-only server-sent events as they become available, with the stream \
              terminated by a data: [DONE] message."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub stream: Option<bool>,
+    #[serde(default)]
+    pub stream: bool,
     #[doc = "The suffix for the model."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub suffix: Option<String>,
@@ -7796,11 +7768,7 @@ impl tabled::Tabled for KclCodeCompletionRequest {
             } else {
                 String::new().into()
             },
-            if let Some(stream) = &self.stream {
-                format!("{:?}", stream).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.stream).into(),
             if let Some(suffix) = &self.suffix {
                 format!("{:?}", suffix).into()
             } else {
@@ -9719,8 +9687,8 @@ pub struct Org {
     pub block: Option<BlockReason>,
     #[doc = "If we can train on the orgs's data. This value overrides any individual user's \
              `can_train_on_data` value if they are a member of the org."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub can_train_on_data: Option<bool>,
+    #[serde(default)]
+    pub can_train_on_data: bool,
     #[doc = "The date and time the org was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The org's domain."]
@@ -9781,11 +9749,7 @@ impl tabled::Tabled for Org {
             } else {
                 String::new().into()
             },
-            if let Some(can_train_on_data) = &self.can_train_on_data {
-                format!("{:?}", can_train_on_data).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.can_train_on_data).into(),
             format!("{:?}", self.created_at).into(),
             if let Some(domain) = &self.domain {
                 format!("{:?}", domain).into()
@@ -14682,8 +14646,8 @@ pub struct User {
     pub block: Option<BlockReason>,
     #[doc = "If we can train on the user's data. If the user is a member of an organization, the \
              organization's setting will override this."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub can_train_on_data: Option<bool>,
+    #[serde(default)]
+    pub can_train_on_data: bool,
     #[doc = "The user's company."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub company: Option<String>,
@@ -14709,8 +14673,8 @@ pub struct User {
     #[doc = "The image avatar for the user. This is a URL."]
     pub image: String,
     #[doc = "If the user is tied to a service account."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub is_service_account: Option<bool>,
+    #[serde(default)]
+    pub is_service_account: bool,
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,
@@ -14746,11 +14710,7 @@ impl tabled::Tabled for User {
             } else {
                 String::new().into()
             },
-            if let Some(can_train_on_data) = &self.can_train_on_data {
-                format!("{:?}", can_train_on_data).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.can_train_on_data).into(),
             if let Some(company) = &self.company {
                 format!("{:?}", company).into()
             } else {
@@ -14784,11 +14744,7 @@ impl tabled::Tabled for User {
             },
             format!("{:?}", self.id).into(),
             self.image.clone().into(),
-            if let Some(is_service_account) = &self.is_service_account {
-                format!("{:?}", is_service_account).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.is_service_account).into(),
             if let Some(last_name) = &self.last_name {
                 format!("{:?}", last_name).into()
             } else {

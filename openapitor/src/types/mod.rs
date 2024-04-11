@@ -702,13 +702,13 @@ impl TypeSpace {
             // Get the type name for the schema.
             let type_name = get_type_name_for_schema(&prop, &inner_schema, &self.spec, true)?;
             // Check if this type is required.
-            if o.required.contains(k) && type_name.is_string()? {
+            let required = o.required.contains(k)
+                || self.is_default_property(&type_name, &inner_schema.schema_data)?;
+            if required && type_name.is_string()? {
                 fields.push(quote!(
                     self.#prop_ident.clone().into()
                 ));
-            } else if !o.required.contains(k)
-                && type_name.rendered()? != "phone_number::PhoneNumber"
-            {
+            } else if !required && type_name.rendered()? != "phone_number::PhoneNumber" {
                 fields.push(quote!(
                     if let Some(#prop_ident) = &self.#prop_ident {
                         format!("{:?}", #prop_ident).into()
@@ -851,7 +851,9 @@ impl TypeSpace {
             };
 
             // Check if this type is required.
-            if !o.required.contains(k) && !type_name.is_option()? {
+            let required = o.required.contains(k)
+                || self.is_default_property(&type_name, &inner_schema.schema_data)?;
+            if !required && !type_name.is_option()? {
                 // Make the type optional.
                 type_name = quote!(Option<#type_name>);
             }
@@ -878,6 +880,12 @@ impl TypeSpace {
             if type_name.is_option()? {
                 serde_props.push(quote!(default));
                 serde_props.push(quote!(skip_serializing_if = "Option::is_none"));
+            }
+            if !o.required.contains(k)
+                && self.is_default_property(&type_name, &inner_schema.schema_data)?
+                && !type_name.is_option()?
+            {
+                serde_props.push(quote!(default));
             }
 
             if type_name.rendered()? == "Vec<u8>" {
@@ -934,6 +942,14 @@ impl TypeSpace {
         }
 
         Ok(values)
+    }
+
+    fn is_default_property(
+        &mut self,
+        type_name: &proc_macro2::TokenStream,
+        data: &openapiv3::SchemaData,
+    ) -> Result<bool> {
+        Ok(data.default.is_some() && type_name.rendered()? == "bool")
     }
 
     /// Render a string type.

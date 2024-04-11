@@ -2894,8 +2894,8 @@ pub struct NetworkInterfaceUpdate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     #[doc = "Make a secondary interface the instance's primary interface.\n\nIf applied to a secondary interface, that interface will become the primary on the next reboot of the instance. Note that this may have implications for routing between instances, as the new primary interface will be on a distinct subnet from the previous primary interface.\n\nNote that this can only be used to select a new primary interface for an instance. Requests to change the primary interface into a secondary will return an error."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub make_primary: Option<bool>,
+    #[serde(default)]
+    pub make_primary: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
 }
@@ -2920,11 +2920,7 @@ impl tabled::Tabled for NetworkInterfaceUpdate {
             } else {
                 String::new().into()
             },
-            if let Some(make_primary) = &self.make_primary {
-                format!("{:?}", make_primary).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.make_primary).into(),
             if let Some(name) = &self.name {
                 format!("{:?}", name).into()
             } else {
