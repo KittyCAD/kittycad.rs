@@ -14257,6 +14257,44 @@
           "direction"
         ]
       },
+      "BatchResponse": {
+        "description": "Websocket responses can either be successful or unsuccessful. Slightly different schemas in either case.",
+        "anyOf": [
+          {
+            "description": "Response sent when a request succeeded.",
+            "type": "object",
+            "properties": {
+              "response": {
+                "description": "Response to the modeling command.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/OkModelingCmdResponse"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "response"
+            ]
+          },
+          {
+            "description": "Response sent when a request did not succeed.",
+            "type": "object",
+            "properties": {
+              "errors": {
+                "description": "Errors that occurred during the modeling command.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "required": [
+              "errors"
+            ]
+          }
+        ]
+      },
       "BillingInfo": {
         "description": "The billing information for payments.",
         "type": "object",
@@ -22459,6 +22497,37 @@
                 "type": "string",
                 "enum": [
                   "modeling"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "Response to a ModelingBatch.",
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "responses": {
+                    "description": "For each request in the batch, maps its ID to the request's outcome.",
+                    "type": "object",
+                    "additionalProperties": {
+                      "$ref": "#/components/schemas/BatchResponse"
+                    }
+                  }
+                },
+                "required": [
+                  "responses"
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "modeling_batch"
                 ]
               }
             },
