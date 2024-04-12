@@ -2354,6 +2354,53 @@ impl tabled::Tabled for AxisDirectionPair {
     }
 }
 
+#[doc = "Websocket responses can either be successful or unsuccessful. Slightly different schemas \
+         in either case."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BatchResponse {
+    #[doc = "Response to the modeling command."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub response: Option<OkModelingCmdResponse>,
+    #[doc = "Errors that occurred during the modeling command."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub errors: Option<Vec<ApiError>>,
+}
+
+impl std::fmt::Display for BatchResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BatchResponse {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(response) = &self.response {
+                format!("{:?}", response).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(errors) = &self.errors {
+                format!("{:?}", errors).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["response".into(), "errors".into()]
+    }
+}
+
 #[doc = "The billing information for payments."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9593,6 +9640,12 @@ pub enum OkWebSocketResponseData {
     Modeling {
         #[doc = "The result of the command."]
         modeling_response: OkModelingCmdResponse,
+    },
+    #[doc = "Response to a ModelingBatch."]
+    #[serde(rename = "modeling_batch")]
+    ModelingBatch {
+        #[doc = "For each request in the batch, maps its ID to the request's outcome."]
+        responses: std::collections::HashMap<String, BatchResponse>,
     },
     #[doc = "The exported files."]
     #[serde(rename = "export")]
