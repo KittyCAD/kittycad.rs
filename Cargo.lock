@@ -923,6 +923,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "itertools"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ba291022dbbd398a455acf126c1e341954079855bc60dfdda641363bd6922569"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -967,7 +976,7 @@ dependencies = [
  "futures",
  "futures-util",
  "http",
- "itertools",
+ "itertools 0.12.1",
  "log",
  "mime_guess",
  "parse-display",
@@ -1352,7 +1361,7 @@ dependencies = [
  "bincode",
  "either",
  "fnv",
- "itertools",
+ "itertools 0.11.0",
  "lazy_static",
  "nom",
  "quick-xml",
