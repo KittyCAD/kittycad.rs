@@ -708,7 +708,7 @@ dependencies = [
  "futures-core",
  "futures-sink",
  "futures-util",
- "http",
+ "http 0.2.12",
  "indexmap 2.0.0",
  "slab",
  "tokio",
@@ -760,9 +760,20 @@ dependencies = [
 
 [[package]]
 name = "http"
-version = "0.2.9"
+version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd6effc99afb63425aff9b05836f029929e345a6148a14b7ecd5ab67af944482"
+checksum = "601cbb57e577e2f5ef5be8e7b83f0f63994f25aa94d673e54a92d5c516d101f1"
+dependencies = [
+ "bytes",
+ "fnv",
+ "itoa",
+]
+
+[[package]]
+name = "http"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "21b9ddb458710bc376481b842f5da65cdf31522de232c1ca8146abce2a358258"
 dependencies = [
  "bytes",
  "fnv",
@@ -776,7 +787,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d5f38f16d184e36f2408a55281cd658ecbd3ca05cce6d6510a176eca393e26d1"
 dependencies = [
  "bytes",
- "http",
+ "http 0.2.12",
  "pin-project-lite",
 ]
 
@@ -803,7 +814,7 @@ dependencies = [
  "futures-core",
  "futures-util",
  "h2",
- "http",
+ "http 0.2.12",
  "http-body",
  "httparse",
  "httpdate",
@@ -823,7 +834,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8d78e1e73ec14cf7375674f74d7dde185c8206fd9dea6fb6295e8a98098aaa97"
 dependencies = [
  "futures-util",
- "http",
+ "http 0.2.12",
  "hyper",
  "rustls",
  "tokio",
@@ -966,7 +977,7 @@ dependencies = [
  "format_serde_error",
  "futures",
  "futures-util",
- "http",
+ "http 1.1.0",
  "itertools",
  "log",
  "mime_guess",
@@ -1204,7 +1215,7 @@ dependencies = [
  "format_serde_error",
  "futures",
  "futures-util",
- "http",
+ "http 1.1.0",
  "indexmap 2.0.0",
  "json-patch",
  "log",
@@ -1581,7 +1592,7 @@ dependencies = [
  "futures-core",
  "futures-util",
  "h2",
- "http",
+ "http 0.2.12",
  "http-body",
  "hyper",
  "hyper-rustls",
@@ -1629,7 +1640,7 @@ checksum = "ff44108c7925d082f2861e683a88618b68235ad9cdc60d64d9d1188efc951cdb"
 dependencies = [
  "anyhow",
  "async-trait",
- "http",
+ "http 0.2.12",
  "reqwest",
  "serde",
  "task-local-extensions",
@@ -1647,7 +1658,7 @@ dependencies = [
  "chrono",
  "futures",
  "getrandom",
- "http",
+ "http 0.2.12",
  "hyper",
  "parking_lot",
  "reqwest",
@@ -2520,7 +2531,7 @@ dependencies = [
  "byteorder",
  "bytes",
  "data-encoding",
- "http",
+ "http 0.2.12",
  "httparse",
  "log",
  "rand",
