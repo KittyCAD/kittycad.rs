@@ -6402,6 +6402,8 @@ impl tabled::Tabled for GetNumObjects {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct GetSketchModePlane {
+    #[doc = "The origin."]
+    pub origin: Point3D,
     #[doc = "The x axis."]
     pub x_axis: Point3D,
     #[doc = "The y axis."]
@@ -6422,9 +6424,10 @@ impl std::fmt::Display for GetSketchModePlane {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for GetSketchModePlane {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            format!("{:?}", self.origin).into(),
             format!("{:?}", self.x_axis).into(),
             format!("{:?}", self.y_axis).into(),
             format!("{:?}", self.z_axis).into(),
@@ -6432,7 +6435,12 @@ impl tabled::Tabled for GetSketchModePlane {
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["x_axis".into(), "y_axis".into(), "z_axis".into()]
+        vec![
+            "origin".into(),
+            "x_axis".into(),
+            "y_axis".into(),
+            "z_axis".into(),
+        ]
     }
 }
 
@@ -8670,6 +8678,12 @@ pub enum ModelingCmd {
         #[doc = "If any of these fields are set, they will overwrite the previous options for the \
                  annotation."]
         options: AnnotationOptions,
+    },
+    #[doc = "Changes visibility of scene-wide edge lines on brep solids"]
+    #[serde(rename = "edge_lines_visible")]
+    EdgeLinesVisible {
+        #[doc = "Whether or not the edge lines should be hidden."]
+        hidden: bool,
     },
     #[doc = "Hide or show an object"]
     #[serde(rename = "object_visible")]
@@ -15212,6 +15226,12 @@ pub enum WebSocketRequest {
     MetricsResponse {
         #[doc = "Collected metrics from the Client's end of the engine connection."]
         metrics: ClientMetrics,
+    },
+    #[doc = "Authentication header request."]
+    #[serde(rename = "headers")]
+    Headers {
+        #[doc = "The authentication header."]
+        headers: std::collections::HashMap<String, String>,
     },
 }
 
