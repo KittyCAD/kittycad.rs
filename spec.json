@@ -17100,6 +17100,14 @@
         "description": "The plane for sketch mode.",
         "type": "object",
         "properties": {
+          "origin": {
+            "description": "The origin.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          },
           "x_axis": {
             "description": "The x axis.",
             "allOf": [
@@ -17126,6 +17134,7 @@
           }
         },
         "required": [
+          "origin",
           "x_axis",
           "y_axis",
           "z_axis"
@@ -19686,6 +19695,26 @@
             "required": [
               "annotation_id",
               "options",
+              "type"
+            ]
+          },
+          {
+            "description": "Changes visibility of scene-wide edge lines on brep solids",
+            "type": "object",
+            "properties": {
+              "hidden": {
+                "description": "Whether or not the edge lines should be hidden.",
+                "type": "boolean"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "edge_lines_visible"
+                ]
+              }
+            },
+            "required": [
+              "hidden",
               "type"
             ]
           },
@@ -27237,6 +27266,29 @@
             },
             "required": [
               "metrics",
+              "type"
+            ]
+          },
+          {
+            "description": "Authentication header request.",
+            "type": "object",
+            "properties": {
+              "headers": {
+                "description": "The authentication header.",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "headers"
+                ]
+              }
+            },
+            "required": [
+              "headers",
               "type"
             ]
           }
