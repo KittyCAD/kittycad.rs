@@ -49,4 +49,4 @@ expectorate = "1"
 # futures is necessary for test-context
 futures = "0.3"
 pretty_assertions = "1"
-test-context = "^0.1.4"
+test-context = "^0.3.0"
