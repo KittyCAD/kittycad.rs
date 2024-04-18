@@ -11828,9 +11828,11 @@ pub struct Session {
     #[doc = "The date and time the session was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The date and time the session expires."]
-    pub expires_at: chrono::DateTime<chrono::Utc>,
+    pub expires: chrono::DateTime<chrono::Utc>,
+    #[doc = "The unique identifier for the session."]
+    pub id: uuid::Uuid,
     #[doc = "The session token."]
-    pub token: uuid::Uuid,
+    pub session_token: uuid::Uuid,
     #[doc = "The date and time the session was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user that the session belongs to."]
@@ -11849,12 +11851,13 @@ impl std::fmt::Display for Session {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Session {
-    const LENGTH: usize = 5;
+    const LENGTH: usize = 6;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.created_at).into(),
-            format!("{:?}", self.expires_at).into(),
-            format!("{:?}", self.token).into(),
+            format!("{:?}", self.expires).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.session_token).into(),
             format!("{:?}", self.updated_at).into(),
             format!("{:?}", self.user_id).into(),
         ]
@@ -11863,8 +11866,9 @@ impl tabled::Tabled for Session {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "created_at".into(),
-            "expires_at".into(),
-            "token".into(),
+            "expires".into(),
+            "id".into(),
+            "session_token".into(),
             "updated_at".into(),
             "user_id".into(),
         ]
