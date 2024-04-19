@@ -19,7 +19,7 @@ json-patch = "1.2.0"
 log = { version = "0.4", features = ["serde"] }
 mime_guess = "2.0.4"
 numeral = "1"
-once_cell = "1.17.1"
+once_cell = "1.19.0"
 openapiv3 = "1"
 phonenumber = "^0.3.1"
 proc-macro2 = "1"
