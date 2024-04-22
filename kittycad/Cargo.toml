@@ -45,7 +45,7 @@ uuid = { version = "1", features = ["serde", "v4", "v7"] }
 
 [dev-dependencies]
 expectorate = "1"
-futures-util = "^0.3.26"
+futures-util = "^0.3.30"
 pretty_assertions = "1"
 rand = "0.8"
 tokio = { version = "1.20.0", features = ["rt", "macros"] }
