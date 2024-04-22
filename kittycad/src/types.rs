@@ -9149,6 +9149,14 @@ pub enum ModelingCmd {
                  camera was used."]
         parameters: Option<PerspectiveCameraParameters>,
     },
+    #[doc = "Fit the view to the specified object(s)."]
+    #[serde(rename = "zoom_to_fit")]
+    ZoomToFit {
+        #[doc = "Which objects to fit to"]
+        object_ids: Option<Vec<uuid::Uuid>>,
+        #[doc = "How much to pad the view frame by."]
+        padding: f64,
+    },
     #[doc = "Get a concise description of all of an extrusion's faces."]
     #[serde(rename = "solid3d_get_extrusion_face_info")]
     Solid3DGetExtrusionFaceInfo {
