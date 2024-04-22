@@ -21334,6 +21334,36 @@
             ]
           },
           {
+            "description": "Fit the view to the specified object(s).",
+            "type": "object",
+            "properties": {
+              "object_ids": {
+                "nullable": true,
+                "description": "Which objects to fit to",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "padding": {
+                "description": "How much to pad the view frame by.",
+                "type": "number",
+                "format": "float"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "zoom_to_fit"
+                ]
+              }
+            },
+            "required": [
+              "padding",
+              "type"
+            ]
+          },
+          {
             "description": "Get a concise description of all of an extrusion's faces.",
             "type": "object",
             "properties": {
