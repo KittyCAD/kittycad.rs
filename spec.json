@@ -19435,6 +19435,48 @@
             ]
           },
           {
+            "description": "Mirror the input entities over the specified axis. (Currently only supports sketches)",
+            "type": "object",
+            "properties": {
+              "axis": {
+                "description": "Axis to use as mirror.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "ids": {
+                "description": "ID of the mirror entities.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "point": {
+                "description": "Point through which the mirror axis passes.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_mirror"
+                ]
+              }
+            },
+            "required": [
+              "axis",
+              "ids",
+              "point",
+              "type"
+            ]
+          },
+          {
             "description": "Enter edit mode",
             "type": "object",
             "properties": {
@@ -21338,8 +21380,8 @@
             "type": "object",
             "properties": {
               "object_ids": {
-                "nullable": true,
-                "description": "Which objects to fit to",
+                "description": "Which objects to fit camera to; if empty, fit to all non-default objects. Defaults to empty vector.",
+                "default": [],
                 "type": "array",
                 "items": {
                   "type": "string",
