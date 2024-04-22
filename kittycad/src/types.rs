@@ -8606,6 +8606,16 @@ pub enum ModelingCmd {
         #[doc = "Start angle (in degrees)."]
         start_angle: Angle,
     },
+    #[doc = "Mirror the input entities over the specified axis. (Currently only supports sketches)"]
+    #[serde(rename = "entity_mirror")]
+    EntityMirror {
+        #[doc = "Axis to use as mirror."]
+        axis: Point3D,
+        #[doc = "ID of the mirror entities."]
+        ids: Vec<uuid::Uuid>,
+        #[doc = "Point through which the mirror axis passes."]
+        point: Point3D,
+    },
     #[doc = "Enter edit mode"]
     #[serde(rename = "edit_mode_enter")]
     EditModeEnter {
@@ -9152,7 +9162,8 @@ pub enum ModelingCmd {
     #[doc = "Fit the view to the specified object(s)."]
     #[serde(rename = "zoom_to_fit")]
     ZoomToFit {
-        #[doc = "Which objects to fit to"]
+        #[doc = "Which objects to fit camera to; if empty, fit to all non-default objects. \
+                 Defaults to empty vector."]
         object_ids: Option<Vec<uuid::Uuid>>,
         #[doc = "How much to pad the view frame by."]
         padding: f64,
