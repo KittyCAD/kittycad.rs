@@ -375,7 +375,7 @@ impl TypeSpace {
                             &property_schema.schema_kind
                         {
                             let inner_values =
-                                self.get_object_values(&inner_name_ident, o, false)?;
+                                self.get_object_values(&inner_name_ident, o, false, None)?;
                             values = quote! {
                                 #values
                                 #inner_name_ident {
@@ -638,7 +638,7 @@ impl TypeSpace {
             }
         }
 
-        let values = self.get_object_values(&struct_name, o, true)?;
+        let values = self.get_object_values(&struct_name, o, true, None)?;
 
         // Implement pagination for this type if we should.
         let mut pagination = quote!();
@@ -703,7 +703,7 @@ impl TypeSpace {
             let type_name = get_type_name_for_schema(&prop, &inner_schema, &self.spec, true)?;
             // Check if this type is required.
             let required = o.required.contains(k)
-                || self.is_default_property(&type_name, &inner_schema.schema_data)?;
+                || is_default_property(&type_name, &inner_schema.schema_data)?;
             if required && type_name.is_string()? {
                 fields.push(quote!(
                     self.#prop_ident.clone().into()
@@ -781,9 +781,15 @@ impl TypeSpace {
         struct_name: &proc_macro2::Ident,
         o: &openapiv3::ObjectType,
         is_pub: bool,
+        ignore_key: Option<&str>,
     ) -> Result<proc_macro2::TokenStream> {
         let mut values = quote!();
         for (k, v) in &o.properties {
+            if let Some(ignore_key) = ignore_key {
+                if k == ignore_key {
+                    continue;
+                }
+            }
             let prop = clean_property_name(k);
 
             // Get the schema for the property.
@@ -852,7 +858,7 @@ impl TypeSpace {
 
             // Check if this type is required.
             let required = o.required.contains(k)
-                || self.is_default_property(&type_name, &inner_schema.schema_data)?;
+                || is_default_property(&type_name, &inner_schema.schema_data)?;
             if !required && !type_name.is_option()? {
                 // Make the type optional.
                 type_name = quote!(Option<#type_name>);
@@ -882,7 +888,7 @@ impl TypeSpace {
                 serde_props.push(quote!(skip_serializing_if = "Option::is_none"));
             }
             if !o.required.contains(k)
-                && self.is_default_property(&type_name, &inner_schema.schema_data)?
+                && is_default_property(&type_name, &inner_schema.schema_data)?
                 && !type_name.is_option()?
             {
                 serde_props.push(quote!(default));
@@ -942,14 +948,6 @@ impl TypeSpace {
         }
 
         Ok(values)
-    }
-
-    fn is_default_property(
-        &mut self,
-        type_name: &proc_macro2::TokenStream,
-        data: &openapiv3::SchemaData,
-    ) -> Result<bool> {
-        Ok(data.default.is_some() && type_name.rendered()? == "bool")
     }
 
     /// Render a string type.
@@ -1233,8 +1231,13 @@ impl TypeSpace {
                             if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
                                 &s.schema_kind
                             {
-                                enum_object_internal =
-                                    Some(render_enum_object_internal(&p, o, &self.spec, tag)?);
+                                enum_object_internal = Some(render_enum_object_internal(
+                                    &self.clone(),
+                                    &p,
+                                    o,
+                                    &self.spec,
+                                    tag,
+                                )?);
                             }
                             get_type_name_for_schema(&content_type_name, s, &self.spec, true)?
                         } else {
@@ -1284,8 +1287,13 @@ impl TypeSpace {
                         }
                     } else {
                         // Render this object.
-                        let content_name =
-                            render_enum_object_internal(&tag_name, o, &self.spec, tag)?;
+                        let content_name = render_enum_object_internal(
+                            &self.clone(),
+                            &tag_name,
+                            o,
+                            &self.spec,
+                            tag,
+                        )?;
                         // Get the type name for this value.
                         values.insert(p.to_string(), one_of.clone());
 
@@ -1798,13 +1806,23 @@ fn get_type_name_for_array(
     Ok(quote!(Vec<#t>))
 }
 
+fn is_default_property(
+    type_name: &proc_macro2::TokenStream,
+    data: &openapiv3::SchemaData,
+) -> Result<bool> {
+    Ok(data.default.is_some()
+        && (type_name.rendered()? == "bool" || type_name.rendered()?.starts_with("Vec<")))
+}
+
 // Render the internal enum type for an object.
 fn render_enum_object_internal(
+    type_space: &TypeSpace,
     name: &str,
     o: &openapiv3::ObjectType,
     spec: &openapiv3::OpenAPI,
     ignore_key: &str,
 ) -> Result<proc_macro2::TokenStream> {
+    let mut type_space = type_space.clone();
     let proper_name = proper_name(name);
     let struct_name = format_ident!("{}", proper_name);
 
@@ -1826,55 +1844,10 @@ fn render_enum_object_internal(
         }
     }
 
-    let mut values = quote!();
-    for (k, v) in &o.properties {
-        if k == ignore_key {
-            continue;
-        }
-        // Get the type name for the schema.
-        let mut type_name = if let openapiv3::ReferenceOr::Item(i) = v {
-            get_type_name_for_schema(k, i, spec, true)?
-        } else {
-            get_type_name_from_reference(&v.reference()?, spec, true)?
-        };
-
-        // Get the schema for the property.
-        let inner_schema = if let openapiv3::ReferenceOr::Item(i) = v {
-            let s = &**i;
-            s.clone()
-        } else {
-            v.get_schema_from_reference(spec, true)?
-        };
-
-        let description = if let Some(d) = &inner_schema.schema_data.description {
-            let d_sanitized = sanitize_indents(d);
-            quote!(#[doc = #d_sanitized])
-        } else {
-            quote!()
-        };
-
-        // Check if this type is required.
-        if !o.required.contains(k) && !type_name.is_option()? {
-            // Make the type optional.
-            type_name = quote!(Option<#type_name>);
-        }
-        let prop_ident = format_ident!("{}", k);
-
-        let prop_value = quote!(
-             #prop_ident: #type_name,
-        );
-
-        values = quote!(
-            #values
-
-            #description
-            #prop_value
-        );
-    }
-
+    let inner_values = type_space.get_object_values(&struct_name, o, false, Some(ignore_key))?;
     let rendered = quote! {
         #struct_name {
-            #values
+            #inner_values
         }
     };
 

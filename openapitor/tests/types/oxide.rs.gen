@@ -1986,8 +1986,8 @@ impl tabled::Tabled for Instance {
 pub struct InstanceCreate {
     pub description: String,
     #[doc = "The disks to be created or attached for this instance."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub disks: Option<Vec<InstanceDiskAttachment>>,
+    #[serde(default)]
+    pub disks: Vec<InstanceDiskAttachment>,
     pub hostname: String,
     #[doc = "A count of bytes, typically used either for memory or storage capacity\n\nThe maximum supported byte count is [`i64::MAX`].  This makes it somewhat inconvenient to define constructors: a u32 constructor can be infallible, but an i64 constructor can fail (if the value is negative) and a u64 constructor can fail (if the value is larger than i64::MAX).  We provide all of these for consumers' convenience."]
     pub memory: u64,
@@ -2019,11 +2019,7 @@ impl tabled::Tabled for InstanceCreate {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             self.description.clone().into(),
-            if let Some(disks) = &self.disks {
-                format!("{:?}", disks).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.disks).into(),
             self.hostname.clone().into(),
             format!("{:?}", self.memory).into(),
             self.name.clone().into(),

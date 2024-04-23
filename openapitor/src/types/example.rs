@@ -9,6 +9,7 @@ use rand::{Rng, SeedableRng};
 
 use crate::types::{
     exts::{ReferenceOrExt, SchemaRenderExt, TokenStreamExt},
+    is_default_property,
     random::Random,
 };
 
@@ -506,7 +507,7 @@ pub fn generate_example_rust_from_schema(
 
                 let inner_schema = v.get_schema_from_reference(&type_space.spec, true)?;
                 let type_name = crate::types::get_type_name_for_schema(
-                    &k,
+                    k,
                     &inner_schema,
                     &type_space.spec,
                     true,
@@ -523,9 +524,7 @@ pub fn generate_example_rust_from_schema(
 
                 // Check if this type is required.
                 if !o.required.contains(k)
-                    && !type_space
-                        .clone()
-                        .is_default_property(&type_name, &inner_schema.schema_data)?
+                    && !is_default_property(&type_name, &inner_schema.schema_data)?
                     && !example
                         .rendered()?
                         .starts_with("crate::types::phone_number::PhoneNumber")

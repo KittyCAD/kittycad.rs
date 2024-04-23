@@ -1907,25 +1907,31 @@ pub enum AsyncApiCallOutput {
     #[serde(rename = "file_conversion")]
     FileConversion {
         #[doc = "The time and date the API call was completed."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The error the function returned, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         error: Option<String>,
         #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
         #[doc = "The output format of the file conversion."]
         output_format: FileExportFormat,
         #[doc = "The output format options of the file conversion."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         output_format_options: Option<OutputFormat>,
         #[doc = "The converted files (if multiple file conversion), if completed, base64 encoded. \
                  The key of the map is the path of the output file."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         outputs: Option<std::collections::HashMap<String, base64::Base64Data>>,
         #[doc = "The source format of the file conversion."]
         src_format: FileImportFormat,
         #[doc = "The source format options of the file conversion."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         src_format_options: Option<InputFormat>,
         #[doc = "The time and date the API call was started."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The status of the API call."]
         status: ApiCallStatus,
@@ -1938,12 +1944,15 @@ pub enum AsyncApiCallOutput {
     #[serde(rename = "file_center_of_mass")]
     FileCenterOfMass {
         #[doc = "The resulting center of mass."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         center_of_mass: Option<Point3D>,
         #[doc = "The time and date the API call was completed."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The error the function returned, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         error: Option<String>,
         #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
@@ -1952,6 +1961,7 @@ pub enum AsyncApiCallOutput {
         #[doc = "The source format of the file."]
         src_format: FileImportFormat,
         #[doc = "The time and date the API call was started."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The status of the API call."]
         status: ApiCallStatus,
@@ -1964,16 +1974,20 @@ pub enum AsyncApiCallOutput {
     #[serde(rename = "file_mass")]
     FileMass {
         #[doc = "The time and date the API call was completed."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The error the function returned, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         error: Option<String>,
         #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
         #[doc = "The resulting mass."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         mass: Option<f64>,
         #[doc = "The material density as denoted by the user."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         material_density: Option<f64>,
         #[doc = "The material density unit."]
         material_density_unit: UnitDensity,
@@ -1982,6 +1996,7 @@ pub enum AsyncApiCallOutput {
         #[doc = "The source format of the file."]
         src_format: FileImportFormat,
         #[doc = "The time and date the API call was started."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The status of the API call."]
         status: ApiCallStatus,
@@ -1994,10 +2009,12 @@ pub enum AsyncApiCallOutput {
     #[serde(rename = "file_volume")]
     FileVolume {
         #[doc = "The time and date the API call was completed."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The error the function returned, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         error: Option<String>,
         #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
@@ -2006,6 +2023,7 @@ pub enum AsyncApiCallOutput {
         #[doc = "The source format of the file."]
         src_format: FileImportFormat,
         #[doc = "The time and date the API call was started."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The status of the API call."]
         status: ApiCallStatus,
@@ -2014,22 +2032,27 @@ pub enum AsyncApiCallOutput {
         #[doc = "The user ID of the user who created the API call."]
         user_id: uuid::Uuid,
         #[doc = "The resulting volume."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         volume: Option<f64>,
     },
     #[doc = "A file density."]
     #[serde(rename = "file_density")]
     FileDensity {
         #[doc = "The time and date the API call was completed."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The resulting density."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         density: Option<f64>,
         #[doc = "The error the function returned, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         error: Option<String>,
         #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
         #[doc = "The material mass as denoted by the user."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         material_mass: Option<f64>,
         #[doc = "The material mass unit."]
         material_mass_unit: UnitMass,
@@ -2038,6 +2061,7 @@ pub enum AsyncApiCallOutput {
         #[doc = "The source format of the file."]
         src_format: FileImportFormat,
         #[doc = "The time and date the API call was started."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The status of the API call."]
         status: ApiCallStatus,
@@ -2050,10 +2074,12 @@ pub enum AsyncApiCallOutput {
     #[serde(rename = "file_surface_area")]
     FileSurfaceArea {
         #[doc = "The time and date the API call was completed."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The error the function returned, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         error: Option<String>,
         #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
@@ -2062,10 +2088,12 @@ pub enum AsyncApiCallOutput {
         #[doc = "The source format of the file."]
         src_format: FileImportFormat,
         #[doc = "The time and date the API call was started."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The status of the API call."]
         status: ApiCallStatus,
         #[doc = "The resulting surface area."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         surface_area: Option<f64>,
         #[doc = "The time and date the API call was last updated."]
         updated_at: chrono::DateTime<chrono::Utc>,
@@ -2076,12 +2104,15 @@ pub enum AsyncApiCallOutput {
     #[serde(rename = "text_to_cad")]
     TextToCad {
         #[doc = "The time and date the API call was completed."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The error the function returned, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         error: Option<String>,
         #[doc = "Feedback from the user, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         feedback: Option<AiFeedback>,
         #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
@@ -2091,10 +2122,12 @@ pub enum AsyncApiCallOutput {
         output_format: FileExportFormat,
         #[doc = "The output of the model in the given file format the user requested, base64 \
                  encoded. The key of the map is the path of the output file."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         outputs: Option<std::collections::HashMap<String, base64::Base64Data>>,
         #[doc = "The prompt."]
         prompt: String,
         #[doc = "The time and date the API call was started."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The status of the API call."]
         status: ApiCallStatus,
@@ -2903,8 +2936,8 @@ pub struct Cluster {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tls_timeout: Option<i64>,
     #[doc = "The urls of the cluster."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub urls: Option<Vec<String>>,
+    #[serde(default)]
+    pub urls: Vec<String>,
 }
 
 impl std::fmt::Display for Cluster {
@@ -2947,11 +2980,7 @@ impl tabled::Tabled for Cluster {
             } else {
                 String::new().into()
             },
-            if let Some(urls) = &self.urls {
-                format!("{:?}", urls).into()
-            } else {
-                String::new().into()
-            },
+            format!("{:?}", self.urls).into(),
         ]
     }
 
@@ -8438,6 +8467,7 @@ pub enum ModelingCmd {
         #[doc = "Logical timestamp. The client should increment this with every event in the \
                  current mouse drag. That way, if the events are being sent over an unordered \
                  channel, the API can ignore the older events."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         sequence: Option<u32>,
         #[doc = "The current mouse position."]
         window: Point2D,
@@ -8461,6 +8491,7 @@ pub enum ModelingCmd {
         #[doc = "Logical timestamp. The client should increment this with every event in the \
                  current mouse drag. That way, if the events are being sent over an unordered \
                  channel, the API can ignore the older events."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         sequence: Option<u32>,
         #[doc = "Which way is \"up\", from the camera's point of view."]
         up: Point3D,
@@ -8477,6 +8508,7 @@ pub enum ModelingCmd {
         #[doc = "Logical timestamp. The client should increment this with every event in the \
                  current mouse drag. That way, if the events are being sent over an unordered \
                  channel, the API can ignore the older events."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         sequence: Option<u32>,
         #[doc = "Which way is \"up\", from the camera's point of view."]
         up: Point3D,
@@ -8558,9 +8590,11 @@ pub enum ModelingCmd {
         #[doc = "Type of distance to be measured."]
         distance_type: DistanceType,
         #[doc = "ID of the first entity being queried."]
-        entity_id1: uuid::Uuid,
+        #[serde(rename = "entity_id1")]
+        entity_id_1: uuid::Uuid,
         #[doc = "ID of the second entity being queried."]
-        entity_id2: uuid::Uuid,
+        #[serde(rename = "entity_id2")]
+        entity_id_2: uuid::Uuid,
     },
     #[doc = "Create a linear pattern using this entity."]
     #[serde(rename = "entity_linear_pattern")]
@@ -8661,6 +8695,7 @@ pub enum ModelingCmd {
         #[doc = "Logical timestamp. The client should increment this with every event in the \
                  current mouse drag. That way, if the events are being sent over an unordered \
                  channel, the API can ignore the older events."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         sequence: Option<u32>,
     },
     #[doc = "Changes the current highlighted entity to these entities."]
@@ -8749,6 +8784,7 @@ pub enum ModelingCmd {
     #[serde(rename = "solid3d_get_all_opposite_edges")]
     Solid3DGetAllOppositeEdges {
         #[doc = "If given, only faces parallel to this vector will be considered."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         along_vector: Option<Point3D>,
         #[doc = "Which edge you want the opposites of."]
         edge_id: uuid::Uuid,
@@ -8844,6 +8880,7 @@ pub enum ModelingCmd {
     #[serde(rename = "entity_fade")]
     EntityFade {
         #[doc = "How many seconds the animation should take."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         duration_seconds: Option<f64>,
         #[doc = "Which entity is being changed."]
         entity_id: uuid::Uuid,
@@ -8857,6 +8894,7 @@ pub enum ModelingCmd {
                  be reset)"]
         clobber: bool,
         #[doc = "If true, the plane will be created but hidden initially."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         hide: Option<bool>,
         #[doc = "Origin of the plane"]
         origin: Point3D,
@@ -8888,6 +8926,7 @@ pub enum ModelingCmd {
         #[doc = "Logical timestamp. The client should increment this with every event in the \
                  current mouse drag. That way, if the events are being sent over an unordered \
                  channel, the API can ignore the older events."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         sequence: Option<u32>,
         #[doc = "Where the mouse is"]
         window: Point2D,
@@ -8906,6 +8945,7 @@ pub enum ModelingCmd {
         animated: bool,
         #[doc = "Disable the camera entirely for sketch mode and sketch on a plane (this would be \
                  the normal of that plane)."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         disable_camera_with_plane: Option<Point3D>,
         #[doc = "Use an orthographic camera."]
         ortho: bool,
@@ -8953,12 +8993,14 @@ pub enum ModelingCmd {
     #[serde(rename = "set_current_tool_properties")]
     SetCurrentToolProperties {
         #[doc = "The color to set the tool line to."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         color: Option<Color>,
     },
     #[doc = "Set the default system properties used when a specific property isn't set."]
     #[serde(rename = "set_default_system_properties")]
     SetDefaultSystemProperties {
         #[doc = "The default system color."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         color: Option<Color>,
     },
     #[doc = "Get type of the given curve."]
@@ -9021,6 +9063,7 @@ pub enum ModelingCmd {
         #[doc = "Logical timestamp. The client should increment this with every event in the \
                  current mouse drag. That way, if the events are being sent over an unordered \
                  channel, the API can ignore the older events."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         sequence: Option<u32>,
         #[doc = "The mouse position."]
         window: Point2D,
@@ -9157,6 +9200,7 @@ pub enum ModelingCmd {
     DefaultCameraSetPerspective {
         #[doc = "If this is not given, use the same parameters as last time the perspective \
                  camera was used."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         parameters: Option<PerspectiveCameraParameters>,
     },
     #[doc = "Fit the view to the specified object(s)."]
@@ -9164,7 +9208,8 @@ pub enum ModelingCmd {
     ZoomToFit {
         #[doc = "Which objects to fit camera to; if empty, fit to all non-default objects. \
                  Defaults to empty vector."]
-        object_ids: Option<Vec<uuid::Uuid>>,
+        #[serde(default)]
+        object_ids: Vec<uuid::Uuid>,
         #[doc = "How much to pad the view frame by."]
         padding: f64,
     },
@@ -10609,9 +10654,11 @@ pub enum PathSegment {
     #[serde(rename = "bezier")]
     Bezier {
         #[doc = "First control point."]
-        control1: Point3D,
+        #[serde(rename = "control1")]
+        control_1: Point3D,
         #[doc = "Second control point."]
-        control2: Point3D,
+        #[serde(rename = "control2")]
+        control_2: Point3D,
         #[doc = "Final control point."]
         end: Point3D,
         #[doc = "Whether or not this bezier is a relative offset"]
@@ -10629,6 +10676,7 @@ pub enum PathSegment {
     #[serde(rename = "tangential_arc_to")]
     TangentialArcTo {
         #[doc = "0 will be interpreted as none/null."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         angle_snap_increment: Option<Angle>,
         #[doc = "Where the arc should end. Must lie in the same plane as the current path pen \
                  position. Must not be colinear with current path pen position."]
@@ -15239,7 +15287,8 @@ pub enum WebSocketRequest {
         requests: Vec<ModelingCmdReq>,
         #[doc = "If false or omitted, responses to each batch command will just be Ok(()). If \
                  true, responses will be the actual response data for that modeling command."]
-        responses: Option<bool>,
+        #[serde(default)]
+        responses: bool,
     },
     #[doc = "The client-to-server Ping to ensure the WebSocket stays alive."]
     #[serde(rename = "ping")]
