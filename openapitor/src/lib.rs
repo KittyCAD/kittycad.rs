@@ -600,7 +600,7 @@ serde = {{ version = "1", features = ["derive"] }}
 serde_bytes = "0.11"
 serde_json = "1"
 serde_urlencoded = {{ version = "^0.7", optional = true }}
-tabled = {{ version = "0.14.0", features = ["color"], optional = true }}
+tabled = {{ version = "0.15.0", features = ["ansi"], optional = true }}
 thiserror = "1"
 tracing = {{ version = "^0.1", optional = true }}
 url = {{ version = "2", features = ["serde"] }}
