@@ -1,6 +1,4 @@
 #![doc = r" This module contains the generated types for the library."]
-#[cfg(feature = "tabled")]
-use tabled::Tabled;
 pub mod base64 {
     #![doc = " Base64 data that encodes to url safe base64, but can decode from multiple"]
     #![doc = " base64 implementations to account for various clients and libraries. Compatible"]
@@ -894,7 +892,6 @@ pub enum AiPromptType {
     #[default]
     TextToCad,
 }
-
 
 
 #[doc = "An angle, with a specific unit."]
@@ -4857,7 +4854,6 @@ pub enum Type {
 }
 
 
-
 #[doc = "An event related to modeling app files"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8209,7 +8205,6 @@ pub enum ModelingAppEventType {
 }
 
 
-
 #[doc = "The subscription tiers we offer for the Modeling App to individuals."]
 #[derive(
     serde :: Serialize,
@@ -9391,7 +9386,6 @@ pub enum Oauth2GrantType {
     #[default]
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
-
 
 
 #[doc = "A successful response from a modeling command. This can be one of several types of \
@@ -10635,7 +10629,7 @@ pub enum PathSegment {
         #[doc = "Whether or not this line is a relative offset"]
         relative: bool,
     },
-    #[doc = "A circular arc segment."]
+    #[doc = "A circular arc segment. Arcs can be drawn clockwise when start > end."]
     #[serde(rename = "arc")]
     Arc {
         #[doc = "Center of the circle"]
@@ -10667,12 +10661,13 @@ pub enum PathSegment {
     #[doc = "Adds a tangent arc from current pen position with the given radius and angle."]
     #[serde(rename = "tangential_arc")]
     TangentialArc {
-        #[doc = "Offset of the arc."]
+        #[doc = "Offset of the arc. Negative values will arc clockwise."]
         offset: Angle,
         #[doc = "Radius of the arc. Not to be confused with Raiders of the Lost Ark."]
         radius: f64,
     },
-    #[doc = "Adds a tangent arc from current pen position to the new position."]
+    #[doc = "Adds a tangent arc from current pen position to the new position. Arcs will choose a \
+             clockwise or counter-clockwise direction based on the arc end position."]
     #[serde(rename = "tangential_arc_to")]
     TangentialArcTo {
         #[doc = "0 will be interpreted as none/null."]
@@ -10922,7 +10917,6 @@ pub enum PaymentMethodType {
     #[default]
     Card,
 }
-
 
 
 #[doc = "Defines a perspective view."]
