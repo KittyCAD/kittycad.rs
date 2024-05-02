@@ -23374,7 +23374,7 @@
             ]
           },
           {
-            "description": "A circular arc segment.",
+            "description": "A circular arc segment. Arcs can be drawn clockwise when start > end.",
             "type": "object",
             "properties": {
               "center": {
@@ -23481,7 +23481,7 @@
             "type": "object",
             "properties": {
               "offset": {
-                "description": "Offset of the arc.",
+                "description": "Offset of the arc. Negative values will arc clockwise.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Angle"
@@ -23510,7 +23510,7 @@
             ]
           },
           {
-            "description": "Adds a tangent arc from current pen position to the new position.",
+            "description": "Adds a tangent arc from current pen position to the new position. Arcs will choose a clockwise or counter-clockwise direction based on the arc end position.",
             "type": "object",
             "properties": {
               "angle_snap_increment": {
