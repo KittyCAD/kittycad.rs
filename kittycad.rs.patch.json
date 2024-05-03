@@ -4,7 +4,7 @@
     "path": "/info/x-rust",
     "value": {
       "client": "// Authenticate via an API token.\nlet client = kittycad::Client::new(\"$TOKEN\");\n\n// - OR -\n\n// Authenticate with your token and host parsed from the environment variables:\n// `KITTYCAD_API_TOKEN`.\nlet client = kittycad::Client::new_from_env();",
-      "install": "[dependencies]\nkittycad = \"0.3.0\""
+      "install": "[dependencies]\nkittycad = \"0.3.1\""
     }
   },
   {

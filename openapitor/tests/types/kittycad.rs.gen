@@ -8377,25 +8377,6 @@ pub enum ModelingCmd {
         #[doc = "Move the camera forward along the vector it's looking at, by this magnitudedefaultCameraZoom. Basically, how much should the camera move forward by."]
         magnitude: f64,
     },
-    #[doc = "Enable sketch mode, where users can sketch 2D geometry. Users choose a plane to sketch on."]
-    #[serde(rename = "default_camera_enable_sketch_mode")]
-    DefaultCameraEnableSketchMode {
-        #[doc = "Should we animate or snap for the camera transition?"]
-        animated: bool,
-        #[doc = "How far to the sketching plane?"]
-        distance_to_plane: f64,
-        #[doc = "What's the origin of the sketching plane?"]
-        origin: Point3D,
-        #[doc = "Should the camera use orthographic projection? In other words, should an object's size in the rendered image stay constant regardless of its distance from the camera."]
-        ortho: bool,
-        #[doc = "Which 3D axis of the scene should be the X axis of the sketching plane?"]
-        x_axis: Point3D,
-        #[doc = "Which 3D axis of the scene should be the Y axis of the sketching plane?"]
-        y_axis: Point3D,
-    },
-    #[doc = "Disable sketch mode, from the default camera."]
-    #[serde(rename = "default_camera_disable_sketch_mode")]
-    DefaultCameraDisableSketchMode {},
     #[doc = "Export the scene to a file."]
     #[serde(rename = "export")]
     Export {
@@ -8766,19 +8747,6 @@ pub enum ModelingCmd {
         #[doc = "Where the mouse is"]
         window: Point2D,
     },
-    #[doc = "Enable sketch mode on the given plane. If you want to sketch on a face, use `enable_sketch_mode` instead."]
-    #[serde(rename = "sketch_mode_enable")]
-    SketchModeEnable {
-        #[doc = "Animate the transition to sketch mode."]
-        animated: bool,
-        #[doc = "Disable the camera entirely for sketch mode and sketch on a plane (this would be the normal of that plane)."]
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        disable_camera_with_plane: Option<Point3D>,
-        #[doc = "Use an orthographic camera."]
-        ortho: bool,
-        #[doc = "Sketch on this plane."]
-        plane_id: uuid::Uuid,
-    },
     #[doc = "Disable sketch mode. If you are sketching on a face, be sure to not disable sketch mode until you have extruded. Otherwise, your object will not be fused with the face."]
     #[serde(rename = "sketch_mode_disable")]
     SketchModeDisable {},
@@ -8806,6 +8774,9 @@ pub enum ModelingCmd {
         entity_id: uuid::Uuid,
         #[doc = "Should the camera use orthographic projection? In other words, should an object's size in the rendered image stay constant regardless of its distance from the camera."]
         ortho: bool,
+        #[doc = "If provided, ensures that the normal of the sketch plane must be aligned with this supplied normal (otherwise the camera position will be used to infer the normal to point towards the viewer)"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        planar_normal: Option<Point3D>,
     },
     #[doc = "Set the background color of the scene."]
     #[serde(rename = "set_background_color")]

@@ -19049,79 +19049,6 @@
             ]
           },
           {
-            "description": "Enable sketch mode, where users can sketch 2D geometry. Users choose a plane to sketch on.",
-            "type": "object",
-            "properties": {
-              "animated": {
-                "description": "Should we animate or snap for the camera transition?",
-                "type": "boolean"
-              },
-              "distance_to_plane": {
-                "description": "How far to the sketching plane?",
-                "type": "number",
-                "format": "float"
-              },
-              "origin": {
-                "description": "What's the origin of the sketching plane?",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Point3d"
-                  }
-                ]
-              },
-              "ortho": {
-                "description": "Should the camera use orthographic projection? In other words, should an object's size in the rendered image stay constant regardless of its distance from the camera.",
-                "type": "boolean"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "default_camera_enable_sketch_mode"
-                ]
-              },
-              "x_axis": {
-                "description": "Which 3D axis of the scene should be the X axis of the sketching plane?",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Point3d"
-                  }
-                ]
-              },
-              "y_axis": {
-                "description": "Which 3D axis of the scene should be the Y axis of the sketching plane?",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Point3d"
-                  }
-                ]
-              }
-            },
-            "required": [
-              "animated",
-              "distance_to_plane",
-              "origin",
-              "ortho",
-              "type",
-              "x_axis",
-              "y_axis"
-            ]
-          },
-          {
-            "description": "Disable sketch mode, from the default camera.",
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "default_camera_disable_sketch_mode"
-                ]
-              }
-            },
-            "required": [
-              "type"
-            ]
-          },
-          {
             "description": "Export the scene to a file.",
             "type": "object",
             "properties": {
@@ -20447,46 +20374,6 @@
             ]
           },
           {
-            "description": "Enable sketch mode on the given plane. If you want to sketch on a face, use `enable_sketch_mode` instead.",
-            "type": "object",
-            "properties": {
-              "animated": {
-                "description": "Animate the transition to sketch mode.",
-                "type": "boolean"
-              },
-              "disable_camera_with_plane": {
-                "nullable": true,
-                "description": "Disable the camera entirely for sketch mode and sketch on a plane (this would be the normal of that plane).",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Point3d"
-                  }
-                ]
-              },
-              "ortho": {
-                "description": "Use an orthographic camera.",
-                "type": "boolean"
-              },
-              "plane_id": {
-                "description": "Sketch on this plane.",
-                "type": "string",
-                "format": "uuid"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "sketch_mode_enable"
-                ]
-              }
-            },
-            "required": [
-              "animated",
-              "ortho",
-              "plane_id",
-              "type"
-            ]
-          },
-          {
             "description": "Disable sketch mode. If you are sketching on a face, be sure to not disable sketch mode until you have extruded. Otherwise, your object will not be fused with the face.",
             "type": "object",
             "properties": {
@@ -20575,6 +20462,15 @@
               "ortho": {
                 "description": "Should the camera use orthographic projection? In other words, should an object's size in the rendered image stay constant regardless of its distance from the camera.",
                 "type": "boolean"
+              },
+              "planar_normal": {
+                "nullable": true,
+                "description": "If provided, ensures that the normal of the sketch plane must be aligned with this supplied normal (otherwise the camera position will be used to infer the normal to point towards the viewer)",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
               },
               "type": {
                 "type": "string",
