@@ -15797,6 +15797,7 @@
           }
         },
         "required": [
+          "error_code",
           "message",
           "request_id"
         ]
