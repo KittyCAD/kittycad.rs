@@ -4740,8 +4740,7 @@ pub enum Environment {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Error {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub error_code: Option<String>,
+    pub error_code: String,
     pub message: String,
     pub request_id: String,
 }
@@ -4761,11 +4760,7 @@ impl tabled::Tabled for Error {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            if let Some(error_code) = &self.error_code {
-                format!("{:?}", error_code).into()
-            } else {
-                String::new().into()
-            },
+            self.error_code.clone().into(),
             self.message.clone().into(),
             self.request_id.clone().into(),
         ]
