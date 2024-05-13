@@ -12,6 +12,15 @@ updates:
     reviewers:
       - jessfraz
       - adamchalmers
+  # This tells dependabot to not update anything in the kittycad/ dir,
+  # as those files are generated from openapitor.
+  - package-ecosystem: "cargo" 
+    directory: "/kittycad"
+    schedule:
+      interval: "daily"
+    labels: [ ]
+    ignore:
+      - dependency-name: "*"
   - package-ecosystem: "github-actions" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:

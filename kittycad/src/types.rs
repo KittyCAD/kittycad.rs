@@ -893,7 +893,6 @@ pub enum AiPromptType {
     TextToCad,
 }
 
-
 #[doc = "An angle, with a specific unit."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4848,7 +4847,6 @@ pub enum Type {
     ModelingAppEvent,
 }
 
-
 #[doc = "An event related to modeling app files"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8199,7 +8197,6 @@ pub enum ModelingAppEventType {
     SuccessfulCompileBeforeClose,
 }
 
-
 #[doc = "The subscription tiers we offer for the Modeling App to individuals."]
 #[derive(
     serde :: Serialize,
@@ -9349,7 +9346,6 @@ pub enum Oauth2GrantType {
     #[default]
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
-
 
 #[doc = "A successful response from a modeling command. This can be one of several types of \
          responses, depending on the command."]
@@ -10880,7 +10876,6 @@ pub enum PaymentMethodType {
     #[default]
     Card,
 }
-
 
 #[doc = "Defines a perspective view."]
 #[derive(
