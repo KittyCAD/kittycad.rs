@@ -4740,7 +4740,8 @@ pub enum Environment {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Error {
-    pub error_code: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error_code: Option<String>,
     pub message: String,
     pub request_id: String,
 }
@@ -4760,7 +4761,11 @@ impl tabled::Tabled for Error {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.error_code.clone().into(),
+            if let Some(error_code) = &self.error_code {
+                format!("{:?}", error_code).into()
+            } else {
+                String::new().into()
+            },
             self.message.clone().into(),
             self.request_id.clone().into(),
         ]
@@ -4800,6 +4805,14 @@ pub enum ErrorCode {
     #[serde(rename = "bad_request")]
     #[display("bad_request")]
     BadRequest,
+    #[doc = "Auth token is missing from the request"]
+    #[serde(rename = "auth_token_missing")]
+    #[display("auth_token_missing")]
+    AuthTokenMissing,
+    #[doc = "Auth token is invalid in some way (expired, incorrect format, etc)"]
+    #[serde(rename = "auth_token_invalid")]
+    #[display("auth_token_invalid")]
+    AuthTokenInvalid,
     #[doc = "Client sent invalid JSON."]
     #[serde(rename = "invalid_json")]
     #[display("invalid_json")]
@@ -5323,6 +5336,37 @@ impl tabled::Tabled for ExtrusionFaceInfo {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["cap".into(), "curve_id".into(), "face_id".into()]
+    }
+}
+
+#[doc = "The 3D center of mass on the surface"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FaceGetCenter {
+    #[doc = "The 3D position on the surface center of mass"]
+    pub pos: Point3D,
+}
+
+impl std::fmt::Display for FaceGetCenter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FaceGetCenter {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.pos).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["pos".into()]
     }
 }
 
@@ -8818,6 +8862,12 @@ pub enum ModelingCmd {
         #[doc = "The 2D paramter-space u,v position to evaluate the surface at"]
         uv: Point2D,
     },
+    #[doc = "Obtains the surface \"center of mass\""]
+    #[serde(rename = "face_get_center")]
+    FaceGetCenter {
+        #[doc = "Which face is being queried."]
+        object_id: uuid::Uuid,
+    },
     #[doc = "Determines the gradient (dFdu, dFdv) + normal vector on a brep face evaluated by \
              parameters u,v"]
     #[serde(rename = "face_get_gradient")]
@@ -9170,6 +9220,13 @@ pub enum ModelingCmd {
         object_ids: Vec<uuid::Uuid>,
         #[doc = "How much to pad the view frame by."]
         padding: f64,
+    },
+    #[doc = "Fit the view to the scene with an isometric view."]
+    #[serde(rename = "view_isometric")]
+    ViewIsometric {
+        #[doc = "How much to pad the view frame by."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        padding: Option<f64>,
     },
     #[doc = "Get a concise description of all of an extrusion's faces."]
     #[serde(rename = "solid3d_get_extrusion_face_info")]
@@ -9549,6 +9606,12 @@ pub enum OkModelingCmdResponse {
     FaceGetPosition {
         #[doc = "The 3D position on the surface that was evaluated"]
         data: FaceGetPosition,
+    },
+    #[doc = "The response to the 'FaceGetCenter' endpoint"]
+    #[serde(rename = "face_get_center")]
+    FaceGetCenter {
+        #[doc = "The 3D center of mass on the surface"]
+        data: FaceGetCenter,
     },
     #[doc = "The response to the 'FaceGetGradient' endpoint"]
     #[serde(rename = "face_get_gradient")]
