@@ -15797,7 +15797,6 @@
           }
         },
         "required": [
-          "error_code",
           "message",
           "request_id"
         ]
@@ -15824,6 +15823,20 @@
             "type": "string",
             "enum": [
               "bad_request"
+            ]
+          },
+          {
+            "description": "Auth token is missing from the request",
+            "type": "string",
+            "enum": [
+              "auth_token_missing"
+            ]
+          },
+          {
+            "description": "Auth token is invalid in some way (expired, incorrect format, etc)",
+            "type": "string",
+            "enum": [
+              "auth_token_invalid"
             ]
           },
           {
@@ -16162,6 +16175,23 @@
         },
         "required": [
           "cap"
+        ]
+      },
+      "FaceGetCenter": {
+        "description": "The 3D center of mass on the surface",
+        "type": "object",
+        "properties": {
+          "pos": {
+            "description": "The 3D position on the surface center of mass",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          }
+        },
+        "required": [
+          "pos"
         ]
       },
       "FaceGetGradient": {
@@ -20090,6 +20120,27 @@
             ]
           },
           {
+            "description": "Obtains the surface \"center of mass\"",
+            "type": "object",
+            "properties": {
+              "object_id": {
+                "description": "Which face is being queried.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "face_get_center"
+                ]
+              }
+            },
+            "required": [
+              "object_id",
+              "type"
+            ]
+          },
+          {
             "description": "Determines the gradient (dFdu, dFdv) + normal vector on a brep face evaluated by parameters u,v",
             "type": "object",
             "properties": {
@@ -21303,6 +21354,27 @@
             ]
           },
           {
+            "description": "Fit the view to the scene with an isometric view.",
+            "type": "object",
+            "properties": {
+              "padding": {
+                "description": "How much to pad the view frame by.",
+                "default": 0.0,
+                "type": "number",
+                "format": "float"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "view_isometric"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
             "description": "Get a concise description of all of an extrusion's faces.",
             "type": "object",
             "properties": {
@@ -22078,6 +22150,25 @@
                 "type": "string",
                 "enum": [
                   "face_get_position"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'FaceGetCenter' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/FaceGetCenter"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "face_get_center"
                 ]
               }
             },
