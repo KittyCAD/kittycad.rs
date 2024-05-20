@@ -14431,6 +14431,14 @@
             "type": "number",
             "format": "float"
           },
+          "orientation": {
+            "description": "The Camera's orientation (in the form of a quaternion)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point4d"
+              }
+            ]
+          },
           "ortho": {
             "description": "Whether or not the camera is in ortho mode",
             "type": "boolean"
@@ -14460,6 +14468,7 @@
         },
         "required": [
           "center",
+          "orientation",
           "ortho",
           "pos",
           "up"
@@ -23793,6 +23802,34 @@
           }
         },
         "required": [
+          "x",
+          "y",
+          "z"
+        ]
+      },
+      "Point4d": {
+        "description": "A point in homogeneous (4D) space",
+        "type": "object",
+        "properties": {
+          "w": {
+            "type": "number",
+            "format": "float"
+          },
+          "x": {
+            "type": "number",
+            "format": "float"
+          },
+          "y": {
+            "type": "number",
+            "format": "float"
+          },
+          "z": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "required": [
+          "w",
           "x",
           "y",
           "z"
