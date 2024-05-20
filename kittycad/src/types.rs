@@ -2640,6 +2640,8 @@ pub struct CameraSettings {
     #[doc = "Camera's field-of-view angle (if ortho is false)"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fov_y: Option<f64>,
+    #[doc = "The Camera's orientation (in the form of a quaternion)"]
+    pub orientation: Point4D,
     #[doc = "Whether or not the camera is in ortho mode"]
     pub ortho: bool,
     #[doc = "The camera's ortho scale (derived from viewing distance if ortho is true)"]
@@ -2663,7 +2665,7 @@ impl std::fmt::Display for CameraSettings {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CameraSettings {
-    const LENGTH: usize = 6;
+    const LENGTH: usize = 7;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.center).into(),
@@ -2672,6 +2674,7 @@ impl tabled::Tabled for CameraSettings {
             } else {
                 String::new().into()
             },
+            format!("{:?}", self.orientation).into(),
             format!("{:?}", self.ortho).into(),
             if let Some(ortho_scale) = &self.ortho_scale {
                 format!("{:?}", ortho_scale).into()
@@ -2687,6 +2690,7 @@ impl tabled::Tabled for CameraSettings {
         vec![
             "center".into(),
             "fov_y".into(),
+            "orientation".into(),
             "ortho".into(),
             "ortho_scale".into(),
             "pos".into(),
@@ -11150,6 +11154,44 @@ impl tabled::Tabled for Point3D {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["x".into(), "y".into(), "z".into()]
+    }
+}
+
+#[doc = "A point in homogeneous (4D) space"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Point4D {
+    pub w: f64,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+}
+
+impl std::fmt::Display for Point4D {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Point4D {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.w).into(),
+            format!("{:?}", self.x).into(),
+            format!("{:?}", self.y).into(),
+            format!("{:?}", self.z).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["w".into(), "x".into(), "y".into(), "z".into()]
     }
 }
 
