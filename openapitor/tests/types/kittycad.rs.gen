@@ -9305,6 +9305,18 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `DefaultCameraZoom` command."]
         data: DefaultCameraZoom,
     },
+    #[doc = "The response to the 'ZoomToFit' endpoint"]
+    #[serde(rename = "zoom_to_fit")]
+    ZoomToFit {
+        #[doc = "The response from the `ZoomToFit` command."]
+        data: ZoomToFit,
+    },
+    #[doc = "The response to the 'ViewIsometric' endpoint"]
+    #[serde(rename = "view_isometric")]
+    ViewIsometric {
+        #[doc = "The response from the `ViewIsometric` command."]
+        data: ViewIsometric,
+    },
     #[doc = "The response to the 'GetNumObjects' endpoint"]
     #[serde(rename = "get_num_objects")]
     GetNumObjects {
@@ -15020,6 +15032,37 @@ impl tabled::Tabled for VerificationTokenResponse {
     }
 }
 
+#[doc = "The response from the `ViewIsometric` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ViewIsometric {
+    #[doc = "Camera settings"]
+    pub settings: CameraSettings,
+}
+
+impl std::fmt::Display for ViewIsometric {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ViewIsometric {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.settings).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["settings".into()]
+    }
+}
+
 #[doc = "The volume response."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -15386,4 +15429,35 @@ pub enum ZooTool {
     #[serde(rename = "diff_chrome_extension")]
     #[display("diff_chrome_extension")]
     DiffChromeExtension,
+}
+
+#[doc = "The response from the `ZoomToFit` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ZoomToFit {
+    #[doc = "Camera settings"]
+    pub settings: CameraSettings,
+}
+
+impl std::fmt::Display for ZoomToFit {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ZoomToFit {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.settings).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["settings".into()]
+    }
 }

@@ -21788,6 +21788,44 @@
             ]
           },
           {
+            "description": "The response to the 'ZoomToFit' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ZoomToFit"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "zoom_to_fit"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'ViewIsometric' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ViewIsometric"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "view_isometric"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
             "description": "The response to the 'GetNumObjects' endpoint",
             "type": "object",
             "properties": {
@@ -27201,6 +27239,23 @@
           "updated_at"
         ]
       },
+      "ViewIsometric": {
+        "description": "The response from the `ViewIsometric` command.",
+        "type": "object",
+        "properties": {
+          "settings": {
+            "description": "Camera settings",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CameraSettings"
+              }
+            ]
+          }
+        },
+        "required": [
+          "settings"
+        ]
+      },
       "Volume": {
         "description": "The volume response.",
         "type": "object",
@@ -27587,6 +27642,23 @@
               "diff_chrome_extension"
             ]
           }
+        ]
+      },
+      "ZoomToFit": {
+        "description": "The response from the `ZoomToFit` command.",
+        "type": "object",
+        "properties": {
+          "settings": {
+            "description": "Camera settings",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CameraSettings"
+              }
+            ]
+          }
+        },
+        "required": [
+          "settings"
         ]
       }
     },
