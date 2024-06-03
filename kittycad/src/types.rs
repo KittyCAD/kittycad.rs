@@ -473,10 +473,6 @@ pub mod error {
         }
     }
 
-    trait ErrorFormat {
-        fn fmt_info(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
-    }
-
     impl std::fmt::Debug for Error {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             std::fmt::Display::fmt(self, f)

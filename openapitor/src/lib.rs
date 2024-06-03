@@ -584,10 +584,10 @@ dirs = {{ version = "^5.0.1", optional = true }}
 format_serde_error = {{ version = "^0.3.0", optional = true }}
 futures = {{ version = "0.3.26", optional = true }}
 http = {{ version = "^0.2.8", optional = true }}
-itertools = "0.12.1"
+itertools = "0.13.0"
 log = {{ version = "^0.4", features = ["serde"], optional = true }}
 mime_guess = "2.0.4"
-parse-display = "0.9.0"
+parse-display = "0.9.1"
 phonenumber = "0.3.5"
 rand = {{ version = "0.8", optional = true }}
 reqwest = {{ version = "0.11.27", default-features = false, features = ["json", "multipart", "rustls-tls"], optional = true }}
@@ -595,7 +595,7 @@ reqwest-conditional-middleware = {{ version = "0.2.1", optional = true }}
 reqwest-middleware = {{ version = "0.2.2", optional = true }}
 reqwest-retry = {{ version = "0.2.2", optional = true }}
 reqwest-tracing = {{ version = "0.4.4", features = ["opentelemetry_0_17"], optional = true }}
-schemars = {{ version = "0.8.16", features = ["bigdecimal04", "bytes", "chrono", "url", "uuid1"] }}
+schemars = {{ version = "0.8.21", features = ["bigdecimal04", "bytes", "chrono", "url", "uuid1"] }}
 serde = {{ version = "1", features = ["derive"] }}
 serde_bytes = "0.11"
 serde_json = "1"
@@ -611,7 +611,7 @@ expectorate = "1"
 futures-util = "^0.3.26"
 pretty_assertions = "1"
 rand = "0.8"
-tokio = {{ version = "1.20.0", features = ["rt", "macros"] }}
+tokio = {{ version = "1.38.0", features = ["rt", "macros"] }}
 tokio-tungstenite = "0.21"
 
 [features]
