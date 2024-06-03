@@ -1041,7 +1041,7 @@ mod test {
         // Lets get a specific schema.
         let schema = openapiv3::Schema {
             schema_data: Default::default(),
-            schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Boolean {}),
+            schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Boolean(Default::default())),
         };
         let result = super::generate_example_rust_from_schema(
             &crate::types::TypeSpace {
