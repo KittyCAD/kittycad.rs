@@ -8465,6 +8465,16 @@ pub enum ModelingCmd {
                  joints. Must be positive (i.e. greater than zero)."]
         tolerance: f64,
     },
+    #[doc = "Command for revolving a solid 2d."]
+    #[serde(rename = "solid3d_shell_face")]
+    Solid3DShellFace {
+        #[doc = "Which faces to remove, leaving only the shell."]
+        face_ids: Vec<uuid::Uuid>,
+        #[doc = "Which Solid3D is being shelled."]
+        object_id: uuid::Uuid,
+        #[doc = "How thick the shell should be. Smaller values mean a thinner shell."]
+        shell_thickness: f64,
+    },
     #[doc = "Command for revolving a solid 2d about a brep edge"]
     #[serde(rename = "revolve_about_edge")]
     RevolveAboutEdge {

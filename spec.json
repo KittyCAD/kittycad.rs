@@ -18762,6 +18762,45 @@
             ]
           },
           {
+            "description": "Command for revolving a solid 2d.",
+            "type": "object",
+            "properties": {
+              "face_ids": {
+                "description": "Which faces to remove, leaving only the shell.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "object_id": {
+                "description": "Which Solid3D is being shelled.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "shell_thickness": {
+                "description": "How thick the shell should be. Smaller values mean a thinner shell.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_shell_face"
+                ]
+              }
+            },
+            "required": [
+              "face_ids",
+              "object_id",
+              "shell_thickness",
+              "type"
+            ]
+          },
+          {
             "description": "Command for revolving a solid 2d about a brep edge",
             "type": "object",
             "properties": {
