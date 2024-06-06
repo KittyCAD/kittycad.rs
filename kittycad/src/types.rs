@@ -4009,6 +4009,31 @@ impl tabled::Tabled for CustomerBalance {
     }
 }
 
+#[doc = "What kind of cut to do"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CutType {
+    #[doc = "Round off an edge."]
+    #[serde(rename = "fillet")]
+    #[display("fillet")]
+    Fillet,
+    #[doc = "Cut away an edge."]
+    #[serde(rename = "chamfer")]
+    #[display("chamfer")]
+    Chamfer,
+}
+
 #[doc = "The response from the `DefaultCameraFocusOn` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8846,6 +8871,9 @@ pub enum ModelingCmd {
     #[doc = "Fillets the given edge with the specified radius."]
     #[serde(rename = "solid3d_fillet_edge")]
     Solid3DFilletEdge {
+        #[doc = "How to apply the cut."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        cut_type: Option<CutType>,
         #[doc = "Which edge you want to fillet."]
         edge_id: uuid::Uuid,
         #[doc = "Which object is being filletted."]
