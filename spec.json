@@ -15364,6 +15364,25 @@
           "updated_at"
         ]
       },
+      "CutType": {
+        "description": "What kind of cut to do",
+        "oneOf": [
+          {
+            "description": "Round off an edge.",
+            "type": "string",
+            "enum": [
+              "fillet"
+            ]
+          },
+          {
+            "description": "Cut away an edge.",
+            "type": "string",
+            "enum": [
+              "chamfer"
+            ]
+          }
+        ]
+      },
       "DefaultCameraFocusOn": {
         "description": "The response from the `DefaultCameraFocusOn` command.",
         "type": "object"
@@ -20075,6 +20094,15 @@
             "description": "Fillets the given edge with the specified radius.",
             "type": "object",
             "properties": {
+              "cut_type": {
+                "description": "How to apply the cut.",
+                "default": "fillet",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CutType"
+                  }
+                ]
+              },
               "edge_id": {
                 "description": "Which edge you want to fillet.",
                 "type": "string",
