@@ -2912,6 +2912,37 @@ impl tabled::Tabled for ClientMetrics {
     }
 }
 
+#[doc = "The response from the `ClosePath` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ClosePath {
+    #[doc = "The UUID of the lone face of the resulting solid2D."]
+    pub face_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for ClosePath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ClosePath {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.face_id).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["face_id".into()]
+    }
+}
+
 #[doc = "Cluster information."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9499,6 +9530,12 @@ pub enum OkModelingCmdResponse {
     EntityGetAllChildUuids {
         #[doc = "The response from the `EntityGetAllChildUuids` command."]
         data: EntityGetAllChildUuids,
+    },
+    #[doc = "The response to the 'ClosePath' endpoint"]
+    #[serde(rename = "close_path")]
+    ClosePath {
+        #[doc = "The response from the `ClosePath` command."]
+        data: ClosePath,
     },
     #[doc = "The response to the 'CameraDragMove' endpoint"]
     #[serde(rename = "camera_drag_move")]
