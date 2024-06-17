@@ -14609,6 +14609,20 @@
           "rtc_total_freezes_duration_sec"
         ]
       },
+      "ClosePath": {
+        "description": "The response from the `ClosePath` command.",
+        "type": "object",
+        "properties": {
+          "face_id": {
+            "description": "The UUID of the lone face of the resulting solid2D.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "face_id"
+        ]
+      },
       "Cluster": {
         "description": "Cluster information.",
         "type": "object",
@@ -21770,6 +21784,25 @@
                 "type": "string",
                 "enum": [
                   "entity_get_all_child_uuids"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'ClosePath' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ClosePath"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "close_path"
                 ]
               }
             },
