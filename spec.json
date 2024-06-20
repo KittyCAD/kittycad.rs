@@ -15782,6 +15782,23 @@
           "entity_ids"
         ]
       },
+      "EntityLinearPatternTransform": {
+        "description": "The response from the `EntityLinearPatternTransform` command.",
+        "type": "object",
+        "properties": {
+          "entity_ids": {
+            "description": "The UUIDs of the entities that were created.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "entity_ids"
+        ]
+      },
       "EntityType": {
         "description": "The type of entity",
         "type": "string",
@@ -18274,6 +18291,43 @@
         "type": "number",
         "format": "double"
       },
+      "LinearTransform": {
+        "description": "Ways to transform each solid being replicated in a repeating pattern.",
+        "type": "object",
+        "properties": {
+          "replicate": {
+            "description": "Whether to replicate the original solid in this instance.",
+            "default": true,
+            "type": "boolean"
+          },
+          "scale": {
+            "description": "Scale the replica's size along each axis. Defaults to (1, 1, 1) (i.e. the same size as the original).",
+            "default": {
+              "x": 1.0,
+              "y": 1.0,
+              "z": 1.0
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          },
+          "translate": {
+            "description": "Translate the replica this far along each dimension. Defaults to zero vector (i.e. same position as the original).",
+            "default": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          }
+        }
+      },
       "Mass": {
         "description": "The mass response.",
         "type": "object",
@@ -19317,6 +19371,35 @@
               "distance_type",
               "entity_id1",
               "entity_id2",
+              "type"
+            ]
+          },
+          {
+            "description": "Create a linear pattern using this entity.",
+            "type": "object",
+            "properties": {
+              "entity_id": {
+                "description": "ID of the entity being copied.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "transform": {
+                "description": "How to transform each repeated solid. The total number of repetitions equals the size of this list.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/LinearTransform"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_linear_pattern_transform"
+                ]
+              }
+            },
+            "required": [
+              "entity_id",
+              "transform",
               "type"
             ]
           },
@@ -22525,6 +22608,25 @@
                 "type": "string",
                 "enum": [
                   "entity_get_distance"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'EntityLinearPatternTransform' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityLinearPatternTransform"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_linear_pattern_transform"
                 ]
               }
             },

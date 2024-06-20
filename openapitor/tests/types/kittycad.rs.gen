@@ -4645,6 +4645,37 @@ impl tabled::Tabled for EntityLinearPattern {
     }
 }
 
+#[doc = "The response from the `EntityLinearPatternTransform` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityLinearPatternTransform {
+    #[doc = "The UUIDs of the entities that were created."]
+    pub entity_ids: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for EntityLinearPatternTransform {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityLinearPatternTransform {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.entity_ids).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_ids".into()]
+    }
+}
+
 #[doc = "The type of entity"]
 #[derive(
     serde :: Serialize,
@@ -7948,6 +7979,56 @@ impl tabled::Tabled for LeafNode {
     }
 }
 
+#[doc = "Ways to transform each solid being replicated in a repeating pattern."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct LinearTransform {
+    #[doc = "Whether to replicate the original solid in this instance."]
+    #[serde(default)]
+    pub replicate: bool,
+    #[doc = "Scale the replica's size along each axis. Defaults to (1, 1, 1) (i.e. the same size as the original)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scale: Option<Point3D>,
+    #[doc = "Translate the replica this far along each dimension. Defaults to zero vector (i.e. same position as the original)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub translate: Option<Point3D>,
+}
+
+impl std::fmt::Display for LinearTransform {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for LinearTransform {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.replicate).into(),
+            if let Some(scale) = &self.scale {
+                format!("{:?}", scale).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(translate) = &self.translate {
+                format!("{:?}", translate).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["replicate".into(), "scale".into(), "translate".into()]
+    }
+}
+
 #[doc = "The mass response."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8527,6 +8608,14 @@ pub enum ModelingCmd {
         #[doc = "ID of the second entity being queried."]
         #[serde(rename = "entity_id2")]
         entity_id_2: uuid::Uuid,
+    },
+    #[doc = "Create a linear pattern using this entity."]
+    #[serde(rename = "entity_linear_pattern_transform")]
+    EntityLinearPatternTransform {
+        #[doc = "ID of the entity being copied."]
+        entity_id: uuid::Uuid,
+        #[doc = "How to transform each repeated solid. The total number of repetitions equals the size of this list."]
+        transform: Vec<LinearTransform>,
     },
     #[doc = "Create a linear pattern using this entity."]
     #[serde(rename = "entity_linear_pattern")]
@@ -9579,6 +9668,12 @@ pub enum OkModelingCmdResponse {
     EntityGetDistance {
         #[doc = "The response from the `EntitiesGetDistance` command."]
         data: EntityGetDistance,
+    },
+    #[doc = "The response to the 'EntityLinearPatternTransform' endpoint"]
+    #[serde(rename = "entity_linear_pattern_transform")]
+    EntityLinearPatternTransform {
+        #[doc = "The response from the `EntityLinearPatternTransform` command."]
+        data: EntityLinearPatternTransform,
     },
     #[doc = "The response to the 'EntityLinearPattern' endpoint"]
     #[serde(rename = "entity_linear_pattern")]
