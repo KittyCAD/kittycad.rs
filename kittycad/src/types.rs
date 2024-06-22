@@ -8687,7 +8687,8 @@ pub enum ModelingCmd {
         #[doc = "What the camera is looking at. Center of the camera's field of vision"]
         center: Point3D,
         #[doc = "The field of view angle in the y direction, in degrees."]
-        fov_y: f64,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        fov_y: Option<f64>,
         #[doc = "Logical timestamp. The client should increment this with every event in the \
                  current mouse drag. That way, if the events are being sent over an unordered \
                  channel, the API can ignore the older events."]
@@ -8698,9 +8699,11 @@ pub enum ModelingCmd {
         #[doc = "Where the camera is positioned"]
         vantage: Point3D,
         #[doc = "The distance to the far clipping plane."]
-        z_far: f64,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        z_far: Option<f64>,
         #[doc = "The distance to the near clipping plane."]
-        z_near: f64,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        z_near: Option<f64>,
     },
     #[doc = "Adjust zoom of the default camera."]
     #[serde(rename = "default_camera_zoom")]
