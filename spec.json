@@ -19139,6 +19139,7 @@
                 ]
               },
               "fov_y": {
+                "nullable": true,
                 "description": "The field of view angle in the y direction, in degrees.",
                 "type": "number",
                 "format": "float"
@@ -19173,11 +19174,13 @@
                 ]
               },
               "z_far": {
+                "nullable": true,
                 "description": "The distance to the far clipping plane.",
                 "type": "number",
                 "format": "float"
               },
               "z_near": {
+                "nullable": true,
                 "description": "The distance to the near clipping plane.",
                 "type": "number",
                 "format": "float"
@@ -19185,12 +19188,9 @@
             },
             "required": [
               "center",
-              "fov_y",
               "type",
               "up",
-              "vantage",
-              "z_far",
-              "z_near"
+              "vantage"
             ]
           },
           {
