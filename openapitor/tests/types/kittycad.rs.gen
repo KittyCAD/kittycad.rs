@@ -10923,11 +10923,14 @@ impl std::default::Default for PaymentMethodType {
 )]
 pub struct PerspectiveCameraParameters {
     #[doc = "Camera frustum vertical field of view."]
-    pub fov_y: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fov_y: Option<f64>,
     #[doc = "Camera frustum far plane."]
-    pub z_far: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub z_far: Option<f64>,
     #[doc = "Camera frustum near plane."]
-    pub z_near: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub z_near: Option<f64>,
 }
 
 impl std::fmt::Display for PerspectiveCameraParameters {
@@ -10945,9 +10948,21 @@ impl tabled::Tabled for PerspectiveCameraParameters {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.fov_y).into(),
-            format!("{:?}", self.z_far).into(),
-            format!("{:?}", self.z_near).into(),
+            if let Some(fov_y) = &self.fov_y {
+                format!("{:?}", fov_y).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(z_far) = &self.z_far {
+                format!("{:?}", z_far).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(z_near) = &self.z_near {
+                format!("{:?}", z_near).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
