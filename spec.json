@@ -23913,26 +23913,24 @@
         "type": "object",
         "properties": {
           "fov_y": {
+            "nullable": true,
             "description": "Camera frustum vertical field of view.",
             "type": "number",
             "format": "float"
           },
           "z_far": {
+            "nullable": true,
             "description": "Camera frustum far plane.",
             "type": "number",
             "format": "float"
           },
           "z_near": {
+            "nullable": true,
             "description": "Camera frustum near plane.",
             "type": "number",
             "format": "float"
           }
-        },
-        "required": [
-          "fov_y",
-          "z_far",
-          "z_near"
-        ]
+        }
       },
       "PlanInterval": {
         "description": "A plan's interval.",
