@@ -12352,6 +12352,14 @@
           },
           {
             "in": "query",
+            "name": "show_grid",
+            "description": "If true, will show the grid at the start of the session.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
             "name": "unlocked_framerate",
             "description": "If true, engine will render video frames as fast as it can.",
             "schema": {
