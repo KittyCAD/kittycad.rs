@@ -1249,7 +1249,8 @@
             "description": "The ID of the async operation.",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],

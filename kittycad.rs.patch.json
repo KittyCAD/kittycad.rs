@@ -4,7 +4,7 @@
     "path": "/info/x-rust",
     "value": {
       "client": "// Authenticate via an API token.\nlet client = kittycad::Client::new(\"$TOKEN\");\n\n// - OR -\n\n// Authenticate with your token and host parsed from the environment variables:\n// `KITTYCAD_API_TOKEN`.\nlet client = kittycad::Client::new_from_env();",
-      "install": "[dependencies]\nkittycad = \"0.3.7\""
+      "install": "[dependencies]\nkittycad = \"0.3.8\""
     }
   },
   {
@@ -123,7 +123,7 @@
     "op": "add",
     "path": "/paths/~1async~1operations~1{id}/get/x-rust",
     "value": {
-      "example": "/// Get an async operation.\n/// \n/// Get the status and output of an async operation.\n/// This endpoint requires authentication by any Zoo user. It returns details of the requested async operation for the user.\n/// If the user is not authenticated to view the specified async operation, then it is not returned.\n/// Only Zoo employees with the proper access can view async operations for other users.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The ID of the async operation. (required)\nasync fn example_api_calls_get_async_operation() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallOutput = client\n        .api_calls()\n        .get_async_operation(\"some-string\")\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get an async operation.\n/// \n/// Get the status and output of an async operation.\n/// This endpoint requires authentication by any Zoo user. It returns details of the requested async operation for the user.\n/// If the user is not authenticated to view the specified async operation, then it is not returned.\n/// Only Zoo employees with the proper access can view async operations for other users.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The ID of the async operation. (required)\nuse std::str::FromStr;\nasync fn example_api_calls_get_async_operation() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallOutput = client\n        .api_calls()\n        .get_async_operation(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.get_async_operation"
     }
   },
