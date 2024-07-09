@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 #[cfg(not(feature = "js"))]
 use futures::TryStreamExt;
 use pretty_assertions::assert_eq;
