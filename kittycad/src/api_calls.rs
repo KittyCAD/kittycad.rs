@@ -323,24 +323,25 @@ impl ApiCalls {
              endpoint requires authentication by any Zoo user. It returns details of the requested \
              async operation for the user.\nIf the user is not authenticated to view the specified \
              async operation, then it is not returned.\nOnly Zoo employees with the proper access \
-             can view async operations for other users.\n\n**Parameters:**\n\n- `id: &'astr`: The \
-             ID of the async operation. (required)\n\n```rust,no_run\nasync fn \
-             example_api_calls_get_async_operation() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: \
-             kittycad::types::AsyncApiCallOutput = client\n        .api_calls()\n        \
-             .get_async_operation(\"some-string\")\n        .await?;\n    println!(\"{:?}\", \
-             result);\n    Ok(())\n}\n```"]
+             can view async operations for other users.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: \
+             The ID of the async operation. (required)\n\n```rust,no_run\nuse \
+             std::str::FromStr;\nasync fn example_api_calls_get_async_operation() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::AsyncApiCallOutput = client\n        .api_calls()\n        \
+             .get_async_operation(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_async_operation<'a>(
         &'a self,
-        id: &'a str,
+        id: uuid::Uuid,
     ) -> Result<crate::types::AsyncApiCallOutput, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "async/operations/{id}".replace("{id}", id)
+                "async/operations/{id}".replace("{id}", &format!("{}", id))
             ),
         );
         req = req.bearer_auth(&self.client.token);
