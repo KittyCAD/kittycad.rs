@@ -11927,7 +11927,7 @@ pub struct Session {
     #[doc = "The unique identifier for the session."]
     pub id: uuid::Uuid,
     #[doc = "The session token."]
-    pub session_token: uuid::Uuid,
+    pub session_token: String,
     #[doc = "The date and time the session was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The user ID of the user that the session belongs to."]
@@ -11952,7 +11952,7 @@ impl tabled::Tabled for Session {
             format!("{:?}", self.created_at).into(),
             format!("{:?}", self.expires).into(),
             format!("{:?}", self.id).into(),
-            format!("{:?}", self.session_token).into(),
+            self.session_token.clone().into(),
             format!("{:?}", self.updated_at).into(),
             format!("{:?}", self.user_id).into(),
         ]
