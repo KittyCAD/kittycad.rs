@@ -1621,7 +1621,7 @@ pub struct ApiToken {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
     #[doc = "The API token itself."]
-    pub token: uuid::Uuid,
+    pub token: String,
     #[doc = "The date and time the API token was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The ID of the user that owns the API token."]
@@ -1651,7 +1651,7 @@ impl tabled::Tabled for ApiToken {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.token).into(),
+            self.token.clone().into(),
             format!("{:?}", self.updated_at).into(),
             format!("{:?}", self.user_id).into(),
         ]
@@ -8760,13 +8760,15 @@ pub enum ModelingCmd {
         #[serde(rename = "entity_id2")]
         entity_id_2: uuid::Uuid,
     },
-    #[doc = "Create a linear pattern using this entity."]
+    #[doc = "Create a pattern using this entity by specifying the transform for each desired \
+             repetition."]
     #[serde(rename = "entity_linear_pattern_transform")]
     EntityLinearPatternTransform {
         #[doc = "ID of the entity being copied."]
         entity_id: uuid::Uuid,
-        #[doc = "How to transform each repeated solid. The total number of repetitions equals the \
-                 size of this list."]
+        #[doc = "How to transform each repeated solid. The 0th transform will create the first \
+                 copy of the entity. The total number of (optional) repetitions equals the size \
+                 of this list."]
         transform: Vec<LinearTransform>,
     },
     #[doc = "Create a linear pattern using this entity."]
@@ -8822,6 +8824,15 @@ pub enum ModelingCmd {
         ids: Vec<uuid::Uuid>,
         #[doc = "Point through which the mirror axis passes."]
         point: Point3D,
+    },
+    #[doc = "Mirror the input entities over the specified edge. (Currently only supports sketches)"]
+    #[serde(rename = "entity_mirror_across_edge")]
+    EntityMirrorAcrossEdge {
+        #[doc = "The edge to use as the mirror axis, must be linear and lie in the plane of the \
+                 solid"]
+        edge_id: uuid::Uuid,
+        #[doc = "ID of the mirror entities."]
+        ids: Vec<uuid::Uuid>,
     },
     #[doc = "Enter edit mode"]
     #[serde(rename = "edit_mode_enter")]
@@ -9216,6 +9227,14 @@ pub enum ModelingCmd {
         path_id: uuid::Uuid,
         #[doc = "IDs of the vertices for which to obtain curve ids from"]
         vertex_ids: Vec<uuid::Uuid>,
+    },
+    #[doc = "Obtain curve id by index"]
+    #[serde(rename = "path_get_curve_uuid")]
+    PathGetCurveUuid {
+        #[doc = "IDs of the vertices for which to obtain curve ids from"]
+        index: u32,
+        #[doc = "Which path to query"]
+        path_id: uuid::Uuid,
     },
     #[doc = "Obtain vertex ids for a path"]
     #[serde(rename = "path_get_vertex_uuids")]
@@ -9764,6 +9783,12 @@ pub enum OkModelingCmdResponse {
     PathGetCurveUuidsForVertices {
         #[doc = "The response from the `PathGetCurveUuidsForVertices` command."]
         data: PathGetCurveUuidsForVertices,
+    },
+    #[doc = "The response to the 'PathGetCurveUuid' endpoint"]
+    #[serde(rename = "path_get_curve_uuid")]
+    PathGetCurveUuid {
+        #[doc = "The response from the `PathGetCurveUuid` command."]
+        data: PathGetCurveUuid,
     },
     #[doc = "The response to the 'PathGetVertexUuids' endpoint"]
     #[serde(rename = "path_get_vertex_uuids")]
@@ -10733,6 +10758,37 @@ pub enum PathComponentConstraintType {
     #[serde(rename = "angle_between")]
     #[display("angle_between")]
     AngleBetween,
+}
+
+#[doc = "The response from the `PathGetCurveUuid` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PathGetCurveUuid {
+    #[doc = "The UUID of the curve entity."]
+    pub curve_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for PathGetCurveUuid {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PathGetCurveUuid {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.curve_id).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["curve_id".into()]
+    }
 }
 
 #[doc = "The response from the `PathGetCurveUuidsForVertices` command."]
@@ -12028,7 +12084,7 @@ pub struct ServiceAccount {
     #[doc = "The ID of the organization that owns the API token."]
     pub org_id: uuid::Uuid,
     #[doc = "The API token itself."]
-    pub token: uuid::Uuid,
+    pub token: String,
     #[doc = "The date and time the API token was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
@@ -12057,7 +12113,7 @@ impl tabled::Tabled for ServiceAccount {
                 String::new().into()
             },
             format!("{:?}", self.org_id).into(),
-            format!("{:?}", self.token).into(),
+            self.token.clone().into(),
             format!("{:?}", self.updated_at).into(),
         ]
     }

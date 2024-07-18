@@ -13210,7 +13210,7 @@
             "description": "The API token itself.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/Uuid"
+                "$ref": "#/components/schemas/StringUuid"
               }
             ]
           },
@@ -19384,7 +19384,7 @@
             ]
           },
           {
-            "description": "Create a linear pattern using this entity.",
+            "description": "Create a pattern using this entity by specifying the transform for each desired repetition.",
             "type": "object",
             "properties": {
               "entity_id": {
@@ -19393,7 +19393,7 @@
                 "format": "uuid"
               },
               "transform": {
-                "description": "How to transform each repeated solid. The total number of repetitions equals the size of this list.",
+                "description": "How to transform each repeated solid. The 0th transform will create the first copy of the entity. The total number of (optional) repetitions equals the size of this list.",
                 "type": "array",
                 "items": {
                   "$ref": "#/components/schemas/LinearTransform"
@@ -19604,6 +19604,36 @@
               "axis",
               "ids",
               "point",
+              "type"
+            ]
+          },
+          {
+            "description": "Mirror the input entities over the specified edge. (Currently only supports sketches)",
+            "type": "object",
+            "properties": {
+              "edge_id": {
+                "description": "The edge to use as the mirror axis, must be linear and lie in the plane of the solid",
+                "type": "string",
+                "format": "uuid"
+              },
+              "ids": {
+                "description": "ID of the mirror entities.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_mirror_across_edge"
+                ]
+              }
+            },
+            "required": [
+              "edge_id",
+              "ids",
               "type"
             ]
           },
@@ -20933,6 +20963,34 @@
               "path_id",
               "type",
               "vertex_ids"
+            ]
+          },
+          {
+            "description": "Obtain curve id by index",
+            "type": "object",
+            "properties": {
+              "index": {
+                "description": "IDs of the vertices for which to obtain curve ids from",
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              },
+              "path_id": {
+                "description": "Which path to query",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "path_get_curve_uuid"
+                ]
+              }
+            },
+            "required": [
+              "index",
+              "path_id",
+              "type"
             ]
           },
           {
@@ -22322,6 +22380,25 @@
             ]
           },
           {
+            "description": "The response to the 'PathGetCurveUuid' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/PathGetCurveUuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "path_get_curve_uuid"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
             "description": "The response to the 'PathGetVertexUuids' endpoint",
             "type": "object",
             "properties": {
@@ -23537,6 +23614,20 @@
           "angle_between"
         ]
       },
+      "PathGetCurveUuid": {
+        "description": "The response from the `PathGetCurveUuid` command.",
+        "type": "object",
+        "properties": {
+          "curve_id": {
+            "description": "The UUID of the curve entity.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "curve_id"
+        ]
+      },
       "PathGetCurveUuidsForVertices": {
         "description": "The response from the `PathGetCurveUuidsForVertices` command.",
         "type": "object",
@@ -24559,7 +24650,7 @@
             "description": "The API token itself.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/Uuid"
+                "$ref": "#/components/schemas/StringUuid"
               }
             ]
           },
@@ -24628,7 +24719,7 @@
             "description": "The session token.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/SessionTokenType"
+                "$ref": "#/components/schemas/SessionTokenUuid"
               }
             ]
           },
@@ -24656,7 +24747,7 @@
           "user_id"
         ]
       },
-      "SessionTokenType": {
+      "SessionTokenUuid": {
         "description": "An auth token. A uuid with a prefix of ses-",
         "type": "string"
       },
@@ -24781,6 +24872,10 @@
         "required": [
           "percent_off"
         ]
+      },
+      "StringUuid": {
+        "description": "An auth token. A UUIDv4",
+        "type": "string"
       },
       "SubscriptionTierFeature": {
         "description": "A subscription tier feature.",
