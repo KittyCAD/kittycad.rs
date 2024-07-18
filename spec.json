@@ -24628,7 +24628,7 @@
             "description": "The session token.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/Uuid"
+                "$ref": "#/components/schemas/SessionTokenType"
               }
             ]
           },
@@ -24655,6 +24655,10 @@
           "updated_at",
           "user_id"
         ]
+      },
+      "SessionTokenType": {
+        "description": "An auth token. A uuid with a prefix of ses-",
+        "type": "string"
       },
       "Solid3dGetAllEdgeFaces": {
         "description": "The response from the `Solid3dGetAllEdgeFaces` command.",
