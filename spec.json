@@ -15774,6 +15774,23 @@
           "entity_id"
         ]
       },
+      "EntityGetSketchPaths": {
+        "description": "The response from the `EntityGetSketchPaths` command.",
+        "type": "object",
+        "properties": {
+          "entity_ids": {
+            "description": "The UUIDs of the sketch paths.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "entity_ids"
+        ]
+      },
       "EntityLinearPattern": {
         "description": "The response from the `EntityLinearPattern` command.",
         "type": "object",
@@ -19348,6 +19365,27 @@
             ]
           },
           {
+            "description": "What are all UUIDs of all the paths sketched on top of this entity?",
+            "type": "object",
+            "properties": {
+              "entity_id": {
+                "description": "ID of the entity being queried.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_get_sketch_paths"
+                ]
+              }
+            },
+            "required": [
+              "entity_id",
+              "type"
+            ]
+          },
+          {
             "description": "What is the distance between these two entities?",
             "type": "object",
             "properties": {
@@ -21015,6 +21053,27 @@
             ]
           },
           {
+            "description": "Obtain the sketch target id (if the path was drawn in sketchmode) for a path",
+            "type": "object",
+            "properties": {
+              "path_id": {
+                "description": "Which path to query",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "path_get_sketch_target_uuid"
+                ]
+              }
+            },
+            "required": [
+              "path_id",
+              "type"
+            ]
+          },
+          {
             "description": "Start dragging the mouse.",
             "type": "object",
             "properties": {
@@ -21943,6 +22002,25 @@
             ]
           },
           {
+            "description": "The response to the 'EntityGetSketchPaths' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityGetSketchPaths"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_get_sketch_paths"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
             "description": "The response to the 'ClosePath' endpoint",
             "type": "object",
             "properties": {
@@ -22409,6 +22487,25 @@
                 "type": "string",
                 "enum": [
                   "path_get_vertex_uuids"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'PathGetSketchTargetUuid' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/PathGetSketchTargetUuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "path_get_sketch_target_uuid"
                 ]
               }
             },
@@ -23660,6 +23757,18 @@
         "required": [
           "segments"
         ]
+      },
+      "PathGetSketchTargetUuid": {
+        "description": "The response from the `PathGetSketchTargetUuid` command.",
+        "type": "object",
+        "properties": {
+          "target_id": {
+            "nullable": true,
+            "description": "The UUID of the sketch target.",
+            "type": "string",
+            "format": "uuid"
+          }
+        }
       },
       "PathGetVertexUuids": {
         "description": "The response from the `PathGetVertexUuids` command.",
