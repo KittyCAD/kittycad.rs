@@ -21,7 +21,7 @@ impl Orgs {
     pub async fn get<'a>(&'a self) -> Result<crate::types::Org, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "org"),
+            &format!("{}/{}", self.client.base_url, "org"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -51,7 +51,7 @@ impl Orgs {
     ) -> Result<crate::types::Org, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::PUT,
-            format!("{}/{}", self.client.base_url, "org"),
+            &format!("{}/{}", self.client.base_url, "org"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -82,7 +82,7 @@ impl Orgs {
     ) -> Result<crate::types::Org, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "org"),
+            &format!("{}/{}", self.client.base_url, "org"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -115,7 +115,7 @@ impl Orgs {
     pub async fn delete<'a>(&'a self) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
-            format!("{}/{}", self.client.base_url, "org"),
+            &format!("{}/{}", self.client.base_url, "org"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -142,7 +142,7 @@ impl Orgs {
     ) -> Result<crate::types::OrgMemberResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "org/members"),
+            &format!("{}/{}", self.client.base_url, "org/members"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
@@ -209,7 +209,7 @@ impl Orgs {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
-                                    format!("{}/{}", self.client.base_url, "org/members"),
+                                    &format!("{}/{}", self.client.base_url, "org/members"),
                                 );
                                 req = req.bearer_auth(&self.client.token);
                                 let mut request = req.build()?;
@@ -274,7 +274,7 @@ impl Orgs {
     ) -> Result<crate::types::OrgMember, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "org/members"),
+            &format!("{}/{}", self.client.base_url, "org/members"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -313,7 +313,7 @@ impl Orgs {
     ) -> Result<crate::types::OrgMember, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "org/members/{user_id}".replace("{user_id}", &format!("{}", user_id))
@@ -348,7 +348,7 @@ impl Orgs {
     ) -> Result<crate::types::OrgMember, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::PUT,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "org/members/{user_id}".replace("{user_id}", &format!("{}", user_id))
@@ -391,7 +391,7 @@ impl Orgs {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "org/members/{user_id}".replace("{user_id}", &format!("{}", user_id))
@@ -424,7 +424,7 @@ impl Orgs {
     ) -> Result<crate::types::PrivacySettings, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "org/privacy"),
+            &format!("{}/{}", self.client.base_url, "org/privacy"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -461,7 +461,7 @@ impl Orgs {
     ) -> Result<crate::types::PrivacySettings, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::PUT,
-            format!("{}/{}", self.client.base_url, "org/privacy"),
+            &format!("{}/{}", self.client.base_url, "org/privacy"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -495,7 +495,7 @@ impl Orgs {
     ) -> Result<crate::types::SamlIdentityProvider, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "org/saml/idp"),
+            &format!("{}/{}", self.client.base_url, "org/saml/idp"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -525,7 +525,7 @@ impl Orgs {
     ) -> Result<crate::types::SamlIdentityProvider, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::PUT,
-            format!("{}/{}", self.client.base_url, "org/saml/idp"),
+            &format!("{}/{}", self.client.base_url, "org/saml/idp"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -556,7 +556,7 @@ impl Orgs {
     ) -> Result<crate::types::SamlIdentityProvider, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "org/saml/idp"),
+            &format!("{}/{}", self.client.base_url, "org/saml/idp"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -587,7 +587,7 @@ impl Orgs {
     pub async fn delete_saml_idp<'a>(&'a self) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
-            format!("{}/{}", self.client.base_url, "org/saml/idp"),
+            &format!("{}/{}", self.client.base_url, "org/saml/idp"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -613,7 +613,7 @@ impl Orgs {
     ) -> Result<crate::types::OrgResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "orgs"),
+            &format!("{}/{}", self.client.base_url, "orgs"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
@@ -674,7 +674,7 @@ impl Orgs {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
-                                    format!("{}/{}", self.client.base_url, "orgs"),
+                                    &format!("{}/{}", self.client.base_url, "orgs"),
                                 );
                                 req = req.bearer_auth(&self.client.token);
                                 let mut request = req.build()?;
@@ -727,7 +727,7 @@ impl Orgs {
     ) -> Result<crate::types::Org, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "orgs/{id}".replace("{id}", &format!("{}", id))
@@ -771,7 +771,7 @@ impl Orgs {
     ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::PUT,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "orgs/{id}/enterprise/pricing".replace("{id}", &format!("{}", id))
@@ -810,7 +810,7 @@ impl Orgs {
     ) -> Result<crate::types::UserOrgInfo, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "user/org"),
+            &format!("{}/{}", self.client.base_url, "user/org"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
