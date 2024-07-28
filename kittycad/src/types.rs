@@ -4683,6 +4683,37 @@ impl tabled::Tabled for EntityGetParentId {
     }
 }
 
+#[doc = "The response from the `EntityGetSketchPaths` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityGetSketchPaths {
+    #[doc = "The UUIDs of the sketch paths."]
+    pub entity_ids: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for EntityGetSketchPaths {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityGetSketchPaths {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.entity_ids).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_ids".into()]
+    }
+}
+
 #[doc = "The response from the `EntityLinearPattern` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8748,6 +8779,12 @@ pub enum ModelingCmd {
         #[doc = "ID of the entity being queried."]
         entity_id: uuid::Uuid,
     },
+    #[doc = "What are all UUIDs of all the paths sketched on top of this entity?"]
+    #[serde(rename = "entity_get_sketch_paths")]
+    EntityGetSketchPaths {
+        #[doc = "ID of the entity being queried."]
+        entity_id: uuid::Uuid,
+    },
     #[doc = "What is the distance between these two entities?"]
     #[serde(rename = "entity_get_distance")]
     EntityGetDistance {
@@ -9242,6 +9279,12 @@ pub enum ModelingCmd {
         #[doc = "Which path to query"]
         path_id: uuid::Uuid,
     },
+    #[doc = "Obtain the sketch target id (if the path was drawn in sketchmode) for a path"]
+    #[serde(rename = "path_get_sketch_target_uuid")]
+    PathGetSketchTargetUuid {
+        #[doc = "Which path to query"]
+        path_id: uuid::Uuid,
+    },
     #[doc = "Start dragging the mouse."]
     #[serde(rename = "handle_mouse_drag_start")]
     HandleMouseDragStart {
@@ -9645,6 +9688,12 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `EntityGetAllChildUuids` command."]
         data: EntityGetAllChildUuids,
     },
+    #[doc = "The response to the 'EntityGetSketchPaths' endpoint"]
+    #[serde(rename = "entity_get_sketch_paths")]
+    EntityGetSketchPaths {
+        #[doc = "The response from the `EntityGetSketchPaths` command."]
+        data: EntityGetSketchPaths,
+    },
     #[doc = "The response to the 'ClosePath' endpoint"]
     #[serde(rename = "close_path")]
     ClosePath {
@@ -9795,6 +9844,12 @@ pub enum OkModelingCmdResponse {
     PathGetVertexUuids {
         #[doc = "The response from the `PathGetVertexUuids` command."]
         data: PathGetVertexUuids,
+    },
+    #[doc = "The response to the 'PathGetSketchTargetUuid' endpoint"]
+    #[serde(rename = "path_get_sketch_target_uuid")]
+    PathGetSketchTargetUuid {
+        #[doc = "The response from the `PathGetSketchTargetUuid` command."]
+        data: PathGetSketchTargetUuid,
     },
     #[doc = "The response to the 'CurveGetEndPoints' endpoint"]
     #[serde(rename = "curve_get_end_points")]
@@ -10850,6 +10905,42 @@ impl tabled::Tabled for PathGetInfo {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["segments".into()]
+    }
+}
+
+#[doc = "The response from the `PathGetSketchTargetUuid` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PathGetSketchTargetUuid {
+    #[doc = "The UUID of the sketch target."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub target_id: Option<uuid::Uuid>,
+}
+
+impl std::fmt::Display for PathGetSketchTargetUuid {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PathGetSketchTargetUuid {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![if let Some(target_id) = &self.target_id {
+            format!("{:?}", target_id).into()
+        } else {
+            String::new().into()
+        }]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["target_id".into()]
     }
 }
 

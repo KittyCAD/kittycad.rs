@@ -29,7 +29,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! kittycad = "0.3.8"
+//! kittycad = "0.3.9"
 //! ```
 //!
 //! ## Basic example
@@ -354,7 +354,7 @@ impl Client {
             format!("{}/{}", self.base_url, uri.trim_start_matches('/'))
         };
 
-        let mut req = self.client.request(method, u);
+        let mut req = self.client.request(method, &u);
 
         // Add in our authentication.
         req = req.bearer_auth(&self.token);

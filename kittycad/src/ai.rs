@@ -22,7 +22,7 @@ impl Ai {
     ) -> Result<crate::types::AiPromptResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "ai-prompts"),
+            &format!("{}/{}", self.client.base_url, "ai-prompts"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
@@ -84,7 +84,7 @@ impl Ai {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
-                                    format!("{}/{}", self.client.base_url, "ai-prompts"),
+                                    &format!("{}/{}", self.client.base_url, "ai-prompts"),
                                 );
                                 req = req.bearer_auth(&self.client.token);
                                 let mut request = req.build()?;
@@ -144,7 +144,7 @@ impl Ai {
     ) -> Result<crate::types::AiPrompt, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "ai-prompts/{id}".replace("{id}", &format!("{}", id))
@@ -178,7 +178,7 @@ impl Ai {
     ) -> Result<crate::types::KclCodeCompletionResponse, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "ai/kcl/completions"),
+            &format!("{}/{}", self.client.base_url, "ai/kcl/completions"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -210,7 +210,7 @@ impl Ai {
     ) -> Result<crate::types::TextToCad, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "ai/text-to-cad/{output_format}"
@@ -249,7 +249,7 @@ impl Ai {
     ) -> Result<crate::types::TextToCadResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "user/text-to-cad"),
+            &format!("{}/{}", self.client.base_url, "user/text-to-cad"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
@@ -316,7 +316,7 @@ impl Ai {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
-                                    format!("{}/{}", self.client.base_url, "user/text-to-cad"),
+                                    &format!("{}/{}", self.client.base_url, "user/text-to-cad"),
                                 );
                                 req = req.bearer_auth(&self.client.token);
                                 let mut request = req.build()?;
@@ -378,7 +378,7 @@ impl Ai {
     ) -> Result<crate::types::TextToCad, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "user/text-to-cad/{id}".replace("{id}", &format!("{}", id))
@@ -423,7 +423,7 @@ impl Ai {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "user/text-to-cad/{id}".replace("{id}", &format!("{}", id))

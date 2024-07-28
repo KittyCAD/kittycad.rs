@@ -28,7 +28,7 @@ impl Oauth2 {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "oauth2/device/auth"),
+            &format!("{}/{}", self.client.base_url, "oauth2/device/auth"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.form(body);
@@ -61,7 +61,7 @@ impl Oauth2 {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "oauth2/device/confirm"),
+            &format!("{}/{}", self.client.base_url, "oauth2/device/confirm"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -86,7 +86,7 @@ impl Oauth2 {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "oauth2/device/token"),
+            &format!("{}/{}", self.client.base_url, "oauth2/device/token"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.form(body);
@@ -118,7 +118,7 @@ impl Oauth2 {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "oauth2/device/verify"),
+            &format!("{}/{}", self.client.base_url, "oauth2/device/verify"),
         );
         req = req.bearer_auth(&self.client.token);
         let query_params = vec![("user_code", user_code.to_string())];
@@ -148,7 +148,7 @@ impl Oauth2 {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "oauth2/provider/{provider}/callback"
@@ -208,7 +208,7 @@ impl Oauth2 {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "oauth2/provider/{provider}/callback"
@@ -248,7 +248,7 @@ impl Oauth2 {
     ) -> Result<crate::types::Oauth2ClientInfo, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "oauth2/provider/{provider}/consent"

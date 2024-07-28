@@ -22,7 +22,7 @@ impl ServiceAccounts {
     ) -> Result<crate::types::ServiceAccountResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "org/service-accounts"),
+            &format!("{}/{}", self.client.base_url, "org/service-accounts"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
@@ -84,7 +84,7 @@ impl ServiceAccounts {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
-                                    format!("{}/{}", self.client.base_url, "org/service-accounts"),
+                                    &format!("{}/{}", self.client.base_url, "org/service-accounts"),
                                 );
                                 req = req.bearer_auth(&self.client.token);
                                 let mut request = req.build()?;
@@ -145,7 +145,7 @@ impl ServiceAccounts {
     ) -> Result<crate::types::ServiceAccount, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "org/service-accounts"),
+            &format!("{}/{}", self.client.base_url, "org/service-accounts"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
@@ -181,7 +181,7 @@ impl ServiceAccounts {
     ) -> Result<crate::types::ServiceAccount, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "org/service-accounts/{token}".replace("{token}", &format!("{}", token))
@@ -225,7 +225,7 @@ impl ServiceAccounts {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "org/service-accounts/{token}".replace("{token}", &format!("{}", token))

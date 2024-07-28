@@ -20,7 +20,7 @@ impl Meta {
     pub async fn get_schema<'a>(&'a self) -> Result<serde_json::Value, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, ""),
+            &format!("{}/{}", self.client.base_url, ""),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -54,7 +54,7 @@ impl Meta {
     ) -> Result<crate::types::Metadata, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "_meta/info"),
+            &format!("{}/{}", self.client.base_url, "_meta/info"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -86,7 +86,7 @@ impl Meta {
     ) -> Result<crate::types::IpAddrInfo, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "_meta/ipinfo"),
+            &format!("{}/{}", self.client.base_url, "_meta/ipinfo"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -125,7 +125,7 @@ impl Meta {
     ) -> Result<Vec<String>, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "debug/uploads"),
+            &format!("{}/{}", self.client.base_url, "debug/uploads"),
         );
         req = req.bearer_auth(&self.client.token);
         use std::convert::TryInto;
@@ -163,7 +163,7 @@ impl Meta {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "events"),
+            &format!("{}/{}", self.client.base_url, "events"),
         );
         req = req.bearer_auth(&self.client.token);
         use std::convert::TryInto;
@@ -207,7 +207,7 @@ impl Meta {
     ) -> Result<crate::types::ApiToken, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "internal/discord/api-token/{discord_id}".replace("{discord_id}", discord_id)
@@ -241,7 +241,7 @@ impl Meta {
     pub async fn ping<'a>(&'a self) -> Result<crate::types::Pong, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "ping"),
+            &format!("{}/{}", self.client.base_url, "ping"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -273,7 +273,7 @@ impl Meta {
     > {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "pricing/subscriptions"),
+            &format!("{}/{}", self.client.base_url, "pricing/subscriptions"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
