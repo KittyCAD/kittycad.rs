@@ -48,6 +48,46 @@ impl Angle {
     }
 }
 
+impl std::ops::AddAssign for Angle {
+    fn add_assign(&mut self, rhs: Self) {
+        match self.unit {
+            UnitAngle::Degrees => self.value += rhs.degrees(),
+            UnitAngle::Radians => self.value += rhs.radians(),
+        }
+    }
+}
+
+impl std::ops::Add for Angle {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            unit: UnitAngle::Degrees,
+            value: self.degrees() + rhs.degrees(),
+        }
+    }
+}
+
+impl std::ops::SubAssign for Angle {
+    fn sub_assign(&mut self, rhs: Self) {
+        match self.unit {
+            UnitAngle::Degrees => self.value -= rhs.degrees(),
+            UnitAngle::Radians => self.value -= rhs.radians(),
+        }
+    }
+}
+
+impl std::ops::Sub for Angle {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self {
+            unit: UnitAngle::Degrees,
+            value: self.degrees() - rhs.degrees(),
+        }
+    }
+}
+
 impl From<[f64; 2]> for Point2D {
     fn from([x, y]: [f64; 2]) -> Self {
         Self { x, y }
@@ -295,10 +335,37 @@ impl From<Point3D> for Point2D {
 
 #[cfg(test)]
 mod tests {
+    use std::f64::consts::PI;
+
     use super::*;
 
     #[test]
     fn scaling_points() {
         assert_eq!(Point2D { x: 1.0, y: 1.0 } * 3.0, Point2D { x: 3.0, y: 3.0 });
+    }
+
+    #[test]
+    fn adding_points() {
+        for (mut start, plus, expected) in [
+            (
+                Angle::ZERO,
+                Angle::from_degrees(90.0),
+                Angle::from_degrees(90.0),
+            ),
+            (
+                Angle::from_radians(PI),
+                Angle::from_degrees(180.0),
+                Angle::from_radians(2.0 * PI),
+            ),
+            (
+                Angle::from_radians(PI / 4.0),
+                Angle::from_radians(PI / 4.0),
+                Angle::from_radians(PI / 2.0),
+            ),
+        ] {
+            assert_eq!((start + plus).degrees(), expected.degrees());
+            start += plus;
+            assert_eq!(start.degrees(), expected.degrees());
+        }
     }
 }
