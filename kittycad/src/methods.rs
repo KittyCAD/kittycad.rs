@@ -48,6 +48,46 @@ impl Angle {
     }
 }
 
+impl std::ops::AddAssign for Angle {
+    fn add_assign(&mut self, rhs: Self) {
+        match self.unit {
+            UnitAngle::Degrees => self.value += rhs.degrees(),
+            UnitAngle::Radians => self.value += rhs.radians(),
+        }
+    }
+}
+
+impl std::ops::Add for Angle {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            unit: UnitAngle::Degrees,
+            value: self.degrees() + rhs.degrees(),
+        }
+    }
+}
+
+impl std::ops::SubAssign for Angle {
+    fn sub_assign(&mut self, rhs: Self) {
+        match self.unit {
+            UnitAngle::Degrees => self.value -= rhs.degrees(),
+            UnitAngle::Radians => self.value -= rhs.radians(),
+        }
+    }
+}
+
+impl std::ops::Sub for Angle {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self {
+            unit: UnitAngle::Degrees,
+            value: self.degrees() - rhs.degrees(),
+        }
+    }
+}
+
 impl From<[f64; 2]> for Point2D {
     fn from([x, y]: [f64; 2]) -> Self {
         Self { x, y }
