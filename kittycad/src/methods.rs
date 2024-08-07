@@ -335,10 +335,37 @@ impl From<Point3D> for Point2D {
 
 #[cfg(test)]
 mod tests {
+    use std::f64::consts::PI;
+
     use super::*;
 
     #[test]
     fn scaling_points() {
         assert_eq!(Point2D { x: 1.0, y: 1.0 } * 3.0, Point2D { x: 3.0, y: 3.0 });
+    }
+
+    #[test]
+    fn adding_points() {
+        for (mut start, plus, expected) in [
+            (
+                Angle::ZERO,
+                Angle::from_degrees(90.0),
+                Angle::from_degrees(90.0),
+            ),
+            (
+                Angle::from_radians(PI),
+                Angle::from_degrees(180.0),
+                Angle::from_radians(2.0 * PI),
+            ),
+            (
+                Angle::from_radians(PI / 4.0),
+                Angle::from_radians(PI / 4.0),
+                Angle::from_radians(PI / 2.0),
+            ),
+        ] {
+            assert_eq!((start + plus).degrees(), expected.degrees());
+            start += plus;
+            assert_eq!(start.degrees(), expected.degrees());
+        }
     }
 }
