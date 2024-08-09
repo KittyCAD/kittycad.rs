@@ -17602,6 +17602,11 @@
             "description": "SolidWorks part (SLDPRT) format.",
             "type": "object",
             "properties": {
+              "split_closed_faces": {
+                "description": "Splits all closed faces into two open faces.\n\nDefaults to `false` but is implicitly `true` when importing into the engine.",
+                "default": false,
+                "type": "boolean"
+              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -17617,6 +17622,11 @@
             "description": "ISO 10303-21 (STEP) format.",
             "type": "object",
             "properties": {
+              "split_closed_faces": {
+                "description": "Splits all closed faces into two open faces.\n\nDefaults to `false` but is implicitly `true` when importing into the engine.",
+                "default": false,
+                "type": "boolean"
+              },
               "type": {
                 "type": "string",
                 "enum": [
