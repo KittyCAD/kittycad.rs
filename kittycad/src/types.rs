@@ -6995,10 +6995,20 @@ pub enum InputFormat {
     },
     #[doc = "SolidWorks part (SLDPRT) format."]
     #[serde(rename = "sldprt")]
-    Sldprt {},
+    Sldprt {
+        #[doc = "Splits all closed faces into two open faces.\n\nDefaults to `false` but is \
+                 implicitly `true` when importing into the engine."]
+        #[serde(default)]
+        split_closed_faces: bool,
+    },
     #[doc = "ISO 10303-21 (STEP) format."]
     #[serde(rename = "step")]
-    Step {},
+    Step {
+        #[doc = "Splits all closed faces into two open faces.\n\nDefaults to `false` but is \
+                 implicitly `true` when importing into the engine."]
+        #[serde(default)]
+        split_closed_faces: bool,
+    },
     #[doc = "*ST**ereo**L**ithography format."]
     #[serde(rename = "stl")]
     Stl {
