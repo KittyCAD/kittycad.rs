@@ -506,6 +506,15 @@
             "schema": {
               "$ref": "#/components/schemas/FileExportFormat"
             }
+          },
+          {
+            "in": "query",
+            "name": "kcl",
+            "description": "If we should output the kcl for the model.",
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
+            }
           }
         ],
         "requestBody": {
@@ -12693,6 +12702,13 @@
             "enum": [
               "text_to_cad"
             ]
+          },
+          {
+            "description": "Text to KCL.",
+            "type": "string",
+            "enum": [
+              "text_to_kcl"
+            ]
           }
         ]
       },
@@ -14012,6 +14028,11 @@
             "description": "Text to CAD.",
             "type": "object",
             "properties": {
+              "code": {
+                "nullable": true,
+                "description": "The code for the model. This is optional but will be required in the future once we are at v1.",
+                "type": "string"
+              },
               "completed_at": {
                 "nullable": true,
                 "title": "DateTime",
@@ -14044,6 +14065,14 @@
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Uuid"
+                  }
+                ]
+              },
+              "model": {
+                "description": "The model being used.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/TextToCadModel"
                   }
                 ]
               },
@@ -14111,6 +14140,7 @@
             "required": [
               "created_at",
               "id",
+              "model",
               "model_version",
               "output_format",
               "prompt",
@@ -25288,6 +25318,11 @@
         "description": "A response from a text to CAD prompt.",
         "type": "object",
         "properties": {
+          "code": {
+            "nullable": true,
+            "description": "The code for the model. This is optional but will be required in the future once we are at v1.",
+            "type": "string"
+          },
           "completed_at": {
             "nullable": true,
             "title": "DateTime",
@@ -25320,6 +25355,14 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "model": {
+            "description": "The model being used.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TextToCadModel"
               }
             ]
           },
@@ -25381,6 +25424,7 @@
         "required": [
           "created_at",
           "id",
+          "model",
           "model_version",
           "output_format",
           "prompt",
@@ -25400,6 +25444,25 @@
         },
         "required": [
           "prompt"
+        ]
+      },
+      "TextToCadModel": {
+        "description": "A type of Text-to-CAD model.",
+        "oneOf": [
+          {
+            "description": "CAD.",
+            "type": "string",
+            "enum": [
+              "cad"
+            ]
+          },
+          {
+            "description": "KCL.",
+            "type": "string",
+            "enum": [
+              "kcl"
+            ]
+          }
         ]
       },
       "TextToCadResultsPage": {
