@@ -880,15 +880,16 @@ impl tabled::Tabled for AiPromptResultsPage {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[derive(Default)]
 pub enum AiPromptType {
     #[doc = "Text to CAD."]
     #[serde(rename = "text_to_cad")]
     #[display("text_to_cad")]
-    #[default]
     TextToCad,
+    #[doc = "Text to KCL."]
+    #[serde(rename = "text_to_kcl")]
+    #[display("text_to_kcl")]
+    TextToKcl,
 }
-
 
 #[doc = "An angle, with a specific unit."]
 #[derive(
@@ -2096,6 +2097,10 @@ pub enum AsyncApiCallOutput {
     #[doc = "Text to CAD."]
     #[serde(rename = "text_to_cad")]
     TextToCad {
+        #[doc = "The code for the model. This is optional but will be required in the future once \
+                 we are at v1."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        code: Option<String>,
         #[doc = "The time and date the API call was completed."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -2109,6 +2114,8 @@ pub enum AsyncApiCallOutput {
         feedback: Option<AiFeedback>,
         #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
+        #[doc = "The model being used."]
+        model: TextToCadModel,
         #[doc = "The version of the model."]
         model_version: String,
         #[doc = "The output format of the model."]
@@ -12906,6 +12913,10 @@ impl tabled::Tabled for TakeSnapshot {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct TextToCad {
+    #[doc = "The code for the model. This is optional but will be required in the future once we \
+             are at v1."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
     #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -12919,6 +12930,8 @@ pub struct TextToCad {
     pub feedback: Option<AiFeedback>,
     #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
+    #[doc = "The model being used."]
+    pub model: TextToCadModel,
     #[doc = "The version of the model."]
     pub model_version: String,
     #[doc = "The output format of the model."]
@@ -12952,9 +12965,14 @@ impl std::fmt::Display for TextToCad {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TextToCad {
-    const LENGTH: usize = 13;
+    const LENGTH: usize = 15;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(code) = &self.code {
+                format!("{:?}", code).into()
+            } else {
+                String::new().into()
+            },
             if let Some(completed_at) = &self.completed_at {
                 format!("{:?}", completed_at).into()
             } else {
@@ -12972,6 +12990,7 @@ impl tabled::Tabled for TextToCad {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
+            format!("{:?}", self.model).into(),
             self.model_version.clone().into(),
             format!("{:?}", self.output_format).into(),
             if let Some(outputs) = &self.outputs {
@@ -12993,11 +13012,13 @@ impl tabled::Tabled for TextToCad {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "code".into(),
             "completed_at".into(),
             "created_at".into(),
             "error".into(),
             "feedback".into(),
             "id".into(),
+            "model".into(),
             "model_version".into(),
             "output_format".into(),
             "outputs".into(),
@@ -13039,6 +13060,31 @@ impl tabled::Tabled for TextToCadCreateBody {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["prompt".into()]
     }
+}
+
+#[doc = "A type of Text-to-CAD model."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum TextToCadModel {
+    #[doc = "CAD."]
+    #[serde(rename = "cad")]
+    #[display("cad")]
+    Cad,
+    #[doc = "KCL."]
+    #[serde(rename = "kcl")]
+    #[display("kcl")]
+    Kcl,
 }
 
 #[doc = "A single page of results"]
