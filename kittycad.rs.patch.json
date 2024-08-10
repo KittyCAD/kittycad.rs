@@ -4,7 +4,7 @@
     "path": "/info/x-rust",
     "value": {
       "client": "// Authenticate via an API token.\nlet client = kittycad::Client::new(\"$TOKEN\");\n\n// - OR -\n\n// Authenticate with your token and host parsed from the environment variables:\n// `KITTYCAD_API_TOKEN`.\nlet client = kittycad::Client::new_from_env();",
-      "install": "[dependencies]\nkittycad = \"0.3.10\""
+      "install": "[dependencies]\nkittycad = \"0.3.11\""
     }
   },
   {
@@ -59,7 +59,7 @@
     "op": "add",
     "path": "/paths/~1ai~1text-to-cad~1{output_format}/post/x-rust",
     "value": {
-      "example": "/// Generate a CAD model from text.\n/// \n/// Because our source of truth for the resulting model is a STEP file, you will always have STEP file contents when you list your generated models. Any other formats you request here will also be returned when you list your generated models.\n/// This operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// One thing to note, if you hit the cache, this endpoint will return right away. So you only have to wait if the status is not `Completed` or `Failed`.\n/// \n/// **Parameters:**\n/// \n/// - `output_format: crate::types::FileExportFormat`: The format the output file should be converted to. (required)\nasync fn example_ai_create_text_to_cad() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCad = client\n        .ai()\n        .create_text_to_cad(\n            kittycad::types::FileExportFormat::Stl,\n            &kittycad::types::TextToCadCreateBody {\n                prompt: \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Generate a CAD model from text.\n/// \n/// Because our source of truth for the resulting model is a STEP file, you will always have STEP file contents when you list your generated models. Any other formats you request here will also be returned when you list your generated models.\n/// This operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n/// One thing to note, if you hit the cache, this endpoint will return right away. So you only have to wait if the status is not `Completed` or `Failed`.\n/// \n/// **Parameters:**\n/// \n/// - `kcl: Option<bool>`: If we should output the kcl for the model.\n/// - `output_format: crate::types::FileExportFormat`: The format the output file should be converted to. (required)\nasync fn example_ai_create_text_to_cad() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCad = client\n        .ai()\n        .create_text_to_cad(\n            Some(false),\n            kittycad::types::FileExportFormat::Stl,\n            &kittycad::types::TextToCadCreateBody {\n                prompt: \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ai/struct.Ai.html#method.create_text_to_cad"
     }
   },

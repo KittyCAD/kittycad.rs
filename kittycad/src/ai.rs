@@ -201,10 +201,11 @@ impl Ai {
         }
     }
 
-    #[doc = "Generate a CAD model from text.\n\nBecause our source of truth for the resulting model is a STEP file, you will always have STEP file contents when you list your generated models. Any other formats you request here will also be returned when you list your generated models.\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nOne thing to note, if you hit the cache, this endpoint will return right away. So you only have to wait if the status is not `Completed` or `Failed`.\n\n**Parameters:**\n\n- `output_format: crate::types::FileExportFormat`: The format the output file should be converted to. (required)\n\n```rust,no_run\nasync fn example_ai_create_text_to_cad() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCad = client\n        .ai()\n        .create_text_to_cad(\n            kittycad::types::FileExportFormat::Stl,\n            &kittycad::types::TextToCadCreateBody {\n                prompt: \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Generate a CAD model from text.\n\nBecause our source of truth for the resulting model is a STEP file, you will always have STEP file contents when you list your generated models. Any other formats you request here will also be returned when you list your generated models.\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nOne thing to note, if you hit the cache, this endpoint will return right away. So you only have to wait if the status is not `Completed` or `Failed`.\n\n**Parameters:**\n\n- `kcl: Option<bool>`: If we should output the kcl for the model.\n- `output_format: crate::types::FileExportFormat`: The format the output file should be converted to. (required)\n\n```rust,no_run\nasync fn example_ai_create_text_to_cad() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCad = client\n        .ai()\n        .create_text_to_cad(\n            Some(false),\n            kittycad::types::FileExportFormat::Stl,\n            &kittycad::types::TextToCadCreateBody {\n                prompt: \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_text_to_cad<'a>(
         &'a self,
+        kcl: Option<bool>,
         output_format: crate::types::FileExportFormat,
         body: &crate::types::TextToCadCreateBody,
     ) -> Result<crate::types::TextToCad, crate::types::error::Error> {
@@ -218,6 +219,12 @@ impl Ai {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = kcl {
+            query_params.push(("kcl", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         req = req.json(body);
         let resp = req.send().await?;
         let status = resp.status();
