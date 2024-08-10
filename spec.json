@@ -197,7 +197,7 @@
     "/ai-prompts": {
       "get": {
         "tags": [
-          "ai",
+          "ml",
           "hidden"
         ],
         "summary": "List all AI prompts.",
@@ -292,7 +292,7 @@
     "/ai-prompts/{id}": {
       "get": {
         "tags": [
-          "ai",
+          "ml",
           "hidden"
         ],
         "summary": "Get an AI prompt.",
@@ -367,7 +367,7 @@
     "/ai/kcl/completions": {
       "post": {
         "tags": [
-          "ai",
+          "ml",
           "beta"
         ],
         "summary": "Generate code completions for KCL.",
@@ -492,7 +492,7 @@
     "/ai/text-to-cad/{output_format}": {
       "post": {
         "tags": [
-          "ai"
+          "ml"
         ],
         "summary": "Generate a CAD model from text.",
         "description": "Because our source of truth for the resulting model is a STEP file, you will always have STEP file contents when you list your generated models. Any other formats you request here will also be returned when you list your generated models.\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nOne thing to note, if you hit the cache, this endpoint will return right away. So you only have to wait if the status is not `Completed` or `Failed`.",
@@ -11326,7 +11326,7 @@
     "/user/text-to-cad": {
       "get": {
         "tags": [
-          "ai"
+          "ml"
         ],
         "summary": "List text-to-CAD models you've generated.",
         "description": "This will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD models for the authenticated user.\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.",
@@ -11429,7 +11429,7 @@
     "/user/text-to-cad/{id}": {
       "get": {
         "tags": [
-          "ai"
+          "ml"
         ],
         "summary": "Get a text-to-CAD response.",
         "description": "This endpoint requires authentication by any Zoo user. The user must be the owner of the text-to-CAD model.",
@@ -11501,7 +11501,7 @@
       },
       "post": {
         "tags": [
-          "ai"
+          "ml"
         ],
         "summary": "Give feedback to a specific text-to-CAD response.",
         "description": "This endpoint requires authentication by any Zoo user. The user must be the owner of the text-to-CAD model, in order to give feedback.",
@@ -12608,7 +12608,12 @@
           },
           "metadata": {
             "nullable": true,
-            "description": "The metadata for the prompt."
+            "description": "The metadata for the prompt.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AiPromptMetadata"
+              }
+            ]
           },
           "model_version": {
             "description": "The version of the model.",
@@ -12671,6 +12676,17 @@
           "updated_at",
           "user_id"
         ]
+      },
+      "AiPromptMetadata": {
+        "description": "Metadata for an AI prompt.",
+        "type": "object",
+        "properties": {
+          "code": {
+            "nullable": true,
+            "description": "Code for the model.",
+            "type": "string"
+          }
+        }
       },
       "AiPromptResultsPage": {
         "description": "A single page of results",
@@ -28167,13 +28183,6 @@
   },
   "tags": [
     {
-      "name": "ai",
-      "description": "AI uses machine learning to generate CAD models.",
-      "externalDocs": {
-        "url": "https://zoo.dev/docs/api/ai"
-      }
-    },
-    {
       "name": "api-calls",
       "description": "API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.",
       "externalDocs": {
@@ -28234,6 +28243,13 @@
       "description": "Meta information about the API.",
       "externalDocs": {
         "url": "https://zoo.dev/docs/api/meta"
+      }
+    },
+    {
+      "name": "ml",
+      "description": "Machine learning to generate CAD models and other things.",
+      "externalDocs": {
+        "url": "https://zoo.dev/docs/api/ml"
       }
     },
     {
