@@ -29,7 +29,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! kittycad = "0.3.11"
+//! kittycad = "0.3.12"
 //! ```
 //!
 //! ## Basic example
@@ -59,11 +59,6 @@
 #![allow(clippy::needless_lifetimes)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
-/// AI uses machine learning to generate CAD models.
-///
-/// FROM: <https://zoo.dev/docs/api/ai>
-#[cfg(feature = "requests")]
-pub mod ai;
 /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
 ///
 /// FROM: <https://zoo.dev/docs/api/api-calls>
@@ -100,6 +95,11 @@ pub mod hidden;
 #[cfg(feature = "requests")]
 pub mod meta;
 mod methods;
+/// Machine learning to generate CAD models and other things.
+///
+/// FROM: <https://zoo.dev/docs/api/ml>
+#[cfg(feature = "requests")]
+pub mod ml;
 /// Modeling API for updating your 3D files using the Zoo engine.
 ///
 /// FROM: <https://zoo.dev/docs/api/modeling>
@@ -376,13 +376,6 @@ impl Client {
         Ok(RequestBuilder(req))
     }
 
-    /// AI uses machine learning to generate CAD models.
-    ///
-    /// FROM: <https://zoo.dev/docs/api/ai>
-    pub fn ai(&self) -> ai::Ai {
-        ai::Ai::new(self.clone())
-    }
-
     /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
     ///
     /// FROM: <https://zoo.dev/docs/api/api-calls>
@@ -430,6 +423,13 @@ impl Client {
     /// FROM: <https://zoo.dev/docs/api/meta>
     pub fn meta(&self) -> meta::Meta {
         meta::Meta::new(self.clone())
+    }
+
+    /// Machine learning to generate CAD models and other things.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/ml>
+    pub fn ml(&self) -> ml::Ml {
+        ml::Ml::new(self.clone())
     }
 
     /// Modeling API for updating your 3D files using the Zoo engine.

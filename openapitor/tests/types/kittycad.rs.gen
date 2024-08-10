@@ -692,7 +692,7 @@ pub struct AiPrompt {
     pub id: uuid::Uuid,
     #[doc = "The metadata for the prompt."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<serde_json::Value>,
+    pub metadata: Option<AiPromptMetadata>,
     #[doc = "The version of the model."]
     pub model_version: String,
     #[doc = "The output file. In the case of TextToCad this is a link to a file in a GCP bucket."]
@@ -787,6 +787,42 @@ impl tabled::Tabled for AiPrompt {
             "updated_at".into(),
             "user_id".into(),
         ]
+    }
+}
+
+#[doc = "Metadata for an AI prompt."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AiPromptMetadata {
+    #[doc = "Code for the model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
+}
+
+impl std::fmt::Display for AiPromptMetadata {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AiPromptMetadata {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![if let Some(code) = &self.code {
+            format!("{:?}", code).into()
+        } else {
+            String::new().into()
+        }]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["code".into()]
     }
 }
 
