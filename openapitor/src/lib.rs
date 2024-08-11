@@ -354,7 +354,6 @@ pub fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     }
 
     // Save the types, now that we've run the functions.
-    //, )
     let mut typesrs = src.clone();
     typesrs.push("types.rs");
     crate::save(

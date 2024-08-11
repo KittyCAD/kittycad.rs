@@ -573,6 +573,10 @@ impl TypeSpace {
                 },
                 data,
             );
+        } else if !any.one_of.is_empty() {
+            return self.render_one_of(name, &any.one_of, data);
+        } else if !any.all_of.is_empty() {
+            return self.render_all_of(name, &any.all_of, data);
         }
 
         // This is a serde_json::Value.
