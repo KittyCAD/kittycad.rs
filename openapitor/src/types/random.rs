@@ -39,61 +39,61 @@ impl Random for uuid::Uuid {
 
 impl Random for i8 {
     fn random() -> Result<Self> {
-        Ok(generator().gen_range(std::i8::MIN..std::i8::MAX))
+        Ok(generator().gen_range(i8::MIN..i8::MAX))
     }
 }
 
 impl Random for i16 {
     fn random() -> Result<Self> {
-        Ok(generator().gen_range(std::i16::MIN..std::i16::MAX))
+        Ok(generator().gen_range(i16::MIN..i16::MAX))
     }
 }
 
 impl Random for i32 {
     fn random() -> Result<Self> {
-        Ok(generator().gen_range(std::i32::MIN..std::i32::MAX))
+        Ok(generator().gen_range(i32::MIN..i32::MAX))
     }
 }
 
 impl Random for i64 {
     fn random() -> Result<Self> {
-        Ok(generator().gen_range(std::i64::MIN..std::i64::MAX))
+        Ok(generator().gen_range(i64::MIN..i64::MAX))
     }
 }
 
 impl Random for f32 {
     fn random() -> Result<Self> {
-        Ok(generator().gen_range(0.0..std::f32::MAX))
+        Ok(generator().gen_range(0.0..f32::MAX))
     }
 }
 
 impl Random for f64 {
     fn random() -> Result<Self> {
-        Ok(generator().gen_range(0.0..std::f64::MAX))
+        Ok(generator().gen_range(0.0..f64::MAX))
     }
 }
 
 impl Random for u8 {
     fn random() -> Result<Self> {
-        Ok(generator().gen_range(std::u8::MIN..std::u8::MAX))
+        Ok(generator().gen_range(u8::MIN..u8::MAX))
     }
 }
 
 impl Random for u16 {
     fn random() -> Result<Self> {
-        Ok(generator().gen_range(std::u16::MIN..std::u16::MAX))
+        Ok(generator().gen_range(u16::MIN..u16::MAX))
     }
 }
 
 impl Random for u32 {
     fn random() -> Result<Self> {
-        Ok(generator().gen_range(std::u32::MIN..std::u32::MAX))
+        Ok(generator().gen_range(u32::MIN..u32::MAX))
     }
 }
 
 impl Random for u64 {
     fn random() -> Result<Self> {
-        Ok(generator().gen_range(std::u64::MIN..std::u64::MAX))
+        Ok(generator().gen_range(u64::MIN..u64::MAX))
     }
 }
 

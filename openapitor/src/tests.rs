@@ -66,7 +66,7 @@ fn test_kittycad_generation(ctx: &mut TestContext) {
     // Move each file over.
     while let Some(Ok(entry)) = assets_dir_contents.next() {
         let dest = assets_dir.join(entry.file_name());
-        std::fs::copy(&entry.path(), &dest).unwrap();
+        std::fs::copy(entry.path(), &dest).unwrap();
     }
 
     // Generate the library.
