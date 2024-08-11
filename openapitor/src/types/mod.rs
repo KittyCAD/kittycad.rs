@@ -860,6 +860,12 @@ impl TypeSpace {
                 get_type_name_from_reference(&v.reference()?, &self.spec, true)?
             };
 
+            if type_name.rendered()? == struct_name.to_string() {
+                // We have a self reference.
+                // We need to box it.
+                type_name = quote!(Box<#type_name>);
+            }
+
             // Check if this type is required.
             let required = o.required.contains(k)
                 || is_default_property(&type_name, &inner_schema.schema_data)?;
