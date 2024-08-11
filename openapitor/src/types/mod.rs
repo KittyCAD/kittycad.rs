@@ -1485,16 +1485,22 @@ pub fn get_type_name_for_schema(
                     )),
                 };
                 return get_type_name_for_schema(name, &obj, spec, in_crate);
-            } else if any.all_of.len() == 1 {
-                if let openapiv3::ReferenceOr::Item(i) = &any.all_of[0] {
-                    return get_type_name_for_schema(name, i, spec, in_crate);
-                } else {
-                    return get_type_name_from_reference(
-                        &any.all_of[0].reference()?,
-                        spec,
-                        in_crate,
-                    );
-                }
+            } else if !any.one_of.is_empty() {
+                let one_of = openapiv3::Schema {
+                    schema_data: schema.schema_data.clone(),
+                    schema_kind: openapiv3::SchemaKind::OneOf {
+                        one_of: any.one_of.clone(),
+                    },
+                };
+                return get_type_name_for_schema(name, &one_of, spec, in_crate);
+            } else if !any.all_of.is_empty() {
+                let all_of = openapiv3::Schema {
+                    schema_data: schema.schema_data.clone(),
+                    schema_kind: openapiv3::SchemaKind::AllOf {
+                        all_of: any.all_of.clone(),
+                    },
+                };
+                return get_type_name_for_schema(name, &all_of, spec, in_crate);
             }
             log::warn!("got any schema kind `{}`: {:?}", name, any);
             quote!(serde_json::Value)
