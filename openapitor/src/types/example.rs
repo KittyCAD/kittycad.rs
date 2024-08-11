@@ -129,6 +129,7 @@ pub fn generate_example_json_from_schema(
                     "partial-date-time" => {
                         serde_json::Value::String(chrono::NaiveDateTime::random()?.to_string())
                     }
+                    "id" => serde_json::Value::String(uuid::Uuid::random()?.to_string()),
                     f => {
                         anyhow::bail!("XXX unknown string format {}", f)
                     }
@@ -384,6 +385,9 @@ pub fn generate_example_rust_from_schema(
                         "partial-date-time" => {
                             quote!(chrono::Utc::now().naive_utc())
                         }
+                        "id" => quote!(uuid::Uuid::from_str(
+                            "d9797f8d-9ad6-4e08-90d7-2ec17e13471c"
+                        )?),
                         f => {
                             anyhow::bail!("XXX unknown string format {}", f)
                         }
@@ -744,7 +748,7 @@ pub fn generate_example_rust_from_schema(
                         {
                             // Remove the tag from the object.
                             let mut properties = o.properties.clone();
-                            properties.remove(tag);
+                            properties.shift_remove(tag);
                             let o = openapiv3::ObjectType {
                                 properties,
                                 required: o.required.clone(),

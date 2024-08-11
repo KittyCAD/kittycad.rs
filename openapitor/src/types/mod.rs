@@ -1485,6 +1485,16 @@ pub fn get_type_name_for_schema(
                     )),
                 };
                 return get_type_name_for_schema(name, &obj, spec, in_crate);
+            } else if any.all_of.len() == 1 {
+                if let openapiv3::ReferenceOr::Item(i) = &any.all_of[0] {
+                    return get_type_name_for_schema(name, i, spec, in_crate);
+                } else {
+                    return get_type_name_from_reference(
+                        &any.all_of[0].reference()?,
+                        spec,
+                        in_crate,
+                    );
+                }
             }
             log::warn!("got any schema kind `{}`: {:?}", name, any);
             quote!(serde_json::Value)
@@ -1565,6 +1575,7 @@ fn get_type_name_for_string(
             "date-time" => quote!(chrono::DateTime<chrono::Utc>),
             "partial-date-time" => quote!(chrono::NaiveDateTime),
             "money-usd" => quote!(bigdecimal::BigDecimal),
+            "id" => quote!(String),
             f => {
                 anyhow::bail!("XXX unknown string format {}", f)
             }
@@ -1833,7 +1844,7 @@ fn render_enum_object_internal(
                 &schema.expand(spec)?.schema_kind
             {
                 let mut modified_properties = o.properties.clone();
-                modified_properties.remove(ignore_key);
+                modified_properties.shift_remove(ignore_key);
                 // Check if we have the same properties.
                 if modified_properties == existing.properties {
                     // We have the same properties.
