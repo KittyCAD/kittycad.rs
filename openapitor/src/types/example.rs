@@ -385,9 +385,7 @@ pub fn generate_example_rust_from_schema(
                         "partial-date-time" => {
                             quote!(chrono::Utc::now().naive_utc())
                         }
-                        "id" => quote!(uuid::Uuid::from_str(
-                            "d9797f8d-9ad6-4e08-90d7-2ec17e13471c"
-                        )?),
+                        "id" => quote!("d9797f8d-9ad6-4e08-90d7-2ec17e13471c"),
                         f => {
                             anyhow::bail!("XXX unknown string format {}", f)
                         }
