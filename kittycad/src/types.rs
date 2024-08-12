@@ -9703,329 +9703,329 @@ pub enum OkModelingCmdResponse {
     #[serde(rename = "export")]
     Export {
         #[doc = "The response from the `Export` endpoint."]
-        data: Box<Export>,
+        data: Export,
     },
     #[doc = "The response to the 'SelectWithPoint' endpoint"]
     #[serde(rename = "select_with_point")]
     SelectWithPoint {
         #[doc = "The response from the `SelectWithPoint` command."]
-        data: Box<SelectWithPoint>,
+        data: SelectWithPoint,
     },
     #[doc = "The response to the 'HighlightSetEntity' endpoint"]
     #[serde(rename = "highlight_set_entity")]
     HighlightSetEntity {
         #[doc = "The response from the `HighlightSetEntity` command."]
-        data: Box<HighlightSetEntity>,
+        data: HighlightSetEntity,
     },
     #[doc = "The response to the 'EntityGetChildUuid' endpoint"]
     #[serde(rename = "entity_get_child_uuid")]
     EntityGetChildUuid {
         #[doc = "The response from the `EntityGetChildUuid` command."]
-        data: Box<EntityGetChildUuid>,
+        data: EntityGetChildUuid,
     },
     #[doc = "The response to the 'EntityGetNumChildren' endpoint"]
     #[serde(rename = "entity_get_num_children")]
     EntityGetNumChildren {
         #[doc = "The response from the `EntityGetNumChildren` command."]
-        data: Box<EntityGetNumChildren>,
+        data: EntityGetNumChildren,
     },
     #[doc = "The response to the 'EntityGetParentId' endpoint"]
     #[serde(rename = "entity_get_parent_id")]
     EntityGetParentId {
         #[doc = "The response from the `EntityGetParentId` command."]
-        data: Box<EntityGetParentId>,
+        data: EntityGetParentId,
     },
     #[doc = "The response to the 'EntityGetAllChildUuids' endpoint"]
     #[serde(rename = "entity_get_all_child_uuids")]
     EntityGetAllChildUuids {
         #[doc = "The response from the `EntityGetAllChildUuids` command."]
-        data: Box<EntityGetAllChildUuids>,
+        data: EntityGetAllChildUuids,
     },
     #[doc = "The response to the 'EntityGetSketchPaths' endpoint"]
     #[serde(rename = "entity_get_sketch_paths")]
     EntityGetSketchPaths {
         #[doc = "The response from the `EntityGetSketchPaths` command."]
-        data: Box<EntityGetSketchPaths>,
+        data: EntityGetSketchPaths,
     },
     #[doc = "The response to the 'ClosePath' endpoint"]
     #[serde(rename = "close_path")]
     ClosePath {
         #[doc = "The response from the `ClosePath` command."]
-        data: Box<ClosePath>,
+        data: ClosePath,
     },
     #[doc = "The response to the 'CameraDragMove' endpoint"]
     #[serde(rename = "camera_drag_move")]
     CameraDragMove {
         #[doc = "The response from the `CameraDragMove` command. Note this is an \"unreliable\" \
                  channel message, so this data may need more data like a \"sequence\""]
-        data: Box<CameraDragMove>,
+        data: CameraDragMove,
     },
     #[doc = "The response to the 'CameraDragEnd' endpoint"]
     #[serde(rename = "camera_drag_end")]
     CameraDragEnd {
         #[doc = "The response from the `CameraDragEnd` command."]
-        data: Box<CameraDragEnd>,
+        data: CameraDragEnd,
     },
     #[doc = "The response to the 'DefaultCameraGetSettings' endpoint"]
     #[serde(rename = "default_camera_get_settings")]
     DefaultCameraGetSettings {
         #[doc = "The response from the `DefaultCameraGetSettings` command."]
-        data: Box<DefaultCameraGetSettings>,
+        data: DefaultCameraGetSettings,
     },
     #[doc = "The response to the 'DefaultCameraZoom' endpoint"]
     #[serde(rename = "default_camera_zoom")]
     DefaultCameraZoom {
         #[doc = "The response from the `DefaultCameraZoom` command."]
-        data: Box<DefaultCameraZoom>,
+        data: DefaultCameraZoom,
     },
     #[doc = "The response to the 'ZoomToFit' endpoint"]
     #[serde(rename = "zoom_to_fit")]
     ZoomToFit {
         #[doc = "The response from the `ZoomToFit` command."]
-        data: Box<ZoomToFit>,
+        data: ZoomToFit,
     },
     #[doc = "The response to the 'ViewIsometric' endpoint"]
     #[serde(rename = "view_isometric")]
     ViewIsometric {
         #[doc = "The response from the `ViewIsometric` command."]
-        data: Box<ViewIsometric>,
+        data: ViewIsometric,
     },
     #[doc = "The response to the 'GetNumObjects' endpoint"]
     #[serde(rename = "get_num_objects")]
     GetNumObjects {
         #[doc = "The response from the `GetNumObjects` command."]
-        data: Box<GetNumObjects>,
+        data: GetNumObjects,
     },
     #[doc = "The response to the 'DefaultCameraFocusOn' endpoint"]
     #[serde(rename = "default_camera_focus_on")]
     DefaultCameraFocusOn {
         #[doc = "The response from the `DefaultCameraFocusOn` command."]
-        data: Box<DefaultCameraFocusOn>,
+        data: DefaultCameraFocusOn,
     },
     #[doc = "The response to the 'SelectGet' endpoint"]
     #[serde(rename = "select_get")]
     SelectGet {
         #[doc = "The response from the `SelectGet` command."]
-        data: Box<SelectGet>,
+        data: SelectGet,
     },
     #[doc = "The response to the 'Solid3dGetAllEdgeFaces' endpoint"]
     #[serde(rename = "solid3d_get_all_edge_faces")]
     Solid3DGetAllEdgeFaces {
         #[doc = "The response from the `Solid3dGetAllEdgeFaces` command."]
-        data: Box<Solid3DGetAllEdgeFaces>,
+        data: Solid3DGetAllEdgeFaces,
     },
     #[doc = "The response to the 'Solid3dGetAllOppositeEdges' endpoint"]
     #[serde(rename = "solid3d_get_all_opposite_edges")]
     Solid3DGetAllOppositeEdges {
         #[doc = "The response from the `Solid3dGetAllOppositeEdges` command."]
-        data: Box<Solid3DGetAllOppositeEdges>,
+        data: Solid3DGetAllOppositeEdges,
     },
     #[doc = "The response to the 'Solid3dGetOppositeEdge' endpoint"]
     #[serde(rename = "solid3d_get_opposite_edge")]
     Solid3DGetOppositeEdge {
         #[doc = "The response from the `Solid3dGetOppositeEdge` command."]
-        data: Box<Solid3DGetOppositeEdge>,
+        data: Solid3DGetOppositeEdge,
     },
     #[doc = "The response to the 'Solid3dGetNextAdjacentEdge' endpoint"]
     #[serde(rename = "solid3d_get_next_adjacent_edge")]
     Solid3DGetNextAdjacentEdge {
         #[doc = "The response from the `Solid3dGetNextAdjacentEdge` command."]
-        data: Box<Solid3DGetNextAdjacentEdge>,
+        data: Solid3DGetNextAdjacentEdge,
     },
     #[doc = "The response to the 'Solid3dGetPrevAdjacentEdge' endpoint"]
     #[serde(rename = "solid3d_get_prev_adjacent_edge")]
     Solid3DGetPrevAdjacentEdge {
         #[doc = "The response from the `Solid3dGetPrevAdjacentEdge` command."]
-        data: Box<Solid3DGetPrevAdjacentEdge>,
+        data: Solid3DGetPrevAdjacentEdge,
     },
     #[doc = "The response to the 'GetEntityType' endpoint"]
     #[serde(rename = "get_entity_type")]
     GetEntityType {
         #[doc = "The response from the `GetEntityType` command."]
-        data: Box<GetEntityType>,
+        data: GetEntityType,
     },
     #[doc = "The response to the 'CurveGetControlPoints' endpoint"]
     #[serde(rename = "curve_get_control_points")]
     CurveGetControlPoints {
         #[doc = "The response from the `CurveGetControlPoints` command."]
-        data: Box<CurveGetControlPoints>,
+        data: CurveGetControlPoints,
     },
     #[doc = "The response to the 'CurveGetType' endpoint"]
     #[serde(rename = "curve_get_type")]
     CurveGetType {
         #[doc = "The response from the `CurveGetType` command."]
-        data: Box<CurveGetType>,
+        data: CurveGetType,
     },
     #[doc = "The response to the 'MouseClick' endpoint"]
     #[serde(rename = "mouse_click")]
     MouseClick {
         #[doc = "The response from the `MouseClick` command."]
-        data: Box<MouseClick>,
+        data: MouseClick,
     },
     #[doc = "The response to the 'TakeSnapshot' endpoint"]
     #[serde(rename = "take_snapshot")]
     TakeSnapshot {
         #[doc = "The response from the `TakeSnapshot` command."]
-        data: Box<TakeSnapshot>,
+        data: TakeSnapshot,
     },
     #[doc = "The response to the 'PathGetInfo' endpoint"]
     #[serde(rename = "path_get_info")]
     PathGetInfo {
         #[doc = "The response from the `PathGetInfo` command."]
-        data: Box<PathGetInfo>,
+        data: PathGetInfo,
     },
     #[doc = "The response to the 'PathSegmentInfo' endpoint"]
     #[serde(rename = "path_segment_info")]
     PathSegmentInfo {
         #[doc = "Info about a path segment"]
-        data: Box<PathSegmentInfo>,
+        data: PathSegmentInfo,
     },
     #[doc = "The response to the 'PathGetCurveUuidsForVertices' endpoint"]
     #[serde(rename = "path_get_curve_uuids_for_vertices")]
     PathGetCurveUuidsForVertices {
         #[doc = "The response from the `PathGetCurveUuidsForVertices` command."]
-        data: Box<PathGetCurveUuidsForVertices>,
+        data: PathGetCurveUuidsForVertices,
     },
     #[doc = "The response to the 'PathGetCurveUuid' endpoint"]
     #[serde(rename = "path_get_curve_uuid")]
     PathGetCurveUuid {
         #[doc = "The response from the `PathGetCurveUuid` command."]
-        data: Box<PathGetCurveUuid>,
+        data: PathGetCurveUuid,
     },
     #[doc = "The response to the 'PathGetVertexUuids' endpoint"]
     #[serde(rename = "path_get_vertex_uuids")]
     PathGetVertexUuids {
         #[doc = "The response from the `PathGetVertexUuids` command."]
-        data: Box<PathGetVertexUuids>,
+        data: PathGetVertexUuids,
     },
     #[doc = "The response to the 'PathGetSketchTargetUuid' endpoint"]
     #[serde(rename = "path_get_sketch_target_uuid")]
     PathGetSketchTargetUuid {
         #[doc = "The response from the `PathGetSketchTargetUuid` command."]
-        data: Box<PathGetSketchTargetUuid>,
+        data: PathGetSketchTargetUuid,
     },
     #[doc = "The response to the 'CurveGetEndPoints' endpoint"]
     #[serde(rename = "curve_get_end_points")]
     CurveGetEndPoints {
         #[doc = "Endpoints of a curve"]
-        data: Box<CurveGetEndPoints>,
+        data: CurveGetEndPoints,
     },
     #[doc = "The response to the 'FaceIsPlanar' endpoint"]
     #[serde(rename = "face_is_planar")]
     FaceIsPlanar {
         #[doc = "Surface-local planar axes (if available)"]
-        data: Box<FaceIsPlanar>,
+        data: FaceIsPlanar,
     },
     #[doc = "The response to the 'FaceGetPosition' endpoint"]
     #[serde(rename = "face_get_position")]
     FaceGetPosition {
         #[doc = "The 3D position on the surface that was evaluated"]
-        data: Box<FaceGetPosition>,
+        data: FaceGetPosition,
     },
     #[doc = "The response to the 'FaceGetCenter' endpoint"]
     #[serde(rename = "face_get_center")]
     FaceGetCenter {
         #[doc = "The 3D center of mass on the surface"]
-        data: Box<FaceGetCenter>,
+        data: FaceGetCenter,
     },
     #[doc = "The response to the 'FaceGetGradient' endpoint"]
     #[serde(rename = "face_get_gradient")]
     FaceGetGradient {
         #[doc = "The gradient (dFdu, dFdv) + normal vector on a brep face"]
-        data: Box<FaceGetGradient>,
+        data: FaceGetGradient,
     },
     #[doc = "The response to the 'PlaneIntersectAndProject' endpoint"]
     #[serde(rename = "plane_intersect_and_project")]
     PlaneIntersectAndProject {
         #[doc = "Corresponding coordinates of given window coordinates, intersected on given \
                  plane."]
-        data: Box<PlaneIntersectAndProject>,
+        data: PlaneIntersectAndProject,
     },
     #[doc = "The response to the 'ImportFiles' endpoint"]
     #[serde(rename = "import_files")]
     ImportFiles {
         #[doc = "Data from importing the files"]
-        data: Box<ImportFiles>,
+        data: ImportFiles,
     },
     #[doc = "The response to the 'ImportedGeometry' endpoint"]
     #[serde(rename = "imported_geometry")]
     ImportedGeometry {
         #[doc = "Data from importing the files"]
-        data: Box<ImportedGeometry>,
+        data: ImportedGeometry,
     },
     #[doc = "The response to the 'Mass' endpoint"]
     #[serde(rename = "mass")]
     Mass {
         #[doc = "The mass response."]
-        data: Box<Mass>,
+        data: Mass,
     },
     #[doc = "The response to the 'Volume' endpoint"]
     #[serde(rename = "volume")]
     Volume {
         #[doc = "The volume response."]
-        data: Box<Volume>,
+        data: Volume,
     },
     #[doc = "The response to the 'Density' endpoint"]
     #[serde(rename = "density")]
     Density {
         #[doc = "The density response."]
-        data: Box<Density>,
+        data: Density,
     },
     #[doc = "The response to the 'SurfaceArea' endpoint"]
     #[serde(rename = "surface_area")]
     SurfaceArea {
         #[doc = "The surface area response."]
-        data: Box<SurfaceArea>,
+        data: SurfaceArea,
     },
     #[doc = "The response to the 'CenterOfMass' endpoint"]
     #[serde(rename = "center_of_mass")]
     CenterOfMass {
         #[doc = "The center of mass response."]
-        data: Box<CenterOfMass>,
+        data: CenterOfMass,
     },
     #[doc = "The response to the 'GetSketchModePlane' endpoint"]
     #[serde(rename = "get_sketch_mode_plane")]
     GetSketchModePlane {
         #[doc = "The plane for sketch mode."]
-        data: Box<GetSketchModePlane>,
+        data: GetSketchModePlane,
     },
     #[doc = "The response to the 'EntityGetDistance' endpoint"]
     #[serde(rename = "entity_get_distance")]
     EntityGetDistance {
         #[doc = "The response from the `EntitiesGetDistance` command."]
-        data: Box<EntityGetDistance>,
+        data: EntityGetDistance,
     },
     #[doc = "The response to the 'EntityLinearPatternTransform' endpoint"]
     #[serde(rename = "entity_linear_pattern_transform")]
     EntityLinearPatternTransform {
         #[doc = "The response from the `EntityLinearPatternTransform` command."]
-        data: Box<EntityLinearPatternTransform>,
+        data: EntityLinearPatternTransform,
     },
     #[doc = "The response to the 'EntityLinearPattern' endpoint"]
     #[serde(rename = "entity_linear_pattern")]
     EntityLinearPattern {
         #[doc = "The response from the `EntityLinearPattern` command."]
-        data: Box<EntityLinearPattern>,
+        data: EntityLinearPattern,
     },
     #[doc = "The response to the 'EntityCircularPattern' endpoint"]
     #[serde(rename = "entity_circular_pattern")]
     EntityCircularPattern {
         #[doc = "The response from the `EntityCircularPattern` command."]
-        data: Box<EntityCircularPattern>,
+        data: EntityCircularPattern,
     },
     #[doc = "The response to the 'Solid3dGetExtrusionFaceInfo' endpoint"]
     #[serde(rename = "solid3d_get_extrusion_face_info")]
     Solid3DGetExtrusionFaceInfo {
         #[doc = "Extrusion face info struct (useful for maintaining mappings between source path \
                  segment ids and extrusion faces)"]
-        data: Box<Solid3DGetExtrusionFaceInfo>,
+        data: Solid3DGetExtrusionFaceInfo,
     },
     #[doc = "The response to the 'ExtrusionFaceInfo' endpoint"]
     #[serde(rename = "extrusion_face_info")]
     ExtrusionFaceInfo {
         #[doc = "Extrusion face info struct (useful for maintaining mappings between source path \
                  segment ids and extrusion faces)"]
-        data: Box<ExtrusionFaceInfo>,
+        data: ExtrusionFaceInfo,
     },
 }
 

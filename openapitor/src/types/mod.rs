@@ -844,7 +844,7 @@ impl TypeSpace {
                 get_type_name_from_reference(&v.reference()?, &self.spec, true)?
             };
 
-            if *struct_name == type_name.rendered()? {
+            if *struct_name == type_name.rendered()? && is_pub {
                 // We have a self reference.
                 // We need to box it.
                 type_name = quote!(Box<#type_name>);

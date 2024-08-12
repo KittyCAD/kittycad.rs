@@ -527,7 +527,7 @@ pub fn generate_example_rust_from_schema(
                 let k_ident = format_ident!("{}", crate::types::clean_property_name(k));
 
                 // Check if this type is required.
-                if !o.required.contains(k)
+                if (!o.required.contains(k) || inner_schema.schema_data.nullable)
                     && !is_default_property(&type_name, &inner_schema.schema_data)?
                     && !example
                         .rendered()?
