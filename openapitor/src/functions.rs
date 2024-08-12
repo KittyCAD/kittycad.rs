@@ -452,7 +452,7 @@ fn generate_docs(
 
     if let Some(description) = &op.description {
         docs.push_str("\n\n");
-        let description_sanitized = sanitize_indents(description);
+        let description_sanitized = sanitize_indents(description, name.to_string());
         docs.push_str(&description_sanitized.replace("```", "```ignore"));
     }
 
@@ -485,9 +485,11 @@ fn generate_docs(
             param_type.rendered()?
         );
         if let Some(description) = &parameter_data.description {
-            param_docs.push_str(": ");
-            let description_sanitized = sanitize_indents(description);
-            param_docs.push_str(&description_sanitized);
+            if !description.trim().is_empty() {
+                param_docs.push_str(": ");
+                let description_sanitized = sanitize_indents(description, "".to_string());
+                param_docs.push_str(&description_sanitized);
+            }
         }
         if parameter_data.required {
             param_docs.push_str(" (required)");

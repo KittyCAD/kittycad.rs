@@ -57,6 +57,7 @@
 //! ```
 #![allow(missing_docs)]
 #![allow(clippy::needless_lifetimes)]
+#![allow(clippy::too_many_arguments)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.

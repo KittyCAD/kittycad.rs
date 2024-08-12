@@ -29,8 +29,13 @@ use crate::types::exts::{
 static LEADING_SPACES: Lazy<Regex> = Lazy::new(|| Regex::new(r"\n +").unwrap());
 
 /// Collapse leading spaces at the beginning of lines.
-pub fn sanitize_indents(s: &str) -> std::borrow::Cow<'_, str> {
-    LEADING_SPACES.replace_all(s, "\n")
+pub fn sanitize_indents(s: &str, name: String) -> std::borrow::Cow<'_, str> {
+    let new_str = LEADING_SPACES.replace_all(s, "\n");
+    if new_str.is_empty() {
+        format!("{}.", name).into()
+    } else {
+        new_str
+    }
 }
 
 /// Our collection of all our parsed types.
@@ -350,15 +355,15 @@ impl TypeSpace {
         one_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
         data: &openapiv3::SchemaData,
     ) -> Result<()> {
+        // Get the proper name version of the type.
+        let one_of_name = get_type_name(name, data)?;
+
         let description = if let Some(d) = &data.description {
-            let d_sanitized = sanitize_indents(d);
+            let d_sanitized = sanitize_indents(d, one_of_name.to_string());
             quote!(#[doc = #d_sanitized])
         } else {
             quote!()
         };
-
-        // Get the proper name version of the type.
-        let one_of_name = get_type_name(name, data)?;
 
         let mut values = quote!();
         for one_of in one_ofs {
@@ -420,15 +425,15 @@ impl TypeSpace {
         one_ofs: &Vec<openapiv3::ReferenceOr<openapiv3::Schema>>,
         data: &openapiv3::SchemaData,
     ) -> Result<()> {
+        // Get the proper name version of the type.
+        let one_of_name = get_type_name(name, data)?;
+
         let description = if let Some(d) = &data.description {
-            let d_sanitized = sanitize_indents(d);
+            let d_sanitized = sanitize_indents(d, one_of_name.to_string());
             quote!(#[doc = #d_sanitized])
         } else {
             quote!()
         };
-
-        // Get the proper name version of the type.
-        let one_of_name = get_type_name(name, data)?;
 
         // Check if this is a one_of with only one enum in each.
         let mut is_enum_with_docs = false;
@@ -591,15 +596,15 @@ impl TypeSpace {
             );
         }
 
+        // Get the proper name version of the name of the object.
+        let struct_name = get_type_name(name, data)?;
+
         let description = if let Some(d) = &data.description {
-            let d_sanitized = sanitize_indents(d);
+            let d_sanitized = sanitize_indents(d, struct_name.to_string());
             quote!(#[doc = #d_sanitized])
         } else {
             quote!()
         };
-
-        // Get the proper name version of the name of the object.
-        let struct_name = get_type_name(name, data)?;
 
         // If the object has no properties, but has additional_properties, just use that
         // for the type.
@@ -789,7 +794,7 @@ impl TypeSpace {
             };
 
             let prop_desc = if let Some(d) = &inner_schema.schema_data.description {
-                let d_sanitized = sanitize_indents(d);
+                let d_sanitized = sanitize_indents(d, prop.to_string());
                 quote!(#[doc = #d_sanitized])
             } else {
                 quote!()
@@ -988,15 +993,15 @@ impl TypeSpace {
             anyhow::bail!("Cannot render empty string enumeration: {}", name);
         }
 
+        // Get the proper name version of the name of the enum.
+        let enum_name = get_type_name(name, data)?;
+
         let description = if let Some(d) = &data.description {
-            let d_sanitized = sanitize_indents(d);
+            let d_sanitized = sanitize_indents(d, enum_name.to_string());
             quote!(#[doc = #d_sanitized])
         } else {
             quote!()
         };
-
-        // Get the proper name version of the name of the enum.
-        let enum_name = get_type_name(name, data)?;
 
         let mut values = quote!();
         for (index, e) in s.enumeration.iter().enumerate() {
@@ -1029,7 +1034,7 @@ impl TypeSpace {
             // Check if we have a description for the enum.
             if let Some(description) = additional_docs.get(index) {
                 if !description.is_empty() {
-                    let description_sanitized = sanitize_indents(description);
+                    let description_sanitized = sanitize_indents(description, proper_name(&e));
                     e_value = quote!(
                         #[doc = #description_sanitized]
                         #e_value
@@ -1146,7 +1151,7 @@ impl TypeSpace {
                 // Get the schema for this OneOf.
                 let schema = one_of.get_schema_from_reference(&self.spec, true)?;
                 let mut description = if let Some(d) = &schema.schema_data.description {
-                    let d_sanitized = sanitize_indents(d);
+                    let d_sanitized = sanitize_indents(d, name.to_string());
                     quote!(#[doc = #d_sanitized])
                 } else {
                     quote!()
@@ -1173,15 +1178,6 @@ impl TypeSpace {
                         tag_schema.get_schema_from_reference(&self.spec, true)?
                     };
 
-                    if description.is_empty() {
-                        description = if let Some(d) = &inner_schema.schema_data.description {
-                            let d_sanitized = sanitize_indents(d);
-                            quote!(#[doc = #d_sanitized])
-                        } else {
-                            quote!()
-                        };
-                    }
-
                     let tag_name = if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
                         inner_schema.schema_kind
                     {
@@ -1202,6 +1198,15 @@ impl TypeSpace {
                     };
                     let p = proper_name(&tag_name);
                     let n = format_ident!("{}", p);
+
+                    if description.is_empty() {
+                        description = if let Some(d) = &inner_schema.schema_data.description {
+                            let d_sanitized = sanitize_indents(d, p.to_string());
+                            quote!(#[doc = #d_sanitized])
+                        } else {
+                            quote!()
+                        };
+                    }
 
                     if let Some(content) = &tag_result.content {
                         let content_type_name = proper_name(&format!("{}_{}", tag_name, content));

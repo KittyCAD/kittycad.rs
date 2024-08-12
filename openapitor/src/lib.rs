@@ -75,6 +75,7 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
      */
     a("#![allow(missing_docs)]"); // TODO: Make this a deny.
     a("#![allow(clippy::needless_lifetimes)]"); // TODO: Fix this.
+    a("#![allow(clippy::too_many_arguments)]"); // TODO: Fix this.
 
     a("#![cfg_attr(docsrs, feature(doc_cfg))]");
     a("");
