@@ -333,7 +333,7 @@ pub fn generate_example_rust_from_schema(
                         quote!(chrono::Utc::now())
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Date) => {
-                        quote!(chrono::Utc::now().date().naive_utc())
+                        quote!(chrono::Utc::now().date_naive())
                     }
                     openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Password) => {
                         quote!("some-password".to_string())
@@ -379,7 +379,7 @@ pub fn generate_example_rust_from_schema(
                             quote!(chrono::Utc::now().time())
                         }
                         "date" => {
-                            quote!(chrono::Utc::now().date().naive_utc())
+                            quote!(chrono::Utc::now().date_naive())
                         }
                         "date-time" => quote!(chrono::Utc::now()),
                         "partial-date-time" => {
@@ -941,6 +941,38 @@ pub fn generate_example_rust_from_schema(
                             },
                         )),
                     },
+                    in_crate,
+                );
+            } else if !any.one_of.is_empty() {
+                let one_of = openapiv3::Schema {
+                    schema_data: schema.schema_data.clone(),
+                    schema_kind: openapiv3::SchemaKind::OneOf {
+                        one_of: any.one_of.clone(),
+                    },
+                };
+                return generate_example_rust_from_schema(type_space, name, &one_of, in_crate);
+            } else if !any.all_of.is_empty() {
+                let all_of = openapiv3::Schema {
+                    schema_data: schema.schema_data.clone(),
+                    schema_kind: openapiv3::SchemaKind::AllOf {
+                        all_of: any.all_of.clone(),
+                    },
+                };
+                return generate_example_rust_from_schema(type_space, name, &all_of, in_crate);
+            } else if let Some(typ) = &any.typ {
+                let string_schema = openapiv3::Schema {
+                    schema_data: schema.schema_data.clone(),
+                    schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::String(
+                        openapiv3::StringType {
+                            format: openapiv3::VariantOrUnknownOrEmpty::Unknown(typ.to_string()),
+                            ..Default::default()
+                        },
+                    )),
+                };
+                return generate_example_rust_from_schema(
+                    type_space,
+                    name,
+                    &string_schema,
                     in_crate,
                 );
             }

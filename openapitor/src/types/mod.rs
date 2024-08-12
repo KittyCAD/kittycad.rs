@@ -577,6 +577,15 @@ impl TypeSpace {
             return self.render_one_of(name, &any.one_of, data);
         } else if !any.all_of.is_empty() {
             return self.render_all_of(name, &any.all_of, data);
+        } else if let Some(typ) = &any.typ {
+            return self.render_string_type(
+                name,
+                &openapiv3::StringType {
+                    format: openapiv3::VariantOrUnknownOrEmpty::Unknown(typ.to_string()),
+                    ..Default::default()
+                },
+                data,
+            );
         }
 
         // This is a serde_json::Value.
@@ -1511,6 +1520,17 @@ pub fn get_type_name_for_schema(
                     },
                 };
                 return get_type_name_for_schema(name, &all_of, spec, in_crate);
+            } else if let Some(typ) = &any.typ {
+                let string_schema = openapiv3::Schema {
+                    schema_data: schema.schema_data.clone(),
+                    schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::String(
+                        openapiv3::StringType {
+                            format: openapiv3::VariantOrUnknownOrEmpty::Unknown(typ.to_string()),
+                            ..Default::default()
+                        },
+                    )),
+                };
+                return get_type_name_for_schema(name, &string_schema, spec, in_crate);
             }
             log::warn!("got any schema kind `{}`: {:?}", name, any);
             quote!(serde_json::Value)
@@ -1593,7 +1613,7 @@ fn get_type_name_for_string(
             "money-usd" => quote!(bigdecimal::BigDecimal),
             "id" => quote!(String),
             f => {
-                anyhow::bail!("XXX unknown string format {}", f)
+                anyhow::bail!("XXX unknown string format {} for {}", f, name)
             }
         },
     };
