@@ -15,6 +15,7 @@ use anyhow::Result;
 use indexmap::map::IndexMap;
 use numeral::Cardinal;
 use once_cell::sync::Lazy;
+use openapiv3::{AnySchema, Schema, SchemaData};
 use regex::Regex;
 
 use crate::types::exts::{
@@ -558,34 +559,8 @@ impl TypeSpace {
         any: &openapiv3::AnySchema,
         data: &openapiv3::SchemaData,
     ) -> Result<()> {
-        // The GitHub API is sometimes missing `type: object`.
-        // See: https://github.com/github/rest-api-description/issues/1354
-        // If we have properties, we can assume this is an object.
-        if !any.properties.is_empty() || any.additional_properties.is_some() {
-            return self.render_object(
-                name,
-                &openapiv3::ObjectType {
-                    properties: any.properties.clone(),
-                    required: any.required.clone(),
-                    additional_properties: any.additional_properties.clone(),
-                    min_properties: any.min_properties,
-                    max_properties: any.max_properties,
-                },
-                data,
-            );
-        } else if !any.one_of.is_empty() {
-            return self.render_one_of(name, &any.one_of, data);
-        } else if !any.all_of.is_empty() {
-            return self.render_all_of(name, &any.all_of, data);
-        } else if let Some(typ) = &any.typ {
-            return self.render_string_type(
-                name,
-                &openapiv3::StringType {
-                    format: openapiv3::VariantOrUnknownOrEmpty::Unknown(typ.to_string()),
-                    ..Default::default()
-                },
-                data,
-            );
+        if let Some(s) = get_schema_from_any(data, any) {
+            return self.render_schema(name, &s);
         }
 
         // This is a serde_json::Value.
@@ -869,7 +844,7 @@ impl TypeSpace {
                 get_type_name_from_reference(&v.reference()?, &self.spec, true)?
             };
 
-            if type_name.rendered()? == struct_name.to_string() {
+            if *struct_name == type_name.rendered()? {
                 // We have a self reference.
                 // We need to box it.
                 type_name = quote!(Box<#type_name>);
@@ -1370,6 +1345,24 @@ impl TypeSpace {
                             continue;
                         }
                     }
+                    openapiv3::SchemaKind::Type(openapiv3::Type::Array(a)) => match &a.items {
+                        Some(openapiv3::ReferenceOr::Reference { .. }) => {
+                            get_type_name_from_reference(
+                                &a.items.clone().unwrap().reference()?,
+                                &self.spec,
+                                true,
+                            )?
+                            .rendered()?
+                        }
+                        Some(openapiv3::ReferenceOr::Item(s)) => {
+                            get_type_name_for_schema(original_name, s, &self.spec, true)?
+                                .rendered()?
+                        }
+                        None => {
+                            log::warn!("Weird array oneof with no item for the name: {a:?}");
+                            continue;
+                        }
+                    },
                     other => {
                         log::warn!("Weird oneof whose type isn't handled: {other:?}");
                         continue;
@@ -1488,49 +1481,8 @@ pub fn get_type_name_for_schema(
             anyhow::bail!("XXX not not supported yet");
         }
         openapiv3::SchemaKind::Any(any) => {
-            if !any.properties.is_empty() || any.additional_properties.is_some() {
-                // This is likely an object but they did not denote it as such.
-                // Effing horrible specs.
-                let obj = openapiv3::Schema {
-                    schema_data: schema.schema_data.clone(),
-                    schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(
-                        openapiv3::ObjectType {
-                            properties: any.properties.clone(),
-                            required: any.required.clone(),
-                            additional_properties: any.additional_properties.clone(),
-                            min_properties: any.min_properties,
-                            max_properties: any.max_properties,
-                        },
-                    )),
-                };
-                return get_type_name_for_schema(name, &obj, spec, in_crate);
-            } else if !any.one_of.is_empty() {
-                let one_of = openapiv3::Schema {
-                    schema_data: schema.schema_data.clone(),
-                    schema_kind: openapiv3::SchemaKind::OneOf {
-                        one_of: any.one_of.clone(),
-                    },
-                };
-                return get_type_name_for_schema(name, &one_of, spec, in_crate);
-            } else if !any.all_of.is_empty() {
-                let all_of = openapiv3::Schema {
-                    schema_data: schema.schema_data.clone(),
-                    schema_kind: openapiv3::SchemaKind::AllOf {
-                        all_of: any.all_of.clone(),
-                    },
-                };
-                return get_type_name_for_schema(name, &all_of, spec, in_crate);
-            } else if let Some(typ) = &any.typ {
-                let string_schema = openapiv3::Schema {
-                    schema_data: schema.schema_data.clone(),
-                    schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::String(
-                        openapiv3::StringType {
-                            format: openapiv3::VariantOrUnknownOrEmpty::Unknown(typ.to_string()),
-                            ..Default::default()
-                        },
-                    )),
-                };
-                return get_type_name_for_schema(name, &string_schema, spec, in_crate);
+            if let Some(s) = get_schema_from_any(&schema.schema_data, any) {
+                return get_type_name_for_schema(name, &s, spec, in_crate);
             }
             log::warn!("got any schema kind `{}`: {:?}", name, any);
             quote!(serde_json::Value)
@@ -2410,6 +2362,65 @@ fn is_pagination_property_param_page(s: &str) -> bool {
 
 fn is_pagination_property_items(s: &str, t: &proc_macro2::TokenStream) -> Result<bool> {
     Ok(["items", "data"].contains(&s) && get_text(t)?.starts_with("Vec<"))
+}
+
+pub(crate) fn get_schema_from_any(data: &SchemaData, any: &AnySchema) -> Option<Schema> {
+    if !any.properties.is_empty() {
+        // Let's assume this is an object.
+
+        // Send back through as an object.
+        return Some(openapiv3::Schema {
+            schema_data: data.clone(),
+            schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(
+                openapiv3::ObjectType {
+                    properties: any.properties.clone(),
+                    required: any.required.clone(),
+                    additional_properties: any.additional_properties.clone(),
+                    min_properties: any.min_properties,
+                    max_properties: any.max_properties,
+                },
+            )),
+        });
+    } else if !any.one_of.is_empty() {
+        return Some(openapiv3::Schema {
+            schema_data: data.clone(),
+            schema_kind: openapiv3::SchemaKind::OneOf {
+                one_of: any.one_of.clone(),
+            },
+        });
+    } else if !any.all_of.is_empty() {
+        return Some(openapiv3::Schema {
+            schema_data: data.clone(),
+            schema_kind: openapiv3::SchemaKind::AllOf {
+                all_of: any.all_of.clone(),
+            },
+        });
+    } else if let Some(typ) = &any.typ {
+        if typ == "array" {
+            return Some(openapiv3::Schema {
+                schema_data: data.clone(),
+                schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Array(
+                    openapiv3::ArrayType {
+                        items: any.items.clone(),
+                        min_items: any.min_items,
+                        max_items: any.max_items,
+                        unique_items: any.unique_items.unwrap_or(false),
+                    },
+                )),
+            });
+        }
+        return Some(openapiv3::Schema {
+            schema_data: data.clone(),
+            schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::String(
+                openapiv3::StringType {
+                    format: openapiv3::VariantOrUnknownOrEmpty::Unknown(typ.to_string()),
+                    ..Default::default()
+                },
+            )),
+        });
+    }
+
+    None
 }
 
 #[cfg(test)]

@@ -9,7 +9,7 @@ use rand::{Rng, SeedableRng};
 
 use crate::types::{
     exts::{ReferenceOrExt, SchemaRenderExt, TokenStreamExt},
-    is_default_property,
+    get_schema_from_any, is_default_property,
     random::Random,
 };
 
@@ -922,59 +922,8 @@ pub fn generate_example_rust_from_schema(
             anyhow::bail!("XXX not not supported yet");
         }
         openapiv3::SchemaKind::Any(any) => {
-            if !any.properties.is_empty() {
-                // Let's assume this is an object.
-
-                // Send back through as an object.
-                return generate_example_rust_from_schema(
-                    type_space,
-                    name,
-                    &openapiv3::Schema {
-                        schema_data: schema.schema_data.clone(),
-                        schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(
-                            openapiv3::ObjectType {
-                                properties: any.properties.clone(),
-                                required: any.required.clone(),
-                                additional_properties: any.additional_properties.clone(),
-                                min_properties: any.min_properties,
-                                max_properties: any.max_properties,
-                            },
-                        )),
-                    },
-                    in_crate,
-                );
-            } else if !any.one_of.is_empty() {
-                let one_of = openapiv3::Schema {
-                    schema_data: schema.schema_data.clone(),
-                    schema_kind: openapiv3::SchemaKind::OneOf {
-                        one_of: any.one_of.clone(),
-                    },
-                };
-                return generate_example_rust_from_schema(type_space, name, &one_of, in_crate);
-            } else if !any.all_of.is_empty() {
-                let all_of = openapiv3::Schema {
-                    schema_data: schema.schema_data.clone(),
-                    schema_kind: openapiv3::SchemaKind::AllOf {
-                        all_of: any.all_of.clone(),
-                    },
-                };
-                return generate_example_rust_from_schema(type_space, name, &all_of, in_crate);
-            } else if let Some(typ) = &any.typ {
-                let string_schema = openapiv3::Schema {
-                    schema_data: schema.schema_data.clone(),
-                    schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::String(
-                        openapiv3::StringType {
-                            format: openapiv3::VariantOrUnknownOrEmpty::Unknown(typ.to_string()),
-                            ..Default::default()
-                        },
-                    )),
-                };
-                return generate_example_rust_from_schema(
-                    type_space,
-                    name,
-                    &string_schema,
-                    in_crate,
-                );
+            if let Some(s) = get_schema_from_any(&schema.schema_data, any) {
+                return generate_example_rust_from_schema(type_space, name, &s, in_crate);
             }
 
             quote!(serde_json::Value::String("some-string".to_string()))

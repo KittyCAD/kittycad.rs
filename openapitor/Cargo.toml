@@ -50,3 +50,7 @@ expectorate = "1"
 futures = "0.3"
 pretty_assertions = "1"
 test-context = "^0.3.0"
+
+[features]
+default = ["retry"]
+retry = []
