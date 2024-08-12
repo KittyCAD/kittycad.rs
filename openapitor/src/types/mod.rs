@@ -1130,6 +1130,44 @@ impl TypeSpace {
         Ok(())
     }
 
+    // Render the internal enum type for an object.
+    fn render_enum_object_internal(
+        &mut self,
+        name: &str,
+        o: &openapiv3::ObjectType,
+        ignore_key: &str,
+    ) -> Result<proc_macro2::TokenStream> {
+        let proper_name = proper_name(name);
+        let struct_name = format_ident!("{}", proper_name);
+
+        // Check if we have an existing object with this name.
+        if let Some(components) = &self.spec.components {
+            if let Some(schema) = components.schemas.get(name) {
+                if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(existing)) =
+                    &schema.expand(&self.spec)?.schema_kind
+                {
+                    let mut modified_properties = o.properties.clone();
+                    modified_properties.shift_remove(ignore_key);
+                    // Check if we have the same properties.
+                    if modified_properties == existing.properties {
+                        // We have the same properties.
+                        // We can just use the existing object.
+                        return Ok(quote!(#struct_name(#struct_name)));
+                    }
+                }
+            }
+        }
+
+        let inner_values = self.get_object_values(&struct_name, o, false, Some(ignore_key))?;
+        let rendered = quote! {
+            #struct_name {
+                #inner_values
+            }
+        };
+
+        Ok(rendered)
+    }
+
     fn get_one_of_values(
         &mut self,
         name: &str,
@@ -1230,13 +1268,8 @@ impl TypeSpace {
                             if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
                                 &s.schema_kind
                             {
-                                enum_object_internal = Some(render_enum_object_internal(
-                                    &self.clone(),
-                                    &p,
-                                    o,
-                                    &self.spec,
-                                    tag,
-                                )?);
+                                enum_object_internal =
+                                    Some(self.render_enum_object_internal(&p, o, tag)?);
                             }
                             get_type_name_for_schema(&content_type_name, s, &self.spec, true)?
                         } else {
@@ -1286,13 +1319,7 @@ impl TypeSpace {
                         }
                     } else {
                         // Render this object.
-                        let content_name = render_enum_object_internal(
-                            &self.clone(),
-                            &tag_name,
-                            o,
-                            &self.spec,
-                            tag,
-                        )?;
+                        let content_name = self.render_enum_object_internal(&tag_name, o, tag)?;
                         // Get the type name for this value.
                         values.insert(p.to_string(), one_of.clone());
 
@@ -1421,6 +1448,7 @@ impl TypeSpace {
                 #o_type
             );
         }
+
         Ok((values, rendered_value))
     }
 }
@@ -1816,46 +1844,6 @@ fn is_default_property(
 ) -> Result<bool> {
     Ok(data.default.is_some()
         && (type_name.rendered()? == "bool" || type_name.rendered()?.starts_with("Vec<")))
-}
-
-// Render the internal enum type for an object.
-fn render_enum_object_internal(
-    type_space: &TypeSpace,
-    name: &str,
-    o: &openapiv3::ObjectType,
-    spec: &openapiv3::OpenAPI,
-    ignore_key: &str,
-) -> Result<proc_macro2::TokenStream> {
-    let mut type_space = type_space.clone();
-    let proper_name = proper_name(name);
-    let struct_name = format_ident!("{}", proper_name);
-
-    // Check if we have an existing object with this name.
-    if let Some(components) = &spec.components {
-        if let Some(schema) = components.schemas.get(name) {
-            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(existing)) =
-                &schema.expand(spec)?.schema_kind
-            {
-                let mut modified_properties = o.properties.clone();
-                modified_properties.shift_remove(ignore_key);
-                // Check if we have the same properties.
-                if modified_properties == existing.properties {
-                    // We have the same properties.
-                    // We can just use the existing object.
-                    return Ok(quote!(#struct_name(#struct_name)));
-                }
-            }
-        }
-    }
-
-    let inner_values = type_space.get_object_values(&struct_name, o, false, Some(ignore_key))?;
-    let rendered = quote! {
-        #struct_name {
-            #inner_values
-        }
-    };
-
-    Ok(rendered)
 }
 
 /// A holder for our tag and content for enums.
