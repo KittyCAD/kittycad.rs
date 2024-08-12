@@ -2396,7 +2396,26 @@ pub(crate) fn get_schema_from_any(data: &SchemaData, any: &AnySchema) -> Option<
             },
         });
     } else if let Some(typ) = &any.typ {
-        if typ == "array" {
+        if typ == "object" {
+            if let Some(format) = &any.format {
+                if format == "uri-map" {
+                    return Some(openapiv3::Schema {
+                        schema_data: data.clone(),
+                        schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(
+                            openapiv3::ObjectType {
+                                properties: any.properties.clone(),
+                                required: any.required.clone(),
+                                additional_properties: Some(openapiv3::AdditionalProperties::Any(
+                                    true,
+                                )),
+                                min_properties: any.min_properties,
+                                max_properties: any.max_properties,
+                            },
+                        )),
+                    });
+                }
+            }
+        } else if typ == "array" {
             return Some(openapiv3::Schema {
                 schema_data: data.clone(),
                 schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Array(
@@ -2409,6 +2428,7 @@ pub(crate) fn get_schema_from_any(data: &SchemaData, any: &AnySchema) -> Option<
                 )),
             });
         }
+
         return Some(openapiv3::Schema {
             schema_data: data.clone(),
             schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::String(

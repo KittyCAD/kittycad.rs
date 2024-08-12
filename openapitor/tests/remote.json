@@ -464,10 +464,7 @@
             "work_address_is_home_address": "yes",
             "years_of_experience": "2"
           },
-          "country": {
-            "code": "AUT",
-            "name": "Austria"
-          },
+          "country_code": "AUT",
           "created_at": "2021-11-11T18:44:39",
           "emergency_contact_details": {
             "email": "taylor@johnson.com",
@@ -544,10 +541,7 @@
           },
           "bank_account_details": {
             "items": {
-              "description": "List of bank account information. Its properties may vary depending on the country.",
-              "type": "list",
-              "x-struct": null,
-              "x-validate": null
+              "description": "List of bank account information. Its properties may vary depending on the country."
             },
             "nullable": true,
             "type": "array",
@@ -565,7 +559,14 @@
           "contract_details": {
             "$ref": "#/components/schemas/ContractDetails"
           },
+          "country_code": {
+            "type": "string",
+            "nullable": true,
+            "x-struct": null,
+            "x-validate": null
+          },
           "country": {
+            "nullable": true,
             "$ref": "#/components/schemas/Country"
           },
           "created_at": {
@@ -577,6 +578,7 @@
             "$ref": "#/components/schemas/EmergencyContactDetails"
           },
           "files": {
+            "nullable": true,
             "items": {
               "$ref": "#/components/schemas/File"
             },
@@ -645,19 +647,15 @@
           "billing_address_details",
           "company_id",
           "contract_details",
-          "country",
           "created_at",
           "emergency_contact_details",
-          "files",
           "full_name",
           "id",
           "type",
           "job_title",
-          "onboarding_tasks",
           "personal_details",
           "personal_email",
           "pricing_plan_details",
-          "status",
           "updated_at"
         ],
         "title": "Employment",
@@ -872,6 +870,7 @@
           },
           "country_code": {
             "type": "string",
+            "nullable": true,
             "x-struct": null,
             "x-validate": null
           },
@@ -1008,10 +1007,7 @@
                 "work_address_is_home_address": "yes",
                 "years_of_experience": "2"
               },
-              "country": {
-                "code": "AUT",
-                "name": "Austria"
-              },
+              "country_code": "AUT",
               "created_at": "2021-11-11T18:44:39",
               "emergency_contact_details": {
                 "email": "taylor@johnson.com",
