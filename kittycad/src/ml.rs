@@ -419,7 +419,7 @@ impl Ml {
              std::str::FromStr;\nasync fn example_ml_create_text_to_cad_model_feedback() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
              client\n        .ml()\n        .create_text_to_cad_model_feedback(\n            \
-             kittycad::types::AiFeedback::ThumbsDown,\n            \
+             kittycad::types::AiFeedback::Rejected,\n            \
              uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        \
              .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]

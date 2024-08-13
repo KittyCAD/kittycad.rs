@@ -673,6 +673,14 @@ pub enum AiFeedback {
     #[serde(rename = "thumbs_down")]
     #[display("thumbs_down")]
     ThumbsDown,
+    #[doc = "Accepted."]
+    #[serde(rename = "accepted")]
+    #[display("accepted")]
+    Accepted,
+    #[doc = "Rejected."]
+    #[serde(rename = "rejected")]
+    #[display("rejected")]
+    Rejected,
 }
 
 #[doc = "An AI prompt."]
