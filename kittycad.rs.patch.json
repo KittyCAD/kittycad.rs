@@ -4,7 +4,7 @@
     "path": "/info/x-rust",
     "value": {
       "client": "// Authenticate via an API token.\nlet client = kittycad::Client::new(\"$TOKEN\");\n\n// - OR -\n\n// Authenticate with your token and host parsed from the environment variables:\n// `KITTYCAD_API_TOKEN`.\nlet client = kittycad::Client::new_from_env();",
-      "install": "[dependencies]\nkittycad = \"0.3.13\""
+      "install": "[dependencies]\nkittycad = \"0.3.14\""
     }
   },
   {
@@ -995,7 +995,7 @@
     "op": "add",
     "path": "/paths/~1user~1text-to-cad~1{id}/post/x-rust",
     "value": {
-      "example": "/// Give feedback to a specific text-to-CAD response.\n/// \n/// This endpoint requires authentication by any Zoo user. The user must be the owner of the text-to-CAD model, in order to give feedback.\n/// \n/// **Parameters:**\n/// \n/// - `feedback: crate::types::AiFeedback`: The feedback. (required)\n/// - `id: uuid::Uuid`: The id of the model to give feedback to. (required)\nuse std::str::FromStr;\nasync fn example_ml_create_text_to_cad_model_feedback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .ml()\n        .create_text_to_cad_model_feedback(\n            kittycad::types::AiFeedback::ThumbsDown,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n",
+      "example": "/// Give feedback to a specific text-to-CAD response.\n/// \n/// This endpoint requires authentication by any Zoo user. The user must be the owner of the text-to-CAD model, in order to give feedback.\n/// \n/// **Parameters:**\n/// \n/// - `feedback: crate::types::AiFeedback`: The feedback. (required)\n/// - `id: uuid::Uuid`: The id of the model to give feedback to. (required)\nuse std::str::FromStr;\nasync fn example_ml_create_text_to_cad_model_feedback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .ml()\n        .create_text_to_cad_model_feedback(\n            kittycad::types::AiFeedback::Rejected,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ml/struct.Ml.html#method.create_text_to_cad_model_feedback"
     }
   },
