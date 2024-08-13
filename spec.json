@@ -12564,6 +12564,20 @@
             "enum": [
               "thumbs_down"
             ]
+          },
+          {
+            "description": "Accepted.",
+            "type": "string",
+            "enum": [
+              "accepted"
+            ]
+          },
+          {
+            "description": "Rejected.",
+            "type": "string",
+            "enum": [
+              "rejected"
+            ]
           }
         ]
       },
