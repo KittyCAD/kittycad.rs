@@ -194,301 +194,6 @@
         }
       }
     },
-    "/ai-prompts": {
-      "get": {
-        "tags": [
-          "ml",
-          "hidden"
-        ],
-        "summary": "List all AI prompts.",
-        "description": "For text-to-cad prompts, this will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by a Zoo employee.\nThe AI prompts are returned in order of creation, with the most recently created AI prompts first.",
-        "operationId": "list_ai_prompts",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "limit",
-            "description": "Maximum number of items returned by a single call",
-            "schema": {
-              "nullable": true,
-              "type": "integer",
-              "format": "uint32",
-              "minimum": 1
-            }
-          },
-          {
-            "in": "query",
-            "name": "page_token",
-            "description": "Token returned by previous call to retrieve the subsequent page",
-            "schema": {
-              "nullable": true,
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "sort_by",
-            "schema": {
-              "$ref": "#/components/schemas/CreatedAtSortMode"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AiPromptResultsPage"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "x-dropshot-pagination": {
-          "required": []
-        }
-      }
-    },
-    "/ai-prompts/{id}": {
-      "get": {
-        "tags": [
-          "ml",
-          "hidden"
-        ],
-        "summary": "Get an AI prompt.",
-        "description": "This endpoint requires authentication by a Zoo employee.",
-        "operationId": "get_ai_prompt",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The id of the model to give feedback to.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AiPrompt"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
-    "/ai/kcl/completions": {
-      "post": {
-        "tags": [
-          "ml",
-          "beta"
-        ],
-        "summary": "Generate code completions for KCL.",
-        "operationId": "create_kcl_code_completions",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/KclCodeCompletionRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "successful creation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/KclCodeCompletionResponse"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "hidden"
-        ],
-        "summary": "OPTIONS endpoint.",
-        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_kcl_code_completions",
-        "responses": {
-          "204": {
-            "description": "successful operation, no content",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
     "/ai/text-to-cad/{output_format}": {
       "post": {
         "tags": [
@@ -3235,6 +2940,426 @@
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
         "operationId": "options_logout",
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/ml-prompts": {
+      "get": {
+        "tags": [
+          "ml",
+          "hidden"
+        ],
+        "summary": "List all ML prompts.",
+        "description": "For text-to-cad prompts, this will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by a Zoo employee.\nThe ML prompts are returned in order of creation, with the most recently created ML prompts first.",
+        "operationId": "list_ml_prompts",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "schema": {
+              "$ref": "#/components/schemas/CreatedAtSortMode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MlPromptResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      }
+    },
+    "/ml-prompts/{id}": {
+      "get": {
+        "tags": [
+          "ml",
+          "hidden"
+        ],
+        "summary": "Get a ML prompt.",
+        "description": "This endpoint requires authentication by a Zoo employee.",
+        "operationId": "get_ml_prompt",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The id of the model to give feedback to.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MlPrompt"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/ml/kcl/completions": {
+      "post": {
+        "tags": [
+          "ml",
+          "beta"
+        ],
+        "summary": "Generate code completions for KCL.",
+        "operationId": "create_kcl_code_completions",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KclCodeCompletionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KclCodeCompletionResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_kcl_code_completions",
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/ml/text-to-cad/iteration": {
+      "post": {
+        "tags": [
+          "ml"
+        ],
+        "summary": "Iterate on a CAD model with a prompt.",
+        "description": "This operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "operationId": "create_text_to_cad_iteration",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TextToCadIterationBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TextToCadIteration"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_text_to_cad_iteration",
         "responses": {
           "204": {
             "description": "successful operation, no content",
@@ -11523,7 +11648,7 @@
             "description": "The feedback.",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/AiFeedback"
+              "$ref": "#/components/schemas/MlFeedback"
             }
           }
         ],
@@ -12546,200 +12671,6 @@
         },
         "required": [
           "country"
-        ]
-      },
-      "AiFeedback": {
-        "description": "Human feedback on an AI response.",
-        "oneOf": [
-          {
-            "description": "Thumbs up.",
-            "type": "string",
-            "enum": [
-              "thumbs_up"
-            ]
-          },
-          {
-            "description": "Thumbs down.",
-            "type": "string",
-            "enum": [
-              "thumbs_down"
-            ]
-          },
-          {
-            "description": "Accepted.",
-            "type": "string",
-            "enum": [
-              "accepted"
-            ]
-          },
-          {
-            "description": "Rejected.",
-            "type": "string",
-            "enum": [
-              "rejected"
-            ]
-          }
-        ]
-      },
-      "AiPrompt": {
-        "description": "An AI prompt.",
-        "type": "object",
-        "properties": {
-          "completed_at": {
-            "nullable": true,
-            "title": "DateTime",
-            "description": "When the prompt was completed.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "created_at": {
-            "title": "DateTime",
-            "description": "The date and time the AI prompt was created.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "error": {
-            "nullable": true,
-            "description": "The error message if the prompt failed.",
-            "type": "string"
-          },
-          "feedback": {
-            "nullable": true,
-            "description": "Feedback from the user, if any.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AiFeedback"
-              }
-            ]
-          },
-          "id": {
-            "description": "The unique identifier for the AI Prompt.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "metadata": {
-            "nullable": true,
-            "description": "The metadata for the prompt.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AiPromptMetadata"
-              }
-            ]
-          },
-          "model_version": {
-            "description": "The version of the model.",
-            "type": "string"
-          },
-          "output_file": {
-            "nullable": true,
-            "description": "The output file. In the case of TextToCad this is a link to a file in a GCP bucket.",
-            "type": "string"
-          },
-          "prompt": {
-            "description": "The prompt.",
-            "type": "string"
-          },
-          "started_at": {
-            "nullable": true,
-            "title": "DateTime",
-            "description": "When the prompt was started.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "status": {
-            "description": "The status of the prompt.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ApiCallStatus"
-              }
-            ]
-          },
-          "type": {
-            "description": "The type of prompt.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AiPromptType"
-              }
-            ]
-          },
-          "updated_at": {
-            "title": "DateTime",
-            "description": "The date and time the AI prompt was last updated.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "user_id": {
-            "description": "The user ID of the user who created the AI Prompt.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          }
-        },
-        "required": [
-          "created_at",
-          "id",
-          "model_version",
-          "prompt",
-          "status",
-          "type",
-          "updated_at",
-          "user_id"
-        ]
-      },
-      "AiPromptMetadata": {
-        "description": "Metadata for an AI prompt.",
-        "type": "object",
-        "properties": {
-          "code": {
-            "nullable": true,
-            "description": "Code for the model.",
-            "type": "string"
-          }
-        }
-      },
-      "AiPromptResultsPage": {
-        "description": "A single page of results",
-        "type": "object",
-        "properties": {
-          "items": {
-            "description": "list of items on this page of results",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AiPrompt"
-            }
-          },
-          "next_page": {
-            "nullable": true,
-            "description": "token used to fetch the next page of results (if any)",
-            "type": "string"
-          }
-        },
-        "required": [
-          "items"
-        ]
-      },
-      "AiPromptType": {
-        "description": "A type of AI prompt.",
-        "oneOf": [
-          {
-            "description": "Text to CAD.",
-            "type": "string",
-            "enum": [
-              "text_to_cad"
-            ]
-          },
-          {
-            "description": "Text to KCL.",
-            "type": "string",
-            "enum": [
-              "text_to_kcl"
-            ]
-          }
         ]
       },
       "Angle": {
@@ -14086,7 +14017,7 @@
                 "description": "Feedback from the user, if any.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/AiFeedback"
+                    "$ref": "#/components/schemas/MlFeedback"
                   }
                 ]
               },
@@ -14179,6 +14110,127 @@
               "updated_at",
               "user_id"
             ]
+          },
+          {
+            "description": "Text to CAD iteration.",
+            "type": "object",
+            "properties": {
+              "code": {
+                "description": "The code for the new model.",
+                "type": "string"
+              },
+              "completed_at": {
+                "nullable": true,
+                "title": "DateTime",
+                "description": "The time and date the API call was completed.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "created_at": {
+                "title": "DateTime",
+                "description": "The time and date the API call was created.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "error": {
+                "nullable": true,
+                "description": "The error the function returned, if any.",
+                "type": "string"
+              },
+              "feedback": {
+                "nullable": true,
+                "description": "Feedback from the user, if any.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/MlFeedback"
+                  }
+                ]
+              },
+              "id": {
+                "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ]
+              },
+              "model": {
+                "description": "The model being used.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/TextToCadModel"
+                  }
+                ]
+              },
+              "model_version": {
+                "description": "The version of the model.",
+                "type": "string"
+              },
+              "original_source_code": {
+                "description": "The original source code for the model, previous to the changes.",
+                "type": "string"
+              },
+              "prompt": {
+                "nullable": true,
+                "description": "The prompt for the overall changes. This is optional if you only want changes on specific source ranges.",
+                "type": "string"
+              },
+              "source_ranges": {
+                "description": "The source ranges the user suggested to change.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SourceRangePrompt"
+                }
+              },
+              "started_at": {
+                "nullable": true,
+                "title": "DateTime",
+                "description": "The time and date the API call was started.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "status": {
+                "description": "The status of the API call.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApiCallStatus"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "text_to_cad_iteration"
+                ]
+              },
+              "updated_at": {
+                "title": "DateTime",
+                "description": "The time and date the API call was last updated.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "user_id": {
+                "description": "The user ID of the user who created the API call.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "code",
+              "created_at",
+              "id",
+              "model",
+              "model_version",
+              "original_source_code",
+              "source_ranges",
+              "status",
+              "type",
+              "updated_at",
+              "user_id"
+            ]
           }
         ]
       },
@@ -14253,6 +14305,13 @@
             "type": "string",
             "enum": [
               "text_to_cad"
+            ]
+          },
+          {
+            "description": "Text to CAD iteration.",
+            "type": "string",
+            "enum": [
+              "text_to_cad_iteration"
             ]
           }
         ]
@@ -18589,6 +18648,219 @@
             "type": "string",
             "enum": [
               "EXTENSION"
+            ]
+          }
+        ]
+      },
+      "MlFeedback": {
+        "description": "Human feedback on an ML response.",
+        "oneOf": [
+          {
+            "description": "Thumbs up.",
+            "type": "string",
+            "enum": [
+              "thumbs_up"
+            ]
+          },
+          {
+            "description": "Thumbs down.",
+            "type": "string",
+            "enum": [
+              "thumbs_down"
+            ]
+          },
+          {
+            "description": "Accepted.",
+            "type": "string",
+            "enum": [
+              "accepted"
+            ]
+          },
+          {
+            "description": "Rejected.",
+            "type": "string",
+            "enum": [
+              "rejected"
+            ]
+          }
+        ]
+      },
+      "MlPrompt": {
+        "description": "A ML prompt.",
+        "type": "object",
+        "properties": {
+          "completed_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "When the prompt was completed.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "The date and time the ML prompt was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "nullable": true,
+            "description": "The error message if the prompt failed.",
+            "type": "string"
+          },
+          "feedback": {
+            "nullable": true,
+            "description": "Feedback from the user, if any.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MlFeedback"
+              }
+            ]
+          },
+          "id": {
+            "description": "The unique identifier for the ML prompt.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "metadata": {
+            "nullable": true,
+            "description": "The metadata for the prompt.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MlPromptMetadata"
+              }
+            ]
+          },
+          "model_version": {
+            "description": "The version of the model.",
+            "type": "string"
+          },
+          "output_file": {
+            "nullable": true,
+            "description": "The output file. In the case of TextToCad this is a link to a file in a GCP bucket.",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "The prompt.",
+            "type": "string"
+          },
+          "started_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "When the prompt was started.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "description": "The status of the prompt.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ]
+          },
+          "type": {
+            "description": "The type of prompt.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MlPromptType"
+              }
+            ]
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The date and time the ML prompt was last updated.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the ML prompt.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "model_version",
+          "prompt",
+          "status",
+          "type",
+          "updated_at",
+          "user_id"
+        ]
+      },
+      "MlPromptMetadata": {
+        "description": "Metadata for a ML prompt.",
+        "type": "object",
+        "properties": {
+          "code": {
+            "nullable": true,
+            "description": "Code for the model.",
+            "type": "string"
+          },
+          "original_source_code": {
+            "nullable": true,
+            "description": "The original source code for the model.",
+            "type": "string"
+          },
+          "source_ranges": {
+            "description": "The source ranges the user suggested to change.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRangePrompt"
+            }
+          }
+        }
+      },
+      "MlPromptResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MlPrompt"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "MlPromptType": {
+        "description": "A type of ML prompt.",
+        "oneOf": [
+          {
+            "description": "Text to CAD.",
+            "type": "string",
+            "enum": [
+              "text_to_cad"
+            ]
+          },
+          {
+            "description": "Text to KCL.",
+            "type": "string",
+            "enum": [
+              "text_to_kcl"
+            ]
+          },
+          {
+            "description": "Text to Kcl iteration,",
+            "type": "string",
+            "enum": [
+              "text_to_kcl_iteration"
             ]
           }
         ]
@@ -25023,6 +25295,76 @@
           }
         }
       },
+      "SourcePosition": {
+        "description": "A position in the source code.",
+        "type": "object",
+        "properties": {
+          "column": {
+            "description": "The column number.",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "line": {
+            "description": "The line number.",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "column",
+          "line"
+        ]
+      },
+      "SourceRange": {
+        "description": "A source range of code.",
+        "type": "object",
+        "properties": {
+          "end": {
+            "description": "The end of the range.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SourcePosition"
+              }
+            ]
+          },
+          "start": {
+            "description": "The start of the range.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SourcePosition"
+              }
+            ]
+          }
+        },
+        "required": [
+          "end",
+          "start"
+        ]
+      },
+      "SourceRangePrompt": {
+        "description": "A source range and prompt for a text to CAD iteration.",
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "description": "The prompt for the changes.",
+            "type": "string"
+          },
+          "range": {
+            "description": "The range of the source code to change.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SourceRange"
+              }
+            ]
+          }
+        },
+        "required": [
+          "prompt",
+          "range"
+        ]
+      },
       "StlStorage": {
         "description": "Export storage.",
         "oneOf": [
@@ -25381,7 +25723,7 @@
             "description": "Feedback from the user, if any.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/AiFeedback"
+                "$ref": "#/components/schemas/MlFeedback"
               }
             ]
           },
@@ -25481,6 +25823,146 @@
           "prompt"
         ]
       },
+      "TextToCadIteration": {
+        "description": "A response from a text to CAD iteration.",
+        "type": "object",
+        "properties": {
+          "code": {
+            "description": "The code for the new model.",
+            "type": "string"
+          },
+          "completed_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The time and date the API call was completed.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "The time and date the API call was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "nullable": true,
+            "description": "The error the function returned, if any.",
+            "type": "string"
+          },
+          "feedback": {
+            "nullable": true,
+            "description": "Feedback from the user, if any.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MlFeedback"
+              }
+            ]
+          },
+          "id": {
+            "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "model": {
+            "description": "The model being used.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TextToCadModel"
+              }
+            ]
+          },
+          "model_version": {
+            "description": "The version of the model.",
+            "type": "string"
+          },
+          "original_source_code": {
+            "description": "The original source code for the model, previous to the changes.",
+            "type": "string"
+          },
+          "prompt": {
+            "nullable": true,
+            "description": "The prompt for the overall changes. This is optional if you only want changes on specific source ranges.",
+            "type": "string"
+          },
+          "source_ranges": {
+            "description": "The source ranges the user suggested to change.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRangePrompt"
+            }
+          },
+          "started_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The time and date the API call was started.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "description": "The status of the API call.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ]
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The time and date the API call was last updated.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the API call.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          }
+        },
+        "required": [
+          "code",
+          "created_at",
+          "id",
+          "model",
+          "model_version",
+          "original_source_code",
+          "source_ranges",
+          "status",
+          "updated_at",
+          "user_id"
+        ]
+      },
+      "TextToCadIterationBody": {
+        "description": "Body for generating models from text.",
+        "type": "object",
+        "properties": {
+          "original_source_code": {
+            "description": "The source code for the model (in kcl) that is to be edited.",
+            "type": "string"
+          },
+          "prompt": {
+            "nullable": true,
+            "description": "The prompt for the model, if not using source ranges.",
+            "type": "string"
+          },
+          "source_ranges": {
+            "description": "The source ranges the user suggested to change. If empty, the prompt will be used and is required.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRangePrompt"
+            }
+          }
+        },
+        "required": [
+          "original_source_code",
+          "source_ranges"
+        ]
+      },
       "TextToCadModel": {
         "description": "A type of Text-to-CAD model.",
         "oneOf": [
@@ -25496,6 +25978,13 @@
             "type": "string",
             "enum": [
               "kcl"
+            ]
+          },
+          {
+            "description": "KCL iteration.",
+            "type": "string",
+            "enum": [
+              "kcl_iteration"
             ]
           }
         ]
