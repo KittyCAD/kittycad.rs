@@ -3285,7 +3285,8 @@
     "/ml/text-to-cad/iteration": {
       "post": {
         "tags": [
-          "ml"
+          "ml",
+          "beta"
         ],
         "summary": "Iterate on a CAD model with a prompt.",
         "description": "This operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
