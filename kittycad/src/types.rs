@@ -650,291 +650,6 @@ impl tabled::Tabled for AddressDetails {
     }
 }
 
-#[doc = "Human feedback on an AI response."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum AiFeedback {
-    #[doc = "Thumbs up."]
-    #[serde(rename = "thumbs_up")]
-    #[display("thumbs_up")]
-    ThumbsUp,
-    #[doc = "Thumbs down."]
-    #[serde(rename = "thumbs_down")]
-    #[display("thumbs_down")]
-    ThumbsDown,
-    #[doc = "Accepted."]
-    #[serde(rename = "accepted")]
-    #[display("accepted")]
-    Accepted,
-    #[doc = "Rejected."]
-    #[serde(rename = "rejected")]
-    #[display("rejected")]
-    Rejected,
-}
-
-#[doc = "An AI prompt."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct AiPrompt {
-    #[doc = "When the prompt was completed."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The date and time the AI prompt was created."]
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The error message if the prompt failed."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[doc = "Feedback from the user, if any."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub feedback: Option<AiFeedback>,
-    #[doc = "The unique identifier for the AI Prompt."]
-    pub id: uuid::Uuid,
-    #[doc = "The metadata for the prompt."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<AiPromptMetadata>,
-    #[doc = "The version of the model."]
-    pub model_version: String,
-    #[doc = "The output file. In the case of TextToCad this is a link to a file in a GCP bucket."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub output_file: Option<String>,
-    #[doc = "The prompt."]
-    pub prompt: String,
-    #[doc = "When the prompt was started."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the prompt."]
-    pub status: ApiCallStatus,
-    #[doc = "The type of prompt."]
-    #[serde(rename = "type")]
-    pub type_: AiPromptType,
-    #[doc = "The date and time the AI prompt was last updated."]
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the AI Prompt."]
-    pub user_id: uuid::Uuid,
-}
-
-impl std::fmt::Display for AiPrompt {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for AiPrompt {
-    const LENGTH: usize = 14;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.created_at).into(),
-            if let Some(error) = &self.error {
-                format!("{:?}", error).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(feedback) = &self.feedback {
-                format!("{:?}", feedback).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.id).into(),
-            if let Some(metadata) = &self.metadata {
-                format!("{:?}", metadata).into()
-            } else {
-                String::new().into()
-            },
-            self.model_version.clone().into(),
-            if let Some(output_file) = &self.output_file {
-                format!("{:?}", output_file).into()
-            } else {
-                String::new().into()
-            },
-            self.prompt.clone().into(),
-            if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.status).into(),
-            format!("{:?}", self.type_).into(),
-            format!("{:?}", self.updated_at).into(),
-            format!("{:?}", self.user_id).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "completed_at".into(),
-            "created_at".into(),
-            "error".into(),
-            "feedback".into(),
-            "id".into(),
-            "metadata".into(),
-            "model_version".into(),
-            "output_file".into(),
-            "prompt".into(),
-            "started_at".into(),
-            "status".into(),
-            "type_".into(),
-            "updated_at".into(),
-            "user_id".into(),
-        ]
-    }
-}
-
-#[doc = "Metadata for an AI prompt."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct AiPromptMetadata {
-    #[doc = "Code for the model."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub code: Option<String>,
-}
-
-impl std::fmt::Display for AiPromptMetadata {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for AiPromptMetadata {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![if let Some(code) = &self.code {
-            format!("{:?}", code).into()
-        } else {
-            String::new().into()
-        }]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["code".into()]
-    }
-}
-
-#[doc = "A single page of results"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct AiPromptResultsPage {
-    #[doc = "list of items on this page of results"]
-    pub items: Vec<AiPrompt>,
-    #[doc = "token used to fetch the next page of results (if any)"]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub next_page: Option<String>,
-}
-
-impl std::fmt::Display for AiPromptResultsPage {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "requests")]
-impl crate::types::paginate::Pagination for AiPromptResultsPage {
-    type Item = AiPrompt;
-    fn has_more_pages(&self) -> bool {
-        self.next_page.is_some()
-    }
-
-    fn next_page_token(&self) -> Option<String> {
-        self.next_page.clone()
-    }
-
-    fn next_page(
-        &self,
-        req: reqwest::Request,
-    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
-        req.url_mut()
-            .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
-        Ok(req)
-    }
-
-    fn items(&self) -> Vec<Self::Item> {
-        self.items.clone()
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for AiPromptResultsPage {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.items).into(),
-            if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["items".into(), "next_page".into()]
-    }
-}
-
-#[doc = "A type of AI prompt."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum AiPromptType {
-    #[doc = "Text to CAD."]
-    #[serde(rename = "text_to_cad")]
-    #[display("text_to_cad")]
-    TextToCad,
-    #[doc = "Text to KCL."]
-    #[serde(rename = "text_to_kcl")]
-    #[display("text_to_kcl")]
-    TextToKcl,
-}
-
 #[doc = "An angle, with a specific unit."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -2155,7 +1870,7 @@ pub enum AsyncApiCallOutput {
         error: Option<String>,
         #[doc = "Feedback from the user, if any."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
-        feedback: Option<AiFeedback>,
+        feedback: Option<MlFeedback>,
         #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
         #[doc = "The model being used."]
@@ -2170,6 +1885,46 @@ pub enum AsyncApiCallOutput {
         outputs: Option<std::collections::HashMap<String, base64::Base64Data>>,
         #[doc = "The prompt."]
         prompt: String,
+        #[doc = "The time and date the API call was started."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
+        status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
+        updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
+        user_id: uuid::Uuid,
+    },
+    #[doc = "Text to CAD iteration."]
+    #[serde(rename = "text_to_cad_iteration")]
+    TextToCadIteration {
+        #[doc = "The code for the new model."]
+        code: String,
+        #[doc = "The time and date the API call was completed."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The time and date the API call was created."]
+        created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        error: Option<String>,
+        #[doc = "Feedback from the user, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        feedback: Option<MlFeedback>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
+        id: uuid::Uuid,
+        #[doc = "The model being used."]
+        model: TextToCadModel,
+        #[doc = "The version of the model."]
+        model_version: String,
+        #[doc = "The original source code for the model, previous to the changes."]
+        original_source_code: String,
+        #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
+                 specific source ranges."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        prompt: Option<String>,
+        #[doc = "The source ranges the user suggested to change."]
+        source_ranges: Vec<SourceRangePrompt>,
         #[doc = "The time and date the API call was started."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -2298,6 +2053,10 @@ pub enum AsyncApiCallType {
     #[serde(rename = "text_to_cad")]
     #[display("text_to_cad")]
     TextToCad,
+    #[doc = "Text to CAD iteration."]
+    #[serde(rename = "text_to_cad_iteration")]
+    #[display("text_to_cad_iteration")]
+    TextToCadIteration,
 }
 
 #[doc = "The authentication callback from the OAuth 2.0 client. This is typically posted to the \
@@ -8450,6 +8209,317 @@ pub enum Method {
     Extension,
 }
 
+#[doc = "Human feedback on an ML response."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum MlFeedback {
+    #[doc = "Thumbs up."]
+    #[serde(rename = "thumbs_up")]
+    #[display("thumbs_up")]
+    ThumbsUp,
+    #[doc = "Thumbs down."]
+    #[serde(rename = "thumbs_down")]
+    #[display("thumbs_down")]
+    ThumbsDown,
+    #[doc = "Accepted."]
+    #[serde(rename = "accepted")]
+    #[display("accepted")]
+    Accepted,
+    #[doc = "Rejected."]
+    #[serde(rename = "rejected")]
+    #[display("rejected")]
+    Rejected,
+}
+
+#[doc = "A ML prompt."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct MlPrompt {
+    #[doc = "When the prompt was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The date and time the ML prompt was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error message if the prompt failed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "Feedback from the user, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub feedback: Option<MlFeedback>,
+    #[doc = "The unique identifier for the ML prompt."]
+    pub id: uuid::Uuid,
+    #[doc = "The metadata for the prompt."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<MlPromptMetadata>,
+    #[doc = "The version of the model."]
+    pub model_version: String,
+    #[doc = "The output file. In the case of TextToCad this is a link to a file in a GCP bucket."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output_file: Option<String>,
+    #[doc = "The prompt."]
+    pub prompt: String,
+    #[doc = "When the prompt was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the prompt."]
+    pub status: ApiCallStatus,
+    #[doc = "The type of prompt."]
+    #[serde(rename = "type")]
+    pub type_: MlPromptType,
+    #[doc = "The date and time the ML prompt was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the ML prompt."]
+    pub user_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for MlPrompt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for MlPrompt {
+    const LENGTH: usize = 14;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.created_at).into(),
+            if let Some(error) = &self.error {
+                format!("{:?}", error).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(feedback) = &self.feedback {
+                format!("{:?}", feedback).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.id).into(),
+            if let Some(metadata) = &self.metadata {
+                format!("{:?}", metadata).into()
+            } else {
+                String::new().into()
+            },
+            self.model_version.clone().into(),
+            if let Some(output_file) = &self.output_file {
+                format!("{:?}", output_file).into()
+            } else {
+                String::new().into()
+            },
+            self.prompt.clone().into(),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.status).into(),
+            format!("{:?}", self.type_).into(),
+            format!("{:?}", self.updated_at).into(),
+            format!("{:?}", self.user_id).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "completed_at".into(),
+            "created_at".into(),
+            "error".into(),
+            "feedback".into(),
+            "id".into(),
+            "metadata".into(),
+            "model_version".into(),
+            "output_file".into(),
+            "prompt".into(),
+            "started_at".into(),
+            "status".into(),
+            "type_".into(),
+            "updated_at".into(),
+            "user_id".into(),
+        ]
+    }
+}
+
+#[doc = "Metadata for a ML prompt."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct MlPromptMetadata {
+    #[doc = "Code for the model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
+    #[doc = "The original source code for the model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub original_source_code: Option<String>,
+    #[doc = "The source ranges the user suggested to change."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_ranges: Option<Vec<SourceRangePrompt>>,
+}
+
+impl std::fmt::Display for MlPromptMetadata {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for MlPromptMetadata {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(code) = &self.code {
+                format!("{:?}", code).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(original_source_code) = &self.original_source_code {
+                format!("{:?}", original_source_code).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(source_ranges) = &self.source_ranges {
+                format!("{:?}", source_ranges).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "code".into(),
+            "original_source_code".into(),
+            "source_ranges".into(),
+        ]
+    }
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct MlPromptResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<MlPrompt>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for MlPromptResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for MlPromptResultsPage {
+    type Item = MlPrompt;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for MlPromptResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "A type of ML prompt."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum MlPromptType {
+    #[doc = "Text to CAD."]
+    #[serde(rename = "text_to_cad")]
+    #[display("text_to_cad")]
+    TextToCad,
+    #[doc = "Text to KCL."]
+    #[serde(rename = "text_to_kcl")]
+    #[display("text_to_kcl")]
+    TextToKcl,
+    #[doc = "Text to Kcl iteration,"]
+    #[serde(rename = "text_to_kcl_iteration")]
+    #[display("text_to_kcl_iteration")]
+    TextToKclIteration,
+}
+
 #[doc = "Type for modeling-app events"]
 #[derive(
     serde :: Serialize,
@@ -12614,6 +12684,114 @@ impl tabled::Tabled for Solid3DGetPrevAdjacentEdge {
     }
 }
 
+#[doc = "A position in the source code."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SourcePosition {
+    #[doc = "The column number."]
+    pub column: u32,
+    #[doc = "The line number."]
+    pub line: u32,
+}
+
+impl std::fmt::Display for SourcePosition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SourcePosition {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.column).into(),
+            format!("{:?}", self.line).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["column".into(), "line".into()]
+    }
+}
+
+#[doc = "A source range of code."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SourceRange {
+    #[doc = "The end of the range."]
+    pub end: SourcePosition,
+    #[doc = "The start of the range."]
+    pub start: SourcePosition,
+}
+
+impl std::fmt::Display for SourceRange {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SourceRange {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.end).into(),
+            format!("{:?}", self.start).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["end".into(), "start".into()]
+    }
+}
+
+#[doc = "A source range and prompt for a text to CAD iteration."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SourceRangePrompt {
+    #[doc = "The prompt for the changes."]
+    pub prompt: String,
+    #[doc = "The range of the source code to change."]
+    pub range: SourceRange,
+}
+
+impl std::fmt::Display for SourceRangePrompt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SourceRangePrompt {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.prompt.clone().into(),
+            format!("{:?}", self.range).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["prompt".into(), "range".into()]
+    }
+}
+
 #[doc = "Export storage."]
 #[derive(
     serde :: Serialize,
@@ -12977,7 +13155,7 @@ pub struct TextToCad {
     pub error: Option<String>,
     #[doc = "Feedback from the user, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub feedback: Option<AiFeedback>,
+    pub feedback: Option<MlFeedback>,
     #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
     #[doc = "The model being used."]
@@ -13112,6 +13290,172 @@ impl tabled::Tabled for TextToCadCreateBody {
     }
 }
 
+#[doc = "A response from a text to CAD iteration."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct TextToCadIteration {
+    #[doc = "The code for the new model."]
+    pub code: String,
+    #[doc = "The time and date the API call was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the API call was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "Feedback from the user, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub feedback: Option<MlFeedback>,
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The model being used."]
+    pub model: TextToCadModel,
+    #[doc = "The version of the model."]
+    pub model_version: String,
+    #[doc = "The original source code for the model, previous to the changes."]
+    pub original_source_code: String,
+    #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
+             specific source ranges."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt: Option<String>,
+    #[doc = "The source ranges the user suggested to change."]
+    pub source_ranges: Vec<SourceRangePrompt>,
+    #[doc = "The time and date the API call was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the API call."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the API call was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the API call."]
+    pub user_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for TextToCadIteration {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for TextToCadIteration {
+    const LENGTH: usize = 15;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.code.clone().into(),
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.created_at).into(),
+            if let Some(error) = &self.error {
+                format!("{:?}", error).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(feedback) = &self.feedback {
+                format!("{:?}", feedback).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.model).into(),
+            self.model_version.clone().into(),
+            self.original_source_code.clone().into(),
+            if let Some(prompt) = &self.prompt {
+                format!("{:?}", prompt).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.source_ranges).into(),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.status).into(),
+            format!("{:?}", self.updated_at).into(),
+            format!("{:?}", self.user_id).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "code".into(),
+            "completed_at".into(),
+            "created_at".into(),
+            "error".into(),
+            "feedback".into(),
+            "id".into(),
+            "model".into(),
+            "model_version".into(),
+            "original_source_code".into(),
+            "prompt".into(),
+            "source_ranges".into(),
+            "started_at".into(),
+            "status".into(),
+            "updated_at".into(),
+            "user_id".into(),
+        ]
+    }
+}
+
+#[doc = "Body for generating models from text."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct TextToCadIterationBody {
+    #[doc = "The source code for the model (in kcl) that is to be edited."]
+    pub original_source_code: String,
+    #[doc = "The prompt for the model, if not using source ranges."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt: Option<String>,
+    #[doc = "The source ranges the user suggested to change. If empty, the prompt will be used \
+             and is required."]
+    pub source_ranges: Vec<SourceRangePrompt>,
+}
+
+impl std::fmt::Display for TextToCadIterationBody {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for TextToCadIterationBody {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.original_source_code.clone().into(),
+            if let Some(prompt) = &self.prompt {
+                format!("{:?}", prompt).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.source_ranges).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "original_source_code".into(),
+            "prompt".into(),
+            "source_ranges".into(),
+        ]
+    }
+}
+
 #[doc = "A type of Text-to-CAD model."]
 #[derive(
     serde :: Serialize,
@@ -13135,6 +13479,10 @@ pub enum TextToCadModel {
     #[serde(rename = "kcl")]
     #[display("kcl")]
     Kcl,
+    #[doc = "KCL iteration."]
+    #[serde(rename = "kcl_iteration")]
+    #[display("kcl_iteration")]
+    KclIteration,
 }
 
 #[doc = "A single page of results"]
