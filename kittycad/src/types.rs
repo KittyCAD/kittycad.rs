@@ -8701,6 +8701,9 @@ pub enum ModelingCmd {
     Solid3DShellFace {
         #[doc = "Which faces to remove, leaving only the shell."]
         face_ids: Vec<uuid::Uuid>,
+        #[doc = "If true, the Solid3D is made hollow instead of removing the selected faces"]
+        #[serde(default)]
+        hollow: bool,
         #[doc = "Which Solid3D is being shelled."]
         object_id: uuid::Uuid,
         #[doc = "How thick the shell should be. Smaller values mean a thinner shell."]
