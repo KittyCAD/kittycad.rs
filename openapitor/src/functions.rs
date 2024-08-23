@@ -29,7 +29,7 @@ fn generate_websocket_fn(
     // Get the function name.
     let fn_name = op.get_fn_name()?;
     let fn_name_ident = format_ident!("{}", fn_name);
-    let response_type = quote!(reqwest::Upgraded);
+    let response_type = quote!((reqwest::Upgraded, http::HeaderMap));
     // Get the function args.
     let raw_args = get_args(name, method, type_space, op, global_params)?;
     // Make sure if we have args, we start with a comma.
@@ -86,10 +86,12 @@ fn generate_websocket_fn(
         if resp.status().is_client_error() || resp.status().is_server_error() {
             return Err(crate::types::error::Error::UnexpectedResponse(resp));
         }
+
+        let headers = resp.headers().clone();
         // TODO: This isn't really a request error, but the response was already consumed.
         // So we can't use Error::UnexpectedResponse.
         let upgraded = resp.upgrade().await.map_err(crate::types::error::Error::RequestError)?;
-        Ok(upgraded)
+        Ok((upgraded, headers))
     };
 
     let function = quote! {
