@@ -13840,6 +13840,15 @@
           },
           {
             "in": "query",
+            "name": "replay",
+            "description": "If given, when the session ends, the modeling commands sent during the session will be written out to this filename. For debugging.",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "show_grid",
             "description": "If true, will show the grid at the start of the session.",
             "schema": {
@@ -23493,6 +23502,19 @@
           "cmd_id"
         ]
       },
+      "ModelingSessionData": {
+        "description": "Successful Websocket response.",
+        "type": "object",
+        "properties": {
+          "api_call_id": {
+            "description": "ID of the API call this modeling session is using. Useful for tracing and debugging.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "api_call_id"
+        ]
+      },
       "MouseClick": {
         "description": "The response from the `MouseClick` command.",
         "type": "object",
@@ -24799,6 +24821,38 @@
                 "type": "string",
                 "enum": [
                   "metrics_request"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "Data about the Modeling Session (application-level).",
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "session": {
+                    "description": "Data about the Modeling Session (application-level).",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/ModelingSessionData"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "session"
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "modeling_session_data"
                 ]
               }
             },
