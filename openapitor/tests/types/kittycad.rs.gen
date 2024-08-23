@@ -9451,6 +9451,37 @@ impl tabled::Tabled for ModelingCmdReq {
     }
 }
 
+#[doc = "Successful Websocket response."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ModelingSessionData {
+    #[doc = "ID of the API call this modeling session is using. Useful for tracing and debugging."]
+    pub api_call_id: String,
+}
+
+impl std::fmt::Display for ModelingSessionData {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ModelingSessionData {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.api_call_id.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["api_call_id".into()]
+    }
+}
+
 #[doc = "The response from the `MouseClick` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9954,6 +9985,12 @@ pub enum OkWebSocketResponseData {
     #[doc = "Request a collection of metrics, to include WebRTC."]
     #[serde(rename = "metrics_request")]
     MetricsRequest {},
+    #[doc = "Data about the Modeling Session (application-level)."]
+    #[serde(rename = "modeling_session_data")]
+    ModelingSessionData {
+        #[doc = "Data about the Modeling Session (application-level)."]
+        session: ModelingSessionData,
+    },
     #[doc = "Pong response to a Ping message."]
     #[serde(rename = "pong")]
     Pong {},
