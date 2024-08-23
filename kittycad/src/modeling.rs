@@ -36,7 +36,7 @@ impl Modeling {
         video_res_height: Option<u32>,
         video_res_width: Option<u32>,
         webrtc: Option<bool>,
-    ) -> Result<reqwest::Upgraded, crate::types::error::Error> {
+    ) -> Result<(reqwest::Upgraded, http::HeaderMap), crate::types::error::Error> {
         let mut req = self.client.client_http1_only.request(
             http::Method::GET,
             format!("{}/{}", self.client.base_url, "ws/modeling/commands"),
@@ -92,10 +92,11 @@ impl Modeling {
             return Err(crate::types::error::Error::UnexpectedResponse(resp));
         }
 
+        let headers = resp.headers().clone();
         let upgraded = resp
             .upgrade()
             .await
             .map_err(crate::types::error::Error::RequestError)?;
-        Ok(upgraded)
+        Ok((upgraded, headers))
     }
 }
