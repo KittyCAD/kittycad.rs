@@ -7873,6 +7873,37 @@ impl tabled::Tabled for LinearTransform {
     }
 }
 
+#[doc = "The response from the `Loft` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Loft {
+    #[doc = "The UUID of the newly created solid loft."]
+    pub solid_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for Loft {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Loft {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.solid_id).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["solid_id".into()]
+    }
+}
+
 #[doc = "The mass response."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8622,7 +8653,7 @@ pub enum ModelingCmd {
         #[doc = "The maximum acceptable surface gap computed between the revolution surface joints. Must be positive (i.e. greater than zero)."]
         tolerance: f64,
     },
-    #[doc = "Command for revolving a solid 2d."]
+    #[doc = "Command for shelling a solid3d face"]
     #[serde(rename = "solid3d_shell_face")]
     Solid3DShellFace {
         #[doc = "Which faces to remove, leaving only the shell."]
@@ -8646,6 +8677,21 @@ pub enum ModelingCmd {
         target: uuid::Uuid,
         #[doc = "The maximum acceptable surface gap computed between the revolution surface joints. Must be positive (i.e. greater than zero)."]
         tolerance: f64,
+    },
+    #[doc = "Command for lofting sections to create a solid"]
+    #[serde(rename = "loft")]
+    Loft {
+        #[doc = "This can be set to override the automatically determined topological base curve, which is usually the first section encountered."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        base_curve_index: Option<u32>,
+        #[doc = "Attempt to approximate rational curves (such as arcs) using a bezier. This will remove banding around interpolations between arcs and non-arcs.  It may produce errors in other scenarios Over time, this field won't be necessary."]
+        bez_approximate_rational: bool,
+        #[doc = "The closed section curves to create a lofted solid from. Currently, these must be Solid2Ds"]
+        section_ids: Vec<uuid::Uuid>,
+        #[doc = "Tolerance"]
+        tolerance: f64,
+        #[doc = "Degree of the interpolation. Must be greater than zero. For example, use 2 for quadratic, or 3 for cubic interpolation in the V direction."]
+        v_degree: u32,
     },
     #[doc = "Closes a path, converting it to a 2D solid."]
     #[serde(rename = "close_path")]
@@ -9660,6 +9706,12 @@ pub enum OkModelingCmdResponse {
     EntityGetSketchPaths {
         #[doc = "The response from the `EntityGetSketchPaths` command."]
         data: EntityGetSketchPaths,
+    },
+    #[doc = "The response to the 'Loft' endpoint"]
+    #[serde(rename = "loft")]
+    Loft {
+        #[doc = "The response from the `Loft` command."]
+        data: Loft,
     },
     #[doc = "The response to the 'ClosePath' endpoint"]
     #[serde(rename = "close_path")]
@@ -13339,6 +13391,50 @@ impl tabled::Tabled for TextToCadResultsPage {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "The request parameters for the OAuth 2.0 token revocation flow."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct TokenRevokeRequestForm {
+    #[doc = "The client ID."]
+    pub client_id: uuid::Uuid,
+    #[doc = "The client secret."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub client_secret: Option<String>,
+    #[doc = "The token to revoke."]
+    pub token: uuid::Uuid,
+}
+
+impl std::fmt::Display for TokenRevokeRequestForm {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for TokenRevokeRequestForm {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.client_id).into(),
+            if let Some(client_secret) = &self.client_secret {
+                format!("{:?}", client_secret).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.token).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["client_id".into(), "client_secret".into(), "token".into()]
     }
 }
 

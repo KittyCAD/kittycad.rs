@@ -4,7 +4,7 @@
     "path": "/info/x-rust",
     "value": {
       "client": "// Authenticate via an API token.\nlet client = kittycad::Client::new(\"$TOKEN\");\n\n// - OR -\n\n// Authenticate with your token and host parsed from the environment variables:\n// `KITTYCAD_API_TOKEN`.\nlet client = kittycad::Client::new_from_env();",
-      "install": "[dependencies]\nkittycad = \"0.3.17\""
+      "install": "[dependencies]\nkittycad = \"0.3.18\""
     }
   },
   {
@@ -309,6 +309,14 @@
     "value": {
       "example": "/// Get the consent URL and other information for the OAuth 2.0 provider.\n/// \n/// **Parameters:**\n/// \n/// - `callback_url: Option<String>`: The URL to redirect back to after we have authenticated.\n/// - `provider: crate::types::AccountProvider`: The provider. (required)\nasync fn example_oauth2_oauth_2_provider_consent() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo = client\n        .oauth2()\n        .oauth_2_provider_consent(\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Tencent,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.oauth_2_provider_consent"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1oauth2~1token~1revoke/post/x-rust",
+    "value": {
+      "example": "/// Revoke an OAuth2 token.\n/// \n/// This endpoint is designed to be accessed from an *unauthenticated* API client.\nuse std::str::FromStr;\nasync fn example_oauth2_oauth_2_token_revoke() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .oauth_2_token_revoke(&kittycad::types::TokenRevokeRequestForm {\n            client_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            client_secret: Some(\"some-string\".to_string()),\n            token: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        })\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.oauth_2_token_revoke"
     }
   },
   {
