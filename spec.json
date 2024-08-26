@@ -4507,6 +4507,98 @@
         }
       }
     },
+    "/oauth2/token/revoke": {
+      "post": {
+        "tags": [
+          "oauth2",
+          "hidden"
+        ],
+        "summary": "Revoke an OAuth2 token.",
+        "description": "This endpoint is designed to be accessed from an *unauthenticated* API client.",
+        "operationId": "oauth2_token_revoke",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRevokeRequestForm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "*/*": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_oauth2_token_revoke",
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/org": {
       "get": {
         "tags": [
@@ -19845,6 +19937,20 @@
           }
         }
       },
+      "Loft": {
+        "description": "The response from the `Loft` command.",
+        "type": "object",
+        "properties": {
+          "solid_id": {
+            "description": "The UUID of the newly created solid loft.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "solid_id"
+        ]
+      },
       "Mass": {
         "description": "The mass response.",
         "type": "object",
@@ -20579,7 +20685,7 @@
             ]
           },
           {
-            "description": "Command for revolving a solid 2d.",
+            "description": "Command for shelling a solid3d face",
             "type": "object",
             "properties": {
               "face_ids": {
@@ -20668,6 +20774,58 @@
               "target",
               "tolerance",
               "type"
+            ]
+          },
+          {
+            "description": "Command for lofting sections to create a solid",
+            "type": "object",
+            "properties": {
+              "base_curve_index": {
+                "nullable": true,
+                "description": "This can be set to override the automatically determined topological base curve, which is usually the first section encountered.",
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              },
+              "bez_approximate_rational": {
+                "description": "Attempt to approximate rational curves (such as arcs) using a bezier. This will remove banding around interpolations between arcs and non-arcs.  It may produce errors in other scenarios Over time, this field won't be necessary.",
+                "type": "boolean"
+              },
+              "section_ids": {
+                "description": "The closed section curves to create a lofted solid from. Currently, these must be Solid2Ds",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "tolerance": {
+                "description": "Tolerance",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "loft"
+                ]
+              },
+              "v_degree": {
+                "description": "Degree of the interpolation. Must be greater than zero. For example, use 2 for quadratic, or 3 for cubic interpolation in the V direction.",
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "bez_approximate_rational",
+              "section_ids",
+              "tolerance",
+              "type",
+              "v_degree"
             ]
           },
           {
@@ -23734,6 +23892,25 @@
                 "type": "string",
                 "enum": [
                   "entity_get_sketch_paths"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'Loft' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Loft"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "loft"
                 ]
               }
             },
@@ -27415,6 +27592,31 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "TokenRevokeRequestForm": {
+        "description": "The request parameters for the OAuth 2.0 token revocation flow.",
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "description": "The client ID.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "client_secret": {
+            "nullable": true,
+            "description": "The client secret.",
+            "type": "string"
+          },
+          "token": {
+            "description": "The token to revoke.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "client_id",
+          "token"
         ]
       },
       "UnitAngle": {
