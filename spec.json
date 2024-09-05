@@ -7705,8 +7705,7 @@
             "description": "The service account.",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "$ref": "#/components/schemas/ServiceAccountTokenUuid"
             }
           }
         ],
@@ -7785,8 +7784,7 @@
             "description": "The service account.",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "$ref": "#/components/schemas/ServiceAccountTokenUuid"
             }
           }
         ],
@@ -7858,8 +7856,7 @@
             "description": "The service account.",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "$ref": "#/components/schemas/ServiceAccountTokenUuid"
             }
           }
         ],
@@ -10811,8 +10808,7 @@
             "description": "The API token.",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "$ref": "#/components/schemas/ApiTokenUuid"
             }
           }
         ],
@@ -10891,8 +10887,7 @@
             "description": "The API token.",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "$ref": "#/components/schemas/ApiTokenUuid"
             }
           }
         ],
@@ -10964,8 +10959,7 @@
             "description": "The API token.",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "$ref": "#/components/schemas/ApiTokenUuid"
             }
           }
         ],
@@ -12730,8 +12724,7 @@
             "description": "The API token.",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "$ref": "#/components/schemas/SessionTokenUuid"
             }
           }
         ],
@@ -14641,7 +14634,7 @@
             "description": "The API token itself.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/StringUuid"
+                "$ref": "#/components/schemas/ApiTokenUuid"
               }
             ]
           },
@@ -14689,6 +14682,10 @@
         "required": [
           "items"
         ]
+      },
+      "ApiTokenUuid": {
+        "description": "An auth token. A uuid with a prefix of api-",
+        "type": "string"
       },
       "AppClientInfo": {
         "description": "Information about a third party app client.",
@@ -17090,6 +17087,10 @@
           "device_code",
           "grant_type"
         ]
+      },
+      "DeviceAccessTokenUuid": {
+        "description": "An auth token. A uuid with a prefix of dev-",
+        "type": "string"
       },
       "DeviceAuthRequestForm": {
         "description": "The request parameters for the OAuth 2.0 Device Authorization Grant flow.",
@@ -19900,43 +19901,6 @@
         "type": "number",
         "format": "double"
       },
-      "LinearTransform": {
-        "description": "Ways to transform each solid being replicated in a repeating pattern.",
-        "type": "object",
-        "properties": {
-          "replicate": {
-            "description": "Whether to replicate the original solid in this instance.",
-            "default": true,
-            "type": "boolean"
-          },
-          "scale": {
-            "description": "Scale the replica's size along each axis. Defaults to (1, 1, 1) (i.e. the same size as the original).",
-            "default": {
-              "x": 1.0,
-              "y": 1.0,
-              "z": 1.0
-            },
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Point3d"
-              }
-            ]
-          },
-          "translate": {
-            "description": "Translate the replica this far along each dimension. Defaults to zero vector (i.e. same position as the original).",
-            "default": {
-              "x": 0.0,
-              "y": 0.0,
-              "z": 0.0
-            },
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Point3d"
-              }
-            ]
-          }
-        }
-      },
       "Loft": {
         "description": "The response from the `Loft` command.",
         "type": "object",
@@ -21289,7 +21253,7 @@
             ]
           },
           {
-            "description": "Create a pattern using this entity by specifying the transform for each desired repetition.",
+            "description": "Create a pattern using this entity by specifying the transform for each desired repetition. Transformations are performed in the following order (first applied to last applied): scale, rotate, translate.",
             "type": "object",
             "properties": {
               "entity_id": {
@@ -21301,7 +21265,7 @@
                 "description": "How to transform each repeated solid. The 0th transform will create the first copy of the entity. The total number of (optional) repetitions equals the size of this list.",
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/LinearTransform"
+                  "$ref": "#/components/schemas/Transform"
                 }
               },
               "type": {
@@ -25373,6 +25337,65 @@
           }
         ]
       },
+      "OriginType": {
+        "description": "The type of origin",
+        "oneOf": [
+          {
+            "description": "Local Origin (center of object bounding box).",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "local"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
+            "description": "Global Origin (0, 0, 0).",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "global"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
+            "description": "Custom Origin (user specified point).",
+            "type": "object",
+            "properties": {
+              "origin": {
+                "description": "Custom origin point.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "custom"
+                ]
+              }
+            },
+            "required": [
+              "origin",
+              "type"
+            ]
+          }
+        ]
+      },
       "OutputFile": {
         "description": "Output file contents.\n\n<details><summary>JSON schema</summary>\n\n```json { \"description\": \"Output file contents.\", \"type\": \"object\", \"properties\": { \"contents\": { \"description\": \"The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for JSON.\", \"type\": \"string\" }, \"name\": { \"description\": \"The name of the file.\", \"default\": \"\", \"type\": \"string\" } } } ``` </details>",
         "type": "object",
@@ -26271,6 +26294,41 @@
           "name"
         ]
       },
+      "Rotation": {
+        "description": "A rotation defined by an axis, origin of rotation, and an angle.",
+        "type": "object",
+        "properties": {
+          "angle": {
+            "description": "Rotate this far about the rotation axis. Defaults to zero (i.e. no rotation).",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Angle"
+              }
+            ]
+          },
+          "axis": {
+            "description": "Rotation axis. Defaults to (0, 0, 1) (i.e. the Z axis).",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          },
+          "origin": {
+            "description": "Origin of the rotation. If one isn't provided, the object will rotate about its own bounding box center.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OriginType"
+              }
+            ]
+          }
+        },
+        "required": [
+          "angle",
+          "axis",
+          "origin"
+        ]
+      },
       "RtcIceCandidateInit": {
         "description": "ICECandidateInit is used to serialize ice candidates",
         "type": "object",
@@ -26690,7 +26748,7 @@
             "description": "The API token itself.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/StringUuid"
+                "$ref": "#/components/schemas/ServiceAccountTokenUuid"
               }
             ]
           },
@@ -26730,6 +26788,10 @@
         "required": [
           "items"
         ]
+      },
+      "ServiceAccountTokenUuid": {
+        "description": "An auth token. A uuid with a prefix of svc-",
+        "type": "string"
       },
       "Session": {
         "description": "An authentication session.",
@@ -26982,10 +27044,6 @@
         "required": [
           "percent_off"
         ]
-      },
-      "StringUuid": {
-        "description": "An auth token. A UUIDv4",
-        "type": "string"
       },
       "SubscriptionTierFeature": {
         "description": "A subscription tier feature.",
@@ -27610,14 +27668,76 @@
           },
           "token": {
             "description": "The token to revoke.",
-            "type": "string",
-            "format": "uuid"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DeviceAccessTokenUuid"
+              }
+            ]
           }
         },
         "required": [
           "client_id",
           "token"
         ]
+      },
+      "Transform": {
+        "description": "Ways to transform each solid being replicated in a repeating pattern.",
+        "type": "object",
+        "properties": {
+          "replicate": {
+            "description": "Whether to replicate the original solid in this instance.",
+            "default": true,
+            "type": "boolean"
+          },
+          "rotation": {
+            "description": "Rotate the replica about the specified rotation axis and origin. Defaults to no rotation.",
+            "default": {
+              "angle": {
+                "unit": "degrees",
+                "value": 0.0
+              },
+              "axis": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 1.0
+              },
+              "origin": {
+                "type": "local"
+              }
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Rotation"
+              }
+            ]
+          },
+          "scale": {
+            "description": "Scale the replica's size along each axis. Defaults to (1, 1, 1) (i.e. the same size as the original).",
+            "default": {
+              "x": 1.0,
+              "y": 1.0,
+              "z": 1.0
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          },
+          "translate": {
+            "description": "Translate the replica this far along each dimension. Defaults to zero vector (i.e. same position as the original).",
+            "default": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          }
+        }
       },
       "UnitAngle": {
         "description": "The valid types of angle formats.",
