@@ -172,18 +172,25 @@ impl ApiTokens {
         }
     }
 
-    #[doc = "Get an API token for your user.\n\nThis endpoint requires authentication by any Zoo user. It returns details of the requested API token for the user.\n\n**Parameters:**\n\n- `token: uuid::Uuid`: The API token. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_api_tokens_get_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = client\n        .api_tokens()\n        .get_for_user(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get an API token for your user.\n\nThis endpoint requires authentication by any Zoo \
+             user. It returns details of the requested API token for the \
+             user.\n\n**Parameters:**\n\n- `token: &'astr`: The API token. \
+             (required)\n\n```rust,no_run\nasync fn example_api_tokens_get_for_user() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::ApiToken = \
+             client.api_tokens().get_for_user(\"some-string\").await?;\n    println!(\"{:?}\", \
+             result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_for_user<'a>(
         &'a self,
-        token: uuid::Uuid,
+        token: &'a str,
     ) -> Result<crate::types::ApiToken, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/api-tokens/{token}".replace("{token}", &format!("{}", token))
+                "user/api-tokens/{token}".replace("{token}", token)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -210,24 +217,21 @@ impl ApiTokens {
              Zoo user. It deletes the requested API token for the user.\nThis endpoint does not \
              actually delete the API token from the database. It merely marks the token as \
              invalid. We still want to keep the token in the database for historical \
-             purposes.\n\n**Parameters:**\n\n- `token: uuid::Uuid`: The API token. \
-             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
-             example_api_tokens_delete_for_user() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    client\n        .api_tokens()\n        \
-             .delete_for_user(uuid::Uuid::from_str(\n            \
-             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
-             Ok(())\n}\n```"]
+             purposes.\n\n**Parameters:**\n\n- `token: &'astr`: The API token. \
+             (required)\n\n```rust,no_run\nasync fn example_api_tokens_delete_for_user() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
+             client.api_tokens().delete_for_user(\"some-string\").await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn delete_for_user<'a>(
         &'a self,
-        token: uuid::Uuid,
+        token: &'a str,
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/api-tokens/{token}".replace("{token}", &format!("{}", token))
+                "user/api-tokens/{token}".replace("{token}", token)
             ),
         );
         req = req.bearer_auth(&self.client.token);

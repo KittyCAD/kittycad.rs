@@ -173,18 +173,25 @@ impl ServiceAccounts {
         }
     }
 
-    #[doc = "Get an service account for your org.\n\nThis endpoint requires authentication by an org admin. It returns details of the requested service account for the organization.\n\n**Parameters:**\n\n- `token: uuid::Uuid`: The service account. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_service_accounts_get_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ServiceAccount = client\n        .service_accounts()\n        .get_for_org(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get an service account for your org.\n\nThis endpoint requires authentication by an \
+             org admin. It returns details of the requested service account for the \
+             organization.\n\n**Parameters:**\n\n- `token: &'astr`: The service account. \
+             (required)\n\n```rust,no_run\nasync fn example_service_accounts_get_for_org() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::ServiceAccount =\n        \
+             client.service_accounts().get_for_org(\"some-string\").await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_for_org<'a>(
         &'a self,
-        token: uuid::Uuid,
+        token: &'a str,
     ) -> Result<crate::types::ServiceAccount, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "org/service-accounts/{token}".replace("{token}", &format!("{}", token))
+                "org/service-accounts/{token}".replace("{token}", token)
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -211,24 +218,22 @@ impl ServiceAccounts {
              an org admin. It deletes the requested service account for the organization.\nThis \
              endpoint does not actually delete the service account from the database. It merely \
              marks the token as invalid. We still want to keep the service account in the database \
-             for historical purposes.\n\n**Parameters:**\n\n- `token: uuid::Uuid`: The service \
-             account. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             for historical purposes.\n\n**Parameters:**\n\n- `token: &'astr`: The service \
+             account. (required)\n\n```rust,no_run\nasync fn \
              example_service_accounts_delete_for_org() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    client\n        .service_accounts()\n        \
-             .delete_for_org(uuid::Uuid::from_str(\n            \
-             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
-             Ok(())\n}\n```"]
+             .delete_for_org(\"some-string\")\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn delete_for_org<'a>(
         &'a self,
-        token: uuid::Uuid,
+        token: &'a str,
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "org/service-accounts/{token}".replace("{token}", &format!("{}", token))
+                "org/service-accounts/{token}".replace("{token}", token)
             ),
         );
         req = req.bearer_auth(&self.client.token);
