@@ -22,7 +22,7 @@ impl Users {
     pub async fn get_self<'a>(&'a self) -> Result<crate::types::User, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user"),
+            format!("{}/{}", self.client.base_url, "user"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -52,7 +52,7 @@ impl Users {
     ) -> Result<crate::types::User, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::PUT,
-            &format!("{}/{}", self.client.base_url, "user"),
+            format!("{}/{}", self.client.base_url, "user"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -85,7 +85,7 @@ impl Users {
     pub async fn delete_self<'a>(&'a self) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::DELETE,
-            &format!("{}/{}", self.client.base_url, "user"),
+            format!("{}/{}", self.client.base_url, "user"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -108,7 +108,7 @@ impl Users {
     ) -> Result<crate::types::ExtendedUser, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user/extended"),
+            format!("{}/{}", self.client.base_url, "user/extended"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -137,7 +137,7 @@ impl Users {
     ) -> Result<Vec<crate::types::AccountProvider>, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user/oauth2/providers"),
+            format!("{}/{}", self.client.base_url, "user/oauth2/providers"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -171,7 +171,7 @@ impl Users {
     ) -> Result<crate::types::Onboarding, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user/onboarding"),
+            format!("{}/{}", self.client.base_url, "user/onboarding"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -205,7 +205,7 @@ impl Users {
     ) -> Result<crate::types::PrivacySettings, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user/privacy"),
+            format!("{}/{}", self.client.base_url, "user/privacy"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
@@ -242,7 +242,7 @@ impl Users {
     ) -> Result<crate::types::PrivacySettings, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::PUT,
-            &format!("{}/{}", self.client.base_url, "user/privacy"),
+            format!("{}/{}", self.client.base_url, "user/privacy"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -280,7 +280,7 @@ impl Users {
     ) -> Result<crate::types::Session, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "user/session/{token}".replace("{token}", token)
@@ -316,7 +316,7 @@ impl Users {
     ) -> Result<crate::types::UserResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "users"),
+            format!("{}/{}", self.client.base_url, "users"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
@@ -377,7 +377,7 @@ impl Users {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
-                                    &format!("{}/{}", self.client.base_url, "users"),
+                                    format!("{}/{}", self.client.base_url, "users"),
                                 );
                                 req = req.bearer_auth(&self.client.token);
                                 let mut request = req.build()?;
@@ -432,7 +432,7 @@ impl Users {
     ) -> Result<crate::types::ExtendedUserResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "users-extended"),
+            format!("{}/{}", self.client.base_url, "users-extended"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
@@ -494,7 +494,7 @@ impl Users {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
-                                    &format!("{}/{}", self.client.base_url, "users-extended"),
+                                    format!("{}/{}", self.client.base_url, "users-extended"),
                                 );
                                 req = req.bearer_auth(&self.client.token);
                                 let mut request = req.build()?;
@@ -556,7 +556,7 @@ impl Users {
     ) -> Result<crate::types::ExtendedUser, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "users-extended/{id}".replace("{id}", id)
@@ -590,7 +590,7 @@ impl Users {
     ) -> Result<crate::types::User, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "users/{id}".replace("{id}", id)

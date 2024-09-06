@@ -33,7 +33,7 @@ impl Executor {
     ) -> Result<crate::types::CodeOutput, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "file/execute/{lang}".replace("{lang}", &format!("{}", lang))
