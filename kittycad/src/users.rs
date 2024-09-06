@@ -267,24 +267,23 @@ impl Users {
 
     #[doc = "Get a session for your user.\n\nThis endpoint requires authentication by any Zoo \
              user. It returns details of the requested API token for the \
-             user.\n\n**Parameters:**\n\n- `token: uuid::Uuid`: The API token. \
-             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
-             example_users_get_session_for() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::Session = \
-             client\n        .users()\n        .get_session_for(uuid::Uuid::from_str(\n            \
-             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+             user.\n\n**Parameters:**\n\n- `token: &'astr`: The API token. \
+             (required)\n\n```rust,no_run\nasync fn example_users_get_session_for() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::Session = \
+             client.users().get_session_for(\"some-string\").await?;\n    println!(\"{:?}\", \
+             result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_session_for<'a>(
         &'a self,
-        token: uuid::Uuid,
+        token: &'a str,
     ) -> Result<crate::types::Session, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             &format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/session/{token}".replace("{token}", &format!("{}", token))
+                "user/session/{token}".replace("{token}", token)
             ),
         );
         req = req.bearer_auth(&self.client.token);

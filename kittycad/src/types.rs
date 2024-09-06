@@ -7958,58 +7958,6 @@ impl tabled::Tabled for LeafNode {
     }
 }
 
-#[doc = "Ways to transform each solid being replicated in a repeating pattern."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct LinearTransform {
-    #[doc = "Whether to replicate the original solid in this instance."]
-    #[serde(default)]
-    pub replicate: bool,
-    #[doc = "Scale the replica's size along each axis. Defaults to (1, 1, 1) (i.e. the same size \
-             as the original)."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub scale: Option<Point3D>,
-    #[doc = "Translate the replica this far along each dimension. Defaults to zero vector (i.e. \
-             same position as the original)."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub translate: Option<Point3D>,
-}
-
-impl std::fmt::Display for LinearTransform {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for LinearTransform {
-    const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.replicate).into(),
-            if let Some(scale) = &self.scale {
-                format!("{:?}", scale).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(translate) = &self.translate {
-                format!("{:?}", translate).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["replicate".into(), "scale".into(), "translate".into()]
-    }
-}
-
 #[doc = "The response from the `Loft` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8983,7 +8931,8 @@ pub enum ModelingCmd {
         entity_id_2: uuid::Uuid,
     },
     #[doc = "Create a pattern using this entity by specifying the transform for each desired \
-             repetition."]
+             repetition. Transformations are performed in the following order (first applied to \
+             last applied): scale, rotate, translate."]
     #[serde(rename = "entity_linear_pattern_transform")]
     EntityLinearPatternTransform {
         #[doc = "ID of the entity being copied."]
@@ -8991,7 +8940,7 @@ pub enum ModelingCmd {
         #[doc = "How to transform each repeated solid. The 0th transform will create the first \
                  copy of the entity. The total number of (optional) repetitions equals the size \
                  of this list."]
-        transform: Vec<LinearTransform>,
+        transform: Vec<Transform>,
     },
     #[doc = "Create a linear pattern using this entity."]
     #[serde(rename = "entity_linear_pattern")]
@@ -10835,6 +10784,27 @@ pub enum OrgRole {
     ServiceAccount,
 }
 
+#[doc = "The type of origin"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum OriginType {
+    #[doc = "Local Origin (center of object bounding box)."]
+    #[serde(rename = "local")]
+    Local {},
+    #[doc = "Global Origin (0, 0, 0)."]
+    #[serde(rename = "global")]
+    Global {},
+    #[doc = "Custom Origin (user specified point)."]
+    #[serde(rename = "custom")]
+    Custom {
+        #[doc = "Custom origin point."]
+        origin: Point3D,
+    },
+}
+
 #[doc = "Output file contents.\n\n<details><summary>JSON schema</summary>\n\n```json { \
          \"description\": \"Output file contents.\", \"type\": \"object\", \"properties\": { \
          \"contents\": { \"description\": \"The contents of the file. This is base64 encoded so we \
@@ -11899,6 +11869,46 @@ impl tabled::Tabled for RawFile {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["contents".into(), "name".into()]
+    }
+}
+
+#[doc = "A rotation defined by an axis, origin of rotation, and an angle."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Rotation {
+    #[doc = "Rotate this far about the rotation axis. Defaults to zero (i.e. no rotation)."]
+    pub angle: Angle,
+    #[doc = "Rotation axis. Defaults to (0, 0, 1) (i.e. the Z axis)."]
+    pub axis: Point3D,
+    #[doc = "Origin of the rotation. If one isn't provided, the object will rotate about its own \
+             bounding box center."]
+    pub origin: OriginType,
+}
+
+impl std::fmt::Display for Rotation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Rotation {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.angle).into(),
+            format!("{:?}", self.axis).into(),
+            format!("{:?}", self.origin).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["angle".into(), "axis".into(), "origin".into()]
     }
 }
 
@@ -13663,7 +13673,7 @@ pub struct TokenRevokeRequestForm {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub client_secret: Option<String>,
     #[doc = "The token to revoke."]
-    pub token: uuid::Uuid,
+    pub token: String,
 }
 
 impl std::fmt::Display for TokenRevokeRequestForm {
@@ -13687,12 +13697,78 @@ impl tabled::Tabled for TokenRevokeRequestForm {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.token).into(),
+            self.token.clone().into(),
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["client_id".into(), "client_secret".into(), "token".into()]
+    }
+}
+
+#[doc = "Ways to transform each solid being replicated in a repeating pattern."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Transform {
+    #[doc = "Whether to replicate the original solid in this instance."]
+    #[serde(default)]
+    pub replicate: bool,
+    #[doc = "Rotate the replica about the specified rotation axis and origin. Defaults to no \
+             rotation."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rotation: Option<Rotation>,
+    #[doc = "Scale the replica's size along each axis. Defaults to (1, 1, 1) (i.e. the same size \
+             as the original)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scale: Option<Point3D>,
+    #[doc = "Translate the replica this far along each dimension. Defaults to zero vector (i.e. \
+             same position as the original)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub translate: Option<Point3D>,
+}
+
+impl std::fmt::Display for Transform {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Transform {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.replicate).into(),
+            if let Some(rotation) = &self.rotation {
+                format!("{:?}", rotation).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(scale) = &self.scale {
+                format!("{:?}", scale).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(translate) = &self.translate {
+                format!("{:?}", translate).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "replicate".into(),
+            "rotation".into(),
+            "scale".into(),
+            "translate".into(),
+        ]
     }
 }
 
