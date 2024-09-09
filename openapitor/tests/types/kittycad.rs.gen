@@ -8561,7 +8561,7 @@ pub enum ModelingCmd {
     #[doc = "Start a new path."]
     #[serde(rename = "start_path")]
     StartPath {},
-    #[doc = "Move the path's \"pen\"."]
+    #[doc = "Move the path's \"pen\". If you're in sketch mode, these coordinates are in the local coordinate system, not the world's coordinate system. For example, say you're sketching on the plane {x: (1,0,0), y: (0,1,0), origin: (0, 0, 50)}. In other words, the plane 50 units above the default XY plane. Then, moving the pen to (1, 1, 0) with this command uses local coordinates. So, it would move the pen to (1, 1, 50) in global coordinates."]
     #[serde(rename = "move_path_pen")]
     MovePathPen {
         #[doc = "The ID of the command which created the path."]
@@ -8580,8 +8580,6 @@ pub enum ModelingCmd {
     #[doc = "Command for extruding a solid 2d."]
     #[serde(rename = "extrude")]
     Extrude {
-        #[doc = "Whether to cap the extrusion with a face, or not. If true, the resulting solid will be closed on all sides, like a dice. If false, it will be open on one side, like a drinking glass."]
-        cap: bool,
         #[doc = "How far off the plane to extrude"]
         distance: f64,
         #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
@@ -9013,6 +9011,9 @@ pub enum ModelingCmd {
         cut_type: Option<CutType>,
         #[doc = "Which edge you want to fillet."]
         edge_id: uuid::Uuid,
+        #[doc = "The ID to use for the newly created fillet face. If not provided, the server will randomly generate one."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        face_id: Option<uuid::Uuid>,
         #[doc = "Which object is being filletted."]
         object_id: uuid::Uuid,
         #[doc = "The radius of the fillet. Measured in length (using the same units that the current sketch uses). Must be positive (i.e. greater than zero)."]
