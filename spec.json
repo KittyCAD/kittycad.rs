@@ -20480,7 +20480,7 @@
             ]
           },
           {
-            "description": "Move the path's \"pen\".",
+            "description": "Move the path's \"pen\". If you're in sketch mode, these coordinates are in the local coordinate system, not the world's coordinate system. For example, say you're sketching on the plane {x: (1,0,0), y: (0,1,0), origin: (0, 0, 50)}. In other words, the plane 50 units above the default XY plane. Then, moving the pen to (1, 1, 0) with this command uses local coordinates. So, it would move the pen to (1, 1, 50) in global coordinates.",
             "type": "object",
             "properties": {
               "path": {
@@ -20549,10 +20549,6 @@
             "description": "Command for extruding a solid 2d.",
             "type": "object",
             "properties": {
-              "cap": {
-                "description": "Whether to cap the extrusion with a face, or not. If true, the resulting solid will be closed on all sides, like a dice. If false, it will be open on one side, like a drinking glass.",
-                "type": "boolean"
-              },
               "distance": {
                 "description": "How far off the plane to extrude",
                 "allOf": [
@@ -20577,7 +20573,6 @@
               }
             },
             "required": [
-              "cap",
               "distance",
               "target",
               "type"
@@ -22110,6 +22105,12 @@
               },
               "edge_id": {
                 "description": "Which edge you want to fillet.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "face_id": {
+                "nullable": true,
+                "description": "The ID to use for the newly created fillet face. If not provided, the server will randomly generate one.",
                 "type": "string",
                 "format": "uuid"
               },
