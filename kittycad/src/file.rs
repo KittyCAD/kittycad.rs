@@ -22,7 +22,7 @@ impl File {
     ) -> Result<crate::types::FileCenterOfMass, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "file/center-of-mass"),
+            &format!("{}/{}", self.client.base_url, "file/center-of-mass"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![("src_format", format!("{}", src_format))];
@@ -78,7 +78,7 @@ impl File {
     ) -> Result<crate::types::FileConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!(
+            &format!(
                 "{}/{}",
                 self.client.base_url,
                 "file/conversion/{src_format}/{output_format}"
@@ -141,7 +141,7 @@ impl File {
     ) -> Result<crate::types::FileDensity, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "file/density"),
+            &format!("{}/{}", self.client.base_url, "file/density"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![
@@ -189,7 +189,7 @@ impl File {
     ) -> Result<crate::types::FileMass, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "file/mass"),
+            &format!("{}/{}", self.client.base_url, "file/mass"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![
@@ -252,7 +252,7 @@ impl File {
     ) -> Result<crate::types::FileSurfaceArea, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "file/surface-area"),
+            &format!("{}/{}", self.client.base_url, "file/surface-area"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![("src_format", format!("{}", src_format))];
@@ -308,7 +308,7 @@ impl File {
     ) -> Result<crate::types::FileVolume, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "file/volume"),
+            &format!("{}/{}", self.client.base_url, "file/volume"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![("src_format", format!("{}", src_format))];

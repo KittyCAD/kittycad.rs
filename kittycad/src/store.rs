@@ -26,7 +26,7 @@ impl Store {
     ) -> Result<crate::types::DiscountCode, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            format!("{}/{}", self.client.base_url, "store/coupon"),
+            &format!("{}/{}", self.client.base_url, "store/coupon"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
