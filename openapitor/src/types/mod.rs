@@ -1971,6 +1971,7 @@ pub fn clean_property_name(s: &str) -> String {
         || prop == "const"
         || prop == "use"
         || prop == "async"
+        || prop == "in"
     {
         prop = format!("{}_", prop);
     } else if prop == "$ref" || prop == "$type" {

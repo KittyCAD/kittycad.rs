@@ -645,7 +645,6 @@ fn run_cargo_fmt(opts: &Opts) -> Result<()> {
 
     let mut cmd = std::process::Command::new("cargo");
     cmd.args([
-        "+nightly",
         "fmt",
         "--",
         "--config",
