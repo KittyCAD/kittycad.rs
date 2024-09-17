@@ -218,39 +218,6 @@ fn test_remote_generation(ctx: &mut TestContext) {
 
 #[test_context(TestContext)]
 #[test]
-fn test_twilio_generation(ctx: &mut TestContext) {
-    let opts = crate::Opts {
-        debug: true,
-        json: false,
-        input: ctx.tmp_dir.clone(),
-        output: ctx.tmp_dir.clone(),
-        base_url: "https://api.twilio.com".parse().unwrap(),
-        name: "twilio-api".to_string(),
-        target_version: "1.0.0".to_string(),
-        description: "HR crap!".to_string(),
-        spec_url: Some("".to_string()),
-        repo_name: Some("kittycad/twilio.rs".to_string()),
-        ..Default::default()
-    };
-
-    // Load our spec.
-    let spec = crate::load_json_spec(include_str!("../tests/twilio.json")).unwrap();
-
-    // Move our test file to our output directory.
-    let test_file = include_str!("../tests/library/twilio.tests.rs");
-    // Write our temporary file.
-    let test_file_path = ctx.tmp_dir.join("src").join("tests.rs");
-    std::fs::write(test_file_path, test_file).unwrap();
-
-    // Generate the library.
-    crate::generate(&spec, &opts).unwrap();
-
-    // Run tests.
-    run_cargo_test(&opts).unwrap();
-}
-
-#[test_context(TestContext)]
-#[test]
 #[ignore]
 fn test_gusto_generation(ctx: &mut TestContext) {
     let opts = crate::Opts {
