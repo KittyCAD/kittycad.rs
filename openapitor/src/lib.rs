@@ -366,7 +366,9 @@ pub fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     run_cargo_fmt(opts)?;
 
     // Run clippy in our output directory.
-    run_cargo_clippy(opts)?;
+    if opts.clippy_fix {
+        run_cargo_clippy(opts)?;
+    }
 
     // Also add our installation information to the modified_spec.
     let mut extension: HashMap<String, String> = HashMap::new();
@@ -468,6 +470,10 @@ pub struct Opts {
     /// Default timeout on the client
     #[arg(long)]
     pub request_timeout_seconds: u64,
+
+    /// Run clippy --fix on the output code
+    #[arg(long, default_value = "false")]
+    pub clippy_fix: bool,
 }
 
 impl Opts {
@@ -533,6 +539,7 @@ impl Default for Opts {
             user_consent_endpoint: Default::default(),
             date_time_format: Default::default(),
             basic_auth: Default::default(),
+            clippy_fix: false,
             request_timeout_seconds: 60,
         }
     }
