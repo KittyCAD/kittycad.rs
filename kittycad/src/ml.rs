@@ -22,7 +22,7 @@ impl Ml {
     ) -> Result<crate::types::TextToCad, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "ai/text-to-cad/{output_format}"
@@ -66,7 +66,7 @@ impl Ml {
     ) -> Result<crate::types::MlPromptResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "ml-prompts"),
+            format!("{}/{}", self.client.base_url, "ml-prompts"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
@@ -128,7 +128,7 @@ impl Ml {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
-                                    &format!("{}/{}", self.client.base_url, "ml-prompts"),
+                                    format!("{}/{}", self.client.base_url, "ml-prompts"),
                                 );
                                 req = req.bearer_auth(&self.client.token);
                                 let mut request = req.build()?;
@@ -188,7 +188,7 @@ impl Ml {
     ) -> Result<crate::types::MlPrompt, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "ml-prompts/{id}".replace("{id}", &format!("{}", id))
@@ -222,7 +222,7 @@ impl Ml {
     ) -> Result<crate::types::KclCodeCompletionResponse, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!("{}/{}", self.client.base_url, "ml/kcl/completions"),
+            format!("{}/{}", self.client.base_url, "ml/kcl/completions"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -253,7 +253,7 @@ impl Ml {
     ) -> Result<crate::types::TextToCadIteration, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!("{}/{}", self.client.base_url, "ml/text-to-cad/iteration"),
+            format!("{}/{}", self.client.base_url, "ml/text-to-cad/iteration"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
@@ -287,7 +287,7 @@ impl Ml {
     ) -> Result<crate::types::TextToCadResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!("{}/{}", self.client.base_url, "user/text-to-cad"),
+            format!("{}/{}", self.client.base_url, "user/text-to-cad"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
@@ -354,7 +354,7 @@ impl Ml {
                             async {
                                 let mut req = self.client.client.request(
                                     http::Method::GET,
-                                    &format!("{}/{}", self.client.base_url, "user/text-to-cad"),
+                                    format!("{}/{}", self.client.base_url, "user/text-to-cad"),
                                 );
                                 req = req.bearer_auth(&self.client.token);
                                 let mut request = req.build()?;
@@ -416,7 +416,7 @@ impl Ml {
     ) -> Result<crate::types::TextToCad, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "user/text-to-cad/{id}".replace("{id}", &format!("{}", id))
@@ -461,7 +461,7 @@ impl Ml {
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "user/text-to-cad/{id}".replace("{id}", &format!("{}", id))
