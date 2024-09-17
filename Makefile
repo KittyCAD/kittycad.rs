@@ -29,8 +29,8 @@ kittycad: target/debug/openapitor
 		--spec-url "https://api.zoo.dev" \
 		--base-url "https://api.zoo.dev" \
 		--request-timeout-seconds 600 \
+		--clippy-fix \
 		--repo-name "KittyCAD/kittycad.rs" $(EXTRA_ARGS)
-		--clippy-fix
 	mv -f $(CURDIR)/kittycad/kittycad.rs.patch.json $(CURDIR)
 
 .PHONY: tag
