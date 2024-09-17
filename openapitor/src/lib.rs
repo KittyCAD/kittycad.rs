@@ -366,7 +366,9 @@ pub fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
     run_cargo_fmt(opts)?;
 
     // Run clippy in our output directory.
-    run_cargo_clippy(opts)?;
+    if opts.clippy_fix {
+        run_cargo_clippy(opts)?;
+    }
 
     // Also add our installation information to the modified_spec.
     let mut extension: HashMap<String, String> = HashMap::new();
@@ -468,6 +470,10 @@ pub struct Opts {
     /// Default timeout on the client
     #[arg(long)]
     pub request_timeout_seconds: u64,
+
+    /// Run clippy --fix on the output code
+    #[arg(long, default_value = "false")]
+    pub clippy_fix: bool,
 }
 
 impl Opts {
@@ -533,6 +539,7 @@ impl Default for Opts {
             user_consent_endpoint: Default::default(),
             date_time_format: Default::default(),
             basic_auth: Default::default(),
+            clippy_fix: false,
             request_timeout_seconds: 60,
         }
     }
@@ -587,7 +594,7 @@ http = {{ version = "^0.2.8", optional = true }}
 itertools = "0.13.0"
 log = {{ version = "^0.4", features = ["serde"], optional = true }}
 mime_guess = "2.0.4"
-parse-display = "0.9.1"
+parse-display = "0.10.0"
 phonenumber = "0.3.5"
 rand = {{ version = "0.8", optional = true }}
 reqwest = {{ version = "0.11.27", default-features = false, features = ["json", "multipart", "rustls-tls"], optional = true }}
@@ -600,7 +607,7 @@ serde = {{ version = "1", features = ["derive"] }}
 serde_bytes = "0.11"
 serde_json = "1"
 serde_urlencoded = {{ version = "^0.7", optional = true }}
-tabled = {{ version = "0.15.0", features = ["ansi"], optional = true }}
+tabled = {{ version = "0.16.0", features = ["ansi"], optional = true }}
 thiserror = "1"
 tracing = {{ version = "^0.1", optional = true }}
 url = {{ version = "2", features = ["serde"] }}
@@ -615,7 +622,7 @@ futures-util = "^0.3.26"
 pretty_assertions = "1"
 rand = "0.8"
 tokio = {{ version = "1.38.0", features = ["rt", "macros"] }}
-tokio-tungstenite = "0.23"
+tokio-tungstenite = "0.24"
 
 [features]
 default = ["requests", "retry"]

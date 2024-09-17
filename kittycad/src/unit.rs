@@ -32,7 +32,7 @@ impl Unit {
     ) -> Result<crate::types::UnitAngleConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/angle/{input_unit}/{output_unit}"
@@ -82,7 +82,7 @@ impl Unit {
     ) -> Result<crate::types::UnitAreaConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/area/{input_unit}/{output_unit}"
@@ -122,7 +122,7 @@ impl Unit {
     ) -> Result<crate::types::UnitCurrentConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/current/{input_unit}/{output_unit}"
@@ -162,7 +162,7 @@ impl Unit {
     ) -> Result<crate::types::UnitEnergyConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/energy/{input_unit}/{output_unit}"
@@ -212,7 +212,7 @@ impl Unit {
     ) -> Result<crate::types::UnitForceConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/force/{input_unit}/{output_unit}"
@@ -252,7 +252,7 @@ impl Unit {
     ) -> Result<crate::types::UnitFrequencyConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/frequency/{input_unit}/{output_unit}"
@@ -302,7 +302,7 @@ impl Unit {
     ) -> Result<crate::types::UnitLengthConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/length/{input_unit}/{output_unit}"
@@ -352,7 +352,7 @@ impl Unit {
     ) -> Result<crate::types::UnitMassConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/mass/{input_unit}/{output_unit}"
@@ -402,7 +402,7 @@ impl Unit {
     ) -> Result<crate::types::UnitPowerConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/power/{input_unit}/{output_unit}"
@@ -442,7 +442,7 @@ impl Unit {
     ) -> Result<crate::types::UnitPressureConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/pressure/{input_unit}/{output_unit}"
@@ -482,7 +482,7 @@ impl Unit {
     ) -> Result<crate::types::UnitTemperatureConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/temperature/{input_unit}/{output_unit}"
@@ -522,7 +522,7 @@ impl Unit {
     ) -> Result<crate::types::UnitTorqueConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/torque/{input_unit}/{output_unit}"
@@ -572,7 +572,7 @@ impl Unit {
     ) -> Result<crate::types::UnitVolumeConversion, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            &format!(
+            format!(
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/volume/{input_unit}/{output_unit}"
