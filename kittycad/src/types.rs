@@ -9579,6 +9579,9 @@ pub enum ModelingCmd {
     #[doc = "Fit the view to the specified object(s)."]
     #[serde(rename = "zoom_to_fit")]
     ZoomToFit {
+        #[doc = "Whether or not to animate the camera movement."]
+        #[serde(default)]
+        animated: bool,
         #[doc = "Which objects to fit camera to; if empty, fit to all non-default objects. \
                  Defaults to empty vector."]
         #[serde(default)]
