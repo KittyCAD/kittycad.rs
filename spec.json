@@ -17693,11 +17693,6 @@
             "description": "The user's first name.",
             "type": "string"
           },
-          "front_id": {
-            "nullable": true,
-            "description": "The user's Front ID. This is mostly used for internal mapping.",
-            "type": "string"
-          },
           "github": {
             "description": "The user's GitHub handle.",
             "type": "string"
