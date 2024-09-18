@@ -23458,6 +23458,11 @@
             "description": "Fit the view to the specified object(s).",
             "type": "object",
             "properties": {
+              "animated": {
+                "description": "Whether or not to animate the camera movement.",
+                "default": false,
+                "type": "boolean"
+              },
               "object_ids": {
                 "description": "Which objects to fit camera to; if empty, fit to all non-default objects. Defaults to empty vector.",
                 "default": [],
