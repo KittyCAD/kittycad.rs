@@ -4970,9 +4970,6 @@ pub struct ExtendedUser {
     #[doc = "The user's first name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub first_name: Option<String>,
-    #[doc = "The user's Front ID. This is mostly used for internal mapping."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub front_id: Option<String>,
     #[doc = "The user's GitHub handle."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub github: Option<String>,
@@ -5016,7 +5013,7 @@ impl std::fmt::Display for ExtendedUser {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ExtendedUser {
-    const LENGTH: usize = 19;
+    const LENGTH: usize = 18;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(block) = &self.block {
@@ -5048,11 +5045,6 @@ impl tabled::Tabled for ExtendedUser {
             },
             if let Some(first_name) = &self.first_name {
                 format!("{:?}", first_name).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(front_id) = &self.front_id {
-                format!("{:?}", front_id).into()
             } else {
                 String::new().into()
             },
@@ -5099,7 +5091,6 @@ impl tabled::Tabled for ExtendedUser {
             "email".into(),
             "email_verified".into(),
             "first_name".into(),
-            "front_id".into(),
             "github".into(),
             "id".into(),
             "image".into(),
