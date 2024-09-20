@@ -629,6 +629,16 @@ impl TypeSpace {
                     },
                 }
             }
+
+            // We have no properties, and no additional properties.
+            // Return a serde_json::Value.
+            return self.render_schema(
+                name,
+                &openapiv3::Schema {
+                    schema_data: data.clone(),
+                    schema_kind: openapiv3::SchemaKind::Any(openapiv3::AnySchema::default()),
+                },
+            );
         }
 
         let values = self.get_object_values(&struct_name, o, true, None)?;
@@ -1762,6 +1772,10 @@ fn get_type_name_for_object(
                 }
             }
         }
+
+        // We have no properties and no additional properties.
+        // Make it a serde_json::Value.
+        return Ok(quote!(serde_json::Value));
     }
 
     if o == &openapiv3::ObjectType::default()
@@ -2315,7 +2329,7 @@ impl PaginationProperties {
             }
         }
 
-        anyhow::bail!("No item type found")
+        anyhow::bail!("No item type found, {:?}", self)
     }
 
     /// Get the item ident for this object.
@@ -2324,7 +2338,7 @@ impl PaginationProperties {
             return Ok(format_ident!("{}", k));
         }
 
-        anyhow::bail!("No item type found")
+        anyhow::bail!("No item type found, {:?}", self)
     }
 
     /// Get the item type for this object.
@@ -2333,7 +2347,7 @@ impl PaginationProperties {
             return Ok(k.to_string());
         }
 
-        anyhow::bail!("No next page property found")
+        anyhow::bail!("No next page property found, {:?}", self)
     }
 
     /// Get the item type for this object.
@@ -2342,7 +2356,7 @@ impl PaginationProperties {
             return Ok(k.to_string());
         }
 
-        anyhow::bail!("No page param property found")
+        anyhow::bail!("No page param property found: {:?}", self)
     }
 }
 
@@ -2355,12 +2369,11 @@ fn is_pagination_property_param_page(s: &str) -> bool {
 }
 
 fn is_pagination_property_items(s: &str, t: &proc_macro2::TokenStream) -> Result<bool> {
-    Ok(["items", "data", "results"].contains(&s)
-        && (get_text(t)?.starts_with("Vec<") || get_text(t)?.starts_with("Option<Vec<")))
+    Ok(["items", "data", "results"].contains(&s) && get_text(t)?.starts_with("Vec<"))
 }
 
 pub(crate) fn get_schema_from_any(data: &SchemaData, any: &AnySchema) -> Option<Schema> {
-    if !any.properties.is_empty() {
+    if any.additional_properties.is_some() || !any.properties.is_empty() {
         // Let's assume this is an object.
 
         // Send back through as an object.
