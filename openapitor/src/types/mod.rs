@@ -2342,20 +2342,21 @@ impl PaginationProperties {
             return Ok(k.to_string());
         }
 
-        anyhow::bail!("No next page property found")
+        anyhow::bail!("No page param property found")
     }
 }
 
 fn is_pagination_property_next_page(s: &str) -> bool {
-    ["next_page", "next"].contains(&s)
+    ["next_page", "next", "next_link"].contains(&s)
 }
 
 fn is_pagination_property_param_page(s: &str) -> bool {
-    ["page_token", "page"].contains(&s)
+    ["page_token", "page", "cursor"].contains(&s)
 }
 
 fn is_pagination_property_items(s: &str, t: &proc_macro2::TokenStream) -> Result<bool> {
-    Ok(["items", "data"].contains(&s) && get_text(t)?.starts_with("Vec<"))
+    Ok(["items", "data", "results"].contains(&s)
+        && (get_text(t)?.starts_with("Vec<") || get_text(t)?.starts_with("Option<Vec<")))
 }
 
 pub(crate) fn get_schema_from_any(data: &SchemaData, any: &AnySchema) -> Option<Schema> {
