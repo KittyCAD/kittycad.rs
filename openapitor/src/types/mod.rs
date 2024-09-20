@@ -629,16 +629,6 @@ impl TypeSpace {
                     },
                 }
             }
-
-            // We have no properties, and no additional properties.
-            // Return a serde_json::Value.
-            return self.render_schema(
-                name,
-                &openapiv3::Schema {
-                    schema_data: data.clone(),
-                    schema_kind: openapiv3::SchemaKind::Any(openapiv3::AnySchema::default()),
-                },
-            );
         }
 
         let values = self.get_object_values(&struct_name, o, true, None)?;
@@ -1772,10 +1762,6 @@ fn get_type_name_for_object(
                 }
             }
         }
-
-        // We have no properties and no additional properties.
-        // Make it a serde_json::Value.
-        return Ok(quote!(serde_json::Value));
     }
 
     if o == &openapiv3::ObjectType::default()

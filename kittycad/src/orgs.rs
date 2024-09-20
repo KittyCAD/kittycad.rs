@@ -761,7 +761,7 @@ impl Orgs {
              kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        \
              .update_enterprise_pricing_for(\n            \
              uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
-             &kittycad::types::SubscriptionTierPrice::serde_json::Value {},\n        )\n        \
+             &kittycad::types::SubscriptionTierPrice::Enterprise {},\n        )\n        \
              .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_enterprise_pricing_for<'a>(

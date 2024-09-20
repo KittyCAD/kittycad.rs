@@ -611,7 +611,7 @@
     "op": "add",
     "path": "/paths/~1orgs~1{id}~1enterprise~1pricing/put/x-rust",
     "value": {
-      "example": "/// Set the enterprise price for an organization.\n/// \n/// You must be a Zoo employee to perform this request.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        .update_enterprise_pricing_for(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::SubscriptionTierPrice::serde_json::Value {},\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Set the enterprise price for an organization.\n/// \n/// You must be a Zoo employee to perform this request.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        .update_enterprise_pricing_for(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::SubscriptionTierPrice::Enterprise {},\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.update_enterprise_pricing_for"
     }
   },

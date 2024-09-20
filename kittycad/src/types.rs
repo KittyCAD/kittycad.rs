@@ -3875,6 +3875,34 @@ pub enum CutType {
     Chamfer,
 }
 
+#[doc = "The response from the `DefaultCameraFocusOn` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DefaultCameraFocusOn {}
+
+impl std::fmt::Display for DefaultCameraFocusOn {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DefaultCameraFocusOn {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "The response from the `DefaultCameraGetSettings` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9901,7 +9929,7 @@ pub enum OkModelingCmdResponse {
     #[serde(rename = "default_camera_focus_on")]
     DefaultCameraFocusOn {
         #[doc = "The response from the `DefaultCameraFocusOn` command."]
-        data: serde_json::Value,
+        data: DefaultCameraFocusOn,
     },
     #[doc = "The response to the 'SelectGet' endpoint"]
     #[serde(rename = "select_get")]
