@@ -4973,6 +4973,9 @@ pub struct ExtendedUser {
     #[doc = "The user's GitHub handle."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub github: Option<String>,
+    #[doc = "The user's Hubspot ID. This is mostly used for internal mapping."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hubspot_contact_id: Option<String>,
     #[doc = "The unique identifier for the user."]
     pub id: uuid::Uuid,
     #[doc = "The image avatar for the user. This is a URL."]
@@ -5013,7 +5016,7 @@ impl std::fmt::Display for ExtendedUser {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ExtendedUser {
-    const LENGTH: usize = 18;
+    const LENGTH: usize = 19;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(block) = &self.block {
@@ -5050,6 +5053,11 @@ impl tabled::Tabled for ExtendedUser {
             },
             if let Some(github) = &self.github {
                 format!("{:?}", github).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(hubspot_contact_id) = &self.hubspot_contact_id {
+                format!("{:?}", hubspot_contact_id).into()
             } else {
                 String::new().into()
             },
@@ -5092,6 +5100,7 @@ impl tabled::Tabled for ExtendedUser {
             "email_verified".into(),
             "first_name".into(),
             "github".into(),
+            "hubspot_contact_id".into(),
             "id".into(),
             "image".into(),
             "is_service_account".into(),
