@@ -15992,6 +15992,10 @@
           "settings"
         ]
       },
+      "CameraDragStart": {
+        "description": "The response from the `CameraDragStart` endpoint.",
+        "type": "object"
+      },
       "CameraSettings": {
         "description": "Camera settings including position, center, fov etc",
         "type": "object",
@@ -16785,6 +16789,10 @@
           "curve_type"
         ]
       },
+      "CurveSetConstraint": {
+        "description": "The response from the `CurveSetConstraint` endpoint.",
+        "type": "object"
+      },
       "CurveType": {
         "description": "The type of Curve (embedded within path)",
         "type": "string",
@@ -16996,6 +17004,22 @@
         "required": [
           "settings"
         ]
+      },
+      "DefaultCameraLookAt": {
+        "description": "The response from the `DefaultCameraLookAt` endpoint.",
+        "type": "object"
+      },
+      "DefaultCameraPerspectiveSettings": {
+        "description": "The response from the `DefaultCameraPerspectiveSettings` endpoint.",
+        "type": "object"
+      },
+      "DefaultCameraSetOrthographic": {
+        "description": "The response from the `DefaultCameraSetOrthographic` endpoint.",
+        "type": "object"
+      },
+      "DefaultCameraSetPerspective": {
+        "description": "The response from the `DefaultCameraSetPerspective` endpoint.",
+        "type": "object"
       },
       "DefaultCameraZoom": {
         "description": "The response from the `DefaultCameraZoom` command.",
@@ -17225,6 +17249,18 @@
           }
         ]
       },
+      "EdgeLinesVisible": {
+        "description": "The response from the `EdgeLinesVisible` endpoint.",
+        "type": "object"
+      },
+      "EditModeEnter": {
+        "description": "The response from the `EditModeEnter` endpoint.",
+        "type": "object"
+      },
+      "EditModeExit": {
+        "description": "The response from the `EditModeExit` endpoint.",
+        "type": "object"
+      },
       "EmailAuthenticationForm": {
         "description": "The body of the form for email authentication.",
         "type": "object",
@@ -17245,6 +17281,10 @@
           "email"
         ]
       },
+      "EnableSketchMode": {
+        "description": "The response from the `EnableSketchMode` endpoint.",
+        "type": "object"
+      },
       "EntityCircularPattern": {
         "description": "The response from the `EntityCircularPattern` command.",
         "type": "object",
@@ -17261,6 +17301,10 @@
         "required": [
           "entity_ids"
         ]
+      },
+      "EntityFade": {
+        "description": "The response from the `EntityFade` endpoint.",
+        "type": "object"
       },
       "EntityGetAllChildUuids": {
         "description": "The response from the `EntityGetAllChildUuids` command.",
@@ -17398,6 +17442,22 @@
         "required": [
           "entity_ids"
         ]
+      },
+      "EntityMakeHelix": {
+        "description": "The response from the `EntityMakeHelix` endpoint.",
+        "type": "object"
+      },
+      "EntityMirror": {
+        "description": "The response from the `EntityMirror` endpoint.",
+        "type": "object"
+      },
+      "EntityMirrorAcrossEdge": {
+        "description": "The response from the `EntityMirrorAcrossEdge` endpoint.",
+        "type": "object"
+      },
+      "EntitySetOpacity": {
+        "description": "The response from the `EntitySetOpacity` endpoint.",
+        "type": "object"
       },
       "EntityType": {
         "description": "The type of entity",
@@ -17645,6 +17705,10 @@
           "name"
         ]
       },
+      "ExtendPath": {
+        "description": "The response from the `ExtendPath` endpoint.",
+        "type": "object"
+      },
       "ExtendedUser": {
         "description": "Extended user information.\n\nThis is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp | Stripe",
         "type": "object",
@@ -17780,6 +17844,10 @@
         "required": [
           "items"
         ]
+      },
+      "Extrude": {
+        "description": "The response from the `Extrude` endpoint.",
+        "type": "object"
       },
       "ExtrusionFaceCapType": {
         "description": "Possible types of faces which can be extruded from a 3D solid.",
@@ -18901,6 +18969,22 @@
           }
         ]
       },
+      "HandleMouseDragEnd": {
+        "description": "The response from the `HandleMouseDragEnd` endpoint.",
+        "type": "object"
+      },
+      "HandleMouseDragMove": {
+        "description": "The response from the `HandleMouseDragMove` endpoint.",
+        "type": "object"
+      },
+      "HandleMouseDragStart": {
+        "description": "The response from the `HandleMouseDragStart` endpoint.",
+        "type": "object"
+      },
+      "HighlightSetEntities": {
+        "description": "The response from the `HighlightSetEntities` endpoint.",
+        "type": "object"
+      },
       "HighlightSetEntity": {
         "description": "The response from the `HighlightSetEntity` command.",
         "type": "object",
@@ -19914,6 +19998,14 @@
         "required": [
           "solid_id"
         ]
+      },
+      "MakeAxesGizmo": {
+        "description": "The response from the `MakeAxesGizmo` endpoint.",
+        "type": "object"
+      },
+      "MakePlane": {
+        "description": "The response from the `MakePlane` endpoint.",
+        "type": "object"
       },
       "Mass": {
         "description": "The mass response.",
@@ -23669,6 +23761,18 @@
           "entities_selected"
         ]
       },
+      "MouseMove": {
+        "description": "The response from the `MouseMove` endpoint.",
+        "type": "object"
+      },
+      "MovePathPen": {
+        "description": "The response from the `MovePathPen` endpoint.",
+        "type": "object"
+      },
+      "NewAnnotation": {
+        "description": "The response from the `NewAnnotation` endpoint.",
+        "type": "object"
+      },
       "OAuth2ClientInfo": {
         "description": "Information about an OAuth 2.0 client.",
         "type": "object",
@@ -23700,6 +23804,18 @@
           }
         ]
       },
+      "ObjectBringToFront": {
+        "description": "The response from the `ObjectBringToFront` endpoint.",
+        "type": "object"
+      },
+      "ObjectSetMaterialParamsPbr": {
+        "description": "The response from the `ObjectSetMaterialParamsPbr` endpoint.",
+        "type": "object"
+      },
+      "ObjectVisible": {
+        "description": "The response from the `ObjectVisible` endpoint.",
+        "type": "object"
+      },
       "OkModelingCmdResponse": {
         "description": "A successful response from a modeling command. This can be one of several types of responses, depending on the command.",
         "oneOf": [
@@ -23715,6 +23831,1013 @@
               }
             },
             "required": [
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'StartPath' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/StartPath"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "start_path"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'MovePathPen' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/MovePathPen"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "move_path_pen"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'ExtendPath' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ExtendPath"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "extend_path"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'Extrude' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Extrude"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "extrude"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'Revolve' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Revolve"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "revolve"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'Solid3dShellFace' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Solid3dShellFace"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_shell_face"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'RevolveAboutEdge' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/RevolveAboutEdge"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "revolve_about_edge"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'CameraDragStart' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/CameraDragStart"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "camera_drag_start"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'DefaultCameraLookAt' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/DefaultCameraLookAt"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_look_at"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'DefaultCameraPerspectiveSettings' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/DefaultCameraPerspectiveSettings"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_perspective_settings"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'EntityMakeHelix' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityMakeHelix"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_make_helix"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'EntityMirror' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityMirror"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_mirror"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'EntityMirrorAcrossEdge' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityMirrorAcrossEdge"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_mirror_across_edge"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'EditModeEnter' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EditModeEnter"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "edit_mode_enter"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'SelectAdd' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SelectAdd"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "select_add"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'SelectRemove' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SelectRemove"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "select_remove"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'SceneClearAll' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SceneClearAll"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "scene_clear_all"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'SelectReplace' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SelectReplace"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "select_replace"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'HighlightSetEntities' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/HighlightSetEntities"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "highlight_set_entities"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'NewAnnotation' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/NewAnnotation"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "new_annotation"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'UpdateAnnotation' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/UpdateAnnotation"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "update_annotation"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'EdgeLinesVisible' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EdgeLinesVisible"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "edge_lines_visible"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'ObjectVisible' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ObjectVisible"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "object_visible"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'ObjectBringToFront' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ObjectBringToFront"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "object_bring_to_front"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'ObjectSetMaterialParamsPbr' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ObjectSetMaterialParamsPbr"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "object_set_material_params_pbr"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'Solid2dAddHole' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Solid2dAddHole"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid2d_add_hole"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'Solid3dFilletEdge' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Solid3dFilletEdge"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_fillet_edge"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'SendObject' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SendObject"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "send_object"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'EntitySetOpacity' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntitySetOpacity"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_set_opacity"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'EntityFade' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityFade"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_fade"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'MakePlane' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/MakePlane"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "make_plane"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'PlaneSetColor' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/PlaneSetColor"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "plane_set_color"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'SetTool' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SetTool"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_tool"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'MouseMove' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/MouseMove"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "mouse_move"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'SketchModeDisable' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SketchModeDisable"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "sketch_mode_disable"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'CurveSetConstraint' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/CurveSetConstraint"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "curve_set_constraint"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'EnableSketchMode' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EnableSketchMode"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "enable_sketch_mode"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'SetBackgroundColor' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SetBackgroundColor"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_background_color"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'SetCurrentToolProperties' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SetCurrentToolProperties"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_current_tool_properties"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'SetDefaultSystemProperties' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SetDefaultSystemProperties"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_default_system_properties"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'MakeAxesGizmo' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/MakeAxesGizmo"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "make_axes_gizmo"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'HandleMouseDragStart' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/HandleMouseDragStart"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "handle_mouse_drag_start"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'HandleMouseDragMove' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/HandleMouseDragMove"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "handle_mouse_drag_move"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'HandleMouseDragEnd' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/HandleMouseDragEnd"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "handle_mouse_drag_end"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'RemoveSceneObjects' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/RemoveSceneObjects"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "remove_scene_objects"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'ReconfigureStream' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ReconfigureStream"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "reconfigure_stream"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'SetSceneUnits' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SetSceneUnits"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_scene_units"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'SetSelectionType' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SetSelectionType"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_selection_type"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'SetSelectionFilter' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SetSelectionFilter"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_selection_filter"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'DefaultCameraSetOrthographic' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/DefaultCameraSetOrthographic"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_set_orthographic"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'DefaultCameraSetPerspective' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/DefaultCameraSetPerspective"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_set_perspective"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'EditModeExit' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EditModeExit"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "edit_mode_exit"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "description": "The response to the 'SelectClear' endpoint",
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SelectClear"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "select_clear"
+                ]
+              }
+            },
+            "required": [
+              "data",
               "type"
             ]
           },
@@ -26149,6 +27272,10 @@
           }
         }
       },
+      "PlaneSetColor": {
+        "description": "The response from the `PlaneSetColor` endpoint.",
+        "type": "object"
+      },
       "PlyStorage": {
         "description": "The storage for the output PLY file.",
         "oneOf": [
@@ -26299,6 +27426,22 @@
           "contents",
           "name"
         ]
+      },
+      "ReconfigureStream": {
+        "description": "The response from the `ReconfigureStream` endpoint.",
+        "type": "object"
+      },
+      "RemoveSceneObjects": {
+        "description": "The response from the `RemoveSceneObjects` endpoint.",
+        "type": "object"
+      },
+      "Revolve": {
+        "description": "The response from the `Revolve` endpoint.",
+        "type": "object"
+      },
+      "RevolveAboutEdge": {
+        "description": "The response from the `RevolveAboutEdge` endpoint.",
+        "type": "object"
       },
       "Rotation": {
         "description": "A rotation defined by an axis, origin of rotation, and an angle.",
@@ -26543,6 +27686,10 @@
           "idp_metadata_source"
         ]
       },
+      "SceneClearAll": {
+        "description": "The response from the `SceneClearAll` endpoint.",
+        "type": "object"
+      },
       "SceneSelectionType": {
         "description": "The type of scene selection change",
         "oneOf": [
@@ -26582,6 +27729,14 @@
           "sketch_curve_mod"
         ]
       },
+      "SelectAdd": {
+        "description": "The response from the `SelectAdd` endpoint.",
+        "type": "object"
+      },
+      "SelectClear": {
+        "description": "The response from the `SelectClear` endpoint.",
+        "type": "object"
+      },
       "SelectGet": {
         "description": "The response from the `SelectGet` command.",
         "type": "object",
@@ -26598,6 +27753,14 @@
         "required": [
           "entity_ids"
         ]
+      },
+      "SelectRemove": {
+        "description": "The response from the `SelectRemove` endpoint.",
+        "type": "object"
+      },
+      "SelectReplace": {
+        "description": "The response from the `SelectReplace` endpoint.",
+        "type": "object"
       },
       "SelectWithPoint": {
         "description": "The response from the `SelectWithPoint` command.",
@@ -26714,6 +27877,10 @@
             ]
           }
         ]
+      },
+      "SendObject": {
+        "description": "The response from the `SendObject` endpoint.",
+        "type": "object"
       },
       "ServiceAccount": {
         "description": "A service account.\n\nThese are used to authenticate orgs with Bearer authentication.\n\nThis works just like an API token, but it is tied to an organization versus an individual user.",
@@ -26859,6 +28026,46 @@
         "description": "An auth token. A uuid with a prefix of ses-",
         "type": "string"
       },
+      "SetBackgroundColor": {
+        "description": "The response from the `SetBackgroundColor` endpoint.",
+        "type": "object"
+      },
+      "SetCurrentToolProperties": {
+        "description": "The response from the `SetCurrentToolProperties` endpoint.",
+        "type": "object"
+      },
+      "SetDefaultSystemProperties": {
+        "description": "The response from the `SetDefaultSystemProperties` endpoint.",
+        "type": "object"
+      },
+      "SetSceneUnits": {
+        "description": "The response from the `SetSceneUnits` endpoint.",
+        "type": "object"
+      },
+      "SetSelectionFilter": {
+        "description": "The response from the `SetSelectionFilter` endpoint.",
+        "type": "object"
+      },
+      "SetSelectionType": {
+        "description": "The response from the `SetSelectionType` endpoint.",
+        "type": "object"
+      },
+      "SetTool": {
+        "description": "The response from the `SetTool` endpoint.",
+        "type": "object"
+      },
+      "SketchModeDisable": {
+        "description": "The response from the `SketchModeDisable` endpoint.",
+        "type": "object"
+      },
+      "Solid2dAddHole": {
+        "description": "The response from the `Solid2dAddHole` endpoint.",
+        "type": "object"
+      },
+      "Solid3dFilletEdge": {
+        "description": "The response from the `Solid3dFilletEdge` endpoint.",
+        "type": "object"
+      },
       "Solid3dGetAllEdgeFaces": {
         "description": "The response from the `Solid3dGetAllEdgeFaces` command.",
         "type": "object",
@@ -26947,6 +28154,10 @@
           }
         }
       },
+      "Solid3dShellFace": {
+        "description": "The response from the `Solid3dShellFace` endpoint.",
+        "type": "object"
+      },
       "SourcePosition": {
         "description": "A position in the source code.",
         "type": "object",
@@ -27016,6 +28227,10 @@
           "prompt",
           "range"
         ]
+      },
+      "StartPath": {
+        "description": "The response from the `StartPath` endpoint.",
+        "type": "object"
       },
       "StlStorage": {
         "description": "Export storage.",
@@ -29614,6 +30829,10 @@
           "user_id"
         ]
       },
+      "UpdateAnnotation": {
+        "description": "The response from the `UpdateAnnotation` endpoint.",
+        "type": "object"
+      },
       "UpdateMemberToOrgBody": {
         "description": "Data for updating a member of an org.",
         "type": "object",
@@ -29965,7 +31184,8 @@
           },
           "identifier": {
             "description": "The identifier for the user. This is typically the user's email address since that is what we are verifying.",
-            "type": "string"
+            "type": "string",
+            "format": "email"
           },
           "saml_redirect_url": {
             "nullable": true,

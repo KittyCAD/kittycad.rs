@@ -2436,6 +2436,34 @@ impl tabled::Tabled for CameraDragMove {
     }
 }
 
+#[doc = "The response from the `CameraDragStart` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CameraDragStart {}
+
+impl std::fmt::Display for CameraDragStart {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CameraDragStart {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "Camera settings including position, center, fov etc"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -3600,6 +3628,34 @@ impl tabled::Tabled for CurveGetType {
     }
 }
 
+#[doc = "The response from the `CurveSetConstraint` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CurveSetConstraint {}
+
+impl std::fmt::Display for CurveSetConstraint {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CurveSetConstraint {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "The type of Curve (embedded within path)"]
 #[derive(
     serde :: Serialize,
@@ -3934,6 +3990,118 @@ impl tabled::Tabled for DefaultCameraGetSettings {
     }
 }
 
+#[doc = "The response from the `DefaultCameraLookAt` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DefaultCameraLookAt {}
+
+impl std::fmt::Display for DefaultCameraLookAt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DefaultCameraLookAt {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `DefaultCameraPerspectiveSettings` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DefaultCameraPerspectiveSettings {}
+
+impl std::fmt::Display for DefaultCameraPerspectiveSettings {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DefaultCameraPerspectiveSettings {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `DefaultCameraSetOrthographic` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DefaultCameraSetOrthographic {}
+
+impl std::fmt::Display for DefaultCameraSetOrthographic {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DefaultCameraSetOrthographic {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `DefaultCameraSetPerspective` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DefaultCameraSetPerspective {}
+
+impl std::fmt::Display for DefaultCameraSetPerspective {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DefaultCameraSetPerspective {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "The response from the `DefaultCameraZoom` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4261,6 +4429,90 @@ pub enum DistanceType {
     },
 }
 
+#[doc = "The response from the `EdgeLinesVisible` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EdgeLinesVisible {}
+
+impl std::fmt::Display for EdgeLinesVisible {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EdgeLinesVisible {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `EditModeEnter` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EditModeEnter {}
+
+impl std::fmt::Display for EditModeEnter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EditModeEnter {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `EditModeExit` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EditModeExit {}
+
+impl std::fmt::Display for EditModeExit {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EditModeExit {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "The body of the form for email authentication."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4302,6 +4554,34 @@ impl tabled::Tabled for EmailAuthenticationForm {
     }
 }
 
+#[doc = "The response from the `EnableSketchMode` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EnableSketchMode {}
+
+impl std::fmt::Display for EnableSketchMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EnableSketchMode {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "The response from the `EntityCircularPattern` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4330,6 +4610,34 @@ impl tabled::Tabled for EntityCircularPattern {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["entity_ids".into()]
+    }
+}
+
+#[doc = "The response from the `EntityFade` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityFade {}
+
+impl std::fmt::Display for EntityFade {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityFade {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 
@@ -4583,6 +4891,118 @@ impl tabled::Tabled for EntityLinearPatternTransform {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["entity_ids".into()]
+    }
+}
+
+#[doc = "The response from the `EntityMakeHelix` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityMakeHelix {}
+
+impl std::fmt::Display for EntityMakeHelix {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityMakeHelix {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `EntityMirror` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityMirror {}
+
+impl std::fmt::Display for EntityMirror {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityMirror {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `EntityMirrorAcrossEdge` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityMirrorAcrossEdge {}
+
+impl std::fmt::Display for EntityMirrorAcrossEdge {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityMirrorAcrossEdge {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `EntitySetOpacity` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntitySetOpacity {}
+
+impl std::fmt::Display for EntitySetOpacity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntitySetOpacity {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 
@@ -4939,6 +5359,34 @@ impl tabled::Tabled for ExportFile {
     }
 }
 
+#[doc = "The response from the `ExtendPath` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ExtendPath {}
+
+impl std::fmt::Display for ExtendPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ExtendPath {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "Extended user information.\n\nThis is mostly used for internal purposes. It returns a \
          mapping of the user's information, including that of our third party services we use for \
          users: MailChimp | Stripe"]
@@ -5184,6 +5632,34 @@ impl tabled::Tabled for ExtendedUserResultsPage {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "The response from the `Extrude` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Extrude {}
+
+impl std::fmt::Display for Extrude {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Extrude {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 
@@ -6519,6 +6995,118 @@ pub enum GltfStorage {
     #[serde(rename = "embedded")]
     #[display("embedded")]
     Embedded,
+}
+
+#[doc = "The response from the `HandleMouseDragEnd` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct HandleMouseDragEnd {}
+
+impl std::fmt::Display for HandleMouseDragEnd {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for HandleMouseDragEnd {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `HandleMouseDragMove` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct HandleMouseDragMove {}
+
+impl std::fmt::Display for HandleMouseDragMove {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for HandleMouseDragMove {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `HandleMouseDragStart` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct HandleMouseDragStart {}
+
+impl std::fmt::Display for HandleMouseDragStart {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for HandleMouseDragStart {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `HighlightSetEntities` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct HighlightSetEntities {}
+
+impl std::fmt::Display for HighlightSetEntities {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for HighlightSetEntities {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
 }
 
 #[doc = "The response from the `HighlightSetEntity` command."]
@@ -7986,6 +8574,62 @@ impl tabled::Tabled for Loft {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["solid_id".into()]
+    }
+}
+
+#[doc = "The response from the `MakeAxesGizmo` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct MakeAxesGizmo {}
+
+impl std::fmt::Display for MakeAxesGizmo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for MakeAxesGizmo {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `MakePlane` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct MakePlane {}
+
+impl std::fmt::Display for MakePlane {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for MakePlane {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 
@@ -9724,6 +10368,90 @@ impl tabled::Tabled for MouseClick {
     }
 }
 
+#[doc = "The response from the `MouseMove` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct MouseMove {}
+
+impl std::fmt::Display for MouseMove {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for MouseMove {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `MovePathPen` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct MovePathPen {}
+
+impl std::fmt::Display for MovePathPen {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for MovePathPen {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `NewAnnotation` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct NewAnnotation {}
+
+impl std::fmt::Display for NewAnnotation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for NewAnnotation {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "Information about an OAuth 2.0 client."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9810,6 +10538,90 @@ pub enum Oauth2GrantType {
 }
 
 
+#[doc = "The response from the `ObjectBringToFront` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ObjectBringToFront {}
+
+impl std::fmt::Display for ObjectBringToFront {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ObjectBringToFront {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `ObjectSetMaterialParamsPbr` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ObjectSetMaterialParamsPbr {}
+
+impl std::fmt::Display for ObjectSetMaterialParamsPbr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ObjectSetMaterialParamsPbr {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `ObjectVisible` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ObjectVisible {}
+
+impl std::fmt::Display for ObjectVisible {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ObjectVisible {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "A successful response from a modeling command. This can be one of several types of \
          responses, depending on the command."]
 #[derive(
@@ -9822,6 +10634,324 @@ pub enum OkModelingCmdResponse {
              defined here."]
     #[serde(rename = "empty")]
     Empty {},
+    #[doc = "The response to the 'StartPath' endpoint"]
+    #[serde(rename = "start_path")]
+    StartPath {
+        #[doc = "The response from the `StartPath` endpoint."]
+        data: StartPath,
+    },
+    #[doc = "The response to the 'MovePathPen' endpoint"]
+    #[serde(rename = "move_path_pen")]
+    MovePathPen {
+        #[doc = "The response from the `MovePathPen` endpoint."]
+        data: MovePathPen,
+    },
+    #[doc = "The response to the 'ExtendPath' endpoint"]
+    #[serde(rename = "extend_path")]
+    ExtendPath {
+        #[doc = "The response from the `ExtendPath` endpoint."]
+        data: ExtendPath,
+    },
+    #[doc = "The response to the 'Extrude' endpoint"]
+    #[serde(rename = "extrude")]
+    Extrude {
+        #[doc = "The response from the `Extrude` endpoint."]
+        data: Extrude,
+    },
+    #[doc = "The response to the 'Revolve' endpoint"]
+    #[serde(rename = "revolve")]
+    Revolve {
+        #[doc = "The response from the `Revolve` endpoint."]
+        data: Revolve,
+    },
+    #[doc = "The response to the 'Solid3dShellFace' endpoint"]
+    #[serde(rename = "solid3d_shell_face")]
+    Solid3DShellFace {
+        #[doc = "The response from the `Solid3dShellFace` endpoint."]
+        data: Solid3DShellFace,
+    },
+    #[doc = "The response to the 'RevolveAboutEdge' endpoint"]
+    #[serde(rename = "revolve_about_edge")]
+    RevolveAboutEdge {
+        #[doc = "The response from the `RevolveAboutEdge` endpoint."]
+        data: RevolveAboutEdge,
+    },
+    #[doc = "The response to the 'CameraDragStart' endpoint"]
+    #[serde(rename = "camera_drag_start")]
+    CameraDragStart {
+        #[doc = "The response from the `CameraDragStart` endpoint."]
+        data: CameraDragStart,
+    },
+    #[doc = "The response to the 'DefaultCameraLookAt' endpoint"]
+    #[serde(rename = "default_camera_look_at")]
+    DefaultCameraLookAt {
+        #[doc = "The response from the `DefaultCameraLookAt` endpoint."]
+        data: DefaultCameraLookAt,
+    },
+    #[doc = "The response to the 'DefaultCameraPerspectiveSettings' endpoint"]
+    #[serde(rename = "default_camera_perspective_settings")]
+    DefaultCameraPerspectiveSettings {
+        #[doc = "The response from the `DefaultCameraPerspectiveSettings` endpoint."]
+        data: DefaultCameraPerspectiveSettings,
+    },
+    #[doc = "The response to the 'EntityMakeHelix' endpoint"]
+    #[serde(rename = "entity_make_helix")]
+    EntityMakeHelix {
+        #[doc = "The response from the `EntityMakeHelix` endpoint."]
+        data: EntityMakeHelix,
+    },
+    #[doc = "The response to the 'EntityMirror' endpoint"]
+    #[serde(rename = "entity_mirror")]
+    EntityMirror {
+        #[doc = "The response from the `EntityMirror` endpoint."]
+        data: EntityMirror,
+    },
+    #[doc = "The response to the 'EntityMirrorAcrossEdge' endpoint"]
+    #[serde(rename = "entity_mirror_across_edge")]
+    EntityMirrorAcrossEdge {
+        #[doc = "The response from the `EntityMirrorAcrossEdge` endpoint."]
+        data: EntityMirrorAcrossEdge,
+    },
+    #[doc = "The response to the 'EditModeEnter' endpoint"]
+    #[serde(rename = "edit_mode_enter")]
+    EditModeEnter {
+        #[doc = "The response from the `EditModeEnter` endpoint."]
+        data: EditModeEnter,
+    },
+    #[doc = "The response to the 'SelectAdd' endpoint"]
+    #[serde(rename = "select_add")]
+    SelectAdd {
+        #[doc = "The response from the `SelectAdd` endpoint."]
+        data: SelectAdd,
+    },
+    #[doc = "The response to the 'SelectRemove' endpoint"]
+    #[serde(rename = "select_remove")]
+    SelectRemove {
+        #[doc = "The response from the `SelectRemove` endpoint."]
+        data: SelectRemove,
+    },
+    #[doc = "The response to the 'SceneClearAll' endpoint"]
+    #[serde(rename = "scene_clear_all")]
+    SceneClearAll {
+        #[doc = "The response from the `SceneClearAll` endpoint."]
+        data: SceneClearAll,
+    },
+    #[doc = "The response to the 'SelectReplace' endpoint"]
+    #[serde(rename = "select_replace")]
+    SelectReplace {
+        #[doc = "The response from the `SelectReplace` endpoint."]
+        data: SelectReplace,
+    },
+    #[doc = "The response to the 'HighlightSetEntities' endpoint"]
+    #[serde(rename = "highlight_set_entities")]
+    HighlightSetEntities {
+        #[doc = "The response from the `HighlightSetEntities` endpoint."]
+        data: HighlightSetEntities,
+    },
+    #[doc = "The response to the 'NewAnnotation' endpoint"]
+    #[serde(rename = "new_annotation")]
+    NewAnnotation {
+        #[doc = "The response from the `NewAnnotation` endpoint."]
+        data: NewAnnotation,
+    },
+    #[doc = "The response to the 'UpdateAnnotation' endpoint"]
+    #[serde(rename = "update_annotation")]
+    UpdateAnnotation {
+        #[doc = "The response from the `UpdateAnnotation` endpoint."]
+        data: UpdateAnnotation,
+    },
+    #[doc = "The response to the 'EdgeLinesVisible' endpoint"]
+    #[serde(rename = "edge_lines_visible")]
+    EdgeLinesVisible {
+        #[doc = "The response from the `EdgeLinesVisible` endpoint."]
+        data: EdgeLinesVisible,
+    },
+    #[doc = "The response to the 'ObjectVisible' endpoint"]
+    #[serde(rename = "object_visible")]
+    ObjectVisible {
+        #[doc = "The response from the `ObjectVisible` endpoint."]
+        data: ObjectVisible,
+    },
+    #[doc = "The response to the 'ObjectBringToFront' endpoint"]
+    #[serde(rename = "object_bring_to_front")]
+    ObjectBringToFront {
+        #[doc = "The response from the `ObjectBringToFront` endpoint."]
+        data: ObjectBringToFront,
+    },
+    #[doc = "The response to the 'ObjectSetMaterialParamsPbr' endpoint"]
+    #[serde(rename = "object_set_material_params_pbr")]
+    ObjectSetMaterialParamsPbr {
+        #[doc = "The response from the `ObjectSetMaterialParamsPbr` endpoint."]
+        data: ObjectSetMaterialParamsPbr,
+    },
+    #[doc = "The response to the 'Solid2dAddHole' endpoint"]
+    #[serde(rename = "solid2d_add_hole")]
+    Solid2DAddHole {
+        #[doc = "The response from the `Solid2dAddHole` endpoint."]
+        data: Solid2DAddHole,
+    },
+    #[doc = "The response to the 'Solid3dFilletEdge' endpoint"]
+    #[serde(rename = "solid3d_fillet_edge")]
+    Solid3DFilletEdge {
+        #[doc = "The response from the `Solid3dFilletEdge` endpoint."]
+        data: Solid3DFilletEdge,
+    },
+    #[doc = "The response to the 'SendObject' endpoint"]
+    #[serde(rename = "send_object")]
+    SendObject {
+        #[doc = "The response from the `SendObject` endpoint."]
+        data: SendObject,
+    },
+    #[doc = "The response to the 'EntitySetOpacity' endpoint"]
+    #[serde(rename = "entity_set_opacity")]
+    EntitySetOpacity {
+        #[doc = "The response from the `EntitySetOpacity` endpoint."]
+        data: EntitySetOpacity,
+    },
+    #[doc = "The response to the 'EntityFade' endpoint"]
+    #[serde(rename = "entity_fade")]
+    EntityFade {
+        #[doc = "The response from the `EntityFade` endpoint."]
+        data: EntityFade,
+    },
+    #[doc = "The response to the 'MakePlane' endpoint"]
+    #[serde(rename = "make_plane")]
+    MakePlane {
+        #[doc = "The response from the `MakePlane` endpoint."]
+        data: MakePlane,
+    },
+    #[doc = "The response to the 'PlaneSetColor' endpoint"]
+    #[serde(rename = "plane_set_color")]
+    PlaneSetColor {
+        #[doc = "The response from the `PlaneSetColor` endpoint."]
+        data: PlaneSetColor,
+    },
+    #[doc = "The response to the 'SetTool' endpoint"]
+    #[serde(rename = "set_tool")]
+    SetTool {
+        #[doc = "The response from the `SetTool` endpoint."]
+        data: SetTool,
+    },
+    #[doc = "The response to the 'MouseMove' endpoint"]
+    #[serde(rename = "mouse_move")]
+    MouseMove {
+        #[doc = "The response from the `MouseMove` endpoint."]
+        data: MouseMove,
+    },
+    #[doc = "The response to the 'SketchModeDisable' endpoint"]
+    #[serde(rename = "sketch_mode_disable")]
+    SketchModeDisable {
+        #[doc = "The response from the `SketchModeDisable` endpoint."]
+        data: SketchModeDisable,
+    },
+    #[doc = "The response to the 'CurveSetConstraint' endpoint"]
+    #[serde(rename = "curve_set_constraint")]
+    CurveSetConstraint {
+        #[doc = "The response from the `CurveSetConstraint` endpoint."]
+        data: CurveSetConstraint,
+    },
+    #[doc = "The response to the 'EnableSketchMode' endpoint"]
+    #[serde(rename = "enable_sketch_mode")]
+    EnableSketchMode {
+        #[doc = "The response from the `EnableSketchMode` endpoint."]
+        data: EnableSketchMode,
+    },
+    #[doc = "The response to the 'SetBackgroundColor' endpoint"]
+    #[serde(rename = "set_background_color")]
+    SetBackgroundColor {
+        #[doc = "The response from the `SetBackgroundColor` endpoint."]
+        data: SetBackgroundColor,
+    },
+    #[doc = "The response to the 'SetCurrentToolProperties' endpoint"]
+    #[serde(rename = "set_current_tool_properties")]
+    SetCurrentToolProperties {
+        #[doc = "The response from the `SetCurrentToolProperties` endpoint."]
+        data: SetCurrentToolProperties,
+    },
+    #[doc = "The response to the 'SetDefaultSystemProperties' endpoint"]
+    #[serde(rename = "set_default_system_properties")]
+    SetDefaultSystemProperties {
+        #[doc = "The response from the `SetDefaultSystemProperties` endpoint."]
+        data: SetDefaultSystemProperties,
+    },
+    #[doc = "The response to the 'MakeAxesGizmo' endpoint"]
+    #[serde(rename = "make_axes_gizmo")]
+    MakeAxesGizmo {
+        #[doc = "The response from the `MakeAxesGizmo` endpoint."]
+        data: MakeAxesGizmo,
+    },
+    #[doc = "The response to the 'HandleMouseDragStart' endpoint"]
+    #[serde(rename = "handle_mouse_drag_start")]
+    HandleMouseDragStart {
+        #[doc = "The response from the `HandleMouseDragStart` endpoint."]
+        data: HandleMouseDragStart,
+    },
+    #[doc = "The response to the 'HandleMouseDragMove' endpoint"]
+    #[serde(rename = "handle_mouse_drag_move")]
+    HandleMouseDragMove {
+        #[doc = "The response from the `HandleMouseDragMove` endpoint."]
+        data: HandleMouseDragMove,
+    },
+    #[doc = "The response to the 'HandleMouseDragEnd' endpoint"]
+    #[serde(rename = "handle_mouse_drag_end")]
+    HandleMouseDragEnd {
+        #[doc = "The response from the `HandleMouseDragEnd` endpoint."]
+        data: HandleMouseDragEnd,
+    },
+    #[doc = "The response to the 'RemoveSceneObjects' endpoint"]
+    #[serde(rename = "remove_scene_objects")]
+    RemoveSceneObjects {
+        #[doc = "The response from the `RemoveSceneObjects` endpoint."]
+        data: RemoveSceneObjects,
+    },
+    #[doc = "The response to the 'ReconfigureStream' endpoint"]
+    #[serde(rename = "reconfigure_stream")]
+    ReconfigureStream {
+        #[doc = "The response from the `ReconfigureStream` endpoint."]
+        data: ReconfigureStream,
+    },
+    #[doc = "The response to the 'SetSceneUnits' endpoint"]
+    #[serde(rename = "set_scene_units")]
+    SetSceneUnits {
+        #[doc = "The response from the `SetSceneUnits` endpoint."]
+        data: SetSceneUnits,
+    },
+    #[doc = "The response to the 'SetSelectionType' endpoint"]
+    #[serde(rename = "set_selection_type")]
+    SetSelectionType {
+        #[doc = "The response from the `SetSelectionType` endpoint."]
+        data: SetSelectionType,
+    },
+    #[doc = "The response to the 'SetSelectionFilter' endpoint"]
+    #[serde(rename = "set_selection_filter")]
+    SetSelectionFilter {
+        #[doc = "The response from the `SetSelectionFilter` endpoint."]
+        data: SetSelectionFilter,
+    },
+    #[doc = "The response to the 'DefaultCameraSetOrthographic' endpoint"]
+    #[serde(rename = "default_camera_set_orthographic")]
+    DefaultCameraSetOrthographic {
+        #[doc = "The response from the `DefaultCameraSetOrthographic` endpoint."]
+        data: DefaultCameraSetOrthographic,
+    },
+    #[doc = "The response to the 'DefaultCameraSetPerspective' endpoint"]
+    #[serde(rename = "default_camera_set_perspective")]
+    DefaultCameraSetPerspective {
+        #[doc = "The response from the `DefaultCameraSetPerspective` endpoint."]
+        data: DefaultCameraSetPerspective,
+    },
+    #[doc = "The response to the 'EditModeExit' endpoint"]
+    #[serde(rename = "edit_mode_exit")]
+    EditModeExit {
+        #[doc = "The response from the `EditModeExit` endpoint."]
+        data: EditModeExit,
+    },
+    #[doc = "The response to the 'SelectClear' endpoint"]
+    #[serde(rename = "select_clear")]
+    SelectClear {
+        #[doc = "The response from the `SelectClear` endpoint."]
+        data: SelectClear,
+    },
     #[doc = "The response to the 'Export' endpoint"]
     #[serde(rename = "export")]
     Export {
@@ -11612,6 +12742,34 @@ impl tabled::Tabled for PlaneIntersectAndProject {
     }
 }
 
+#[doc = "The response from the `PlaneSetColor` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PlaneSetColor {}
+
+impl std::fmt::Display for PlaneSetColor {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PlaneSetColor {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "The storage for the output PLY file."]
 #[derive(
     serde :: Serialize,
@@ -11877,6 +13035,118 @@ impl tabled::Tabled for RawFile {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["contents".into(), "name".into()]
+    }
+}
+
+#[doc = "The response from the `ReconfigureStream` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ReconfigureStream {}
+
+impl std::fmt::Display for ReconfigureStream {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ReconfigureStream {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `RemoveSceneObjects` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct RemoveSceneObjects {}
+
+impl std::fmt::Display for RemoveSceneObjects {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for RemoveSceneObjects {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `Revolve` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Revolve {}
+
+impl std::fmt::Display for Revolve {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Revolve {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `RevolveAboutEdge` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct RevolveAboutEdge {}
+
+impl std::fmt::Display for RevolveAboutEdge {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for RevolveAboutEdge {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 
@@ -12234,6 +13504,34 @@ impl tabled::Tabled for SamlIdentityProviderCreate {
     }
 }
 
+#[doc = "The response from the `SceneClearAll` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SceneClearAll {}
+
+impl std::fmt::Display for SceneClearAll {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SceneClearAll {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "The type of scene selection change"]
 #[derive(
     serde :: Serialize,
@@ -12301,6 +13599,62 @@ pub enum SceneToolType {
     SketchCurveMod,
 }
 
+#[doc = "The response from the `SelectAdd` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SelectAdd {}
+
+impl std::fmt::Display for SelectAdd {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SelectAdd {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `SelectClear` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SelectClear {}
+
+impl std::fmt::Display for SelectClear {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SelectClear {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "The response from the `SelectGet` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -12329,6 +13683,62 @@ impl tabled::Tabled for SelectGet {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["entity_ids".into()]
+    }
+}
+
+#[doc = "The response from the `SelectRemove` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SelectRemove {}
+
+impl std::fmt::Display for SelectRemove {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SelectRemove {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `SelectReplace` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SelectReplace {}
+
+impl std::fmt::Display for SelectReplace {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SelectReplace {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 
@@ -12402,6 +13812,34 @@ pub enum Selection {
         #[doc = "The name."]
         name: String,
     },
+}
+
+#[doc = "The response from the `SendObject` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SendObject {}
+
+impl std::fmt::Display for SendObject {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SendObject {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
 }
 
 #[doc = "A service account.\n\nThese are used to authenticate orgs with Bearer \
@@ -12596,6 +14034,286 @@ impl tabled::Tabled for Session {
             "updated_at".into(),
             "user_id".into(),
         ]
+    }
+}
+
+#[doc = "The response from the `SetBackgroundColor` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SetBackgroundColor {}
+
+impl std::fmt::Display for SetBackgroundColor {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SetBackgroundColor {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `SetCurrentToolProperties` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SetCurrentToolProperties {}
+
+impl std::fmt::Display for SetCurrentToolProperties {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SetCurrentToolProperties {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `SetDefaultSystemProperties` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SetDefaultSystemProperties {}
+
+impl std::fmt::Display for SetDefaultSystemProperties {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SetDefaultSystemProperties {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `SetSceneUnits` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SetSceneUnits {}
+
+impl std::fmt::Display for SetSceneUnits {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SetSceneUnits {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `SetSelectionFilter` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SetSelectionFilter {}
+
+impl std::fmt::Display for SetSelectionFilter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SetSelectionFilter {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `SetSelectionType` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SetSelectionType {}
+
+impl std::fmt::Display for SetSelectionType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SetSelectionType {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `SetTool` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SetTool {}
+
+impl std::fmt::Display for SetTool {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SetTool {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `SketchModeDisable` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SketchModeDisable {}
+
+impl std::fmt::Display for SketchModeDisable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SketchModeDisable {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `Solid2dAddHole` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid2DAddHole {}
+
+impl std::fmt::Display for Solid2DAddHole {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid2DAddHole {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `Solid3dFilletEdge` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DFilletEdge {}
+
+impl std::fmt::Display for Solid3DFilletEdge {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DFilletEdge {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 
@@ -12796,6 +14514,34 @@ impl tabled::Tabled for Solid3DGetPrevAdjacentEdge {
     }
 }
 
+#[doc = "The response from the `Solid3dShellFace` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DShellFace {}
+
+impl std::fmt::Display for Solid3DShellFace {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DShellFace {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "A position in the source code."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -12901,6 +14647,34 @@ impl tabled::Tabled for SourceRangePrompt {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["prompt".into(), "range".into()]
+    }
+}
+
+#[doc = "The response from the `StartPath` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct StartPath {}
+
+impl std::fmt::Display for StartPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for StartPath {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 
@@ -15667,6 +17441,34 @@ impl tabled::Tabled for UnitVolumeConversion {
             "updated_at".into(),
             "user_id".into(),
         ]
+    }
+}
+
+#[doc = "The response from the `UpdateAnnotation` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UpdateAnnotation {}
+
+impl std::fmt::Display for UpdateAnnotation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for UpdateAnnotation {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 
