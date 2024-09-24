@@ -1365,7 +1365,7 @@ fn get_function_body(
         } else {
             // Try to decode the error.
             let text = resp.text().await.unwrap_or_default();
-            return Err(crate::types::error::Error::Server{body:text.to_string(), status});
+            Err(crate::types::error::Error::Server{body:text.to_string(), status})
         }
     })
 }
