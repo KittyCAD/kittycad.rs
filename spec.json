@@ -23835,7 +23835,6 @@
             ]
           },
           {
-            "description": "The response to the 'StartPath' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -23854,7 +23853,6 @@
             ]
           },
           {
-            "description": "The response to the 'MovePathPen' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -23873,7 +23871,6 @@
             ]
           },
           {
-            "description": "The response to the 'ExtendPath' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -23892,7 +23889,6 @@
             ]
           },
           {
-            "description": "The response to the 'Extrude' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -23911,7 +23907,6 @@
             ]
           },
           {
-            "description": "The response to the 'Revolve' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -23930,7 +23925,6 @@
             ]
           },
           {
-            "description": "The response to the 'Solid3dShellFace' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -23949,7 +23943,6 @@
             ]
           },
           {
-            "description": "The response to the 'RevolveAboutEdge' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -23968,7 +23961,6 @@
             ]
           },
           {
-            "description": "The response to the 'CameraDragStart' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -23987,7 +23979,6 @@
             ]
           },
           {
-            "description": "The response to the 'DefaultCameraLookAt' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24006,7 +23997,6 @@
             ]
           },
           {
-            "description": "The response to the 'DefaultCameraPerspectiveSettings' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24025,7 +24015,6 @@
             ]
           },
           {
-            "description": "The response to the 'EntityMakeHelix' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24044,7 +24033,6 @@
             ]
           },
           {
-            "description": "The response to the 'EntityMirror' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24063,7 +24051,6 @@
             ]
           },
           {
-            "description": "The response to the 'EntityMirrorAcrossEdge' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24082,7 +24069,6 @@
             ]
           },
           {
-            "description": "The response to the 'EditModeEnter' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24101,7 +24087,6 @@
             ]
           },
           {
-            "description": "The response to the 'SelectAdd' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24120,7 +24105,6 @@
             ]
           },
           {
-            "description": "The response to the 'SelectRemove' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24139,7 +24123,6 @@
             ]
           },
           {
-            "description": "The response to the 'SceneClearAll' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24158,7 +24141,6 @@
             ]
           },
           {
-            "description": "The response to the 'SelectReplace' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24177,7 +24159,6 @@
             ]
           },
           {
-            "description": "The response to the 'HighlightSetEntities' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24196,7 +24177,6 @@
             ]
           },
           {
-            "description": "The response to the 'NewAnnotation' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24215,7 +24195,6 @@
             ]
           },
           {
-            "description": "The response to the 'UpdateAnnotation' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24234,7 +24213,6 @@
             ]
           },
           {
-            "description": "The response to the 'EdgeLinesVisible' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24253,7 +24231,6 @@
             ]
           },
           {
-            "description": "The response to the 'ObjectVisible' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24272,7 +24249,6 @@
             ]
           },
           {
-            "description": "The response to the 'ObjectBringToFront' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24291,7 +24267,6 @@
             ]
           },
           {
-            "description": "The response to the 'ObjectSetMaterialParamsPbr' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24310,7 +24285,6 @@
             ]
           },
           {
-            "description": "The response to the 'Solid2dAddHole' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24329,7 +24303,6 @@
             ]
           },
           {
-            "description": "The response to the 'Solid3dFilletEdge' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24348,7 +24321,6 @@
             ]
           },
           {
-            "description": "The response to the 'SendObject' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24367,7 +24339,6 @@
             ]
           },
           {
-            "description": "The response to the 'EntitySetOpacity' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24386,7 +24357,6 @@
             ]
           },
           {
-            "description": "The response to the 'EntityFade' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24405,7 +24375,6 @@
             ]
           },
           {
-            "description": "The response to the 'MakePlane' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24424,7 +24393,6 @@
             ]
           },
           {
-            "description": "The response to the 'PlaneSetColor' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24443,7 +24411,6 @@
             ]
           },
           {
-            "description": "The response to the 'SetTool' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24462,7 +24429,6 @@
             ]
           },
           {
-            "description": "The response to the 'MouseMove' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24481,7 +24447,6 @@
             ]
           },
           {
-            "description": "The response to the 'SketchModeDisable' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24500,7 +24465,6 @@
             ]
           },
           {
-            "description": "The response to the 'CurveSetConstraint' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24519,7 +24483,6 @@
             ]
           },
           {
-            "description": "The response to the 'EnableSketchMode' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24538,7 +24501,6 @@
             ]
           },
           {
-            "description": "The response to the 'SetBackgroundColor' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24557,7 +24519,6 @@
             ]
           },
           {
-            "description": "The response to the 'SetCurrentToolProperties' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24576,7 +24537,6 @@
             ]
           },
           {
-            "description": "The response to the 'SetDefaultSystemProperties' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24595,7 +24555,6 @@
             ]
           },
           {
-            "description": "The response to the 'MakeAxesGizmo' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24614,7 +24573,6 @@
             ]
           },
           {
-            "description": "The response to the 'HandleMouseDragStart' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24633,7 +24591,6 @@
             ]
           },
           {
-            "description": "The response to the 'HandleMouseDragMove' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24652,7 +24609,6 @@
             ]
           },
           {
-            "description": "The response to the 'HandleMouseDragEnd' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24671,7 +24627,6 @@
             ]
           },
           {
-            "description": "The response to the 'RemoveSceneObjects' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24690,7 +24645,6 @@
             ]
           },
           {
-            "description": "The response to the 'ReconfigureStream' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24709,7 +24663,6 @@
             ]
           },
           {
-            "description": "The response to the 'SetSceneUnits' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24728,7 +24681,6 @@
             ]
           },
           {
-            "description": "The response to the 'SetSelectionType' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24747,7 +24699,6 @@
             ]
           },
           {
-            "description": "The response to the 'SetSelectionFilter' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24766,7 +24717,6 @@
             ]
           },
           {
-            "description": "The response to the 'DefaultCameraSetOrthographic' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24785,7 +24735,6 @@
             ]
           },
           {
-            "description": "The response to the 'DefaultCameraSetPerspective' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24804,7 +24753,6 @@
             ]
           },
           {
-            "description": "The response to the 'EditModeExit' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24823,7 +24771,6 @@
             ]
           },
           {
-            "description": "The response to the 'SelectClear' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24842,7 +24789,6 @@
             ]
           },
           {
-            "description": "The response to the 'Export' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24861,7 +24807,6 @@
             ]
           },
           {
-            "description": "The response to the 'SelectWithPoint' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24880,7 +24825,6 @@
             ]
           },
           {
-            "description": "The response to the 'HighlightSetEntity' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24899,7 +24843,6 @@
             ]
           },
           {
-            "description": "The response to the 'EntityGetChildUuid' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24918,7 +24861,6 @@
             ]
           },
           {
-            "description": "The response to the 'EntityGetNumChildren' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24937,7 +24879,6 @@
             ]
           },
           {
-            "description": "The response to the 'EntityGetParentId' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24956,7 +24897,6 @@
             ]
           },
           {
-            "description": "The response to the 'EntityGetAllChildUuids' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24975,7 +24915,6 @@
             ]
           },
           {
-            "description": "The response to the 'EntityGetSketchPaths' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -24994,7 +24933,6 @@
             ]
           },
           {
-            "description": "The response to the 'Loft' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25013,7 +24951,6 @@
             ]
           },
           {
-            "description": "The response to the 'ClosePath' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25032,7 +24969,6 @@
             ]
           },
           {
-            "description": "The response to the 'CameraDragMove' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25051,7 +24987,6 @@
             ]
           },
           {
-            "description": "The response to the 'CameraDragEnd' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25070,7 +25005,6 @@
             ]
           },
           {
-            "description": "The response to the 'DefaultCameraGetSettings' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25089,7 +25023,6 @@
             ]
           },
           {
-            "description": "The response to the 'DefaultCameraZoom' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25108,7 +25041,6 @@
             ]
           },
           {
-            "description": "The response to the 'ZoomToFit' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25127,7 +25059,6 @@
             ]
           },
           {
-            "description": "The response to the 'ViewIsometric' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25146,7 +25077,6 @@
             ]
           },
           {
-            "description": "The response to the 'GetNumObjects' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25165,7 +25095,6 @@
             ]
           },
           {
-            "description": "The response to the 'DefaultCameraFocusOn' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25184,7 +25113,6 @@
             ]
           },
           {
-            "description": "The response to the 'SelectGet' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25203,7 +25131,6 @@
             ]
           },
           {
-            "description": "The response to the 'Solid3dGetAllEdgeFaces' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25222,7 +25149,6 @@
             ]
           },
           {
-            "description": "The response to the 'Solid3dGetAllOppositeEdges' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25241,7 +25167,6 @@
             ]
           },
           {
-            "description": "The response to the 'Solid3dGetOppositeEdge' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25260,7 +25185,6 @@
             ]
           },
           {
-            "description": "The response to the 'Solid3dGetNextAdjacentEdge' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25279,7 +25203,6 @@
             ]
           },
           {
-            "description": "The response to the 'Solid3dGetPrevAdjacentEdge' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25298,7 +25221,6 @@
             ]
           },
           {
-            "description": "The response to the 'GetEntityType' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25317,7 +25239,6 @@
             ]
           },
           {
-            "description": "The response to the 'CurveGetControlPoints' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25336,7 +25257,6 @@
             ]
           },
           {
-            "description": "The response to the 'CurveGetType' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25355,7 +25275,6 @@
             ]
           },
           {
-            "description": "The response to the 'MouseClick' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25374,7 +25293,6 @@
             ]
           },
           {
-            "description": "The response to the 'TakeSnapshot' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25393,7 +25311,6 @@
             ]
           },
           {
-            "description": "The response to the 'PathGetInfo' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25412,7 +25329,6 @@
             ]
           },
           {
-            "description": "The response to the 'PathSegmentInfo' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25431,7 +25347,6 @@
             ]
           },
           {
-            "description": "The response to the 'PathGetCurveUuidsForVertices' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25450,7 +25365,6 @@
             ]
           },
           {
-            "description": "The response to the 'PathGetCurveUuid' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25469,7 +25383,6 @@
             ]
           },
           {
-            "description": "The response to the 'PathGetVertexUuids' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25488,7 +25401,6 @@
             ]
           },
           {
-            "description": "The response to the 'PathGetSketchTargetUuid' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25507,7 +25419,6 @@
             ]
           },
           {
-            "description": "The response to the 'CurveGetEndPoints' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25526,7 +25437,6 @@
             ]
           },
           {
-            "description": "The response to the 'FaceIsPlanar' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25545,7 +25455,6 @@
             ]
           },
           {
-            "description": "The response to the 'FaceGetPosition' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25564,7 +25473,6 @@
             ]
           },
           {
-            "description": "The response to the 'FaceGetCenter' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25583,7 +25491,6 @@
             ]
           },
           {
-            "description": "The response to the 'FaceGetGradient' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25602,7 +25509,6 @@
             ]
           },
           {
-            "description": "The response to the 'PlaneIntersectAndProject' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25621,7 +25527,6 @@
             ]
           },
           {
-            "description": "The response to the 'ImportFiles' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25640,7 +25545,6 @@
             ]
           },
           {
-            "description": "The response to the 'ImportedGeometry' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25659,7 +25563,6 @@
             ]
           },
           {
-            "description": "The response to the 'Mass' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25678,7 +25581,6 @@
             ]
           },
           {
-            "description": "The response to the 'Volume' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25697,7 +25599,6 @@
             ]
           },
           {
-            "description": "The response to the 'Density' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25716,7 +25617,6 @@
             ]
           },
           {
-            "description": "The response to the 'SurfaceArea' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25735,7 +25635,6 @@
             ]
           },
           {
-            "description": "The response to the 'CenterOfMass' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25754,7 +25653,6 @@
             ]
           },
           {
-            "description": "The response to the 'GetSketchModePlane' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25773,7 +25671,6 @@
             ]
           },
           {
-            "description": "The response to the 'EntityGetDistance' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25792,7 +25689,6 @@
             ]
           },
           {
-            "description": "The response to the 'EntityLinearPatternTransform' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25811,7 +25707,6 @@
             ]
           },
           {
-            "description": "The response to the 'EntityLinearPattern' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25830,7 +25725,6 @@
             ]
           },
           {
-            "description": "The response to the 'EntityCircularPattern' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25849,7 +25743,6 @@
             ]
           },
           {
-            "description": "The response to the 'Solid3dGetExtrusionFaceInfo' endpoint",
             "type": "object",
             "properties": {
               "data": {
@@ -25868,7 +25761,6 @@
             ]
           },
           {
-            "description": "The response to the 'ExtrusionFaceInfo' endpoint",
             "type": "object",
             "properties": {
               "data": {

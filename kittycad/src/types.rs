@@ -10634,652 +10634,544 @@ pub enum OkModelingCmdResponse {
              defined here."]
     #[serde(rename = "empty")]
     Empty {},
-    #[doc = "The response to the 'StartPath' endpoint"]
     #[serde(rename = "start_path")]
     StartPath {
         #[doc = "The response from the `StartPath` endpoint."]
         data: StartPath,
     },
-    #[doc = "The response to the 'MovePathPen' endpoint"]
     #[serde(rename = "move_path_pen")]
     MovePathPen {
         #[doc = "The response from the `MovePathPen` endpoint."]
         data: MovePathPen,
     },
-    #[doc = "The response to the 'ExtendPath' endpoint"]
     #[serde(rename = "extend_path")]
     ExtendPath {
         #[doc = "The response from the `ExtendPath` endpoint."]
         data: ExtendPath,
     },
-    #[doc = "The response to the 'Extrude' endpoint"]
     #[serde(rename = "extrude")]
     Extrude {
         #[doc = "The response from the `Extrude` endpoint."]
         data: Extrude,
     },
-    #[doc = "The response to the 'Revolve' endpoint"]
     #[serde(rename = "revolve")]
     Revolve {
         #[doc = "The response from the `Revolve` endpoint."]
         data: Revolve,
     },
-    #[doc = "The response to the 'Solid3dShellFace' endpoint"]
     #[serde(rename = "solid3d_shell_face")]
     Solid3DShellFace {
         #[doc = "The response from the `Solid3dShellFace` endpoint."]
         data: Solid3DShellFace,
     },
-    #[doc = "The response to the 'RevolveAboutEdge' endpoint"]
     #[serde(rename = "revolve_about_edge")]
     RevolveAboutEdge {
         #[doc = "The response from the `RevolveAboutEdge` endpoint."]
         data: RevolveAboutEdge,
     },
-    #[doc = "The response to the 'CameraDragStart' endpoint"]
     #[serde(rename = "camera_drag_start")]
     CameraDragStart {
         #[doc = "The response from the `CameraDragStart` endpoint."]
         data: CameraDragStart,
     },
-    #[doc = "The response to the 'DefaultCameraLookAt' endpoint"]
     #[serde(rename = "default_camera_look_at")]
     DefaultCameraLookAt {
         #[doc = "The response from the `DefaultCameraLookAt` endpoint."]
         data: DefaultCameraLookAt,
     },
-    #[doc = "The response to the 'DefaultCameraPerspectiveSettings' endpoint"]
     #[serde(rename = "default_camera_perspective_settings")]
     DefaultCameraPerspectiveSettings {
         #[doc = "The response from the `DefaultCameraPerspectiveSettings` endpoint."]
         data: DefaultCameraPerspectiveSettings,
     },
-    #[doc = "The response to the 'EntityMakeHelix' endpoint"]
     #[serde(rename = "entity_make_helix")]
     EntityMakeHelix {
         #[doc = "The response from the `EntityMakeHelix` endpoint."]
         data: EntityMakeHelix,
     },
-    #[doc = "The response to the 'EntityMirror' endpoint"]
     #[serde(rename = "entity_mirror")]
     EntityMirror {
         #[doc = "The response from the `EntityMirror` endpoint."]
         data: EntityMirror,
     },
-    #[doc = "The response to the 'EntityMirrorAcrossEdge' endpoint"]
     #[serde(rename = "entity_mirror_across_edge")]
     EntityMirrorAcrossEdge {
         #[doc = "The response from the `EntityMirrorAcrossEdge` endpoint."]
         data: EntityMirrorAcrossEdge,
     },
-    #[doc = "The response to the 'EditModeEnter' endpoint"]
     #[serde(rename = "edit_mode_enter")]
     EditModeEnter {
         #[doc = "The response from the `EditModeEnter` endpoint."]
         data: EditModeEnter,
     },
-    #[doc = "The response to the 'SelectAdd' endpoint"]
     #[serde(rename = "select_add")]
     SelectAdd {
         #[doc = "The response from the `SelectAdd` endpoint."]
         data: SelectAdd,
     },
-    #[doc = "The response to the 'SelectRemove' endpoint"]
     #[serde(rename = "select_remove")]
     SelectRemove {
         #[doc = "The response from the `SelectRemove` endpoint."]
         data: SelectRemove,
     },
-    #[doc = "The response to the 'SceneClearAll' endpoint"]
     #[serde(rename = "scene_clear_all")]
     SceneClearAll {
         #[doc = "The response from the `SceneClearAll` endpoint."]
         data: SceneClearAll,
     },
-    #[doc = "The response to the 'SelectReplace' endpoint"]
     #[serde(rename = "select_replace")]
     SelectReplace {
         #[doc = "The response from the `SelectReplace` endpoint."]
         data: SelectReplace,
     },
-    #[doc = "The response to the 'HighlightSetEntities' endpoint"]
     #[serde(rename = "highlight_set_entities")]
     HighlightSetEntities {
         #[doc = "The response from the `HighlightSetEntities` endpoint."]
         data: HighlightSetEntities,
     },
-    #[doc = "The response to the 'NewAnnotation' endpoint"]
     #[serde(rename = "new_annotation")]
     NewAnnotation {
         #[doc = "The response from the `NewAnnotation` endpoint."]
         data: NewAnnotation,
     },
-    #[doc = "The response to the 'UpdateAnnotation' endpoint"]
     #[serde(rename = "update_annotation")]
     UpdateAnnotation {
         #[doc = "The response from the `UpdateAnnotation` endpoint."]
         data: UpdateAnnotation,
     },
-    #[doc = "The response to the 'EdgeLinesVisible' endpoint"]
     #[serde(rename = "edge_lines_visible")]
     EdgeLinesVisible {
         #[doc = "The response from the `EdgeLinesVisible` endpoint."]
         data: EdgeLinesVisible,
     },
-    #[doc = "The response to the 'ObjectVisible' endpoint"]
     #[serde(rename = "object_visible")]
     ObjectVisible {
         #[doc = "The response from the `ObjectVisible` endpoint."]
         data: ObjectVisible,
     },
-    #[doc = "The response to the 'ObjectBringToFront' endpoint"]
     #[serde(rename = "object_bring_to_front")]
     ObjectBringToFront {
         #[doc = "The response from the `ObjectBringToFront` endpoint."]
         data: ObjectBringToFront,
     },
-    #[doc = "The response to the 'ObjectSetMaterialParamsPbr' endpoint"]
     #[serde(rename = "object_set_material_params_pbr")]
     ObjectSetMaterialParamsPbr {
         #[doc = "The response from the `ObjectSetMaterialParamsPbr` endpoint."]
         data: ObjectSetMaterialParamsPbr,
     },
-    #[doc = "The response to the 'Solid2dAddHole' endpoint"]
     #[serde(rename = "solid2d_add_hole")]
     Solid2DAddHole {
         #[doc = "The response from the `Solid2dAddHole` endpoint."]
         data: Solid2DAddHole,
     },
-    #[doc = "The response to the 'Solid3dFilletEdge' endpoint"]
     #[serde(rename = "solid3d_fillet_edge")]
     Solid3DFilletEdge {
         #[doc = "The response from the `Solid3dFilletEdge` endpoint."]
         data: Solid3DFilletEdge,
     },
-    #[doc = "The response to the 'SendObject' endpoint"]
     #[serde(rename = "send_object")]
     SendObject {
         #[doc = "The response from the `SendObject` endpoint."]
         data: SendObject,
     },
-    #[doc = "The response to the 'EntitySetOpacity' endpoint"]
     #[serde(rename = "entity_set_opacity")]
     EntitySetOpacity {
         #[doc = "The response from the `EntitySetOpacity` endpoint."]
         data: EntitySetOpacity,
     },
-    #[doc = "The response to the 'EntityFade' endpoint"]
     #[serde(rename = "entity_fade")]
     EntityFade {
         #[doc = "The response from the `EntityFade` endpoint."]
         data: EntityFade,
     },
-    #[doc = "The response to the 'MakePlane' endpoint"]
     #[serde(rename = "make_plane")]
     MakePlane {
         #[doc = "The response from the `MakePlane` endpoint."]
         data: MakePlane,
     },
-    #[doc = "The response to the 'PlaneSetColor' endpoint"]
     #[serde(rename = "plane_set_color")]
     PlaneSetColor {
         #[doc = "The response from the `PlaneSetColor` endpoint."]
         data: PlaneSetColor,
     },
-    #[doc = "The response to the 'SetTool' endpoint"]
     #[serde(rename = "set_tool")]
     SetTool {
         #[doc = "The response from the `SetTool` endpoint."]
         data: SetTool,
     },
-    #[doc = "The response to the 'MouseMove' endpoint"]
     #[serde(rename = "mouse_move")]
     MouseMove {
         #[doc = "The response from the `MouseMove` endpoint."]
         data: MouseMove,
     },
-    #[doc = "The response to the 'SketchModeDisable' endpoint"]
     #[serde(rename = "sketch_mode_disable")]
     SketchModeDisable {
         #[doc = "The response from the `SketchModeDisable` endpoint."]
         data: SketchModeDisable,
     },
-    #[doc = "The response to the 'CurveSetConstraint' endpoint"]
     #[serde(rename = "curve_set_constraint")]
     CurveSetConstraint {
         #[doc = "The response from the `CurveSetConstraint` endpoint."]
         data: CurveSetConstraint,
     },
-    #[doc = "The response to the 'EnableSketchMode' endpoint"]
     #[serde(rename = "enable_sketch_mode")]
     EnableSketchMode {
         #[doc = "The response from the `EnableSketchMode` endpoint."]
         data: EnableSketchMode,
     },
-    #[doc = "The response to the 'SetBackgroundColor' endpoint"]
     #[serde(rename = "set_background_color")]
     SetBackgroundColor {
         #[doc = "The response from the `SetBackgroundColor` endpoint."]
         data: SetBackgroundColor,
     },
-    #[doc = "The response to the 'SetCurrentToolProperties' endpoint"]
     #[serde(rename = "set_current_tool_properties")]
     SetCurrentToolProperties {
         #[doc = "The response from the `SetCurrentToolProperties` endpoint."]
         data: SetCurrentToolProperties,
     },
-    #[doc = "The response to the 'SetDefaultSystemProperties' endpoint"]
     #[serde(rename = "set_default_system_properties")]
     SetDefaultSystemProperties {
         #[doc = "The response from the `SetDefaultSystemProperties` endpoint."]
         data: SetDefaultSystemProperties,
     },
-    #[doc = "The response to the 'MakeAxesGizmo' endpoint"]
     #[serde(rename = "make_axes_gizmo")]
     MakeAxesGizmo {
         #[doc = "The response from the `MakeAxesGizmo` endpoint."]
         data: MakeAxesGizmo,
     },
-    #[doc = "The response to the 'HandleMouseDragStart' endpoint"]
     #[serde(rename = "handle_mouse_drag_start")]
     HandleMouseDragStart {
         #[doc = "The response from the `HandleMouseDragStart` endpoint."]
         data: HandleMouseDragStart,
     },
-    #[doc = "The response to the 'HandleMouseDragMove' endpoint"]
     #[serde(rename = "handle_mouse_drag_move")]
     HandleMouseDragMove {
         #[doc = "The response from the `HandleMouseDragMove` endpoint."]
         data: HandleMouseDragMove,
     },
-    #[doc = "The response to the 'HandleMouseDragEnd' endpoint"]
     #[serde(rename = "handle_mouse_drag_end")]
     HandleMouseDragEnd {
         #[doc = "The response from the `HandleMouseDragEnd` endpoint."]
         data: HandleMouseDragEnd,
     },
-    #[doc = "The response to the 'RemoveSceneObjects' endpoint"]
     #[serde(rename = "remove_scene_objects")]
     RemoveSceneObjects {
         #[doc = "The response from the `RemoveSceneObjects` endpoint."]
         data: RemoveSceneObjects,
     },
-    #[doc = "The response to the 'ReconfigureStream' endpoint"]
     #[serde(rename = "reconfigure_stream")]
     ReconfigureStream {
         #[doc = "The response from the `ReconfigureStream` endpoint."]
         data: ReconfigureStream,
     },
-    #[doc = "The response to the 'SetSceneUnits' endpoint"]
     #[serde(rename = "set_scene_units")]
     SetSceneUnits {
         #[doc = "The response from the `SetSceneUnits` endpoint."]
         data: SetSceneUnits,
     },
-    #[doc = "The response to the 'SetSelectionType' endpoint"]
     #[serde(rename = "set_selection_type")]
     SetSelectionType {
         #[doc = "The response from the `SetSelectionType` endpoint."]
         data: SetSelectionType,
     },
-    #[doc = "The response to the 'SetSelectionFilter' endpoint"]
     #[serde(rename = "set_selection_filter")]
     SetSelectionFilter {
         #[doc = "The response from the `SetSelectionFilter` endpoint."]
         data: SetSelectionFilter,
     },
-    #[doc = "The response to the 'DefaultCameraSetOrthographic' endpoint"]
     #[serde(rename = "default_camera_set_orthographic")]
     DefaultCameraSetOrthographic {
         #[doc = "The response from the `DefaultCameraSetOrthographic` endpoint."]
         data: DefaultCameraSetOrthographic,
     },
-    #[doc = "The response to the 'DefaultCameraSetPerspective' endpoint"]
     #[serde(rename = "default_camera_set_perspective")]
     DefaultCameraSetPerspective {
         #[doc = "The response from the `DefaultCameraSetPerspective` endpoint."]
         data: DefaultCameraSetPerspective,
     },
-    #[doc = "The response to the 'EditModeExit' endpoint"]
     #[serde(rename = "edit_mode_exit")]
     EditModeExit {
         #[doc = "The response from the `EditModeExit` endpoint."]
         data: EditModeExit,
     },
-    #[doc = "The response to the 'SelectClear' endpoint"]
     #[serde(rename = "select_clear")]
     SelectClear {
         #[doc = "The response from the `SelectClear` endpoint."]
         data: SelectClear,
     },
-    #[doc = "The response to the 'Export' endpoint"]
     #[serde(rename = "export")]
     Export {
         #[doc = "The response from the `Export` endpoint."]
         data: Export,
     },
-    #[doc = "The response to the 'SelectWithPoint' endpoint"]
     #[serde(rename = "select_with_point")]
     SelectWithPoint {
         #[doc = "The response from the `SelectWithPoint` command."]
         data: SelectWithPoint,
     },
-    #[doc = "The response to the 'HighlightSetEntity' endpoint"]
     #[serde(rename = "highlight_set_entity")]
     HighlightSetEntity {
         #[doc = "The response from the `HighlightSetEntity` command."]
         data: HighlightSetEntity,
     },
-    #[doc = "The response to the 'EntityGetChildUuid' endpoint"]
     #[serde(rename = "entity_get_child_uuid")]
     EntityGetChildUuid {
         #[doc = "The response from the `EntityGetChildUuid` command."]
         data: EntityGetChildUuid,
     },
-    #[doc = "The response to the 'EntityGetNumChildren' endpoint"]
     #[serde(rename = "entity_get_num_children")]
     EntityGetNumChildren {
         #[doc = "The response from the `EntityGetNumChildren` command."]
         data: EntityGetNumChildren,
     },
-    #[doc = "The response to the 'EntityGetParentId' endpoint"]
     #[serde(rename = "entity_get_parent_id")]
     EntityGetParentId {
         #[doc = "The response from the `EntityGetParentId` command."]
         data: EntityGetParentId,
     },
-    #[doc = "The response to the 'EntityGetAllChildUuids' endpoint"]
     #[serde(rename = "entity_get_all_child_uuids")]
     EntityGetAllChildUuids {
         #[doc = "The response from the `EntityGetAllChildUuids` command."]
         data: EntityGetAllChildUuids,
     },
-    #[doc = "The response to the 'EntityGetSketchPaths' endpoint"]
     #[serde(rename = "entity_get_sketch_paths")]
     EntityGetSketchPaths {
         #[doc = "The response from the `EntityGetSketchPaths` command."]
         data: EntityGetSketchPaths,
     },
-    #[doc = "The response to the 'Loft' endpoint"]
     #[serde(rename = "loft")]
     Loft {
         #[doc = "The response from the `Loft` command."]
         data: Loft,
     },
-    #[doc = "The response to the 'ClosePath' endpoint"]
     #[serde(rename = "close_path")]
     ClosePath {
         #[doc = "The response from the `ClosePath` command."]
         data: ClosePath,
     },
-    #[doc = "The response to the 'CameraDragMove' endpoint"]
     #[serde(rename = "camera_drag_move")]
     CameraDragMove {
         #[doc = "The response from the `CameraDragMove` command. Note this is an \"unreliable\" \
                  channel message, so this data may need more data like a \"sequence\""]
         data: CameraDragMove,
     },
-    #[doc = "The response to the 'CameraDragEnd' endpoint"]
     #[serde(rename = "camera_drag_end")]
     CameraDragEnd {
         #[doc = "The response from the `CameraDragEnd` command."]
         data: CameraDragEnd,
     },
-    #[doc = "The response to the 'DefaultCameraGetSettings' endpoint"]
     #[serde(rename = "default_camera_get_settings")]
     DefaultCameraGetSettings {
         #[doc = "The response from the `DefaultCameraGetSettings` command."]
         data: DefaultCameraGetSettings,
     },
-    #[doc = "The response to the 'DefaultCameraZoom' endpoint"]
     #[serde(rename = "default_camera_zoom")]
     DefaultCameraZoom {
         #[doc = "The response from the `DefaultCameraZoom` command."]
         data: DefaultCameraZoom,
     },
-    #[doc = "The response to the 'ZoomToFit' endpoint"]
     #[serde(rename = "zoom_to_fit")]
     ZoomToFit {
         #[doc = "The response from the `ZoomToFit` command."]
         data: ZoomToFit,
     },
-    #[doc = "The response to the 'ViewIsometric' endpoint"]
     #[serde(rename = "view_isometric")]
     ViewIsometric {
         #[doc = "The response from the `ViewIsometric` command."]
         data: ViewIsometric,
     },
-    #[doc = "The response to the 'GetNumObjects' endpoint"]
     #[serde(rename = "get_num_objects")]
     GetNumObjects {
         #[doc = "The response from the `GetNumObjects` command."]
         data: GetNumObjects,
     },
-    #[doc = "The response to the 'DefaultCameraFocusOn' endpoint"]
     #[serde(rename = "default_camera_focus_on")]
     DefaultCameraFocusOn {
         #[doc = "The response from the `DefaultCameraFocusOn` command."]
         data: DefaultCameraFocusOn,
     },
-    #[doc = "The response to the 'SelectGet' endpoint"]
     #[serde(rename = "select_get")]
     SelectGet {
         #[doc = "The response from the `SelectGet` command."]
         data: SelectGet,
     },
-    #[doc = "The response to the 'Solid3dGetAllEdgeFaces' endpoint"]
     #[serde(rename = "solid3d_get_all_edge_faces")]
     Solid3DGetAllEdgeFaces {
         #[doc = "The response from the `Solid3dGetAllEdgeFaces` command."]
         data: Solid3DGetAllEdgeFaces,
     },
-    #[doc = "The response to the 'Solid3dGetAllOppositeEdges' endpoint"]
     #[serde(rename = "solid3d_get_all_opposite_edges")]
     Solid3DGetAllOppositeEdges {
         #[doc = "The response from the `Solid3dGetAllOppositeEdges` command."]
         data: Solid3DGetAllOppositeEdges,
     },
-    #[doc = "The response to the 'Solid3dGetOppositeEdge' endpoint"]
     #[serde(rename = "solid3d_get_opposite_edge")]
     Solid3DGetOppositeEdge {
         #[doc = "The response from the `Solid3dGetOppositeEdge` command."]
         data: Solid3DGetOppositeEdge,
     },
-    #[doc = "The response to the 'Solid3dGetNextAdjacentEdge' endpoint"]
     #[serde(rename = "solid3d_get_next_adjacent_edge")]
     Solid3DGetNextAdjacentEdge {
         #[doc = "The response from the `Solid3dGetNextAdjacentEdge` command."]
         data: Solid3DGetNextAdjacentEdge,
     },
-    #[doc = "The response to the 'Solid3dGetPrevAdjacentEdge' endpoint"]
     #[serde(rename = "solid3d_get_prev_adjacent_edge")]
     Solid3DGetPrevAdjacentEdge {
         #[doc = "The response from the `Solid3dGetPrevAdjacentEdge` command."]
         data: Solid3DGetPrevAdjacentEdge,
     },
-    #[doc = "The response to the 'GetEntityType' endpoint"]
     #[serde(rename = "get_entity_type")]
     GetEntityType {
         #[doc = "The response from the `GetEntityType` command."]
         data: GetEntityType,
     },
-    #[doc = "The response to the 'CurveGetControlPoints' endpoint"]
     #[serde(rename = "curve_get_control_points")]
     CurveGetControlPoints {
         #[doc = "The response from the `CurveGetControlPoints` command."]
         data: CurveGetControlPoints,
     },
-    #[doc = "The response to the 'CurveGetType' endpoint"]
     #[serde(rename = "curve_get_type")]
     CurveGetType {
         #[doc = "The response from the `CurveGetType` command."]
         data: CurveGetType,
     },
-    #[doc = "The response to the 'MouseClick' endpoint"]
     #[serde(rename = "mouse_click")]
     MouseClick {
         #[doc = "The response from the `MouseClick` command."]
         data: MouseClick,
     },
-    #[doc = "The response to the 'TakeSnapshot' endpoint"]
     #[serde(rename = "take_snapshot")]
     TakeSnapshot {
         #[doc = "The response from the `TakeSnapshot` command."]
         data: TakeSnapshot,
     },
-    #[doc = "The response to the 'PathGetInfo' endpoint"]
     #[serde(rename = "path_get_info")]
     PathGetInfo {
         #[doc = "The response from the `PathGetInfo` command."]
         data: PathGetInfo,
     },
-    #[doc = "The response to the 'PathSegmentInfo' endpoint"]
     #[serde(rename = "path_segment_info")]
     PathSegmentInfo {
         #[doc = "Info about a path segment"]
         data: PathSegmentInfo,
     },
-    #[doc = "The response to the 'PathGetCurveUuidsForVertices' endpoint"]
     #[serde(rename = "path_get_curve_uuids_for_vertices")]
     PathGetCurveUuidsForVertices {
         #[doc = "The response from the `PathGetCurveUuidsForVertices` command."]
         data: PathGetCurveUuidsForVertices,
     },
-    #[doc = "The response to the 'PathGetCurveUuid' endpoint"]
     #[serde(rename = "path_get_curve_uuid")]
     PathGetCurveUuid {
         #[doc = "The response from the `PathGetCurveUuid` command."]
         data: PathGetCurveUuid,
     },
-    #[doc = "The response to the 'PathGetVertexUuids' endpoint"]
     #[serde(rename = "path_get_vertex_uuids")]
     PathGetVertexUuids {
         #[doc = "The response from the `PathGetVertexUuids` command."]
         data: PathGetVertexUuids,
     },
-    #[doc = "The response to the 'PathGetSketchTargetUuid' endpoint"]
     #[serde(rename = "path_get_sketch_target_uuid")]
     PathGetSketchTargetUuid {
         #[doc = "The response from the `PathGetSketchTargetUuid` command."]
         data: PathGetSketchTargetUuid,
     },
-    #[doc = "The response to the 'CurveGetEndPoints' endpoint"]
     #[serde(rename = "curve_get_end_points")]
     CurveGetEndPoints {
         #[doc = "Endpoints of a curve"]
         data: CurveGetEndPoints,
     },
-    #[doc = "The response to the 'FaceIsPlanar' endpoint"]
     #[serde(rename = "face_is_planar")]
     FaceIsPlanar {
         #[doc = "Surface-local planar axes (if available)"]
         data: FaceIsPlanar,
     },
-    #[doc = "The response to the 'FaceGetPosition' endpoint"]
     #[serde(rename = "face_get_position")]
     FaceGetPosition {
         #[doc = "The 3D position on the surface that was evaluated"]
         data: FaceGetPosition,
     },
-    #[doc = "The response to the 'FaceGetCenter' endpoint"]
     #[serde(rename = "face_get_center")]
     FaceGetCenter {
         #[doc = "The 3D center of mass on the surface"]
         data: FaceGetCenter,
     },
-    #[doc = "The response to the 'FaceGetGradient' endpoint"]
     #[serde(rename = "face_get_gradient")]
     FaceGetGradient {
         #[doc = "The gradient (dFdu, dFdv) + normal vector on a brep face"]
         data: FaceGetGradient,
     },
-    #[doc = "The response to the 'PlaneIntersectAndProject' endpoint"]
     #[serde(rename = "plane_intersect_and_project")]
     PlaneIntersectAndProject {
         #[doc = "Corresponding coordinates of given window coordinates, intersected on given \
                  plane."]
         data: PlaneIntersectAndProject,
     },
-    #[doc = "The response to the 'ImportFiles' endpoint"]
     #[serde(rename = "import_files")]
     ImportFiles {
         #[doc = "Data from importing the files"]
         data: ImportFiles,
     },
-    #[doc = "The response to the 'ImportedGeometry' endpoint"]
     #[serde(rename = "imported_geometry")]
     ImportedGeometry {
         #[doc = "Data from importing the files"]
         data: ImportedGeometry,
     },
-    #[doc = "The response to the 'Mass' endpoint"]
     #[serde(rename = "mass")]
     Mass {
         #[doc = "The mass response."]
         data: Mass,
     },
-    #[doc = "The response to the 'Volume' endpoint"]
     #[serde(rename = "volume")]
     Volume {
         #[doc = "The volume response."]
         data: Volume,
     },
-    #[doc = "The response to the 'Density' endpoint"]
     #[serde(rename = "density")]
     Density {
         #[doc = "The density response."]
         data: Density,
     },
-    #[doc = "The response to the 'SurfaceArea' endpoint"]
     #[serde(rename = "surface_area")]
     SurfaceArea {
         #[doc = "The surface area response."]
         data: SurfaceArea,
     },
-    #[doc = "The response to the 'CenterOfMass' endpoint"]
     #[serde(rename = "center_of_mass")]
     CenterOfMass {
         #[doc = "The center of mass response."]
         data: CenterOfMass,
     },
-    #[doc = "The response to the 'GetSketchModePlane' endpoint"]
     #[serde(rename = "get_sketch_mode_plane")]
     GetSketchModePlane {
         #[doc = "The plane for sketch mode."]
         data: GetSketchModePlane,
     },
-    #[doc = "The response to the 'EntityGetDistance' endpoint"]
     #[serde(rename = "entity_get_distance")]
     EntityGetDistance {
         #[doc = "The response from the `EntitiesGetDistance` command."]
         data: EntityGetDistance,
     },
-    #[doc = "The response to the 'EntityLinearPatternTransform' endpoint"]
     #[serde(rename = "entity_linear_pattern_transform")]
     EntityLinearPatternTransform {
         #[doc = "The response from the `EntityLinearPatternTransform` command."]
         data: EntityLinearPatternTransform,
     },
-    #[doc = "The response to the 'EntityLinearPattern' endpoint"]
     #[serde(rename = "entity_linear_pattern")]
     EntityLinearPattern {
         #[doc = "The response from the `EntityLinearPattern` command."]
         data: EntityLinearPattern,
     },
-    #[doc = "The response to the 'EntityCircularPattern' endpoint"]
     #[serde(rename = "entity_circular_pattern")]
     EntityCircularPattern {
         #[doc = "The response from the `EntityCircularPattern` command."]
         data: EntityCircularPattern,
     },
-    #[doc = "The response to the 'Solid3dGetExtrusionFaceInfo' endpoint"]
     #[serde(rename = "solid3d_get_extrusion_face_info")]
     Solid3DGetExtrusionFaceInfo {
         #[doc = "Extrusion face info struct (useful for maintaining mappings between source path \
                  segment ids and extrusion faces)"]
         data: Solid3DGetExtrusionFaceInfo,
     },
-    #[doc = "The response to the 'ExtrusionFaceInfo' endpoint"]
     #[serde(rename = "extrusion_face_info")]
     ExtrusionFaceInfo {
         #[doc = "Extrusion face info struct (useful for maintaining mappings between source path \
