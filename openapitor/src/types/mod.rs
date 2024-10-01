@@ -96,48 +96,71 @@ pub fn generate_types(spec: &openapiv3::OpenAPI, opts: crate::Opts) -> Result<Ty
         opts,
     };
 
-    if let Some(components) = &spec.components {
-        // Parse the schemas.
-        // Schemas are "definition of input and output data types",
-        // i.e. the shape of requests to and responses from endpoints.
-        //
-        // Schemae are either defined as:
-        //  - shared "components" that get used in many different places
-        //  - a description of some parameter used in a request
-        //    (e.g. a path/query/header parameter)
-        //  - a description of a request body
-        //  - a description of a response body
-        //
-        // We need to search each of these 4 places in the spec for schemae, and
-        // generate Rust types for them.
+    // The 'components' field of an OpenAPI object stores
+    // definitions of various types/shapes of data.
+    // We will generate a Rust type for these.
+    // If there aren't any of them, then there's no work left to do!
+    // So we can return early.
+    let Some(components) = &spec.components else {
+        return Ok(type_space);
+    };
 
-        // First, the 'components' stores shared schemae that are reused across
-        // parameters/bodies
-        for (name, schema) in &components.schemas {
-            // Let's get the schema from the reference.
-            let schema = schema.get_schema_from_reference(spec, true)?;
-            // Let's handle all the kinds of schemas.
-            type_space.render_schema(name, &schema)?;
-        }
+    // Parse the schemas.
+    // Schemas are "definition of input and output data types",
+    // i.e. the shape of requests to and responses from endpoints.
+    //
+    // Schemae are either defined as:
+    //  - shared schemae that get used in many different places
+    //  - a description of some parameter used in a request
+    //    (e.g. a path/query/header parameter)
+    //  - a description of a request body
+    //  - a description of a response body
+    //
+    // We need to search each of these 4 places in the spec for schemae, and
+    // generate Rust types for them.
 
-        // Search the parameters for schemae
-        for (name, parameter) in &components.parameters {
-            let schema = (&parameter.expand(spec)?).data()?.format.schema()?;
-            // Let's get the schema from the reference.
-            let schema = schema.get_schema_from_reference(spec, true)?;
-            // Let's handle all the kinds of schemas.
-            type_space.render_schema(name, &schema)?;
-        }
+    let mut schemas = Vec::new();
+    // First, search for shared schemae that are reused across
+    // parameters/bodies
+    for (name, schema) in &components.schemas {
+        // Let's get the schema from the reference.
+        let schema = schema.get_schema_from_reference(spec, true)?;
+        schemas.push((name.to_owned(), schema));
+    }
 
-        // Search the responses for schemae
-        for (name, response) in &components.responses {
-            type_space.render_response(name, &response.expand(spec)?)?;
-        }
+    // Search the parameters for schemae
+    for (name, parameter) in &components.parameters {
+        let schema = (&parameter.expand(spec)?).data()?.format.schema()?;
+        // Let's get the schema from the reference.
+        let schema = schema.get_schema_from_reference(spec, true)?;
+        schemas.push((name.to_owned(), schema));
+    }
 
-        // Search the requests for schemae
-        for (name, request_body) in &components.request_bodies {
-            type_space.render_request_body(name, &request_body.expand(spec)?)?;
+    // Search the responses for schemae
+    for (name, response) in &components.responses {
+        for (content_name, content) in response.expand(spec)?.content {
+            if let Some(openapiv3::ReferenceOr::Item(i)) = content.schema {
+                // If the schema is a reference we don't care, since we would have already rendered
+                // that reference.
+                schemas.push((format!("{}_{}", name, content_name), i));
+            }
         }
+    }
+
+    // Search the requests for schemae
+    for (name, request_body) in &components.request_bodies {
+        for (content_name, content) in request_body.expand(spec)?.content {
+            if let Some(openapiv3::ReferenceOr::Item(i)) = content.schema {
+                // If the schema is a reference we don't care, since we would have already rendered
+                // that reference.
+                schemas.push((format!("{}_{}", name, content_name), i));
+            }
+        }
+    }
+
+    // Each schema becomes a Rust type
+    for (name, i) in schemas {
+        type_space.render_schema(&name, &i)?;
     }
 
     Ok(type_space)
@@ -1112,36 +1135,6 @@ impl TypeSpace {
                 },
             ),
         )?;
-
-        Ok(())
-    }
-
-    /// Render the full type for a response.
-    fn render_response(&mut self, name: &str, response: &openapiv3::Response) -> Result<()> {
-        for (content_name, content) in &response.content {
-            if let Some(openapiv3::ReferenceOr::Item(i)) = &content.schema {
-                // If the schema is a reference we don't care, since we would have already rendered
-                // that reference.
-                self.render_schema(&format!("{}_{}", name, content_name), i)?;
-            }
-        }
-
-        Ok(())
-    }
-
-    /// Render the full type for a request body.
-    fn render_request_body(
-        &mut self,
-        name: &str,
-        request_body: &openapiv3::RequestBody,
-    ) -> Result<()> {
-        for (content_name, content) in &request_body.content {
-            if let Some(openapiv3::ReferenceOr::Item(i)) = &content.schema {
-                // If the schema is a reference we don't care, since we would have already rendered
-                // that reference.
-                self.render_schema(&format!("{}_{}", name, content_name), i)?;
-            }
-        }
 
         Ok(())
     }
