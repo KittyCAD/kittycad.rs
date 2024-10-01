@@ -7705,7 +7705,7 @@
             "description": "The service account.",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/ServiceAccountTokenUuid"
+              "$ref": "#/components/schemas/ServiceAccountUuid"
             }
           }
         ],
@@ -7784,7 +7784,7 @@
             "description": "The service account.",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/ServiceAccountTokenUuid"
+              "$ref": "#/components/schemas/ServiceAccountUuid"
             }
           }
         ],
@@ -7856,7 +7856,7 @@
             "description": "The service account.",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/ServiceAccountTokenUuid"
+              "$ref": "#/components/schemas/ServiceAccountUuid"
             }
           }
         ],
@@ -12724,7 +12724,7 @@
             "description": "The API token.",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/SessionTokenUuid"
+              "$ref": "#/components/schemas/SessionUuid"
             }
           }
         ],
@@ -27813,7 +27813,7 @@
             "description": "The API token itself.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/ServiceAccountTokenUuid"
+                "$ref": "#/components/schemas/ServiceAccountUuid"
               }
             ]
           },
@@ -27854,7 +27854,7 @@
           "items"
         ]
       },
-      "ServiceAccountTokenUuid": {
+      "ServiceAccountUuid": {
         "description": "An auth token. A uuid with a prefix of svc-",
         "type": "string"
       },
@@ -27886,7 +27886,7 @@
             "description": "The session token.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/SessionTokenUuid"
+                "$ref": "#/components/schemas/SessionUuid"
               }
             ]
           },
@@ -27914,7 +27914,7 @@
           "user_id"
         ]
       },
-      "SessionTokenUuid": {
+      "SessionUuid": {
         "description": "An auth token. A uuid with a prefix of ses-",
         "type": "string"
       },
