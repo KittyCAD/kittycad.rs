@@ -585,23 +585,22 @@ base64 = "0.22"
 bigdecimal = {{ version = "0.4", features = ["serde"] }}
 bytes = {{ version = "1", features = ["serde"] }}
 clap = {{ version = "4.2.4", features = ["cargo", "derive", "env", "unicode"], optional = true }}
-chrono = {{ version = "0.4", default-features = false, features = ["serde", "std"] }}
 data-encoding = "^2.3.2"
 dirs = {{ version = "^5.0.1", optional = true }}
 format_serde_error = {{ version = "^0.3.0", optional = true }}
 futures = {{ version = "0.3.26", optional = true }}
-http = {{ version = "^0.2.8", optional = true }}
+http = {{ version = "1", optional = true }}
 itertools = "0.13.0"
 log = {{ version = "^0.4", features = ["serde"], optional = true }}
 mime_guess = "2.0.4"
 parse-display = "0.10.0"
 phonenumber = "0.3.5"
 rand = {{ version = "0.8", optional = true }}
-reqwest = {{ version = "0.11.27", default-features = false, features = ["json", "multipart", "rustls-tls"], optional = true }}
-reqwest-conditional-middleware = {{ version = "0.2.1", optional = true }}
-reqwest-middleware = {{ version = "0.2.2", optional = true }}
-reqwest-retry = {{ version = "0.2.2", optional = true }}
-reqwest-tracing = {{ version = "0.4.4", features = ["opentelemetry_0_17"], optional = true }}
+reqwest = {{ version = "0.12", default-features = false, features = ["json", "multipart", "rustls-tls"], optional = true }}
+reqwest-conditional-middleware = {{ version = "0.3", optional = true }}
+reqwest-middleware = {{ version = "0.3", optional = true, features = ["json", "multipart", "http2", "rustls-tls"] }}
+reqwest-retry = {{ version = "0.6", optional = true }}
+reqwest-tracing = {{ version = "0.5", features = ["opentelemetry_0_24"], optional = true }}
 schemars = {{ version = "0.8.17", features = ["bigdecimal04", "bytes", "chrono", "url", "uuid1"] }}
 serde = {{ version = "1", features = ["derive"] }}
 serde_bytes = "0.11"
@@ -614,7 +613,11 @@ url = {{ version = "2", features = ["serde"] }}
 uuid = {{ version = "1", features = ["serde", "v4", "v7"] }}
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+chrono = {{ version = "0.4", default-features = false, features = ["now", "serde", "std"] }}
 tokio = {{ version = "1.38.0", features = ["rt", "macros"] }}
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+chrono = {{ version = "0.4", default-features = false, features = ["serde", "std"] }}
 
 [dev-dependencies]
 expectorate = "1"
