@@ -98,13 +98,29 @@ pub fn generate_types(spec: &openapiv3::OpenAPI, opts: crate::Opts) -> Result<Ty
 
     if let Some(components) = &spec.components {
         // Parse the schemas.
+        // Schemas are "definition of input and output data types",
+        // i.e. the shape of requests to and responses from endpoints.
+        //
+        // Schemae are either defined as:
+        //  - shared "components" that get used in many different places
+        //  - a description of some parameter used in a request
+        //    (e.g. a path/query/header parameter)
+        //  - a description of a request body
+        //  - a description of a response body
+        //
+        // We need to search each of these 4 places in the spec for schemae, and
+        // generate Rust types for them.
+
+        // First, the 'components' stores shared schemae that are reused across
+        // parameters/bodies
         for (name, schema) in &components.schemas {
             // Let's get the schema from the reference.
             let schema = schema.get_schema_from_reference(spec, true)?;
             // Let's handle all the kinds of schemas.
             type_space.render_schema(name, &schema)?;
         }
-        // Parse the parameters.
+
+        // Search the parameters for schemae
         for (name, parameter) in &components.parameters {
             let schema = (&parameter.expand(spec)?).data()?.format.schema()?;
             // Let's get the schema from the reference.
@@ -113,12 +129,12 @@ pub fn generate_types(spec: &openapiv3::OpenAPI, opts: crate::Opts) -> Result<Ty
             type_space.render_schema(name, &schema)?;
         }
 
-        // Parse the responses.
+        // Search the responses for schemae
         for (name, response) in &components.responses {
             type_space.render_response(name, &response.expand(spec)?)?;
         }
 
-        // Parse the request bodies.
+        // Search the requests for schemae
         for (name, request_body) in &components.request_bodies {
             type_space.render_request_body(name, &request_body.expand(spec)?)?;
         }
