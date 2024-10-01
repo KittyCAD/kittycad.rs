@@ -15,7 +15,7 @@ use anyhow::Result;
 use indexmap::map::IndexMap;
 use numeral::Cardinal;
 use once_cell::sync::Lazy;
-use openapiv3::{AnySchema, Schema, SchemaData};
+use openapiv3::{AnySchema, Schema, SchemaData, SchemaKind};
 use regex::Regex;
 
 use crate::types::exts::{
@@ -159,8 +159,8 @@ pub fn generate_types(spec: &openapiv3::OpenAPI, opts: crate::Opts) -> Result<Ty
     }
 
     // Each schema becomes a Rust type
-    for (name, i) in schemas {
-        type_space.render_schema(&name, &i)?;
+    for (name, schema) in schemas {
+        type_space.render_schema(&name, &schema)?;
     }
 
     Ok(type_space)
@@ -209,21 +209,20 @@ impl TypeSpace {
     /// This generates the Rust type.
     pub fn render_schema(&mut self, name: &str, schema: &openapiv3::Schema) -> Result<()> {
         match &schema.schema_kind {
-            openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
+            // Don't render primitive types.
+            SchemaKind::Type(openapiv3::Type::Number(_))
+            | SchemaKind::Type(openapiv3::Type::Boolean { .. })
+            | SchemaKind::Type(openapiv3::Type::Integer(_)) => Ok(()),
+
+            // The remaining types are complex (non-primitive)
+            // and do need to be rendered.
+            SchemaKind::Type(openapiv3::Type::String(s)) => {
                 self.render_string_type(name, s, &schema.schema_data)
             }
-            openapiv3::SchemaKind::Type(openapiv3::Type::Number(_n)) => {
-                // We don't render numbers yet, since it is a primitive type.
-                Ok(())
-            }
-            openapiv3::SchemaKind::Type(openapiv3::Type::Integer(_i)) => {
-                // We don't render integers yet, since it is a primitive type.
-                Ok(())
-            }
-            openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
+            SchemaKind::Type(openapiv3::Type::Object(o)) => {
                 self.render_object(name, o, &schema.schema_data)
             }
-            openapiv3::SchemaKind::Type(openapiv3::Type::Array(a)) => {
+            SchemaKind::Type(openapiv3::Type::Array(a)) => {
                 // We don't render arrays, since it is a combination of another type.
                 // Let's ensure the items are a reference, otherwise we should render it.
                 if let Some(openapiv3::ReferenceOr::Item(s)) = &a.items {
@@ -233,23 +232,13 @@ impl TypeSpace {
 
                 Ok(())
             }
-            openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => {
-                // We don't render booleans yet, since it is a primitive type.
-                Ok(())
-            }
-            openapiv3::SchemaKind::OneOf { one_of } => {
-                self.render_one_of(name, one_of, &schema.schema_data)
-            }
-            openapiv3::SchemaKind::AllOf { all_of } => {
-                self.render_all_of(name, all_of, &schema.schema_data)
-            }
-            openapiv3::SchemaKind::AnyOf { any_of } => {
-                self.render_any_of(name, any_of, &schema.schema_data)
-            }
-            openapiv3::SchemaKind::Not { not } => {
+            SchemaKind::OneOf { one_of } => self.render_one_of(name, one_of, &schema.schema_data),
+            SchemaKind::AllOf { all_of } => self.render_all_of(name, all_of, &schema.schema_data),
+            SchemaKind::AnyOf { any_of } => self.render_any_of(name, any_of, &schema.schema_data),
+            SchemaKind::Not { not } => {
                 anyhow::bail!("XXX not not supported yet: {} => {:?}", name, not);
             }
-            openapiv3::SchemaKind::Any(any) => self.render_any(name, any, &schema.schema_data),
+            SchemaKind::Any(any) => self.render_any(name, any, &schema.schema_data),
         }
     }
 
@@ -270,12 +259,12 @@ impl TypeSpace {
             let schema = all_of.get_schema_from_reference(&self.spec, true)?;
 
             // Ensure the type is an object.
-            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
+            if let SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
                 for (k, v) in o.properties.iter() {
                     properties.insert(k.clone(), v.clone());
                 }
                 required.extend(o.required.iter().cloned());
-            } else if let openapiv3::SchemaKind::AllOf { all_of } = &schema.schema_kind {
+            } else if let SchemaKind::AllOf { all_of } = &schema.schema_kind {
                 // Recurse.
                 let (p, r) = self.get_all_of_properties(name, all_of)?;
                 properties.extend(p);
@@ -364,7 +353,7 @@ impl TypeSpace {
             let schema = any_of.get_schema_from_reference(&self.spec, true)?;
 
             // Ensure the type is an object.
-            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
+            if let SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
                 for (k, v) in o.properties.iter() {
                     properties.insert(k.clone(), v.clone());
                 }
@@ -408,7 +397,7 @@ impl TypeSpace {
         for one_of in one_ofs {
             // Get the first property in the object.
             let schema = one_of.get_schema_from_reference(&self.spec, true)?;
-            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
+            if let SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
                 if o.properties.len() == 1 {
                     // Check if the property is a nested object.
                     for (inner_name, property) in o.properties.iter() {
@@ -416,7 +405,7 @@ impl TypeSpace {
                         let inner_name_ident = format_ident!("{}", proper_name(inner_name));
                         let property_schema =
                             property.get_schema_from_reference(&self.spec, true)?;
-                        if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
+                        if let SchemaKind::Type(openapiv3::Type::Object(o)) =
                             &property_schema.schema_kind
                         {
                             let inner_values =
@@ -447,7 +436,7 @@ impl TypeSpace {
                 one_of_name.to_string(),
                 openapiv3::Schema {
                     schema_data: data.clone(),
-                    schema_kind: openapiv3::SchemaKind::OneOf {
+                    schema_kind: SchemaKind::OneOf {
                         one_of: one_ofs.clone(),
                     },
                 },
@@ -483,7 +472,7 @@ impl TypeSpace {
         };
         for one_of in one_ofs {
             let schema = one_of.get_schema_from_reference(&self.spec, true)?;
-            if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) = &schema.schema_kind {
+            if let SchemaKind::Type(openapiv3::Type::String(s)) = &schema.schema_kind {
                 if s.enumeration.len() == 1 {
                     // This is an enum with only one value.
                     // Add the description to our array of descriptions.
@@ -515,13 +504,13 @@ impl TypeSpace {
         let mut is_one_of_nested_object = false;
         for one_of in one_ofs {
             let schema = one_of.get_schema_from_reference(&self.spec, true)?;
-            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
+            if let SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
                 if o.properties.len() == 1 {
                     // Check if the property is a nested object.
                     for (_, property) in o.properties.iter() {
                         let property_schema =
                             property.get_schema_from_reference(&self.spec, true)?;
-                        if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(_)) =
+                        if let SchemaKind::Type(openapiv3::Type::Object(_)) =
                             &property_schema.schema_kind
                         {
                             is_one_of_nested_object = true;
@@ -586,7 +575,7 @@ impl TypeSpace {
                 one_of_name.to_string(),
                 openapiv3::Schema {
                     schema_data: data.clone(),
-                    schema_kind: openapiv3::SchemaKind::OneOf {
+                    schema_kind: SchemaKind::OneOf {
                         one_of: one_ofs.clone(),
                     },
                 },
@@ -800,7 +789,7 @@ impl TypeSpace {
                 struct_name.to_string(),
                 openapiv3::Schema {
                     schema_data: data.clone(),
-                    schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(o.clone())),
+                    schema_kind: SchemaKind::Type(openapiv3::Type::Object(o.clone())),
                 },
             ),
         )?;
@@ -858,7 +847,7 @@ impl TypeSpace {
                 // Check if the name is already taken.
                 if let Some(rendered) = self.types.get(&t) {
                     let mut compare_inner_schema = Box::new(inner_schema.clone());
-                    if let openapiv3::SchemaKind::Type(openapiv3::Type::Array(inner_array)) =
+                    if let SchemaKind::Type(openapiv3::Type::Array(inner_array)) =
                         &inner_schema.schema_kind
                     {
                         if let Some(openapiv3::ReferenceOr::Item(item_schema)) = &inner_array.items
@@ -941,9 +930,7 @@ impl TypeSpace {
 
             // If we have a custom date format  and this is a datetime we need to override deserialize_with
             if self.opts.date_time_format.is_some() {
-                if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
-                    inner_schema.schema_kind
-                {
+                if let SchemaKind::Type(openapiv3::Type::String(s)) = inner_schema.schema_kind {
                     if s.format
                         == openapiv3::VariantOrUnknownOrEmpty::Item(
                             openapiv3::StringFormat::DateTime,
@@ -1131,7 +1118,7 @@ impl TypeSpace {
                 enum_name.to_string(),
                 openapiv3::Schema {
                     schema_data: data.clone(),
-                    schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::String(s.clone())),
+                    schema_kind: SchemaKind::Type(openapiv3::Type::String(s.clone())),
                 },
             ),
         )?;
@@ -1152,7 +1139,7 @@ impl TypeSpace {
         // Check if we have an existing object with this name.
         if let Some(components) = &self.spec.components {
             if let Some(schema) = components.schemas.get(name) {
-                if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(existing)) =
+                if let SchemaKind::Type(openapiv3::Type::Object(existing)) =
                     &schema.expand(&self.spec)?.schema_kind
                 {
                     let mut modified_properties = o.properties.clone();
@@ -1204,8 +1191,7 @@ impl TypeSpace {
                     quote!()
                 };
 
-                if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind
-                {
+                if let SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
                     // Get the value of this tag.
                     let tag_schema = match o.properties.get(tag) {
                         Some(v) => v,
@@ -1225,7 +1211,7 @@ impl TypeSpace {
                         tag_schema.get_schema_from_reference(&self.spec, true)?
                     };
 
-                    let tag_name = if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
+                    let tag_name = if let SchemaKind::Type(openapiv3::Type::String(s)) =
                         inner_schema.schema_kind
                     {
                         if s.enumeration.len() == 1 {
@@ -1274,9 +1260,7 @@ impl TypeSpace {
                         // Get the single value from the enum.
                         let content_name = if let openapiv3::ReferenceOr::Item(i) = content_schema {
                             let s = &**i;
-                            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) =
-                                &s.schema_kind
-                            {
+                            if let SchemaKind::Type(openapiv3::Type::Object(o)) = &s.schema_kind {
                                 enum_object_internal =
                                     Some(self.render_enum_object_internal(&p, o, tag)?);
                             }
@@ -1365,7 +1349,7 @@ impl TypeSpace {
                 // Render the schema.
                 name = match &expanded_one_of.schema_kind {
                     // Enums with no fields, e.g. MyEnum::SimpleVariant
-                    openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
+                    SchemaKind::Type(openapiv3::Type::String(s)) => {
                         if let Some(Some(variant_name)) = s.enumeration.first() {
                             format!("{original_name}_{variant_name}")
                         } else {
@@ -1378,7 +1362,7 @@ impl TypeSpace {
                     // Enum variants should be named after their nested object.
                     // E.g. instead of ModelingCmd::ModelingCmd, it should be
                     // ModelingCmd::ModelingCmdCameraDragStart.
-                    openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
+                    SchemaKind::Type(openapiv3::Type::Object(o)) => {
                         if let Some(prop_name) = o.properties.first().map(|(k, _v)| k.to_owned()) {
                             format!("{original_name}_{prop_name}")
                         } else {
@@ -1386,7 +1370,7 @@ impl TypeSpace {
                             continue;
                         }
                     }
-                    openapiv3::SchemaKind::Type(openapiv3::Type::Array(a)) => match &a.items {
+                    SchemaKind::Type(openapiv3::Type::Array(a)) => match &a.items {
                         Some(openapiv3::ReferenceOr::Reference { .. }) => {
                             get_type_name_from_reference(
                                 &a.items.clone().unwrap().reference()?,
@@ -1470,19 +1454,19 @@ pub fn get_type_name_for_schema(
     in_crate: bool,
 ) -> Result<proc_macro2::TokenStream> {
     let t = match &schema.schema_kind {
-        openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) => {
+        SchemaKind::Type(openapiv3::Type::String(s)) => {
             get_type_name_for_string(name, s, &schema.schema_data, in_crate)?
         }
-        openapiv3::SchemaKind::Type(openapiv3::Type::Number(n)) => get_type_name_for_number(n)?,
-        openapiv3::SchemaKind::Type(openapiv3::Type::Integer(i)) => get_type_name_for_integer(i)?,
-        openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
+        SchemaKind::Type(openapiv3::Type::Number(n)) => get_type_name_for_number(n)?,
+        SchemaKind::Type(openapiv3::Type::Integer(i)) => get_type_name_for_integer(i)?,
+        SchemaKind::Type(openapiv3::Type::Object(o)) => {
             get_type_name_for_object(name, o, &schema.schema_data, spec, in_crate)?
         }
-        openapiv3::SchemaKind::Type(openapiv3::Type::Array(a)) => {
+        SchemaKind::Type(openapiv3::Type::Array(a)) => {
             get_type_name_for_array(name, a, spec, in_crate)?
         }
-        openapiv3::SchemaKind::Type(openapiv3::Type::Boolean { .. }) => quote!(bool),
-        openapiv3::SchemaKind::OneOf { one_of } => {
+        SchemaKind::Type(openapiv3::Type::Boolean { .. }) => quote!(bool),
+        SchemaKind::OneOf { one_of } => {
             if one_of.len() != 1 {
                 if name.is_empty() {
                     anyhow::bail!(
@@ -1509,20 +1493,20 @@ pub fn get_type_name_for_schema(
                 }
             }
         }
-        openapiv3::SchemaKind::AllOf { all_of } => {
+        SchemaKind::AllOf { all_of } => {
             get_type_name_for_all_of(name, all_of, &schema.schema_data, spec, in_crate)?
         }
-        openapiv3::SchemaKind::AnyOf { any_of: _ } => get_type_name_for_object(
+        SchemaKind::AnyOf { any_of: _ } => get_type_name_for_object(
             name,
             &openapiv3::ObjectType::default(),
             &schema.schema_data,
             spec,
             in_crate,
         )?,
-        openapiv3::SchemaKind::Not { not: _ } => {
+        SchemaKind::Not { not: _ } => {
             anyhow::bail!("XXX not not supported yet");
         }
-        openapiv3::SchemaKind::Any(any) => {
+        SchemaKind::Any(any) => {
             if let Some(s) = get_schema_from_any(&schema.schema_data, any) {
                 return get_type_name_for_schema(name, &s, spec, in_crate);
             }
@@ -1872,7 +1856,7 @@ fn get_one_of_tag(
         // Get the schema for this OneOf.
         let schema = one_of.get_schema_from_reference(spec, true)?;
         // Determine if we can do anything fancy with the resulting enum and flatten it.
-        if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = schema.schema_kind {
+        if let SchemaKind::Type(openapiv3::Type::Object(o)) = schema.schema_kind {
             // If the object contains a property that is an enum of 1, then that is the tag.
             for (k, v) in &o.properties {
                 // Get the schema for the property.
@@ -1883,9 +1867,7 @@ fn get_one_of_tag(
                     v.get_schema_from_reference(spec, true)?
                 };
 
-                if let openapiv3::SchemaKind::Type(openapiv3::Type::String(s)) =
-                    inner_schema.schema_kind
-                {
+                if let SchemaKind::Type(openapiv3::Type::String(s)) = inner_schema.schema_kind {
                     if s.enumeration.len() == 1
                         && (result.tag.is_none() || result.tag == Some(k.to_string()))
                     {
@@ -1916,7 +1898,7 @@ fn get_one_of_tag(
             // Get the schema for this OneOf.
             let schema = one_of.get_schema_from_reference(spec, true)?;
             // Determine if we can do anything fancy with the resulting enum and flatten it.
-            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = schema.schema_kind {
+            if let SchemaKind::Type(openapiv3::Type::Object(o)) = schema.schema_kind {
                 if o.properties.len() == 2 {
                     for (k, _) in &o.properties {
                         if tag != k {
@@ -2069,18 +2051,15 @@ pub fn proper_name(s: &str) -> String {
 
 /// Return the name for a type based on a name if passed or the title of the schema data.
 fn get_type_name(name: &str, data: &openapiv3::SchemaData) -> Result<proc_macro2::Ident> {
-    let t = format_ident!(
-        "{}",
-        if !name.is_empty() {
-            proper_name(name)
-        } else if let Some(title) = &data.title {
-            proper_name(title)
-        } else {
-            anyhow::bail!("Cannot get type name without name or title: {:?}", data);
-        }
-    );
+    let t = if !name.is_empty() {
+        proper_name(name)
+    } else if let Some(title) = &data.title {
+        proper_name(title)
+    } else {
+        anyhow::bail!("Cannot get type name without name or title: {:?}", data);
+    };
 
-    Ok(t)
+    Ok(format_ident!("{t}"))
 }
 
 fn clean_text(s: &str) -> String {
@@ -2294,7 +2273,7 @@ impl PaginationProperties {
         };
 
         let mut properties =
-            if let openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
+            if let SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
                 // Get the pagination properties for the object.
                 PaginationProperties::from_object(o, spec)?
             } else {
@@ -2374,27 +2353,25 @@ pub(crate) fn get_schema_from_any(data: &SchemaData, any: &AnySchema) -> Option<
         // Send back through as an object.
         return Some(openapiv3::Schema {
             schema_data: data.clone(),
-            schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(
-                openapiv3::ObjectType {
-                    properties: any.properties.clone(),
-                    required: any.required.clone(),
-                    additional_properties: any.additional_properties.clone(),
-                    min_properties: any.min_properties,
-                    max_properties: any.max_properties,
-                },
-            )),
+            schema_kind: SchemaKind::Type(openapiv3::Type::Object(openapiv3::ObjectType {
+                properties: any.properties.clone(),
+                required: any.required.clone(),
+                additional_properties: any.additional_properties.clone(),
+                min_properties: any.min_properties,
+                max_properties: any.max_properties,
+            })),
         });
     } else if !any.one_of.is_empty() {
         return Some(openapiv3::Schema {
             schema_data: data.clone(),
-            schema_kind: openapiv3::SchemaKind::OneOf {
+            schema_kind: SchemaKind::OneOf {
                 one_of: any.one_of.clone(),
             },
         });
     } else if !any.all_of.is_empty() {
         return Some(openapiv3::Schema {
             schema_data: data.clone(),
-            schema_kind: openapiv3::SchemaKind::AllOf {
+            schema_kind: SchemaKind::AllOf {
                 all_of: any.all_of.clone(),
             },
         });
@@ -2404,7 +2381,7 @@ pub(crate) fn get_schema_from_any(data: &SchemaData, any: &AnySchema) -> Option<
                 if format == "uri-map" {
                     return Some(openapiv3::Schema {
                         schema_data: data.clone(),
-                        schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Object(
+                        schema_kind: SchemaKind::Type(openapiv3::Type::Object(
                             openapiv3::ObjectType {
                                 properties: any.properties.clone(),
                                 required: any.required.clone(),
@@ -2421,25 +2398,21 @@ pub(crate) fn get_schema_from_any(data: &SchemaData, any: &AnySchema) -> Option<
         } else if typ == "array" {
             return Some(openapiv3::Schema {
                 schema_data: data.clone(),
-                schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::Array(
-                    openapiv3::ArrayType {
-                        items: any.items.clone(),
-                        min_items: any.min_items,
-                        max_items: any.max_items,
-                        unique_items: any.unique_items.unwrap_or(false),
-                    },
-                )),
+                schema_kind: SchemaKind::Type(openapiv3::Type::Array(openapiv3::ArrayType {
+                    items: any.items.clone(),
+                    min_items: any.min_items,
+                    max_items: any.max_items,
+                    unique_items: any.unique_items.unwrap_or(false),
+                })),
             });
         }
 
         return Some(openapiv3::Schema {
             schema_data: data.clone(),
-            schema_kind: openapiv3::SchemaKind::Type(openapiv3::Type::String(
-                openapiv3::StringType {
-                    format: openapiv3::VariantOrUnknownOrEmpty::Unknown(typ.to_string()),
-                    ..Default::default()
-                },
-            )),
+            schema_kind: SchemaKind::Type(openapiv3::Type::String(openapiv3::StringType {
+                format: openapiv3::VariantOrUnknownOrEmpty::Unknown(typ.to_string()),
+                ..Default::default()
+            })),
         });
     }
 
