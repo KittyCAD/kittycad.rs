@@ -275,10 +275,7 @@ impl<T: SchemaExt + Clone + std::fmt::Debug> ReferenceOrExt<T> for openapiv3::Re
         } else if !recursive {
             anyhow::bail!("item not supported here");
         } else {
-            match self.recurse(spec) {
-                Ok(s) => Ok(s),
-                Err(err) => Err(err),
-            }
+            self.recurse(spec)
         }
     }
 
