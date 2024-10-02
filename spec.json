@@ -84,7 +84,7 @@
           "hidden"
         ],
         "summary": "Get the metadata about our currently running server.",
-        "description": "This includes information on any of our other distributed systems it is connected to.\nYou must be a Zoo employee to perform this request.",
+        "description": "This includes information on any of our other distributed systems it is connected to.\n\nYou must be a Zoo employee to perform this request.",
         "operationId": "get_metadata",
         "responses": {
           "200": {
@@ -224,7 +224,7 @@
           "ml"
         ],
         "summary": "Generate a CAD model from text.",
-        "description": "Because our source of truth for the resulting model is a STEP file, you will always have STEP file contents when you list your generated models. Any other formats you request here will also be returned when you list your generated models.\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\nOne thing to note, if you hit the cache, this endpoint will return right away. So you only have to wait if the status is not `Completed` or `Failed`.",
+        "description": "Because our source of truth for the resulting model is a STEP file, you will always have STEP file contents when you list your generated models. Any other formats you request here will also be returned when you list your generated models.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nOne thing to note, if you hit the cache, this endpoint will return right away. So you only have to wait if the status is not `Completed` or `Failed`.",
         "operationId": "create_text_to_cad",
         "parameters": [
           {
@@ -586,7 +586,7 @@
           "hidden"
         ],
         "summary": "Get details of an API call.",
-        "description": "This endpoint requires authentication by any Zoo user. It returns details of the requested API call for the user.\nIf the user is not authenticated to view the specified API call, then it is not returned.\nOnly Zoo employees can view API calls for other users.",
+        "description": "This endpoint requires authentication by any Zoo user. It returns details of the requested API call for the user.\n\nIf the user is not authenticated to view the specified API call, then it is not returned.\n\nOnly Zoo employees can view API calls for other users.",
         "operationId": "get_api_call",
         "parameters": [
           {
@@ -669,7 +669,7 @@
           "hidden"
         ],
         "summary": "Listen for callbacks to GitHub app authentication.",
-        "description": "This is different than OAuth 2.0 authentication for users. This endpoint grants access for Zoo to access user's repos.\nThe user doesn't need Zoo OAuth authorization for this endpoint, this is purely for the GitHub permissions to access repos.",
+        "description": "This is different than OAuth 2.0 authentication for users. This endpoint grants access for Zoo to access user's repos.\n\nThe user doesn't need Zoo OAuth authorization for this endpoint, this is purely for the GitHub permissions to access repos.",
         "operationId": "apps_github_callback",
         "requestBody": {
           "content": {
@@ -741,7 +741,7 @@
           "hidden"
         ],
         "summary": "Get the consent URL for GitHub app authentication.",
-        "description": "This is different than OAuth 2.0 authentication for users. This endpoint grants access for Zoo to access user's repos.\nThe user doesn't need Zoo OAuth authorization for this endpoint, this is purely for the GitHub permissions to access repos.",
+        "description": "This is different than OAuth 2.0 authentication for users. This endpoint grants access for Zoo to access user's repos.\n\nThe user doesn't need Zoo OAuth authorization for this endpoint, this is purely for the GitHub permissions to access repos.",
         "operationId": "apps_github_consent",
         "responses": {
           "200": {
@@ -888,7 +888,7 @@
         "operationId": "options_apps_github_webhook",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -948,7 +948,7 @@
           "hidden"
         ],
         "summary": "List async operations.",
-        "description": "For async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\nThis endpoint requires authentication by a Zoo employee.",
+        "description": "For async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\n\nThis endpoint requires authentication by a Zoo employee.",
         "operationId": "list_async_operations",
         "parameters": [
           {
@@ -1058,7 +1058,7 @@
           "api-calls"
         ],
         "summary": "Get an async operation.",
-        "description": "Get the status and output of an async operation.\nThis endpoint requires authentication by any Zoo user. It returns details of the requested async operation for the user.\nIf the user is not authenticated to view the specified async operation, then it is not returned.\nOnly Zoo employees with the proper access can view async operations for other users.",
+        "description": "Get the status and output of an async operation.\n\nThis endpoint requires authentication by any Zoo user. It returns details of the requested async operation for the user.\n\nIf the user is not authenticated to view the specified async operation, then it is not returned.\n\nOnly Zoo employees with the proper access can view async operations for other users.",
         "operationId": "get_async_operation",
         "parameters": [
           {
@@ -1221,7 +1221,7 @@
         "operationId": "options_auth_email",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -1700,7 +1700,7 @@
         "operationId": "options_create_debug_uploads",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -1836,7 +1836,7 @@
         "operationId": "options_create_event",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -1895,7 +1895,7 @@
           "file"
         ],
         "summary": "Get CAD file center of mass.",
-        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint returns the cartesian coordinate in world space measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\n\nThis endpoint returns the cartesian coordinate in world space measure units.\n\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\n\nGet the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_center_of_mass",
         "parameters": [
           {
@@ -1997,7 +1997,7 @@
         "operationId": "options_file_center_of_mass",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -2056,7 +2056,7 @@
           "file"
         ],
         "summary": "Convert CAD file with defaults.",
-        "description": "If you wish to specify the conversion options, use the `/file/conversion` endpoint instead.\nConvert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\nIf the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "If you wish to specify the conversion options, use the `/file/conversion` endpoint instead.\n\nConvert a CAD file from one format to another. If the file being converted is larger than 25MB, it will be performed asynchronously.\n\nIf the conversion is performed synchronously, the contents of the converted file (`output`) will be returned as a base64 encoded string.\n\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_conversion",
         "parameters": [
           {
@@ -2238,7 +2238,7 @@
           "file"
         ],
         "summary": "Get CAD file density.",
-        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint assumes if you are giving a material mass in a specific mass units, we return a density in mass unit per cubic measure unit.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\n\nThis endpoint assumes if you are giving a material mass in a specific mass units, we return a density in mass unit per cubic measure unit.\n\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\n\nGet the density of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_density",
         "parameters": [
           {
@@ -2358,7 +2358,7 @@
         "operationId": "options_file_density",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -2590,7 +2590,7 @@
           "file"
         ],
         "summary": "Get CAD file mass.",
-        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint assumes if you are giving a material density in a specific mass unit per cubic measure unit, we return a mass in mass units. The same mass units as passed in the material density.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\n\nThis endpoint assumes if you are giving a material density in a specific mass unit per cubic measure unit, we return a mass in mass units. The same mass units as passed in the material density.\n\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\n\nGet the mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_mass",
         "parameters": [
           {
@@ -2710,7 +2710,7 @@
         "operationId": "options_file_mass",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -2769,7 +2769,7 @@
           "file"
         ],
         "summary": "Get CAD file surface area.",
-        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint returns the square measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the surface area of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\n\nThis endpoint returns the square measure units.\n\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\n\nGet the surface area of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_surface_area",
         "parameters": [
           {
@@ -2871,7 +2871,7 @@
         "operationId": "options_file_surface_area",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -2930,7 +2930,7 @@
           "file"
         ],
         "summary": "Get CAD file volume.",
-        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\nThis endpoint returns the cubic measure units.\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\nGet the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\n\nThis endpoint returns the cubic measure units.\n\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\n\nGet the volume of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_volume",
         "parameters": [
           {
@@ -3032,7 +3032,7 @@
         "operationId": "options_file_volume",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -3092,7 +3092,7 @@
           "hidden"
         ],
         "summary": "Get an API token for a user by their discord id.",
-        "description": "This endpoint allows us to run API calls from our discord bot on behalf of a user. The user must have a discord account linked to their Zoo Account via oauth2 for this to work.\nYou must be a Zoo employee to use this endpoint.",
+        "description": "This endpoint allows us to run API calls from our discord bot on behalf of a user. The user must have a discord account linked to their Zoo Account via oauth2 for this to work.\n\nYou must be a Zoo employee to use this endpoint.",
         "operationId": "internal_get_api_token_for_discord_user",
         "parameters": [
           {
@@ -3238,7 +3238,7 @@
         "operationId": "options_logout",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -3298,7 +3298,7 @@
           "hidden"
         ],
         "summary": "List all ML prompts.",
-        "description": "For text-to-cad prompts, this will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by a Zoo employee.\nThe ML prompts are returned in order of creation, with the most recently created ML prompts first.",
+        "description": "For text-to-cad prompts, this will always return the STEP file contents as well as the format the user originally requested.\n\nThis endpoint requires authentication by a Zoo employee.\n\nThe ML prompts are returned in order of creation, with the most recently created ML prompts first.",
         "operationId": "list_ml_prompts",
         "parameters": [
           {
@@ -3565,7 +3565,7 @@
         "operationId": "options_kcl_code_completions",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -3707,7 +3707,7 @@
         "operationId": "options_text_to_cad_iteration",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -3799,7 +3799,7 @@
         "operationId": "options_device_auth_request",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -3934,7 +3934,7 @@
         "operationId": "options_device_auth_confirm",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -4026,7 +4026,7 @@
         "operationId": "options_device_access_token",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -4546,7 +4546,7 @@
         "operationId": "options_oauth2_token_revoke",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -4830,7 +4830,7 @@
           "hidden"
         ],
         "summary": "Delete an org.",
-        "description": "In order to delete an org, you must first delete all of its members, except yourself.\nYou must also have no outstanding invoices or unpaid balances.\nThis endpoint requires authentication by an org admin. It deletes the authenticated user's org.",
+        "description": "In order to delete an org, you must first delete all of its members, except yourself.\n\nYou must also have no outstanding invoices or unpaid balances.\n\nThis endpoint requires authentication by an org admin. It deletes the authenticated user's org.",
         "operationId": "delete_org",
         "responses": {
           "204": {
@@ -4895,7 +4895,7 @@
         "operationId": "options_org",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -4954,7 +4954,7 @@
           "api-calls"
         ],
         "summary": "List API calls for your org.",
-        "description": "This includes all API calls that were made by users in the org.\nThis endpoint requires authentication by an org admin. It returns the API calls for the authenticated user's org.\nThe API calls are returned in order of creation, with the most recently created API calls first.",
+        "description": "This includes all API calls that were made by users in the org.\n\nThis endpoint requires authentication by an org admin. It returns the API calls for the authenticated user's org.\n\nThe API calls are returned in order of creation, with the most recently created API calls first.",
         "operationId": "org_list_api_calls",
         "parameters": [
           {
@@ -5246,7 +5246,7 @@
           "orgs"
         ],
         "summary": "Add a member to your org.",
-        "description": "If the user exists, this will add them to your org. If they do not exist, this will create a new user and add them to your org.\nIn both cases the user gets an email that they have been added to the org.\nIf the user is already in your org, this will return a 400 and a message.\nIf the user is already in a different org, this will return a 400 and a message.\nThis endpoint requires authentication by an org admin. It adds the specified member to the authenticated user's org.",
+        "description": "If the user exists, this will add them to your org. If they do not exist, this will create a new user and add them to your org.\n\nIn both cases the user gets an email that they have been added to the org.\n\nIf the user is already in your org, this will return a 400 and a message.\n\nIf the user is already in a different org, this will return a 400 and a message.\n\nThis endpoint requires authentication by an org admin. It adds the specified member to the authenticated user's org.",
         "operationId": "create_org_member",
         "requestBody": {
           "content": {
@@ -5328,7 +5328,7 @@
         "operationId": "options_org_member",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -5701,7 +5701,7 @@
           "payments"
         ],
         "summary": "Get payment info about your org.",
-        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by an org admin. It gets the payment information for the authenticated user's org.",
+        "description": "This includes billing address, phone, and name.\n\nThis endpoint requires authentication by an org admin. It gets the payment information for the authenticated user's org.",
         "operationId": "get_payment_information_for_org",
         "responses": {
           "200": {
@@ -5769,7 +5769,7 @@
           "payments"
         ],
         "summary": "Update payment info for your org.",
-        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by an org admin. It updates the payment information for the authenticated user's org.",
+        "description": "This includes billing address, phone, and name.\n\nThis endpoint requires authentication by an org admin. It updates the payment information for the authenticated user's org.",
         "operationId": "update_payment_information_for_org",
         "requestBody": {
           "content": {
@@ -5847,7 +5847,7 @@
           "payments"
         ],
         "summary": "Create payment info for your org.",
-        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by the org admin. It creates the payment information for the authenticated user's org.",
+        "description": "This includes billing address, phone, and name.\n\nThis endpoint requires authentication by the org admin. It creates the payment information for the authenticated user's org.",
         "operationId": "create_payment_information_for_org",
         "requestBody": {
           "content": {
@@ -5925,7 +5925,7 @@
           "payments"
         ],
         "summary": "Delete payment info for your org.",
-        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by an org admin. It deletes the payment information for the authenticated user's org.",
+        "description": "This includes billing address, phone, and name.\n\nThis endpoint requires authentication by an org admin. It deletes the payment information for the authenticated user's org.",
         "operationId": "delete_payment_information_for_org",
         "responses": {
           "204": {
@@ -5990,7 +5990,7 @@
         "operationId": "options_payment_information_for_org",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -6192,7 +6192,7 @@
         "operationId": "options_payment_intent_for_org",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -6774,7 +6774,7 @@
         "operationId": "options_org_subscription",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -7047,7 +7047,7 @@
         "operationId": "options_org_privacy_settings",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -7395,7 +7395,7 @@
         "operationId": "options_org_saml_idp",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -7454,7 +7454,7 @@
           "service-accounts"
         ],
         "summary": "List service accounts for your org.",
-        "description": "This endpoint requires authentication by an org admin. It returns the service accounts for the organization.\nThe service accounts are returned in order of creation, with the most recently created service accounts first.",
+        "description": "This endpoint requires authentication by an org admin. It returns the service accounts for the organization.\n\nThe service accounts are returned in order of creation, with the most recently created service accounts first.",
         "operationId": "list_service_accounts_for_org",
         "parameters": [
           {
@@ -7637,7 +7637,7 @@
         "operationId": "options_create_service_account_for_org",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -7775,7 +7775,7 @@
           "service-accounts"
         ],
         "summary": "Delete an service account for your org.",
-        "description": "This endpoint requires authentication by an org admin. It deletes the requested service account for the organization.\nThis endpoint does not actually delete the service account from the database. It merely marks the token as invalid. We still want to keep the service account in the database for historical purposes.",
+        "description": "This endpoint requires authentication by an org admin. It deletes the requested service account for the organization.\n\nThis endpoint does not actually delete the service account from the database. It merely marks the token as invalid. We still want to keep the service account in the database for historical purposes.",
         "operationId": "delete_service_account_for_org",
         "parameters": [
           {
@@ -8744,7 +8744,7 @@
         "operationId": "options_store_coupon",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -10103,7 +10103,7 @@
           "users"
         ],
         "summary": "Get your user.",
-        "description": "Get the user information for the authenticated user.\nAlternatively, you can also use the `/users/me` endpoint.",
+        "description": "Get the user information for the authenticated user.\n\nAlternatively, you can also use the `/users/me` endpoint.",
         "operationId": "get_user_self",
         "responses": {
           "200": {
@@ -10249,7 +10249,7 @@
           "users"
         ],
         "summary": "Delete your user.",
-        "description": "This endpoint requires authentication by any Zoo user. It deletes the authenticated user from Zoo's database.\nThis call will only succeed if all invoices associated with the user have been paid in full and there is no outstanding balance.",
+        "description": "This endpoint requires authentication by any Zoo user. It deletes the authenticated user from Zoo's database.\n\nThis call will only succeed if all invoices associated with the user have been paid in full and there is no outstanding balance.",
         "operationId": "delete_user_self",
         "responses": {
           "204": {
@@ -10314,7 +10314,7 @@
         "operationId": "options_user_self",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -10373,7 +10373,7 @@
           "api-calls"
         ],
         "summary": "List API calls for your user.",
-        "description": "This endpoint requires authentication by any Zoo user. It returns the API calls for the authenticated user.\nThe API calls are returned in order of creation, with the most recently created API calls first.",
+        "description": "This endpoint requires authentication by any Zoo user. It returns the API calls for the authenticated user.\n\nThe API calls are returned in order of creation, with the most recently created API calls first.",
         "operationId": "user_list_api_calls",
         "parameters": [
           {
@@ -10557,7 +10557,7 @@
           "api-tokens"
         ],
         "summary": "List API tokens for your user.",
-        "description": "This endpoint requires authentication by any Zoo user. It returns the API tokens for the authenticated user.\nThe API tokens are returned in order of creation, with the most recently created API tokens first.",
+        "description": "This endpoint requires authentication by any Zoo user. It returns the API tokens for the authenticated user.\n\nThe API tokens are returned in order of creation, with the most recently created API tokens first.",
         "operationId": "list_api_tokens_for_user",
         "parameters": [
           {
@@ -10740,7 +10740,7 @@
         "operationId": "options_create_api_token_for_user",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -10878,7 +10878,7 @@
           "api-tokens"
         ],
         "summary": "Delete an API token for your user.",
-        "description": "This endpoint requires authentication by any Zoo user. It deletes the requested API token for the user.\nThis endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.",
+        "description": "This endpoint requires authentication by any Zoo user. It deletes the requested API token for the user.\n\nThis endpoint does not actually delete the API token from the database. It merely marks the token as invalid. We still want to keep the token in the database for historical purposes.",
         "operationId": "delete_api_token_for_user",
         "parameters": [
           {
@@ -11024,7 +11024,7 @@
           "users"
         ],
         "summary": "Get extended information about your user.",
-        "description": "Get the user information for the authenticated user.\nAlternatively, you can also use the `/users-extended/me` endpoint.",
+        "description": "Get the user information for the authenticated user.\n\nAlternatively, you can also use the `/users-extended/me` endpoint.",
         "operationId": "get_user_self_extended",
         "responses": {
           "200": {
@@ -11094,7 +11094,7 @@
           "users"
         ],
         "summary": "Get the OAuth2 providers for your user.",
-        "description": "If this returns an empty array, then the user has not connected any OAuth2 providers and uses raw email authentication.\nThis endpoint requires authentication by any Zoo user. It gets the providers for the authenticated user.",
+        "description": "If this returns an empty array, then the user has not connected any OAuth2 providers and uses raw email authentication.\n\nThis endpoint requires authentication by any Zoo user. It gets the providers for the authenticated user.",
         "operationId": "get_oauth2_providers_for_user",
         "responses": {
           "200": {
@@ -11240,7 +11240,7 @@
           "users"
         ],
         "summary": "Get a user's org.",
-        "description": "This endpoint requires authentication by any Zoo user. It gets the authenticated user's org.\nIf the user is not a member of an org, this endpoint will return a 404.",
+        "description": "This endpoint requires authentication by any Zoo user. It gets the authenticated user's org.\n\nIf the user is not a member of an org, this endpoint will return a 404.",
         "operationId": "get_user_org",
         "responses": {
           "200": {
@@ -11310,7 +11310,7 @@
           "payments"
         ],
         "summary": "Get payment info about your user.",
-        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by any Zoo user. It gets the payment information for the authenticated user.",
+        "description": "This includes billing address, phone, and name.\n\nThis endpoint requires authentication by any Zoo user. It gets the payment information for the authenticated user.",
         "operationId": "get_payment_information_for_user",
         "responses": {
           "200": {
@@ -11378,7 +11378,7 @@
           "payments"
         ],
         "summary": "Update payment info for your user.",
-        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by any Zoo user. It updates the payment information for the authenticated user.",
+        "description": "This includes billing address, phone, and name.\n\nThis endpoint requires authentication by any Zoo user. It updates the payment information for the authenticated user.",
         "operationId": "update_payment_information_for_user",
         "requestBody": {
           "content": {
@@ -11456,7 +11456,7 @@
           "payments"
         ],
         "summary": "Create payment info for your user.",
-        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by any Zoo user. It creates the payment information for the authenticated user.",
+        "description": "This includes billing address, phone, and name.\n\nThis endpoint requires authentication by any Zoo user. It creates the payment information for the authenticated user.",
         "operationId": "create_payment_information_for_user",
         "requestBody": {
           "content": {
@@ -11534,7 +11534,7 @@
           "payments"
         ],
         "summary": "Delete payment info for your user.",
-        "description": "This includes billing address, phone, and name.\nThis endpoint requires authentication by any Zoo user. It deletes the payment information for the authenticated user.",
+        "description": "This includes billing address, phone, and name.\n\nThis endpoint requires authentication by any Zoo user. It deletes the payment information for the authenticated user.",
         "operationId": "delete_payment_information_for_user",
         "responses": {
           "204": {
@@ -11599,7 +11599,7 @@
         "operationId": "options_payment_information_for_user",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -11801,7 +11801,7 @@
         "operationId": "options_payment_intent_for_user",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -12383,7 +12383,7 @@
         "operationId": "options_user_subscription",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -12656,7 +12656,7 @@
         "operationId": "options_user_privacy_settings",
         "responses": {
           "204": {
-            "description": "successful operation, no content",
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -12796,7 +12796,7 @@
           "ml"
         ],
         "summary": "List text-to-CAD models you've generated.",
-        "description": "This will always return the STEP file contents as well as the format the user originally requested.\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD models for the authenticated user.\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.",
+        "description": "This will always return the STEP file contents as well as the format the user originally requested.\n\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD models for the authenticated user.\n\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.",
         "operationId": "list_text_to_cad_models_for_user",
         "parameters": [
           {
@@ -13351,7 +13351,7 @@
           "hidden"
         ],
         "summary": "Get extended information about a user.",
-        "description": "To get information about yourself, use `/users-extended/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user/extended` endpoint.\nTo get information about any Zoo user, you must be a Zoo employee.",
+        "description": "To get information about yourself, use `/users-extended/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n\nAlternatively, to get information about the authenticated user, use `/user/extended` endpoint.\n\nTo get information about any Zoo user, you must be a Zoo employee.",
         "operationId": "get_user_extended",
         "parameters": [
           {
@@ -13433,7 +13433,7 @@
           "hidden"
         ],
         "summary": "Get a user.",
-        "description": "To get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user` endpoint.\nTo get information about any Zoo user, you must be a Zoo employee.",
+        "description": "To get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n\nAlternatively, to get information about the authenticated user, use `/user` endpoint.\n\nTo get information about any Zoo user, you must be a Zoo employee.",
         "operationId": "get_user",
         "parameters": [
           {
@@ -13515,7 +13515,7 @@
           "hidden"
         ],
         "summary": "List API calls for a user.",
-        "description": "This endpoint requires authentication by any Zoo user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\nAlternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\nIf the authenticated user is a Zoo employee, then the API calls are returned for the user specified by the user id.\nThe API calls are returned in order of creation, with the most recently created API calls first.",
+        "description": "This endpoint requires authentication by any Zoo user. It returns the API calls for the authenticated user if \"me\" is passed as the user id.\n\nAlternatively, you can use the `/user/api-calls` endpoint to get the API calls for your user.\n\nIf the authenticated user is a Zoo employee, then the API calls are returned for the user specified by the user id.\n\nThe API calls are returned in order of creation, with the most recently created API calls first.",
         "operationId": "list_api_calls_for_user",
         "parameters": [
           {
@@ -16984,6 +16984,10 @@
           }
         ]
       },
+      "DefaultCameraCenterToSelection": {
+        "description": "The response from the `DefaultCameraCenterToSelection` endpoint.",
+        "type": "object"
+      },
       "DefaultCameraFocusOn": {
         "description": "The response from the `DefaultCameraFocusOn` command.",
         "type": "object"
@@ -17162,6 +17166,10 @@
           }
         ]
       },
+      "DisableDryRun": {
+        "description": "The response from the `DisableDryRun` endpoint.",
+        "type": "object"
+      },
       "Discount": {
         "description": "The resource representing a Discount.",
         "type": "object",
@@ -17253,14 +17261,6 @@
         "description": "The response from the `EdgeLinesVisible` endpoint.",
         "type": "object"
       },
-      "EditModeEnter": {
-        "description": "The response from the `EditModeEnter` endpoint.",
-        "type": "object"
-      },
-      "EditModeExit": {
-        "description": "The response from the `EditModeExit` endpoint.",
-        "type": "object"
-      },
       "EmailAuthenticationForm": {
         "description": "The body of the form for email authentication.",
         "type": "object",
@@ -17280,6 +17280,10 @@
         "required": [
           "email"
         ]
+      },
+      "EnableDryRun": {
+        "description": "The response from the `EnableDryRun` endpoint.",
+        "type": "object"
       },
       "EnableSketchMode": {
         "description": "The response from the `EnableSketchMode` endpoint.",
@@ -17710,7 +17714,7 @@
         "type": "object"
       },
       "ExtendedUser": {
-        "description": "Extended user information.\n\nThis is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: MailChimp | Stripe",
+        "description": "Extended user information.\n\nThis is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: Stripe",
         "type": "object",
         "properties": {
           "block": {
@@ -17787,11 +17791,6 @@
           },
           "last_name": {
             "description": "The user's last name.",
-            "type": "string"
-          },
-          "mailchimp_id": {
-            "nullable": true,
-            "description": "The user's MailChimp ID. This is mostly used for internal mapping.",
             "type": "string"
           },
           "name": {
@@ -21594,27 +21593,6 @@
             ]
           },
           {
-            "description": "Enter edit mode",
-            "type": "object",
-            "properties": {
-              "target": {
-                "description": "The edit target",
-                "type": "string",
-                "format": "uuid"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "edit_mode_enter"
-                ]
-              }
-            },
-            "required": [
-              "target",
-              "type"
-            ]
-          },
-          {
             "description": "Modifies the selection by simulating a \"mouse click\" at the given x,y window coordinate Returns ID of whatever was selected.",
             "type": "object",
             "properties": {
@@ -22714,6 +22692,36 @@
             ]
           },
           {
+            "description": "Sets whether or not changes to the scene or its objects will be done as a \"dry run\" In a dry run, successful commands won't actually change the model. This is useful for catching errors before actually making the change.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "enable_dry_run"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
+            "description": "Sets whether or not changes to the scene or its objects will be done as a \"dry run\" In a dry run, successful commands won't actually change the model. This is useful for catching errors before actually making the change.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "disable_dry_run"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
             "description": "Set the background color of the scene.",
             "type": "object",
             "properties": {
@@ -23547,6 +23555,21 @@
             ]
           },
           {
+            "description": "Updates the camera to center to the center of the current selection (or the origin if nothing is selected)",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_center_to_selection"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
             "description": "Fit the view to the specified object(s).",
             "type": "object",
             "properties": {
@@ -23626,21 +23649,6 @@
             "required": [
               "edge_id",
               "object_id",
-              "type"
-            ]
-          },
-          {
-            "description": "Exit edit mode",
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "edit_mode_exit"
-                ]
-              }
-            },
-            "required": [
               "type"
             ]
           },
@@ -24072,24 +24080,6 @@
             "type": "object",
             "properties": {
               "data": {
-                "$ref": "#/components/schemas/EditModeEnter"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "edit_mode_enter"
-                ]
-              }
-            },
-            "required": [
-              "data",
-              "type"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "data": {
                 "$ref": "#/components/schemas/SelectAdd"
               },
               "type": {
@@ -24468,6 +24458,42 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/EnableDryRun"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "enable_dry_run"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/DisableDryRun"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "disable_dry_run"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/CurveSetConstraint"
               },
               "type": {
@@ -24756,12 +24782,12 @@
             "type": "object",
             "properties": {
               "data": {
-                "$ref": "#/components/schemas/EditModeExit"
+                "$ref": "#/components/schemas/DefaultCameraCenterToSelection"
               },
               "type": {
                 "type": "string",
                 "enum": [
-                  "edit_mode_exit"
+                  "default_camera_center_to_selection"
                 ]
               }
             },
