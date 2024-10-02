@@ -14,7 +14,7 @@ impl Apps {
 
     #[doc = "Listen for callbacks to GitHub app authentication.\n\nThis is different than OAuth \
              2.0 authentication for users. This endpoint grants access for Zoo to access user's \
-             repos.\nThe user doesn't need Zoo OAuth authorization for this endpoint, this is \
+             repos.\n\nThe user doesn't need Zoo OAuth authorization for this endpoint, this is \
              purely for the GitHub permissions to access repos.\n\n```rust,no_run\nasync fn \
              example_apps_github_callback() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    client\n        .apps()\n        \
@@ -46,7 +46,7 @@ impl Apps {
 
     #[doc = "Get the consent URL for GitHub app authentication.\n\nThis is different than OAuth \
              2.0 authentication for users. This endpoint grants access for Zoo to access user's \
-             repos.\nThe user doesn't need Zoo OAuth authorization for this endpoint, this is \
+             repos.\n\nThe user doesn't need Zoo OAuth authorization for this endpoint, this is \
              purely for the GitHub permissions to access repos.\n\n```rust,no_run\nasync fn \
              example_apps_github_consent() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::AppClientInfo = \

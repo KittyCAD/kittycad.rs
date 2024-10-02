@@ -3931,6 +3931,34 @@ pub enum CutType {
     Chamfer,
 }
 
+#[doc = "The response from the `DefaultCameraCenterToSelection` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DefaultCameraCenterToSelection {}
+
+impl std::fmt::Display for DefaultCameraCenterToSelection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DefaultCameraCenterToSelection {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "The response from the `DefaultCameraFocusOn` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4336,6 +4364,34 @@ pub enum Direction {
     Negative,
 }
 
+#[doc = "The response from the `DisableDryRun` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DisableDryRun {}
+
+impl std::fmt::Display for DisableDryRun {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DisableDryRun {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "The resource representing a Discount."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4457,62 +4513,6 @@ impl tabled::Tabled for EdgeLinesVisible {
     }
 }
 
-#[doc = "The response from the `EditModeEnter` endpoint."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct EditModeEnter {}
-
-impl std::fmt::Display for EditModeEnter {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for EditModeEnter {
-    const LENGTH: usize = 0;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
-    }
-}
-
-#[doc = "The response from the `EditModeExit` endpoint."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct EditModeExit {}
-
-impl std::fmt::Display for EditModeExit {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for EditModeExit {
-    const LENGTH: usize = 0;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
-    }
-}
-
 #[doc = "The body of the form for email authentication."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4551,6 +4551,34 @@ impl tabled::Tabled for EmailAuthenticationForm {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["callback_url".into(), "email".into()]
+    }
+}
+
+#[doc = "The response from the `EnableDryRun` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EnableDryRun {}
+
+impl std::fmt::Display for EnableDryRun {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EnableDryRun {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 
@@ -5389,7 +5417,7 @@ impl tabled::Tabled for ExtendPath {
 
 #[doc = "Extended user information.\n\nThis is mostly used for internal purposes. It returns a \
          mapping of the user's information, including that of our third party services we use for \
-         users: MailChimp | Stripe"]
+         users: Stripe"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -5434,9 +5462,6 @@ pub struct ExtendedUser {
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,
-    #[doc = "The user's MailChimp ID. This is mostly used for internal mapping."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub mailchimp_id: Option<String>,
     #[doc = "The name of the user. This is auto populated at first from the authentication \
              provider (if there was a name). It can be updated by the user by updating their \
              `first_name` and `last_name` fields."]
@@ -5464,7 +5489,7 @@ impl std::fmt::Display for ExtendedUser {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ExtendedUser {
-    const LENGTH: usize = 19;
+    const LENGTH: usize = 18;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(block) = &self.block {
@@ -5517,11 +5542,6 @@ impl tabled::Tabled for ExtendedUser {
             } else {
                 String::new().into()
             },
-            if let Some(mailchimp_id) = &self.mailchimp_id {
-                format!("{:?}", mailchimp_id).into()
-            } else {
-                String::new().into()
-            },
             if let Some(name) = &self.name {
                 format!("{:?}", name).into()
             } else {
@@ -5553,7 +5573,6 @@ impl tabled::Tabled for ExtendedUser {
             "image".into(),
             "is_service_account".into(),
             "last_name".into(),
-            "mailchimp_id".into(),
             "name".into(),
             "phone".into(),
             "stripe_id".into(),
@@ -9650,12 +9669,6 @@ pub enum ModelingCmd {
         #[doc = "ID of the mirror entities."]
         ids: Vec<uuid::Uuid>,
     },
-    #[doc = "Enter edit mode"]
-    #[serde(rename = "edit_mode_enter")]
-    EditModeEnter {
-        #[doc = "The edit target"]
-        target: uuid::Uuid,
-    },
     #[doc = "Modifies the selection by simulating a \"mouse click\" at the given x,y window \
              coordinate Returns ID of whatever was selected."]
     #[serde(rename = "select_with_point")]
@@ -9986,6 +9999,16 @@ pub enum ModelingCmd {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         planar_normal: Option<Point3D>,
     },
+    #[doc = "Sets whether or not changes to the scene or its objects will be done as a \"dry \
+             run\" In a dry run, successful commands won't actually change the model. This is \
+             useful for catching errors before actually making the change."]
+    #[serde(rename = "enable_dry_run")]
+    EnableDryRun {},
+    #[doc = "Sets whether or not changes to the scene or its objects will be done as a \"dry \
+             run\" In a dry run, successful commands won't actually change the model. This is \
+             useful for catching errors before actually making the change."]
+    #[serde(rename = "disable_dry_run")]
+    DisableDryRun {},
     #[doc = "Set the background color of the scene."]
     #[serde(rename = "set_background_color")]
     SetBackgroundColor {
@@ -10220,6 +10243,10 @@ pub enum ModelingCmd {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         parameters: Option<PerspectiveCameraParameters>,
     },
+    #[doc = "Updates the camera to center to the center of the current selection (or the origin \
+             if nothing is selected)"]
+    #[serde(rename = "default_camera_center_to_selection")]
+    DefaultCameraCenterToSelection {},
     #[doc = "Fit the view to the specified object(s)."]
     #[serde(rename = "zoom_to_fit")]
     ZoomToFit {
@@ -10251,9 +10278,6 @@ pub enum ModelingCmd {
         #[doc = "The Solid3d object whose extrusion is being queried."]
         object_id: uuid::Uuid,
     },
-    #[doc = "Exit edit mode"]
-    #[serde(rename = "edit_mode_exit")]
-    EditModeExit {},
     #[doc = "Clear the selection"]
     #[serde(rename = "select_clear")]
     SelectClear {},
@@ -10699,11 +10723,6 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `EntityMirrorAcrossEdge` endpoint."]
         data: EntityMirrorAcrossEdge,
     },
-    #[serde(rename = "edit_mode_enter")]
-    EditModeEnter {
-        #[doc = "The response from the `EditModeEnter` endpoint."]
-        data: EditModeEnter,
-    },
     #[serde(rename = "select_add")]
     SelectAdd {
         #[doc = "The response from the `SelectAdd` endpoint."]
@@ -10809,6 +10828,16 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `SketchModeDisable` endpoint."]
         data: SketchModeDisable,
     },
+    #[serde(rename = "enable_dry_run")]
+    EnableDryRun {
+        #[doc = "The response from the `EnableDryRun` endpoint."]
+        data: EnableDryRun,
+    },
+    #[serde(rename = "disable_dry_run")]
+    DisableDryRun {
+        #[doc = "The response from the `DisableDryRun` endpoint."]
+        data: DisableDryRun,
+    },
     #[serde(rename = "curve_set_constraint")]
     CurveSetConstraint {
         #[doc = "The response from the `CurveSetConstraint` endpoint."]
@@ -10889,10 +10918,10 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `DefaultCameraSetPerspective` endpoint."]
         data: DefaultCameraSetPerspective,
     },
-    #[serde(rename = "edit_mode_exit")]
-    EditModeExit {
-        #[doc = "The response from the `EditModeExit` endpoint."]
-        data: EditModeExit,
+    #[serde(rename = "default_camera_center_to_selection")]
+    DefaultCameraCenterToSelection {
+        #[doc = "The response from the `DefaultCameraCenterToSelection` endpoint."]
+        data: DefaultCameraCenterToSelection,
     },
     #[serde(rename = "select_clear")]
     SelectClear {

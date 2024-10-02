@@ -13,7 +13,7 @@ impl Users {
     }
 
     #[doc = "Get your user.\n\nGet the user information for the authenticated \
-             user.\nAlternatively, you can also use the `/users/me` \
+             user.\n\nAlternatively, you can also use the `/users/me` \
              endpoint.\n\n```rust,no_run\nasync fn example_users_get_self() -> anyhow::Result<()> \
              {\n    let client = kittycad::Client::new_from_env();\n    let result: \
              kittycad::types::User = client.users().get_self().await?;\n    println!(\"{:?}\", \
@@ -76,7 +76,7 @@ impl Users {
     }
 
     #[doc = "Delete your user.\n\nThis endpoint requires authentication by any Zoo user. It \
-             deletes the authenticated user from Zoo's database.\nThis call will only succeed if \
+             deletes the authenticated user from Zoo's database.\n\nThis call will only succeed if \
              all invoices associated with the user have been paid in full and there is no \
              outstanding balance.\n\n```rust,no_run\nasync fn example_users_delete_self() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
@@ -101,7 +101,7 @@ impl Users {
         }
     }
 
-    #[doc = "Get extended information about your user.\n\nGet the user information for the authenticated user.\nAlternatively, you can also use the `/users-extended/me` endpoint.\n\n```rust,no_run\nasync fn example_users_get_self_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUser = client.users().get_self_extended().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get extended information about your user.\n\nGet the user information for the authenticated user.\n\nAlternatively, you can also use the `/users-extended/me` endpoint.\n\n```rust,no_run\nasync fn example_users_get_self_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUser = client.users().get_self_extended().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_self_extended<'a>(
         &'a self,
@@ -130,7 +130,7 @@ impl Users {
         }
     }
 
-    #[doc = "Get the OAuth2 providers for your user.\n\nIf this returns an empty array, then the user has not connected any OAuth2 providers and uses raw email authentication.\nThis endpoint requires authentication by any Zoo user. It gets the providers for the authenticated user.\n\n```rust,no_run\nasync fn example_users_get_oauth_2_providers_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::AccountProvider> =\n        client.users().get_oauth_2_providers_for().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get the OAuth2 providers for your user.\n\nIf this returns an empty array, then the user has not connected any OAuth2 providers and uses raw email authentication.\n\nThis endpoint requires authentication by any Zoo user. It gets the providers for the authenticated user.\n\n```rust,no_run\nasync fn example_users_get_oauth_2_providers_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::AccountProvider> =\n        client.users().get_oauth_2_providers_for().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_oauth_2_providers_for<'a>(
         &'a self,
@@ -541,10 +541,10 @@ impl Users {
 
     #[doc = "Get extended information about a user.\n\nTo get information about yourself, use \
              `/users-extended/me` as the endpoint. By doing so you will get the user information \
-             for the authenticated user.\nAlternatively, to get information about the \
-             authenticated user, use `/user/extended` endpoint.\nTo get information about any Zoo \
-             user, you must be a Zoo employee.\n\n**Parameters:**\n\n- `id: &'astr`: The user ID. \
-             (required)\n\n```rust,no_run\nasync fn example_users_get_extended() -> \
+             for the authenticated user.\n\nAlternatively, to get information about the \
+             authenticated user, use `/user/extended` endpoint.\n\nTo get information about any \
+             Zoo user, you must be a Zoo employee.\n\n**Parameters:**\n\n- `id: &'astr`: The user \
+             ID. (required)\n\n```rust,no_run\nasync fn example_users_get_extended() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::ExtendedUser = \
              client.users().get_extended(\"some-string\").await?;\n    println!(\"{:?}\", \
@@ -582,7 +582,7 @@ impl Users {
         }
     }
 
-    #[doc = "Get a user.\n\nTo get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\nAlternatively, to get information about the authenticated user, use `/user` endpoint.\nTo get information about any Zoo user, you must be a Zoo employee.\n\n**Parameters:**\n\n- `id: &'astr`: The user ID. (required)\n\n```rust,no_run\nasync fn example_users_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client.users().get(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get a user.\n\nTo get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n\nAlternatively, to get information about the authenticated user, use `/user` endpoint.\n\nTo get information about any Zoo user, you must be a Zoo employee.\n\n**Parameters:**\n\n- `id: &'astr`: The user ID. (required)\n\n```rust,no_run\nasync fn example_users_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client.users().get(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get<'a>(
         &'a self,
