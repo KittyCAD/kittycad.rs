@@ -13,7 +13,7 @@ impl Payments {
     }
 
     #[doc = "Get payment info about your org.\n\nThis includes billing address, phone, and \
-             name.\nThis endpoint requires authentication by an org admin. It gets the payment \
+             name.\n\nThis endpoint requires authentication by an org admin. It gets the payment \
              information for the authenticated user's org.\n\n```rust,no_run\nasync fn \
              example_payments_get_information_for_org() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = \
@@ -48,8 +48,8 @@ impl Payments {
     }
 
     #[doc = "Update payment info for your org.\n\nThis includes billing address, phone, and \
-             name.\nThis endpoint requires authentication by an org admin. It updates the payment \
-             information for the authenticated user's org.\n\n```rust,no_run\nuse \
+             name.\n\nThis endpoint requires authentication by an org admin. It updates the \
+             payment information for the authenticated user's org.\n\n```rust,no_run\nuse \
              std::str::FromStr;\nasync fn example_payments_update_information_for_org() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::Customer = client\n        .payments()\n        \
@@ -95,8 +95,8 @@ impl Payments {
     }
 
     #[doc = "Create payment info for your org.\n\nThis includes billing address, phone, and \
-             name.\nThis endpoint requires authentication by the org admin. It creates the payment \
-             information for the authenticated user's org.\n\n```rust,no_run\nuse \
+             name.\n\nThis endpoint requires authentication by the org admin. It creates the \
+             payment information for the authenticated user's org.\n\n```rust,no_run\nuse \
              std::str::FromStr;\nasync fn example_payments_create_information_for_org() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::Customer = client\n        .payments()\n        \
@@ -142,8 +142,8 @@ impl Payments {
     }
 
     #[doc = "Delete payment info for your org.\n\nThis includes billing address, phone, and \
-             name.\nThis endpoint requires authentication by an org admin. It deletes the payment \
-             information for the authenticated user's org.\n\n```rust,no_run\nasync fn \
+             name.\n\nThis endpoint requires authentication by an org admin. It deletes the \
+             payment information for the authenticated user's org.\n\n```rust,no_run\nasync fn \
              example_payments_delete_information_for_org() -> anyhow::Result<()> {\n    let client \
              = kittycad::Client::new_from_env();\n    \
              client.payments().delete_information_for_org().await?;\n    Ok(())\n}\n```"]
@@ -518,7 +518,7 @@ impl Payments {
     }
 
     #[doc = "Get payment info about your user.\n\nThis includes billing address, phone, and \
-             name.\nThis endpoint requires authentication by any Zoo user. It gets the payment \
+             name.\n\nThis endpoint requires authentication by any Zoo user. It gets the payment \
              information for the authenticated user.\n\n```rust,no_run\nasync fn \
              example_payments_get_information_for_user() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::Customer = \
@@ -553,8 +553,8 @@ impl Payments {
     }
 
     #[doc = "Update payment info for your user.\n\nThis includes billing address, phone, and \
-             name.\nThis endpoint requires authentication by any Zoo user. It updates the payment \
-             information for the authenticated user.\n\n```rust,no_run\nuse \
+             name.\n\nThis endpoint requires authentication by any Zoo user. It updates the \
+             payment information for the authenticated user.\n\n```rust,no_run\nuse \
              std::str::FromStr;\nasync fn example_payments_update_information_for_user() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::Customer = client\n        .payments()\n        \
@@ -600,8 +600,8 @@ impl Payments {
     }
 
     #[doc = "Create payment info for your user.\n\nThis includes billing address, phone, and \
-             name.\nThis endpoint requires authentication by any Zoo user. It creates the payment \
-             information for the authenticated user.\n\n```rust,no_run\nuse \
+             name.\n\nThis endpoint requires authentication by any Zoo user. It creates the \
+             payment information for the authenticated user.\n\n```rust,no_run\nuse \
              std::str::FromStr;\nasync fn example_payments_create_information_for_user() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::Customer = client\n        .payments()\n        \
@@ -647,8 +647,8 @@ impl Payments {
     }
 
     #[doc = "Delete payment info for your user.\n\nThis includes billing address, phone, and \
-             name.\nThis endpoint requires authentication by any Zoo user. It deletes the payment \
-             information for the authenticated user.\n\n```rust,no_run\nasync fn \
+             name.\n\nThis endpoint requires authentication by any Zoo user. It deletes the \
+             payment information for the authenticated user.\n\n```rust,no_run\nasync fn \
              example_payments_delete_information_for_user() -> anyhow::Result<()> {\n    let \
              client = kittycad::Client::new_from_env();\n    \
              client.payments().delete_information_for_user().await?;\n    Ok(())\n}\n```"]

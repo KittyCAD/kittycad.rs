@@ -106,8 +106,8 @@ impl Orgs {
     }
 
     #[doc = "Delete an org.\n\nIn order to delete an org, you must first delete all of its \
-             members, except yourself.\nYou must also have no outstanding invoices or unpaid \
-             balances.\nThis endpoint requires authentication by an org admin. It deletes the \
+             members, except yourself.\n\nYou must also have no outstanding invoices or unpaid \
+             balances.\n\nThis endpoint requires authentication by an org admin. It deletes the \
              authenticated user's org.\n\n```rust,no_run\nasync fn example_orgs_delete() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
              client.orgs().delete().await?;\n    Ok(())\n}\n```"]
@@ -255,10 +255,10 @@ impl Orgs {
     }
 
     #[doc = "Add a member to your org.\n\nIf the user exists, this will add them to your org. If \
-             they do not exist, this will create a new user and add them to your org.\nIn both \
-             cases the user gets an email that they have been added to the org.\nIf the user is \
-             already in your org, this will return a 400 and a message.\nIf the user is already in \
-             a different org, this will return a 400 and a message.\nThis endpoint requires \
+             they do not exist, this will create a new user and add them to your org.\n\nIn both \
+             cases the user gets an email that they have been added to the org.\n\nIf the user is \
+             already in your org, this will return a 400 and a message.\n\nIf the user is already \
+             in a different org, this will return a 400 and a message.\n\nThis endpoint requires \
              authentication by an org admin. It adds the specified member to the authenticated \
              user's org.\n\n```rust,no_run\nasync fn example_orgs_create_member() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
@@ -799,7 +799,7 @@ impl Orgs {
     }
 
     #[doc = "Get a user's org.\n\nThis endpoint requires authentication by any Zoo user. It gets \
-             the authenticated user's org.\nIf the user is not a member of an org, this endpoint \
+             the authenticated user's org.\n\nIf the user is not a member of an org, this endpoint \
              will return a 404.\n\n```rust,no_run\nasync fn example_orgs_get_user() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::UserOrgInfo = client.orgs().get_user().await?;\n    \
