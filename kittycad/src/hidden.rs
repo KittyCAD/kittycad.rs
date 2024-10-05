@@ -174,4 +174,39 @@ impl Hidden {
             })
         }
     }
+
+    #[doc = "Redirect the user to the URL for the shortlink.\n\nThis endpoint might require \
+             authentication by a Zoo user. It gets the shortlink for the user and redirects them \
+             to the URL. If the shortlink is owned by an org, the user must be a member of the \
+             org.\n\n**Parameters:**\n\n- `key: &'astr`: The key of the shortlink. \
+             (required)\n\n```rust,no_run\nasync fn example_hidden_redirect_user_shortlink() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
+             client\n        .hidden()\n        .redirect_user_shortlink(\"some-string\")\n        \
+             .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn redirect_user_shortlink<'a>(
+        &'a self,
+        key: &'a str,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/shortlinks/{key}".replace("{key}", key)
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
 }
