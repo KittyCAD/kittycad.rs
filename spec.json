@@ -7915,6 +7915,109 @@
         }
       }
     },
+    "/org/shortlinks": {
+      "get": {
+        "tags": [
+          "orgs",
+          "shortlinks"
+        ],
+        "summary": "Get the shortlinks for an org.",
+        "description": "This endpoint requires authentication by an org admin. It gets the shortlinks for the authenticated user's org.",
+        "operationId": "get_org_shortlinks",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "schema": {
+              "$ref": "#/components/schemas/CreatedAtSortMode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShortlinkResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      }
+    },
     "/orgs": {
       "get": {
         "tags": [
@@ -12790,6 +12893,552 @@
         }
       }
     },
+    "/user/shortlinks": {
+      "get": {
+        "tags": [
+          "users",
+          "shortlinks"
+        ],
+        "summary": "Get the shortlinks for a user.",
+        "description": "This endpoint requires authentication by any Zoo user. It gets the shortlinks for the user.",
+        "operationId": "get_user_shortlinks",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "schema": {
+              "$ref": "#/components/schemas/CreatedAtSortMode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShortlinkResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      },
+      "post": {
+        "tags": [
+          "users",
+          "shortlinks"
+        ],
+        "summary": "Create a shortlink for a user.",
+        "description": "This endpoint requires authentication by any Zoo user. It creates a shortlink for the user.",
+        "operationId": "create_user_shortlink",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateShortlinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateShortlinkResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_user_shortlinks",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/user/shortlinks/{key}": {
+      "get": {
+        "tags": [
+          "users",
+          "shortlinks"
+        ],
+        "summary": "Redirect the user to the URL for the shortlink.",
+        "description": "This endpoint might require authentication by a Zoo user. It gets the shortlink for the user and redirects them to the URL. If the shortlink is owned by an org, the user must be a member of the org.",
+        "operationId": "redirect_user_shortlink",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "description": "The key of the shortlink.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Temporary Redirect",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "users",
+          "shortlinks"
+        ],
+        "summary": "Update a shortlink for a user.",
+        "description": "This endpoint requires authentication by any Zoo user. It updates a shortlink for the user.\n\nThis endpoint really only allows you to change the `restrict_to_org` setting of a shortlink. Thus it is only useful for folks who are part of an org. If you are not part of an org, you will not be able to change the `restrict_to_org` status.",
+        "operationId": "update_user_shortlink",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "description": "The key of the shortlink.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateShortlinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "users",
+          "shortlinks"
+        ],
+        "summary": "Delete a shortlink for a user.",
+        "description": "This endpoint requires authentication by any Zoo user. It deletes a shortlink for the user.",
+        "operationId": "delete_user_shortlink",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "description": "The key of the shortlink.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_delete_user_shortlinks",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "description": "The key of the shortlink.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/user/text-to-cad": {
       "get": {
         "tags": [
@@ -16706,6 +17355,44 @@
             "format": "double"
           }
         }
+      },
+      "CreateShortlinkRequest": {
+        "description": "Request to create a shortlink.",
+        "type": "object",
+        "properties": {
+          "restrict_to_org": {
+            "description": "If the shortlink should be restricted to the user's organization to view. This only applies to org shortlinks. If you are creating a user shortlink and you are not a member of a team or enterprise and you try to set this to true, it will fail.",
+            "type": "boolean"
+          },
+          "url": {
+            "description": "The URL to redirect back to.",
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "restrict_to_org",
+          "url"
+        ]
+      },
+      "CreateShortlinkResponse": {
+        "description": "Response from creating a shortlink.",
+        "type": "object",
+        "properties": {
+          "key": {
+            "description": "The key for this url. This is what you use to update or delete the specific shortlink.",
+            "type": "string"
+          },
+          "url": {
+            "description": "The shortened url.",
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "key",
+          "url"
+        ]
       },
       "CreatedAtSortMode": {
         "description": "Supported set of sort modes for scanning by created_at only.\n\nCurrently, we only support scanning in ascending order.",
@@ -27972,6 +28659,98 @@
         "description": "The response from the `SetTool` endpoint.",
         "type": "object"
       },
+      "Shortlink": {
+        "description": "A short url.",
+        "type": "object",
+        "properties": {
+          "created_at": {
+            "title": "DateTime",
+            "description": "The date and time the shortlink was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "description": "The unique identifier for the shortlink.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "key": {
+            "description": "The key of the shortlink. This is the short part of the URL.",
+            "type": "string"
+          },
+          "org_id": {
+            "nullable": true,
+            "description": "The organization ID of the shortlink.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "password_hash": {
+            "nullable": true,
+            "description": "The hash of the password for the shortlink.",
+            "type": "string"
+          },
+          "restrict_to_org": {
+            "description": "If the shortlink should be restricted to the organization. This only applies to org shortlinks. If you are creating a user shortlink and you are not a member of a team or enterprise and you try to set this to true, it will fail.",
+            "default": false,
+            "type": "boolean"
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The date and time the shortlink was last updated.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "description": "The ID of the user that made the shortlink.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "value": {
+            "title": "String",
+            "description": "The URL the shortlink redirects to.",
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "key",
+          "updated_at",
+          "user_id",
+          "value"
+        ]
+      },
+      "ShortlinkResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Shortlink"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
       "SketchModeDisable": {
         "description": "The response from the `SketchModeDisable` endpoint.",
         "type": "object"
@@ -30795,6 +31574,19 @@
           }
         }
       },
+      "UpdateShortlinkRequest": {
+        "description": "Request to update a shortlink.",
+        "type": "object",
+        "properties": {
+          "restrict_to_org": {
+            "description": "If the shortlink should be restricted to the user's organization to view. This only applies to org shortlinks. If you are creating a user shortlink and you are not a member of a team or enterprise and you try to set this to true, it will fail.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "restrict_to_org"
+        ]
+      },
       "UpdateUser": {
         "description": "The user-modifiable parts of a User.",
         "type": "object",
@@ -31666,6 +32458,13 @@
       "description": "Service accounts allow organizations to call the API. Organization admins can create, delete, and list the service accounts for their org. Service accounts are scoped to an organization not individual users, these are better to use for automations than individual API tokens, since they won't stop working when an individual leaves the company.",
       "externalDocs": {
         "url": "https://zoo.dev/docs/api/service-accounts"
+      }
+    },
+    {
+      "name": "shortlinks",
+      "description": "Shortlinks are a way to create a short URL that redirects to a longer URL. This is useful for sharing links that are long and unwieldy.",
+      "externalDocs": {
+        "url": "https://zoo.dev/docs/api/shortlinks"
       }
     },
     {
