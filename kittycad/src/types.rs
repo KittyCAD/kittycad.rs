@@ -3504,6 +3504,78 @@ impl tabled::Tabled for Coupon {
     }
 }
 
+#[doc = "Request to create a shortlink."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CreateShortlinkRequest {
+    #[doc = "If the shortlink should be restricted to the user's organization to view. This only \
+             applies to org shortlinks. If you are creating a user shortlink and you are not a \
+             member of a team or enterprise and you try to set this to true, it will fail."]
+    pub restrict_to_org: bool,
+    #[doc = "The URL to redirect back to."]
+    pub url: String,
+}
+
+impl std::fmt::Display for CreateShortlinkRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CreateShortlinkRequest {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.restrict_to_org).into(),
+            self.url.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["restrict_to_org".into(), "url".into()]
+    }
+}
+
+#[doc = "Response from creating a shortlink."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CreateShortlinkResponse {
+    #[doc = "The key for this url. This is what you use to update or delete the specific \
+             shortlink."]
+    pub key: String,
+    #[doc = "The shortened url."]
+    pub url: String,
+}
+
+impl std::fmt::Display for CreateShortlinkResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CreateShortlinkResponse {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.key.clone().into(), self.url.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["key".into(), "url".into()]
+    }
+}
+
 #[doc = "Supported set of sort modes for scanning by created_at only.\n\nCurrently, we only \
          support scanning in ascending order."]
 #[derive(
@@ -14154,6 +14226,159 @@ impl tabled::Tabled for SetTool {
     }
 }
 
+#[doc = "A short url."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Shortlink {
+    #[doc = "The date and time the shortlink was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The unique identifier for the shortlink."]
+    pub id: uuid::Uuid,
+    #[doc = "The key of the shortlink. This is the short part of the URL."]
+    pub key: String,
+    #[doc = "The organization ID of the shortlink."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub org_id: Option<uuid::Uuid>,
+    #[doc = "The hash of the password for the shortlink."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub password_hash: Option<String>,
+    #[doc = "If the shortlink should be restricted to the organization. This only applies to org \
+             shortlinks. If you are creating a user shortlink and you are not a member of a team \
+             or enterprise and you try to set this to true, it will fail."]
+    #[serde(default)]
+    pub restrict_to_org: bool,
+    #[doc = "The date and time the shortlink was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The ID of the user that made the shortlink."]
+    pub user_id: uuid::Uuid,
+    #[doc = "The URL the shortlink redirects to."]
+    pub value: String,
+}
+
+impl std::fmt::Display for Shortlink {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Shortlink {
+    const LENGTH: usize = 9;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.id).into(),
+            self.key.clone().into(),
+            if let Some(org_id) = &self.org_id {
+                format!("{:?}", org_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(password_hash) = &self.password_hash {
+                format!("{:?}", password_hash).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.restrict_to_org).into(),
+            format!("{:?}", self.updated_at).into(),
+            format!("{:?}", self.user_id).into(),
+            self.value.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "created_at".into(),
+            "id".into(),
+            "key".into(),
+            "org_id".into(),
+            "password_hash".into(),
+            "restrict_to_org".into(),
+            "updated_at".into(),
+            "user_id".into(),
+            "value".into(),
+        ]
+    }
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ShortlinkResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<Shortlink>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for ShortlinkResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for ShortlinkResultsPage {
+    type Item = Shortlink;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ShortlinkResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
+    }
+}
+
 #[doc = "The response from the `SketchModeDisable` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -17492,6 +17717,39 @@ impl tabled::Tabled for UpdatePaymentBalance {
             "pre_pay_cash_remaining".into(),
             "pre_pay_credits_remaining".into(),
         ]
+    }
+}
+
+#[doc = "Request to update a shortlink."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UpdateShortlinkRequest {
+    #[doc = "If the shortlink should be restricted to the user's organization to view. This only \
+             applies to org shortlinks. If you are creating a user shortlink and you are not a \
+             member of a team or enterprise and you try to set this to true, it will fail."]
+    pub restrict_to_org: bool,
+}
+
+impl std::fmt::Display for UpdateShortlinkRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for UpdateShortlinkRequest {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.restrict_to_org).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["restrict_to_org".into()]
     }
 }
 
