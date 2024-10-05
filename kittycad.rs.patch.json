@@ -1027,8 +1027,8 @@
     "op": "add",
     "path": "/paths/~1user~1shortlinks~1{key}/get/x-rust",
     "value": {
-      "example": "/// Redirect the user to the URL for the shortlink.\n/// \n/// This endpoint might require authentication by a Zoo user. It gets the shortlink for the user and redirects them to the URL. If the shortlink is owned by an org, the user must be a member of the org.\n/// \n/// **Parameters:**\n/// \n/// - `key: &'astr`: The key of the shortlink. (required)\nasync fn example_users_redirect_shortlink() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.users().redirect_shortlink(\"some-string\").await?;\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.redirect_shortlink"
+      "example": "/// Redirect the user to the URL for the shortlink.\n/// \n/// This endpoint might require authentication by a Zoo user. It gets the shortlink for the user and redirects them to the URL. If the shortlink is owned by an org, the user must be a member of the org.\n/// \n/// **Parameters:**\n/// \n/// - `key: &'astr`: The key of the shortlink. (required)\nasync fn example_hidden_redirect_user_shortlink() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .redirect_user_shortlink(\"some-string\")\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.redirect_user_shortlink"
     }
   },
   {
