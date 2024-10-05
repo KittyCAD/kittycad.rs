@@ -13139,6 +13139,7 @@
     "/user/shortlinks/{key}": {
       "get": {
         "tags": [
+          "hidden",
           "users",
           "shortlinks"
         ],
