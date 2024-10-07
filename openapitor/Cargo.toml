@@ -12,7 +12,7 @@ chrono = { version = "0.4", features = ["serde", "std"], default-features = fals
 clap = { version = "4.5.19", features = ["cargo", "derive", "env", "unicode", "wrap_help"] }
 data-encoding = "^2.6.0"
 format_serde_error = "^0.3.0"
-futures-util = "^0.3.30"
+futures-util = "^0.3.31"
 http = "^0.2.8"
 indexmap = { version = "2.6.0", features = ["serde"] }
 json-patch = "2.0.0"
