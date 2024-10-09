@@ -22849,6 +22849,38 @@
             ]
           },
           {
+            "description": "Gets the shared edge between these two faces if it exists",
+            "type": "object",
+            "properties": {
+              "face_ids": {
+                "description": "The faces being queried",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "object_id": {
+                "description": "Which object is being queried.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_get_common_edge"
+                ]
+              }
+            },
+            "required": [
+              "face_ids",
+              "object_id",
+              "type"
+            ]
+          },
+          {
             "description": "Fillets the given edge with the specified radius.",
             "type": "object",
             "properties": {
@@ -25938,6 +25970,24 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/Solid3dGetCommonEdge"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_get_common_edge"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/GetEntityType"
               },
               "type": {
@@ -28797,6 +28847,18 @@
         "required": [
           "edges"
         ]
+      },
+      "Solid3dGetCommonEdge": {
+        "description": "The response from the `Solid3DGetCommonEdge` command.",
+        "type": "object",
+        "properties": {
+          "edge": {
+            "nullable": true,
+            "description": "The UUID of the common edge, if any.",
+            "type": "string",
+            "format": "uuid"
+          }
+        }
       },
       "Solid3dGetExtrusionFaceInfo": {
         "description": "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces)",

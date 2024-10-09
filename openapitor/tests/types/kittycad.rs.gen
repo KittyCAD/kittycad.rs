@@ -9729,6 +9729,14 @@ pub enum ModelingCmd {
         #[doc = "Which object is being queried."]
         object_id: uuid::Uuid,
     },
+    #[doc = "Gets the shared edge between these two faces if it exists"]
+    #[serde(rename = "solid3d_get_common_edge")]
+    Solid3DGetCommonEdge {
+        #[doc = "The faces being queried"]
+        face_ids: Vec<uuid::Uuid>,
+        #[doc = "Which object is being queried."]
+        object_id: uuid::Uuid,
+    },
     #[doc = "Fillets the given edge with the specified radius."]
     #[serde(rename = "solid3d_fillet_edge")]
     Solid3DFilletEdge {
@@ -10902,6 +10910,11 @@ pub enum OkModelingCmdResponse {
     Solid3DGetPrevAdjacentEdge {
         #[doc = "The response from the `Solid3dGetPrevAdjacentEdge` command."]
         data: Solid3DGetPrevAdjacentEdge,
+    },
+    #[serde(rename = "solid3d_get_common_edge")]
+    Solid3DGetCommonEdge {
+        #[doc = "The response from the `Solid3DGetCommonEdge` command."]
+        data: Solid3DGetCommonEdge,
     },
     #[serde(rename = "get_entity_type")]
     GetEntityType {
@@ -14257,6 +14270,42 @@ impl tabled::Tabled for Solid3DGetAllOppositeEdges {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["edges".into()]
+    }
+}
+
+#[doc = "The response from the `Solid3DGetCommonEdge` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DGetCommonEdge {
+    #[doc = "The UUID of the common edge, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edge: Option<uuid::Uuid>,
+}
+
+impl std::fmt::Display for Solid3DGetCommonEdge {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DGetCommonEdge {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![if let Some(edge) = &self.edge {
+            format!("{:?}", edge).into()
+        } else {
+            String::new().into()
+        }]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["edge".into()]
     }
 }
 
