@@ -14007,10 +14007,10 @@
           {
             "in": "path",
             "name": "id",
-            "description": "The user ID.",
+            "description": "The user's identifier (uuid or email).",
             "required": true,
             "schema": {
-              "type": "string"
+              "$ref": "#/components/schemas/UserIdentifier"
             }
           }
         ],
@@ -14089,10 +14089,10 @@
           {
             "in": "path",
             "name": "id",
-            "description": "The user ID.",
+            "description": "The user's identifier (uuid or email).",
             "required": true,
             "schema": {
-              "type": "string"
+              "$ref": "#/components/schemas/UserIdentifier"
             }
           }
         ],
@@ -14171,10 +14171,10 @@
           {
             "in": "path",
             "name": "id",
-            "description": "The user ID.",
+            "description": "The user's identifier (uuid or email).",
             "required": true,
             "schema": {
-              "type": "string"
+              "$ref": "#/components/schemas/UserIdentifier"
             }
           },
           {
@@ -14283,10 +14283,10 @@
           {
             "in": "path",
             "name": "id",
-            "description": "The user ID.",
+            "description": "The user's identifier (uuid or email).",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/Uuid"
+              "$ref": "#/components/schemas/UserIdentifier"
             }
           }
         ],
@@ -14363,10 +14363,10 @@
           {
             "in": "path",
             "name": "id",
-            "description": "The user ID.",
+            "description": "The user's identifier (uuid or email).",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/Uuid"
+              "$ref": "#/components/schemas/UserIdentifier"
             }
           }
         ],
@@ -14452,10 +14452,10 @@
           {
             "in": "path",
             "name": "id",
-            "description": "The user ID.",
+            "description": "The user's identifier (uuid or email).",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/Uuid"
+              "$ref": "#/components/schemas/UserIdentifier"
             }
           }
         ],
@@ -31791,6 +31791,9 @@
           "image",
           "updated_at"
         ]
+      },
+      "UserIdentifier": {
+        "type": "string"
       },
       "UserOrgInfo": {
         "description": "A user's information about an org, including their role.",
