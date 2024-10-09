@@ -15,7 +15,7 @@ format_serde_error = "^0.3.0"
 futures-util = "^0.3.31"
 http = "^0.2.8"
 indexmap = { version = "2.6.0", features = ["serde"] }
-json-patch = "2.0.0"
+json-patch = "3.0.1"
 log = { version = "0.4", features = ["serde"] }
 mime_guess = "2.0.5"
 numeral = "1"
