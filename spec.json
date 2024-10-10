@@ -17361,8 +17361,14 @@
         "description": "Request to create a shortlink.",
         "type": "object",
         "properties": {
+          "password": {
+            "nullable": true,
+            "description": "The password for the shortlink, if you want to restrict access to it. This can only be set if your subscription allows for it. Otherwise, it will return an error. When you access the link it will be required to enter this password through basic auth. The username will be `{anything}` and the password will be the password you set here.",
+            "type": "string"
+          },
           "restrict_to_org": {
             "description": "If the shortlink should be restricted to the user's organization to view. This only applies to org shortlinks. If you are creating a user shortlink and you are not a member of a team or enterprise and you try to set this to true, it will fail.",
+            "default": false,
             "type": "boolean"
           },
           "url": {
@@ -17372,7 +17378,6 @@
           }
         },
         "required": [
-          "restrict_to_org",
           "url"
         ]
       },
@@ -21126,6 +21131,32 @@
           }
         ]
       },
+      "ModelingAppShareLinks": {
+        "description": "The options for sharable links through the modeling app.",
+        "oneOf": [
+          {
+            "description": "Public.",
+            "type": "string",
+            "enum": [
+              "public"
+            ]
+          },
+          {
+            "description": "Password protected.",
+            "type": "string",
+            "enum": [
+              "password_protected"
+            ]
+          },
+          {
+            "description": "Organization only. Links can be made only available to members of the organization.",
+            "type": "string",
+            "enum": [
+              "organization_only"
+            ]
+          }
+        ]
+      },
       "ModelingAppSubscriptionTier": {
         "description": "A subscription tier we offer for the Modeling App.",
         "type": "object",
@@ -21164,6 +21195,13 @@
                 "$ref": "#/components/schemas/SubscriptionTierPrice"
               }
             ]
+          },
+          "share_links": {
+            "description": "The options for sharable links through the modeling app.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModelingAppShareLinks"
+            }
           },
           "support_tier": {
             "description": "The support tier the subscription provides.",
@@ -31642,6 +31680,11 @@
         "description": "Request to update a shortlink.",
         "type": "object",
         "properties": {
+          "password": {
+            "nullable": true,
+            "description": "The password for the shortlink, if you want to restrict access to it. This can only be set if your subscription allows for it. Otherwise, it will return an error. When you access the link it will be required to enter this password through basic auth. The username will be `{anything}` and the password will be the password you set here.",
+            "type": "string"
+          },
           "restrict_to_org": {
             "description": "If the shortlink should be restricted to the user's organization to view. This only applies to org shortlinks. If you are creating a user shortlink and you are not a member of a team or enterprise and you try to set this to true, it will fail.",
             "type": "boolean"
@@ -32272,6 +32315,13 @@
                     "$ref": "#/components/schemas/SubscriptionTierPrice"
                   }
                 ]
+              },
+              "share_links": {
+                "description": "The options for sharable links through the modeling app.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ModelingAppShareLinks"
+                }
               },
               "support_tier": {
                 "description": "The support tier the subscription provides.",
