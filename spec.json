@@ -26920,6 +26920,7 @@
           }
         },
         "required": [
+          "billing_email",
           "created_at",
           "id",
           "updated_at"
