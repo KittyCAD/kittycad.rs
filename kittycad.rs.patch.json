@@ -1011,7 +1011,7 @@
     "op": "add",
     "path": "/paths/~1user~1shortlinks/post/x-rust",
     "value": {
-      "example": "/// Create a shortlink for a user.\n/// \n/// This endpoint requires authentication by any Zoo user. It creates a shortlink for the user.\nasync fn example_users_create_shortlink() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CreateShortlinkResponse = client\n        .users()\n        .create_shortlink(&kittycad::types::CreateShortlinkRequest {\n            restrict_to_org: false,\n            url: \"https://example.com/foo/bar\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Create a shortlink for a user.\n/// \n/// This endpoint requires authentication by any Zoo user. It creates a shortlink for the user.\nasync fn example_users_create_shortlink() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CreateShortlinkResponse = client\n        .users()\n        .create_shortlink(&kittycad::types::CreateShortlinkRequest {\n            password: Some(\"some-string\".to_string()),\n            restrict_to_org: false,\n            url: \"https://example.com/foo/bar\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.create_shortlink"
     }
   },
@@ -1035,7 +1035,7 @@
     "op": "add",
     "path": "/paths/~1user~1shortlinks~1{key}/put/x-rust",
     "value": {
-      "example": "/// Update a shortlink for a user.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates a shortlink for the user.\n/// \n/// This endpoint really only allows you to change the `restrict_to_org` setting of a shortlink. Thus it is only useful for folks who are part of an org. If you are not part of an org, you will not be able to change the `restrict_to_org` status.\n/// \n/// **Parameters:**\n/// \n/// - `key: &'astr`: The key of the shortlink. (required)\nasync fn example_users_update_shortlink() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .update_shortlink(\n            \"some-string\",\n            &kittycad::types::UpdateShortlinkRequest {\n                restrict_to_org: false,\n            },\n        )\n        .await?;\n    Ok(())\n}\n",
+      "example": "/// Update a shortlink for a user.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates a shortlink for the user.\n/// \n/// This endpoint really only allows you to change the `restrict_to_org` setting of a shortlink. Thus it is only useful for folks who are part of an org. If you are not part of an org, you will not be able to change the `restrict_to_org` status.\n/// \n/// **Parameters:**\n/// \n/// - `key: &'astr`: The key of the shortlink. (required)\nasync fn example_users_update_shortlink() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .update_shortlink(\n            \"some-string\",\n            &kittycad::types::UpdateShortlinkRequest {\n                password: Some(\"some-string\".to_string()),\n                restrict_to_org: false,\n            },\n        )\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.update_shortlink"
     }
   },
