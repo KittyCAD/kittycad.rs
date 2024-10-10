@@ -11420,8 +11420,7 @@ pub struct Org {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allow_users_in_domain_to_auto_join: Option<bool>,
     #[doc = "The billing email address of the org."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub billing_email: Option<String>,
+    pub billing_email: String,
     #[doc = "The date and time the billing email address was verified."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub billing_email_verified: Option<chrono::DateTime<chrono::Utc>>,
@@ -11477,11 +11476,7 @@ impl tabled::Tabled for Org {
             } else {
                 String::new().into()
             },
-            if let Some(billing_email) = &self.billing_email {
-                format!("{:?}", billing_email).into()
-            } else {
-                String::new().into()
-            },
+            self.billing_email.clone().into(),
             if let Some(billing_email_verified) = &self.billing_email_verified {
                 format!("{:?}", billing_email_verified).into()
             } else {
