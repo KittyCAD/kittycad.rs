@@ -21161,6 +21161,13 @@
         "description": "A subscription tier we offer for the Modeling App.",
         "type": "object",
         "properties": {
+          "annual_discount": {
+            "nullable": true,
+            "description": "Annual discount. The percentage off the monthly price if the user pays annually.",
+            "type": "integer",
+            "format": "uint",
+            "minimum": 0
+          },
           "description": {
             "description": "A description of the tier.",
             "type": "string"
@@ -32281,6 +32288,13 @@
             "description": "A subscription to the modeling app.",
             "type": "object",
             "properties": {
+              "annual_discount": {
+                "nullable": true,
+                "description": "Annual discount. The percentage off the monthly price if the user pays annually.",
+                "type": "integer",
+                "format": "uint",
+                "minimum": 0
+              },
               "description": {
                 "description": "A description of the tier.",
                 "type": "string"
@@ -32396,6 +32410,11 @@
                 "$ref": "#/components/schemas/ModelingAppOrganizationSubscriptionTier"
               }
             ]
+          },
+          "pay_annually": {
+            "nullable": true,
+            "description": "If the customer chooses to pay annually or monthly, we can add that here. The annual discount will apply if there is a discount for the subscription.",
+            "type": "boolean"
           }
         }
       },
@@ -32411,6 +32430,11 @@
                 "$ref": "#/components/schemas/ModelingAppIndividualSubscriptionTier"
               }
             ]
+          },
+          "pay_annually": {
+            "nullable": true,
+            "description": "If the customer chooses to pay annually or monthly, we can add that here. The annual discount will apply if there is a discount for the subscription.",
+            "type": "boolean"
           }
         }
       },
