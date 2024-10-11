@@ -9215,6 +9215,9 @@ pub enum ModelingAppShareLinks {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ModelingAppSubscriptionTier {
+    #[doc = "Annual discount. The percentage off the monthly price if the user pays annually."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub annual_discount: Option<u32>,
     #[doc = "A description of the tier."]
     pub description: String,
     #[doc = "Features that are included in the subscription."]
@@ -9253,9 +9256,14 @@ impl std::fmt::Display for ModelingAppSubscriptionTier {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ModelingAppSubscriptionTier {
-    const LENGTH: usize = 10;
+    const LENGTH: usize = 11;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(annual_discount) = &self.annual_discount {
+                format!("{:?}", annual_discount).into()
+            } else {
+                String::new().into()
+            },
             self.description.clone().into(),
             if let Some(features) = &self.features {
                 format!("{:?}", features).into()
@@ -9283,6 +9291,7 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "annual_discount".into(),
             "description".into(),
             "features".into(),
             "name".into(),
@@ -18275,6 +18284,9 @@ impl tabled::Tabled for WebSocketResponse {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ZooProductSubscription {
+    #[doc = "Annual discount. The percentage off the monthly price if the user pays annually."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub annual_discount: Option<u32>,
     #[doc = "A description of the tier."]
     pub description: String,
     #[doc = "Features that are included in the subscription."]
@@ -18313,9 +18325,14 @@ impl std::fmt::Display for ZooProductSubscription {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ZooProductSubscription {
-    const LENGTH: usize = 10;
+    const LENGTH: usize = 11;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(annual_discount) = &self.annual_discount {
+                format!("{:?}", annual_discount).into()
+            } else {
+                String::new().into()
+            },
             self.description.clone().into(),
             if let Some(features) = &self.features {
                 format!("{:?}", features).into()
@@ -18343,6 +18360,7 @@ impl tabled::Tabled for ZooProductSubscription {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "annual_discount".into(),
             "description".into(),
             "features".into(),
             "name".into(),
@@ -18396,6 +18414,9 @@ pub struct ZooProductSubscriptionsOrgRequest {
     #[doc = "A modeling app subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub modeling_app: Option<ModelingAppOrganizationSubscriptionTier>,
+    #[doc = "If the customer chooses to pay annually or monthly, we can add that here. The annual discount will apply if there is a discount for the subscription."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pay_annually: Option<bool>,
 }
 
 impl std::fmt::Display for ZooProductSubscriptionsOrgRequest {
@@ -18410,17 +18431,24 @@ impl std::fmt::Display for ZooProductSubscriptionsOrgRequest {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ZooProductSubscriptionsOrgRequest {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![if let Some(modeling_app) = &self.modeling_app {
-            format!("{:?}", modeling_app).into()
-        } else {
-            String::new().into()
-        }]
+        vec![
+            if let Some(modeling_app) = &self.modeling_app {
+                format!("{:?}", modeling_app).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(pay_annually) = &self.pay_annually {
+                format!("{:?}", pay_annually).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["modeling_app".into()]
+        vec!["modeling_app".into(), "pay_annually".into()]
     }
 }
 
@@ -18432,6 +18460,9 @@ pub struct ZooProductSubscriptionsUserRequest {
     #[doc = "A modeling app subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub modeling_app: Option<ModelingAppIndividualSubscriptionTier>,
+    #[doc = "If the customer chooses to pay annually or monthly, we can add that here. The annual discount will apply if there is a discount for the subscription."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pay_annually: Option<bool>,
 }
 
 impl std::fmt::Display for ZooProductSubscriptionsUserRequest {
@@ -18446,17 +18477,24 @@ impl std::fmt::Display for ZooProductSubscriptionsUserRequest {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ZooProductSubscriptionsUserRequest {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![if let Some(modeling_app) = &self.modeling_app {
-            format!("{:?}", modeling_app).into()
-        } else {
-            String::new().into()
-        }]
+        vec![
+            if let Some(modeling_app) = &self.modeling_app {
+                format!("{:?}", modeling_app).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(pay_annually) = &self.pay_annually {
+                format!("{:?}", pay_annually).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["modeling_app".into()]
+        vec!["modeling_app".into(), "pay_annually".into()]
     }
 }
 

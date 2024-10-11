@@ -354,7 +354,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Update the subscription for an org.\n\nThis endpoint requires authentication by an org admin. It updates the subscription for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_update_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_org_subscription(&kittycad::types::ZooProductSubscriptionsOrgRequest {\n            modeling_app: Some(kittycad::types::ModelingAppOrganizationSubscriptionTier::Enterprise),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update the subscription for an org.\n\nThis endpoint requires authentication by an org admin. It updates the subscription for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_update_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_org_subscription(&kittycad::types::ZooProductSubscriptionsOrgRequest {\n            modeling_app: Some(kittycad::types::ModelingAppOrganizationSubscriptionTier::Enterprise),\n            pay_annually: Some(false),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_org_subscription<'a>(
         &'a self,
@@ -385,7 +385,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Create the subscription for an org.\n\nThis endpoint requires authentication by an org admin. It creates the subscription for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_create_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_org_subscription(&kittycad::types::ZooProductSubscriptionsOrgRequest {\n            modeling_app: Some(kittycad::types::ModelingAppOrganizationSubscriptionTier::Enterprise),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create the subscription for an org.\n\nThis endpoint requires authentication by an org admin. It creates the subscription for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_create_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_org_subscription(&kittycad::types::ZooProductSubscriptionsOrgRequest {\n            modeling_app: Some(kittycad::types::ModelingAppOrganizationSubscriptionTier::Enterprise),\n            pay_annually: Some(false),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_org_subscription<'a>(
         &'a self,
@@ -847,7 +847,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Update the user's subscription.\n\nThis endpoint requires authentication by any Zoo user. It updates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_update_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            modeling_app: Some(kittycad::types::ModelingAppIndividualSubscriptionTier::Pro),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update the user's subscription.\n\nThis endpoint requires authentication by any Zoo user. It updates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_update_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            modeling_app: Some(kittycad::types::ModelingAppIndividualSubscriptionTier::Pro),\n            pay_annually: Some(false),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_user_subscription<'a>(
         &'a self,
@@ -878,7 +878,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Create the subscription for a user.\n\nThis endpoint requires authentication by any Zoo user. It creates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_create_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            modeling_app: Some(kittycad::types::ModelingAppIndividualSubscriptionTier::Pro),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create the subscription for a user.\n\nThis endpoint requires authentication by any Zoo user. It creates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_create_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            modeling_app: Some(kittycad::types::ModelingAppIndividualSubscriptionTier::Pro),\n            pay_annually: Some(false),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_user_subscription<'a>(
         &'a self,
