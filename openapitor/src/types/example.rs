@@ -51,10 +51,9 @@ pub fn generate_example_json_from_schema(
                 let max_length = s.max_length.unwrap_or(10);
 
                 // Generate a random string.
-                let mut s = String::new();
-                for _ in 0..rng.gen_range(min_length..max_length) {
-                    s.push(rng.gen_range(b'a'..=b'z') as char);
-                }
+                let s: String = (0..rng.gen_range(min_length..max_length))
+                    .map(|_| rng.gen_range(b'a'..=b'z') as char)
+                    .collect();
                 return Ok(serde_json::Value::String(s));
             }
 
@@ -249,10 +248,9 @@ pub fn generate_example_json_from_schema(
                 let items = s.get_schema_from_reference(spec, true)?;
 
                 // Generate a random array.
-                let mut arr = Vec::new();
-                for _ in 0..rng.gen_range(0..10) {
-                    arr.push(generate_example_json_from_schema(&items, spec)?);
-                }
+                let arr: Vec<_> = (0..rng.gen_range(0..10))
+                    .map(|_| generate_example_json_from_schema(&items, spec))
+                    .collect::<Result<_, _>>()?;
                 serde_json::Value::Array(arr)
             } else {
                 // We have no items.
@@ -264,13 +262,15 @@ pub fn generate_example_json_from_schema(
         }
         openapiv3::SchemaKind::OneOf { one_of } => {
             // Generate a random one of.
-            let mut results = Vec::new();
-            for s in one_of {
-                results.push(generate_example_json_from_schema(
-                    &s.get_schema_from_reference(spec, true)?,
-                    spec,
-                )?);
-            }
+            let results: Vec<_> = one_of
+                .iter()
+                .map(|s| {
+                    generate_example_json_from_schema(
+                        &s.get_schema_from_reference(spec, true)?,
+                        spec,
+                    )
+                })
+                .collect::<Result<_, _>>()?;
             let i = rng.gen_range(0..results.len());
             results[i].clone()
         }
