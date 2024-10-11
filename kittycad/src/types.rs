@@ -3509,9 +3509,16 @@ impl tabled::Tabled for Coupon {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CreateShortlinkRequest {
+    #[doc = "The password for the shortlink, if you want to restrict access to it. This can only \
+             be set if your subscription allows for it. Otherwise, it will return an error. When \
+             you access the link it will be required to enter this password through basic auth. \
+             The username will be `{anything}` and the password will be the password you set here."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub password: Option<String>,
     #[doc = "If the shortlink should be restricted to the user's organization to view. This only \
              applies to org shortlinks. If you are creating a user shortlink and you are not a \
              member of a team or enterprise and you try to set this to true, it will fail."]
+    #[serde(default)]
     pub restrict_to_org: bool,
     #[doc = "The URL to redirect back to."]
     pub url: String,
@@ -3529,16 +3536,21 @@ impl std::fmt::Display for CreateShortlinkRequest {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CreateShortlinkRequest {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(password) = &self.password {
+                format!("{:?}", password).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.restrict_to_org).into(),
             self.url.clone().into(),
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["restrict_to_org".into(), "url".into()]
+        vec!["password".into(), "restrict_to_org".into(), "url".into()]
     }
 }
 
@@ -9309,6 +9321,35 @@ pub enum ModelingAppOrganizationSubscriptionTier {
     Enterprise,
 }
 
+#[doc = "The options for sharable links through the modeling app."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ModelingAppShareLinks {
+    #[doc = "Public."]
+    #[serde(rename = "public")]
+    #[display("public")]
+    Public,
+    #[doc = "Password protected."]
+    #[serde(rename = "password_protected")]
+    #[display("password_protected")]
+    PasswordProtected,
+    #[doc = "Organization only. Links can be made only available to members of the organization."]
+    #[serde(rename = "organization_only")]
+    #[display("organization_only")]
+    OrganizationOnly,
+}
+
 #[doc = "A subscription tier we offer for the Modeling App."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9328,6 +9369,9 @@ pub struct ModelingAppSubscriptionTier {
              they pay. If this is for an organization, this is the price the organization pays \
              per member in the org. This is in USD."]
     pub price: SubscriptionTierPrice,
+    #[doc = "The options for sharable links through the modeling app."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub share_links: Option<Vec<ModelingAppShareLinks>>,
     #[doc = "The support tier the subscription provides."]
     pub support_tier: SupportTier,
     #[doc = "The behavior of the users data (can it be used for training, etc)."]
@@ -9352,7 +9396,7 @@ impl std::fmt::Display for ModelingAppSubscriptionTier {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ModelingAppSubscriptionTier {
-    const LENGTH: usize = 9;
+    const LENGTH: usize = 10;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             self.description.clone().into(),
@@ -9364,6 +9408,11 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
             format!("{:?}", self.name).into(),
             format!("{:?}", self.pay_as_you_go_credits).into(),
             format!("{:?}", self.price).into(),
+            if let Some(share_links) = &self.share_links {
+                format!("{:?}", share_links).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.support_tier).into(),
             format!("{:?}", self.training_data_behavior).into(),
             format!("{:?}", self.type_).into(),
@@ -9382,6 +9431,7 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
             "name".into(),
             "pay_as_you_go_credits".into(),
             "price".into(),
+            "share_links".into(),
             "support_tier".into(),
             "training_data_behavior".into(),
             "type_".into(),
@@ -17769,6 +17819,12 @@ impl tabled::Tabled for UpdatePaymentBalance {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UpdateShortlinkRequest {
+    #[doc = "The password for the shortlink, if you want to restrict access to it. This can only \
+             be set if your subscription allows for it. Otherwise, it will return an error. When \
+             you access the link it will be required to enter this password through basic auth. \
+             The username will be `{anything}` and the password will be the password you set here."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub password: Option<String>,
     #[doc = "If the shortlink should be restricted to the user's organization to view. This only \
              applies to org shortlinks. If you are creating a user shortlink and you are not a \
              member of a team or enterprise and you try to set this to true, it will fail."]
@@ -17787,13 +17843,20 @@ impl std::fmt::Display for UpdateShortlinkRequest {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UpdateShortlinkRequest {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.restrict_to_org).into()]
+        vec![
+            if let Some(password) = &self.password {
+                format!("{:?}", password).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.restrict_to_org).into(),
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["restrict_to_org".into()]
+        vec!["password".into(), "restrict_to_org".into()]
     }
 }
 
@@ -18536,6 +18599,9 @@ pub struct ZooProductSubscription {
              they pay. If this is for an organization, this is the price the organization pays \
              per member in the org. This is in USD."]
     pub price: SubscriptionTierPrice,
+    #[doc = "The options for sharable links through the modeling app."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub share_links: Option<Vec<ModelingAppShareLinks>>,
     #[doc = "The support tier the subscription provides."]
     pub support_tier: SupportTier,
     #[doc = "The behavior of the users data (can it be used for training, etc)."]
@@ -18560,7 +18626,7 @@ impl std::fmt::Display for ZooProductSubscription {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ZooProductSubscription {
-    const LENGTH: usize = 9;
+    const LENGTH: usize = 10;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             self.description.clone().into(),
@@ -18572,6 +18638,11 @@ impl tabled::Tabled for ZooProductSubscription {
             format!("{:?}", self.name).into(),
             format!("{:?}", self.pay_as_you_go_credits).into(),
             format!("{:?}", self.price).into(),
+            if let Some(share_links) = &self.share_links {
+                format!("{:?}", share_links).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.support_tier).into(),
             format!("{:?}", self.training_data_behavior).into(),
             format!("{:?}", self.type_).into(),
@@ -18590,6 +18661,7 @@ impl tabled::Tabled for ZooProductSubscription {
             "name".into(),
             "pay_as_you_go_credits".into(),
             "price".into(),
+            "share_links".into(),
             "support_tier".into(),
             "training_data_behavior".into(),
             "type_".into(),
