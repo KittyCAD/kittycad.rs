@@ -275,16 +275,11 @@ pub fn generate_example_json_from_schema(
             results[i].clone()
         }
         openapiv3::SchemaKind::AllOf { all_of } => {
-            // Generate a random all of.
-            let mut results = Vec::new();
-            for s in all_of {
-                results.push(generate_example_json_from_schema(
-                    &s.get_schema_from_reference(spec, true)?,
-                    spec,
-                )?);
-            }
-            let i = rng.gen_range(0..results.len());
-            results[i].clone()
+            let i = rng.gen_range(0..all_of.len());
+            generate_example_json_from_schema(
+                &all_of[i].get_schema_from_reference(spec, true)?,
+                spec,
+            )?
         }
         openapiv3::SchemaKind::AnyOf { any_of: _ } => {
             anyhow::bail!("XXX any of not supported yet");
