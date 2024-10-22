@@ -4614,6 +4614,37 @@ impl tabled::Tabled for EnableSketchMode {
     }
 }
 
+#[doc = "The response of the `EngineUtilEvaluatePath` endpoint"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EngineUtilEvaluatePath {
+    #[doc = "The evaluated path curve position"]
+    pub pos: Point3D,
+}
+
+impl std::fmt::Display for EngineUtilEvaluatePath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EngineUtilEvaluatePath {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.pos).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["pos".into()]
+    }
+}
+
 #[doc = "The response from the `EntityCircularPattern` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9346,6 +9377,14 @@ pub enum ModelingAppSubscriptionTierName {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum ModelingCmd {
+    #[doc = "Evaluates the position of a path in one shot (engine utility for kcl executor)"]
+    #[serde(rename = "engine_util_evaluate_path")]
+    EngineUtilEvaluatePath {
+        #[doc = "The path in json form (the serialized result of the kcl Sketch/Path object"]
+        path_json: String,
+        #[doc = "The evaluation parameter (path curve parameter in the normalized domain [0, 1])"]
+        t: f64,
+    },
     #[doc = "Start a new path."]
     #[serde(rename = "start_path")]
     StartPath {},
@@ -10183,12 +10222,13 @@ pub enum ModelingCmd {
         #[serde(default)]
         object_ids: Vec<uuid::Uuid>,
         #[doc = "How much to pad the view frame by, as a fraction of the object(s) bounding box size. Negative padding will crop the view of the object proportionally. e.g. padding = 0.2 means the view will span 120% of the object(s) bounding box, and padding = -0.2 means the view will span 80% of the object(s) bounding box."]
-        padding: f64,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        padding: Option<f64>,
     },
     #[doc = "Fit the view to the scene with an isometric view."]
     #[serde(rename = "view_isometric")]
     ViewIsometric {
-        #[doc = "How much to pad the view frame by."]
+        #[doc = "How much to pad the view frame by, as a fraction of the object(s) bounding box size. Negative padding will crop the view of the object proportionally. e.g. padding = 0.2 means the view will span 120% of the object(s) bounding box, and padding = -0.2 means the view will span 80% of the object(s) bounding box."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         padding: Option<f64>,
     },
@@ -10577,6 +10617,11 @@ pub enum OkModelingCmdResponse {
     #[doc = "An empty response, used for any command that does not explicitly have a response defined here."]
     #[serde(rename = "empty")]
     Empty {},
+    #[serde(rename = "engine_util_evaluate_path")]
+    EngineUtilEvaluatePath {
+        #[doc = "The response of the `EngineUtilEvaluatePath` endpoint"]
+        data: EngineUtilEvaluatePath,
+    },
     #[serde(rename = "start_path")]
     StartPath {
         #[doc = "The response from the `StartPath` endpoint."]
