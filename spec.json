@@ -17982,6 +17982,23 @@
         "description": "The response from the `EnableSketchMode` endpoint.",
         "type": "object"
       },
+      "EngineUtilEvaluatePath": {
+        "description": "The response of the `EngineUtilEvaluatePath` endpoint",
+        "type": "object",
+        "properties": {
+          "pos": {
+            "description": "The evaluated path curve position",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          }
+        },
+        "required": [
+          "pos"
+        ]
+      },
       "EntityCircularPattern": {
         "description": "The response from the `EntityCircularPattern` command.",
         "type": "object",
@@ -21289,6 +21306,32 @@
         "description": "Commands that the KittyCAD engine can execute.",
         "oneOf": [
           {
+            "description": "Evaluates the position of a path in one shot (engine utility for kcl executor)",
+            "type": "object",
+            "properties": {
+              "path_json": {
+                "description": "The path in json form (the serialized result of the kcl Sketch/Path object",
+                "type": "string"
+              },
+              "t": {
+                "description": "The evaluation parameter (path curve parameter in the normalized domain [0, 1])",
+                "type": "number",
+                "format": "double"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "engine_util_evaluate_path"
+                ]
+              }
+            },
+            "required": [
+              "path_json",
+              "t",
+              "type"
+            ]
+          },
+          {
             "description": "Start a new path.",
             "type": "object",
             "properties": {
@@ -24354,6 +24397,7 @@
               },
               "padding": {
                 "description": "How much to pad the view frame by, as a fraction of the object(s) bounding box size. Negative padding will crop the view of the object proportionally. e.g. padding = 0.2 means the view will span 120% of the object(s) bounding box, and padding = -0.2 means the view will span 80% of the object(s) bounding box.",
+                "default": 0.0,
                 "type": "number",
                 "format": "float"
               },
@@ -24365,7 +24409,6 @@
               }
             },
             "required": [
-              "padding",
               "type"
             ]
           },
@@ -24374,7 +24417,7 @@
             "type": "object",
             "properties": {
               "padding": {
-                "description": "How much to pad the view frame by.",
+                "description": "How much to pad the view frame by, as a fraction of the object(s) bounding box size. Negative padding will crop the view of the object proportionally. e.g. padding = 0.2 means the view will span 120% of the object(s) bounding box, and padding = -0.2 means the view will span 80% of the object(s) bounding box.",
                 "default": 0.0,
                 "type": "number",
                 "format": "float"
@@ -24604,6 +24647,24 @@
               }
             },
             "required": [
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EngineUtilEvaluatePath"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "engine_util_evaluate_path"
+                ]
+              }
+            },
+            "required": [
+              "data",
               "type"
             ]
           },
