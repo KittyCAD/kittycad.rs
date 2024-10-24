@@ -4645,6 +4645,31 @@ impl tabled::Tabled for EngineUtilEvaluatePath {
     }
 }
 
+#[doc = "The price for an enterprise subscription."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum EnterpriseSubscriptionTierPrice {
+    #[doc = "A flat price that we publicly list."]
+    #[serde(rename = "flat")]
+    Flat {
+        #[doc = "The interval the price is charged."]
+        interval: PlanInterval,
+        #[doc = "The price."]
+        price: f64,
+    },
+    #[doc = "A per user price that we publicly list."]
+    #[serde(rename = "per_user")]
+    PerUser {
+        #[doc = "The interval the price is charged."]
+        interval: PlanInterval,
+        #[doc = "The price."]
+        price: f64,
+    },
+}
+
 #[doc = "The response from the `EntityCircularPattern` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,

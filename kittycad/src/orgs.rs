@@ -870,21 +870,12 @@ impl Orgs {
         }
     }
 
-    #[doc = "Set the enterprise price for an organization.\n\nYou must be a Zoo employee to \
-             perform this request.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. \
-             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
-             example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client \
-             = kittycad::Client::new_from_env();\n    let result: \
-             kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        \
-             .update_enterprise_pricing_for(\n            \
-             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
-             &kittycad::types::SubscriptionTierPrice::Enterprise {},\n        )\n        \
-             .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Set the enterprise price for an organization.\n\nYou must be a Zoo employee to perform this request.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        .update_enterprise_pricing_for(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::EnterpriseSubscriptionTierPrice::Flat {\n                interval: kittycad::types::PlanInterval::Year,\n                price: 3.14 as f64,\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_enterprise_pricing_for<'a>(
         &'a self,
         id: uuid::Uuid,
-        body: &crate::types::SubscriptionTierPrice,
+        body: &crate::types::EnterpriseSubscriptionTierPrice,
     ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::PUT,
