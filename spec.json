@@ -8227,7 +8227,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SubscriptionTierPrice"
+                "$ref": "#/components/schemas/EnterpriseSubscriptionTierPrice"
               }
             }
           },
@@ -17997,6 +17997,73 @@
         },
         "required": [
           "pos"
+        ]
+      },
+      "EnterpriseSubscriptionTierPrice": {
+        "description": "The price for an enterprise subscription.",
+        "oneOf": [
+          {
+            "description": "A flat price that we publicly list.",
+            "type": "object",
+            "properties": {
+              "interval": {
+                "description": "The interval the price is charged.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PlanInterval"
+                  }
+                ]
+              },
+              "price": {
+                "title": "double",
+                "description": "The price.",
+                "type": "number",
+                "format": "money-usd"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "flat"
+                ]
+              }
+            },
+            "required": [
+              "interval",
+              "price",
+              "type"
+            ]
+          },
+          {
+            "description": "A per user price that we publicly list.",
+            "type": "object",
+            "properties": {
+              "interval": {
+                "description": "The interval the price is charged.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PlanInterval"
+                  }
+                ]
+              },
+              "price": {
+                "title": "double",
+                "description": "The price.",
+                "type": "number",
+                "format": "money-usd"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "per_user"
+                ]
+              }
+            },
+            "required": [
+              "interval",
+              "price",
+              "type"
+            ]
+          }
         ]
       },
       "EntityCircularPattern": {
