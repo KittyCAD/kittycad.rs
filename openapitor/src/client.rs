@@ -10,8 +10,8 @@ pub fn generate_client(opts: &crate::Opts) -> String {
 
         return CLIENT_FUNCTIONS_OAUTH_TOKEN
             .replace(
-                "ENV_VARIABLE_PREFIX",
-                &crate::template::get_env_variable_prefix(&opts.name),
+                "ENV_VARIABLE_CODE",
+                &get_env_variable_code_oauth_token(opts),
             )
             .replace("TOKEN_ENDPOINT", token_endpoint.as_ref())
             .replace(
@@ -31,10 +31,7 @@ pub fn generate_client(opts: &crate::Opts) -> String {
                 "TIMEOUT_NUM_SECONDS",
                 &opts.request_timeout_seconds.to_string(),
             )
-            .replace(
-                "ENV_VARIABLE_PREFIX",
-                &crate::template::get_env_variable_prefix(&opts.name),
-            )
+            .replace("ENV_VARIABLE_CODE", &get_env_variable_code_basic_auth(opts))
             .replace("BASE_URL", opts.base_url.to_string().trim_end_matches('/'));
     }
 
@@ -43,11 +40,60 @@ pub fn generate_client(opts: &crate::Opts) -> String {
             "TIMEOUT_NUM_SECONDS",
             &opts.request_timeout_seconds.to_string(),
         )
+        .replace("ENV_VARIABLE_CODE", &get_env_variable_code_token(opts))
+        .replace("BASE_URL", opts.base_url.to_string().trim_end_matches('/'))
+}
+
+fn get_env_variable_code_basic_auth(opts: &crate::Opts) -> String {
+    let start = if let Some(add_env_prefix) = &opts.add_env_prefix {
+        r#"let username = if let Ok(username) = env::var("ENV_VARIABLE_PREFIX_USERNAME") {
+        username
+    } else if let Ok(username) = env::var("ADD_ENV_VARIABLE_PREFIX_USERNAME") {
+        username
+    } else {
+        panic!("must set ENV_VARIABLE_PREFIX_USERNAME or ADD_ENV_VARIABLE_PREFIX_USERNAME");
+    };
+    let password = if let Ok(password) = env::var("ENV_VARIABLE_PREFIX_PASSWORD") {
+        password
+    } else if let Ok(password) = env::var("ADD_ENV_VARIABLE_PREFIX_PASSWORD") {
+        password
+    } else {
+        panic!("must set ENV_VARIABLE_PREFIX_PASSWORD or ADD_ENV_VARIABLE_PREFIX_PASSWORD");
+    };
+    let base_url = if let Ok(base_url) = env::var("ENV_VARIABLE_PREFIX_HOST") {
+        base_url
+    } else if let Ok(base_url) = env::var("ADD_ENV_VARIABLE_PREFIX_HOST") {
+        base_url
+    } else {            
+        "BASE_URL".to_string()
+    };"#
+        .replace(
+            "ADD_ENV_VARIABLE_PREFIX",
+            &crate::template::get_env_variable_prefix(add_env_prefix),
+        )
         .replace(
             "ENV_VARIABLE_PREFIX",
             &crate::template::get_env_variable_prefix(&opts.name),
         )
-        .replace("BASE_URL", opts.base_url.to_string().trim_end_matches('/'))
+    } else {
+        r#"let username = env::var("ENV_VARIABLE_PREFIX_USERNAME").expect("must set ENV_VARIABLE_PREFIX_USERNAME");
+        let password = env::var("ENV_VARIABLE_PREFIX_PASSWORD").expect("must set ENV_VARIABLE_PREFIX_PASSWORD");
+        let base_url = env::var("ENV_VARIABLE_PREFIX_HOST").unwrap_or("BASE_URL".to_string());"#.replace("ENV_VARIABLE_PREFIX", &crate::template::get_env_variable_prefix(&opts.name))
+    };
+
+    format!(
+        r#"{}
+
+
+    let mut c = Client::new(
+        username,
+        password,
+    );
+    c.set_base_url(base_url);
+    c
+    "#,
+        start
+    )
 }
 
 const CLIENT_FUNCTIONS_BASIC_AUTH: &str = r#"
@@ -143,17 +189,12 @@ impl Client {
         self.base_url = base_url.to_string().trim_end_matches('/').to_string();
     }
 
-    /// Create a new Client struct from the environment variable: `ENV_VARIABLE_PREFIX_API_TOKEN`.
+    /// Create a new Client struct from the environment variable: `ENV_VARIABLE_PREFIX_USERNAME`
+    /// and `ENV_VARIABLE_PREFIX_PASSWORD`.
     #[tracing::instrument]
     pub fn new_from_env() -> Self
     {
-        let username = env::var("ENV_VARIABLE_PREFIX_USERNAME").expect("must set ENV_VARIABLE_PREFIX_USERNAME");
-        let password = env::var("ENV_VARIABLE_PREFIX_PASSWORD").expect("must set ENV_VARIABLE_PREFIX_PASSWORD");
-
-        Client::new(
-            username,
-            password,
-        )
+        ENV_VARIABLE_CODE
     }
 
     /// Create a raw request to our API.
@@ -196,6 +237,50 @@ impl Client {
         Ok(req)
     }
 "#;
+
+fn get_env_variable_code_token(opts: &crate::Opts) -> String {
+    let start = if let Some(add_env_prefix) = &opts.add_env_prefix {
+        r#"let token = if let Ok(token) = env::var("ENV_VARIABLE_PREFIX_API_TOKEN") {
+        token
+    } else if let Ok(token) = env::var("ADD_ENV_VARIABLE_PREFIX_API_TOKEN") {
+        token
+    } else {
+        panic!("must set ENV_VARIABLE_PREFIX_API_TOKEN or ADD_ENV_VARIABLE_PREFIX_API_TOKEN");
+    };
+    let base_url = if let Ok(base_url) = env::var("ENV_VARIABLE_PREFIX_HOST") {
+        base_url
+    } else if let Ok(base_url) = env::var("ADD_ENV_VARIABLE_PREFIX_HOST") {
+        base_url
+    } else {
+        "BASE_URL".to_string()
+    };"#
+        .replace(
+            "ADD_ENV_VARIABLE_PREFIX",
+            &crate::template::get_env_variable_prefix(add_env_prefix),
+        )
+        .replace(
+            "ENV_VARIABLE_PREFIX",
+            &crate::template::get_env_variable_prefix(&opts.name),
+        )
+    } else {
+        r#"let token = env::var("ENV_VARIABLE_PREFIX_API_TOKEN").expect("must set ENV_VARIABLE_PREFIX_API_TOKEN");
+        let base_url = env::var("ENV_VARIABLE_PREFIX_HOST").unwrap_or("BASE_URL".to_string());
+        "#.replace("ENV_VARIABLE_PREFIX", &crate::template::get_env_variable_prefix(&opts.name))
+    };
+
+    format!(
+        r#"{}
+
+
+    let mut c = Client::new(
+        token,
+    );
+    c.set_base_url(base_url);
+    c
+    "#,
+        start
+    )
+}
 
 const CLIENT_FUNCTIONS_TOKEN: &str = r#"
 #[cfg(feature = "requests")]
@@ -399,11 +484,7 @@ impl Client {
     #[tracing::instrument]
     pub fn new_from_env() -> Self
     {
-        let token = env::var("ENV_VARIABLE_PREFIX_API_TOKEN").expect("must set ENV_VARIABLE_PREFIX_API_TOKEN");
-
-        Client::new(
-            token,
-        )
+       ENV_VARIABLE_CODE 
     }
 
     /// Create a raw request to our API.
@@ -446,6 +527,66 @@ impl Client {
         Ok(RequestBuilder(req))
     }
 "#;
+
+fn get_env_variable_code_oauth_token(opts: &crate::Opts) -> String {
+    let start = if let Some(add_env_prefix) = &opts.add_env_prefix {
+        r#"let client_id = if let Ok(client_id) = env::var("ENV_VARIABLE_PREFIX_CLIENT_ID") {
+            client_id
+        } else {
+            if let Ok(client_id) = env::var("ADD_ENV_VARIABLE_PREFIX_CLIENT_ID") {
+                client_id
+            } else {
+                panic!("must set ENV_VARIABLE_PREFIX_CLIENT_ID or ADD_ENV_VARIABLE_PREFIX_CLIENT_ID");
+            }
+        };
+    };
+    let client_secret = if let Ok(client_secret) = env::var("ENV_VARIABLE_PREFIX_CLIENT_SECRET") {
+        client_secret
+    } else if let Ok(client_secret) = env::var("ADD_ENV_VARIABLE_PREFIX_CLIENT_SECRET") {
+        client_secret
+    } else {
+        panic!("must set ENV_VARIABLE_PREFIX_CLIENT_SECRET or ADD_ENV_VARIABLE_PREFIX_CLIENT_SECRET");
+    };
+    let redirect_uri = if let Ok(redirect_uri) = env::var("ENV_VARIABLE_PREFIX_REDIRECT_URI") {
+        redirect_uri
+    } else if let Ok(redirect_uri) = env::var("ADD_ENV_VARIABLE_PREFIX_REDIRECT_URI") {
+        redirect_uri
+    } else {
+        panic!("must set ENV_VARIABLE_PREFIX_REDIRECT_URI or ADD_ENV_VARIABLE_PREFIX_REDIRECT_URI");
+    };
+    let base_url = if let Ok(base_url) = env::var("ENV_VARIABLE_PREFIX_HOST"){
+        base_url
+    } else if let Ok(base_url) = env::var("ADD_ENV_VARIABLE_PREFIX_HOST") {
+        base_url
+    } else {
+        "BASE_URL".to_string()
+    };"#
+        .replace(
+            "ADD_ENV_VARIABLE_PREFIX",
+            &crate::template::get_env_variable_prefix(add_env_prefix),
+        )
+        .replace(
+            "ENV_VARIABLE_PREFIX",
+            &crate::template::get_env_variable_prefix(&opts.name),
+        )
+    } else {
+        r#"let client_id = env::var("ENV_VARIABLE_PREFIX_CLIENT_ID").expect("must set ENV_VARIABLE_PREFIX_CLIENT_ID");
+        let client_secret = env::var("ENV_VARIABLE_PREFIX_CLIENT_SECRET").expect("must set ENV_VARIABLE_PREFIX_CLIENT_SECRET");
+        let redirect_uri = env::var("ENV_VARIABLE_PREFIX_REDIRECT_URI").expect("must set ENV_VARIABLE_PREFIX_REDIRECT_URI");
+        let base_url = env::var("ENV_VARIABLE_PREFIX_HOST").unwrap_or("BASE_URL".to_string());"#.replace("ENV_VARIABLE_PREFIX", &crate::template::get_env_variable_prefix(&opts.name))
+    };
+
+    format!(
+        r#"{}
+
+    
+    let mut c = Client::new(client_id, client_secret, redirect_uri, token, refresh_token);
+    c.set_base_url(base_url);
+    c
+    "#,
+        start
+    )
+}
 
 const CLIENT_FUNCTIONS_OAUTH_TOKEN: &str = r#"
 use std::{env, sync::Arc, convert::TryInto, ops::Add, time::{Duration, Instant}};
@@ -690,11 +831,7 @@ impl Client {
         T: ToString + std::fmt::Debug,
         R: ToString + std::fmt::Debug,
     {
-        let client_id = env::var("ENV_VARIABLE_PREFIX_CLIENT_ID").expect("must set ENV_VARIABLE_PREFIX_CLIENT_ID");
-        let client_secret = env::var("ENV_VARIABLE_PREFIX_CLIENT_SECRET").expect("must set ENV_VARIABLE_PREFIX_CLIENT_SECRET");
-        let redirect_uri = env::var("ENV_VARIABLE_PREFIX_REDIRECT_URI").expect("must set ENV_VARIABLE_PREFIX_REDIRECT_URI");
-
-        Client::new(client_id, client_secret, redirect_uri, token, refresh_token)
+        ENV_VARIABLE_CODE
     }
 
     /// Return a user consent url with an optional set of scopes.

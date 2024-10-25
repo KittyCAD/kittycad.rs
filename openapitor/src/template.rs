@@ -178,6 +178,7 @@ pub fn generate_docs(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> Result<St
 //! - `{}_CLIENT_ID`
 //! - `{}_CLIENT_SECRET`
 //! - `{}_REDIRECT_URI`
+//! {}
 //!
 //! And then you can create a client from the environment.
 //!
@@ -194,6 +195,18 @@ pub fn generate_docs(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> Result<St
             get_env_variable_prefix(&opts.name),
             get_env_variable_prefix(&opts.name),
             get_env_variable_prefix(&opts.name),
+            if let Some(add_env_prefix) = &opts.add_env_prefix {
+                format!(
+                    r#"- `{}_CLIENT_ID`
+//! - `{}_CLIENT_SECRET`
+//! - `{}_REDIRECT_URI`"#,
+                    get_env_variable_prefix(add_env_prefix),
+                    get_env_variable_prefix(add_env_prefix),
+                    get_env_variable_prefix(add_env_prefix)
+                )
+            } else {
+                "".to_string()
+            },
             opts.code_package_name(),
         ));
     }
@@ -228,6 +241,7 @@ pub fn generate_docs(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> Result<St
 //!
 //! - `{}_USERNAME`
 //! - `{}_PASSWORD`
+//! {}
 //!
 //! And then you can create a client from the environment.
 //!
@@ -243,6 +257,16 @@ pub fn generate_docs(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> Result<St
             opts.code_package_name(),
             get_env_variable_prefix(&opts.name),
             get_env_variable_prefix(&opts.name),
+            if let Some(add_env_prefix) = &opts.add_env_prefix {
+                format!(
+                    r#"- `{}_USERNAME`
+//! - `{}_PASSWORD`"#,
+                    get_env_variable_prefix(add_env_prefix),
+                    get_env_variable_prefix(add_env_prefix)
+                )
+            } else {
+                "".to_string()
+            },
             opts.code_package_name(),
         ));
     }
@@ -274,6 +298,7 @@ pub fn generate_docs(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> Result<St
 //! the client in the environment:
 //!
 //! - `{}_API_TOKEN`
+//! {}
 //!
 //! And then you can create a client from the environment.
 //!
@@ -288,6 +313,14 @@ pub fn generate_docs(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> Result<St
         opts.target_version,
         opts.code_package_name(),
         get_env_variable_prefix(&opts.name),
+        if let Some(add_env_prefix) = &opts.add_env_prefix {
+            format!(
+                r#"- `{}_API_TOKEN`"#,
+                get_env_variable_prefix(add_env_prefix),
+            )
+        } else {
+            "".to_string()
+        },
         opts.code_package_name(),
     ))
 }

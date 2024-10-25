@@ -471,6 +471,11 @@ pub struct Opts {
     #[arg(long)]
     pub request_timeout_seconds: u64,
 
+    /// An additional env variable prefix (the default is the name of the package).
+    /// If given, both the package name and this prefix will be used.
+    #[arg(long)]
+    pub add_env_prefix: Option<String>,
+
     /// Run clippy --fix on the output code
     #[arg(long, default_value = "false")]
     pub clippy_fix: bool,
@@ -540,6 +545,7 @@ impl Default for Opts {
             date_time_format: Default::default(),
             basic_auth: Default::default(),
             clippy_fix: false,
+            add_env_prefix: Default::default(),
             request_timeout_seconds: 60,
         }
     }

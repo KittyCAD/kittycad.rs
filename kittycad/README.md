@@ -51,6 +51,7 @@ Alternatively, the library can search for most of the variables required for
 the client in the environment:
 
 - `KITTYCAD_API_TOKEN`
+- `ZOO_API_TOKEN`
 
 And then you can create a client from the environment.
 

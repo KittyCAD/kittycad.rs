@@ -47,6 +47,7 @@
 //! the client in the environment:
 //!
 //! - `KITTYCAD_API_TOKEN`
+//! - `ZOO_API_TOKEN`
 //!
 //! And then you can create a client from the environment.
 //!
@@ -335,12 +336,27 @@ impl Client {
         self.base_url = base_url.to_string().trim_end_matches('/').to_string();
     }
 
-    /// Create a new Client struct from the environment variable: `KITTYCAD_API_TOKEN`.
+    /// Create a new Client struct from the environment variable: `ENV_VARIABLE_PREFIX_API_TOKEN`.
     #[tracing::instrument]
     pub fn new_from_env() -> Self {
-        let token = env::var("KITTYCAD_API_TOKEN").expect("must set KITTYCAD_API_TOKEN");
+        let token = if let Ok(token) = env::var("KITTYCAD_API_TOKEN") {
+            token
+        } else if let Ok(token) = env::var("ZOO_API_TOKEN") {
+            token
+        } else {
+            panic!("must set KITTYCAD_API_TOKEN or ZOO_API_TOKEN");
+        };
+        let base_url = if let Ok(base_url) = env::var("KITTYCAD_HOST") {
+            base_url
+        } else if let Ok(base_url) = env::var("ZOO_HOST") {
+            base_url
+        } else {
+            "https://api.zoo.dev".to_string()
+        };
 
-        Client::new(token)
+        let mut c = Client::new(token);
+        c.set_base_url(base_url);
+        c
     }
 
     /// Create a raw request to our API.

@@ -28,6 +28,7 @@ kittycad: target/debug/openapitor
 		-d "A fully generated & opinionated API client for the KittyCAD API." \
 		--spec-url "https://api.zoo.dev" \
 		--base-url "https://api.zoo.dev" \
+		--add-env-prefix "ZOO" \
 		--request-timeout-seconds 600 \
 		--clippy-fix \
 		--repo-name "KittyCAD/kittycad.rs" $(EXTRA_ARGS)
