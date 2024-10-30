@@ -16646,6 +16646,25 @@
         "description": "The response from the `CameraDragStart` endpoint.",
         "type": "object"
       },
+      "CameraMovement": {
+        "description": "A type of camera movement applied after certain camera operations",
+        "oneOf": [
+          {
+            "description": "Adjusts the camera position during the camera operation",
+            "type": "string",
+            "enum": [
+              "vantage"
+            ]
+          },
+          {
+            "description": "Keeps the camera position in place",
+            "type": "string",
+            "enum": [
+              "none"
+            ]
+          }
+        ]
+      },
       "CameraSettings": {
         "description": "Camera settings including position, center, fov etc",
         "type": "object",
@@ -17676,6 +17695,10 @@
             ]
           }
         ]
+      },
+      "DefaultCameraCenterToScene": {
+        "description": "The response from the `DefaultCameraCenterToScene` endpoint.",
+        "type": "object"
       },
       "DefaultCameraCenterToSelection": {
         "description": "The response from the `DefaultCameraCenterToSelection` endpoint.",
@@ -24039,6 +24062,13 @@
             "description": "Reconfigure the stream.",
             "type": "object",
             "properties": {
+              "bitrate": {
+                "nullable": true,
+                "description": "Video feed's constant bitrate (CBR)",
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              },
               "fps": {
                 "description": "Frames per second.",
                 "type": "integer",
@@ -24433,10 +24463,43 @@
             "description": "Updates the camera to center to the center of the current selection (or the origin if nothing is selected)",
             "type": "object",
             "properties": {
+              "camera_movement": {
+                "description": "Dictates whether or not the camera position should be adjusted during this operation If no movement is requested, the camera will orbit around the new center from its current position",
+                "default": "vantage",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CameraMovement"
+                  }
+                ]
+              },
               "type": {
                 "type": "string",
                 "enum": [
                   "default_camera_center_to_selection"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
+            "description": "Updates the camera to center to the center of the current scene's bounds",
+            "type": "object",
+            "properties": {
+              "camera_movement": {
+                "description": "Dictates whether or not the camera position should be adjusted during this operation If no movement is requested, the camera will orbit around the new center from its current position",
+                "default": "vantage",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CameraMovement"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_center_to_scene"
                 ]
               }
             },
@@ -25681,6 +25744,24 @@
                 "type": "string",
                 "enum": [
                   "default_camera_center_to_selection"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/DefaultCameraCenterToScene"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_center_to_scene"
                 ]
               }
             },
@@ -27898,6 +27979,44 @@
             },
             "required": [
               "to",
+              "type"
+            ]
+          },
+          {
+            "description": "Adds an arc from the current position that goes through the given interior point and ends at the given end position",
+            "type": "object",
+            "properties": {
+              "end": {
+                "description": "End point of the arc.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "interior": {
+                "description": "Interior point of the arc.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "relative": {
+                "description": "Whether or not interior and end are relative to the previous path position",
+                "type": "boolean"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "arc_to"
+                ]
+              }
+            },
+            "required": [
+              "end",
+              "interior",
+              "relative",
               "type"
             ]
           }
