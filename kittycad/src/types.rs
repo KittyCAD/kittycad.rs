@@ -2464,6 +2464,31 @@ impl tabled::Tabled for CameraDragStart {
     }
 }
 
+#[doc = "A type of camera movement applied after certain camera operations"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CameraMovement {
+    #[doc = "Adjusts the camera position during the camera operation"]
+    #[serde(rename = "vantage")]
+    #[display("vantage")]
+    Vantage,
+    #[doc = "Keeps the camera position in place"]
+    #[serde(rename = "none")]
+    #[display("none")]
+    None,
+}
+
 #[doc = "Camera settings including position, center, fov etc"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4013,6 +4038,34 @@ pub enum CutType {
     #[serde(rename = "chamfer")]
     #[display("chamfer")]
     Chamfer,
+}
+
+#[doc = "The response from the `DefaultCameraCenterToScene` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DefaultCameraCenterToScene {}
+
+impl std::fmt::Display for DefaultCameraCenterToScene {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DefaultCameraCenterToScene {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
 }
 
 #[doc = "The response from the `DefaultCameraCenterToSelection` endpoint."]
@@ -10341,6 +10394,9 @@ pub enum ModelingCmd {
     #[doc = "Reconfigure the stream."]
     #[serde(rename = "reconfigure_stream")]
     ReconfigureStream {
+        #[doc = "Video feed's constant bitrate (CBR)"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        bitrate: Option<u32>,
         #[doc = "Frames per second."]
         fps: u32,
         #[doc = "Height of the stream."]
@@ -10449,7 +10505,22 @@ pub enum ModelingCmd {
     #[doc = "Updates the camera to center to the center of the current selection (or the origin \
              if nothing is selected)"]
     #[serde(rename = "default_camera_center_to_selection")]
-    DefaultCameraCenterToSelection {},
+    DefaultCameraCenterToSelection {
+        #[doc = "Dictates whether or not the camera position should be adjusted during this \
+                 operation If no movement is requested, the camera will orbit around the new \
+                 center from its current position"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        camera_movement: Option<CameraMovement>,
+    },
+    #[doc = "Updates the camera to center to the center of the current scene's bounds"]
+    #[serde(rename = "default_camera_center_to_scene")]
+    DefaultCameraCenterToScene {
+        #[doc = "Dictates whether or not the camera position should be adjusted during this \
+                 operation If no movement is requested, the camera will orbit around the new \
+                 center from its current position"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        camera_movement: Option<CameraMovement>,
+    },
     #[doc = "Fit the view to the specified object(s)."]
     #[serde(rename = "zoom_to_fit")]
     ZoomToFit {
@@ -11134,6 +11205,11 @@ pub enum OkModelingCmdResponse {
     DefaultCameraCenterToSelection {
         #[doc = "The response from the `DefaultCameraCenterToSelection` endpoint."]
         data: DefaultCameraCenterToSelection,
+    },
+    #[serde(rename = "default_camera_center_to_scene")]
+    DefaultCameraCenterToScene {
+        #[doc = "The response from the `DefaultCameraCenterToScene` endpoint."]
+        data: DefaultCameraCenterToScene,
     },
     #[serde(rename = "select_clear")]
     SelectClear {
@@ -12509,6 +12585,17 @@ pub enum PathSegment {
         #[doc = "Where the arc should end. Must lie in the same plane as the current path pen \
                  position. Must not be colinear with current path pen position."]
         to: Point3D,
+    },
+    #[doc = "Adds an arc from the current position that goes through the given interior point and \
+             ends at the given end position"]
+    #[serde(rename = "arc_to")]
+    ArcTo {
+        #[doc = "End point of the arc."]
+        end: Point3D,
+        #[doc = "Interior point of the arc."]
+        interior: Point3D,
+        #[doc = "Whether or not interior and end are relative to the previous path position"]
+        relative: bool,
     },
 }
 
