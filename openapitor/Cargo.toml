@@ -39,7 +39,7 @@ slog-json = "^2.6.1"
 slog-scope = "^4.4.0"
 slog-stdlog = "^4.1.1"
 slog-term = "^2.9.1"
-thiserror = "1"
+thiserror = "2"
 url = { version = "^2.5.2", features = ["serde"] }
 uuid = { version = "1", features = ["serde", "v4"] }
 
