@@ -1,7 +1,7 @@
 [package]
 name = "kittycad"
 description = "A fully generated & opinionated API client for the KittyCAD API."
-version = "0.3.25"
+version = "0.3.26"
 documentation = "https://docs.rs/kittycad"
 readme = "README.md"
 repository = "https://github.com/KittyCAD/kittycad.rs/tree/main/kittycad"
@@ -27,10 +27,10 @@ parse-display = "0.10.0"
 phonenumber = "0.3.5"
 rand = { version = "0.8", optional = true }
 reqwest = { version = "0.12", default-features = false, features = ["json", "multipart", "rustls-tls"], optional = true }
-reqwest-conditional-middleware = { version = "0.3", optional = true }
-reqwest-middleware = { version = "0.3", optional = true, features = ["json", "multipart", "http2", "rustls-tls"] }
-reqwest-retry = { version = "0.6", optional = true }
-reqwest-tracing = { version = "0.5", features = ["opentelemetry_0_24"], optional = true }
+reqwest-conditional-middleware = { version = "0.4", optional = true }
+reqwest-middleware = { version = "0.4", optional = true, features = ["json", "multipart", "http2", "rustls-tls"] }
+reqwest-retry = { version = "0.7", optional = true }
+reqwest-tracing = { version = "0.5.4", features = ["opentelemetry_0_24"], optional = true }
 schemars = { version = "0.8.17", features = ["bigdecimal04", "bytes", "chrono", "url", "uuid1"] }
 serde = { version = "1", features = ["derive"] }
 serde_bytes = "0.11"
@@ -44,7 +44,7 @@ uuid = { version = "1", features = ["serde", "v4", "v7"] }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 chrono = { version = "0.4", default-features = false, features = ["now", "serde", "std"] }
-tokio = { version = "1.41.1", features = ["rt", "macros"] }
+tokio = { version = "1.38.0", features = ["rt", "macros"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 chrono = { version = "0.4", default-features = false, features = ["serde", "std"] }
@@ -54,7 +54,7 @@ expectorate = "1"
 futures-util = "^0.3.26"
 pretty_assertions = "1"
 rand = "0.8"
-tokio = { version = "1.41.1", features = ["rt", "macros"] }
+tokio = { version = "1.38.0", features = ["rt", "macros"] }
 tokio-tungstenite = "0.24"
 
 [features]
