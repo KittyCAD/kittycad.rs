@@ -20802,6 +20802,23 @@
         "description": "The response from the `MakeAxesGizmo` endpoint.",
         "type": "object"
       },
+      "MakeOffsetPath": {
+        "description": "The response from the `MakeOffsetPath` command.",
+        "type": "object",
+        "properties": {
+          "entity_ids": {
+            "description": "If the offset path splits into multiple paths, this will contain the UUIDs of the new paths. If the offset path remains as a single path, this will be empty, and the resulting ID of the (single) new path will be the ID of the `MakeOffsetPath` command.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "entity_ids"
+        ]
+      },
       "MakePlane": {
         "description": "The response from the `MakePlane` endpoint.",
         "type": "object"
@@ -24634,6 +24651,42 @@
             "required": [
               "type"
             ]
+          },
+          {
+            "description": "Make a new path by offsetting an object by a given distance. The new path's ID will be the ID of this command.",
+            "type": "object",
+            "properties": {
+              "face_id": {
+                "nullable": true,
+                "description": "If the object is a solid, this is the ID of the face to base the offset on. If given, and `object_id` refers to a solid, then this face on the solid will be offset. If given but `object_id` doesn't refer to a solid, responds with an error. If not given, then `object_id` itself will be offset directly.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "object_id": {
+                "description": "The object that will be offset (can be a path, sketch, or a solid)",
+                "type": "string",
+                "format": "uuid"
+              },
+              "offset": {
+                "description": "The distance to offset the path (positive for outset, negative for inset)",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "make_offset_path"
+                ]
+              }
+            },
+            "required": [
+              "object_id",
+              "offset",
+              "type"
+            ]
           }
         ]
       },
@@ -26086,6 +26139,24 @@
                 "type": "string",
                 "enum": [
                   "get_num_objects"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/MakeOffsetPath"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "make_offset_path"
                 ]
               }
             },

@@ -8676,6 +8676,37 @@ impl tabled::Tabled for MakeAxesGizmo {
     }
 }
 
+#[doc = "The response from the `MakeOffsetPath` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct MakeOffsetPath {
+    #[doc = "If the offset path splits into multiple paths, this will contain the UUIDs of the new paths. If the offset path remains as a single path, this will be empty, and the resulting ID of the (single) new path will be the ID of the `MakeOffsetPath` command."]
+    pub entity_ids: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for MakeOffsetPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for MakeOffsetPath {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.entity_ids).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_ids".into()]
+    }
+}
+
 #[doc = "The response from the `MakePlane` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -10341,6 +10372,17 @@ pub enum ModelingCmd {
     #[doc = "Get the number of objects in the scene"]
     #[serde(rename = "get_num_objects")]
     GetNumObjects {},
+    #[doc = "Make a new path by offsetting an object by a given distance. The new path's ID will be the ID of this command."]
+    #[serde(rename = "make_offset_path")]
+    MakeOffsetPath {
+        #[doc = "If the object is a solid, this is the ID of the face to base the offset on. If given, and `object_id` refers to a solid, then this face on the solid will be offset. If given but `object_id` doesn't refer to a solid, responds with an error. If not given, then `object_id` itself will be offset directly."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        face_id: Option<uuid::Uuid>,
+        #[doc = "The object that will be offset (can be a path, sketch, or a solid)"]
+        object_id: uuid::Uuid,
+        #[doc = "The distance to offset the path (positive for outset, negative for inset)"]
+        offset: f64,
+    },
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -11073,6 +11115,11 @@ pub enum OkModelingCmdResponse {
     GetNumObjects {
         #[doc = "The response from the `GetNumObjects` command."]
         data: GetNumObjects,
+    },
+    #[serde(rename = "make_offset_path")]
+    MakeOffsetPath {
+        #[doc = "The response from the `MakeOffsetPath` command."]
+        data: MakeOffsetPath,
     },
     #[serde(rename = "default_camera_focus_on")]
     DefaultCameraFocusOn {
