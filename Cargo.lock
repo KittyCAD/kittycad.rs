@@ -1203,7 +1203,7 @@ dependencies = [
  "rand",
  "reqwest 0.12.8",
  "reqwest-conditional-middleware",
- "reqwest-middleware 0.4.0",
+ "reqwest-middleware",
  "reqwest-retry",
  "reqwest-tracing",
  "schemars",
@@ -1458,7 +1458,7 @@ dependencies = [
  "rand",
  "regex",
  "reqwest 0.11.27",
- "reqwest-middleware 0.2.5",
+ "reqwest-middleware",
  "rustfmt-wrapper",
  "schemars",
  "serde",
@@ -1940,22 +1940,7 @@ dependencies = [
  "async-trait",
  "http 1.1.0",
  "reqwest 0.12.8",
- "reqwest-middleware 0.4.0",
-]
-
-[[package]]
-name = "reqwest-middleware"
-version = "0.2.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5a735987236a8e238bf0296c7e351b999c188ccc11477f311b82b55c93984216"
-dependencies = [
- "anyhow",
- "async-trait",
- "http 0.2.12",
- "reqwest 0.11.27",
- "serde",
- "task-local-extensions",
- "thiserror 1.0.69",
+ "reqwest-middleware",
 ]
 
 [[package]]
@@ -1987,7 +1972,7 @@ dependencies = [
  "hyper 1.4.1",
  "parking_lot",
  "reqwest 0.12.8",
- "reqwest-middleware 0.4.0",
+ "reqwest-middleware",
  "retry-policies",
  "thiserror 1.0.69",
  "tokio",
@@ -2008,7 +1993,7 @@ dependencies = [
  "matchit",
  "opentelemetry",
  "reqwest 0.12.8",
- "reqwest-middleware 0.4.0",
+ "reqwest-middleware",
  "tracing",
  "tracing-opentelemetry",
 ]
@@ -2600,15 +2585,6 @@ name = "take_mut"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f764005d11ee5f36500a149ace24e00e3da98b0158b3e2d53a7495660d3f4d60"
-
-[[package]]
-name = "task-local-extensions"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba323866e5d033818e3240feeb9f7db2c4296674e4d9e16b97b7bf8f490434e8"
-dependencies = [
- "pin-utils",
-]
 
 [[package]]
 name = "tempfile"
