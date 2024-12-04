@@ -3,3 +3,4 @@ members = [
 	"kittycad",
 	"openapitor",
 ]
+resolver = "2"

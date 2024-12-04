@@ -5,7 +5,7 @@ pub mod client;
 pub mod functions;
 pub mod template;
 #[cfg(test)]
-pub mod tests;
+mod tests;
 pub mod types;
 
 #[macro_use]
