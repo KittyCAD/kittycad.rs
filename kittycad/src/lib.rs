@@ -56,7 +56,9 @@
 //!
 //! let client = Client::new_from_env();
 //! ```
+#![allow(elided_named_lifetimes)]
 #![allow(missing_docs)]
+#![allow(unused_imports)]
 #![allow(clippy::needless_lifetimes)]
 #![allow(clippy::too_many_arguments)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
