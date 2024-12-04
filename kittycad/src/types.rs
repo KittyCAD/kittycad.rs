@@ -1,4 +1,6 @@
 #![doc = r" This module contains the generated types for the library."]
+#[cfg(feature = "tabled")]
+use tabled::Tabled;
 pub mod base64 {
     #![doc = " Base64 data that encodes to url safe base64, but can decode from multiple"]
     #![doc = " base64 implementations to account for various clients and libraries. Compatible"]

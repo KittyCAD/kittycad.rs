@@ -73,7 +73,9 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
     /*
      * Deal with any dependencies we require to produce this client.
      */
+    a("#![allow(elided_named_lifetimes)]");
     a("#![allow(missing_docs)]"); // TODO: Make this a deny.
+    a("#![allow(unused_imports)]");
     a("#![allow(clippy::needless_lifetimes)]"); // TODO: Fix this.
     a("#![allow(clippy::too_many_arguments)]"); // TODO: Fix this.
 
@@ -581,7 +583,7 @@ version = "{}"
 documentation = "https://docs.rs/{}"
 readme = "README.md"
 {}
-edition = "2018"
+edition = "2021"
 license = "MIT"
 
 [dependencies]
@@ -612,8 +614,8 @@ serde = {{ version = "1", features = ["derive"] }}
 serde_bytes = "0.11"
 serde_json = "1"
 serde_urlencoded = {{ version = "^0.7", optional = true }}
-tabled = {{ version = "0.16.0", features = ["ansi"], optional = true }}
-thiserror = "1"
+tabled = {{ version = "0.17.0", features = ["ansi"], optional = true }}
+thiserror = "2"
 tracing = {{ version = "^0.1", optional = true }}
 url = {{ version = "2", features = ["serde"] }}
 uuid = {{ version = "1", features = ["serde", "v4", "v7"] }}
