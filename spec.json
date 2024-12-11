@@ -1605,6 +1605,89 @@
         }
       }
     },
+    "/community/sso": {
+      "get": {
+        "tags": [
+          "meta",
+          "hidden"
+        ],
+        "summary": "Authorize an inbound auth request from our Community page.",
+        "operationId": "community_sso",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "sig",
+            "description": "The signature for the given payload",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sso",
+            "description": "The nonce and redirect URL sent to us by Discourse",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Temporary Redirect",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/debug/uploads": {
       "post": {
         "tags": [
@@ -16610,10 +16693,17 @@
             ]
           },
           {
-            "description": "Camera rotate (revolve/orbit)",
+            "description": "Camera rotate (spherical camera revolve/orbit)",
             "type": "string",
             "enum": [
               "rotate"
+            ]
+          },
+          {
+            "description": "Camera rotate (trackball with 3 degrees of freedom)",
+            "type": "string",
+            "enum": [
+              "rotatetrackball"
             ]
           },
           {
@@ -18670,6 +18760,13 @@
             "type": "string",
             "enum": [
               "bottom"
+            ]
+          },
+          {
+            "description": "Capped on both ends.",
+            "type": "string",
+            "enum": [
+              "both"
             ]
           }
         ]
@@ -21553,6 +21650,53 @@
             ]
           },
           {
+            "description": "Extrude the object along a path.",
+            "type": "object",
+            "properties": {
+              "sectional": {
+                "description": "If true, the sweep will be broken up into sub-sweeps (extrusions, revolves, sweeps) based on the trajectory path components.",
+                "type": "boolean"
+              },
+              "target": {
+                "description": "Which sketch to sweep. Must be a closed 2D solid.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ModelingCmdId"
+                  }
+                ]
+              },
+              "tolerance": {
+                "description": "The maximum acceptable surface gap computed between the revolution surface joints. Must be positive (i.e. greater than zero).",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "trajectory": {
+                "description": "Path along which to sweep.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ModelingCmdId"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "sweep"
+                ]
+              }
+            },
+            "required": [
+              "sectional",
+              "target",
+              "tolerance",
+              "trajectory",
+              "type"
+            ]
+          },
+          {
             "description": "Command for revolving a solid 2d.",
             "type": "object",
             "properties": {
@@ -22232,9 +22376,21 @@
               },
               "transform": {
                 "description": "How to transform each repeated solid. The 0th transform will create the first copy of the entity. The total number of (optional) repetitions equals the size of this list.",
+                "default": [],
                 "type": "array",
                 "items": {
                   "$ref": "#/components/schemas/Transform"
+                }
+              },
+              "transforms": {
+                "description": "Alternatively, you could set this key instead. If you want to use multiple transforms per item. If this is non-empty then the `transform` key must be empty, and vice-versa.",
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Transform"
+                  }
                 }
               },
               "type": {
@@ -22246,7 +22402,6 @@
             },
             "required": [
               "entity_id",
-              "transform",
               "type"
             ]
           },
@@ -24915,6 +25070,24 @@
                 "type": "string",
                 "enum": [
                   "extrude"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Sweep"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "sweep"
                 ]
               }
             },
@@ -29636,6 +29809,10 @@
           "output_unit",
           "surface_area"
         ]
+      },
+      "Sweep": {
+        "description": "The response from the `Sweep` endpoint.",
+        "type": "object"
       },
       "System": {
         "description": "Co-ordinate system definition.\n\nThe `up` axis must be orthogonal to the `forward` axis.\n\nSee [cglearn.eu] for background reading.\n\n[cglearn.eu](https://cglearn.eu/pub/computer-graphics/introduction-to-geometry#material-coordinate-systems-1)",
