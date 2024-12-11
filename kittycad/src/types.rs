@@ -2396,10 +2396,14 @@ pub enum CameraDragInteractionType {
     #[serde(rename = "pan")]
     #[display("pan")]
     Pan,
-    #[doc = "Camera rotate (revolve/orbit)"]
+    #[doc = "Camera rotate (spherical camera revolve/orbit)"]
     #[serde(rename = "rotate")]
     #[display("rotate")]
     Rotate,
+    #[doc = "Camera rotate (trackball with 3 degrees of freedom)"]
+    #[serde(rename = "rotatetrackball")]
+    #[display("rotatetrackball")]
+    Rotatetrackball,
     #[doc = "Camera zoom (increase or decrease distance to reference point center)"]
     #[serde(rename = "zoom")]
     #[display("zoom")]
@@ -5904,6 +5908,10 @@ pub enum ExtrusionFaceCapType {
     #[serde(rename = "bottom")]
     #[display("bottom")]
     Bottom,
+    #[doc = "Capped on both ends."]
+    #[serde(rename = "both")]
+    #[display("both")]
+    Both,
 }
 
 #[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment \
@@ -9675,6 +9683,20 @@ pub enum ModelingCmd {
         #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
         target: uuid::Uuid,
     },
+    #[doc = "Extrude the object along a path."]
+    #[serde(rename = "sweep")]
+    Sweep {
+        #[doc = "If true, the sweep will be broken up into sub-sweeps (extrusions, revolves, \
+                 sweeps) based on the trajectory path components."]
+        sectional: bool,
+        #[doc = "Which sketch to sweep. Must be a closed 2D solid."]
+        target: uuid::Uuid,
+        #[doc = "The maximum acceptable surface gap computed between the revolution surface \
+                 joints. Must be positive (i.e. greater than zero)."]
+        tolerance: f64,
+        #[doc = "Path along which to sweep."]
+        trajectory: uuid::Uuid,
+    },
     #[doc = "Command for revolving a solid 2d."]
     #[serde(rename = "revolve")]
     Revolve {
@@ -9887,7 +9909,13 @@ pub enum ModelingCmd {
         #[doc = "How to transform each repeated solid. The 0th transform will create the first \
                  copy of the entity. The total number of (optional) repetitions equals the size \
                  of this list."]
+        #[serde(default)]
         transform: Vec<Transform>,
+        #[doc = "Alternatively, you could set this key instead. If you want to use multiple \
+                 transforms per item. If this is non-empty then the `transform` key must be \
+                 empty, and vice-versa."]
+        #[serde(default)]
+        transforms: Vec<Vec<Transform>>,
     },
     #[doc = "Create a linear pattern using this entity."]
     #[serde(rename = "entity_linear_pattern")]
@@ -11010,6 +11038,11 @@ pub enum OkModelingCmdResponse {
     Extrude {
         #[doc = "The response from the `Extrude` endpoint."]
         data: Extrude,
+    },
+    #[serde(rename = "sweep")]
+    Sweep {
+        #[doc = "The response from the `Sweep` endpoint."]
+        data: Sweep,
     },
     #[serde(rename = "revolve")]
     Revolve {
@@ -15416,6 +15449,34 @@ impl tabled::Tabled for SurfaceArea {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["output_unit".into(), "surface_area".into()]
+    }
+}
+
+#[doc = "The response from the `Sweep` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Sweep {}
+
+impl std::fmt::Display for Sweep {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Sweep {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 

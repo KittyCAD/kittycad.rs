@@ -109,6 +109,38 @@ impl Meta {
         }
     }
 
+    #[doc = "Authorize an inbound auth request from our Community page.\n\n**Parameters:**\n\n- \
+             `sig: &'astr`: The signature for the given payload (required)\n- `sso: &'astr`: The \
+             nonce and redirect URL sent to us by Discourse (required)\n\n```rust,no_run\nasync fn \
+             example_meta_community_sso() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    client\n        .meta()\n        \
+             .community_sso(\"some-string\", \"some-string\")\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn community_sso<'a>(
+        &'a self,
+        sig: &'a str,
+        sso: &'a str,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "community/sso"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let query_params = vec![("sig", sig.to_string()), ("sso", sso.to_string())];
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Uploads files to public blob storage for debugging purposes.\n\nDo NOT send files \
              here that you don't want to be public.\n\n```rust,no_run\nasync fn \
              example_meta_create_debug_uploads() -> anyhow::Result<()> {\n    let client = \
