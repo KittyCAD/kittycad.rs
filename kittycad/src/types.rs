@@ -1078,9 +1078,6 @@ pub struct ApiCallWithPrice {
     #[doc = "The ip address of the origin."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ip_address: Option<std::net::IpAddr>,
-    #[doc = "If the API call was spawned from the litterbox or not."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub litterbox: Option<bool>,
     #[doc = "The HTTP method requested by the API call."]
     pub method: Method,
     #[doc = "The number of minutes the API call was billed for."]
@@ -1136,7 +1133,7 @@ impl std::fmt::Display for ApiCallWithPrice {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ApiCallWithPrice {
-    const LENGTH: usize = 23;
+    const LENGTH: usize = 22;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -1163,11 +1160,6 @@ impl tabled::Tabled for ApiCallWithPrice {
             format!("{:?}", self.id).into(),
             if let Some(ip_address) = &self.ip_address {
                 format!("{:?}", ip_address).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(litterbox) = &self.litterbox {
-                format!("{:?}", litterbox).into()
             } else {
                 String::new().into()
             },
@@ -1238,7 +1230,6 @@ impl tabled::Tabled for ApiCallWithPrice {
             "endpoint".into(),
             "id".into(),
             "ip_address".into(),
-            "litterbox".into(),
             "method".into(),
             "minutes".into(),
             "org_id".into(),

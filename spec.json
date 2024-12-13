@@ -15185,11 +15185,6 @@
             "type": "string",
             "format": "ip"
           },
-          "litterbox": {
-            "nullable": true,
-            "description": "If the API call was spawned from the litterbox or not.",
-            "type": "boolean"
-          },
           "method": {
             "description": "The HTTP method requested by the API call.",
             "allOf": [
