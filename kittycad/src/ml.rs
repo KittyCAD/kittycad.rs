@@ -245,7 +245,7 @@ impl Ml {
         }
     }
 
-    #[doc = "Iterate on a CAD model with a prompt.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_ml_create_text_to_cad_iteration() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadIteration = client\n        .ml()\n        .create_text_to_cad_iteration(&kittycad::types::TextToCadIterationBody {\n            original_source_code: \"some-string\".to_string(),\n            prompt: Some(\"some-string\".to_string()),\n            source_ranges: vec![kittycad::types::SourceRangePrompt {\n                prompt: \"some-string\".to_string(),\n                range: kittycad::types::SourceRange {\n                    end: kittycad::types::SourcePosition {\n                        column: 4 as u32,\n                        line: 4 as u32,\n                    },\n                    start: kittycad::types::SourcePosition {\n                        column: 4 as u32,\n                        line: 4 as u32,\n                    },\n                },\n            }],\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Iterate on a CAD model with a prompt.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_ml_create_text_to_cad_iteration() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadIteration = client\n        .ml()\n        .create_text_to_cad_iteration(&kittycad::types::TextToCadIterationBody {\n            original_source_code: \"some-string\".to_string(),\n            prompt: Some(\"some-string\".to_string()),\n            source_ranges: vec![kittycad::types::SourceRangePrompt {\n                prompt: \"some-string\".to_string(),\n                range: kittycad::types::SourceRange {\n                    end: kittycad::types::SourcePosition {\n                        column: 4 as u32,\n                        line: 4 as u32,\n                    },\n                    start: kittycad::types::SourcePosition {\n                        column: 4 as u32,\n                        line: 4 as u32,\n                    },\n                },\n            }],\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_text_to_cad_iteration<'a>(
         &'a self,
@@ -442,11 +442,11 @@ impl Ml {
         }
     }
 
-    #[doc = "Give feedback to a specific text-to-CAD response.\n\nThis endpoint requires \
-             authentication by any Zoo user. The user must be the owner of the text-to-CAD model, \
-             in order to give feedback.\n\n**Parameters:**\n\n- `feedback: \
-             crate::types::MlFeedback`: The feedback. (required)\n- `id: uuid::Uuid`: The id of \
-             the model to give feedback to. (required)\n\n```rust,no_run\nuse \
+    #[doc = "Give feedback to a specific ML response.\n\nThis can be a text-to-CAD creation or \
+             iteration.\n\nThis endpoint requires authentication by any Zoo user. The user must be \
+             the owner of the ML response, in order to give feedback.\n\n**Parameters:**\n\n- \
+             `feedback: crate::types::MlFeedback`: The feedback. (required)\n- `id: uuid::Uuid`: \
+             The id of the model to give feedback to. (required)\n\n```rust,no_run\nuse \
              std::str::FromStr;\nasync fn example_ml_create_text_to_cad_model_feedback() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
              client\n        .ml()\n        .create_text_to_cad_model_feedback(\n            \
