@@ -3708,7 +3708,7 @@
           "beta"
         ],
         "summary": "Iterate on a CAD model with a prompt.",
-        "description": "This operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "Even if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_text_to_cad_iteration",
         "requestBody": {
           "content": {
@@ -13719,8 +13719,8 @@
         "tags": [
           "ml"
         ],
-        "summary": "Give feedback to a specific text-to-CAD response.",
-        "description": "This endpoint requires authentication by any Zoo user. The user must be the owner of the text-to-CAD model, in order to give feedback.",
+        "summary": "Give feedback to a specific ML response.",
+        "description": "This can be a text-to-CAD creation or iteration.\n\nThis endpoint requires authentication by any Zoo user. The user must be the owner of the ML response, in order to give feedback.",
         "operationId": "create_text_to_cad_model_feedback",
         "parameters": [
           {
