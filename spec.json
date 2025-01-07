@@ -14793,6 +14793,23 @@
           }
         ]
       },
+      "AddHoleFromOffset": {
+        "description": "The response from the `AddHoleFromOffset` command.",
+        "type": "object",
+        "properties": {
+          "entity_ids": {
+            "description": "If the offset path splits into multiple paths, this will contain the UUIDs of the new paths. If the offset path remains as a single path, this will be empty, and the resulting ID of the (single) new path will be the ID of the `AddHoleFromOffset` command.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "entity_ids"
+        ]
+      },
       "AddOrgMember": {
         "description": "Data for adding a member to an org.",
         "type": "object",
@@ -18334,15 +18351,65 @@
       },
       "EntityMakeHelix": {
         "description": "The response from the `EntityMakeHelix` endpoint.",
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "helix_id": {
+            "description": "The UUID of the helix that was created.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "helix_id"
+        ]
+      },
+      "EntityMakeHelixFromParams": {
+        "description": "The response from the `EntityMakeHelixFromParams` endpoint.",
+        "type": "object",
+        "properties": {
+          "helix_id": {
+            "description": "The UUID of the helix that was created.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "helix_id"
+        ]
       },
       "EntityMirror": {
         "description": "The response from the `EntityMirror` endpoint.",
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "entity_ids": {
+            "description": "The UUIDs of the entities that were created.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "entity_ids"
+        ]
       },
       "EntityMirrorAcrossEdge": {
         "description": "The response from the `EntityMirrorAcrossEdge` endpoint.",
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "entity_ids": {
+            "description": "The UUIDs of the entities that were created.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "entity_ids"
+        ]
       },
       "EntitySetOpacity": {
         "description": "The response from the `EntitySetOpacity` endpoint.",
@@ -18732,6 +18799,34 @@
       "Extrude": {
         "description": "The response from the `Extrude` endpoint.",
         "type": "object"
+      },
+      "ExtrudedFaceInfo": {
+        "description": "IDs for the extruded faces.",
+        "type": "object",
+        "properties": {
+          "bottom": {
+            "nullable": true,
+            "description": "The face made from the original 2D shape being extruded. If the solid is extruded from a shape which already has an ID (e.g. extruding something which was sketched on a face), this doesn't need to be sent.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "sides": {
+            "description": "Any intermediate sides between the top and bottom.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SideFace"
+            }
+          },
+          "top": {
+            "description": "Top face of the extrusion (parallel and further away from the original 2D shape being extruded).",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "sides",
+          "top"
+        ]
       },
       "ExtrusionFaceCapType": {
         "description": "Possible types of faces which can be extruded from a 3D solid.",
@@ -21623,6 +21718,15 @@
                   }
                 ]
               },
+              "faces": {
+                "nullable": true,
+                "description": "Which IDs should the new faces have? If this isn't given, the engine will generate IDs.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ExtrudedFaceInfo"
+                  }
+                ]
+              },
               "target": {
                 "description": "Which sketch to extrude. Must be a closed 2D solid.",
                 "allOf": [
@@ -22530,7 +22634,11 @@
                 "format": "double"
               },
               "start_angle": {
-                "description": "Start angle (in degrees).",
+                "description": "Start angle.",
+                "default": {
+                  "unit": "degrees",
+                  "value": 0.0
+                },
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Angle"
@@ -22549,7 +22657,77 @@
               "is_clockwise",
               "length",
               "revolutions",
-              "start_angle",
+              "type"
+            ]
+          },
+          {
+            "description": "Create a helix using the specified parameters.",
+            "type": "object",
+            "properties": {
+              "axis": {
+                "description": "Axis of the helix. The helix will be created around and in the direction of this axis.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "center": {
+                "description": "Center of the helix at the base of the helix.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "is_clockwise": {
+                "description": "Is the helix rotation clockwise?",
+                "type": "boolean"
+              },
+              "length": {
+                "description": "Length of the helix.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "radius": {
+                "description": "Radius of the helix.",
+                "type": "number",
+                "format": "double"
+              },
+              "revolutions": {
+                "description": "Number of revolutions.",
+                "type": "number",
+                "format": "double"
+              },
+              "start_angle": {
+                "description": "Start angle.",
+                "default": {
+                  "unit": "degrees",
+                  "value": 0.0
+                },
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Angle"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_make_helix_from_params"
+                ]
+              }
+            },
+            "required": [
+              "axis",
+              "center",
+              "is_clockwise",
+              "length",
+              "radius",
+              "revolutions",
               "type"
             ]
           },
@@ -24837,6 +25015,36 @@
               "offset",
               "type"
             ]
+          },
+          {
+            "description": "Add a hole to a closed path by offsetting it a uniform distance inward.",
+            "type": "object",
+            "properties": {
+              "object_id": {
+                "description": "The closed path to add a hole to.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "offset": {
+                "description": "The distance to offset the path (positive for outset, negative for inset)",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "add_hole_from_offset"
+                ]
+              }
+            },
+            "required": [
+              "object_id",
+              "offset",
+              "type"
+            ]
           }
         ]
       },
@@ -25191,60 +25399,6 @@
                 "type": "string",
                 "enum": [
                   "default_camera_perspective_settings"
-                ]
-              }
-            },
-            "required": [
-              "data",
-              "type"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "data": {
-                "$ref": "#/components/schemas/EntityMakeHelix"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "entity_make_helix"
-                ]
-              }
-            },
-            "required": [
-              "data",
-              "type"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "data": {
-                "$ref": "#/components/schemas/EntityMirror"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "entity_mirror"
-                ]
-              }
-            },
-            "required": [
-              "data",
-              "type"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "data": {
-                "$ref": "#/components/schemas/EntityMirrorAcrossEdge"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "entity_mirror_across_edge"
                 ]
               }
             },
@@ -26337,6 +26491,24 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/AddHoleFromOffset"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "add_hole_from_offset"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/DefaultCameraFocusOn"
               },
               "type": {
@@ -26991,6 +27163,78 @@
                 "type": "string",
                 "enum": [
                   "entity_circular_pattern"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityMirror"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_mirror"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityMirrorAcrossEdge"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_mirror_across_edge"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityMakeHelix"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_make_helix"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityMakeHelixFromParams"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_make_helix_from_params"
                 ]
               }
             },
@@ -29332,6 +29576,26 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "SideFace": {
+        "description": "IDs for a side face, extruded from the path of some sketch/2D shape.",
+        "type": "object",
+        "properties": {
+          "face_id": {
+            "description": "Desired ID for the resulting face.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "path_id": {
+            "description": "ID of the path this face is being extruded from.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "face_id",
+          "path_id"
         ]
       },
       "SketchModeDisable": {
