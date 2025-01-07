@@ -534,6 +534,37 @@ pub enum AccountProvider {
     Tencent,
 }
 
+#[doc = "The response from the `AddHoleFromOffset` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AddHoleFromOffset {
+    #[doc = "If the offset path splits into multiple paths, this will contain the UUIDs of the new paths. If the offset path remains as a single path, this will be empty, and the resulting ID of the (single) new path will be the ID of the `AddHoleFromOffset` command."]
+    pub entity_ids: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for AddHoleFromOffset {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AddHoleFromOffset {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.entity_ids).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_ids".into()]
+    }
+}
+
 #[doc = "Data for adding a member to an org."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -5034,7 +5065,10 @@ impl tabled::Tabled for EntityLinearPatternTransform {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct EntityMakeHelix {}
+pub struct EntityMakeHelix {
+    #[doc = "The UUID of the helix that was created."]
+    pub helix_id: uuid::Uuid,
+}
 
 impl std::fmt::Display for EntityMakeHelix {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -5048,13 +5082,44 @@ impl std::fmt::Display for EntityMakeHelix {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityMakeHelix {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![format!("{:?}", self.helix_id).into()]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["helix_id".into()]
+    }
+}
+
+#[doc = "The response from the `EntityMakeHelixFromParams` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityMakeHelixFromParams {
+    #[doc = "The UUID of the helix that was created."]
+    pub helix_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for EntityMakeHelixFromParams {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityMakeHelixFromParams {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.helix_id).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["helix_id".into()]
     }
 }
 
@@ -5062,7 +5127,10 @@ impl tabled::Tabled for EntityMakeHelix {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct EntityMirror {}
+pub struct EntityMirror {
+    #[doc = "The UUIDs of the entities that were created."]
+    pub entity_ids: Vec<uuid::Uuid>,
+}
 
 impl std::fmt::Display for EntityMirror {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -5076,13 +5144,13 @@ impl std::fmt::Display for EntityMirror {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityMirror {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![format!("{:?}", self.entity_ids).into()]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["entity_ids".into()]
     }
 }
 
@@ -5090,7 +5158,10 @@ impl tabled::Tabled for EntityMirror {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct EntityMirrorAcrossEdge {}
+pub struct EntityMirrorAcrossEdge {
+    #[doc = "The UUIDs of the entities that were created."]
+    pub entity_ids: Vec<uuid::Uuid>,
+}
 
 impl std::fmt::Display for EntityMirrorAcrossEdge {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -5104,13 +5175,13 @@ impl std::fmt::Display for EntityMirrorAcrossEdge {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityMirrorAcrossEdge {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![format!("{:?}", self.entity_ids).into()]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["entity_ids".into()]
     }
 }
 
@@ -5781,6 +5852,50 @@ impl tabled::Tabled for Extrude {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
+    }
+}
+
+#[doc = "IDs for the extruded faces."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ExtrudedFaceInfo {
+    #[doc = "The face made from the original 2D shape being extruded. If the solid is extruded from a shape which already has an ID (e.g. extruding something which was sketched on a face), this doesn't need to be sent."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bottom: Option<uuid::Uuid>,
+    #[doc = "Any intermediate sides between the top and bottom."]
+    pub sides: Vec<SideFace>,
+    #[doc = "Top face of the extrusion (parallel and further away from the original 2D shape being extruded)."]
+    pub top: uuid::Uuid,
+}
+
+impl std::fmt::Display for ExtrudedFaceInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ExtrudedFaceInfo {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(bottom) = &self.bottom {
+                format!("{:?}", bottom).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.sides).into(),
+            format!("{:?}", self.top).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["bottom".into(), "sides".into(), "top".into()]
     }
 }
 
@@ -9517,6 +9632,9 @@ pub enum ModelingCmd {
     Extrude {
         #[doc = "How far off the plane to extrude"]
         distance: f64,
+        #[doc = "Which IDs should the new faces have? If this isn't given, the engine will generate IDs."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        faces: Option<ExtrudedFaceInfo>,
         #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
         target: uuid::Uuid,
     },
@@ -9768,8 +9886,28 @@ pub enum ModelingCmd {
         length: f64,
         #[doc = "Number of revolutions."]
         revolutions: f64,
-        #[doc = "Start angle (in degrees)."]
-        start_angle: Angle,
+        #[doc = "Start angle."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        start_angle: Option<Angle>,
+    },
+    #[doc = "Create a helix using the specified parameters."]
+    #[serde(rename = "entity_make_helix_from_params")]
+    EntityMakeHelixFromParams {
+        #[doc = "Axis of the helix. The helix will be created around and in the direction of this axis."]
+        axis: Point3D,
+        #[doc = "Center of the helix at the base of the helix."]
+        center: Point3D,
+        #[doc = "Is the helix rotation clockwise?"]
+        is_clockwise: bool,
+        #[doc = "Length of the helix."]
+        length: f64,
+        #[doc = "Radius of the helix."]
+        radius: f64,
+        #[doc = "Number of revolutions."]
+        revolutions: f64,
+        #[doc = "Start angle."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        start_angle: Option<Angle>,
     },
     #[doc = "Mirror the input entities over the specified axis. (Currently only supports sketches)"]
     #[serde(rename = "entity_mirror")]
@@ -10398,6 +10536,14 @@ pub enum ModelingCmd {
         #[doc = "The distance to offset the path (positive for outset, negative for inset)"]
         offset: f64,
     },
+    #[doc = "Add a hole to a closed path by offsetting it a uniform distance inward."]
+    #[serde(rename = "add_hole_from_offset")]
+    AddHoleFromOffset {
+        #[doc = "The closed path to add a hole to."]
+        object_id: uuid::Uuid,
+        #[doc = "The distance to offset the path (positive for outset, negative for inset)"]
+        offset: f64,
+    },
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -10826,21 +10972,6 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `DefaultCameraPerspectiveSettings` endpoint."]
         data: DefaultCameraPerspectiveSettings,
     },
-    #[serde(rename = "entity_make_helix")]
-    EntityMakeHelix {
-        #[doc = "The response from the `EntityMakeHelix` endpoint."]
-        data: EntityMakeHelix,
-    },
-    #[serde(rename = "entity_mirror")]
-    EntityMirror {
-        #[doc = "The response from the `EntityMirror` endpoint."]
-        data: EntityMirror,
-    },
-    #[serde(rename = "entity_mirror_across_edge")]
-    EntityMirrorAcrossEdge {
-        #[doc = "The response from the `EntityMirrorAcrossEdge` endpoint."]
-        data: EntityMirrorAcrossEdge,
-    },
     #[serde(rename = "select_add")]
     SelectAdd {
         #[doc = "The response from the `SelectAdd` endpoint."]
@@ -11141,6 +11272,11 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `MakeOffsetPath` command."]
         data: MakeOffsetPath,
     },
+    #[serde(rename = "add_hole_from_offset")]
+    AddHoleFromOffset {
+        #[doc = "The response from the `AddHoleFromOffset` command."]
+        data: AddHoleFromOffset,
+    },
     #[serde(rename = "default_camera_focus_on")]
     DefaultCameraFocusOn {
         #[doc = "The response from the `DefaultCameraFocusOn` command."]
@@ -11325,6 +11461,26 @@ pub enum OkModelingCmdResponse {
     EntityCircularPattern {
         #[doc = "The response from the `EntityCircularPattern` command."]
         data: EntityCircularPattern,
+    },
+    #[serde(rename = "entity_mirror")]
+    EntityMirror {
+        #[doc = "The response from the `EntityMirror` endpoint."]
+        data: EntityMirror,
+    },
+    #[serde(rename = "entity_mirror_across_edge")]
+    EntityMirrorAcrossEdge {
+        #[doc = "The response from the `EntityMirrorAcrossEdge` endpoint."]
+        data: EntityMirrorAcrossEdge,
+    },
+    #[serde(rename = "entity_make_helix")]
+    EntityMakeHelix {
+        #[doc = "The response from the `EntityMakeHelix` endpoint."]
+        data: EntityMakeHelix,
+    },
+    #[serde(rename = "entity_make_helix_from_params")]
+    EntityMakeHelixFromParams {
+        #[doc = "The response from the `EntityMakeHelixFromParams` endpoint."]
+        data: EntityMakeHelixFromParams,
     },
     #[serde(rename = "solid3d_get_extrusion_face_info")]
     Solid3DGetExtrusionFaceInfo {
@@ -14394,6 +14550,42 @@ impl tabled::Tabled for ShortlinkResultsPage {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "IDs for a side face, extruded from the path of some sketch/2D shape."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SideFace {
+    #[doc = "Desired ID for the resulting face."]
+    pub face_id: uuid::Uuid,
+    #[doc = "ID of the path this face is being extruded from."]
+    pub path_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for SideFace {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SideFace {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.face_id).into(),
+            format!("{:?}", self.path_id).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["face_id".into(), "path_id".into()]
     }
 }
 
