@@ -10,7 +10,7 @@ Inflector = "^0.11.4"
 anyhow = { version = "1", features = ["backtrace"] }
 chrono = { version = "0.4", features = ["serde", "std"], default-features = false }
 clap = { version = "4.5.26", features = ["cargo", "derive", "env", "unicode", "wrap_help"] }
-data-encoding = "^2.6.0"
+data-encoding = "^2.7.0"
 format_serde_error = "^0.3.0"
 futures-util = "^0.3.31"
 http = "1"
