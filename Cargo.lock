@@ -1016,15 +1016,6 @@ checksum = "7943c866cc5cd64cbc25b2e01621d07fa8eb2a1a23160ee81ce38704e97b8ecf"
 
 [[package]]
 name = "itertools"
-version = "0.12.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba291022dbbd398a455acf126c1e341954079855bc60dfdda641363bd6922569"
-dependencies = [
- "either",
-]
-
-[[package]]
-name = "itertools"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
@@ -1088,7 +1079,7 @@ dependencies = [
  "futures",
  "futures-util",
  "http",
- "itertools 0.13.0",
+ "itertools",
  "log",
  "mime_guess",
  "parse-display",
@@ -1489,16 +1480,15 @@ checksum = "e3148f5046208a5d56bcfc03053e3ca6334e51da8dfb19b6cdc8b306fae3283e"
 
 [[package]]
 name = "phonenumber"
-version = "0.3.6+8.13.36"
+version = "0.3.7+8.13.52"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "11756237b57b8cc5e97dc8b1e70ea436324d30e7075de63b14fd15073a8f692a"
+checksum = "2247167dc3741816fdd4d3690e97f56a892a264b44f4c702078b72d1f8b6bd40"
 dependencies = [
  "bincode",
  "either",
  "fnv",
- "itertools 0.12.1",
- "lazy_static",
  "nom",
+ "once_cell",
  "quick-xml",
  "regex",
  "regex-cache",
