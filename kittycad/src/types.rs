@@ -3054,6 +3054,74 @@ impl tabled::Tabled for Color {
     }
 }
 
+#[doc = "Container that holds a translate, rotate and scale."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ComponentTransform {
+    #[doc = "Rotate component of the transform. The rotation is specified as an axis and an angle \
+             (xyz are the components of the axis, w is the angle in degrees)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rotate_angle_axis: Option<String>,
+    #[doc = "Rotate component of the transform. The rotation is specified as a roll, pitch, yaw."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rotate_rpy: Option<String>,
+    #[doc = "Scale component of the transform."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scale: Option<String>,
+    #[doc = "Translate component of the transform."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub translate: Option<String>,
+}
+
+impl std::fmt::Display for ComponentTransform {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ComponentTransform {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(rotate_angle_axis) = &self.rotate_angle_axis {
+                format!("{:?}", rotate_angle_axis).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rotate_rpy) = &self.rotate_rpy {
+                format!("{:?}", rotate_rpy).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(scale) = &self.scale {
+                format!("{:?}", scale).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(translate) = &self.translate {
+                format!("{:?}", translate).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "rotate_angle_axis".into(),
+            "rotate_rpy".into(),
+            "scale".into(),
+            "translate".into(),
+        ]
+    }
+}
+
 #[doc = "Metadata about a pub-sub connection.\n\nThis is mostly used for internal purposes and \
          debugging."]
 #[derive(
@@ -5150,10 +5218,7 @@ impl tabled::Tabled for EntityLinearPatternTransform {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct EntityMakeHelix {
-    #[doc = "The UUID of the helix that was created."]
-    pub helix_id: uuid::Uuid,
-}
+pub struct EntityMakeHelix {}
 
 impl std::fmt::Display for EntityMakeHelix {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -5167,13 +5232,41 @@ impl std::fmt::Display for EntityMakeHelix {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityMakeHelix {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 0;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.helix_id).into()]
+        vec![]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["helix_id".into()]
+        vec![]
+    }
+}
+
+#[doc = "The response from the `EntityMakeHelixFromEdge` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityMakeHelixFromEdge {}
+
+impl std::fmt::Display for EntityMakeHelixFromEdge {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityMakeHelixFromEdge {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 
@@ -5181,10 +5274,7 @@ impl tabled::Tabled for EntityMakeHelix {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct EntityMakeHelixFromParams {
-    #[doc = "The UUID of the helix that was created."]
-    pub helix_id: uuid::Uuid,
-}
+pub struct EntityMakeHelixFromParams {}
 
 impl std::fmt::Display for EntityMakeHelixFromParams {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -5198,13 +5288,13 @@ impl std::fmt::Display for EntityMakeHelixFromParams {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityMakeHelixFromParams {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 0;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.helix_id).into()]
+        vec![]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["helix_id".into()]
+        vec![]
     }
 }
 
@@ -10098,6 +10188,24 @@ pub enum ModelingCmd {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         start_angle: Option<Angle>,
     },
+    #[doc = "Create a helix using the specified parameters."]
+    #[serde(rename = "entity_make_helix_from_edge")]
+    EntityMakeHelixFromEdge {
+        #[doc = "Edge about which to make the helix."]
+        edge_id: uuid::Uuid,
+        #[doc = "Is the helix rotation clockwise?"]
+        is_clockwise: bool,
+        #[doc = "Length of the helix. If None, the length of the edge will be used instead."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        length: Option<f64>,
+        #[doc = "Radius of the helix."]
+        radius: f64,
+        #[doc = "Number of revolutions."]
+        revolutions: f64,
+        #[doc = "Start angle."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        start_angle: Option<Angle>,
+    },
     #[doc = "Mirror the input entities over the specified axis. (Currently only supports sketches)"]
     #[serde(rename = "entity_mirror")]
     EntityMirror {
@@ -10765,6 +10873,14 @@ pub enum ModelingCmd {
     #[doc = "Get the number of objects in the scene"]
     #[serde(rename = "get_num_objects")]
     GetNumObjects {},
+    #[doc = "Set the transform of an object."]
+    #[serde(rename = "set_object_transform")]
+    SetObjectTransform {
+        #[doc = "Id of the object whose transform is to be set."]
+        object_id: uuid::Uuid,
+        #[doc = "List of transforms to be applied to the object."]
+        transforms: Vec<ComponentTransform>,
+    },
     #[doc = "Make a new path by offsetting an object by a given distance. The new path's ID will \
              be the ID of this command."]
     #[serde(rename = "make_offset_path")]
@@ -11520,6 +11636,11 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `MakeOffsetPath` command."]
         data: MakeOffsetPath,
     },
+    #[serde(rename = "set_object_transform")]
+    SetObjectTransform {
+        #[doc = "The response from the `SetObjectTransform` command."]
+        data: SetObjectTransform,
+    },
     #[serde(rename = "add_hole_from_offset")]
     AddHoleFromOffset {
         #[doc = "The response from the `AddHoleFromOffset` command."]
@@ -11730,6 +11851,11 @@ pub enum OkModelingCmdResponse {
     EntityMakeHelixFromParams {
         #[doc = "The response from the `EntityMakeHelixFromParams` endpoint."]
         data: EntityMakeHelixFromParams,
+    },
+    #[serde(rename = "entity_make_helix_from_edge")]
+    EntityMakeHelixFromEdge {
+        #[doc = "The response from the `EntityMakeHelixFromEdge` endpoint."]
+        data: EntityMakeHelixFromEdge,
     },
     #[serde(rename = "solid3d_get_extrusion_face_info")]
     Solid3DGetExtrusionFaceInfo {
@@ -14574,6 +14700,34 @@ impl std::fmt::Display for SetDefaultSystemProperties {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for SetDefaultSystemProperties {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `SetObjectTransform` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SetObjectTransform {}
+
+impl std::fmt::Display for SetObjectTransform {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SetObjectTransform {
     const LENGTH: usize = 0;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
