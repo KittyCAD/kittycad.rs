@@ -1279,7 +1279,7 @@
         "tags": [
           "hidden"
         ],
-        "summary": "Listen for callbacks for email verification for users.",
+        "summary": "Listen for callbacks for email authentication for users.",
         "operationId": "auth_email_callback",
         "parameters": [
           {
@@ -17100,6 +17100,48 @@
           "r"
         ]
       },
+      "ComponentTransform": {
+        "description": "Container that holds a translate, rotate and scale.",
+        "type": "object",
+        "properties": {
+          "rotate_angle_axis": {
+            "nullable": true,
+            "description": "Rotate component of the transform. The rotation is specified as an axis and an angle (xyz are the components of the axis, w is the angle in degrees).",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TransformByForPoint4d"
+              }
+            ]
+          },
+          "rotate_rpy": {
+            "nullable": true,
+            "description": "Rotate component of the transform. The rotation is specified as a roll, pitch, yaw.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TransformByForPoint3d"
+              }
+            ]
+          },
+          "scale": {
+            "nullable": true,
+            "description": "Scale component of the transform.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TransformByForPoint3d"
+              }
+            ]
+          },
+          "translate": {
+            "nullable": true,
+            "description": "Translate component of the transform.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TransformByForPoint3d"
+              }
+            ]
+          }
+        }
+      },
       "Connection": {
         "description": "Metadata about a pub-sub connection.\n\nThis is mostly used for internal purposes and debugging.",
         "type": "object",
@@ -18351,31 +18393,15 @@
       },
       "EntityMakeHelix": {
         "description": "The response from the `EntityMakeHelix` endpoint.",
-        "type": "object",
-        "properties": {
-          "helix_id": {
-            "description": "The UUID of the helix that was created.",
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "required": [
-          "helix_id"
-        ]
+        "type": "object"
+      },
+      "EntityMakeHelixFromEdge": {
+        "description": "The response from the `EntityMakeHelixFromEdge` endpoint.",
+        "type": "object"
       },
       "EntityMakeHelixFromParams": {
         "description": "The response from the `EntityMakeHelixFromParams` endpoint.",
-        "type": "object",
-        "properties": {
-          "helix_id": {
-            "description": "The UUID of the helix that was created.",
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "required": [
-          "helix_id"
-        ]
+        "type": "object"
       },
       "EntityMirror": {
         "description": "The response from the `EntityMirror` endpoint.",
@@ -22694,8 +22720,11 @@
               },
               "radius": {
                 "description": "Radius of the helix.",
-                "type": "number",
-                "format": "double"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
               },
               "revolutions": {
                 "description": "Number of revolutions.",
@@ -22726,6 +22755,68 @@
               "center",
               "is_clockwise",
               "length",
+              "radius",
+              "revolutions",
+              "type"
+            ]
+          },
+          {
+            "description": "Create a helix using the specified parameters.",
+            "type": "object",
+            "properties": {
+              "edge_id": {
+                "description": "Edge about which to make the helix.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "is_clockwise": {
+                "description": "Is the helix rotation clockwise?",
+                "type": "boolean"
+              },
+              "length": {
+                "nullable": true,
+                "description": "Length of the helix. If None, the length of the edge will be used instead.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "radius": {
+                "description": "Radius of the helix.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "revolutions": {
+                "description": "Number of revolutions.",
+                "type": "number",
+                "format": "double"
+              },
+              "start_angle": {
+                "description": "Start angle.",
+                "default": {
+                  "unit": "degrees",
+                  "value": 0.0
+                },
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Angle"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_make_helix_from_edge"
+                ]
+              }
+            },
+            "required": [
+              "edge_id",
+              "is_clockwise",
               "radius",
               "revolutions",
               "type"
@@ -24981,6 +25072,35 @@
             ]
           },
           {
+            "description": "Set the transform of an object.",
+            "type": "object",
+            "properties": {
+              "object_id": {
+                "description": "Id of the object whose transform is to be set.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "transforms": {
+                "description": "List of transforms to be applied to the object.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ComponentTransform"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_object_transform"
+                ]
+              }
+            },
+            "required": [
+              "object_id",
+              "transforms",
+              "type"
+            ]
+          },
+          {
             "description": "Make a new path by offsetting an object by a given distance. The new path's ID will be the ID of this command.",
             "type": "object",
             "properties": {
@@ -26491,6 +26611,24 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/SetObjectTransform"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_object_transform"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/AddHoleFromOffset"
               },
               "type": {
@@ -27235,6 +27373,24 @@
                 "type": "string",
                 "enum": [
                   "entity_make_helix_from_params"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityMakeHelixFromEdge"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_make_helix_from_edge"
                 ]
               }
             },
@@ -29470,6 +29626,10 @@
         "description": "The response from the `SetDefaultSystemProperties` endpoint.",
         "type": "object"
       },
+      "SetObjectTransform": {
+        "description": "The response from the `SetObjectTransform` command.",
+        "type": "object"
+      },
       "SetSceneUnits": {
         "description": "The response from the `SetSceneUnits` endpoint.",
         "type": "object"
@@ -30519,6 +30679,12 @@
             ]
           }
         }
+      },
+      "TransformByForPoint3d": {
+        "type": "string"
+      },
+      "TransformByForPoint4d": {
+        "type": "string"
       },
       "UnitAngle": {
         "description": "The valid types of angle formats.",
