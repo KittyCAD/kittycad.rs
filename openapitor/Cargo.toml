@@ -24,7 +24,7 @@ openapiv3 = "2.0.0"
 phonenumber = "0.3.7"
 proc-macro2 = "1"
 quote = "1"
-rand = { version = "0.8.5", features = ["small_rng"] }
+rand = { version = "0.9.0", features = ["small_rng"] }
 regex = "^1.11"
 reqwest = { version = "0.12", default-features = false, features = ["json", "multipart", "rustls-tls"] }
 reqwest-middleware = "0.4"
