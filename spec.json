@@ -20221,7 +20221,7 @@
                 ]
               },
               "units": {
-                "description": "The units of the input data. This is very important for correct scaling and when calculating physics properties like mass, etc.\n\nDefaults to meters.",
+                "description": "The units of the input data.\n\nThis is very important for correct scaling and when calculating physics properties like mass, etc.\n\nDefaults to millimeters.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/UnitLength"
@@ -20254,7 +20254,7 @@
                 ]
               },
               "units": {
-                "description": "The units of the input data. This is very important for correct scaling and when calculating physics properties like mass, etc.",
+                "description": "The units of the input data.\n\nThis is very important for correct scaling and when calculating physics properties like mass, etc.\n\nDefaults to millimeters.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/UnitLength"
@@ -20327,7 +20327,7 @@
                 ]
               },
               "units": {
-                "description": "The units of the input data. This is very important for correct scaling and when calculating physics properties like mass, etc.",
+                "description": "The units of the input data.\n\nThis is very important for correct scaling and when calculating physics properties like mass, etc.\n\nDefaults to millimeters.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/UnitLength"
@@ -24170,6 +24170,72 @@
             ]
           },
           {
+            "description": "Project an entity on to a plane.",
+            "type": "object",
+            "properties": {
+              "entity_id": {
+                "description": "Which entity to project (vertex or edge).",
+                "type": "string",
+                "format": "uuid"
+              },
+              "plane_id": {
+                "description": "Which plane to project entity_id onto.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "project_entity_to_plane"
+                ]
+              },
+              "use_plane_coords": {
+                "description": "If true: the projected points are returned in the plane_id's coordinate system, else: the projected points are returned in the world coordinate system.",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "entity_id",
+              "plane_id",
+              "type",
+              "use_plane_coords"
+            ]
+          },
+          {
+            "description": "Project a list of points on to a plane.",
+            "type": "object",
+            "properties": {
+              "plane_id": {
+                "description": "The id of the plane used for the projection.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "points": {
+                "description": "The list of points that will be projected.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Point3d"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "project_points_to_plane"
+                ]
+              },
+              "use_plane_coords": {
+                "description": "If true: the projected points are returned in the plane_id's coordinate sysetm. else: the projected points are returned in the world coordinate system.",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "plane_id",
+              "points",
+              "type",
+              "use_plane_coords"
+            ]
+          },
+          {
             "description": "Take a snapshot of the current view.",
             "type": "object",
             "properties": {
@@ -24570,7 +24636,7 @@
             ]
           },
           {
-            "description": "Set the units of the scene. For all following commands, the units will be interpreted as the given units.",
+            "description": "Set the units of the scene. For all following commands, the units will be interpreted as the given units. Any previously executed commands will not be affected or have their units changed. They will remain in the units they were originally executed in.",
             "type": "object",
             "properties": {
               "type": {
@@ -26827,6 +26893,42 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/ProjectEntityToPlane"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "project_entity_to_plane"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ProjectPointsToPlane"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "project_points_to_plane"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/CurveGetType"
               },
               "type": {
@@ -28170,7 +28272,7 @@
                 ]
               },
               "units": {
-                "description": "Export length unit.\n\nDefaults to meters.",
+                "description": "Export length unit.\n\nDefaults to millimeters.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/UnitLength"
@@ -28219,7 +28321,7 @@
                 ]
               },
               "units": {
-                "description": "Export length unit.\n\nDefaults to meters.",
+                "description": "Export length unit.\n\nDefaults to millimeters.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/UnitLength"
@@ -28294,7 +28396,7 @@
                 ]
               },
               "units": {
-                "description": "Export length unit.\n\nDefaults to meters.",
+                "description": "Export length unit.\n\nDefaults to millimeters.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/UnitLength"
@@ -28990,6 +29092,38 @@
         },
         "required": [
           "can_train_on_data"
+        ]
+      },
+      "ProjectEntityToPlane": {
+        "description": "The response from the `ProjectEntityToPlane` command.",
+        "type": "object",
+        "properties": {
+          "projected_points": {
+            "description": "Projected points.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Point3d"
+            }
+          }
+        },
+        "required": [
+          "projected_points"
+        ]
+      },
+      "ProjectPointsToPlane": {
+        "description": "The response from the `ProjectPointsToPlane` command.",
+        "type": "object",
+        "properties": {
+          "projected_points": {
+            "description": "Projected points.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Point3d"
+            }
+          }
+        },
+        "required": [
+          "projected_points"
         ]
       },
       "RawFile": {
