@@ -7801,8 +7801,8 @@ pub enum InputFormat {
         #[doc = "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate \
                  system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
-        #[doc = "The units of the input data. This is very important for correct scaling and when \
-                 calculating physics properties like mass, etc.\n\nDefaults to meters."]
+        #[doc = "The units of the input data.\n\nThis is very important for correct scaling and \
+                 when calculating physics properties like mass, etc.\n\nDefaults to millimeters."]
         units: UnitLength,
     },
     #[doc = "The PLY Polygon File Format."]
@@ -7811,8 +7811,8 @@ pub enum InputFormat {
         #[doc = "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate \
                  system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
-        #[doc = "The units of the input data. This is very important for correct scaling and when \
-                 calculating physics properties like mass, etc."]
+        #[doc = "The units of the input data.\n\nThis is very important for correct scaling and \
+                 when calculating physics properties like mass, etc.\n\nDefaults to millimeters."]
         units: UnitLength,
     },
     #[doc = "SolidWorks part (SLDPRT) format."]
@@ -7837,8 +7837,8 @@ pub enum InputFormat {
         #[doc = "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate \
                  system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
-        #[doc = "The units of the input data. This is very important for correct scaling and when \
-                 calculating physics properties like mass, etc."]
+        #[doc = "The units of the input data.\n\nThis is very important for correct scaling and \
+                 when calculating physics properties like mass, etc.\n\nDefaults to millimeters."]
         units: UnitLength,
     },
 }
@@ -10605,6 +10605,28 @@ pub enum ModelingCmd {
         #[doc = "Which curve to query."]
         curve_id: uuid::Uuid,
     },
+    #[doc = "Project an entity on to a plane."]
+    #[serde(rename = "project_entity_to_plane")]
+    ProjectEntityToPlane {
+        #[doc = "Which entity to project (vertex or edge)."]
+        entity_id: uuid::Uuid,
+        #[doc = "Which plane to project entity_id onto."]
+        plane_id: uuid::Uuid,
+        #[doc = "If true: the projected points are returned in the plane_id's coordinate system, \
+                 else: the projected points are returned in the world coordinate system."]
+        use_plane_coords: bool,
+    },
+    #[doc = "Project a list of points on to a plane."]
+    #[serde(rename = "project_points_to_plane")]
+    ProjectPointsToPlane {
+        #[doc = "The id of the plane used for the projection."]
+        plane_id: uuid::Uuid,
+        #[doc = "The list of points that will be projected."]
+        points: Vec<Point3D>,
+        #[doc = "If true: the projected points are returned in the plane_id's coordinate sysetm. \
+                 else: the projected points are returned in the world coordinate system."]
+        use_plane_coords: bool,
+    },
     #[doc = "Take a snapshot of the current view."]
     #[serde(rename = "take_snapshot")]
     TakeSnapshot {
@@ -10721,7 +10743,9 @@ pub enum ModelingCmd {
         format: InputFormat,
     },
     #[doc = "Set the units of the scene. For all following commands, the units will be \
-             interpreted as the given units."]
+             interpreted as the given units. Any previously executed commands will not be \
+             affected or have their units changed. They will remain in the units they were \
+             originally executed in."]
     #[serde(rename = "set_scene_units")]
     SetSceneUnits {
         #[doc = "Which units the scene uses."]
@@ -11696,6 +11720,16 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `CurveGetControlPoints` command."]
         data: CurveGetControlPoints,
     },
+    #[serde(rename = "project_entity_to_plane")]
+    ProjectEntityToPlane {
+        #[doc = "The response from the `ProjectEntityToPlane` command."]
+        data: ProjectEntityToPlane,
+    },
+    #[serde(rename = "project_points_to_plane")]
+    ProjectPointsToPlane {
+        #[doc = "The response from the `ProjectPointsToPlane` command."]
+        data: ProjectPointsToPlane,
+    },
     #[serde(rename = "curve_get_type")]
     CurveGetType {
         #[doc = "The response from the `CurveGetType` command."]
@@ -12601,7 +12635,7 @@ pub enum OutputFormat {
         #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate \
                  system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
-        #[doc = "Export length unit.\n\nDefaults to meters."]
+        #[doc = "Export length unit.\n\nDefaults to millimeters."]
         units: UnitLength,
     },
     #[doc = "The PLY Polygon File Format."]
@@ -12614,7 +12648,7 @@ pub enum OutputFormat {
         selection: Selection,
         #[doc = "The storage for the output PLY file."]
         storage: PlyStorage,
-        #[doc = "Export length unit.\n\nDefaults to meters."]
+        #[doc = "Export length unit.\n\nDefaults to millimeters."]
         units: UnitLength,
     },
     #[doc = "ISO 10303-21 (STEP) format."]
@@ -12634,7 +12668,7 @@ pub enum OutputFormat {
         selection: Selection,
         #[doc = "Export storage."]
         storage: StlStorage,
-        #[doc = "Export length unit.\n\nDefaults to meters."]
+        #[doc = "Export length unit.\n\nDefaults to millimeters."]
         units: UnitLength,
     },
 }
@@ -13583,6 +13617,68 @@ impl tabled::Tabled for PrivacySettings {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["can_train_on_data".into()]
+    }
+}
+
+#[doc = "The response from the `ProjectEntityToPlane` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectEntityToPlane {
+    #[doc = "Projected points."]
+    pub projected_points: Vec<Point3D>,
+}
+
+impl std::fmt::Display for ProjectEntityToPlane {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectEntityToPlane {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.projected_points).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["projected_points".into()]
+    }
+}
+
+#[doc = "The response from the `ProjectPointsToPlane` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectPointsToPlane {
+    #[doc = "Projected points."]
+    pub projected_points: Vec<Point3D>,
+}
+
+impl std::fmt::Display for ProjectPointsToPlane {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectPointsToPlane {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.projected_points).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["projected_points".into()]
     }
 }
 
