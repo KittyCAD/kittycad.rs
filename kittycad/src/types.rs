@@ -5623,14 +5623,17 @@ pub enum ErrorCode {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[derive(Default)]
 pub enum Type {
     #[serde(rename = "modeling_app_event")]
     #[display("modeling_app_event")]
-    #[default]
     ModelingAppEvent,
 }
 
+impl std::default::Default for Type {
+    fn default() -> Self {
+        Type::ModelingAppEvent
+    }
+}
 
 #[doc = "An event related to modeling app files"]
 #[derive(
@@ -9658,16 +9661,19 @@ pub enum MlPromptType {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[derive(Default)]
 pub enum ModelingAppEventType {
     #[doc = "This event is sent before the modeling app or project is closed. The attachment \
              should contain the contents of the most recent successful compile."]
     #[serde(rename = "successful_compile_before_close")]
     #[display("successful_compile_before_close")]
-    #[default]
     SuccessfulCompileBeforeClose,
 }
 
+impl std::default::Default for ModelingAppEventType {
+    fn default() -> Self {
+        ModelingAppEventType::SuccessfulCompileBeforeClose
+    }
+}
 
 #[doc = "The subscription tiers we offer for the Modeling App to individuals."]
 #[derive(
@@ -11237,15 +11243,18 @@ impl tabled::Tabled for Oauth2ClientInfo {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[derive(Default)]
 pub enum Oauth2GrantType {
     #[doc = "An OAuth 2.0 Device Authorization Grant."]
     #[serde(rename = "urn:ietf:params:oauth:grant-type:device_code")]
     #[display("urn:ietf:params:oauth:grant-type:device_code")]
-    #[default]
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
 
+impl std::default::Default for Oauth2GrantType {
+    fn default() -> Self {
+        Oauth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode
+    }
+}
 
 #[doc = "The response from the `ObjectBringToFront` endpoint."]
 #[derive(
@@ -13276,15 +13285,18 @@ impl tabled::Tabled for PaymentMethodCardChecks {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[derive(Default)]
 pub enum PaymentMethodType {
     #[doc = "A card payment method."]
     #[serde(rename = "card")]
     #[display("card")]
-    #[default]
     Card,
 }
 
+impl std::default::Default for PaymentMethodType {
+    fn default() -> Self {
+        PaymentMethodType::Card
+    }
+}
 
 #[doc = "Defines a perspective view."]
 #[derive(

@@ -121,7 +121,7 @@ impl Oauth2 {
             format!("{}/{}", self.client.base_url, "oauth2/device/verify"),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("user_code", user_code.to_string())];
+        let query_params = vec![("user_code", format!("{}", user_code))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
