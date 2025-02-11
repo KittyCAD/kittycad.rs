@@ -3708,7 +3708,7 @@
           "beta"
         ],
         "summary": "Iterate on a CAD model with a prompt.",
-        "description": "Even if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "Even if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nThis endpoint will soon be deprecated in favor of the `/ml/text-to-cad/multi-file/iteration` endpoint. In that the endpoint path will remain but it will have the same behavior as `ml/text-to-cad/multi-file/iteration`.",
         "operationId": "create_text_to_cad_iteration",
         "requestBody": {
           "content": {
@@ -3788,6 +3788,149 @@
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
         "operationId": "options_text_to_cad_iteration",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/ml/text-to-cad/multi-file/iteration": {
+      "post": {
+        "tags": [
+          "ml",
+          "beta"
+        ],
+        "summary": "Iterate on a CAD model with a prompt.",
+        "description": "This endpoint can iterate on multi-file models.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it. This endpoint will always return all the code back, including files that were not changed. If your original source code imported a stl/gltf/step/etc file, the output will not include that file since the model will never change non-kcl files. The endpoint will only return the kcl files that were changed.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "operationId": "create_text_to_cad_multi_file_iteration",
+        "requestBody": {
+          "description": "Iteration on a multi-file CAD model",
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/TextToCadMultiFileIterationBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TextToCadMultiFileIteration"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_text_to_cad_multi_file_iteration",
         "responses": {
           "204": {
             "description": "resource updated",
@@ -16427,6 +16570,119 @@
               "updated_at",
               "user_id"
             ]
+          },
+          {
+            "description": "Text to CAD multi-file iteration.",
+            "type": "object",
+            "properties": {
+              "completed_at": {
+                "nullable": true,
+                "title": "DateTime",
+                "description": "The time and date the API call was completed.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "created_at": {
+                "title": "DateTime",
+                "description": "The time and date the API call was created.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "error": {
+                "nullable": true,
+                "description": "The error the function returned, if any.",
+                "type": "string"
+              },
+              "feedback": {
+                "nullable": true,
+                "description": "Feedback from the user, if any.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/MlFeedback"
+                  }
+                ]
+              },
+              "id": {
+                "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ]
+              },
+              "model": {
+                "description": "The model being used.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/TextToCadModel"
+                  }
+                ]
+              },
+              "model_version": {
+                "description": "The version of the model.",
+                "type": "string"
+              },
+              "outputs": {
+                "description": "The output files. Returns a map of the file name to the file contents. The file contents are not encoded since kcl files are not binary.",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "source_ranges": {
+                "description": "The source ranges the user suggested to change.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SourceRangePrompt"
+                }
+              },
+              "started_at": {
+                "nullable": true,
+                "title": "DateTime",
+                "description": "The time and date the API call was started.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "status": {
+                "description": "The status of the API call.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApiCallStatus"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "text_to_cad_multi_file_iteration"
+                ]
+              },
+              "updated_at": {
+                "title": "DateTime",
+                "description": "The time and date the API call was last updated.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "user_id": {
+                "description": "The user ID of the user who created the API call.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "created_at",
+              "id",
+              "model",
+              "model_version",
+              "source_ranges",
+              "status",
+              "type",
+              "updated_at",
+              "user_id"
+            ]
           }
         ]
       },
@@ -16508,6 +16764,13 @@
             "type": "string",
             "enum": [
               "text_to_cad_iteration"
+            ]
+          },
+          {
+            "description": "Text to CAD multi-file iteration.",
+            "type": "string",
+            "enum": [
+              "text_to_cad_multi_file_iteration"
             ]
           }
         ]
@@ -21410,10 +21673,17 @@
             ]
           },
           {
-            "description": "Text to Kcl iteration,",
+            "description": "Text to KCL iteration.",
             "type": "string",
             "enum": [
               "text_to_kcl_iteration"
+            ]
+          },
+          {
+            "description": "Text to KCL iteration with multiple files.",
+            "type": "string",
+            "enum": [
+              "text_to_kcl_multi_file_iteration"
             ]
           }
         ]
@@ -30060,12 +30330,17 @@
         "description": "A source range and prompt for a text to CAD iteration.",
         "type": "object",
         "properties": {
+          "file": {
+            "nullable": true,
+            "description": "The name of the file the source range applies to. This only applies to multi-file iterations.",
+            "type": "string"
+          },
           "prompt": {
             "description": "The prompt for the changes.",
             "type": "string"
           },
           "range": {
-            "description": "The range of the source code to change.",
+            "description": "The range of the source code to change. If you want to apply the prompt to the whole file, set the start to 0 and the end to the end of the file.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/SourceRange"
@@ -30704,6 +30979,128 @@
               "kcl_iteration"
             ]
           }
+        ]
+      },
+      "TextToCadMultiFileIteration": {
+        "description": "A response from a text to CAD multi-file iteration.",
+        "type": "object",
+        "properties": {
+          "completed_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The time and date the API call was completed.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "The time and date the API call was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "nullable": true,
+            "description": "The error the function returned, if any.",
+            "type": "string"
+          },
+          "feedback": {
+            "nullable": true,
+            "description": "Feedback from the user, if any.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MlFeedback"
+              }
+            ]
+          },
+          "id": {
+            "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "model": {
+            "description": "The model being used.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TextToCadModel"
+              }
+            ]
+          },
+          "model_version": {
+            "description": "The version of the model.",
+            "type": "string"
+          },
+          "outputs": {
+            "description": "The output files. Returns a map of the file name to the file contents. The file contents are not encoded since kcl files are not binary.",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "source_ranges": {
+            "description": "The source ranges the user suggested to change.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRangePrompt"
+            }
+          },
+          "started_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The time and date the API call was started.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "description": "The status of the API call.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ]
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The time and date the API call was last updated.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the API call.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "model",
+          "model_version",
+          "source_ranges",
+          "status",
+          "updated_at",
+          "user_id"
+        ]
+      },
+      "TextToCadMultiFileIterationBody": {
+        "description": "Body for generating models from text.",
+        "type": "object",
+        "properties": {
+          "source_ranges": {
+            "description": "The source ranges the user suggested to change. If empty, the prompt will be used and is required.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRangePrompt"
+            }
+          }
+        },
+        "required": [
+          "source_ranges"
         ]
       },
       "TextToCadResultsPage": {

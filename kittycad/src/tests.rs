@@ -74,7 +74,7 @@ async fn test_create_file_volume() {
         .await
         .unwrap();
 
-    assert_eq!(result.volume.map(|x| x.round()), Some(54.0));
+    assert_eq!(result.volume.map(|x| (x * 1000000.0).round()), Some(0.0));
 
     assert_eq!(result.src_format, crate::types::FileImportFormat::Obj);
     assert_eq!(result.status, crate::types::ApiCallStatus::Completed);

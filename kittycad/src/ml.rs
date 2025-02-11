@@ -245,7 +245,7 @@ impl Ml {
         }
     }
 
-    #[doc = "Iterate on a CAD model with a prompt.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_ml_create_text_to_cad_iteration() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadIteration = client\n        .ml()\n        .create_text_to_cad_iteration(&kittycad::types::TextToCadIterationBody {\n            original_source_code: \"some-string\".to_string(),\n            prompt: Some(\"some-string\".to_string()),\n            source_ranges: vec![kittycad::types::SourceRangePrompt {\n                prompt: \"some-string\".to_string(),\n                range: kittycad::types::SourceRange {\n                    end: kittycad::types::SourcePosition {\n                        column: 4 as u32,\n                        line: 4 as u32,\n                    },\n                    start: kittycad::types::SourcePosition {\n                        column: 4 as u32,\n                        line: 4 as u32,\n                    },\n                },\n            }],\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Iterate on a CAD model with a prompt.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nThis endpoint will soon be deprecated in favor of the `/ml/text-to-cad/multi-file/iteration` endpoint. In that the endpoint path will remain but it will have the same behavior as `ml/text-to-cad/multi-file/iteration`.\n\n```rust,no_run\nasync fn example_ml_create_text_to_cad_iteration() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadIteration = client\n        .ml()\n        .create_text_to_cad_iteration(&kittycad::types::TextToCadIterationBody {\n            original_source_code: \"some-string\".to_string(),\n            prompt: Some(\"some-string\".to_string()),\n            source_ranges: vec![kittycad::types::SourceRangePrompt {\n                file: Some(\"some-string\".to_string()),\n                prompt: \"some-string\".to_string(),\n                range: kittycad::types::SourceRange {\n                    end: kittycad::types::SourcePosition {\n                        column: 4 as u32,\n                        line: 4 as u32,\n                    },\n                    start: kittycad::types::SourcePosition {\n                        column: 4 as u32,\n                        line: 4 as u32,\n                    },\n                },\n            }],\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_text_to_cad_iteration<'a>(
         &'a self,
@@ -257,6 +257,51 @@ impl Ml {
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Iterate on a CAD model with a prompt.\n\nThis endpoint can iterate on multi-file models.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it. This endpoint will always return all the code back, including files that were not changed. If your original source code imported a stl/gltf/step/etc file, the output will not include that file since the model will never change non-kcl files. The endpoint will only return the kcl files that were changed.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_ml_create_text_to_cad_multi_file_iteration() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadMultiFileIteration = client\n        .ml()\n        .create_text_to_cad_multi_file_iteration(\n            vec![kittycad::types::multipart::Attachment {\n                name: \"thing\".to_string(),\n                filename: Some(\"myfile.json\".to_string()),\n                content_type: Some(\"application/json\".to_string()),\n                data: std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            &kittycad::types::TextToCadMultiFileIterationBody {\n                source_ranges: vec![kittycad::types::SourceRangePrompt {\n                    file: Some(\"some-string\".to_string()),\n                    prompt: \"some-string\".to_string(),\n                    range: kittycad::types::SourceRange {\n                        end: kittycad::types::SourcePosition {\n                            column: 4 as u32,\n                            line: 4 as u32,\n                        },\n                        start: kittycad::types::SourcePosition {\n                            column: 4 as u32,\n                            line: 4 as u32,\n                        },\n                    },\n                }],\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn create_text_to_cad_multi_file_iteration<'a>(
+        &'a self,
+        attachments: Vec<crate::types::multipart::Attachment>,
+        body: &crate::types::TextToCadMultiFileIterationBody,
+    ) -> Result<crate::types::TextToCadMultiFileIteration, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url, "ml/text-to-cad/multi-file/iteration"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        use std::convert::TryInto;
+        let mut form = reqwest::multipart::Form::new();
+        let mut json_part = reqwest::multipart::Part::text(serde_json::to_string(&body)?);
+        json_part = json_part.file_name(format!("{}.json", "texttocadmultifileiterationbody"));
+        json_part = json_part.mime_str("application/json")?;
+        form = form.part("texttocadmultifileiterationbody", json_part);
+        for attachment in attachments {
+            form = form.part(attachment.name.clone(), attachment.try_into()?);
+        }
+
+        req = req.multipart(form);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {

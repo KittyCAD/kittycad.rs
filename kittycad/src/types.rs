@@ -1962,6 +1962,42 @@ pub enum AsyncApiCallOutput {
         #[doc = "The user ID of the user who created the API call."]
         user_id: uuid::Uuid,
     },
+    #[doc = "Text to CAD multi-file iteration."]
+    #[serde(rename = "text_to_cad_multi_file_iteration")]
+    TextToCadMultiFileIteration {
+        #[doc = "The time and date the API call was completed."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The time and date the API call was created."]
+        created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        error: Option<String>,
+        #[doc = "Feedback from the user, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        feedback: Option<MlFeedback>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
+        id: uuid::Uuid,
+        #[doc = "The model being used."]
+        model: TextToCadModel,
+        #[doc = "The version of the model."]
+        model_version: String,
+        #[doc = "The output files. Returns a map of the file name to the file contents. The file \
+                 contents are not encoded since kcl files are not binary."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        outputs: Option<std::collections::HashMap<String, String>>,
+        #[doc = "The source ranges the user suggested to change."]
+        source_ranges: Vec<SourceRangePrompt>,
+        #[doc = "The time and date the API call was started."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
+        status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
+        updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
+        user_id: uuid::Uuid,
+    },
 }
 
 #[doc = "A single page of results"]
@@ -2084,6 +2120,10 @@ pub enum AsyncApiCallType {
     #[serde(rename = "text_to_cad_iteration")]
     #[display("text_to_cad_iteration")]
     TextToCadIteration,
+    #[doc = "Text to CAD multi-file iteration."]
+    #[serde(rename = "text_to_cad_multi_file_iteration")]
+    #[display("text_to_cad_multi_file_iteration")]
+    TextToCadMultiFileIteration,
 }
 
 #[doc = "The authentication callback from the OAuth 2.0 client. This is typically posted to the \
@@ -9594,10 +9634,14 @@ pub enum MlPromptType {
     #[serde(rename = "text_to_kcl")]
     #[display("text_to_kcl")]
     TextToKcl,
-    #[doc = "Text to Kcl iteration,"]
+    #[doc = "Text to KCL iteration."]
     #[serde(rename = "text_to_kcl_iteration")]
     #[display("text_to_kcl_iteration")]
     TextToKclIteration,
+    #[doc = "Text to KCL iteration with multiple files."]
+    #[serde(rename = "text_to_kcl_multi_file_iteration")]
+    #[display("text_to_kcl_multi_file_iteration")]
+    TextToKclMultiFileIteration,
 }
 
 #[doc = "Type for modeling-app events"]
@@ -15557,9 +15601,14 @@ impl tabled::Tabled for SourceRange {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct SourceRangePrompt {
+    #[doc = "The name of the file the source range applies to. This only applies to multi-file \
+             iterations."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub file: Option<String>,
     #[doc = "The prompt for the changes."]
     pub prompt: String,
-    #[doc = "The range of the source code to change."]
+    #[doc = "The range of the source code to change. If you want to apply the prompt to the whole \
+             file, set the start to 0 and the end to the end of the file."]
     pub range: SourceRange,
 }
 
@@ -15575,16 +15624,21 @@ impl std::fmt::Display for SourceRangePrompt {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for SourceRangePrompt {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(file) = &self.file {
+                format!("{:?}", file).into()
+            } else {
+                String::new().into()
+            },
             self.prompt.clone().into(),
             format!("{:?}", self.range).into(),
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["prompt".into(), "range".into()]
+        vec!["file".into(), "prompt".into(), "range".into()]
     }
 }
 
@@ -16335,6 +16389,147 @@ pub enum TextToCadModel {
     #[serde(rename = "kcl_iteration")]
     #[display("kcl_iteration")]
     KclIteration,
+}
+
+#[doc = "A response from a text to CAD multi-file iteration."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct TextToCadMultiFileIteration {
+    #[doc = "The time and date the API call was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the API call was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "Feedback from the user, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub feedback: Option<MlFeedback>,
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The model being used."]
+    pub model: TextToCadModel,
+    #[doc = "The version of the model."]
+    pub model_version: String,
+    #[doc = "The output files. Returns a map of the file name to the file contents. The file \
+             contents are not encoded since kcl files are not binary."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub outputs: Option<std::collections::HashMap<String, String>>,
+    #[doc = "The source ranges the user suggested to change."]
+    pub source_ranges: Vec<SourceRangePrompt>,
+    #[doc = "The time and date the API call was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the API call."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the API call was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the API call."]
+    pub user_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for TextToCadMultiFileIteration {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for TextToCadMultiFileIteration {
+    const LENGTH: usize = 13;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.created_at).into(),
+            if let Some(error) = &self.error {
+                format!("{:?}", error).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(feedback) = &self.feedback {
+                format!("{:?}", feedback).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.model).into(),
+            self.model_version.clone().into(),
+            if let Some(outputs) = &self.outputs {
+                format!("{:?}", outputs).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.source_ranges).into(),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.status).into(),
+            format!("{:?}", self.updated_at).into(),
+            format!("{:?}", self.user_id).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "completed_at".into(),
+            "created_at".into(),
+            "error".into(),
+            "feedback".into(),
+            "id".into(),
+            "model".into(),
+            "model_version".into(),
+            "outputs".into(),
+            "source_ranges".into(),
+            "started_at".into(),
+            "status".into(),
+            "updated_at".into(),
+            "user_id".into(),
+        ]
+    }
+}
+
+#[doc = "Body for generating models from text."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct TextToCadMultiFileIterationBody {
+    #[doc = "The source ranges the user suggested to change. If empty, the prompt will be used \
+             and is required."]
+    pub source_ranges: Vec<SourceRangePrompt>,
+}
+
+impl std::fmt::Display for TextToCadMultiFileIterationBody {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for TextToCadMultiFileIterationBody {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.source_ranges).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["source_ranges".into()]
+    }
 }
 
 #[doc = "A single page of results"]
