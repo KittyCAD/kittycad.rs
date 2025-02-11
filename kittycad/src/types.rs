@@ -9380,6 +9380,9 @@ pub struct MlPrompt {
     pub feedback: Option<MlFeedback>,
     #[doc = "The unique identifier for the ML prompt."]
     pub id: uuid::Uuid,
+    #[doc = "The KCL version being used."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kcl_version: Option<String>,
     #[doc = "The metadata for the prompt."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub metadata: Option<MlPromptMetadata>,
@@ -9388,6 +9391,10 @@ pub struct MlPrompt {
     #[doc = "The output file. In the case of TextToCad this is a link to a file in a GCP bucket."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub output_file: Option<String>,
+    #[doc = "The name of the project, if any. This allows us to group prompts together that come \
+             from the same project and user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_name: Option<String>,
     #[doc = "The prompt."]
     pub prompt: String,
     #[doc = "When the prompt was started."]
@@ -9416,7 +9423,7 @@ impl std::fmt::Display for MlPrompt {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for MlPrompt {
-    const LENGTH: usize = 14;
+    const LENGTH: usize = 16;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -9436,6 +9443,11 @@ impl tabled::Tabled for MlPrompt {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
+            if let Some(kcl_version) = &self.kcl_version {
+                format!("{:?}", kcl_version).into()
+            } else {
+                String::new().into()
+            },
             if let Some(metadata) = &self.metadata {
                 format!("{:?}", metadata).into()
             } else {
@@ -9444,6 +9456,11 @@ impl tabled::Tabled for MlPrompt {
             self.model_version.clone().into(),
             if let Some(output_file) = &self.output_file {
                 format!("{:?}", output_file).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(project_name) = &self.project_name {
+                format!("{:?}", project_name).into()
             } else {
                 String::new().into()
             },
@@ -9467,9 +9484,11 @@ impl tabled::Tabled for MlPrompt {
             "error".into(),
             "feedback".into(),
             "id".into(),
+            "kcl_version".into(),
             "metadata".into(),
             "model_version".into(),
             "output_file".into(),
+            "project_name".into(),
             "prompt".into(),
             "started_at".into(),
             "status".into(),
@@ -16170,6 +16189,13 @@ impl tabled::Tabled for TextToCad {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct TextToCadCreateBody {
+    #[doc = "The version of kcl to use. If empty, the latest version will be used."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kcl_version: Option<String>,
+    #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make \
+             our models better over time."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_name: Option<String>,
     #[doc = "The prompt for the model."]
     pub prompt: String,
 }
@@ -16186,13 +16212,25 @@ impl std::fmt::Display for TextToCadCreateBody {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TextToCadCreateBody {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![self.prompt.clone().into()]
+        vec![
+            if let Some(kcl_version) = &self.kcl_version {
+                format!("{:?}", kcl_version).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(project_name) = &self.project_name {
+                format!("{:?}", project_name).into()
+            } else {
+                String::new().into()
+            },
+            self.prompt.clone().into(),
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["prompt".into()]
+        vec!["kcl_version".into(), "project_name".into(), "prompt".into()]
     }
 }
 
@@ -16318,8 +16356,15 @@ impl tabled::Tabled for TextToCadIteration {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct TextToCadIterationBody {
+    #[doc = "The version of kcl to use. If empty, the latest version will be used."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kcl_version: Option<String>,
     #[doc = "The source code for the model (in kcl) that is to be edited."]
     pub original_source_code: String,
+    #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make \
+             our models better over time."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_name: Option<String>,
     #[doc = "The prompt for the model, if not using source ranges."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prompt: Option<String>,
@@ -16340,10 +16385,20 @@ impl std::fmt::Display for TextToCadIterationBody {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TextToCadIterationBody {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 5;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(kcl_version) = &self.kcl_version {
+                format!("{:?}", kcl_version).into()
+            } else {
+                String::new().into()
+            },
             self.original_source_code.clone().into(),
+            if let Some(project_name) = &self.project_name {
+                format!("{:?}", project_name).into()
+            } else {
+                String::new().into()
+            },
             if let Some(prompt) = &self.prompt {
                 format!("{:?}", prompt).into()
             } else {
@@ -16355,7 +16410,9 @@ impl tabled::Tabled for TextToCadIterationBody {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "kcl_version".into(),
             "original_source_code".into(),
+            "project_name".into(),
             "prompt".into(),
             "source_ranges".into(),
         ]
@@ -16505,6 +16562,13 @@ impl tabled::Tabled for TextToCadMultiFileIteration {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct TextToCadMultiFileIterationBody {
+    #[doc = "The version of kcl to use. If empty, the latest version will be used."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kcl_version: Option<String>,
+    #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make \
+             our models better over time."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_name: Option<String>,
     #[doc = "The source ranges the user suggested to change. If empty, the prompt will be used \
              and is required."]
     pub source_ranges: Vec<SourceRangePrompt>,
@@ -16522,13 +16586,29 @@ impl std::fmt::Display for TextToCadMultiFileIterationBody {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TextToCadMultiFileIterationBody {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.source_ranges).into()]
+        vec![
+            if let Some(kcl_version) = &self.kcl_version {
+                format!("{:?}", kcl_version).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(project_name) = &self.project_name {
+                format!("{:?}", project_name).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.source_ranges).into(),
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["source_ranges".into()]
+        vec![
+            "kcl_version".into(),
+            "project_name".into(),
+            "source_ranges".into(),
+        ]
     }
 }
 
