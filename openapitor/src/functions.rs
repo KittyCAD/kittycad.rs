@@ -1205,11 +1205,6 @@ fn get_function_body(
             }
             "multipart/form-data" => {
                 // The json part of multipart data is sent as a file.
-                let type_name = request_body
-                    .type_name
-                    .rendered()?
-                    .replace("crate::types::", "")
-                    .to_lowercase();
                 if !multipart_has_body(&request_body.type_name)? {
                     // We don't add the body to the form.
                     quote! {
@@ -1234,9 +1229,9 @@ fn get_function_body(
                         // Add the body to the form.
 
                         let mut json_part = reqwest::multipart::Part::text(serde_json::to_string(&body)?);
-                        json_part = json_part.file_name(format!("{}.json", #type_name));
+                        json_part = json_part.file_name(format!("{}.json", "body"));
                         json_part = json_part.mime_str("application/json")?;
-                        form = form.part(#type_name, json_part);
+                        form = form.part("body", json_part);
 
                         // For each of the files add them to the form.
                         for attachment in attachments {

@@ -202,9 +202,9 @@ impl Meta {
         use std::convert::TryInto;
         let mut form = reqwest::multipart::Form::new();
         let mut json_part = reqwest::multipart::Part::text(serde_json::to_string(&body)?);
-        json_part = json_part.file_name(format!("{}.json", "event"));
+        json_part = json_part.file_name(format!("{}.json", "body"));
         json_part = json_part.mime_str("application/json")?;
-        form = form.part("event", json_part);
+        form = form.part("body", json_part);
         for attachment in attachments {
             form = form.part(attachment.name.clone(), attachment.try_into()?);
         }
