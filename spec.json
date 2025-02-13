@@ -3849,7 +3849,7 @@
           "ml",
           "beta"
         ],
-        "summary": "Iterate on a CAD model with a prompt.",
+        "summary": "Iterate on a multi-file CAD model with a prompt.",
         "description": "This endpoint can iterate on multi-file models.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it. This endpoint will always return all the code back, including files that were not changed. If your original source code imported a stl/gltf/step/etc file, the output will not include that file since the model will never change non-kcl files. The endpoint will only return the kcl files that were changed.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_text_to_cad_multi_file_iteration",
         "requestBody": {
