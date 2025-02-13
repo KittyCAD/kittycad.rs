@@ -1888,6 +1888,9 @@ pub enum AsyncApiCallOutput {
         feedback: Option<MlFeedback>,
         #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
+        #[doc = "The version of kcl requested."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        kcl_version: Option<String>,
         #[doc = "The model being used."]
         model: TextToCadModel,
         #[doc = "The version of the model."]
@@ -10689,6 +10692,18 @@ pub enum ModelingCmd {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         padding: Option<f64>,
     },
+    #[doc = "Looks along the normal of the specified face (if it is planar!), and fits the view to it."]
+    #[serde(rename = "orient_to_face")]
+    OrientToFace {
+        #[doc = "Whether or not to animate the camera movement. (Animation is currently not supported.)"]
+        #[serde(default)]
+        animated: bool,
+        #[doc = "Which face to orient camera to. If the face is not planar, no action will occur."]
+        face_id: uuid::Uuid,
+        #[doc = "How much to pad the view frame by, as a fraction of the face bounding box size. Negative padding will crop the view of the face proportionally. e.g. padding = 0.2 means the view will span 120% of the face bounding box, and padding = -0.2 means the view will span 80% of the face bounding box."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        padding: Option<f64>,
+    },
     #[doc = "Fit the view to the scene with an isometric view."]
     #[serde(rename = "view_isometric")]
     ViewIsometric {
@@ -11452,6 +11467,11 @@ pub enum OkModelingCmdResponse {
     ZoomToFit {
         #[doc = "The response from the `ZoomToFit` command."]
         data: ZoomToFit,
+    },
+    #[serde(rename = "orient_to_face")]
+    OrientToFace {
+        #[doc = "The response from the `OrientToFace` command."]
+        data: OrientToFace,
     },
     #[serde(rename = "view_isometric")]
     ViewIsometric {
@@ -12332,6 +12352,37 @@ pub enum OrgRole {
     #[serde(rename = "service_account")]
     #[display("service_account")]
     ServiceAccount,
+}
+
+#[doc = "The response from the `OrientToFace` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrientToFace {
+    #[doc = "Camera settings"]
+    pub settings: CameraSettings,
+}
+
+impl std::fmt::Display for OrientToFace {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrientToFace {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.settings).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["settings".into()]
+    }
 }
 
 #[doc = "The type of origin"]
@@ -15774,6 +15825,9 @@ pub struct TextToCad {
     pub feedback: Option<MlFeedback>,
     #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
+    #[doc = "The version of kcl requested."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kcl_version: Option<String>,
     #[doc = "The model being used."]
     pub model: TextToCadModel,
     #[doc = "The version of the model."]
@@ -15808,7 +15862,7 @@ impl std::fmt::Display for TextToCad {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TextToCad {
-    const LENGTH: usize = 15;
+    const LENGTH: usize = 16;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(code) = &self.code {
@@ -15833,6 +15887,11 @@ impl tabled::Tabled for TextToCad {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
+            if let Some(kcl_version) = &self.kcl_version {
+                format!("{:?}", kcl_version).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.model).into(),
             self.model_version.clone().into(),
             format!("{:?}", self.output_format).into(),
@@ -15861,6 +15920,7 @@ impl tabled::Tabled for TextToCad {
             "error".into(),
             "feedback".into(),
             "id".into(),
+            "kcl_version".into(),
             "model".into(),
             "model_version".into(),
             "output_format".into(),

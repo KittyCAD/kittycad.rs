@@ -16368,6 +16368,11 @@
                   }
                 ]
               },
+              "kcl_version": {
+                "nullable": true,
+                "description": "The version of kcl requested.",
+                "type": "string"
+              },
               "model": {
                 "description": "The model being used.",
                 "allOf": [
@@ -25325,6 +25330,38 @@
             ]
           },
           {
+            "description": "Looks along the normal of the specified face (if it is planar!), and fits the view to it.",
+            "type": "object",
+            "properties": {
+              "animated": {
+                "description": "Whether or not to animate the camera movement. (Animation is currently not supported.)",
+                "default": false,
+                "type": "boolean"
+              },
+              "face_id": {
+                "description": "Which face to orient camera to. If the face is not planar, no action will occur.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "padding": {
+                "description": "How much to pad the view frame by, as a fraction of the face bounding box size. Negative padding will crop the view of the face proportionally. e.g. padding = 0.2 means the view will span 120% of the face bounding box, and padding = -0.2 means the view will span 80% of the face bounding box.",
+                "default": 0.0,
+                "type": "number",
+                "format": "float"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "orient_to_face"
+                ]
+              }
+            },
+            "required": [
+              "face_id",
+              "type"
+            ]
+          },
+          {
             "description": "Fit the view to the scene with an isometric view.",
             "type": "object",
             "properties": {
@@ -26903,6 +26940,24 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/OrientToFace"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "orient_to_face"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/ViewIsometric"
               },
               "type": {
@@ -28396,6 +28451,23 @@
               "service_account"
             ]
           }
+        ]
+      },
+      "OrientToFace": {
+        "description": "The response from the `OrientToFace` command.",
+        "type": "object",
+        "properties": {
+          "settings": {
+            "description": "Camera settings",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CameraSettings"
+              }
+            ]
+          }
+        },
+        "required": [
+          "settings"
         ]
       },
       "OriginType": {
@@ -30736,6 +30808,11 @@
                 "$ref": "#/components/schemas/Uuid"
               }
             ]
+          },
+          "kcl_version": {
+            "nullable": true,
+            "description": "The version of kcl requested.",
+            "type": "string"
           },
           "model": {
             "description": "The model being used.",
