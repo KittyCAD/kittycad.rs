@@ -31,7 +31,7 @@ pub fn generate_example_json_from_schema(
                     .into_iter()
                     .filter(|v| v.is_some())
                     .collect::<Vec<_>>();
-                let index = rng.gen_range(0..values.len());
+                let index = rng.random_range(0..values.len());
                 return Ok(serde_json::Value::String(
                     values[index]
                         .as_ref()
@@ -51,8 +51,8 @@ pub fn generate_example_json_from_schema(
                 let max_length = s.max_length.unwrap_or(10);
 
                 // Generate a random string.
-                let s: String = (0..rng.gen_range(min_length..max_length))
-                    .map(|_| rng.gen_range(b'a'..=b'z') as char)
+                let s: String = (0..rng.random_range(min_length..max_length))
+                    .map(|_| rng.random_range(b'a'..=b'z') as char)
                     .collect();
                 return Ok(serde_json::Value::String(s));
             }
@@ -69,8 +69,8 @@ pub fn generate_example_json_from_schema(
                 openapiv3::VariantOrUnknownOrEmpty::Item(openapiv3::StringFormat::Password) => {
                     // Return a random password.
                     let mut password = String::new();
-                    for _ in 0..rng.gen_range(8..16) {
-                        password.push(rng.gen_range(b'a'..=b'z') as char);
+                    for _ in 0..rng.random_range(8..16) {
+                        password.push(rng.random_range(b'a'..=b'z') as char);
                     }
                     serde_json::Value::String(password)
                 }
@@ -99,8 +99,8 @@ pub fn generate_example_json_from_schema(
                     "uri-template" => {
                         // Return a random URI template.
                         let mut uri = String::new();
-                        for _ in 0..rng.gen_range(8..16) {
-                            write!(uri, "{}.", rng.gen_range(0..255))?;
+                        for _ in 0..rng.random_range(8..16) {
+                            write!(uri, "{}.", rng.random_range(0..255))?;
                         }
                         uri.pop();
                         serde_json::Value::String(uri)
@@ -114,8 +114,8 @@ pub fn generate_example_json_from_schema(
                     "hostname" => {
                         // Return a random hostname.
                         let mut hostname = String::new();
-                        for _ in 0..rng.gen_range(8..16) {
-                            write!(hostname, "{}.", rng.gen_range(0..255))?;
+                        for _ in 0..rng.random_range(8..16) {
+                            write!(hostname, "{}.", rng.random_range(0..255))?;
                         }
                         hostname.pop();
                         serde_json::Value::String(hostname)
@@ -248,7 +248,7 @@ pub fn generate_example_json_from_schema(
                 let items = s.get_schema_from_reference(spec, true)?;
 
                 // Generate a random array.
-                let arr: Vec<_> = (0..rng.gen_range(0..10))
+                let arr: Vec<_> = (0..rng.random_range(0..10))
                     .map(|_| generate_example_json_from_schema(&items, spec))
                     .collect::<Result<_, _>>()?;
                 serde_json::Value::Array(arr)
@@ -271,11 +271,11 @@ pub fn generate_example_json_from_schema(
                     )
                 })
                 .collect::<Result<_, _>>()?;
-            let i = rng.gen_range(0..results.len());
+            let i = rng.random_range(0..results.len());
             results[i].clone()
         }
         openapiv3::SchemaKind::AllOf { all_of } => {
-            let i = rng.gen_range(0..all_of.len());
+            let i = rng.random_range(0..all_of.len());
             generate_example_json_from_schema(
                 &all_of[i].get_schema_from_reference(spec, true)?,
                 spec,

@@ -56,10 +56,7 @@ impl Hidden {
             format!("{}/{}", self.client.base_url, "auth/email/callback"),
         );
         req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![
-            ("email", email.to_string()),
-            ("token", token.to_string()),
-        ];
+        let mut query_params = vec![("email", email.to_string()), ("token", token.to_string())];
         if let Some(p) = callback_url {
             query_params.push(("callback_url", p));
         }
