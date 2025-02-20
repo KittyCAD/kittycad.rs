@@ -25,7 +25,8 @@ log = { version = "^0.4", features = ["serde"], optional = true }
 mime_guess = "2.0.4"
 parse-display = "0.10.0"
 phonenumber = "0.3.5"
-rand = { version = "0.8", optional = true }
+rand = { version = "0.9", optional = true }
+getrandom = { version = "0.3" }
 reqwest = { version = "0.12", default-features = false, features = ["json", "multipart", "rustls-tls"], optional = true }
 reqwest-conditional-middleware = { version = "0.4", optional = true }
 reqwest-middleware = { version = "0.4", optional = true, features = ["json", "multipart", "http2", "rustls-tls"] }
@@ -53,7 +54,7 @@ chrono = { version = "0.4", default-features = false, features = ["serde", "std"
 expectorate = "1"
 futures-util = "^0.3.26"
 pretty_assertions = "1"
-rand = "0.8"
+rand = "0.9"
 tokio = { version = "1.38.0", features = ["rt", "macros"] }
 tokio-tungstenite = "0.24"
 
@@ -63,7 +64,7 @@ clap = ["dep:clap"]
 tabled = ["dep:tabled"]
 requests = ["dep:async-trait", "dep:format_serde_error", "dep:futures", "dep:http", "dep:log", "dep:rand", "dep:reqwest", "dep:serde_urlencoded", "dep:tracing"]
 retry = ["dep:reqwest-conditional-middleware", "dep:reqwest-retry", "dep:reqwest-middleware", "dep:reqwest-tracing"]
-js = ["uuid/js"]
+js = ["uuid/js", "getrandom/wasm_js" ]
 
 [package.metadata.docs.rs]
 all-features = true
