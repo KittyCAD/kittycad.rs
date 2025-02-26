@@ -43,7 +43,7 @@ impl Orgs {
         }
     }
 
-    #[doc = "Update an org.\n\nThis endpoint requires authentication by an org admin. It updates the authenticated user's org.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_update() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Org = client\n        .orgs()\n        .update(&kittycad::types::OrgDetails {\n            allow_users_in_domain_to_auto_join: Some(false),\n            billing_email: Some(\"email@example.com\".to_string()),\n            domain: Some(\"some-string\".to_string()),\n            image: Some(\"https://example.com/foo/bar\".to_string()),\n            name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update an org.\n\nThis endpoint requires authentication by an org admin. It updates the authenticated user's org.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_update() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Org = client\n        .orgs()\n        .update(&kittycad::types::OrgDetails {\n            allow_users_in_domain_to_auto_join: Some(true),\n            billing_email: Some(\"email@example.com\".to_string()),\n            domain: Some(\"some-string\".to_string()),\n            image: Some(\"https://example.com/foo/bar\".to_string()),\n            name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update<'a>(
         &'a self,
@@ -74,7 +74,7 @@ impl Orgs {
         }
     }
 
-    #[doc = "Create an org.\n\nThis endpoint requires authentication by a Zoo user that is not already in an org. It creates a new org for the authenticated user and makes them an admin.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_create() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Org = client\n        .orgs()\n        .create(&kittycad::types::OrgDetails {\n            allow_users_in_domain_to_auto_join: Some(false),\n            billing_email: Some(\"email@example.com\".to_string()),\n            domain: Some(\"some-string\".to_string()),\n            image: Some(\"https://example.com/foo/bar\".to_string()),\n            name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create an org.\n\nThis endpoint requires authentication by a Zoo user that is not already in an org. It creates a new org for the authenticated user and makes them an admin.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_create() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Org = client\n        .orgs()\n        .create(&kittycad::types::OrgDetails {\n            allow_users_in_domain_to_auto_join: Some(true),\n            billing_email: Some(\"email@example.com\".to_string()),\n            domain: Some(\"some-string\".to_string()),\n            image: Some(\"https://example.com/foo/bar\".to_string()),\n            name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create<'a>(
         &'a self,
@@ -452,7 +452,7 @@ impl Orgs {
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::PrivacySettings = client\n        .orgs()\n        \
              .update_privacy_settings(&kittycad::types::PrivacySettings {\n            \
-             can_train_on_data: false,\n        })\n        .await?;\n    println!(\"{:?}\", \
+             can_train_on_data: true,\n        })\n        .await?;\n    println!(\"{:?}\", \
              result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_privacy_settings<'a>(
@@ -870,7 +870,7 @@ impl Orgs {
         }
     }
 
-    #[doc = "Set the enterprise price for an organization.\n\nYou must be a Zoo employee to perform this request.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        .update_enterprise_pricing_for(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::EnterpriseSubscriptionTierPrice::Flat {\n                interval: kittycad::types::PlanInterval::Year,\n                price: 3.14 as f64,\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Set the enterprise price for an organization.\n\nYou must be a Zoo employee to perform this request.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        .update_enterprise_pricing_for(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::EnterpriseSubscriptionTierPrice::Flat {\n                interval: kittycad::types::PlanInterval::Week,\n                price: 3.14 as f64,\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_enterprise_pricing_for<'a>(
         &'a self,

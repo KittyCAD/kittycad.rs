@@ -604,6 +604,7 @@ mime_guess = "2.0.4"
 parse-display = "0.10.0"
 phonenumber = "0.3.5"
 rand = {{ version = "0.9", optional = true }}
+getrandom = {{ version = "0.3" }}
 reqwest = {{ version = "0.12", default-features = false, features = ["json", "multipart", "rustls-tls"], optional = true }}
 reqwest-conditional-middleware = {{ version = "0.4", optional = true }}
 reqwest-middleware = {{ version = "0.4", optional = true, features = ["json", "multipart", "http2", "rustls-tls"] }}
@@ -641,7 +642,7 @@ clap = ["dep:clap"]
 tabled = ["dep:tabled"]
 requests = ["dep:async-trait", "dep:format_serde_error", "dep:futures", "dep:http", "dep:log", "dep:rand", "dep:reqwest", "dep:serde_urlencoded", "dep:tracing"]
 retry = ["dep:reqwest-conditional-middleware", "dep:reqwest-retry", "dep:reqwest-middleware", "dep:reqwest-tracing"]
-js = ["uuid/js"]
+js = ["uuid/js", "getrandom/wasm_js"]
 
 [package.metadata.docs.rs]
 all-features = true

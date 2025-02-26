@@ -70,8 +70,8 @@ impl Unit {
              example_unit_get_area_conversion() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: \
              kittycad::types::UnitAreaConversion = client\n        .unit()\n        \
-             .get_area_conversion(\n            kittycad::types::UnitArea::Yd2,\n            \
-             kittycad::types::UnitArea::Yd2,\n            3.14 as f64,\n        )\n        \
+             .get_area_conversion(\n            kittycad::types::UnitArea::Km2,\n            \
+             kittycad::types::UnitArea::Km2,\n            3.14 as f64,\n        )\n        \
              .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_area_conversion<'a>(
@@ -112,7 +112,7 @@ impl Unit {
         }
     }
 
-    #[doc = "Convert current units.\n\nConvert a current unit value to another current unit value. This is a nice endpoint to use for helper functions.\n\n**Parameters:**\n\n- `input_unit: crate::types::UnitCurrent`: The source format of the unit. (required)\n- `output_unit: crate::types::UnitCurrent`: The output format of the unit. (required)\n- `value: f64`: The initial value. (required)\n\n```rust,no_run\nasync fn example_unit_get_current_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitCurrentConversion = client\n        .unit()\n        .get_current_conversion(\n            kittycad::types::UnitCurrent::Nanoamperes,\n            kittycad::types::UnitCurrent::Nanoamperes,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Convert current units.\n\nConvert a current unit value to another current unit value. This is a nice endpoint to use for helper functions.\n\n**Parameters:**\n\n- `input_unit: crate::types::UnitCurrent`: The source format of the unit. (required)\n- `output_unit: crate::types::UnitCurrent`: The output format of the unit. (required)\n- `value: f64`: The initial value. (required)\n\n```rust,no_run\nasync fn example_unit_get_current_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitCurrentConversion = client\n        .unit()\n        .get_current_conversion(\n            kittycad::types::UnitCurrent::Milliamperes,\n            kittycad::types::UnitCurrent::Milliamperes,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_current_conversion<'a>(
         &'a self,
@@ -152,7 +152,7 @@ impl Unit {
         }
     }
 
-    #[doc = "Convert energy units.\n\nConvert a energy unit value to another energy unit value. This is a nice endpoint to use for helper functions.\n\n**Parameters:**\n\n- `input_unit: crate::types::UnitEnergy`: The source format of the unit. (required)\n- `output_unit: crate::types::UnitEnergy`: The output format of the unit. (required)\n- `value: f64`: The initial value. (required)\n\n```rust,no_run\nasync fn example_unit_get_energy_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitEnergyConversion = client\n        .unit()\n        .get_energy_conversion(\n            kittycad::types::UnitEnergy::WattHours,\n            kittycad::types::UnitEnergy::WattHours,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Convert energy units.\n\nConvert a energy unit value to another energy unit value. This is a nice endpoint to use for helper functions.\n\n**Parameters:**\n\n- `input_unit: crate::types::UnitEnergy`: The source format of the unit. (required)\n- `output_unit: crate::types::UnitEnergy`: The output format of the unit. (required)\n- `value: f64`: The initial value. (required)\n\n```rust,no_run\nasync fn example_unit_get_energy_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitEnergyConversion = client\n        .unit()\n        .get_energy_conversion(\n            kittycad::types::UnitEnergy::Kilocalories,\n            kittycad::types::UnitEnergy::Kilocalories,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_energy_conversion<'a>(
         &'a self,
@@ -200,8 +200,8 @@ impl Unit {
              example_unit_get_force_conversion() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: \
              kittycad::types::UnitForceConversion = client\n        .unit()\n        \
-             .get_force_conversion(\n            kittycad::types::UnitForce::Pounds,\n            \
-             kittycad::types::UnitForce::Pounds,\n            3.14 as f64,\n        )\n        \
+             .get_force_conversion(\n            kittycad::types::UnitForce::Newtons,\n            \
+             kittycad::types::UnitForce::Newtons,\n            3.14 as f64,\n        )\n        \
              .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_force_conversion<'a>(
@@ -242,7 +242,7 @@ impl Unit {
         }
     }
 
-    #[doc = "Convert frequency units.\n\nConvert a frequency unit value to another frequency unit value. This is a nice endpoint to use for helper functions.\n\n**Parameters:**\n\n- `input_unit: crate::types::UnitFrequency`: The source format of the unit. (required)\n- `output_unit: crate::types::UnitFrequency`: The output format of the unit. (required)\n- `value: f64`: The initial value. (required)\n\n```rust,no_run\nasync fn example_unit_get_frequency_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitFrequencyConversion = client\n        .unit()\n        .get_frequency_conversion(\n            kittycad::types::UnitFrequency::Terahertz,\n            kittycad::types::UnitFrequency::Terahertz,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Convert frequency units.\n\nConvert a frequency unit value to another frequency unit value. This is a nice endpoint to use for helper functions.\n\n**Parameters:**\n\n- `input_unit: crate::types::UnitFrequency`: The source format of the unit. (required)\n- `output_unit: crate::types::UnitFrequency`: The output format of the unit. (required)\n- `value: f64`: The initial value. (required)\n\n```rust,no_run\nasync fn example_unit_get_frequency_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitFrequencyConversion = client\n        .unit()\n        .get_frequency_conversion(\n            kittycad::types::UnitFrequency::Microhertz,\n            kittycad::types::UnitFrequency::Microhertz,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_frequency_conversion<'a>(
         &'a self,
@@ -290,8 +290,8 @@ impl Unit {
              example_unit_get_length_conversion() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: \
              kittycad::types::UnitLengthConversion = client\n        .unit()\n        \
-             .get_length_conversion(\n            kittycad::types::UnitLength::Yd,\n            \
-             kittycad::types::UnitLength::Yd,\n            3.14 as f64,\n        )\n        \
+             .get_length_conversion(\n            kittycad::types::UnitLength::M,\n            \
+             kittycad::types::UnitLength::M,\n            3.14 as f64,\n        )\n        \
              .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_length_conversion<'a>(
@@ -340,8 +340,8 @@ impl Unit {
              example_unit_get_mass_conversion() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: \
              kittycad::types::UnitMassConversion = client\n        .unit()\n        \
-             .get_mass_conversion(\n            kittycad::types::UnitMass::Lb,\n            \
-             kittycad::types::UnitMass::Lb,\n            3.14 as f64,\n        )\n        \
+             .get_mass_conversion(\n            kittycad::types::UnitMass::Kg,\n            \
+             kittycad::types::UnitMass::Kg,\n            3.14 as f64,\n        )\n        \
              .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_mass_conversion<'a>(
@@ -382,17 +382,7 @@ impl Unit {
         }
     }
 
-    #[doc = "Convert power units.\n\nConvert a power unit value to another power unit value. This \
-             is a nice endpoint to use for helper functions.\n\n**Parameters:**\n\n- `input_unit: \
-             crate::types::UnitPower`: The source format of the unit. (required)\n- `output_unit: \
-             crate::types::UnitPower`: The output format of the unit. (required)\n- `value: f64`: \
-             The initial value. (required)\n\n```rust,no_run\nasync fn \
-             example_unit_get_power_conversion() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: \
-             kittycad::types::UnitPowerConversion = client\n        .unit()\n        \
-             .get_power_conversion(\n            kittycad::types::UnitPower::Watts,\n            \
-             kittycad::types::UnitPower::Watts,\n            3.14 as f64,\n        )\n        \
-             .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Convert power units.\n\nConvert a power unit value to another power unit value. This is a nice endpoint to use for helper functions.\n\n**Parameters:**\n\n- `input_unit: crate::types::UnitPower`: The source format of the unit. (required)\n- `output_unit: crate::types::UnitPower`: The output format of the unit. (required)\n- `value: f64`: The initial value. (required)\n\n```rust,no_run\nasync fn example_unit_get_power_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitPowerConversion = client\n        .unit()\n        .get_power_conversion(\n            kittycad::types::UnitPower::Microwatts,\n            kittycad::types::UnitPower::Microwatts,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_power_conversion<'a>(
         &'a self,
@@ -432,7 +422,7 @@ impl Unit {
         }
     }
 
-    #[doc = "Convert pressure units.\n\nConvert a pressure unit value to another pressure unit value. This is a nice endpoint to use for helper functions.\n\n**Parameters:**\n\n- `input_unit: crate::types::UnitPressure`: The source format of the unit. (required)\n- `output_unit: crate::types::UnitPressure`: The output format of the unit. (required)\n- `value: f64`: The initial value. (required)\n\n```rust,no_run\nasync fn example_unit_get_pressure_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitPressureConversion = client\n        .unit()\n        .get_pressure_conversion(\n            kittycad::types::UnitPressure::Psi,\n            kittycad::types::UnitPressure::Psi,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Convert pressure units.\n\nConvert a pressure unit value to another pressure unit value. This is a nice endpoint to use for helper functions.\n\n**Parameters:**\n\n- `input_unit: crate::types::UnitPressure`: The source format of the unit. (required)\n- `output_unit: crate::types::UnitPressure`: The output format of the unit. (required)\n- `value: f64`: The initial value. (required)\n\n```rust,no_run\nasync fn example_unit_get_pressure_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitPressureConversion = client\n        .unit()\n        .get_pressure_conversion(\n            kittycad::types::UnitPressure::Millibars,\n            kittycad::types::UnitPressure::Millibars,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_pressure_conversion<'a>(
         &'a self,
@@ -472,7 +462,7 @@ impl Unit {
         }
     }
 
-    #[doc = "Convert temperature units.\n\nConvert a temperature unit value to another temperature unit value. This is a nice endpoint to use for helper functions.\n\n**Parameters:**\n\n- `input_unit: crate::types::UnitTemperature`: The source format of the unit. (required)\n- `output_unit: crate::types::UnitTemperature`: The output format of the unit. (required)\n- `value: f64`: The initial value. (required)\n\n```rust,no_run\nasync fn example_unit_get_temperature_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitTemperatureConversion = client\n        .unit()\n        .get_temperature_conversion(\n            kittycad::types::UnitTemperature::Rankine,\n            kittycad::types::UnitTemperature::Rankine,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Convert temperature units.\n\nConvert a temperature unit value to another temperature unit value. This is a nice endpoint to use for helper functions.\n\n**Parameters:**\n\n- `input_unit: crate::types::UnitTemperature`: The source format of the unit. (required)\n- `output_unit: crate::types::UnitTemperature`: The output format of the unit. (required)\n- `value: f64`: The initial value. (required)\n\n```rust,no_run\nasync fn example_unit_get_temperature_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitTemperatureConversion = client\n        .unit()\n        .get_temperature_conversion(\n            kittycad::types::UnitTemperature::Kelvin,\n            kittycad::types::UnitTemperature::Kelvin,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_temperature_conversion<'a>(
         &'a self,
@@ -552,17 +542,7 @@ impl Unit {
         }
     }
 
-    #[doc = "Convert volume units.\n\nConvert a volume unit value to another volume unit value. \
-             This is a nice endpoint to use for helper functions.\n\n**Parameters:**\n\n- \
-             `input_unit: crate::types::UnitVolume`: The source format of the unit. (required)\n- \
-             `output_unit: crate::types::UnitVolume`: The output format of the unit. (required)\n- \
-             `value: f64`: The initial value. (required)\n\n```rust,no_run\nasync fn \
-             example_unit_get_volume_conversion() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: \
-             kittycad::types::UnitVolumeConversion = client\n        .unit()\n        \
-             .get_volume_conversion(\n            kittycad::types::UnitVolume::Ml,\n            \
-             kittycad::types::UnitVolume::Ml,\n            3.14 as f64,\n        )\n        \
-             .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Convert volume units.\n\nConvert a volume unit value to another volume unit value. This is a nice endpoint to use for helper functions.\n\n**Parameters:**\n\n- `input_unit: crate::types::UnitVolume`: The source format of the unit. (required)\n- `output_unit: crate::types::UnitVolume`: The output format of the unit. (required)\n- `value: f64`: The initial value. (required)\n\n```rust,no_run\nasync fn example_unit_get_volume_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UnitVolumeConversion = client\n        .unit()\n        .get_volume_conversion(\n            kittycad::types::UnitVolume::Usfloz,\n            kittycad::types::UnitVolume::Usfloz,\n            3.14 as f64,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_volume_conversion<'a>(
         &'a self,

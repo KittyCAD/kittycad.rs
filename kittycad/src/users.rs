@@ -233,7 +233,7 @@ impl Users {
              kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings = \
              client\n        .users()\n        \
              .update_privacy_settings(&kittycad::types::PrivacySettings {\n            \
-             can_train_on_data: false,\n        })\n        .await?;\n    println!(\"{:?}\", \
+             can_train_on_data: true,\n        })\n        .await?;\n    println!(\"{:?}\", \
              result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_privacy_settings<'a>(
@@ -423,7 +423,7 @@ impl Users {
             .boxed()
     }
 
-    #[doc = "Create a shortlink for a user.\n\nThis endpoint requires authentication by any Zoo user. It creates a shortlink for the user.\n\n```rust,no_run\nasync fn example_users_create_shortlink() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CreateShortlinkResponse = client\n        .users()\n        .create_shortlink(&kittycad::types::CreateShortlinkRequest {\n            password: Some(\"some-string\".to_string()),\n            restrict_to_org: false,\n            url: \"https://example.com/foo/bar\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create a shortlink for a user.\n\nThis endpoint requires authentication by any Zoo user. It creates a shortlink for the user.\n\n```rust,no_run\nasync fn example_users_create_shortlink() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CreateShortlinkResponse = client\n        .users()\n        .create_shortlink(&kittycad::types::CreateShortlinkRequest {\n            password: Some(\"some-string\".to_string()),\n            restrict_to_org: true,\n            url: \"https://example.com/foo/bar\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_shortlink<'a>(
         &'a self,
@@ -454,7 +454,7 @@ impl Users {
         }
     }
 
-    #[doc = "Update a shortlink for a user.\n\nThis endpoint requires authentication by any Zoo user. It updates a shortlink for the user.\n\nThis endpoint really only allows you to change the `restrict_to_org` setting of a shortlink. Thus it is only useful for folks who are part of an org. If you are not part of an org, you will not be able to change the `restrict_to_org` status.\n\n**Parameters:**\n\n- `key: &'astr`: The key of the shortlink. (required)\n\n```rust,no_run\nasync fn example_users_update_shortlink() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .update_shortlink(\n            \"some-string\",\n            &kittycad::types::UpdateShortlinkRequest {\n                password: Some(\"some-string\".to_string()),\n                restrict_to_org: false,\n            },\n        )\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Update a shortlink for a user.\n\nThis endpoint requires authentication by any Zoo user. It updates a shortlink for the user.\n\nThis endpoint really only allows you to change the `restrict_to_org` setting of a shortlink. Thus it is only useful for folks who are part of an org. If you are not part of an org, you will not be able to change the `restrict_to_org` status.\n\n**Parameters:**\n\n- `key: &'astr`: The key of the shortlink. (required)\n\n```rust,no_run\nasync fn example_users_update_shortlink() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .update_shortlink(\n            \"some-string\",\n            &kittycad::types::UpdateShortlinkRequest {\n                password: Some(\"some-string\".to_string()),\n                restrict_to_org: true,\n            },\n        )\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_shortlink<'a>(
         &'a self,

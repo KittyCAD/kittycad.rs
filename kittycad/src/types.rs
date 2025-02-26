@@ -5634,6 +5634,7 @@ pub enum Type {
     ModelingAppEvent,
 }
 
+
 #[doc = "An event related to modeling app files"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9689,6 +9690,7 @@ pub enum ModelingAppEventType {
     SuccessfulCompileBeforeClose,
 }
 
+
 #[doc = "The subscription tiers we offer for the Modeling App to individuals."]
 #[derive(
     serde :: Serialize,
@@ -11282,6 +11284,7 @@ pub enum Oauth2GrantType {
     #[default]
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
+
 
 #[doc = "The response from the `ObjectBringToFront` endpoint."]
 #[derive(
@@ -13356,6 +13359,7 @@ pub enum PaymentMethodType {
     #[default]
     Card,
 }
+
 
 #[doc = "Defines a perspective view."]
 #[derive(
