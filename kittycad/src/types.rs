@@ -66,7 +66,7 @@ pub mod base64 {
     }
 
     struct Base64DataVisitor;
-    impl<'de> Visitor<'de> for Base64DataVisitor {
+    impl Visitor<'_> for Base64DataVisitor {
         type Value = Base64Data;
         fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
             write!(formatter, "a base64 encoded string")
