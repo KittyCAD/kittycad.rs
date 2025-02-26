@@ -20,7 +20,7 @@ impl Executor {
              example_executor_create_file_execution() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::CodeOutput = \
              client\n        .executor()\n        .create_file_execution(\n            \
-             kittycad::types::CodeLanguage::Node,\n            \
+             kittycad::types::CodeLanguage::Python,\n            \
              Some(\"some-string\".to_string()),\n            \
              &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
