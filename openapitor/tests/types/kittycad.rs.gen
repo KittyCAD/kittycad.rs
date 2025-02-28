@@ -1561,6 +1561,9 @@ impl tabled::Tabled for AppClientInfo {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AsyncApiCall {
+    #[doc = "The number of times we've attempted to process this job."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attempts: Option<i16>,
     #[doc = "The time and date the async API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -1606,9 +1609,14 @@ impl std::fmt::Display for AsyncApiCall {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AsyncApiCall {
-    const LENGTH: usize = 12;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(attempts) = &self.attempts {
+                format!("{:?}", attempts).into()
+            } else {
+                String::new().into()
+            },
             if let Some(completed_at) = &self.completed_at {
                 format!("{:?}", completed_at).into()
             } else {
@@ -1650,6 +1658,7 @@ impl tabled::Tabled for AsyncApiCall {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "attempts".into(),
             "completed_at".into(),
             "created_at".into(),
             "error".into(),
