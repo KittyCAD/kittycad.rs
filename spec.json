@@ -15589,6 +15589,12 @@
         "description": "An async API call.",
         "type": "object",
         "properties": {
+          "attempts": {
+            "description": "The number of times we've attempted to process this job.",
+            "default": 0,
+            "type": "integer",
+            "format": "int16"
+          },
           "completed_at": {
             "nullable": true,
             "title": "DateTime",
