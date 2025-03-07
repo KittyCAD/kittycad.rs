@@ -1709,7 +1709,7 @@ pub enum AsyncApiCallOutput {
         output_format: FileExportFormat,
         #[doc = "The output format options of the file conversion."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
-        output_format_options: Option<OutputFormat>,
+        output_format_options: Option<OutputFormat3D>,
         #[doc = "The converted files (if multiple file conversion), if completed, base64 encoded. \
                  The key of the map is the path of the output file."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1718,7 +1718,7 @@ pub enum AsyncApiCallOutput {
         src_format: FileImportFormat,
         #[doc = "The source format options of the file conversion."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
-        src_format_options: Option<InputFormat>,
+        src_format_options: Option<InputFormat3D>,
         #[doc = "The time and date the API call was started."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -4773,6 +4773,31 @@ pub enum DistanceType {
     },
 }
 
+#[doc = "Export storage."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum DxfStorage {
+    #[doc = "Plaintext encoding.\n\nThis is the default setting."]
+    #[serde(rename = "ascii")]
+    #[display("ascii")]
+    Ascii,
+    #[doc = "Binary encoding."]
+    #[serde(rename = "binary")]
+    #[display("binary")]
+    Binary,
+}
+
 #[doc = "The response from the `EdgeLinesVisible` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4982,6 +5007,34 @@ impl tabled::Tabled for EntityCircularPattern {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["entity_ids".into()]
+    }
+}
+
+#[doc = "The response from the `EntityClone` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityClone {}
+
+impl std::fmt::Display for EntityClone {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityClone {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 
@@ -5747,6 +5800,68 @@ impl std::fmt::Display for Export {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Export {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.files).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["files".into()]
+    }
+}
+
+#[doc = "The response from the `Export2d` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Export2D {
+    #[doc = "The files that were exported."]
+    pub files: Vec<ExportFile>,
+}
+
+impl std::fmt::Display for Export2D {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Export2D {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.files).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["files".into()]
+    }
+}
+
+#[doc = "The response from the `Export3d` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Export3D {
+    #[doc = "The files that were exported."]
+    pub files: Vec<ExportFile>,
+}
+
+impl std::fmt::Display for Export3D {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Export3D {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![format!("{:?}", self.files).into()]
@@ -6571,7 +6686,7 @@ pub struct FileConversion {
     pub output_format: FileExportFormat,
     #[doc = "The output format options of the file conversion."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub output_format_options: Option<OutputFormat>,
+    pub output_format_options: Option<OutputFormat3D>,
     #[doc = "The converted files (if multiple file conversion), if completed, base64 encoded. The \
              key of the map is the path of the output file."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -6580,7 +6695,7 @@ pub struct FileConversion {
     pub src_format: FileImportFormat,
     #[doc = "The source format options of the file conversion."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub src_format_options: Option<InputFormat>,
+    pub src_format_options: Option<InputFormat3D>,
     #[doc = "The time and date the API call was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -7839,7 +7954,7 @@ impl tabled::Tabled for ImportedGeometry {
 )]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
-pub enum InputFormat {
+pub enum InputFormat3D {
     #[doc = "Autodesk Filmbox (FBX) format."]
     #[serde(rename = "fbx")]
     Fbx {},
@@ -10127,6 +10242,23 @@ pub enum ModelingCmd {
                  by."]
         magnitude: f64,
     },
+    #[doc = "Export a sketch to a file."]
+    #[serde(rename = "export2d")]
+    Export2D {
+        #[doc = "IDs of the entities to be exported."]
+        entity_ids: Vec<uuid::Uuid>,
+        #[doc = "The file format to export to."]
+        format: OutputFormat2D,
+    },
+    #[doc = "Export the scene to a file."]
+    #[serde(rename = "export3d")]
+    Export3D {
+        #[doc = "IDs of the entities to be exported. If this is empty, then all entities are \
+                 exported."]
+        entity_ids: Vec<uuid::Uuid>,
+        #[doc = "The file format to export to."]
+        format: OutputFormat3D,
+    },
     #[doc = "Export the scene to a file."]
     #[serde(rename = "export")]
     Export {
@@ -10134,7 +10266,7 @@ pub enum ModelingCmd {
                  exported."]
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The file format to export to."]
-        format: OutputFormat,
+        format: OutputFormat3D,
     },
     #[doc = "What is this entity's parent?"]
     #[serde(rename = "entity_get_parent_id")]
@@ -10179,6 +10311,14 @@ pub enum ModelingCmd {
         #[doc = "ID of the second entity being queried."]
         #[serde(rename = "entity_id2")]
         entity_id_2: uuid::Uuid,
+    },
+    #[doc = "Create a pattern using this entity by specifying the transform for each desired \
+             repetition. Transformations are performed in the following order (first applied to \
+             last applied): scale, rotate, translate."]
+    #[serde(rename = "entity_clone")]
+    EntityClone {
+        #[doc = "ID of the entity being cloned."]
+        entity_id: uuid::Uuid,
     },
     #[doc = "Create a pattern using this entity by specifying the transform for each desired \
              repetition. Transformations are performed in the following order (first applied to \
@@ -10815,7 +10955,7 @@ pub enum ModelingCmd {
         #[doc = "Files to import."]
         files: Vec<ImportFile>,
         #[doc = "Input file format."]
-        format: InputFormat,
+        format: InputFormat3D,
     },
     #[doc = "Set the units of the scene. For all following commands, the units will be \
              interpreted as the given units. Any previously executed commands will not be \
@@ -11661,6 +11801,16 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `SelectClear` endpoint."]
         data: SelectClear,
     },
+    #[serde(rename = "export2d")]
+    Export2D {
+        #[doc = "The response from the `Export2d` endpoint."]
+        data: Export2D,
+    },
+    #[serde(rename = "export3d")]
+    Export3D {
+        #[doc = "The response from the `Export3d` endpoint."]
+        data: Export3D,
+    },
     #[serde(rename = "export")]
     Export {
         #[doc = "The response from the `Export` endpoint."]
@@ -11947,6 +12097,11 @@ pub enum OkModelingCmdResponse {
     EntityGetDistance {
         #[doc = "The response from the `EntitiesGetDistance` command."]
         data: EntityGetDistance,
+    },
+    #[serde(rename = "entity_clone")]
+    EntityClone {
+        #[doc = "The response from the `EntityClone` command."]
+        data: EntityClone,
     },
     #[serde(rename = "entity_linear_pattern_transform")]
     EntityLinearPatternTransform {
@@ -12734,13 +12889,71 @@ impl tabled::Tabled for OutputFile {
     }
 }
 
-#[doc = "Output format specifier."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[derive(Default)]
+pub enum OutputFormat2DType {
+    #[serde(rename = "dxf")]
+    #[display("dxf")]
+    #[default]
+    Dxf,
+}
+
+
+#[doc = "AutoCAD drawing interchange format."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OutputFormat2D {
+    #[doc = "Export storage."]
+    pub storage: DxfStorage,
+    #[serde(rename = "type")]
+    pub type_: OutputFormat2DType,
+}
+
+impl std::fmt::Display for OutputFormat2D {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OutputFormat2D {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.storage).into(),
+            format!("{:?}", self.type_).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["storage".into(), "type_".into()]
+    }
+}
+
+#[doc = "Output 3D format specifier."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
-pub enum OutputFormat {
+pub enum OutputFormat3D {
     #[doc = "Autodesk Filmbox (FBX) format."]
     #[serde(rename = "fbx")]
     Fbx {
