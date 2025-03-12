@@ -15725,7 +15725,7 @@
                 "description": "The output format options of the file conversion.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/OutputFormat"
+                    "$ref": "#/components/schemas/OutputFormat3d"
                   }
                 ]
               },
@@ -15751,7 +15751,7 @@
                 "description": "The source format options of the file conversion.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/InputFormat"
+                    "$ref": "#/components/schemas/InputFormat3d"
                   }
                 ]
               },
@@ -17102,6 +17102,60 @@
           "up"
         ]
       },
+      "CameraViewState": {
+        "type": "object",
+        "properties": {
+          "eye_offset": {
+            "type": "number",
+            "format": "float"
+          },
+          "fov_y": {
+            "type": "number",
+            "format": "float"
+          },
+          "is_ortho": {
+            "type": "boolean"
+          },
+          "ortho_scale_enabled": {
+            "type": "boolean"
+          },
+          "ortho_scale_factor": {
+            "type": "number",
+            "format": "float"
+          },
+          "pivot_position": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "float"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "pivot_rotation": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "float"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "world_coord_system": {
+            "$ref": "#/components/schemas/WorldCoordinateSystem"
+          }
+        },
+        "required": [
+          "eye_offset",
+          "fov_y",
+          "is_ortho",
+          "ortho_scale_enabled",
+          "ortho_scale_factor",
+          "pivot_position",
+          "pivot_rotation",
+          "world_coord_system"
+        ]
+      },
       "CardDetails": {
         "description": "The card details of a payment method.",
         "type": "object",
@@ -18143,6 +18197,23 @@
           "settings"
         ]
       },
+      "DefaultCameraGetView": {
+        "description": "The response from the `DefaultCameraGetView` command.",
+        "type": "object",
+        "properties": {
+          "view": {
+            "description": "Camera view state",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CameraViewState"
+              }
+            ]
+          }
+        },
+        "required": [
+          "view"
+        ]
+      },
       "DefaultCameraLookAt": {
         "description": "The response from the `DefaultCameraLookAt` endpoint.",
         "type": "object"
@@ -18157,6 +18228,10 @@
       },
       "DefaultCameraSetPerspective": {
         "description": "The response from the `DefaultCameraSetPerspective` endpoint.",
+        "type": "object"
+      },
+      "DefaultCameraSetView": {
+        "description": "The response from the `DefaultCameraSetView` command.",
         "type": "object"
       },
       "DefaultCameraZoom": {
@@ -18391,6 +18466,25 @@
           }
         ]
       },
+      "DxfStorage": {
+        "description": "Export storage.",
+        "oneOf": [
+          {
+            "description": "Plaintext encoding.\n\nThis is the default setting.",
+            "type": "string",
+            "enum": [
+              "ascii"
+            ]
+          },
+          {
+            "description": "Binary encoding.",
+            "type": "string",
+            "enum": [
+              "binary"
+            ]
+          }
+        ]
+      },
       "EdgeLinesVisible": {
         "description": "The response from the `EdgeLinesVisible` endpoint.",
         "type": "object"
@@ -18523,6 +18617,10 @@
         "required": [
           "entity_ids"
         ]
+      },
+      "EntityClone": {
+        "description": "The response from the `EntityClone` command.",
+        "type": "object"
       },
       "EntityFade": {
         "description": "The response from the `EntityFade` endpoint.",
@@ -18927,6 +19025,38 @@
       },
       "Export": {
         "description": "The response from the `Export` endpoint.",
+        "type": "object",
+        "properties": {
+          "files": {
+            "description": "The files that were exported.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExportFile"
+            }
+          }
+        },
+        "required": [
+          "files"
+        ]
+      },
+      "Export2d": {
+        "description": "The response from the `Export2d` endpoint.",
+        "type": "object",
+        "properties": {
+          "files": {
+            "description": "The files that were exported.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExportFile"
+            }
+          }
+        },
+        "required": [
+          "files"
+        ]
+      },
+      "Export3d": {
+        "description": "The response from the `Export3d` endpoint.",
         "type": "object",
         "properties": {
           "files": {
@@ -19485,7 +19615,7 @@
             "description": "The output format options of the file conversion.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/OutputFormat"
+                "$ref": "#/components/schemas/OutputFormat3d"
               }
             ]
           },
@@ -19511,7 +19641,7 @@
             "description": "The source format options of the file conversion.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/InputFormat"
+                "$ref": "#/components/schemas/InputFormat3d"
               }
             ]
           },
@@ -20443,7 +20573,7 @@
           "value"
         ]
       },
-      "InputFormat": {
+      "InputFormat3d": {
         "description": "Input format specifier.",
         "oneOf": [
           {
@@ -22464,6 +22594,45 @@
             ]
           },
           {
+            "description": "Gets the default camera's view state",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_get_view"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
+            "description": "Sets the default camera's view state",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_set_view"
+                ]
+              },
+              "view": {
+                "description": "Camera view state",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CameraViewState"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "type",
+              "view"
+            ]
+          },
+          {
             "description": "Change what the default camera is looking at.",
             "type": "object",
             "properties": {
@@ -22601,6 +22770,39 @@
             ]
           },
           {
+            "description": "Export a sketch to a file.",
+            "type": "object",
+            "properties": {
+              "entity_ids": {
+                "description": "IDs of the entities to be exported.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "format": {
+                "description": "The file format to export to.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/OutputFormat2d"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "export2d"
+                ]
+              }
+            },
+            "required": [
+              "entity_ids",
+              "format",
+              "type"
+            ]
+          },
+          {
             "description": "Export the scene to a file.",
             "type": "object",
             "properties": {
@@ -22616,7 +22818,40 @@
                 "description": "The file format to export to.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/OutputFormat"
+                    "$ref": "#/components/schemas/OutputFormat3d"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "export3d"
+                ]
+              }
+            },
+            "required": [
+              "entity_ids",
+              "format",
+              "type"
+            ]
+          },
+          {
+            "description": "Export the scene to a file.",
+            "type": "object",
+            "properties": {
+              "entity_ids": {
+                "description": "IDs of the entities to be exported. If this is empty, then all entities are exported.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "format": {
+                "description": "The file format to export to.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/OutputFormat3d"
                   }
                 ]
               },
@@ -22778,6 +23013,27 @@
               "distance_type",
               "entity_id1",
               "entity_id2",
+              "type"
+            ]
+          },
+          {
+            "description": "Create a pattern using this entity by specifying the transform for each desired repetition. Transformations are performed in the following order (first applied to last applied): scale, rotate, translate.",
+            "type": "object",
+            "properties": {
+              "entity_id": {
+                "description": "ID of the entity being cloned.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_clone"
+                ]
+              }
+            },
+            "required": [
+              "entity_id",
               "type"
             ]
           },
@@ -24909,7 +25165,7 @@
                 "description": "Input file format.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/InputFormat"
+                    "$ref": "#/components/schemas/InputFormat3d"
                   }
                 ]
               },
@@ -25552,6 +25808,33 @@
             "required": [
               "object_id",
               "offset",
+              "type"
+            ]
+          },
+          {
+            "description": "Align the grid with a plane or a planar face.",
+            "type": "object",
+            "properties": {
+              "grid_id": {
+                "description": "The grid to be moved.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "reference_id": {
+                "description": "The plane or face that the grid will be aligned to. If a face, it must be planar to succeed.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_grid_reference_plane"
+                ]
+              }
+            },
+            "required": [
+              "grid_id",
+              "reference_id",
               "type"
             ]
           }
@@ -26676,6 +26959,42 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/Export2d"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "export2d"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Export3d"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "export3d"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/Export"
               },
               "type": {
@@ -26898,6 +27217,42 @@
                 "type": "string",
                 "enum": [
                   "default_camera_get_settings"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/DefaultCameraGetView"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_get_view"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/DefaultCameraSetView"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "default_camera_set_view"
                 ]
               }
             },
@@ -27702,6 +28057,24 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/EntityClone"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_clone"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/EntityLinearPatternTransform"
               },
               "type": {
@@ -27870,6 +28243,24 @@
                 "type": "string",
                 "enum": [
                   "extrusion_face_info"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SetGridReferencePlane"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_grid_reference_plane"
                 ]
               }
             },
@@ -28551,8 +28942,37 @@
           }
         }
       },
-      "OutputFormat": {
-        "description": "Output format specifier.",
+      "OutputFormat2d": {
+        "description": "Output 2D format specifier.",
+        "oneOf": [
+          {
+            "description": "AutoCAD drawing interchange format.",
+            "type": "object",
+            "properties": {
+              "storage": {
+                "description": "Export storage.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/DxfStorage"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "dxf"
+                ]
+              }
+            },
+            "required": [
+              "storage",
+              "type"
+            ]
+          }
+        ]
+      },
+      "OutputFormat3d": {
+        "description": "Output 3D format specifier.",
         "oneOf": [
           {
             "description": "Autodesk Filmbox (FBX) format.",
@@ -30116,6 +30536,10 @@
       },
       "SetDefaultSystemProperties": {
         "description": "The response from the `SetDefaultSystemProperties` endpoint.",
+        "type": "object"
+      },
+      "SetGridReferencePlane": {
+        "description": "The response from the 'SetGridReferencePlane'.",
         "type": "object"
       },
       "SetObjectTransform": {
@@ -33853,6 +34277,13 @@
               }
             ]
           }
+        ]
+      },
+      "WorldCoordinateSystem": {
+        "type": "string",
+        "enum": [
+          "right_handed_up_z",
+          "right_handed_up_y"
         ]
       },
       "ZooProductSubscription": {
