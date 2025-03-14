@@ -28978,6 +28978,12 @@
             "description": "Autodesk Filmbox (FBX) format.",
             "type": "object",
             "properties": {
+              "created": {
+                "nullable": true,
+                "description": "Timestamp override.",
+                "type": "string",
+                "format": "date-time"
+              },
               "storage": {
                 "description": "Specifies which kind of FBX will be exported.",
                 "allOf": [
@@ -29126,6 +29132,12 @@
                     "$ref": "#/components/schemas/System"
                   }
                 ]
+              },
+              "created": {
+                "nullable": true,
+                "description": "Timestamp override.",
+                "type": "string",
+                "format": "date-time"
               },
               "type": {
                 "type": "string",
