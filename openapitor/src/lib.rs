@@ -605,7 +605,7 @@ parse-display = "0.10.0"
 phonenumber = "0.3.5"
 rand = {{ version = "0.9", optional = true }}
 getrandom = {{ version = "0.3" }}
-reqwest = {{ version = "=0.12.12", default-features = false, features = ["json", "multipart", "rustls-tls"], optional = true }}
+reqwest = {{ version = "0.12.14", default-features = false, features = ["json", "multipart", "rustls-tls"], optional = true }}
 reqwest-conditional-middleware = {{ version = "0.4", optional = true }}
 reqwest-middleware = {{ version = "0.4", optional = true, features = ["json", "multipart", "http2", "rustls-tls"] }}
 reqwest-retry = {{ version = "0.7", optional = true }}
