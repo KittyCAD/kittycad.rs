@@ -12829,6 +12829,9 @@ pub enum OutputFormat3D {
     #[doc = "Autodesk Filmbox (FBX) format."]
     #[serde(rename = "fbx")]
     Fbx {
+        #[doc = "Timestamp override."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        created: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "Specifies which kind of FBX will be exported."]
         storage: FbxStorage,
     },
@@ -12865,6 +12868,9 @@ pub enum OutputFormat3D {
     Step {
         #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
+        #[doc = "Timestamp override."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        created: Option<chrono::DateTime<chrono::Utc>>,
     },
     #[doc = "*ST**ereo**L**ithography format."]
     #[serde(rename = "stl")]
