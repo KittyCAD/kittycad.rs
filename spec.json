@@ -16640,6 +16640,11 @@
                   "type": "string"
                 }
               },
+              "prompt": {
+                "nullable": true,
+                "description": "The prompt for the overall changes. This is optional if you only want changes on specific source ranges. This will apply to all the files.",
+                "type": "string"
+              },
               "source_ranges": {
                 "description": "The source ranges the user suggested to change.",
                 "type": "array",
@@ -30856,7 +30861,7 @@
         "properties": {
           "file": {
             "nullable": true,
-            "description": "The name of the file the source range applies to. This only applies to multi-file iterations.",
+            "description": "The name of the file the source range applies to. This is the relative path to the file from the root of the project. This only applies to multi-file iterations.",
             "type": "string"
           },
           "prompt": {
@@ -31588,6 +31593,11 @@
               "type": "string"
             }
           },
+          "prompt": {
+            "nullable": true,
+            "description": "The prompt for the overall changes. This is optional if you only want changes on specific source ranges. This will apply to all the files.",
+            "type": "string"
+          },
           "source_ranges": {
             "description": "The source ranges the user suggested to change.",
             "type": "array",
@@ -31637,7 +31647,7 @@
         ]
       },
       "TextToCadMultiFileIterationBody": {
-        "description": "Body for generating models from text.",
+        "description": "Body for iterating on models from text prompts.",
         "type": "object",
         "properties": {
           "kcl_version": {
@@ -31650,6 +31660,11 @@
             "description": "The project name. This is used to tie the prompt to a project. Which helps us make our models better over time.",
             "type": "string"
           },
+          "prompt": {
+            "nullable": true,
+            "description": "The prompt for the overall changes. This is optional if you only want changes on specific source ranges. This will apply to all the files. If you want to apply a prompt to just a single file, use the source_ranges field and you can leave this empty.",
+            "type": "string"
+          },
           "source_ranges": {
             "description": "The source ranges the user suggested to change. If empty, the prompt will be used and is required.",
             "type": "array",
@@ -31657,10 +31672,7 @@
               "$ref": "#/components/schemas/SourceRangePrompt"
             }
           }
-        },
-        "required": [
-          "source_ranges"
-        ]
+        }
       },
       "TextToCadResultsPage": {
         "description": "A single page of results",
