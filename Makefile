@@ -8,6 +8,7 @@ generate: kittycad
 	cargo clippy --all
 	cargo nextest run --all-features --no-capture --no-fail-fast
 	cargo doc --all
+	cargo test --doc
 
 target/debug/openapitor: openapitor/src/*.rs openapitor/src/*/*.rs openapitor/Cargo.toml spec.json
 	cargo build --bin openapitor
