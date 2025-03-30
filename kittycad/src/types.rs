@@ -1998,6 +1998,10 @@ pub enum AsyncApiCallOutput {
                  contents are not encoded since kcl files are not binary."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         outputs: Option<std::collections::HashMap<String, String>>,
+        #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
+                 specific source ranges. This will apply to all the files."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        prompt: Option<String>,
         #[doc = "The source ranges the user suggested to change."]
         source_ranges: Vec<SourceRangePrompt>,
         #[doc = "The time and date the API call was started."]
@@ -16078,8 +16082,8 @@ impl tabled::Tabled for SourceRange {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct SourceRangePrompt {
-    #[doc = "The name of the file the source range applies to. This only applies to multi-file \
-             iterations."]
+    #[doc = "The name of the file the source range applies to. This is the relative path to the \
+             file from the root of the project. This only applies to multi-file iterations."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub file: Option<String>,
     #[doc = "The prompt for the changes."]
@@ -16941,6 +16945,10 @@ pub struct TextToCadMultiFileIteration {
              contents are not encoded since kcl files are not binary."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub outputs: Option<std::collections::HashMap<String, String>>,
+    #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
+             specific source ranges. This will apply to all the files."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt: Option<String>,
     #[doc = "The source ranges the user suggested to change."]
     pub source_ranges: Vec<SourceRangePrompt>,
     #[doc = "The time and date the API call was started."]
@@ -16966,7 +16974,7 @@ impl std::fmt::Display for TextToCadMultiFileIteration {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TextToCadMultiFileIteration {
-    const LENGTH: usize = 13;
+    const LENGTH: usize = 14;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -16993,6 +17001,11 @@ impl tabled::Tabled for TextToCadMultiFileIteration {
             } else {
                 String::new().into()
             },
+            if let Some(prompt) = &self.prompt {
+                format!("{:?}", prompt).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.source_ranges).into(),
             if let Some(started_at) = &self.started_at {
                 format!("{:?}", started_at).into()
@@ -17015,6 +17028,7 @@ impl tabled::Tabled for TextToCadMultiFileIteration {
             "model".into(),
             "model_version".into(),
             "outputs".into(),
+            "prompt".into(),
             "source_ranges".into(),
             "started_at".into(),
             "status".into(),
@@ -17024,7 +17038,7 @@ impl tabled::Tabled for TextToCadMultiFileIteration {
     }
 }
 
-#[doc = "Body for generating models from text."]
+#[doc = "Body for iterating on models from text prompts."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -17036,9 +17050,16 @@ pub struct TextToCadMultiFileIterationBody {
              our models better over time."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub project_name: Option<String>,
+    #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
+             specific source ranges. This will apply to all the files. If you want to apply a \
+             prompt to just a single file, use the source_ranges field and you can leave this \
+             empty."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt: Option<String>,
     #[doc = "The source ranges the user suggested to change. If empty, the prompt will be used \
              and is required."]
-    pub source_ranges: Vec<SourceRangePrompt>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_ranges: Option<Vec<SourceRangePrompt>>,
 }
 
 impl std::fmt::Display for TextToCadMultiFileIterationBody {
@@ -17053,7 +17074,7 @@ impl std::fmt::Display for TextToCadMultiFileIterationBody {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TextToCadMultiFileIterationBody {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(kcl_version) = &self.kcl_version {
@@ -17066,7 +17087,16 @@ impl tabled::Tabled for TextToCadMultiFileIterationBody {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.source_ranges).into(),
+            if let Some(prompt) = &self.prompt {
+                format!("{:?}", prompt).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(source_ranges) = &self.source_ranges {
+                format!("{:?}", source_ranges).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
@@ -17074,6 +17104,7 @@ impl tabled::Tabled for TextToCadMultiFileIterationBody {
         vec![
             "kcl_version".into(),
             "project_name".into(),
+            "prompt".into(),
             "source_ranges".into(),
         ]
     }
