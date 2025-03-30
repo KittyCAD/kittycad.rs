@@ -826,7 +826,7 @@ fn get_example_args(
                 quote! {
                     vec![crate::types::multipart::Attachment {
                         name: "thing".to_string(),
-                        filename: Some("myfile.json".to_string()),
+                        filepath: Some(std::path::Path::new("myfile.json")),
                         content_type: Some("application/json".to_string()),
                         data: std::fs::read("myfile.json").unwrap(),
                     }]
