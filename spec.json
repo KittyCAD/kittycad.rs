@@ -16621,6 +16621,11 @@
                   }
                 ]
               },
+              "kcl_version": {
+                "nullable": true,
+                "description": "The version of kcl to use. If empty, the latest version will be used.",
+                "type": "string"
+              },
               "model": {
                 "description": "The model being used.",
                 "allOf": [
@@ -16639,6 +16644,11 @@
                 "additionalProperties": {
                   "type": "string"
                 }
+              },
+              "project_name": {
+                "nullable": true,
+                "description": "The project name. This is used to tie the prompt to a project. Which helps us make our models better over time.",
+                "type": "string"
               },
               "prompt": {
                 "nullable": true,
@@ -31574,6 +31584,11 @@
               }
             ]
           },
+          "kcl_version": {
+            "nullable": true,
+            "description": "The version of kcl to use. If empty, the latest version will be used.",
+            "type": "string"
+          },
           "model": {
             "description": "The model being used.",
             "allOf": [
@@ -31592,6 +31607,11 @@
             "additionalProperties": {
               "type": "string"
             }
+          },
+          "project_name": {
+            "nullable": true,
+            "description": "The project name. This is used to tie the prompt to a project. Which helps us make our models better over time.",
+            "type": "string"
           },
           "prompt": {
             "nullable": true,
