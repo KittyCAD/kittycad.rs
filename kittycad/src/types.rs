@@ -2652,8 +2652,10 @@ pub struct CameraViewState {
     pub is_ortho: bool,
     pub ortho_scale_enabled: bool,
     pub ortho_scale_factor: f64,
-    pub pivot_position: Vec<f64>,
-    pub pivot_rotation: Vec<f64>,
+    #[doc = "A point in 3D space"]
+    pub pivot_position: Point3D,
+    #[doc = "A point in homogeneous (4D) space"]
+    pub pivot_rotation: Point4D,
     pub world_coord_system: WorldCoordinateSystem,
 }
 
@@ -10745,10 +10747,6 @@ pub enum ModelingCmd {
         cut_type: Option<CutType>,
         #[doc = "Which edge you want to fillet."]
         edge_id: uuid::Uuid,
-        #[doc = "The ID to use for the newly created fillet face. If not provided, the server \
-                 will randomly generate one."]
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        face_id: Option<uuid::Uuid>,
         #[doc = "Which object is being filletted."]
         object_id: uuid::Uuid,
         #[doc = "The radius of the fillet. Measured in length (using the same units that the \
@@ -13494,6 +13492,23 @@ pub enum PathSegment {
         interior: Point3D,
         #[doc = "Whether or not interior and end are relative to the previous path position"]
         relative: bool,
+    },
+    #[doc = "Adds a circular involute from the current position that goes through the given \
+             end_radius and is rotated around the current point by angle."]
+    #[serde(rename = "circular_involute")]
+    CircularInvolute {
+        #[doc = "The angle to rotate the involute by. A value of zero will produce a curve with a \
+                 tangent along the x-axis at the start point of the curve."]
+        angle: Angle,
+        #[doc = "The involute is described between two circles, end_radius is the radius of the \
+                 outer circle."]
+        end_radius: f64,
+        #[doc = "If reverse is true, the segment will start from the end of the involute, \
+                 otherwise it will start from that start."]
+        reverse: bool,
+        #[doc = "The involute is described between two circles, start_radius is the radius of the \
+                 inner circle."]
+        start_radius: f64,
     },
 }
 

@@ -17139,22 +17139,10 @@
             "format": "float"
           },
           "pivot_position": {
-            "type": "array",
-            "items": {
-              "type": "number",
-              "format": "float"
-            },
-            "minItems": 3,
-            "maxItems": 3
+            "$ref": "#/components/schemas/Point3d"
           },
           "pivot_rotation": {
-            "type": "array",
-            "items": {
-              "type": "number",
-              "format": "float"
-            },
-            "minItems": 4,
-            "maxItems": 4
+            "$ref": "#/components/schemas/Point4d"
           },
           "world_coord_system": {
             "$ref": "#/components/schemas/WorldCoordinateSystem"
@@ -24074,12 +24062,6 @@
                 "type": "string",
                 "format": "uuid"
               },
-              "face_id": {
-                "nullable": true,
-                "description": "The ID to use for the newly created fillet face. If not provided, the server will randomly generate one.",
-                "type": "string",
-                "format": "uuid"
-              },
               "object_id": {
                 "description": "Which object is being filletted.",
                 "type": "string",
@@ -29563,6 +29545,53 @@
               "end",
               "interior",
               "relative",
+              "type"
+            ]
+          },
+          {
+            "description": "Adds a circular involute from the current position that goes through the given end_radius and is rotated around the current point by angle.",
+            "type": "object",
+            "properties": {
+              "angle": {
+                "description": "The angle to rotate the involute by. A value of zero will produce a curve with a tangent along the x-axis at the start point of the curve.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Angle"
+                  }
+                ]
+              },
+              "end_radius": {
+                "description": "The involute is described between two circles, end_radius is the radius of the outer circle.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "reverse": {
+                "description": "If reverse is true, the segment will start from the end of the involute, otherwise it will start from that start.",
+                "type": "boolean"
+              },
+              "start_radius": {
+                "description": "The involute is described between two circles, start_radius is the radius of the inner circle.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "circular_involute"
+                ]
+              }
+            },
+            "required": [
+              "angle",
+              "end_radius",
+              "reverse",
+              "start_radius",
               "type"
             ]
           }
