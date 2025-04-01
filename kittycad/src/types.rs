@@ -1981,6 +1981,9 @@ pub enum AsyncApiCallOutput {
         feedback: Option<MlFeedback>,
         #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
         id: uuid::Uuid,
+        #[doc = "The version of kcl to use. If empty, the latest version will be used."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        kcl_version: Option<String>,
         #[doc = "The model being used."]
         model: TextToCadModel,
         #[doc = "The version of the model."]
@@ -1989,6 +1992,10 @@ pub enum AsyncApiCallOutput {
                  contents are not encoded since kcl files are not binary."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         outputs: Option<std::collections::HashMap<String, String>>,
+        #[doc = "The project name. This is used to tie the prompt to a project. Which helps us \
+                 make our models better over time."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        project_name: Option<String>,
         #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
                  specific source ranges. This will apply to all the files."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -16928,6 +16935,9 @@ pub struct TextToCadMultiFileIteration {
     pub feedback: Option<MlFeedback>,
     #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
     pub id: uuid::Uuid,
+    #[doc = "The version of kcl to use. If empty, the latest version will be used."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kcl_version: Option<String>,
     #[doc = "The model being used."]
     pub model: TextToCadModel,
     #[doc = "The version of the model."]
@@ -16936,6 +16946,10 @@ pub struct TextToCadMultiFileIteration {
              contents are not encoded since kcl files are not binary."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub outputs: Option<std::collections::HashMap<String, String>>,
+    #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make \
+             our models better over time."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_name: Option<String>,
     #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
              specific source ranges. This will apply to all the files."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -16965,7 +16979,7 @@ impl std::fmt::Display for TextToCadMultiFileIteration {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TextToCadMultiFileIteration {
-    const LENGTH: usize = 14;
+    const LENGTH: usize = 16;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -16985,10 +16999,20 @@ impl tabled::Tabled for TextToCadMultiFileIteration {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
+            if let Some(kcl_version) = &self.kcl_version {
+                format!("{:?}", kcl_version).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.model).into(),
             self.model_version.clone().into(),
             if let Some(outputs) = &self.outputs {
                 format!("{:?}", outputs).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(project_name) = &self.project_name {
+                format!("{:?}", project_name).into()
             } else {
                 String::new().into()
             },
@@ -17016,9 +17040,11 @@ impl tabled::Tabled for TextToCadMultiFileIteration {
             "error".into(),
             "feedback".into(),
             "id".into(),
+            "kcl_version".into(),
             "model".into(),
             "model_version".into(),
             "outputs".into(),
+            "project_name".into(),
             "prompt".into(),
             "source_ranges".into(),
             "started_at".into(),
