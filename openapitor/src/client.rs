@@ -127,7 +127,7 @@ impl Client {
     /// Create a new Client struct. It takes a type that can convert into
     /// an &str (`String` or `Vec<u8>` for example). As long as the function is
     /// given a valid API key your requests will work.
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all)]
     pub fn new<T>(
         username: T,
         password: T,
@@ -330,7 +330,7 @@ impl Client {
     /// an &str (`String` or `Vec<u8>` for example). As long as the function is
     /// given a valid API key your requests will work.
     /// Also takes reqwest client builders, for customizing the client's behaviour.
-    #[tracing::instrument]
+    #[tracing::instrument(skip(token))]
     #[cfg(not(target_arch = "wasm32"))]
     pub fn new_from_reqwest<T>(
         token: T,
@@ -393,7 +393,7 @@ impl Client {
     /// an &str (`String` or `Vec<u8>` for example). As long as the function is
     /// given a valid API key your requests will work.
     /// Also takes reqwest client builders, for customizing the client's behaviour.
-    #[tracing::instrument]
+    #[tracing::instrument(skip(token))]
     #[cfg(target_arch = "wasm32")]
     pub fn new_from_reqwest<T>(
         token: T,
@@ -445,7 +445,7 @@ impl Client {
     /// Create a new Client struct. It takes a type that can convert into
     /// an &str (`String` or `Vec<u8>` for example). As long as the function is
     /// given a valid API key your requests will work.
-    #[tracing::instrument]
+    #[tracing::instrument(skip(token))]
     pub fn new<T>(token: T) -> Self
     where
         T: ToString + std::fmt::Debug,
@@ -672,7 +672,7 @@ impl Client {
     /// Create a new Client struct. It takes a type that can convert into
     /// an &str (`String` or `Vec<u8>` for example). As long as the function is
     /// given a valid API credentials your requests will work.
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all)]
     pub fn new<I, K, R, T, Q>(
         client_id: I,
         client_secret: K,
@@ -825,7 +825,7 @@ impl Client {
     ///     - `ENV_VARIABLE_PREFIX_CLIENT_ID`
     ///     - `ENV_VARIABLE_PREFIX_CLIENT_SECRET`
     ///     - `ENV_VARIABLE_PREFIX_REDIRECT_URI`
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all]
     pub fn new_from_env<T, R>(token: T, refresh_token: R) -> Self
     where
         T: ToString + std::fmt::Debug,
