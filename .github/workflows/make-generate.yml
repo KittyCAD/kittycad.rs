@@ -53,7 +53,7 @@ jobs:
         shell: bash
       - name: Check for modified files
         id: git-check
-        run: echo ::set-output name=modified::$(if git diff-index --ignore-submodules --quiet HEAD --; then echo "false"; else echo "true"; fi)
+        run: echo ::set-output name=modified::$(if [[ -z $(git status --porcelain --untracked-files=no) ]]; then echo "false"; else echo "true"; fi)
 
       - name: Commit changes, if any
         if: steps.git-check.outputs.modified == 'true'
