@@ -825,7 +825,7 @@ impl Client {
     ///     - `ENV_VARIABLE_PREFIX_CLIENT_ID`
     ///     - `ENV_VARIABLE_PREFIX_CLIENT_SECRET`
     ///     - `ENV_VARIABLE_PREFIX_REDIRECT_URI`
-    #[tracing::instrument(skip_all]
+    #[tracing::instrument(skip_all)]
     pub fn new_from_env<T, R>(token: T, refresh_token: R) -> Self
     where
         T: ToString + std::fmt::Debug,
