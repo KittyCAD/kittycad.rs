@@ -15469,6 +15469,32 @@
           "items"
         ]
       },
+      "ApiEndpoint": {
+        "description": "Types of API endpoints.",
+        "oneOf": [
+          {
+            "description": "The modeling API.",
+            "type": "string",
+            "enum": [
+              "modeling"
+            ]
+          },
+          {
+            "description": "Machine learning API.",
+            "type": "string",
+            "enum": [
+              "ml"
+            ]
+          },
+          {
+            "description": "File API.",
+            "type": "string",
+            "enum": [
+              "file"
+            ]
+          }
+        ]
+      },
       "ApiError": {
         "description": "An error.",
         "type": "object",
@@ -17236,63 +17262,108 @@
         "description": "ClientMetrics contains information regarding the state of the peer.",
         "type": "object",
         "properties": {
+          "rtc_frame_height": {
+            "nullable": true,
+            "description": "The height of the inbound video stream in pixels.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-frameheight",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "rtc_frame_width": {
+            "nullable": true,
+            "description": "The width of the inbound video stream in pixels.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-framewidth",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
           "rtc_frames_decoded": {
-            "description": "Counter of the number of WebRTC frames that the client has decoded during this session.",
+            "nullable": true,
+            "description": "Counter of the number of WebRTC frames that the client has decoded from the inbound video stream.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-freezecount",
             "type": "integer",
             "format": "uint64",
             "minimum": 0
           },
           "rtc_frames_dropped": {
-            "description": "Counter of the number of WebRTC frames the client has dropped during this session.",
+            "nullable": true,
+            "description": "Counter of the number of WebRTC frames the client has dropped from the inbound video stream.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-framesdropped",
             "type": "integer",
             "format": "uint32",
             "minimum": 0
           },
           "rtc_frames_per_second": {
-            "description": "Current number of frames being rendered per second. A good target is 60 frames per second, but it can fluctuate depending on network conditions.",
+            "nullable": true,
+            "description": "Current number of frames being rendered in the last second. A good target is 60 frames per second, but it can fluctuate depending on network conditions.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-freezecount",
             "type": "integer",
             "format": "uint8",
             "minimum": 0
           },
           "rtc_frames_received": {
-            "description": "Counter of the number of WebRTC frames that the client has received during this session.",
+            "nullable": true,
+            "description": "Counter of the number of WebRTC frames that the client has received from the inbound video stream.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-freezecount",
             "type": "integer",
             "format": "uint64",
             "minimum": 0
           },
           "rtc_freeze_count": {
-            "description": "Number of times the WebRTC playback has frozen. This is usually due to network conditions.",
+            "nullable": true,
+            "description": "Number of times the inbound video playback has frozen. This is usually due to network conditions.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-freezecount",
             "type": "integer",
             "format": "uint32",
             "minimum": 0
           },
           "rtc_jitter_sec": {
-            "description": "Amount of \"jitter\" in the WebRTC session. Network latency is the time it takes a packet to traverse the network. The amount that the latency varies is the jitter. Video latency is the time it takes to render a frame sent by the server (including network latency). A low jitter means the video latency can be reduced without impacting smooth playback. High jitter means clients will increase video latency to ensure smooth playback.",
+            "nullable": true,
+            "description": "Amount of \"jitter\" in the inbound video stream. Network latency is the time it takes a packet to traverse the network. The amount that the latency varies is the jitter. Video latency is the time it takes to render a frame sent by the server (including network latency). A low jitter means the video latency can be reduced without impacting smooth playback. High jitter means clients will increase video latency to ensure smooth playback.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcreceivedrtpstreamstats-jitter",
             "type": "number",
-            "format": "float"
+            "format": "double"
           },
           "rtc_keyframes_decoded": {
-            "description": "Number of \"key frames\" decoded in the underlying h.264 stream. A key frame is an expensive (bandwidth-wise) \"full image\" of the video frame. Data after the keyframe become -- effectively -- \"diff\" operations on that key frame. The Engine will only send a keyframe if required, which is an indication that some of the \"diffs\" have been lost, usually an indication of poor network conditions. We like this metric to understand times when the connection has had to recover.",
+            "nullable": true,
+            "description": "Number of \"key frames\" decoded in the inbound h.264 stream. A key frame is an expensive (bandwidth-wise) \"full image\" of the video frame. Data after the keyframe become -- effectively -- \"diff\" operations on that key frame. The Engine will only send a keyframe if required, which is an indication that some of the \"diffs\" have been lost, usually an indication of poor network conditions. We like this metric to understand times when the connection has had to recover.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-keyframesdecoded",
             "type": "integer",
             "format": "uint32",
             "minimum": 0
           },
+          "rtc_packets_lost": {
+            "nullable": true,
+            "description": "Amount of packets lost in the inbound video stream.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcreceivedrtpstreamstats-packetslost",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "rtc_pause_count": {
+            "nullable": true,
+            "description": "Count of the total number of video pauses experienced by this receiver.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-pausecount",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "rtc_pli_count": {
+            "nullable": true,
+            "description": "Count the total number of Picture Loss Indication (PLI) packets.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-plicount",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "rtc_stun_rtt_sec": {
+            "nullable": true,
+            "description": "Total duration of pauses in seconds.\n\nThis is the \"ping\" between the client and the STUN server. Not to be confused with the E2E RTT documented [here](https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats-roundtriptime)\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats-currentroundtriptime",
+            "type": "number",
+            "format": "float"
+          },
           "rtc_total_freezes_duration_sec": {
-            "description": "Number of seconds of frozen video the user has been subjected to.",
+            "nullable": true,
+            "description": "Number of seconds of frozen video the user has been subjected to.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-totalfreezesduration",
+            "type": "number",
+            "format": "float"
+          },
+          "rtc_total_pauses_duration_sec": {
+            "nullable": true,
+            "description": "Count of the total number of video pauses experienced by this receiver.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-totalpausesduration",
             "type": "number",
             "format": "float"
           }
-        },
-        "required": [
-          "rtc_frames_decoded",
-          "rtc_frames_dropped",
-          "rtc_frames_per_second",
-          "rtc_frames_received",
-          "rtc_freeze_count",
-          "rtc_jitter_sec",
-          "rtc_keyframes_decoded",
-          "rtc_total_freezes_duration_sec"
-        ]
+        }
       },
       "ClosePath": {
         "description": "The response from the `ClosePath` command.",
@@ -21932,6 +22003,13 @@
           "description": {
             "description": "A description of the tier.",
             "type": "string"
+          },
+          "endpoints_included": {
+            "description": "The Zoo API endpoints that are included when through an approved zoo tool.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiEndpoint"
+            }
           },
           "features": {
             "description": "Features that are included in the subscription.",
@@ -34376,6 +34454,13 @@
               "description": {
                 "description": "A description of the tier.",
                 "type": "string"
+              },
+              "endpoints_included": {
+                "description": "The Zoo API endpoints that are included when through an approved zoo tool.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ApiEndpoint"
+                }
               },
               "features": {
                 "description": "Features that are included in the subscription.",
