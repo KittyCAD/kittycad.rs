@@ -1338,6 +1338,35 @@ impl tabled::Tabled for ApiCallWithPriceResultsPage {
     }
 }
 
+#[doc = "Types of API endpoints."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ApiEndpoint {
+    #[doc = "The modeling API."]
+    #[serde(rename = "modeling")]
+    #[display("modeling")]
+    Modeling,
+    #[doc = "Machine learning API."]
+    #[serde(rename = "ml")]
+    #[display("ml")]
+    Ml,
+    #[doc = "File API."]
+    #[serde(rename = "file")]
+    #[display("file")]
+    File,
+}
+
 #[doc = "An error."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -2820,22 +2849,51 @@ impl tabled::Tabled for CenterOfMass {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ClientMetrics {
-    #[doc = "Counter of the number of WebRTC frames that the client has decoded during this session."]
-    pub rtc_frames_decoded: u64,
-    #[doc = "Counter of the number of WebRTC frames the client has dropped during this session."]
-    pub rtc_frames_dropped: u32,
-    #[doc = "Current number of frames being rendered per second. A good target is 60 frames per second, but it can fluctuate depending on network conditions."]
-    pub rtc_frames_per_second: u8,
-    #[doc = "Counter of the number of WebRTC frames that the client has received during this session."]
-    pub rtc_frames_received: u64,
-    #[doc = "Number of times the WebRTC playback has frozen. This is usually due to network conditions."]
-    pub rtc_freeze_count: u32,
-    #[doc = "Amount of \"jitter\" in the WebRTC session. Network latency is the time it takes a packet to traverse the network. The amount that the latency varies is the jitter. Video latency is the time it takes to render a frame sent by the server (including network latency). A low jitter means the video latency can be reduced without impacting smooth playback. High jitter means clients will increase video latency to ensure smooth playback."]
-    pub rtc_jitter_sec: f64,
-    #[doc = "Number of \"key frames\" decoded in the underlying h.264 stream. A key frame is an expensive (bandwidth-wise) \"full image\" of the video frame. Data after the keyframe become -- effectively -- \"diff\" operations on that key frame. The Engine will only send a keyframe if required, which is an indication that some of the \"diffs\" have been lost, usually an indication of poor network conditions. We like this metric to understand times when the connection has had to recover."]
-    pub rtc_keyframes_decoded: u32,
-    #[doc = "Number of seconds of frozen video the user has been subjected to."]
-    pub rtc_total_freezes_duration_sec: f64,
+    #[doc = "The height of the inbound video stream in pixels.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-frameheight"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rtc_frame_height: Option<u32>,
+    #[doc = "The width of the inbound video stream in pixels.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-framewidth"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rtc_frame_width: Option<u32>,
+    #[doc = "Counter of the number of WebRTC frames that the client has decoded from the inbound video stream.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-freezecount"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rtc_frames_decoded: Option<u64>,
+    #[doc = "Counter of the number of WebRTC frames the client has dropped from the inbound video stream.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-framesdropped"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rtc_frames_dropped: Option<u32>,
+    #[doc = "Current number of frames being rendered in the last second. A good target is 60 frames per second, but it can fluctuate depending on network conditions.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-freezecount"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rtc_frames_per_second: Option<u8>,
+    #[doc = "Counter of the number of WebRTC frames that the client has received from the inbound video stream.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-freezecount"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rtc_frames_received: Option<u64>,
+    #[doc = "Number of times the inbound video playback has frozen. This is usually due to network conditions.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-freezecount"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rtc_freeze_count: Option<u32>,
+    #[doc = "Amount of \"jitter\" in the inbound video stream. Network latency is the time it takes a packet to traverse the network. The amount that the latency varies is the jitter. Video latency is the time it takes to render a frame sent by the server (including network latency). A low jitter means the video latency can be reduced without impacting smooth playback. High jitter means clients will increase video latency to ensure smooth playback.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcreceivedrtpstreamstats-jitter"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rtc_jitter_sec: Option<f64>,
+    #[doc = "Number of \"key frames\" decoded in the inbound h.264 stream. A key frame is an expensive (bandwidth-wise) \"full image\" of the video frame. Data after the keyframe become -- effectively -- \"diff\" operations on that key frame. The Engine will only send a keyframe if required, which is an indication that some of the \"diffs\" have been lost, usually an indication of poor network conditions. We like this metric to understand times when the connection has had to recover.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-keyframesdecoded"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rtc_keyframes_decoded: Option<u32>,
+    #[doc = "Amount of packets lost in the inbound video stream.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcreceivedrtpstreamstats-packetslost"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rtc_packets_lost: Option<u32>,
+    #[doc = "Count of the total number of video pauses experienced by this receiver.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-pausecount"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rtc_pause_count: Option<u32>,
+    #[doc = "Count the total number of Picture Loss Indication (PLI) packets.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-plicount"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rtc_pli_count: Option<u32>,
+    #[doc = "Total duration of pauses in seconds.\n\nThis is the \"ping\" between the client and the STUN server. Not to be confused with the E2E RTT documented [here](https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats-roundtriptime)\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats-currentroundtriptime"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rtc_stun_rtt_sec: Option<f64>,
+    #[doc = "Number of seconds of frozen video the user has been subjected to.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-totalfreezesduration"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rtc_total_freezes_duration_sec: Option<f64>,
+    #[doc = "Count of the total number of video pauses experienced by this receiver.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-totalpausesduration"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rtc_total_pauses_duration_sec: Option<f64>,
 }
 
 impl std::fmt::Display for ClientMetrics {
@@ -2850,22 +2908,91 @@ impl std::fmt::Display for ClientMetrics {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ClientMetrics {
-    const LENGTH: usize = 8;
+    const LENGTH: usize = 15;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.rtc_frames_decoded).into(),
-            format!("{:?}", self.rtc_frames_dropped).into(),
-            format!("{:?}", self.rtc_frames_per_second).into(),
-            format!("{:?}", self.rtc_frames_received).into(),
-            format!("{:?}", self.rtc_freeze_count).into(),
-            format!("{:?}", self.rtc_jitter_sec).into(),
-            format!("{:?}", self.rtc_keyframes_decoded).into(),
-            format!("{:?}", self.rtc_total_freezes_duration_sec).into(),
+            if let Some(rtc_frame_height) = &self.rtc_frame_height {
+                format!("{:?}", rtc_frame_height).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rtc_frame_width) = &self.rtc_frame_width {
+                format!("{:?}", rtc_frame_width).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rtc_frames_decoded) = &self.rtc_frames_decoded {
+                format!("{:?}", rtc_frames_decoded).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rtc_frames_dropped) = &self.rtc_frames_dropped {
+                format!("{:?}", rtc_frames_dropped).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rtc_frames_per_second) = &self.rtc_frames_per_second {
+                format!("{:?}", rtc_frames_per_second).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rtc_frames_received) = &self.rtc_frames_received {
+                format!("{:?}", rtc_frames_received).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rtc_freeze_count) = &self.rtc_freeze_count {
+                format!("{:?}", rtc_freeze_count).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rtc_jitter_sec) = &self.rtc_jitter_sec {
+                format!("{:?}", rtc_jitter_sec).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rtc_keyframes_decoded) = &self.rtc_keyframes_decoded {
+                format!("{:?}", rtc_keyframes_decoded).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rtc_packets_lost) = &self.rtc_packets_lost {
+                format!("{:?}", rtc_packets_lost).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rtc_pause_count) = &self.rtc_pause_count {
+                format!("{:?}", rtc_pause_count).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rtc_pli_count) = &self.rtc_pli_count {
+                format!("{:?}", rtc_pli_count).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rtc_stun_rtt_sec) = &self.rtc_stun_rtt_sec {
+                format!("{:?}", rtc_stun_rtt_sec).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rtc_total_freezes_duration_sec) = &self.rtc_total_freezes_duration_sec {
+                format!("{:?}", rtc_total_freezes_duration_sec).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rtc_total_pauses_duration_sec) = &self.rtc_total_pauses_duration_sec {
+                format!("{:?}", rtc_total_pauses_duration_sec).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "rtc_frame_height".into(),
+            "rtc_frame_width".into(),
             "rtc_frames_decoded".into(),
             "rtc_frames_dropped".into(),
             "rtc_frames_per_second".into(),
@@ -2873,7 +3000,12 @@ impl tabled::Tabled for ClientMetrics {
             "rtc_freeze_count".into(),
             "rtc_jitter_sec".into(),
             "rtc_keyframes_decoded".into(),
+            "rtc_packets_lost".into(),
+            "rtc_pause_count".into(),
+            "rtc_pli_count".into(),
+            "rtc_stun_rtt_sec".into(),
             "rtc_total_freezes_duration_sec".into(),
+            "rtc_total_pauses_duration_sec".into(),
         ]
     }
 }
@@ -9866,6 +9998,9 @@ pub struct ModelingAppSubscriptionTier {
     pub annual_discount: Option<u32>,
     #[doc = "A description of the tier."]
     pub description: String,
+    #[doc = "The Zoo API endpoints that are included when through an approved zoo tool."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub endpoints_included: Option<Vec<ApiEndpoint>>,
     #[doc = "Features that are included in the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub features: Option<Vec<SubscriptionTierFeature>>,
@@ -9902,7 +10037,7 @@ impl std::fmt::Display for ModelingAppSubscriptionTier {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ModelingAppSubscriptionTier {
-    const LENGTH: usize = 11;
+    const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
@@ -9911,6 +10046,11 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
                 String::new().into()
             },
             self.description.clone().into(),
+            if let Some(endpoints_included) = &self.endpoints_included {
+                format!("{:?}", endpoints_included).into()
+            } else {
+                String::new().into()
+            },
             if let Some(features) = &self.features {
                 format!("{:?}", features).into()
             } else {
@@ -9939,6 +10079,7 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
         vec![
             "annual_discount".into(),
             "description".into(),
+            "endpoints_included".into(),
             "features".into(),
             "name".into(),
             "pay_as_you_go_credits".into(),
@@ -19774,6 +19915,9 @@ pub struct ZooProductSubscription {
     pub annual_discount: Option<u32>,
     #[doc = "A description of the tier."]
     pub description: String,
+    #[doc = "The Zoo API endpoints that are included when through an approved zoo tool."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub endpoints_included: Option<Vec<ApiEndpoint>>,
     #[doc = "Features that are included in the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub features: Option<Vec<SubscriptionTierFeature>>,
@@ -19810,7 +19954,7 @@ impl std::fmt::Display for ZooProductSubscription {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ZooProductSubscription {
-    const LENGTH: usize = 11;
+    const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
@@ -19819,6 +19963,11 @@ impl tabled::Tabled for ZooProductSubscription {
                 String::new().into()
             },
             self.description.clone().into(),
+            if let Some(endpoints_included) = &self.endpoints_included {
+                format!("{:?}", endpoints_included).into()
+            } else {
+                String::new().into()
+            },
             if let Some(features) = &self.features {
                 format!("{:?}", features).into()
             } else {
@@ -19847,6 +19996,7 @@ impl tabled::Tabled for ZooProductSubscription {
         vec![
             "annual_discount".into(),
             "description".into(),
+            "endpoints_included".into(),
             "features".into(),
             "name".into(),
             "pay_as_you_go_credits".into(),
