@@ -283,7 +283,7 @@
     "op": "add",
     "path": "/paths/~1oauth2~1device~1confirm/post/x-rust",
     "value": {
-      "example": "/// Confirm an OAuth 2.0 Device Authorization Grant.\n/// \n/// This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/oauth2/device/token`.\nasync fn example_oauth2_device_auth_confirm() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_auth_confirm(&kittycad::types::DeviceAuthVerifyParams {\n            user_code: \"some-string\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n",
+      "example": "/// Confirm an OAuth 2.0 Device Authorization Grant.\n/// \n/// This endpoint is designed to be accessed by the user agent (browser), not the client requesting the token. So we do not actually return the token here; it will be returned in response to the poll on `/oauth2/device/token`.\nasync fn example_oauth2_device_auth_confirm() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_auth_confirm(&kittycad::types::DeviceAuthConfirmParams {\n            user_code: \"some-string\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.device_auth_confirm"
     }
   },
@@ -299,7 +299,7 @@
     "op": "add",
     "path": "/paths/~1oauth2~1device~1verify/get/x-rust",
     "value": {
-      "example": "/// Verify an OAuth 2.0 Device Authorization Grant.\n/// \n/// This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website.\n/// \n/// **Parameters:**\n/// \n/// - `user_code: &'astr`: The user code. (required)\nasync fn example_oauth2_device_auth_verify() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.oauth2().device_auth_verify(\"some-string\").await?;\n    Ok(())\n}\n",
+      "example": "/// Verify an OAuth 2.0 Device Authorization Grant.\n/// \n/// This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website.\n/// \n/// **Parameters:**\n/// \n/// - `app_name: Option<String>`: The originating app's name\n/// - `user_code: &'astr`: The user code. (required)\nasync fn example_oauth2_device_auth_verify() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .device_auth_verify(Some(\"some-string\".to_string()), \"some-string\")\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.device_auth_verify"
     }
   },

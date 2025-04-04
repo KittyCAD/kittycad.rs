@@ -51,13 +51,13 @@ impl Oauth2 {
              `/oauth2/device/token`.\n\n```rust,no_run\nasync fn \
              example_oauth2_device_auth_confirm() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        \
-             .device_auth_confirm(&kittycad::types::DeviceAuthVerifyParams {\n            \
+             .device_auth_confirm(&kittycad::types::DeviceAuthConfirmParams {\n            \
              user_code: \"some-string\".to_string(),\n        })\n        .await?;\n    \
              Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn device_auth_confirm<'a>(
         &'a self,
-        body: &crate::types::DeviceAuthVerifyParams,
+        body: &crate::types::DeviceAuthConfirmParams,
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
@@ -107,13 +107,17 @@ impl Oauth2 {
              in a full user agent (e.g., a browser). If the user is not logged in, we redirect \
              them to the login page and use the `callback_url` parameter to get them to the UI \
              verification form upon logging in. If they are logged in, we redirect them to the UI \
-             verification form on the website.\n\n**Parameters:**\n\n- `user_code: &'astr`: The \
-             user code. (required)\n\n```rust,no_run\nasync fn example_oauth2_device_auth_verify() \
-             -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
-             client.oauth2().device_auth_verify(\"some-string\").await?;\n    Ok(())\n}\n```"]
+             verification form on the website.\n\n**Parameters:**\n\n- `app_name: Option<String>`: \
+             The originating app's name\n- `user_code: &'astr`: The user code. \
+             (required)\n\n```rust,no_run\nasync fn example_oauth2_device_auth_verify() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
+             client\n        .oauth2()\n        \
+             .device_auth_verify(Some(\"some-string\".to_string()), \"some-string\")\n        \
+             .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn device_auth_verify<'a>(
         &'a self,
+        app_name: Option<String>,
         user_code: &'a str,
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
@@ -121,7 +125,11 @@ impl Oauth2 {
             format!("{}/{}", self.client.base_url, "oauth2/device/verify"),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("user_code", user_code.to_string())];
+        let mut query_params = vec![("user_code", user_code.to_string())];
+        if let Some(p) = app_name {
+            query_params.push(("app_name", p));
+        }
+
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
