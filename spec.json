@@ -4091,7 +4091,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DeviceAuthVerifyParams"
+                "$ref": "#/components/schemas/DeviceAuthConfirmParams"
               }
             }
           },
@@ -4315,6 +4315,15 @@
         "description": "This endpoint should be accessed in a full user agent (e.g., a browser). If the user is not logged in, we redirect them to the login page and use the `callback_url` parameter to get them to the UI verification form upon logging in. If they are logged in, we redirect them to the UI verification form on the website.",
         "operationId": "device_auth_verify",
         "parameters": [
+          {
+            "in": "query",
+            "name": "app_name",
+            "description": "The originating app's name",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
           {
             "in": "query",
             "name": "user_code",
@@ -18403,6 +18412,19 @@
         "description": "An auth token. A uuid with a prefix of dev-",
         "type": "string"
       },
+      "DeviceAuthConfirmParams": {
+        "description": "The request parameters to confirm the `user_code` for the OAuth 2.0 Device Authorization Grant.",
+        "type": "object",
+        "properties": {
+          "user_code": {
+            "description": "The user code.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_code"
+        ]
+      },
       "DeviceAuthRequestForm": {
         "description": "The request parameters for the OAuth 2.0 Device Authorization Grant flow.",
         "type": "object",
@@ -18415,19 +18437,6 @@
         },
         "required": [
           "client_id"
-        ]
-      },
-      "DeviceAuthVerifyParams": {
-        "description": "The request parameters to verify the `user_code` for the OAuth 2.0 Device Authorization Grant.",
-        "type": "object",
-        "properties": {
-          "user_code": {
-            "description": "The user code.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "user_code"
         ]
       },
       "Direction": {
