@@ -4725,6 +4725,37 @@ impl tabled::Tabled for DeviceAccessTokenRequestForm {
     }
 }
 
+#[doc = "The request parameters to confirm the `user_code` for the OAuth 2.0 Device Authorization Grant."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DeviceAuthConfirmParams {
+    #[doc = "The user code."]
+    pub user_code: String,
+}
+
+impl std::fmt::Display for DeviceAuthConfirmParams {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DeviceAuthConfirmParams {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.user_code.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["user_code".into()]
+    }
+}
+
 #[doc = "The request parameters for the OAuth 2.0 Device Authorization Grant flow."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4753,37 +4784,6 @@ impl tabled::Tabled for DeviceAuthRequestForm {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["client_id".into()]
-    }
-}
-
-#[doc = "The request parameters to verify the `user_code` for the OAuth 2.0 Device Authorization Grant."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DeviceAuthVerifyParams {
-    #[doc = "The user code."]
-    pub user_code: String,
-}
-
-impl std::fmt::Display for DeviceAuthVerifyParams {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for DeviceAuthVerifyParams {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![self.user_code.clone().into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["user_code".into()]
     }
 }
 
