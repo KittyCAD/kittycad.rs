@@ -16988,6 +16988,57 @@
           }
         ]
       },
+      "BooleanIntersection": {
+        "description": "The response from the 'BooleanIntersection'.",
+        "type": "object",
+        "properties": {
+          "extra_solid_ids": {
+            "description": "If the operation produced just one solid, then its ID will be the ID of the modeling command request. But if any extra solids are produced, then their IDs will be included here.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "extra_solid_ids"
+        ]
+      },
+      "BooleanSubtract": {
+        "description": "The response from the 'BooleanSubtract'.",
+        "type": "object",
+        "properties": {
+          "extra_solid_ids": {
+            "description": "If the operation produced just one solid, then its ID will be the ID of the modeling command request. But if any extra solids are produced, then their IDs will be included here.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "extra_solid_ids"
+        ]
+      },
+      "BooleanUnion": {
+        "description": "The response from the 'BooleanUnion'.",
+        "type": "object",
+        "properties": {
+          "extra_solid_ids": {
+            "description": "If the operation produced just one solid, then its ID will be the ID of the modeling command request. But if any extra solids are produced, then their IDs will be included here.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "extra_solid_ids"
+        ]
+      },
       "CacheMetadata": {
         "description": "Metadata about our cache.\n\nThis is mostly used for internal purposes and debugging.",
         "type": "object",
@@ -22264,6 +22315,15 @@
                   }
                 ]
               },
+              "opposite": {
+                "description": "Should the extrusion also extrude in the opposite direction? If so, this specifies its distance.",
+                "default": "None",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/OppositeForLengthUnit"
+                  }
+                ]
+              },
               "target": {
                 "description": "Which sketch to extrude. Must be a closed 2D solid.",
                 "allOf": [
@@ -22355,6 +22415,15 @@
               "axis_is_2d": {
                 "description": "If true, the axis is interpreted within the 2D space of the solid 2D's plane",
                 "type": "boolean"
+              },
+              "opposite": {
+                "description": "Should the revolution also revolve in the opposite direction along the given axis? If so, this specifies its angle.",
+                "default": "None",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/OppositeForAngle"
+                  }
+                ]
               },
               "origin": {
                 "description": "The origin of the extrusion axis",
@@ -22457,6 +22526,15 @@
                 "description": "The edge to use as the axis of revolution, must be linear and lie in the plane of the solid",
                 "type": "string",
                 "format": "uuid"
+              },
+              "opposite": {
+                "description": "Should the revolution also revolve in the opposite direction along the given axis? If so, this specifies its angle.",
+                "default": "None",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/OppositeForAngle"
+                  }
+                ]
               },
               "target": {
                 "description": "Which sketch to revolve. Must be a closed 2D solid.",
@@ -25830,6 +25908,114 @@
             ]
           },
           {
+            "description": "Create a new solid from combining other smaller solids. In other words, every part of the input solids will be included in the output solid.",
+            "type": "object",
+            "properties": {
+              "solid_ids": {
+                "description": "Which solids to union together. Cannot be empty.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "tolerance": {
+                "description": "The maximum acceptable surface gap computed between the joined solids. Must be positive (i.e. greater than zero).",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "boolean_union"
+                ]
+              }
+            },
+            "required": [
+              "solid_ids",
+              "tolerance",
+              "type"
+            ]
+          },
+          {
+            "description": "Create a new solid from intersecting several other solids. In other words, the part of the input solids where they all overlap will be the output solid.",
+            "type": "object",
+            "properties": {
+              "solid_ids": {
+                "description": "Which solids to intersect together",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "tolerance": {
+                "description": "The maximum acceptable surface gap computed between the joined solids. Must be positive (i.e. greater than zero).",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "boolean_intersection"
+                ]
+              }
+            },
+            "required": [
+              "solid_ids",
+              "tolerance",
+              "type"
+            ]
+          },
+          {
+            "description": "Create a new solid from subtracting several other solids. The 'target' is what will be cut from. The 'tool' is what will be cut out from 'target'.",
+            "type": "object",
+            "properties": {
+              "target_ids": {
+                "description": "Geometry to cut out from.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "tolerance": {
+                "description": "The maximum acceptable surface gap computed between the target and the solids cut out from it. Must be positive (i.e. greater than zero).",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "tool_ids": {
+                "description": "Will be cut out from the 'target'.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "boolean_subtract"
+                ]
+              }
+            },
+            "required": [
+              "target_ids",
+              "tolerance",
+              "tool_ids",
+              "type"
+            ]
+          },
+          {
             "description": "Make a new path by offsetting an object by a given distance. The new path's ID will be the ID of this command.",
             "type": "object",
             "properties": {
@@ -28352,6 +28538,60 @@
               "data",
               "type"
             ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/BooleanUnion"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "boolean_union"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/BooleanIntersection"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "boolean_intersection"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/BooleanSubtract"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "boolean_subtract"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
           }
         ]
       },
@@ -28645,6 +28885,12 @@
             "format": "date-time"
           }
         }
+      },
+      "OppositeForAngle": {
+        "type": "string"
+      },
+      "OppositeForLengthUnit": {
+        "type": "string"
       },
       "Org": {
         "description": "An organization.",
