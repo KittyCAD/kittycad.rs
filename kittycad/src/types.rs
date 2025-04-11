@@ -2423,6 +2423,105 @@ pub enum BlockReason {
     PaymentMethodFailed,
 }
 
+#[doc = "The response from the 'BooleanIntersection'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BooleanIntersection {
+    #[doc = "If the operation produced just one solid, then its ID will be the ID of the modeling \
+             command request. But if any extra solids are produced, then their IDs will be \
+             included here."]
+    pub extra_solid_ids: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for BooleanIntersection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BooleanIntersection {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.extra_solid_ids).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["extra_solid_ids".into()]
+    }
+}
+
+#[doc = "The response from the 'BooleanSubtract'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BooleanSubtract {
+    #[doc = "If the operation produced just one solid, then its ID will be the ID of the modeling \
+             command request. But if any extra solids are produced, then their IDs will be \
+             included here."]
+    pub extra_solid_ids: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for BooleanSubtract {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BooleanSubtract {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.extra_solid_ids).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["extra_solid_ids".into()]
+    }
+}
+
+#[doc = "The response from the 'BooleanUnion'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BooleanUnion {
+    #[doc = "If the operation produced just one solid, then its ID will be the ID of the modeling \
+             command request. But if any extra solids are produced, then their IDs will be \
+             included here."]
+    pub extra_solid_ids: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for BooleanUnion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BooleanUnion {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.extra_solid_ids).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["extra_solid_ids".into()]
+    }
+}
+
 #[doc = "Metadata about our cache.\n\nThis is mostly used for internal purposes and debugging."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -10320,6 +10419,10 @@ pub enum ModelingCmd {
                  generate IDs."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         faces: Option<ExtrudedFaceInfo>,
+        #[doc = "Should the extrusion also extrude in the opposite direction? If so, this \
+                 specifies its distance."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        opposite: Option<String>,
         #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
         target: uuid::Uuid,
     },
@@ -10346,6 +10449,10 @@ pub enum ModelingCmd {
         axis: Point3D,
         #[doc = "If true, the axis is interpreted within the 2D space of the solid 2D's plane"]
         axis_is_2d: bool,
+        #[doc = "Should the revolution also revolve in the opposite direction along the given \
+                 axis? If so, this specifies its angle."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        opposite: Option<String>,
         #[doc = "The origin of the extrusion axis"]
         origin: Point3D,
         #[doc = "Which sketch to revolve. Must be a closed 2D solid."]
@@ -10375,6 +10482,10 @@ pub enum ModelingCmd {
         #[doc = "The edge to use as the axis of revolution, must be linear and lie in the plane \
                  of the solid"]
         edge_id: uuid::Uuid,
+        #[doc = "Should the revolution also revolve in the opposite direction along the given \
+                 axis? If so, this specifies its angle."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        opposite: Option<String>,
         #[doc = "Which sketch to revolve. Must be a closed 2D solid."]
         target: uuid::Uuid,
         #[doc = "The maximum acceptable surface gap computed between the revolution surface \
@@ -11385,6 +11496,38 @@ pub enum ModelingCmd {
         object_id: uuid::Uuid,
         #[doc = "List of transforms to be applied to the object."]
         transforms: Vec<ComponentTransform>,
+    },
+    #[doc = "Create a new solid from combining other smaller solids. In other words, every part \
+             of the input solids will be included in the output solid."]
+    #[serde(rename = "boolean_union")]
+    BooleanUnion {
+        #[doc = "Which solids to union together. Cannot be empty."]
+        solid_ids: Vec<uuid::Uuid>,
+        #[doc = "The maximum acceptable surface gap computed between the joined solids. Must be \
+                 positive (i.e. greater than zero)."]
+        tolerance: f64,
+    },
+    #[doc = "Create a new solid from intersecting several other solids. In other words, the part \
+             of the input solids where they all overlap will be the output solid."]
+    #[serde(rename = "boolean_intersection")]
+    BooleanIntersection {
+        #[doc = "Which solids to intersect together"]
+        solid_ids: Vec<uuid::Uuid>,
+        #[doc = "The maximum acceptable surface gap computed between the joined solids. Must be \
+                 positive (i.e. greater than zero)."]
+        tolerance: f64,
+    },
+    #[doc = "Create a new solid from subtracting several other solids. The 'target' is what will \
+             be cut from. The 'tool' is what will be cut out from 'target'."]
+    #[serde(rename = "boolean_subtract")]
+    BooleanSubtract {
+        #[doc = "Geometry to cut out from."]
+        target_ids: Vec<uuid::Uuid>,
+        #[doc = "The maximum acceptable surface gap computed between the target and the solids \
+                 cut out from it. Must be positive (i.e. greater than zero)."]
+        tolerance: f64,
+        #[doc = "Will be cut out from the 'target'."]
+        tool_ids: Vec<uuid::Uuid>,
     },
     #[doc = "Make a new path by offsetting an object by a given distance. The new path's ID will \
              be the ID of this command."]
@@ -12427,6 +12570,21 @@ pub enum OkModelingCmdResponse {
     SetGridReferencePlane {
         #[doc = "The response from the 'SetGridReferencePlane'."]
         data: SetGridReferencePlane,
+    },
+    #[serde(rename = "boolean_union")]
+    BooleanUnion {
+        #[doc = "The response from the 'BooleanUnion'."]
+        data: BooleanUnion,
+    },
+    #[serde(rename = "boolean_intersection")]
+    BooleanIntersection {
+        #[doc = "The response from the 'BooleanIntersection'."]
+        data: BooleanIntersection,
+    },
+    #[serde(rename = "boolean_subtract")]
+    BooleanSubtract {
+        #[doc = "The response from the 'BooleanSubtract'."]
+        data: BooleanSubtract,
     },
 }
 
