@@ -9,7 +9,7 @@ description = "An OpenAPI client generator."
 Inflector = "^0.11.4"
 anyhow = { version = "1", features = ["backtrace"] }
 chrono = { version = "0.4", features = ["serde", "std"], default-features = false }
-clap = { version = "4.5.35", features = ["cargo", "derive", "env", "unicode", "wrap_help"] }
+clap = { version = "4.5.37", features = ["cargo", "derive", "env", "unicode", "wrap_help"] }
 data-encoding = "^2.8.0"
 format_serde_error = "^0.3.0"
 futures-util = "^0.3.31"
@@ -24,7 +24,7 @@ openapiv3 = "2.0.0"
 phonenumber = "0.3.7"
 proc-macro2 = "1"
 quote = "1"
-rand = { version = "0.9.0", features = ["small_rng"] }
+rand = { version = "0.9.1", features = ["small_rng"] }
 regex = "^1.11"
 reqwest = { version = "0.12", default-features = false, features = ["json", "multipart", "rustls-tls"] }
 reqwest-middleware = "0.4"
