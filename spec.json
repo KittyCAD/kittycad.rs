@@ -20745,6 +20745,11 @@
             "type": "string",
             "format": "date-time"
           },
+          "deletion_scheduled": {
+            "description": "If the user is scheduled for deletion",
+            "default": false,
+            "type": "boolean"
+          },
           "discord": {
             "description": "The user's Discord handle.",
             "type": "string"
@@ -35662,6 +35667,11 @@
             "description": "The date and time the user was created.",
             "type": "string",
             "format": "date-time"
+          },
+          "deletion_scheduled": {
+            "description": "If the user is scheduled for deletion",
+            "default": false,
+            "type": "boolean"
           },
           "discord": {
             "description": "The user's Discord handle.",
