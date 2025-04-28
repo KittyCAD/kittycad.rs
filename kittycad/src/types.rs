@@ -6289,6 +6289,9 @@ pub struct ExtendedUser {
     pub company: Option<String>,
     #[doc = "The date and time the user was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "If the user is scheduled for deletion"]
+    #[serde(default)]
+    pub deletion_scheduled: bool,
     #[doc = "The user's Discord handle."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub discord: Option<String>,
@@ -6344,7 +6347,7 @@ impl std::fmt::Display for ExtendedUser {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ExtendedUser {
-    const LENGTH: usize = 18;
+    const LENGTH: usize = 19;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(block) = &self.block {
@@ -6359,6 +6362,7 @@ impl tabled::Tabled for ExtendedUser {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.deletion_scheduled).into(),
             if let Some(discord) = &self.discord {
                 format!("{:?}", discord).into()
             } else {
@@ -6418,6 +6422,7 @@ impl tabled::Tabled for ExtendedUser {
             "can_train_on_data".into(),
             "company".into(),
             "created_at".into(),
+            "deletion_scheduled".into(),
             "discord".into(),
             "email".into(),
             "email_verified".into(),
@@ -19779,6 +19784,9 @@ pub struct User {
     pub company: Option<String>,
     #[doc = "The date and time the user was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "If the user is scheduled for deletion"]
+    #[serde(default)]
+    pub deletion_scheduled: bool,
     #[doc = "The user's Discord handle."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub discord: Option<String>,
@@ -19828,7 +19836,7 @@ impl std::fmt::Display for User {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for User {
-    const LENGTH: usize = 16;
+    const LENGTH: usize = 17;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(block) = &self.block {
@@ -19843,6 +19851,7 @@ impl tabled::Tabled for User {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.deletion_scheduled).into(),
             if let Some(discord) = &self.discord {
                 format!("{:?}", discord).into()
             } else {
@@ -19892,6 +19901,7 @@ impl tabled::Tabled for User {
             "can_train_on_data".into(),
             "company".into(),
             "created_at".into(),
+            "deletion_scheduled".into(),
             "discord".into(),
             "email".into(),
             "email_verified".into(),
