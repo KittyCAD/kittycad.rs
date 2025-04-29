@@ -11764,6 +11764,9 @@ pub struct Oauth2ClientInfo {
              via the `state` parameter."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub csrf_token: Option<String>,
+    #[doc = "Nonce required for OIDC flows."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oidc_nonce: Option<String>,
     #[doc = "Code Verifier used for [PKCE]((https://tools.ietf.org/html/rfc7636)) protection via \
              the `code_verifier` parameter. The value must have a minimum length of 43 characters \
              and a maximum length of 128 characters.  Each character must be ASCII alphanumeric \
@@ -11787,11 +11790,16 @@ impl std::fmt::Display for Oauth2ClientInfo {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Oauth2ClientInfo {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(csrf_token) = &self.csrf_token {
                 format!("{:?}", csrf_token).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(oidc_nonce) = &self.oidc_nonce {
+                format!("{:?}", oidc_nonce).into()
             } else {
                 String::new().into()
             },
@@ -11811,6 +11819,7 @@ impl tabled::Tabled for Oauth2ClientInfo {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "csrf_token".into(),
+            "oidc_nonce".into(),
             "pkce_code_verifier".into(),
             "url".into(),
         ]
