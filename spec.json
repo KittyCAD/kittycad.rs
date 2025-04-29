@@ -27693,6 +27693,11 @@
             "description": "Value used for [CSRF](https://tools.ietf.org/html/rfc6749#section-10.12) protection via the `state` parameter.",
             "type": "string"
           },
+          "oidc_nonce": {
+            "nullable": true,
+            "description": "Nonce required for OIDC flows.",
+            "type": "string"
+          },
           "pkce_code_verifier": {
             "nullable": true,
             "description": "Code Verifier used for [PKCE]((https://tools.ietf.org/html/rfc7636)) protection via the `code_verifier` parameter. The value must have a minimum length of 43 characters and a maximum length of 128 characters.  Each character must be ASCII alphanumeric or one of the characters \"-\" / \".\" / \"_\" / \"~\".",
