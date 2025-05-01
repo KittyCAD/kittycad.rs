@@ -219,7 +219,7 @@ async fn test_modeling_websocket() {
 
     let ws = match client
         .modeling()
-        .commands_ws(None, None, None, None, None, None, None, None, None)
+        .commands_ws(None, None, None, None, None, None, None, None, None, None)
         .await
     {
         Ok((ws, _headers)) => ws,

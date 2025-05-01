@@ -2431,7 +2431,8 @@ pub struct BooleanIntersection {
     #[doc = "If the operation produced just one solid, then its ID will be the ID of the modeling \
              command request. But if any extra solids are produced, then their IDs will be \
              included here."]
-    pub extra_solid_ids: Vec<uuid::Uuid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub extra_solid_ids: Option<Vec<uuid::Uuid>>,
 }
 
 impl std::fmt::Display for BooleanIntersection {
@@ -2448,7 +2449,11 @@ impl std::fmt::Display for BooleanIntersection {
 impl tabled::Tabled for BooleanIntersection {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.extra_solid_ids).into()]
+        vec![if let Some(extra_solid_ids) = &self.extra_solid_ids {
+            format!("{:?}", extra_solid_ids).into()
+        } else {
+            String::new().into()
+        }]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
@@ -2464,7 +2469,8 @@ pub struct BooleanSubtract {
     #[doc = "If the operation produced just one solid, then its ID will be the ID of the modeling \
              command request. But if any extra solids are produced, then their IDs will be \
              included here."]
-    pub extra_solid_ids: Vec<uuid::Uuid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub extra_solid_ids: Option<Vec<uuid::Uuid>>,
 }
 
 impl std::fmt::Display for BooleanSubtract {
@@ -2481,7 +2487,11 @@ impl std::fmt::Display for BooleanSubtract {
 impl tabled::Tabled for BooleanSubtract {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.extra_solid_ids).into()]
+        vec![if let Some(extra_solid_ids) = &self.extra_solid_ids {
+            format!("{:?}", extra_solid_ids).into()
+        } else {
+            String::new().into()
+        }]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
@@ -2497,7 +2507,8 @@ pub struct BooleanUnion {
     #[doc = "If the operation produced just one solid, then its ID will be the ID of the modeling \
              command request. But if any extra solids are produced, then their IDs will be \
              included here."]
-    pub extra_solid_ids: Vec<uuid::Uuid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub extra_solid_ids: Option<Vec<uuid::Uuid>>,
 }
 
 impl std::fmt::Display for BooleanUnion {
@@ -2514,7 +2525,11 @@ impl std::fmt::Display for BooleanUnion {
 impl tabled::Tabled for BooleanUnion {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.extra_solid_ids).into()]
+        vec![if let Some(extra_solid_ids) = &self.extra_solid_ids {
+            format!("{:?}", extra_solid_ids).into()
+        } else {
+            String::new().into()
+        }]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
@@ -3381,7 +3396,8 @@ impl tabled::Tabled for Color {
     }
 }
 
-#[doc = "Container that holds a translate, rotate and scale."]
+#[doc = "Container that holds a translate, rotate and scale. Defaults to no change, everything \
+         stays the same (i.e. the identity function)."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -12688,6 +12704,12 @@ pub enum OkWebSocketResponseData {
     #[doc = "Pong response to a Ping message."]
     #[serde(rename = "pong")]
     Pong {},
+    #[doc = "Information about the connected instance"]
+    #[serde(rename = "debug")]
+    Debug {
+        #[doc = "Instance name. This may or may not mean something."]
+        name: String,
+    },
 }
 
 #[doc = "Onboarding details"]
@@ -20368,6 +20390,9 @@ pub enum WebSocketRequest {
         #[doc = "Collected metrics from the Client's end of the engine connection."]
         metrics: ClientMetrics,
     },
+    #[doc = "Return information about the connected instance"]
+    #[serde(rename = "debug")]
+    Debug {},
     #[doc = "Authentication header request."]
     #[serde(rename = "headers")]
     Headers {
