@@ -249,6 +249,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1ml~1convert~1proprietary-to-kcl/post/x-rust",
+    "value": {
+      "example": "/// Converts a proprietary CAD format to KCL.\n/// \n/// This endpoint is used to convert a proprietary CAD format to KCL. The file passed MUST have feature tree data.\n/// \n/// A STEP file does not have feature tree data, so it will not work. A sldprt file does have feature tree data, so it will work.\nasync fn example_ml_create_proprietary_to_kcl() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::KclModel = client\n        .ml()\n        .create_proprietary_to_kcl(vec![kittycad::types::multipart::Attachment {\n            name: \"thing\".to_string(),\n            filepath: Some(\"myfile.json\".into()),\n            content_type: Some(\"application/json\".to_string()),\n            data: std::fs::read(\"myfile.json\").unwrap(),\n        }])\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ml/struct.Ml.html#method.create_proprietary_to_kcl"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1ml~1kcl~1completions/post/x-rust",
     "value": {
       "example": "/// Generate code completions for KCL.\nasync fn example_ml_create_kcl_code_completions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::KclCodeCompletionResponse = client\n        .ml()\n        .create_kcl_code_completions(&kittycad::types::KclCodeCompletionRequest {\n            extra: Some(kittycad::types::KclCodeCompletionParams {\n                language: Some(\"some-string\".to_string()),\n                next_indent: Some(4 as u8),\n                prompt_tokens: Some(4 as u32),\n                suffix_tokens: Some(4 as u32),\n                trim_by_indentation: true,\n            }),\n            max_tokens: Some(4 as u16),\n            n: Some(4 as u8),\n            nwo: Some(\"some-string\".to_string()),\n            prompt: Some(\"some-string\".to_string()),\n            stop: Some(vec![\"some-string\".to_string()]),\n            stream: true,\n            suffix: Some(\"some-string\".to_string()),\n            temperature: Some(3.14 as f64),\n            top_p: Some(3.14 as f64),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
