@@ -16429,6 +16429,15 @@
         "parameters": [
           {
             "in": "query",
+            "name": "api_call_id",
+            "description": "API Call ID for distributed tracing",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "fps",
             "description": "Frames per second of the video feed.",
             "schema": {
@@ -18646,10 +18655,7 @@
               "format": "uuid"
             }
           }
-        },
-        "required": [
-          "extra_solid_ids"
-        ]
+        }
       },
       "BooleanSubtract": {
         "description": "The response from the 'BooleanSubtract'.",
@@ -18663,10 +18669,7 @@
               "format": "uuid"
             }
           }
-        },
-        "required": [
-          "extra_solid_ids"
-        ]
+        }
       },
       "BooleanUnion": {
         "description": "The response from the 'BooleanUnion'.",
@@ -18680,10 +18683,7 @@
               "format": "uuid"
             }
           }
-        },
-        "required": [
-          "extra_solid_ids"
-        ]
+        }
       },
       "CacheMetadata": {
         "description": "Metadata about our cache.\n\nThis is mostly used for internal purposes and debugging.",
@@ -19209,7 +19209,7 @@
         ]
       },
       "ComponentTransform": {
-        "description": "Container that holds a translate, rotate and scale.",
+        "description": "Container that holds a translate, rotate and scale. Defaults to no change, everything stays the same (i.e. the identity function).",
         "type": "object",
         "properties": {
           "rotate_angle_axis": {
@@ -30525,6 +30525,34 @@
               "data",
               "type"
             ]
+          },
+          {
+            "description": "Information about the connected instance",
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "description": "Instance name. This may or may not mean something.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "debug"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
           }
         ]
       },
@@ -36310,6 +36338,21 @@
             },
             "required": [
               "metrics",
+              "type"
+            ]
+          },
+          {
+            "description": "Return information about the connected instance",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "debug"
+                ]
+              }
+            },
+            "required": [
               "type"
             ]
           },
