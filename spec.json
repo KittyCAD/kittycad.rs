@@ -19874,21 +19874,27 @@
               }
             ]
           },
-          "monthly_credits_remaining": {
+          "monthly_api_credits_remaining": {
+            "description": "The number of monthly API credits remaining in the balance. This is the number of credits remaining in the balance.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database.",
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0
+          },
+          "monthly_api_credits_remaining_monetary_value": {
             "title": "double",
-            "description": "The monthy credits remaining in the balance. This gets re-upped every month, but if the credits are not used for a month they do not carry over to the next month. It is a stable amount granted to the customer per month.",
+            "description": "The monetary value of the monthy API credits remaining in the balance. This gets re-upped every month, but if the credits are not used for a month they do not carry over to the next month.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database.",
             "type": "number",
             "format": "money-usd"
           },
-          "pre_pay_cash_remaining": {
-            "title": "double",
-            "description": "The amount of pre-pay cash remaining in the balance. This number goes down as the customer uses their pre-paid credits. The reason we track this amount is if a customer ever wants to withdraw their pre-pay cash, we can use this amount to determine how much to give them. Say a customer has $100 in pre-paid cash, their bill is worth, $50 after subtracting any other credits (like monthly etc.) Their bill is $50, their pre-pay cash remaining will be subtracted by 50 to pay the bill and their `pre_pay_credits_remaining` will be subtracted by 50 to pay the bill. This way if they want to withdraw money after, they can only withdraw $50 since that is the amount of cash they have remaining.",
-            "type": "number",
-            "format": "money-usd"
+          "stable_api_credits_remaining": {
+            "description": "The number of stable API credits remaining in the balance. These do not get reset or re-upped every month. This is separate from the monthly credits. Credits will first pull from the monthly credits, then the stable credits. Stable just means that they do not get reset every month. A user will have stable credits if a Zoo employee granted them credits.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database.",
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0
           },
-          "pre_pay_credits_remaining": {
+          "stable_api_credits_remaining_monetary_value": {
             "title": "double",
-            "description": "The amount of credits remaining in the balance. This is typically the amount of cash * some multiplier they get for pre-paying their account. This number lowers every time a bill is paid with the balance. This number increases every time a customer adds funds to their balance. This may be through a subscription or a one off payment.",
+            "description": "The monetary value of stable API credits remaining in the balance. These do not get reset or re-upped every month. This is separate from the monthly credits. Credits will first pull from the monthly credits, then the stable credits. Stable just means that they do not get reset every month. A user will have stable credits if a Zoo employee granted them credits.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database.",
             "type": "number",
             "format": "money-usd"
           },
@@ -19923,9 +19929,10 @@
           "created_at",
           "id",
           "map_id",
-          "monthly_credits_remaining",
-          "pre_pay_cash_remaining",
-          "pre_pay_credits_remaining",
+          "monthly_api_credits_remaining",
+          "monthly_api_credits_remaining_monetary_value",
+          "stable_api_credits_remaining",
+          "stable_api_credits_remaining_monetary_value",
           "total_due",
           "updated_at"
         ]
@@ -23745,6 +23752,19 @@
             "minItems": 0,
             "maxItems": 15
           },
+          "monthly_pay_as_you_go_api_credits": {
+            "description": "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month. This is equivalent to the monetary value divided by the price of an API credit.",
+            "default": 0,
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0
+          },
+          "monthly_pay_as_you_go_api_credits_monetary_value": {
+            "title": "double",
+            "description": "The monetary value of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month.",
+            "type": "number",
+            "format": "money-usd"
+          },
           "name": {
             "description": "The name of the tier.",
             "allOf": [
@@ -23753,9 +23773,10 @@
               }
             ]
           },
-          "pay_as_you_go_credits": {
+          "pay_as_you_go_api_credit_price": {
             "title": "double",
-            "description": "The amount of pay-as-you-go credits the individual or org gets outside the modeling app.",
+            "description": "The price of an API credit (meaning 1 credit = 1 minute of API usage).",
+            "default": 0.0,
             "type": "number",
             "format": "money-usd"
           },
@@ -23808,8 +23829,8 @@
         },
         "required": [
           "description",
+          "monthly_pay_as_you_go_api_credits_monetary_value",
           "name",
-          "pay_as_you_go_credits",
           "price",
           "support_tier",
           "training_data_behavior",
@@ -35762,24 +35783,17 @@
         "description": "The data for updating a balance.",
         "type": "object",
         "properties": {
-          "monthly_credits_remaining": {
+          "monthly_api_credits_remaining_monetary_value": {
             "nullable": true,
             "title": "double",
-            "description": "The monthy credits remaining in the balance. This gets re-upped every month, but if the credits are not used for a month they do not carry over to the next month. It is a stable amount granted to the user per month.",
+            "description": "The monetary value of the monthy API credits remaining in the balance. This gets re-upped every month,",
             "type": "number",
             "format": "money-usd"
           },
-          "pre_pay_cash_remaining": {
+          "stable_api_credits_remaining_monetary_value": {
             "nullable": true,
             "title": "double",
-            "description": "The amount of pre-pay cash remaining in the balance. This number goes down as the user uses their pre-paid credits. The reason we track this amount is if a user ever wants to withdraw their pre-pay cash, we can use this amount to determine how much to give them. Say a user has $100 in pre-paid cash, their bill is worth, $50 after subtracting any other credits (like monthly etc.) Their bill is $50, their pre-pay cash remaining will be subtracted by 50 to pay the bill and their `pre_pay_credits_remaining` will be subtracted by 50 to pay the bill. This way if they want to withdraw money after, they can only withdraw $50 since that is the amount of cash they have remaining.",
-            "type": "number",
-            "format": "money-usd"
-          },
-          "pre_pay_credits_remaining": {
-            "nullable": true,
-            "title": "double",
-            "description": "The amount of credits remaining in the balance. This is typically the amount of cash * some multiplier they get for pre-paying their account. This number lowers every time a bill is paid with the balance. This number increases every time a user adds funds to their balance. This may be through a subscription or a one off payment.",
+            "description": "The monetary value of stable API credits remaining in the balance. These do not get reset or re-upped every month. This is separate from the monthly credits. Credits will first pull from the monthly credits, then the stable credits. Stable just means that they do not get reset every month. A user will have stable credits if a Zoo employee granted them credits.",
             "type": "number",
             "format": "money-usd"
           }
@@ -36444,6 +36458,19 @@
                 "minItems": 0,
                 "maxItems": 15
               },
+              "monthly_pay_as_you_go_api_credits": {
+                "description": "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month. This is equivalent to the monetary value divided by the price of an API credit.",
+                "default": 0,
+                "type": "integer",
+                "format": "uint64",
+                "minimum": 0
+              },
+              "monthly_pay_as_you_go_api_credits_monetary_value": {
+                "title": "double",
+                "description": "The monetary value of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month.",
+                "type": "number",
+                "format": "money-usd"
+              },
               "name": {
                 "description": "The name of the tier.",
                 "allOf": [
@@ -36452,9 +36479,10 @@
                   }
                 ]
               },
-              "pay_as_you_go_credits": {
+              "pay_as_you_go_api_credit_price": {
                 "title": "double",
-                "description": "The amount of pay-as-you-go credits the individual or org gets outside the modeling app.",
+                "description": "The price of an API credit (meaning 1 credit = 1 minute of API usage).",
+                "default": 0.0,
                 "type": "number",
                 "format": "money-usd"
               },
@@ -36507,8 +36535,8 @@
             },
             "required": [
               "description",
+              "monthly_pay_as_you_go_api_credits_monetary_value",
               "name",
-              "pay_as_you_go_credits",
               "price",
               "support_tier",
               "training_data_behavior",
