@@ -4367,25 +4367,29 @@ pub struct CustomerBalance {
              enterprise plan."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub modeling_app_enterprise_price: Option<SubscriptionTierPrice>,
-    #[doc = "The monthy credits remaining in the balance. This gets re-upped every month, but if \
-             the credits are not used for a month they do not carry over to the next month. It is \
-             a stable amount granted to the customer per month."]
-    pub monthly_credits_remaining: f64,
-    #[doc = "The amount of pre-pay cash remaining in the balance. This number goes down as the \
-             customer uses their pre-paid credits. The reason we track this amount is if a \
-             customer ever wants to withdraw their pre-pay cash, we can use this amount to \
-             determine how much to give them. Say a customer has $100 in pre-paid cash, their \
-             bill is worth, $50 after subtracting any other credits (like monthly etc.) Their \
-             bill is $50, their pre-pay cash remaining will be subtracted by 50 to pay the bill \
-             and their `pre_pay_credits_remaining` will be subtracted by 50 to pay the bill. This \
-             way if they want to withdraw money after, they can only withdraw $50 since that is \
-             the amount of cash they have remaining."]
-    pub pre_pay_cash_remaining: f64,
-    #[doc = "The amount of credits remaining in the balance. This is typically the amount of cash \
-             * some multiplier they get for pre-paying their account. This number lowers every \
-             time a bill is paid with the balance. This number increases every time a customer \
-             adds funds to their balance. This may be through a subscription or a one off payment."]
-    pub pre_pay_credits_remaining: f64,
+    #[doc = "The number of monthly API credits remaining in the balance. This is the number of \
+             credits remaining in the balance.\n\nBoth the monetary value and the number of \
+             credits are returned, but they reflect the same value in the database."]
+    pub monthly_api_credits_remaining: u64,
+    #[doc = "The monetary value of the monthy API credits remaining in the balance. This gets \
+             re-upped every month, but if the credits are not used for a month they do not carry \
+             over to the next month.\n\nBoth the monetary value and the number of credits are \
+             returned, but they reflect the same value in the database."]
+    pub monthly_api_credits_remaining_monetary_value: f64,
+    #[doc = "The number of stable API credits remaining in the balance. These do not get reset or \
+             re-upped every month. This is separate from the monthly credits. Credits will first \
+             pull from the monthly credits, then the stable credits. Stable just means that they \
+             do not get reset every month. A user will have stable credits if a Zoo employee \
+             granted them credits.\n\nBoth the monetary value and the number of credits are \
+             returned, but they reflect the same value in the database."]
+    pub stable_api_credits_remaining: u64,
+    #[doc = "The monetary value of stable API credits remaining in the balance. These do not get \
+             reset or re-upped every month. This is separate from the monthly credits. Credits \
+             will first pull from the monthly credits, then the stable credits. Stable just means \
+             that they do not get reset every month. A user will have stable credits if a Zoo \
+             employee granted them credits.\n\nBoth the monetary value and the number of credits \
+             are returned, but they reflect the same value in the database."]
+    pub stable_api_credits_remaining_monetary_value: f64,
     #[doc = "Details about the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub subscription_details: Option<ZooProductSubscriptions>,
@@ -4411,7 +4415,7 @@ impl std::fmt::Display for CustomerBalance {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CustomerBalance {
-    const LENGTH: usize = 11;
+    const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.created_at).into(),
@@ -4422,9 +4426,10 @@ impl tabled::Tabled for CustomerBalance {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.monthly_credits_remaining).into(),
-            format!("{:?}", self.pre_pay_cash_remaining).into(),
-            format!("{:?}", self.pre_pay_credits_remaining).into(),
+            format!("{:?}", self.monthly_api_credits_remaining).into(),
+            format!("{:?}", self.monthly_api_credits_remaining_monetary_value).into(),
+            format!("{:?}", self.stable_api_credits_remaining).into(),
+            format!("{:?}", self.stable_api_credits_remaining_monetary_value).into(),
             if let Some(subscription_details) = &self.subscription_details {
                 format!("{:?}", subscription_details).into()
             } else {
@@ -4446,9 +4451,10 @@ impl tabled::Tabled for CustomerBalance {
             "id".into(),
             "map_id".into(),
             "modeling_app_enterprise_price".into(),
-            "monthly_credits_remaining".into(),
-            "pre_pay_cash_remaining".into(),
-            "pre_pay_credits_remaining".into(),
+            "monthly_api_credits_remaining".into(),
+            "monthly_api_credits_remaining_monetary_value".into(),
+            "stable_api_credits_remaining".into(),
+            "stable_api_credits_remaining_monetary_value".into(),
             "subscription_details".into(),
             "subscription_id".into(),
             "total_due".into(),
@@ -10296,11 +10302,19 @@ pub struct ModelingAppSubscriptionTier {
     #[doc = "Features that are included in the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub features: Option<Vec<SubscriptionTierFeature>>,
+    #[doc = "The amount of pay-as-you-go API credits the individual or org gets outside the \
+             modeling app per month. This re-ups on the 1st of each month. This is equivalent to \
+             the monetary value divided by the price of an API credit."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub monthly_pay_as_you_go_api_credits: Option<u64>,
+    #[doc = "The monetary value of pay-as-you-go API credits the individual or org gets outside \
+             the modeling app per month. This re-ups on the 1st of each month."]
+    pub monthly_pay_as_you_go_api_credits_monetary_value: f64,
     #[doc = "The name of the tier."]
     pub name: ModelingAppSubscriptionTierName,
-    #[doc = "The amount of pay-as-you-go credits the individual or org gets outside the modeling \
-             app."]
-    pub pay_as_you_go_credits: f64,
+    #[doc = "The price of an API credit (meaning 1 credit = 1 minute of API usage)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pay_as_you_go_api_credit_price: Option<f64>,
     #[doc = "The price of the tier per month. If this is for an individual, this is the price \
              they pay. If this is for an organization, this is the price the organization pays \
              per member in the org. This is in USD."]
@@ -10332,7 +10346,7 @@ impl std::fmt::Display for ModelingAppSubscriptionTier {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ModelingAppSubscriptionTier {
-    const LENGTH: usize = 12;
+    const LENGTH: usize = 14;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
@@ -10351,8 +10365,23 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
             } else {
                 String::new().into()
             },
+            if let Some(monthly_pay_as_you_go_api_credits) = &self.monthly_pay_as_you_go_api_credits
+            {
+                format!("{:?}", monthly_pay_as_you_go_api_credits).into()
+            } else {
+                String::new().into()
+            },
+            format!(
+                "{:?}",
+                self.monthly_pay_as_you_go_api_credits_monetary_value
+            )
+            .into(),
             format!("{:?}", self.name).into(),
-            format!("{:?}", self.pay_as_you_go_credits).into(),
+            if let Some(pay_as_you_go_api_credit_price) = &self.pay_as_you_go_api_credit_price {
+                format!("{:?}", pay_as_you_go_api_credit_price).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.price).into(),
             if let Some(share_links) = &self.share_links {
                 format!("{:?}", share_links).into()
@@ -10376,8 +10405,10 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
             "description".into(),
             "endpoints_included".into(),
             "features".into(),
+            "monthly_pay_as_you_go_api_credits".into(),
+            "monthly_pay_as_you_go_api_credits_monetary_value".into(),
             "name".into(),
-            "pay_as_you_go_credits".into(),
+            "pay_as_you_go_api_credit_price".into(),
             "price".into(),
             "share_links".into(),
             "support_tier".into(),
@@ -19631,28 +19662,17 @@ impl tabled::Tabled for UpdateMemberToOrgBody {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UpdatePaymentBalance {
-    #[doc = "The monthy credits remaining in the balance. This gets re-upped every month, but if \
-             the credits are not used for a month they do not carry over to the next month. It is \
-             a stable amount granted to the user per month."]
+    #[doc = "The monetary value of the monthy API credits remaining in the balance. This gets \
+             re-upped every month,"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub monthly_credits_remaining: Option<f64>,
-    #[doc = "The amount of pre-pay cash remaining in the balance. This number goes down as the \
-             user uses their pre-paid credits. The reason we track this amount is if a user ever \
-             wants to withdraw their pre-pay cash, we can use this amount to determine how much \
-             to give them. Say a user has $100 in pre-paid cash, their bill is worth, $50 after \
-             subtracting any other credits (like monthly etc.) Their bill is $50, their pre-pay \
-             cash remaining will be subtracted by 50 to pay the bill and their \
-             `pre_pay_credits_remaining` will be subtracted by 50 to pay the bill. This way if \
-             they want to withdraw money after, they can only withdraw $50 since that is the \
-             amount of cash they have remaining."]
+    pub monthly_api_credits_remaining_monetary_value: Option<f64>,
+    #[doc = "The monetary value of stable API credits remaining in the balance. These do not get \
+             reset or re-upped every month. This is separate from the monthly credits. Credits \
+             will first pull from the monthly credits, then the stable credits. Stable just means \
+             that they do not get reset every month. A user will have stable credits if a Zoo \
+             employee granted them credits."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pre_pay_cash_remaining: Option<f64>,
-    #[doc = "The amount of credits remaining in the balance. This is typically the amount of cash \
-             * some multiplier they get for pre-paying their account. This number lowers every \
-             time a bill is paid with the balance. This number increases every time a user adds \
-             funds to their balance. This may be through a subscription or a one off payment."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pre_pay_credits_remaining: Option<f64>,
+    pub stable_api_credits_remaining_monetary_value: Option<f64>,
 }
 
 impl std::fmt::Display for UpdatePaymentBalance {
@@ -19667,21 +19687,20 @@ impl std::fmt::Display for UpdatePaymentBalance {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UpdatePaymentBalance {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            if let Some(monthly_credits_remaining) = &self.monthly_credits_remaining {
-                format!("{:?}", monthly_credits_remaining).into()
+            if let Some(monthly_api_credits_remaining_monetary_value) =
+                &self.monthly_api_credits_remaining_monetary_value
+            {
+                format!("{:?}", monthly_api_credits_remaining_monetary_value).into()
             } else {
                 String::new().into()
             },
-            if let Some(pre_pay_cash_remaining) = &self.pre_pay_cash_remaining {
-                format!("{:?}", pre_pay_cash_remaining).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(pre_pay_credits_remaining) = &self.pre_pay_credits_remaining {
-                format!("{:?}", pre_pay_credits_remaining).into()
+            if let Some(stable_api_credits_remaining_monetary_value) =
+                &self.stable_api_credits_remaining_monetary_value
+            {
+                format!("{:?}", stable_api_credits_remaining_monetary_value).into()
             } else {
                 String::new().into()
             },
@@ -19690,9 +19709,8 @@ impl tabled::Tabled for UpdatePaymentBalance {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "monthly_credits_remaining".into(),
-            "pre_pay_cash_remaining".into(),
-            "pre_pay_credits_remaining".into(),
+            "monthly_api_credits_remaining_monetary_value".into(),
+            "stable_api_credits_remaining_monetary_value".into(),
         ]
     }
 }
@@ -20509,11 +20527,19 @@ pub struct ZooProductSubscription {
     #[doc = "Features that are included in the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub features: Option<Vec<SubscriptionTierFeature>>,
+    #[doc = "The amount of pay-as-you-go API credits the individual or org gets outside the \
+             modeling app per month. This re-ups on the 1st of each month. This is equivalent to \
+             the monetary value divided by the price of an API credit."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub monthly_pay_as_you_go_api_credits: Option<u64>,
+    #[doc = "The monetary value of pay-as-you-go API credits the individual or org gets outside \
+             the modeling app per month. This re-ups on the 1st of each month."]
+    pub monthly_pay_as_you_go_api_credits_monetary_value: f64,
     #[doc = "The name of the tier."]
     pub name: ModelingAppSubscriptionTierName,
-    #[doc = "The amount of pay-as-you-go credits the individual or org gets outside the modeling \
-             app."]
-    pub pay_as_you_go_credits: f64,
+    #[doc = "The price of an API credit (meaning 1 credit = 1 minute of API usage)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pay_as_you_go_api_credit_price: Option<f64>,
     #[doc = "The price of the tier per month. If this is for an individual, this is the price \
              they pay. If this is for an organization, this is the price the organization pays \
              per member in the org. This is in USD."]
@@ -20545,7 +20571,7 @@ impl std::fmt::Display for ZooProductSubscription {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ZooProductSubscription {
-    const LENGTH: usize = 12;
+    const LENGTH: usize = 14;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
@@ -20564,8 +20590,23 @@ impl tabled::Tabled for ZooProductSubscription {
             } else {
                 String::new().into()
             },
+            if let Some(monthly_pay_as_you_go_api_credits) = &self.monthly_pay_as_you_go_api_credits
+            {
+                format!("{:?}", monthly_pay_as_you_go_api_credits).into()
+            } else {
+                String::new().into()
+            },
+            format!(
+                "{:?}",
+                self.monthly_pay_as_you_go_api_credits_monetary_value
+            )
+            .into(),
             format!("{:?}", self.name).into(),
-            format!("{:?}", self.pay_as_you_go_credits).into(),
+            if let Some(pay_as_you_go_api_credit_price) = &self.pay_as_you_go_api_credit_price {
+                format!("{:?}", pay_as_you_go_api_credit_price).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.price).into(),
             if let Some(share_links) = &self.share_links {
                 format!("{:?}", share_links).into()
@@ -20589,8 +20630,10 @@ impl tabled::Tabled for ZooProductSubscription {
             "description".into(),
             "endpoints_included".into(),
             "features".into(),
+            "monthly_pay_as_you_go_api_credits".into(),
+            "monthly_pay_as_you_go_api_credits_monetary_value".into(),
             "name".into(),
-            "pay_as_you_go_credits".into(),
+            "pay_as_you_go_api_credit_price".into(),
             "price".into(),
             "share_links".into(),
             "support_tier".into(),
