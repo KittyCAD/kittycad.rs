@@ -4371,7 +4371,7 @@ pub struct CustomerBalance {
              credits remaining in the balance.\n\nBoth the monetary value and the number of \
              credits are returned, but they reflect the same value in the database."]
     pub monthly_api_credits_remaining: u64,
-    #[doc = "The monetary value of the monthy API credits remaining in the balance. This gets \
+    #[doc = "The monetary value of the monthly API credits remaining in the balance. This gets \
              re-upped every month, but if the credits are not used for a month they do not carry \
              over to the next month.\n\nBoth the monetary value and the number of credits are \
              returned, but they reflect the same value in the database."]
