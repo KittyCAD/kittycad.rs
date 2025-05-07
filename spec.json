@@ -4230,8 +4230,7 @@
     "/ml/text-to-cad/iteration": {
       "post": {
         "tags": [
-          "ml",
-          "beta"
+          "ml"
         ],
         "summary": "Iterate on a CAD model with a prompt.",
         "description": "Even if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nThis endpoint will soon be deprecated in favor of the `/ml/text-to-cad/multi-file/iteration` endpoint. In that the endpoint path will remain but it will have the same behavior as `ml/text-to-cad/multi-file/iteration`.",
@@ -4389,8 +4388,7 @@
     "/ml/text-to-cad/multi-file/iteration": {
       "post": {
         "tags": [
-          "ml",
-          "beta"
+          "ml"
         ],
         "summary": "Iterate on a multi-file CAD model with a prompt.",
         "description": "This endpoint can iterate on multi-file models.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it. This endpoint will always return all the code back, including files that were not changed. If your original source code imported a stl/gltf/step/etc file, the output will not include that file since the model will never change non-kcl files. The endpoint will only return the kcl files that were changed.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
@@ -7077,6 +7075,16 @@
         "summary": "Get balance for your org.",
         "description": "This endpoint requires authentication by an org admin. It gets the balance information for the authenticated user's org.",
         "operationId": "get_payment_balance_for_org",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "include_total_due",
+            "description": "If you would like to return the total due for a user. This makes the API call take longer so it is off by default.",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -9652,6 +9660,14 @@
         "operationId": "get_payment_balance_for_any_org",
         "parameters": [
           {
+            "in": "query",
+            "name": "include_total_due",
+            "description": "If you would like to return the total due for a user. This makes the API call take longer so it is off by default.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "in": "path",
             "name": "id",
             "description": "The organization ID.",
@@ -9746,6 +9762,14 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_total_due",
+            "description": "If you would like to return the total due for a user. This makes the API call take longer so it is off by default.",
+            "schema": {
+              "type": "boolean"
             }
           }
         ],
@@ -13365,6 +13389,16 @@
         "summary": "Get balance for your user.",
         "description": "This endpoint requires authentication by any Zoo user. It gets the balance information for the authenticated user.",
         "operationId": "get_payment_balance_for_user",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "include_total_due",
+            "description": "If you would like to return the total due for a user. This makes the API call take longer so it is off by default.",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -16146,6 +16180,14 @@
             "schema": {
               "$ref": "#/components/schemas/UserIdentifier"
             }
+          },
+          {
+            "in": "query",
+            "name": "include_total_due",
+            "description": "If you would like to return the total due for a user. This makes the API call take longer so it is off by default.",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -16233,6 +16275,14 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/UserIdentifier"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_total_due",
+            "description": "If you would like to return the total due for a user. This makes the API call take longer so it is off by default.",
+            "schema": {
+              "type": "boolean"
             }
           }
         ],
@@ -16421,8 +16471,7 @@
     "/ws/modeling/commands": {
       "get": {
         "tags": [
-          "modeling",
-          "beta"
+          "modeling"
         ],
         "summary": "Open a websocket which accepts modeling commands.",
         "description": "Pass those commands to the engine via websocket, and pass responses back to the client. Basically, this is a websocket proxy between the frontend/client and the engine.",
@@ -19913,8 +19962,9 @@
             "type": "string"
           },
           "total_due": {
+            "nullable": true,
             "title": "double",
-            "description": "This includes any outstanding, draft, or open invoices and any pending invoice items. This does not include any credits the customer has on their account.",
+            "description": "This includes any outstanding, draft, or open invoices and any pending invoice items. This does not include any credits the customer has on their account. This amount is only returned if requested from the api.",
             "type": "number",
             "format": "money-usd"
           },
@@ -19933,7 +19983,6 @@
           "monthly_api_credits_remaining_monetary_value",
           "stable_api_credits_remaining",
           "stable_api_credits_remaining_monetary_value",
-          "total_due",
           "updated_at"
         ]
       },

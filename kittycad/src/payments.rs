@@ -171,20 +171,29 @@ impl Payments {
 
     #[doc = "Get balance for your org.\n\nThis endpoint requires authentication by an org admin. \
              It gets the balance information for the authenticated user's \
-             org.\n\n```rust,no_run\nasync fn example_payments_get_balance_for_org() -> \
+             org.\n\n**Parameters:**\n\n- `include_total_due: Option<bool>`: If you would like to \
+             return the total due for a user. This makes the API call take longer so it is off by \
+             default.\n\n```rust,no_run\nasync fn example_payments_get_balance_for_org() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::CustomerBalance = \
-             client.payments().get_balance_for_org().await?;\n    println!(\"{:?}\", result);\n    \
-             Ok(())\n}\n```"]
+             result: kittycad::types::CustomerBalance =\n        \
+             client.payments().get_balance_for_org(Some(true)).await?;\n    println!(\"{:?}\", \
+             result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_balance_for_org<'a>(
         &'a self,
+        include_total_due: Option<bool>,
     ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!("{}/{}", self.client.base_url, "org/payment/balance"),
         );
         req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = include_total_due {
+            query_params.push(("include_total_due", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
@@ -441,17 +450,20 @@ impl Payments {
 
     #[doc = "Get balance for an org.\n\nThis endpoint requires authentication by a Zoo employee. \
              It gets the balance information for the specified org.\n\n**Parameters:**\n\n- `id: \
-             uuid::Uuid`: The organization ID. (required)\n\n```rust,no_run\nuse \
-             std::str::FromStr;\nasync fn example_payments_get_balance_for_any_org() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::CustomerBalance = client\n        .payments()\n        \
-             .get_balance_for_any_org(uuid::Uuid::from_str(\n            \
-             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+             uuid::Uuid`: The organization ID. (required)\n- `include_total_due: Option<bool>`: If \
+             you would like to return the total due for a user. This makes the API call take \
+             longer so it is off by default.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_payments_get_balance_for_any_org() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = \
+             client\n        .payments()\n        .get_balance_for_any_org(\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    \
+             Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_balance_for_any_org<'a>(
         &'a self,
         id: uuid::Uuid,
+        include_total_due: Option<bool>,
     ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
@@ -462,6 +474,12 @@ impl Payments {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = include_total_due {
+            query_params.push(("include_total_due", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
@@ -481,11 +499,12 @@ impl Payments {
         }
     }
 
-    #[doc = "Update balance for an org.\n\nThis endpoint requires authentication by a Zoo employee. It updates the balance information for the specified org.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_payments_update_balance_for_any_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client\n        .payments()\n        .update_balance_for_any_org(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdatePaymentBalance {\n                monthly_api_credits_remaining_monetary_value: Some(3.14 as f64),\n                stable_api_credits_remaining_monetary_value: Some(3.14 as f64),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update balance for an org.\n\nThis endpoint requires authentication by a Zoo employee. It updates the balance information for the specified org.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. (required)\n- `include_total_due: Option<bool>`: If you would like to return the total due for a user. This makes the API call take longer so it is off by default.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_payments_update_balance_for_any_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client\n        .payments()\n        .update_balance_for_any_org(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(true),\n            &kittycad::types::UpdatePaymentBalance {\n                monthly_api_credits_remaining_monetary_value: Some(3.14 as f64),\n                stable_api_credits_remaining_monetary_value: Some(3.14 as f64),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_balance_for_any_org<'a>(
         &'a self,
         id: uuid::Uuid,
+        include_total_due: Option<bool>,
         body: &crate::types::UpdatePaymentBalance,
     ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
         let mut req = self.client.client.request(
@@ -497,6 +516,12 @@ impl Payments {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = include_total_due {
+            query_params.push(("include_total_due", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         req = req.json(body);
         let resp = req.send().await?;
         let status = resp.status();
@@ -674,16 +699,31 @@ impl Payments {
         }
     }
 
-    #[doc = "Get balance for your user.\n\nThis endpoint requires authentication by any Zoo user. It gets the balance information for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_get_balance_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client.payments().get_balance_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get balance for your user.\n\nThis endpoint requires authentication by any Zoo user. \
+             It gets the balance information for the authenticated user.\n\n**Parameters:**\n\n- \
+             `include_total_due: Option<bool>`: If you would like to return the total due for a \
+             user. This makes the API call take longer so it is off by \
+             default.\n\n```rust,no_run\nasync fn example_payments_get_balance_for_user() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::CustomerBalance =\n        \
+             client.payments().get_balance_for_user(Some(true)).await?;\n    println!(\"{:?}\", \
+             result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_balance_for_user<'a>(
         &'a self,
+        include_total_due: Option<bool>,
     ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!("{}/{}", self.client.base_url, "user/payment/balance"),
         );
         req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = include_total_due {
+            query_params.push(("include_total_due", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
@@ -941,16 +981,18 @@ impl Payments {
 
     #[doc = "Get balance for an user.\n\nThis endpoint requires authentication by a Zoo employee. \
              It gets the balance information for the specified user.\n\n**Parameters:**\n\n- `id: \
-             &'astr`: The user's identifier (uuid or email). (required)\n\n```rust,no_run\nasync \
-             fn example_payments_get_balance_for_any_user() -> anyhow::Result<()> {\n    let \
-             client = kittycad::Client::new_from_env();\n    let result: \
-             kittycad::types::CustomerBalance = client\n        .payments()\n        \
-             .get_balance_for_any_user(\"some-string\")\n        .await?;\n    println!(\"{:?}\", \
-             result);\n    Ok(())\n}\n```"]
+             &'astr`: The user's identifier (uuid or email). (required)\n- `include_total_due: \
+             Option<bool>`: If you would like to return the total due for a user. This makes the \
+             API call take longer so it is off by default.\n\n```rust,no_run\nasync fn \
+             example_payments_get_balance_for_any_user() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = \
+             client\n        .payments()\n        .get_balance_for_any_user(\"some-string\", \
+             Some(true))\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_balance_for_any_user<'a>(
         &'a self,
         id: &'a str,
+        include_total_due: Option<bool>,
     ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
@@ -961,6 +1003,12 @@ impl Payments {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = include_total_due {
+            query_params.push(("include_total_due", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
@@ -980,11 +1028,12 @@ impl Payments {
         }
     }
 
-    #[doc = "Update balance for an user.\n\nThis endpoint requires authentication by a Zoo employee. It updates the balance information for the specified user.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or email). (required)\n\n```rust,no_run\nasync fn example_payments_update_balance_for_any_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client\n        .payments()\n        .update_balance_for_any_user(\n            \"some-string\",\n            &kittycad::types::UpdatePaymentBalance {\n                monthly_api_credits_remaining_monetary_value: Some(3.14 as f64),\n                stable_api_credits_remaining_monetary_value: Some(3.14 as f64),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update balance for an user.\n\nThis endpoint requires authentication by a Zoo employee. It updates the balance information for the specified user.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or email). (required)\n- `include_total_due: Option<bool>`: If you would like to return the total due for a user. This makes the API call take longer so it is off by default.\n\n```rust,no_run\nasync fn example_payments_update_balance_for_any_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client\n        .payments()\n        .update_balance_for_any_user(\n            \"some-string\",\n            Some(true),\n            &kittycad::types::UpdatePaymentBalance {\n                monthly_api_credits_remaining_monetary_value: Some(3.14 as f64),\n                stable_api_credits_remaining_monetary_value: Some(3.14 as f64),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_balance_for_any_user<'a>(
         &'a self,
         id: &'a str,
+        include_total_due: Option<bool>,
         body: &crate::types::UpdatePaymentBalance,
     ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
         let mut req = self.client.client.request(
@@ -996,6 +1045,12 @@ impl Payments {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = include_total_due {
+            query_params.push(("include_total_due", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         req = req.json(body);
         let resp = req.send().await?;
         let status = resp.status();

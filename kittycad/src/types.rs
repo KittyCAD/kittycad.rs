@@ -4397,8 +4397,10 @@ pub struct CustomerBalance {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub subscription_id: Option<String>,
     #[doc = "This includes any outstanding, draft, or open invoices and any pending invoice \
-             items. This does not include any credits the customer has on their account."]
-    pub total_due: f64,
+             items. This does not include any credits the customer has on their account. This \
+             amount is only returned if requested from the api."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_due: Option<f64>,
     #[doc = "The date and time the balance was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
@@ -4440,7 +4442,11 @@ impl tabled::Tabled for CustomerBalance {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.total_due).into(),
+            if let Some(total_due) = &self.total_due {
+                format!("{:?}", total_due).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.updated_at).into(),
         ]
     }
