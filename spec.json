@@ -19258,6 +19258,29 @@
           "r"
         ]
       },
+      "ComplementaryEdges": {
+        "description": "Struct to contain the edge information of a wall of an extrude/rotate/loft/sweep.",
+        "type": "object",
+        "properties": {
+          "adjacent_ids": {
+            "description": "Every edge that shared one common vertex with the original edge.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "opposite_id": {
+            "nullable": true,
+            "description": "The opposite edge has no common vertices with the original edge. A wall may not have an opposite edge (i.e. a revolve that touches the axis of rotation).",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "adjacent_ids"
+        ]
+      },
       "ComponentTransform": {
         "description": "Container that holds a translate, rotate and scale. Defaults to no change, everything stays the same (i.e. the identity function).",
         "type": "object",
@@ -19986,6 +20009,32 @@
           "updated_at"
         ]
       },
+      "CutStrategy": {
+        "description": "What strategy (algorithm) should be used for cutting? Defaults to Automatic.",
+        "oneOf": [
+          {
+            "description": "Basic fillet cut. This has limitations, like the filletted edges can't touch each other. But it's very fast and simple.",
+            "type": "string",
+            "enum": [
+              "basic"
+            ]
+          },
+          {
+            "description": "More complicated fillet cut. It works for more use-cases, like edges that touch each other. But it's slower than the Basic method.",
+            "type": "string",
+            "enum": [
+              "csg"
+            ]
+          },
+          {
+            "description": "Tries the Basic method, and if that doesn't work, tries the CSG strategy.",
+            "type": "string",
+            "enum": [
+              "automatic"
+            ]
+          }
+        ]
+      },
       "CutType": {
         "description": "What kind of cut to do",
         "oneOf": [
@@ -20442,6 +20491,13 @@
         "description": "The response from the `EntityCircularPattern` command.",
         "type": "object",
         "properties": {
+          "entity_face_edge_ids": {
+            "description": "The Face, edge, and entity ids of the patterned entities.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FaceEdgeInfo"
+            }
+          },
           "entity_ids": {
             "description": "The UUIDs of the entities that were created.",
             "type": "array",
@@ -20450,14 +20506,28 @@
               "format": "uuid"
             }
           }
-        },
-        "required": [
-          "entity_ids"
-        ]
+        }
       },
       "EntityClone": {
         "description": "The response from the `EntityClone` command.",
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "entity_ids": {
+            "description": "The UUIDs of the entities that were created.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "face_edge_ids": {
+            "description": "The Face and Edge Ids of the cloned entity.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FaceEdgeInfo"
+            }
+          }
+        }
       },
       "EntityFade": {
         "description": "The response from the `EntityFade` endpoint.",
@@ -20570,6 +20640,13 @@
         "description": "The response from the `EntityLinearPattern` command.",
         "type": "object",
         "properties": {
+          "entity_face_edge_ids": {
+            "description": "The Face, edge, and entity ids of the patterned entities.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FaceEdgeInfo"
+            }
+          },
           "entity_ids": {
             "description": "The UUIDs of the entities that were created.",
             "type": "array",
@@ -20578,15 +20655,19 @@
               "format": "uuid"
             }
           }
-        },
-        "required": [
-          "entity_ids"
-        ]
+        }
       },
       "EntityLinearPatternTransform": {
         "description": "The response from the `EntityLinearPatternTransform` command.",
         "type": "object",
         "properties": {
+          "entity_face_edge_ids": {
+            "description": "The Face, edge, and entity ids of the patterned entities.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FaceEdgeInfo"
+            }
+          },
           "entity_ids": {
             "description": "The UUIDs of the entities that were created.",
             "type": "array",
@@ -20595,10 +20676,7 @@
               "format": "uuid"
             }
           }
-        },
-        "required": [
-          "entity_ids"
-        ]
+        }
       },
       "EntityMakeHelix": {
         "description": "The response from the `EntityMakeHelix` endpoint.",
@@ -20616,6 +20694,13 @@
         "description": "The response from the `EntityMirror` endpoint.",
         "type": "object",
         "properties": {
+          "entity_face_edge_ids": {
+            "description": "The Face, edge, and entity ids of the patterned entities.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FaceEdgeInfo"
+            }
+          },
           "entity_ids": {
             "description": "The UUIDs of the entities that were created.",
             "type": "array",
@@ -20624,15 +20709,19 @@
               "format": "uuid"
             }
           }
-        },
-        "required": [
-          "entity_ids"
-        ]
+        }
       },
       "EntityMirrorAcrossEdge": {
         "description": "The response from the `EntityMirrorAcrossEdge` endpoint.",
         "type": "object",
         "properties": {
+          "entity_face_edge_ids": {
+            "description": "The Face, edge, and entity ids of the patterned entities.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FaceEdgeInfo"
+            }
+          },
           "entity_ids": {
             "description": "The UUIDs of the entities that were created.",
             "type": "array",
@@ -20641,10 +20730,7 @@
               "format": "uuid"
             }
           }
-        },
-        "required": [
-          "entity_ids"
-        ]
+        }
       },
       "EntitySetOpacity": {
         "description": "The response from the `EntitySetOpacity` endpoint.",
@@ -21160,6 +21246,38 @@
         },
         "required": [
           "cap"
+        ]
+      },
+      "FaceEdgeInfo": {
+        "description": "Faces and edges id info (most used in identifying geometry in patterned and mirrored objects).",
+        "type": "object",
+        "properties": {
+          "edges": {
+            "description": "The edges of each object.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "faces": {
+            "description": "The faces of each object.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "object_id": {
+            "description": "The UUID of the object.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "edges",
+          "faces",
+          "object_id"
         ]
       },
       "FaceGetCenter": {
@@ -25958,9 +26076,28 @@
                 ]
               },
               "edge_id": {
+                "nullable": true,
                 "description": "Which edge you want to fillet.",
                 "type": "string",
                 "format": "uuid"
+              },
+              "edge_ids": {
+                "description": "Which edges you want to fillet.",
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "extra_face_ids": {
+                "description": "What IDs should the resulting faces have? If you've only passed one edge ID, its ID will be the command ID used to send this command, and this field should be empty. If you've passed `n` IDs (to fillet `n` edges), then this should be length `n-1`, and the first edge will use the command ID used to send this command.",
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
               },
               "object_id": {
                 "description": "Which object is being filletted.",
@@ -25972,6 +26109,15 @@
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "strategy": {
+                "description": "Which cutting algorithm to use.",
+                "default": "automatic",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CutStrategy"
                   }
                 ]
               },
@@ -25991,7 +26137,6 @@
               }
             },
             "required": [
-              "edge_id",
               "object_id",
               "radius",
               "tolerance",
@@ -27564,6 +27709,27 @@
             },
             "required": [
               "edge_id",
+              "object_id",
+              "type"
+            ]
+          },
+          {
+            "description": "Get a concise description of all of solids edges.",
+            "type": "object",
+            "properties": {
+              "object_id": {
+                "description": "The Solid3d object whose info is being queried.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_get_info"
+                ]
+              }
+            },
+            "required": [
               "object_id",
               "type"
             ]
@@ -30067,6 +30233,24 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/FaceEdgeInfo"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "face_edge_info"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/EntityClone"
               },
               "type": {
@@ -30253,6 +30437,60 @@
                 "type": "string",
                 "enum": [
                   "extrusion_face_info"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ComplementaryEdges"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "complementary_edges"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Solid3dGetInfo"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_get_info"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SolidInfo"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid_info"
                 ]
               }
             },
@@ -32905,6 +33143,23 @@
           "faces"
         ]
       },
+      "Solid3dGetInfo": {
+        "description": "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces)",
+        "type": "object",
+        "properties": {
+          "info": {
+            "description": "Details of each face.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SolidInfo"
+              }
+            ]
+          }
+        },
+        "required": [
+          "info"
+        ]
+      },
       "Solid3dGetNextAdjacentEdge": {
         "description": "The response from the `Solid3dGetNextAdjacentEdge` command.",
         "type": "object",
@@ -32946,6 +33201,46 @@
       "Solid3dShellFace": {
         "description": "The response from the `Solid3dShellFace` endpoint.",
         "type": "object"
+      },
+      "SolidInfo": {
+        "description": "Solid info struct (useful for maintaining mappings between edges and faces and adjacent/opposite edges).",
+        "type": "object",
+        "properties": {
+          "bottom_cap_id": {
+            "nullable": true,
+            "description": "UUID for bottom cap.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "common_edges": {
+            "description": "A map containing the common faces for all edges.",
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          "complementary_edges": {
+            "description": "A map containing the adjacent and opposite edge ids of each wall face.",
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ComplementaryEdges"
+            }
+          },
+          "top_cap_id": {
+            "nullable": true,
+            "description": "UUID for top cap.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "common_edges",
+          "complementary_edges"
+        ]
       },
       "SourcePosition": {
         "description": "A position in the source code.",
