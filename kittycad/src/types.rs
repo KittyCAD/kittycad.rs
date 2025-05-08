@@ -3396,6 +3396,48 @@ impl tabled::Tabled for Color {
     }
 }
 
+#[doc = "Struct to contain the edge information of a wall of an extrude/rotate/loft/sweep."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ComplementaryEdges {
+    #[doc = "Every edge that shared one common vertex with the original edge."]
+    pub adjacent_ids: Vec<uuid::Uuid>,
+    #[doc = "The opposite edge has no common vertices with the original edge. A wall may not have \
+             an opposite edge (i.e. a revolve that touches the axis of rotation)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub opposite_id: Option<uuid::Uuid>,
+}
+
+impl std::fmt::Display for ComplementaryEdges {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ComplementaryEdges {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.adjacent_ids).into(),
+            if let Some(opposite_id) = &self.opposite_id {
+                format!("{:?}", opposite_id).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["adjacent_ids".into(), "opposite_id".into()]
+    }
+}
+
 #[doc = "Container that holds a translate, rotate and scale. Defaults to no change, everything \
          stays the same (i.e. the identity function)."]
 #[derive(
@@ -4469,6 +4511,37 @@ impl tabled::Tabled for CustomerBalance {
     }
 }
 
+#[doc = "What strategy (algorithm) should be used for cutting? Defaults to Automatic."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CutStrategy {
+    #[doc = "Basic fillet cut. This has limitations, like the filletted edges can't touch each \
+             other. But it's very fast and simple."]
+    #[serde(rename = "basic")]
+    #[display("basic")]
+    Basic,
+    #[doc = "More complicated fillet cut. It works for more use-cases, like edges that touch each \
+             other. But it's slower than the Basic method."]
+    #[serde(rename = "csg")]
+    #[display("csg")]
+    Csg,
+    #[doc = "Tries the Basic method, and if that doesn't work, tries the CSG strategy."]
+    #[serde(rename = "automatic")]
+    #[display("automatic")]
+    Automatic,
+}
+
 #[doc = "What kind of cut to do"]
 #[derive(
     serde :: Serialize,
@@ -5346,8 +5419,12 @@ pub enum EnterpriseSubscriptionTierPrice {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct EntityCircularPattern {
+    #[doc = "The Face, edge, and entity ids of the patterned entities."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_face_edge_ids: Option<Vec<FaceEdgeInfo>>,
     #[doc = "The UUIDs of the entities that were created."]
-    pub entity_ids: Vec<uuid::Uuid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_ids: Option<Vec<uuid::Uuid>>,
 }
 
 impl std::fmt::Display for EntityCircularPattern {
@@ -5362,13 +5439,24 @@ impl std::fmt::Display for EntityCircularPattern {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityCircularPattern {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.entity_ids).into()]
+        vec![
+            if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
+                format!("{:?}", entity_face_edge_ids).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(entity_ids) = &self.entity_ids {
+                format!("{:?}", entity_ids).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["entity_ids".into()]
+        vec!["entity_face_edge_ids".into(), "entity_ids".into()]
     }
 }
 
@@ -5376,7 +5464,14 @@ impl tabled::Tabled for EntityCircularPattern {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct EntityClone {}
+pub struct EntityClone {
+    #[doc = "The UUIDs of the entities that were created."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_ids: Option<Vec<uuid::Uuid>>,
+    #[doc = "The Face and Edge Ids of the cloned entity."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub face_edge_ids: Option<Vec<FaceEdgeInfo>>,
+}
 
 impl std::fmt::Display for EntityClone {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -5390,13 +5485,24 @@ impl std::fmt::Display for EntityClone {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityClone {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![
+            if let Some(entity_ids) = &self.entity_ids {
+                format!("{:?}", entity_ids).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(face_edge_ids) = &self.face_edge_ids {
+                format!("{:?}", face_edge_ids).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["entity_ids".into(), "face_edge_ids".into()]
     }
 }
 
@@ -5624,8 +5730,12 @@ impl tabled::Tabled for EntityGetSketchPaths {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct EntityLinearPattern {
+    #[doc = "The Face, edge, and entity ids of the patterned entities."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_face_edge_ids: Option<Vec<FaceEdgeInfo>>,
     #[doc = "The UUIDs of the entities that were created."]
-    pub entity_ids: Vec<uuid::Uuid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_ids: Option<Vec<uuid::Uuid>>,
 }
 
 impl std::fmt::Display for EntityLinearPattern {
@@ -5640,13 +5750,24 @@ impl std::fmt::Display for EntityLinearPattern {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityLinearPattern {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.entity_ids).into()]
+        vec![
+            if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
+                format!("{:?}", entity_face_edge_ids).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(entity_ids) = &self.entity_ids {
+                format!("{:?}", entity_ids).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["entity_ids".into()]
+        vec!["entity_face_edge_ids".into(), "entity_ids".into()]
     }
 }
 
@@ -5655,8 +5776,12 @@ impl tabled::Tabled for EntityLinearPattern {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct EntityLinearPatternTransform {
+    #[doc = "The Face, edge, and entity ids of the patterned entities."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_face_edge_ids: Option<Vec<FaceEdgeInfo>>,
     #[doc = "The UUIDs of the entities that were created."]
-    pub entity_ids: Vec<uuid::Uuid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_ids: Option<Vec<uuid::Uuid>>,
 }
 
 impl std::fmt::Display for EntityLinearPatternTransform {
@@ -5671,13 +5796,24 @@ impl std::fmt::Display for EntityLinearPatternTransform {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityLinearPatternTransform {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.entity_ids).into()]
+        vec![
+            if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
+                format!("{:?}", entity_face_edge_ids).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(entity_ids) = &self.entity_ids {
+                format!("{:?}", entity_ids).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["entity_ids".into()]
+        vec!["entity_face_edge_ids".into(), "entity_ids".into()]
     }
 }
 
@@ -5770,8 +5906,12 @@ impl tabled::Tabled for EntityMakeHelixFromParams {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct EntityMirror {
+    #[doc = "The Face, edge, and entity ids of the patterned entities."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_face_edge_ids: Option<Vec<FaceEdgeInfo>>,
     #[doc = "The UUIDs of the entities that were created."]
-    pub entity_ids: Vec<uuid::Uuid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_ids: Option<Vec<uuid::Uuid>>,
 }
 
 impl std::fmt::Display for EntityMirror {
@@ -5786,13 +5926,24 @@ impl std::fmt::Display for EntityMirror {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityMirror {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.entity_ids).into()]
+        vec![
+            if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
+                format!("{:?}", entity_face_edge_ids).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(entity_ids) = &self.entity_ids {
+                format!("{:?}", entity_ids).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["entity_ids".into()]
+        vec!["entity_face_edge_ids".into(), "entity_ids".into()]
     }
 }
 
@@ -5801,8 +5952,12 @@ impl tabled::Tabled for EntityMirror {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct EntityMirrorAcrossEdge {
+    #[doc = "The Face, edge, and entity ids of the patterned entities."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_face_edge_ids: Option<Vec<FaceEdgeInfo>>,
     #[doc = "The UUIDs of the entities that were created."]
-    pub entity_ids: Vec<uuid::Uuid>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_ids: Option<Vec<uuid::Uuid>>,
 }
 
 impl std::fmt::Display for EntityMirrorAcrossEdge {
@@ -5817,13 +5972,24 @@ impl std::fmt::Display for EntityMirrorAcrossEdge {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityMirrorAcrossEdge {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.entity_ids).into()]
+        vec![
+            if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
+                format!("{:?}", entity_face_edge_ids).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(entity_ids) = &self.entity_ids {
+                format!("{:?}", entity_ids).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["entity_ids".into()]
+        vec!["entity_face_edge_ids".into(), "entity_ids".into()]
     }
 }
 
@@ -6698,6 +6864,46 @@ impl tabled::Tabled for ExtrusionFaceInfo {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["cap".into(), "curve_id".into(), "face_id".into()]
+    }
+}
+
+#[doc = "Faces and edges id info (most used in identifying geometry in patterned and mirrored \
+         objects)."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FaceEdgeInfo {
+    #[doc = "The edges of each object."]
+    pub edges: Vec<uuid::Uuid>,
+    #[doc = "The faces of each object."]
+    pub faces: Vec<uuid::Uuid>,
+    #[doc = "The UUID of the object."]
+    pub object_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for FaceEdgeInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FaceEdgeInfo {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.edges).into(),
+            format!("{:?}", self.faces).into(),
+            format!("{:?}", self.object_id).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["edges".into(), "faces".into(), "object_id".into()]
     }
 }
 
@@ -11073,12 +11279,26 @@ pub enum ModelingCmd {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         cut_type: Option<CutType>,
         #[doc = "Which edge you want to fillet."]
-        edge_id: uuid::Uuid,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        edge_id: Option<uuid::Uuid>,
+        #[doc = "Which edges you want to fillet."]
+        #[serde(default)]
+        edge_ids: Vec<uuid::Uuid>,
+        #[doc = "What IDs should the resulting faces have? If you've only passed one edge ID, its \
+                 ID will be the command ID used to send this command, and this field should be \
+                 empty. If you've passed `n` IDs (to fillet `n` edges), then this should be \
+                 length `n-1`, and the first edge will use the command ID used to send this \
+                 command."]
+        #[serde(default)]
+        extra_face_ids: Vec<uuid::Uuid>,
         #[doc = "Which object is being filletted."]
         object_id: uuid::Uuid,
         #[doc = "The radius of the fillet. Measured in length (using the same units that the \
                  current sketch uses). Must be positive (i.e. greater than zero)."]
         radius: f64,
+        #[doc = "Which cutting algorithm to use."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        strategy: Option<CutStrategy>,
         #[doc = "The maximum acceptable surface gap computed between the filleted surfaces. Must \
                  be positive (i.e. greater than zero)."]
         tolerance: f64,
@@ -11567,6 +11787,12 @@ pub enum ModelingCmd {
         #[doc = "Any edge that lies on the extrusion base path."]
         edge_id: uuid::Uuid,
         #[doc = "The Solid3d object whose extrusion is being queried."]
+        object_id: uuid::Uuid,
+    },
+    #[doc = "Get a concise description of all of solids edges."]
+    #[serde(rename = "solid3d_get_info")]
+    Solid3DGetInfo {
+        #[doc = "The Solid3d object whose info is being queried."]
         object_id: uuid::Uuid,
     },
     #[doc = "Clear the selection"]
@@ -12607,6 +12833,12 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `EntitiesGetDistance` command."]
         data: EntityGetDistance,
     },
+    #[serde(rename = "face_edge_info")]
+    FaceEdgeInfo {
+        #[doc = "Faces and edges id info (most used in identifying geometry in patterned and \
+                 mirrored objects)."]
+        data: FaceEdgeInfo,
+    },
     #[serde(rename = "entity_clone")]
     EntityClone {
         #[doc = "The response from the `EntityClone` command."]
@@ -12663,6 +12895,23 @@ pub enum OkModelingCmdResponse {
         #[doc = "Extrusion face info struct (useful for maintaining mappings between source path \
                  segment ids and extrusion faces)"]
         data: ExtrusionFaceInfo,
+    },
+    #[serde(rename = "complementary_edges")]
+    ComplementaryEdges {
+        #[doc = "Struct to contain the edge information of a wall of an extrude/rotate/loft/sweep."]
+        data: ComplementaryEdges,
+    },
+    #[serde(rename = "solid3d_get_info")]
+    Solid3DGetInfo {
+        #[doc = "Extrusion face info struct (useful for maintaining mappings between source path \
+                 segment ids and extrusion faces)"]
+        data: Solid3DGetInfo,
+    },
+    #[serde(rename = "solid_info")]
+    SolidInfo {
+        #[doc = "Solid info struct (useful for maintaining mappings between edges and faces and \
+                 adjacent/opposite edges)."]
+        data: SolidInfo,
     },
     #[serde(rename = "set_grid_reference_plane")]
     SetGridReferencePlane {
@@ -16276,6 +16525,38 @@ impl tabled::Tabled for Solid3DGetExtrusionFaceInfo {
     }
 }
 
+#[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment \
+         ids and extrusion faces)"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DGetInfo {
+    #[doc = "Details of each face."]
+    pub info: SolidInfo,
+}
+
+impl std::fmt::Display for Solid3DGetInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DGetInfo {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.info).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["info".into()]
+    }
+}
+
 #[doc = "The response from the `Solid3dGetNextAdjacentEdge` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -16404,6 +16685,64 @@ impl tabled::Tabled for Solid3DShellFace {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
+    }
+}
+
+#[doc = "Solid info struct (useful for maintaining mappings between edges and faces and \
+         adjacent/opposite edges)."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SolidInfo {
+    #[doc = "UUID for bottom cap."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bottom_cap_id: Option<uuid::Uuid>,
+    #[doc = "A map containing the common faces for all edges."]
+    pub common_edges: std::collections::HashMap<String, Vec<uuid::Uuid>>,
+    #[doc = "A map containing the adjacent and opposite edge ids of each wall face."]
+    pub complementary_edges: std::collections::HashMap<String, ComplementaryEdges>,
+    #[doc = "UUID for top cap."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub top_cap_id: Option<uuid::Uuid>,
+}
+
+impl std::fmt::Display for SolidInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SolidInfo {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(bottom_cap_id) = &self.bottom_cap_id {
+                format!("{:?}", bottom_cap_id).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.common_edges).into(),
+            format!("{:?}", self.complementary_edges).into(),
+            if let Some(top_cap_id) = &self.top_cap_id {
+                format!("{:?}", top_cap_id).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "bottom_cap_id".into(),
+            "common_edges".into(),
+            "complementary_edges".into(),
+            "top_cap_id".into(),
+        ]
     }
 }
 
