@@ -33557,10 +33557,17 @@
             ]
           },
           {
-            "description": "Standard support.",
+            "description": "Standard email support.",
             "type": "string",
             "enum": [
-              "standard"
+              "standard_email"
+            ]
+          },
+          {
+            "description": "Priority email support.",
+            "type": "string",
+            "enum": [
+              "priority_email"
             ]
           },
           {
@@ -33568,13 +33575,6 @@
             "type": "string",
             "enum": [
               "premium"
-            ]
-          },
-          {
-            "description": "Priority support.",
-            "type": "string",
-            "enum": [
-              "priority"
             ]
           }
         ]
