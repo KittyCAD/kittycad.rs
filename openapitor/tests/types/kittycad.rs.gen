@@ -16779,18 +16779,18 @@ pub enum SupportTier {
     #[serde(rename = "community")]
     #[display("community")]
     Community,
-    #[doc = "Standard support."]
-    #[serde(rename = "standard")]
-    #[display("standard")]
-    Standard,
+    #[doc = "Standard email support."]
+    #[serde(rename = "standard_email")]
+    #[display("standard_email")]
+    StandardEmail,
+    #[doc = "Priority email support."]
+    #[serde(rename = "priority_email")]
+    #[display("priority_email")]
+    PriorityEmail,
     #[doc = "Premium support."]
     #[serde(rename = "premium")]
     #[display("premium")]
     Premium,
-    #[doc = "Priority support."]
-    #[serde(rename = "priority")]
-    #[display("priority")]
-    Priority,
 }
 
 #[doc = "The surface area response."]
