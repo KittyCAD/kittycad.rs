@@ -12675,6 +12675,156 @@
         }
       }
     },
+    "/user/crm": {
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_patch_user_crm",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "users",
+          "hidden"
+        ],
+        "summary": "Update properties in the CRM",
+        "operationId": "patch_user_crm",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CrmData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/user/extended": {
       "get": {
         "tags": [
@@ -12740,6 +12890,157 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ExtendedUser"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/user/form": {
+      "put": {
+        "tags": [
+          "users",
+          "hidden"
+        ],
+        "summary": "Create a new support/sales ticket from the website contact form. This endpoint is authenticated.",
+        "description": "It gets attached to the user's account.",
+        "operationId": "put_user_form_self",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InquiryForm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_put_user_form_self",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -16446,6 +16747,307 @@
         }
       }
     },
+    "/website/form": {
+      "put": {
+        "tags": [
+          "users",
+          "hidden"
+        ],
+        "summary": "Creates a new support/sales ticket from the website contact form. This endpoint is for untrusted",
+        "description": "users and is not authenticated.",
+        "operationId": "put_public_form",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InquiryForm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_put_public_form",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/website/subscribe": {
+      "put": {
+        "tags": [
+          "users",
+          "hidden"
+        ],
+        "summary": "Subscribes a user to the newsletter.",
+        "operationId": "put_public_subscribe",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Subscribe"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_put_public_subscribe",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/ws/executor/term": {
       "get": {
         "tags": [
@@ -19763,6 +20365,27 @@
           }
         ]
       },
+      "CrmData": {
+        "description": "The data for subscribing a user to the newsletter.",
+        "type": "object",
+        "properties": {
+          "cad_industry": {
+            "nullable": true,
+            "description": "The industry of the user.",
+            "type": "string"
+          },
+          "cad_user_count": {
+            "nullable": true,
+            "description": "The user count of the user.",
+            "type": "string"
+          },
+          "cad_user_type": {
+            "nullable": true,
+            "description": "The user type.",
+            "type": "string"
+          }
+        }
+      },
       "Currency": {
         "description": "Currency is the list of supported currencies. Always lowercase.\n\nThis comes from the Stripe API docs: For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.",
         "type": "string"
@@ -20763,7 +21386,7 @@
             ]
           },
           {
-            "description": "The preview environment. This is when PRs are created and a service is deployed for testing.",
+            "description": "The preview environment. This is deployed to api.dev.zoo.dev.",
             "type": "string",
             "enum": [
               "PREVIEW"
@@ -21093,6 +21716,11 @@
             "description": "The image avatar for the user. This is a URL.",
             "type": "string",
             "format": "uri"
+          },
+          "is_onboarded": {
+            "description": "If the user has finished onboarding.",
+            "default": false,
+            "type": "boolean"
           },
           "is_service_account": {
             "description": "If the user is tied to a service account.",
@@ -22703,6 +23331,120 @@
               "coords",
               "type",
               "units"
+            ]
+          }
+        ]
+      },
+      "InquiryForm": {
+        "description": "The form for a public inquiry submission.",
+        "type": "object",
+        "properties": {
+          "company": {
+            "nullable": true,
+            "description": "The company name.",
+            "type": "string"
+          },
+          "email": {
+            "description": "The email address of the user.",
+            "type": "string",
+            "format": "email"
+          },
+          "first_name": {
+            "description": "The first name of the user.",
+            "type": "string"
+          },
+          "industry": {
+            "nullable": true,
+            "description": "The industry of the user.",
+            "type": "string"
+          },
+          "inquiry_type": {
+            "description": "The type of inquiry.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InquiryType"
+              }
+            ]
+          },
+          "last_name": {
+            "description": "The last name of the user.",
+            "type": "string"
+          },
+          "message": {
+            "description": "The message content.",
+            "type": "string"
+          },
+          "phone": {
+            "nullable": true,
+            "description": "The phone number of the user.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "first_name",
+          "inquiry_type",
+          "last_name",
+          "message"
+        ]
+      },
+      "InquiryType": {
+        "description": "The type of inquiry.",
+        "oneOf": [
+          {
+            "description": "General inquiry about the service or product.",
+            "type": "string",
+            "enum": [
+              "general_inquiry"
+            ]
+          },
+          {
+            "description": "Questions related to sales or purchasing.",
+            "type": "string",
+            "enum": [
+              "sales_question"
+            ]
+          },
+          {
+            "description": "Inquiry from a developer, typically technical in nature.",
+            "type": "string",
+            "enum": [
+              "developer_inquiry"
+            ]
+          },
+          {
+            "description": "Opportunity for partnership or collaboration.",
+            "type": "string",
+            "enum": [
+              "partnership_opportunity"
+            ]
+          },
+          {
+            "description": "Other inquiries related to sales that do not fit predefined categories.",
+            "type": "string",
+            "enum": [
+              "other_sales_inquiry"
+            ]
+          },
+          {
+            "description": "Request for technical support or troubleshooting.",
+            "type": "string",
+            "enum": [
+              "technical_support"
+            ]
+          },
+          {
+            "description": "Questions or requests related to account management.",
+            "type": "string",
+            "enum": [
+              "account_management"
+            ]
+          },
+          {
+            "description": "Other support-related inquiries that do not fit predefined categories.",
+            "type": "string",
+            "enum": [
+              "other_support_inquiry"
             ]
           }
         ]
@@ -33355,6 +34097,20 @@
           "percent_off"
         ]
       },
+      "Subscribe": {
+        "description": "The data for subscribing a user to the newsletter.",
+        "type": "object",
+        "properties": {
+          "email": {
+            "description": "The email",
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
       "SubscriptionTierFeature": {
         "description": "A subscription tier feature.",
         "type": "object",
@@ -36187,6 +36943,11 @@
             "type": "string",
             "format": "uri"
           },
+          "is_onboarded": {
+            "nullable": true,
+            "description": "If the user is now onboarded.",
+            "type": "boolean"
+          },
           "last_name": {
             "description": "The user's last name.",
             "type": "string"
@@ -36232,7 +36993,7 @@
             "format": "date-time"
           },
           "deletion_scheduled": {
-            "description": "If the user is scheduled for deletion",
+            "description": "If the user is scheduled for deletion.",
             "default": false,
             "type": "boolean"
           },
@@ -36273,6 +37034,11 @@
             "description": "The image avatar for the user. This is a URL.",
             "type": "string",
             "format": "uri"
+          },
+          "is_onboarded": {
+            "description": "If the user has finished onboarding.",
+            "default": false,
+            "type": "boolean"
           },
           "is_service_account": {
             "description": "If the user is tied to a service account.",

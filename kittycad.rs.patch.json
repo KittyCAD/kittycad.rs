@@ -811,7 +811,7 @@
     "op": "add",
     "path": "/paths/~1user/put/x-rust",
     "value": {
-      "example": "/// Update your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates information about the authenticated user.\nuse std::str::FromStr;\nasync fn example_users_update_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client\n        .users()\n        .update_self(&kittycad::types::UpdateUser {\n            company: Some(\"some-string\".to_string()),\n            discord: Some(\"some-string\".to_string()),\n            first_name: Some(\"some-string\".to_string()),\n            github: Some(\"some-string\".to_string()),\n            image: \"https://example.com/foo/bar\".to_string(),\n            last_name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Update your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates information about the authenticated user.\nuse std::str::FromStr;\nasync fn example_users_update_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client\n        .users()\n        .update_self(&kittycad::types::UpdateUser {\n            company: Some(\"some-string\".to_string()),\n            discord: Some(\"some-string\".to_string()),\n            first_name: Some(\"some-string\".to_string()),\n            github: Some(\"some-string\".to_string()),\n            image: \"https://example.com/foo/bar\".to_string(),\n            is_onboarded: Some(true),\n            last_name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.update_self"
     }
   },
@@ -865,10 +865,26 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1user~1crm/patch/x-rust",
+    "value": {
+      "example": "/// Update properties in the CRM\nasync fn example_users_patch_crm() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .patch_crm(&kittycad::types::CrmData {\n            cad_industry: Some(\"some-string\".to_string()),\n            cad_user_count: Some(\"some-string\".to_string()),\n            cad_user_type: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.patch_crm"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1user~1extended/get/x-rust",
     "value": {
       "example": "/// Get extended information about your user.\n/// \n/// Get the user information for the authenticated user.\n/// \n/// Alternatively, you can also use the `/users-extended/me` endpoint.\nasync fn example_users_get_self_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUser = client.users().get_self_extended().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_self_extended"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1form/put/x-rust",
+    "value": {
+      "example": "/// Create a new support/sales ticket from the website contact form. This endpoint is authenticated.\n/// \n/// It gets attached to the user's account.\nasync fn example_users_put_form_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_form_self(&kittycad::types::InquiryForm {\n            company: Some(\"some-string\".to_string()),\n            email: \"email@example.com\".to_string(),\n            first_name: \"some-string\".to_string(),\n            industry: Some(\"some-string\".to_string()),\n            inquiry_type: kittycad::types::InquiryType::OtherSalesInquiry,\n            last_name: \"some-string\".to_string(),\n            message: \"some-string\".to_string(),\n            phone: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.put_form_self"
     }
   },
   {
@@ -1141,6 +1157,22 @@
     "value": {
       "example": "/// Update balance for an user.\n/// \n/// This endpoint requires authentication by a Zoo employee. It updates the balance information for the specified user.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The user's identifier (uuid or email). (required)\n/// - `include_total_due: Option<bool>`: If you would like to return the total due for a user. This makes the API call take longer so it is off by default.\nasync fn example_payments_update_balance_for_any_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client\n        .payments()\n        .update_balance_for_any_user(\n            \"some-string\",\n            Some(true),\n            &kittycad::types::UpdatePaymentBalance {\n                monthly_api_credits_remaining_monetary_value: Some(3.14 as f64),\n                stable_api_credits_remaining_monetary_value: Some(3.14 as f64),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.update_balance_for_any_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1website~1form/put/x-rust",
+    "value": {
+      "example": "/// Creates a new support/sales ticket from the website contact form. This endpoint is for untrusted\n/// \n/// users and is not authenticated.\nasync fn example_users_put_public_form() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_form(&kittycad::types::InquiryForm {\n            company: Some(\"some-string\".to_string()),\n            email: \"email@example.com\".to_string(),\n            first_name: \"some-string\".to_string(),\n            industry: Some(\"some-string\".to_string()),\n            inquiry_type: kittycad::types::InquiryType::OtherSalesInquiry,\n            last_name: \"some-string\".to_string(),\n            message: \"some-string\".to_string(),\n            phone: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.put_public_form"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1website~1subscribe/put/x-rust",
+    "value": {
+      "example": "/// Subscribes a user to the newsletter.\nasync fn example_users_put_public_subscribe() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_subscribe(&kittycad::types::Subscribe {\n            email: \"email@example.com\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.put_public_subscribe"
     }
   },
   {
