@@ -4067,6 +4067,64 @@ pub enum CreatedAtSortMode {
     CreatedAtDescending,
 }
 
+#[doc = "The data for subscribing a user to the newsletter."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CrmData {
+    #[doc = "The industry of the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cad_industry: Option<String>,
+    #[doc = "The user count of the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cad_user_count: Option<String>,
+    #[doc = "The user type."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cad_user_type: Option<String>,
+}
+
+impl std::fmt::Display for CrmData {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CrmData {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(cad_industry) = &self.cad_industry {
+                format!("{:?}", cad_industry).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(cad_user_count) = &self.cad_user_count {
+                format!("{:?}", cad_user_count).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(cad_user_type) = &self.cad_user_type {
+                format!("{:?}", cad_user_type).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "cad_industry".into(),
+            "cad_user_count".into(),
+            "cad_user_type".into(),
+        ]
+    }
+}
+
 #[doc = "The response from the `CurveGetControlPoints` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -5999,7 +6057,7 @@ pub enum Environment {
     #[serde(rename = "DEVELOPMENT")]
     #[display("DEVELOPMENT")]
     Development,
-    #[doc = "The preview environment. This is when PRs are created and a service is deployed for testing."]
+    #[doc = "The preview environment. This is deployed to api.dev.zoo.dev."]
     #[serde(rename = "PREVIEW")]
     #[display("PREVIEW")]
     Preview,
@@ -6416,6 +6474,9 @@ pub struct ExtendedUser {
     pub id: uuid::Uuid,
     #[doc = "The image avatar for the user. This is a URL."]
     pub image: String,
+    #[doc = "If the user has finished onboarding."]
+    #[serde(default)]
+    pub is_onboarded: bool,
     #[doc = "If the user is tied to a service account."]
     #[serde(default)]
     pub is_service_account: bool,
@@ -6447,7 +6508,7 @@ impl std::fmt::Display for ExtendedUser {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ExtendedUser {
-    const LENGTH: usize = 19;
+    const LENGTH: usize = 20;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(block) = &self.block {
@@ -6495,6 +6556,7 @@ impl tabled::Tabled for ExtendedUser {
             },
             format!("{:?}", self.id).into(),
             self.image.clone().into(),
+            format!("{:?}", self.is_onboarded).into(),
             format!("{:?}", self.is_service_account).into(),
             if let Some(last_name) = &self.last_name {
                 format!("{:?}", last_name).into()
@@ -6531,6 +6593,7 @@ impl tabled::Tabled for ExtendedUser {
             "hubspot_contact_id".into(),
             "id".into(),
             "image".into(),
+            "is_onboarded".into(),
             "is_service_account".into(),
             "last_name".into(),
             "name".into(),
@@ -8455,6 +8518,133 @@ pub enum InputFormat3D {
         #[doc = "The units of the input data.\n\nThis is very important for correct scaling and when calculating physics properties like mass, etc.\n\nDefaults to millimeters."]
         units: UnitLength,
     },
+}
+
+#[doc = "The form for a public inquiry submission."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct InquiryForm {
+    #[doc = "The company name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub company: Option<String>,
+    #[doc = "The email address of the user."]
+    pub email: String,
+    #[doc = "The first name of the user."]
+    pub first_name: String,
+    #[doc = "The industry of the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub industry: Option<String>,
+    #[doc = "The type of inquiry."]
+    pub inquiry_type: InquiryType,
+    #[doc = "The last name of the user."]
+    pub last_name: String,
+    #[doc = "The message content."]
+    pub message: String,
+    #[doc = "The phone number of the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+}
+
+impl std::fmt::Display for InquiryForm {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for InquiryForm {
+    const LENGTH: usize = 8;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(company) = &self.company {
+                format!("{:?}", company).into()
+            } else {
+                String::new().into()
+            },
+            self.email.clone().into(),
+            self.first_name.clone().into(),
+            if let Some(industry) = &self.industry {
+                format!("{:?}", industry).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.inquiry_type).into(),
+            self.last_name.clone().into(),
+            self.message.clone().into(),
+            if let Some(phone) = &self.phone {
+                format!("{:?}", phone).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "company".into(),
+            "email".into(),
+            "first_name".into(),
+            "industry".into(),
+            "inquiry_type".into(),
+            "last_name".into(),
+            "message".into(),
+            "phone".into(),
+        ]
+    }
+}
+
+#[doc = "The type of inquiry."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum InquiryType {
+    #[doc = "General inquiry about the service or product."]
+    #[serde(rename = "general_inquiry")]
+    #[display("general_inquiry")]
+    GeneralInquiry,
+    #[doc = "Questions related to sales or purchasing."]
+    #[serde(rename = "sales_question")]
+    #[display("sales_question")]
+    SalesQuestion,
+    #[doc = "Inquiry from a developer, typically technical in nature."]
+    #[serde(rename = "developer_inquiry")]
+    #[display("developer_inquiry")]
+    DeveloperInquiry,
+    #[doc = "Opportunity for partnership or collaboration."]
+    #[serde(rename = "partnership_opportunity")]
+    #[display("partnership_opportunity")]
+    PartnershipOpportunity,
+    #[doc = "Other inquiries related to sales that do not fit predefined categories."]
+    #[serde(rename = "other_sales_inquiry")]
+    #[display("other_sales_inquiry")]
+    OtherSalesInquiry,
+    #[doc = "Request for technical support or troubleshooting."]
+    #[serde(rename = "technical_support")]
+    #[display("technical_support")]
+    TechnicalSupport,
+    #[doc = "Questions or requests related to account management."]
+    #[serde(rename = "account_management")]
+    #[display("account_management")]
+    AccountManagement,
+    #[doc = "Other support-related inquiries that do not fit predefined categories."]
+    #[serde(rename = "other_support_inquiry")]
+    #[display("other_support_inquiry")]
+    OtherSupportInquiry,
 }
 
 #[doc = "An invoice."]
@@ -16610,6 +16800,37 @@ impl tabled::Tabled for StoreCouponParams {
     }
 }
 
+#[doc = "The data for subscribing a user to the newsletter."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Subscribe {
+    #[doc = "The email"]
+    pub email: String,
+}
+
+impl std::fmt::Display for Subscribe {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Subscribe {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.email.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["email".into()]
+    }
+}
+
 #[doc = "A subscription tier feature."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -19758,6 +19979,9 @@ pub struct UpdateUser {
     pub github: Option<String>,
     #[doc = "The image URL for the user. NOTE: If the user uses an OAuth2 provider, this will be overwritten by the provider's image URL when the user logs in next."]
     pub image: String,
+    #[doc = "If the user is now onboarded."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub is_onboarded: Option<bool>,
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,
@@ -19778,7 +20002,7 @@ impl std::fmt::Display for UpdateUser {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UpdateUser {
-    const LENGTH: usize = 7;
+    const LENGTH: usize = 8;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(company) = &self.company {
@@ -19802,6 +20026,11 @@ impl tabled::Tabled for UpdateUser {
                 String::new().into()
             },
             self.image.clone().into(),
+            if let Some(is_onboarded) = &self.is_onboarded {
+                format!("{:?}", is_onboarded).into()
+            } else {
+                String::new().into()
+            },
             if let Some(last_name) = &self.last_name {
                 format!("{:?}", last_name).into()
             } else {
@@ -19818,6 +20047,7 @@ impl tabled::Tabled for UpdateUser {
             "first_name".into(),
             "github".into(),
             "image".into(),
+            "is_onboarded".into(),
             "last_name".into(),
             "phone".into(),
         ]
@@ -19840,7 +20070,7 @@ pub struct User {
     pub company: Option<String>,
     #[doc = "The date and time the user was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "If the user is scheduled for deletion"]
+    #[doc = "If the user is scheduled for deletion."]
     #[serde(default)]
     pub deletion_scheduled: bool,
     #[doc = "The user's Discord handle."]
@@ -19862,6 +20092,9 @@ pub struct User {
     pub id: uuid::Uuid,
     #[doc = "The image avatar for the user. This is a URL."]
     pub image: String,
+    #[doc = "If the user has finished onboarding."]
+    #[serde(default)]
+    pub is_onboarded: bool,
     #[doc = "If the user is tied to a service account."]
     #[serde(default)]
     pub is_service_account: bool,
@@ -19890,7 +20123,7 @@ impl std::fmt::Display for User {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for User {
-    const LENGTH: usize = 17;
+    const LENGTH: usize = 18;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(block) = &self.block {
@@ -19933,6 +20166,7 @@ impl tabled::Tabled for User {
             },
             format!("{:?}", self.id).into(),
             self.image.clone().into(),
+            format!("{:?}", self.is_onboarded).into(),
             format!("{:?}", self.is_service_account).into(),
             if let Some(last_name) = &self.last_name {
                 format!("{:?}", last_name).into()
@@ -19963,6 +20197,7 @@ impl tabled::Tabled for User {
             "github".into(),
             "id".into(),
             "image".into(),
+            "is_onboarded".into(),
             "is_service_account".into(),
             "last_name".into(),
             "name".into(),
