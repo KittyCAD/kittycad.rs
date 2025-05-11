@@ -163,6 +163,7 @@ fn test_empty_phone_number() {
         github: Some("@example-company".to_string()),
         discord: Some("@example-company".to_string()),
         image: "".to_string(),
+        is_onboarded: Default::default(),
     };
 
     assert_eq!(
