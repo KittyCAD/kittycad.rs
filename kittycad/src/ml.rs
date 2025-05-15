@@ -214,11 +214,26 @@ impl Ml {
         }
     }
 
-    #[doc = "Converts a proprietary CAD format to KCL.\n\nThis endpoint is used to convert a proprietary CAD format to KCL. The file passed MUST have feature tree data.\n\nA STEP file does not have feature tree data, so it will not work. A sldprt file does have feature tree data, so it will work.\n\n```rust,no_run\nasync fn example_ml_create_proprietary_to_kcl() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::KclModel = client\n        .ml()\n        .create_proprietary_to_kcl(vec![kittycad::types::multipart::Attachment {\n            name: \"thing\".to_string(),\n            filepath: Some(\"myfile.json\".into()),\n            content_type: Some(\"application/json\".to_string()),\n            data: std::fs::read(\"myfile.json\").unwrap(),\n        }])\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Converts a proprietary CAD format to KCL.\n\nThis endpoint is used to convert a \
+             proprietary CAD format to KCL. The file passed MUST have feature tree data.\n\nA STEP \
+             file does not have feature tree data, so it will not work. A sldprt file does have \
+             feature tree data, so it will work.\n\n**Parameters:**\n\n- `code_option: \
+             Option<crate::types::CodeOption>`: The options to run on the code. By default this is \
+             set to `execute`.\n\n```rust,no_run\nasync fn example_ml_create_proprietary_to_kcl() \
+             -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::KclModel = client\n        .ml()\n        \
+             .create_proprietary_to_kcl(\n            vec![kittycad::types::multipart::Attachment \
+             {\n                name: \"thing\".to_string(),\n                filepath: \
+             Some(\"myfile.json\".into()),\n                content_type: \
+             Some(\"application/json\".to_string()),\n                data: \
+             std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            \
+             Some(kittycad::types::CodeOption::Cleanup),\n        )\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_proprietary_to_kcl<'a>(
         &'a self,
         attachments: Vec<crate::types::multipart::Attachment>,
+        code_option: Option<crate::types::CodeOption>,
     ) -> Result<crate::types::KclModel, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
@@ -228,6 +243,12 @@ impl Ml {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = code_option {
+            query_params.push(("code_option", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         use std::convert::TryInto;
         let mut form = reqwest::multipart::Form::new();
         for attachment in attachments {

@@ -669,6 +669,64 @@ impl tabled::Tabled for AddressDetails {
     }
 }
 
+#[doc = "Edge info struct (useful for maintaining mappings between edges and faces and adjacent/opposite edges)."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AdjacencyInfo {
+    #[doc = "Adjacent edge and face info."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub adjacent_info: Option<EdgeInfo>,
+    #[doc = "Opposite edge and face info."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub opposite_info: Option<EdgeInfo>,
+    #[doc = "Original edge id and face info."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub original_info: Option<EdgeInfo>,
+}
+
+impl std::fmt::Display for AdjacencyInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AdjacencyInfo {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(adjacent_info) = &self.adjacent_info {
+                format!("{:?}", adjacent_info).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(opposite_info) = &self.opposite_info {
+                format!("{:?}", opposite_info).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(original_info) = &self.original_info {
+                format!("{:?}", original_info).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "adjacent_info".into(),
+            "opposite_info".into(),
+            "original_info".into(),
+        ]
+    }
+}
+
 #[doc = "An angle, with a specific unit."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -3259,6 +3317,35 @@ pub enum CodeLanguage {
     Node,
 }
 
+#[doc = "Code option for running and verifying kcl.\n\n<details><summary>JSON schema</summary>\n\n```json { \"title\": \"CodeOption\", \"description\": \"Code option for running and verifying kcl.\", \"type\": \"string\", \"enum\": [ \"parse\", \"execute\", \"cleanup\", \"mock_execute\" ] } ``` </details>"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CodeOption {
+    #[serde(rename = "parse")]
+    #[display("parse")]
+    Parse,
+    #[serde(rename = "execute")]
+    #[display("execute")]
+    Execute,
+    #[serde(rename = "cleanup")]
+    #[display("cleanup")]
+    Cleanup,
+    #[serde(rename = "mock_execute")]
+    #[display("mock_execute")]
+    MockExecute,
+}
+
 #[doc = "Output of the code being executed.\n\n<details><summary>JSON schema</summary>\n\n```json { \"description\": \"Output of the code being executed.\", \"type\": \"object\", \"properties\": { \"output_files\": { \"description\": \"The contents of the files requested if they were passed.\", \"type\": \"array\", \"items\": { \"$ref\": \"#/components/schemas/OutputFile\" } }, \"stderr\": { \"description\": \"The stderr of the code.\", \"default\": \"\", \"type\": \"string\" }, \"stdout\": { \"description\": \"The stdout of the code.\", \"default\": \"\", \"type\": \"string\" } } } ``` </details>"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -5201,6 +5288,42 @@ pub enum DxfStorage {
     #[serde(rename = "binary")]
     #[display("binary")]
     Binary,
+}
+
+#[doc = "A list of faces for a specific edge."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EdgeInfo {
+    #[doc = "The UUID of the id."]
+    pub edge_id: uuid::Uuid,
+    #[doc = "The faces of each edge."]
+    pub faces: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for EdgeInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EdgeInfo {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.edge_id).into(),
+            format!("{:?}", self.faces).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["edge_id".into(), "faces".into()]
+    }
 }
 
 #[doc = "The response from the `EdgeLinesVisible` endpoint."]
@@ -10745,6 +10868,9 @@ pub enum ModelingCmd {
     #[doc = "Extrude the object along a path."]
     #[serde(rename = "sweep")]
     Sweep {
+        #[doc = "What is this sweep relative to?"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        relative_to: Option<RelativeTo>,
         #[doc = "If true, the sweep will be broken up into sub-sweeps (extrusions, revolves, sweeps) based on the trajectory path components."]
         sectional: bool,
         #[doc = "Which sketch to sweep. Must be a closed 2D solid."]
@@ -11715,8 +11841,10 @@ pub enum ModelingCmd {
         object_id: uuid::Uuid,
     },
     #[doc = "Get a concise description of all of solids edges."]
-    #[serde(rename = "solid3d_get_info")]
-    Solid3DGetInfo {
+    #[serde(rename = "solid3d_get_adjacency_info")]
+    Solid3DGetAdjacencyInfo {
+        #[doc = "Any edge that lies on the extrusion base path."]
+        edge_id: uuid::Uuid,
         #[doc = "The Solid3d object whose info is being queried."]
         object_id: uuid::Uuid,
     },
@@ -12572,6 +12700,11 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `SelectGet` command."]
         data: SelectGet,
     },
+    #[serde(rename = "solid3d_get_adjacency_info")]
+    Solid3DGetAdjacencyInfo {
+        #[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces) This includes the opposite and adjacent faces and edges."]
+        data: Solid3DGetAdjacencyInfo,
+    },
     #[serde(rename = "solid3d_get_all_edge_faces")]
     Solid3DGetAllEdgeFaces {
         #[doc = "The response from the `Solid3dGetAllEdgeFaces` command."]
@@ -12747,6 +12880,11 @@ pub enum OkModelingCmdResponse {
         #[doc = "Faces and edges id info (most used in identifying geometry in patterned and mirrored objects)."]
         data: FaceEdgeInfo,
     },
+    #[serde(rename = "edge_info")]
+    EdgeInfo {
+        #[doc = "A list of faces for a specific edge."]
+        data: EdgeInfo,
+    },
     #[serde(rename = "entity_clone")]
     EntityClone {
         #[doc = "The response from the `EntityClone` command."]
@@ -12807,15 +12945,10 @@ pub enum OkModelingCmdResponse {
         #[doc = "Struct to contain the edge information of a wall of an extrude/rotate/loft/sweep."]
         data: ComplementaryEdges,
     },
-    #[serde(rename = "solid3d_get_info")]
-    Solid3DGetInfo {
-        #[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces)"]
-        data: Solid3DGetInfo,
-    },
-    #[serde(rename = "solid_info")]
-    SolidInfo {
-        #[doc = "Solid info struct (useful for maintaining mappings between edges and faces and adjacent/opposite edges)."]
-        data: SolidInfo,
+    #[serde(rename = "adjacency_info")]
+    AdjacencyInfo {
+        #[doc = "Edge info struct (useful for maintaining mappings between edges and faces and adjacent/opposite edges)."]
+        data: AdjacencyInfo,
     },
     #[serde(rename = "set_grid_reference_plane")]
     SetGridReferencePlane {
@@ -14773,6 +14906,31 @@ impl tabled::Tabled for ReconfigureStream {
     }
 }
 
+#[doc = "What is the given geometry relative to?"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum RelativeTo {
+    #[doc = "Local/relative to a position centered within the plane being sketched on"]
+    #[serde(rename = "sketch_plane")]
+    #[display("sketch_plane")]
+    SketchPlane,
+    #[doc = "Local/relative to the trajectory curve"]
+    #[serde(rename = "trajectory_curve")]
+    #[display("trajectory_curve")]
+    TrajectoryCurve,
+}
+
 #[doc = "The response from the `RemoveSceneObjects` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -16252,6 +16410,37 @@ impl tabled::Tabled for Solid3DFilletEdge {
     }
 }
 
+#[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces) This includes the opposite and adjacent faces and edges."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DGetAdjacencyInfo {
+    #[doc = "Details of each edge."]
+    pub edges: Vec<AdjacencyInfo>,
+}
+
+impl std::fmt::Display for Solid3DGetAdjacencyInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DGetAdjacencyInfo {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.edges).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["edges".into()]
+    }
+}
+
 #[doc = "The response from the `Solid3dGetAllEdgeFaces` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -16378,37 +16567,6 @@ impl tabled::Tabled for Solid3DGetExtrusionFaceInfo {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["faces".into()]
-    }
-}
-
-#[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces)"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Solid3DGetInfo {
-    #[doc = "Details of each face."]
-    pub info: SolidInfo,
-}
-
-impl std::fmt::Display for Solid3DGetInfo {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for Solid3DGetInfo {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.info).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["info".into()]
     }
 }
 
@@ -16540,63 +16698,6 @@ impl tabled::Tabled for Solid3DShellFace {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
-    }
-}
-
-#[doc = "Solid info struct (useful for maintaining mappings between edges and faces and adjacent/opposite edges)."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct SolidInfo {
-    #[doc = "UUID for bottom cap."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub bottom_cap_id: Option<uuid::Uuid>,
-    #[doc = "A map containing the common faces for all edges."]
-    pub common_edges: std::collections::HashMap<String, Vec<uuid::Uuid>>,
-    #[doc = "A map containing the adjacent and opposite edge ids of each wall face."]
-    pub complementary_edges: std::collections::HashMap<String, ComplementaryEdges>,
-    #[doc = "UUID for top cap."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub top_cap_id: Option<uuid::Uuid>,
-}
-
-impl std::fmt::Display for SolidInfo {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for SolidInfo {
-    const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(bottom_cap_id) = &self.bottom_cap_id {
-                format!("{:?}", bottom_cap_id).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.common_edges).into(),
-            format!("{:?}", self.complementary_edges).into(),
-            if let Some(top_cap_id) = &self.top_cap_id {
-                format!("{:?}", top_cap_id).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "bottom_cap_id".into(),
-            "common_edges".into(),
-            "complementary_edges".into(),
-            "top_cap_id".into(),
-        ]
     }
 }
 
