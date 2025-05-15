@@ -20980,14 +20980,14 @@ pub enum ZooTool {
     #[serde(rename = "modeling_app")]
     #[display("modeling_app")]
     ModelingApp,
-    #[doc = "The Text-to-CAD UI."]
-    #[serde(rename = "text_to_cad")]
-    #[display("text_to_cad")]
-    TextToCad,
     #[doc = "The Diff Chrome Extension."]
     #[serde(rename = "diff_chrome_extension")]
     #[display("diff_chrome_extension")]
     DiffChromeExtension,
+    #[doc = "The Text-to-CAD UI."]
+    #[serde(rename = "text_to_cad")]
+    #[display("text_to_cad")]
+    TextToCad,
 }
 
 #[doc = "The response from the `ZoomToFit` command."]
