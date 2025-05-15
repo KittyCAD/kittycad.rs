@@ -867,7 +867,7 @@
     "op": "add",
     "path": "/paths/~1user~1crm/patch/x-rust",
     "value": {
-      "example": "/// Update properties in the CRM\nasync fn example_users_patch_crm() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .patch_crm(&kittycad::types::CrmData {\n            cad_industry: Some(\"some-string\".to_string()),\n            cad_user_count: Some(\"some-string\".to_string()),\n            cad_user_type: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n",
+      "example": "/// Update properties in the CRM\nasync fn example_users_patch_crm() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .patch_crm(&kittycad::types::CrmData {\n            cad_industry: Some(\"some-string\".to_string()),\n            cad_user_type: Some(\"some-string\".to_string()),\n            number_of_cad_users: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.patch_crm"
     }
   },
