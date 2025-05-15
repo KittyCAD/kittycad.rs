@@ -4075,12 +4075,12 @@ pub struct CrmData {
     #[doc = "The industry of the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cad_industry: Option<String>,
-    #[doc = "The user count of the user."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cad_user_count: Option<String>,
     #[doc = "The user type."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cad_user_type: Option<String>,
+    #[doc = "The user count of the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub number_of_cad_users: Option<String>,
 }
 
 impl std::fmt::Display for CrmData {
@@ -4103,13 +4103,13 @@ impl tabled::Tabled for CrmData {
             } else {
                 String::new().into()
             },
-            if let Some(cad_user_count) = &self.cad_user_count {
-                format!("{:?}", cad_user_count).into()
+            if let Some(cad_user_type) = &self.cad_user_type {
+                format!("{:?}", cad_user_type).into()
             } else {
                 String::new().into()
             },
-            if let Some(cad_user_type) = &self.cad_user_type {
-                format!("{:?}", cad_user_type).into()
+            if let Some(number_of_cad_users) = &self.number_of_cad_users {
+                format!("{:?}", number_of_cad_users).into()
             } else {
                 String::new().into()
             },
@@ -4119,8 +4119,8 @@ impl tabled::Tabled for CrmData {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "cad_industry".into(),
-            "cad_user_count".into(),
             "cad_user_type".into(),
+            "number_of_cad_users".into(),
         ]
     }
 }

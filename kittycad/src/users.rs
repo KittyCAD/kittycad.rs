@@ -104,8 +104,8 @@ impl Users {
     #[doc = "Update properties in the CRM\n\n```rust,no_run\nasync fn example_users_patch_crm() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
              client\n        .users()\n        .patch_crm(&kittycad::types::CrmData {\n            \
-             cad_industry: Some(\"some-string\".to_string()),\n            cad_user_count: \
-             Some(\"some-string\".to_string()),\n            cad_user_type: \
+             cad_industry: Some(\"some-string\".to_string()),\n            cad_user_type: \
+             Some(\"some-string\".to_string()),\n            number_of_cad_users: \
              Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn patch_crm<'a>(

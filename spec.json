@@ -20374,14 +20374,14 @@
             "description": "The industry of the user.",
             "type": "string"
           },
-          "cad_user_count": {
-            "nullable": true,
-            "description": "The user count of the user.",
-            "type": "string"
-          },
           "cad_user_type": {
             "nullable": true,
             "description": "The user type.",
+            "type": "string"
+          },
+          "number_of_cad_users": {
+            "nullable": true,
+            "description": "The user count of the user.",
             "type": "string"
           }
         }
