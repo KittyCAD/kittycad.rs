@@ -37723,17 +37723,17 @@
             ]
           },
           {
-            "description": "The Text-to-CAD UI.",
-            "type": "string",
-            "enum": [
-              "text_to_cad"
-            ]
-          },
-          {
             "description": "The Diff Chrome Extension.",
             "type": "string",
             "enum": [
               "diff_chrome_extension"
+            ]
+          },
+          {
+            "description": "The Text-to-CAD UI.",
+            "type": "string",
+            "enum": [
+              "text_to_cad"
             ]
           }
         ]
