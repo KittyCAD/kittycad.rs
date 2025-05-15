@@ -3920,6 +3920,16 @@
         "summary": "Converts a proprietary CAD format to KCL.",
         "description": "This endpoint is used to convert a proprietary CAD format to KCL. The file passed MUST have feature tree data.\n\nA STEP file does not have feature tree data, so it will not work. A sldprt file does have feature tree data, so it will work.",
         "operationId": "create_proprietary_to_kcl",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code_option",
+            "description": "The options to run on the code. By default this is set to `execute`.",
+            "schema": {
+              "$ref": "#/components/schemas/CodeOption"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "multipart/form-data": {
@@ -17329,6 +17339,39 @@
           "country"
         ]
       },
+      "AdjacencyInfo": {
+        "description": "Edge info struct (useful for maintaining mappings between edges and faces and adjacent/opposite edges).",
+        "type": "object",
+        "properties": {
+          "adjacent_info": {
+            "nullable": true,
+            "description": "Adjacent edge and face info.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EdgeInfo"
+              }
+            ]
+          },
+          "opposite_info": {
+            "nullable": true,
+            "description": "Opposite edge and face info.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EdgeInfo"
+              }
+            ]
+          },
+          "original_info": {
+            "nullable": true,
+            "description": "Original edge id and face info.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EdgeInfo"
+              }
+            ]
+          }
+        }
+      },
       "Angle": {
         "description": "An angle, with a specific unit.",
         "type": "object",
@@ -19805,6 +19848,16 @@
           }
         ]
       },
+      "CodeOption": {
+        "description": "Code option for running and verifying kcl.\n\n<details><summary>JSON schema</summary>\n\n```json { \"title\": \"CodeOption\", \"description\": \"Code option for running and verifying kcl.\", \"type\": \"string\", \"enum\": [ \"parse\", \"execute\", \"cleanup\", \"mock_execute\" ] } ``` </details>",
+        "type": "string",
+        "enum": [
+          "parse",
+          "execute",
+          "cleanup",
+          "mock_execute"
+        ]
+      },
       "CodeOutput": {
         "description": "Output of the code being executed.\n\n<details><summary>JSON schema</summary>\n\n```json { \"description\": \"Output of the code being executed.\", \"type\": \"object\", \"properties\": { \"output_files\": { \"description\": \"The contents of the files requested if they were passed.\", \"type\": \"array\", \"items\": { \"$ref\": \"#/components/schemas/OutputFile\" } }, \"stderr\": { \"description\": \"The stderr of the code.\", \"default\": \"\", \"type\": \"string\" }, \"stdout\": { \"description\": \"The stdout of the code.\", \"default\": \"\", \"type\": \"string\" } } } ``` </details>",
         "type": "object",
@@ -20992,6 +21045,29 @@
               "binary"
             ]
           }
+        ]
+      },
+      "EdgeInfo": {
+        "description": "A list of faces for a specific edge.",
+        "type": "object",
+        "properties": {
+          "edge_id": {
+            "description": "The UUID of the id.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "faces": {
+            "description": "The faces of each edge.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "edge_id",
+          "faces"
         ]
       },
       "EdgeLinesVisible": {
@@ -24944,6 +25020,15 @@
             "description": "Extrude the object along a path.",
             "type": "object",
             "properties": {
+              "relative_to": {
+                "description": "What is this sweep relative to?",
+                "default": "sketch_plane",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RelativeTo"
+                  }
+                ]
+              },
               "sectional": {
                 "description": "If true, the sweep will be broken up into sub-sweeps (extrusions, revolves, sweeps) based on the trajectory path components.",
                 "type": "boolean"
@@ -28459,6 +28544,11 @@
             "description": "Get a concise description of all of solids edges.",
             "type": "object",
             "properties": {
+              "edge_id": {
+                "description": "Any edge that lies on the extrusion base path.",
+                "type": "string",
+                "format": "uuid"
+              },
               "object_id": {
                 "description": "The Solid3d object whose info is being queried.",
                 "type": "string",
@@ -28467,11 +28557,12 @@
               "type": {
                 "type": "string",
                 "enum": [
-                  "solid3d_get_info"
+                  "solid3d_get_adjacency_info"
                 ]
               }
             },
             "required": [
+              "edge_id",
               "object_id",
               "type"
             ]
@@ -30363,6 +30454,24 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/Solid3dGetAdjacencyInfo"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_get_adjacency_info"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/Solid3dGetAllEdgeFaces"
               },
               "type": {
@@ -30993,6 +31102,24 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/EdgeInfo"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "edge_info"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/EntityClone"
               },
               "type": {
@@ -31209,30 +31336,12 @@
             "type": "object",
             "properties": {
               "data": {
-                "$ref": "#/components/schemas/Solid3dGetInfo"
+                "$ref": "#/components/schemas/AdjacencyInfo"
               },
               "type": {
                 "type": "string",
                 "enum": [
-                  "solid3d_get_info"
-                ]
-              }
-            },
-            "required": [
-              "data",
-              "type"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "data": {
-                "$ref": "#/components/schemas/SolidInfo"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "solid_info"
+                  "adjacency_info"
                 ]
               }
             },
@@ -33068,6 +33177,25 @@
         "description": "The response from the `ReconfigureStream` endpoint.",
         "type": "object"
       },
+      "RelativeTo": {
+        "description": "What is the given geometry relative to?",
+        "oneOf": [
+          {
+            "description": "Local/relative to a position centered within the plane being sketched on",
+            "type": "string",
+            "enum": [
+              "sketch_plane"
+            ]
+          },
+          {
+            "description": "Local/relative to the trajectory curve",
+            "type": "string",
+            "enum": [
+              "trajectory_curve"
+            ]
+          }
+        ]
+      },
       "RemoveSceneObjects": {
         "description": "The response from the `RemoveSceneObjects` endpoint.",
         "type": "object"
@@ -33823,6 +33951,22 @@
         "description": "The response from the `Solid3dFilletEdge` endpoint.",
         "type": "object"
       },
+      "Solid3dGetAdjacencyInfo": {
+        "description": "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces) This includes the opposite and adjacent faces and edges.",
+        "type": "object",
+        "properties": {
+          "edges": {
+            "description": "Details of each edge.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdjacencyInfo"
+            }
+          }
+        },
+        "required": [
+          "edges"
+        ]
+      },
       "Solid3dGetAllEdgeFaces": {
         "description": "The response from the `Solid3dGetAllEdgeFaces` command.",
         "type": "object",
@@ -33885,23 +34029,6 @@
           "faces"
         ]
       },
-      "Solid3dGetInfo": {
-        "description": "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces)",
-        "type": "object",
-        "properties": {
-          "info": {
-            "description": "Details of each face.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/SolidInfo"
-              }
-            ]
-          }
-        },
-        "required": [
-          "info"
-        ]
-      },
       "Solid3dGetNextAdjacentEdge": {
         "description": "The response from the `Solid3dGetNextAdjacentEdge` command.",
         "type": "object",
@@ -33943,46 +34070,6 @@
       "Solid3dShellFace": {
         "description": "The response from the `Solid3dShellFace` endpoint.",
         "type": "object"
-      },
-      "SolidInfo": {
-        "description": "Solid info struct (useful for maintaining mappings between edges and faces and adjacent/opposite edges).",
-        "type": "object",
-        "properties": {
-          "bottom_cap_id": {
-            "nullable": true,
-            "description": "UUID for bottom cap.",
-            "type": "string",
-            "format": "uuid"
-          },
-          "common_edges": {
-            "description": "A map containing the common faces for all edges.",
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uuid"
-              }
-            }
-          },
-          "complementary_edges": {
-            "description": "A map containing the adjacent and opposite edge ids of each wall face.",
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/ComplementaryEdges"
-            }
-          },
-          "top_cap_id": {
-            "nullable": true,
-            "description": "UUID for top cap.",
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "required": [
-          "common_edges",
-          "complementary_edges"
-        ]
       },
       "SourcePosition": {
         "description": "A position in the source code.",
