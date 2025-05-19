@@ -3915,7 +3915,8 @@
     "/ml/convert/proprietary-to-kcl": {
       "post": {
         "tags": [
-          "ml"
+          "ml",
+          "hidden"
         ],
         "summary": "Converts a proprietary CAD format to KCL.",
         "description": "This endpoint is used to convert a proprietary CAD format to KCL. The file passed MUST have feature tree data.\n\nA STEP file does not have feature tree data, so it will not work. A sldprt file does have feature tree data, so it will work.",
