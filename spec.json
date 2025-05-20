@@ -3919,7 +3919,7 @@
           "hidden"
         ],
         "summary": "Converts a proprietary CAD format to KCL.",
-        "description": "This endpoint is used to convert a proprietary CAD format to KCL. The file passed MUST have feature tree data.\n\nA STEP file does not have feature tree data, so it will not work. A sldprt file does have feature tree data, so it will work.",
+        "description": "This endpoint is used to convert a proprietary CAD format to KCL. The file passed MUST have feature tree data.\n\nA STEP file does not have feature tree data, so it will not work. A sldprt file does have feature tree data, so it will work.\n\nInput filepaths will be normalized and re-canonicalized to be under the current working directory -- so returned paths may differ from provided paths, and care must be taken when handling user provided paths.",
         "operationId": "create_proprietary_to_kcl",
         "parameters": [
           {
@@ -4402,7 +4402,7 @@
           "ml"
         ],
         "summary": "Iterate on a multi-file CAD model with a prompt.",
-        "description": "This endpoint can iterate on multi-file models.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it. This endpoint will always return all the code back, including files that were not changed. If your original source code imported a stl/gltf/step/etc file, the output will not include that file since the model will never change non-kcl files. The endpoint will only return the kcl files that were changed.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "This endpoint can iterate on multi-file models.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it. This endpoint will always return all the code back, including files that were not changed. If your original source code imported a stl/gltf/step/etc file, the output will not include that file since the model will never change non-kcl files. The endpoint will only return the kcl files that were changed.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nInput filepaths will be normalized and re-canonicalized to be under the current working directory -- so returned paths may differ from provided paths, and care must be taken when handling user provided paths.",
         "operationId": "create_text_to_cad_multi_file_iteration",
         "requestBody": {
           "description": "Iteration on a multi-file CAD model",
