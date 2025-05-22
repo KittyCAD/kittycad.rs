@@ -808,10 +808,9 @@ impl Users {
     #[doc = "Get extended information about a user.\n\nTo get information about yourself, use \
              `/users-extended/me` as the endpoint. By doing so you will get the user information \
              for the authenticated user.\n\nAlternatively, to get information about the \
-             authenticated user, use `/user/extended` endpoint.\n\nTo get information about any \
-             Zoo user, you must be a Zoo employee.\n\n**Parameters:**\n\n- `id: &'astr`: The \
-             user's identifier (uuid or email). (required)\n\n```rust,no_run\nasync fn \
-             example_users_get_extended() -> anyhow::Result<()> {\n    let client = \
+             authenticated user, use `/user/extended` endpoint.\n\n**Parameters:**\n\n- `id: \
+             &'astr`: The user's identifier (uuid or email). (required)\n\n```rust,no_run\nasync \
+             fn example_users_get_extended() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUser = \
              client.users().get_extended(\"some-string\").await?;\n    println!(\"{:?}\", \
              result);\n    Ok(())\n}\n```"]
@@ -851,8 +850,7 @@ impl Users {
     #[doc = "Get a user.\n\nTo get information about yourself, use `/users/me` as the endpoint. By \
              doing so you will get the user information for the authenticated \
              user.\n\nAlternatively, to get information about the authenticated user, use `/user` \
-             endpoint.\n\nTo get information about any Zoo user, you must be a Zoo \
-             employee.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or \
+             endpoint.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or \
              email). (required)\n\n```rust,no_run\nasync fn example_users_get() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::User = client.users().get(\"some-string\").await?;\n    \
