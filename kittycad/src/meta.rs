@@ -42,41 +42,6 @@ impl Meta {
         }
     }
 
-    #[doc = "Get the metadata about our currently running server.\n\nThis includes information on \
-             any of our other distributed systems it is connected to.\n\nYou must be a Zoo \
-             employee to perform this request.\n\n```rust,no_run\nasync fn \
-             example_meta_get_metadata() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::Metadata = \
-             client.meta().get_metadata().await?;\n    println!(\"{:?}\", result);\n    \
-             Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn get_metadata<'a>(
-        &'a self,
-    ) -> Result<crate::types::Metadata, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!("{}/{}", self.client.base_url, "_meta/info"),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
-    }
-
     #[doc = "Get ip address information.\n\n```rust,no_run\nasync fn example_meta_get_ipinfo() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::IpAddrInfo = client.meta().get_ipinfo().await?;\n    \
@@ -226,8 +191,8 @@ impl Meta {
     #[doc = "Get an API token for a user by their discord id.\n\nThis endpoint allows us to run \
              API calls from our discord bot on behalf of a user. The user must have a discord \
              account linked to their Zoo Account via oauth2 for this to work.\n\nYou must be a Zoo \
-             employee to use this endpoint.\n\n**Parameters:**\n\n- `discord_id: &'astr`: The \
-             user's discord ID. (required)\n\n```rust,no_run\nasync fn \
+             admin to use this endpoint.\n\n**Parameters:**\n\n- `discord_id: &'astr`: The user's \
+             discord ID. (required)\n\n```rust,no_run\nasync fn \
              example_meta_internal_get_api_token_for_discord_user() -> anyhow::Result<()> {\n    \
              let client = kittycad::Client::new_from_env();\n    let result: \
              kittycad::types::ApiToken = client\n        .meta()\n        \

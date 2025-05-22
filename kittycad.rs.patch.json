@@ -17,14 +17,6 @@
   },
   {
     "op": "add",
-    "path": "/paths/~1_meta~1info/get/x-rust",
-    "value": {
-      "example": "/// Get the metadata about our currently running server.\n/// \n/// This includes information on any of our other distributed systems it is connected to.\n/// \n/// You must be a Zoo employee to perform this request.\nasync fn example_meta_get_metadata() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Metadata = client.meta().get_metadata().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.get_metadata"
-    }
-  },
-  {
-    "op": "add",
     "path": "/paths/~1_meta~1ipinfo/get/x-rust",
     "value": {
       "example": "/// Get ip address information.\nasync fn example_meta_get_ipinfo() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::IpAddrInfo = client.meta().get_ipinfo().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
@@ -219,7 +211,7 @@
     "op": "add",
     "path": "/paths/~1internal~1discord~1api-token~1{discord_id}/get/x-rust",
     "value": {
-      "example": "/// Get an API token for a user by their discord id.\n/// \n/// This endpoint allows us to run API calls from our discord bot on behalf of a user. The user must have a discord account linked to their Zoo Account via oauth2 for this to work.\n/// \n/// You must be a Zoo employee to use this endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `discord_id: &'astr`: The user's discord ID. (required)\nasync fn example_meta_internal_get_api_token_for_discord_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = client\n        .meta()\n        .internal_get_api_token_for_discord_user(\"some-string\")\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get an API token for a user by their discord id.\n/// \n/// This endpoint allows us to run API calls from our discord bot on behalf of a user. The user must have a discord account linked to their Zoo Account via oauth2 for this to work.\n/// \n/// You must be a Zoo admin to use this endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `discord_id: &'astr`: The user's discord ID. (required)\nasync fn example_meta_internal_get_api_token_for_discord_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = client\n        .meta()\n        .internal_get_api_token_for_discord_user(\"some-string\")\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.internal_get_api_token_for_discord_user"
     }
   },
@@ -643,7 +635,7 @@
     "op": "add",
     "path": "/paths/~1orgs~1{id}~1enterprise~1pricing/put/x-rust",
     "value": {
-      "example": "/// Set the enterprise price for an organization.\n/// \n/// You must be a Zoo employee to perform this request.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        .update_enterprise_pricing_for(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::EnterpriseSubscriptionTierPrice::Flat {\n                interval: kittycad::types::PlanInterval::Week,\n                price: 3.14 as f64,\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Set the enterprise price for an organization.\n/// \n/// You must be a Zoo admin to perform this request.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        .update_enterprise_pricing_for(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::EnterpriseSubscriptionTierPrice::Flat {\n                interval: kittycad::types::PlanInterval::Week,\n                price: 3.14 as f64,\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.update_enterprise_pricing_for"
     }
   },
@@ -1123,7 +1115,7 @@
     "op": "add",
     "path": "/paths/~1users-extended~1{id}/get/x-rust",
     "value": {
-      "example": "/// Get extended information about a user.\n/// \n/// To get information about yourself, use `/users-extended/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n/// \n/// Alternatively, to get information about the authenticated user, use `/user/extended` endpoint.\n/// \n/// To get information about any Zoo user, you must be a Zoo employee.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The user's identifier (uuid or email). (required)\nasync fn example_users_get_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUser = client.users().get_extended(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get extended information about a user.\n/// \n/// To get information about yourself, use `/users-extended/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n/// \n/// Alternatively, to get information about the authenticated user, use `/user/extended` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The user's identifier (uuid or email). (required)\nasync fn example_users_get_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUser = client.users().get_extended(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_extended"
     }
   },
@@ -1131,7 +1123,7 @@
     "op": "add",
     "path": "/paths/~1users~1{id}/get/x-rust",
     "value": {
-      "example": "/// Get a user.\n/// \n/// To get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n/// \n/// Alternatively, to get information about the authenticated user, use `/user` endpoint.\n/// \n/// To get information about any Zoo user, you must be a Zoo employee.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The user's identifier (uuid or email). (required)\nasync fn example_users_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client.users().get(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get a user.\n/// \n/// To get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n/// \n/// Alternatively, to get information about the authenticated user, use `/user` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The user's identifier (uuid or email). (required)\nasync fn example_users_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client.users().get(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get"
     }
   },

@@ -85,85 +85,6 @@
         }
       }
     },
-    "/_meta/info": {
-      "get": {
-        "tags": [
-          "meta",
-          "hidden"
-        ],
-        "summary": "Get the metadata about our currently running server.",
-        "description": "This includes information on any of our other distributed systems it is connected to.\n\nYou must be a Zoo employee to perform this request.",
-        "operationId": "get_metadata",
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Metadata"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
     "/_meta/ipinfo": {
       "get": {
         "tags": [
@@ -3487,7 +3408,7 @@
           "hidden"
         ],
         "summary": "Get an API token for a user by their discord id.",
-        "description": "This endpoint allows us to run API calls from our discord bot on behalf of a user. The user must have a discord account linked to their Zoo Account via oauth2 for this to work.\n\nYou must be a Zoo employee to use this endpoint.",
+        "description": "This endpoint allows us to run API calls from our discord bot on behalf of a user. The user must have a discord account linked to their Zoo Account via oauth2 for this to work.\n\nYou must be a Zoo admin to use this endpoint.",
         "operationId": "internal_get_api_token_for_discord_user",
         "parameters": [
           {
@@ -9487,7 +9408,7 @@
           "hidden"
         ],
         "summary": "Set the enterprise price for an organization.",
-        "description": "You must be a Zoo employee to perform this request.",
+        "description": "You must be a Zoo admin to perform this request.",
         "operationId": "update_enterprise_pricing_for_org",
         "parameters": [
           {
@@ -16181,7 +16102,7 @@
           "hidden"
         ],
         "summary": "Get extended information about a user.",
-        "description": "To get information about yourself, use `/users-extended/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n\nAlternatively, to get information about the authenticated user, use `/user/extended` endpoint.\n\nTo get information about any Zoo user, you must be a Zoo employee.",
+        "description": "To get information about yourself, use `/users-extended/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n\nAlternatively, to get information about the authenticated user, use `/user/extended` endpoint.",
         "operationId": "get_user_extended",
         "parameters": [
           {
@@ -16271,7 +16192,7 @@
           "hidden"
         ],
         "summary": "Get a user.",
-        "description": "To get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n\nAlternatively, to get information about the authenticated user, use `/user` endpoint.\n\nTo get information about any Zoo user, you must be a Zoo employee.",
+        "description": "To get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n\nAlternatively, to get information about the authenticated user, use `/user` endpoint.",
         "operationId": "get_user",
         "parameters": [
           {
@@ -19381,19 +19302,6 @@
           }
         }
       },
-      "CacheMetadata": {
-        "description": "Metadata about our cache.\n\nThis is mostly used for internal purposes and debugging.",
-        "type": "object",
-        "properties": {
-          "ok": {
-            "description": "If the cache returned an ok response from ping.",
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "ok"
-        ]
-      },
       "CameraDragEnd": {
         "description": "The response from the `CameraDragEnd` command.",
         "type": "object",
@@ -19781,48 +19689,6 @@
           "face_id"
         ]
       },
-      "Cluster": {
-        "description": "Cluster information.",
-        "type": "object",
-        "properties": {
-          "addr": {
-            "nullable": true,
-            "description": "The IP address of the cluster.",
-            "type": "string"
-          },
-          "auth_timeout": {
-            "description": "The auth timeout of the cluster.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "cluster_port": {
-            "description": "The port of the cluster.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "description": "The name of the cluster.",
-            "default": "",
-            "type": "string"
-          },
-          "tls_timeout": {
-            "description": "The TLS timeout for the cluster.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "urls": {
-            "description": "The urls of the cluster.",
-            "default": [],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
       "CodeLanguage": {
         "description": "The language code is written in.\n\n<details><summary>JSON schema</summary>\n\n```json { \"description\": \"The language code is written in.\", \"oneOf\": [ { \"description\": \"The `go` programming language.\", \"type\": \"string\", \"enum\": [ \"go\" ] }, { \"description\": \"The `python` programming language.\", \"type\": \"string\", \"enum\": [ \"python\" ] }, { \"description\": \"The `node` programming language.\", \"type\": \"string\", \"enum\": [ \"node\" ] } ] } ``` </details>",
         "oneOf": [
@@ -19978,339 +19844,6 @@
             ]
           }
         }
-      },
-      "Connection": {
-        "description": "Metadata about a pub-sub connection.\n\nThis is mostly used for internal purposes and debugging.",
-        "type": "object",
-        "properties": {
-          "auth_timeout": {
-            "description": "The auth timeout of the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "cluster": {
-            "description": "Information about the cluster.",
-            "default": {
-              "addr": null,
-              "auth_timeout": 0,
-              "cluster_port": 0,
-              "name": "",
-              "tls_timeout": 0,
-              "urls": []
-            },
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            ]
-          },
-          "config_load_time": {
-            "description": "The time the configuration was loaded.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "connections": {
-            "description": "The number of connections to the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "cores": {
-            "description": "The CPU core usage of the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "cpu": {
-            "description": "The CPU usage of the server.",
-            "default": 0.0,
-            "type": "number",
-            "format": "double"
-          },
-          "gateway": {
-            "description": "Information about the gateway.",
-            "default": {
-              "auth_timeout": 0,
-              "host": "",
-              "name": "",
-              "port": 0,
-              "tls_timeout": 0
-            },
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Gateway"
-              }
-            ]
-          },
-          "git_commit": {
-            "description": "The git commit.",
-            "default": "",
-            "type": "string"
-          },
-          "go": {
-            "description": "The go version.",
-            "default": "",
-            "type": "string"
-          },
-          "gomaxprocs": {
-            "description": "`GOMAXPROCS` of the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "host": {
-            "description": "The host of the server.",
-            "type": "string",
-            "format": "ip"
-          },
-          "http_base_path": {
-            "description": "The http base path of the server.",
-            "default": "",
-            "type": "string"
-          },
-          "http_host": {
-            "description": "The http host of the server.",
-            "default": "",
-            "type": "string"
-          },
-          "http_port": {
-            "description": "The http port of the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "http_req_stats": {
-            "description": "HTTP request statistics.",
-            "type": "object",
-            "additionalProperties": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          "https_port": {
-            "description": "The https port of the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "in_bytes": {
-            "description": "The count of inbound bytes for the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "in_msgs": {
-            "description": "The number of inbound messages for the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "jetstream": {
-            "description": "Jetstream information.",
-            "default": {
-              "config": {
-                "domain": "",
-                "max_memory": 0,
-                "max_storage": 0,
-                "store_dir": ""
-              },
-              "meta": {
-                "cluster_size": 0,
-                "leader": "",
-                "name": ""
-              },
-              "stats": {
-                "accounts": 0,
-                "api": {
-                  "errors": 0,
-                  "inflight": 0,
-                  "total": 0
-                },
-                "ha_assets": 0,
-                "memory": 0,
-                "reserved_memory": 0,
-                "reserved_store": 0,
-                "store": 0
-              }
-            },
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Jetstream"
-              }
-            ]
-          },
-          "leaf": {
-            "description": "Information about leaf nodes.",
-            "default": {
-              "auth_timeout": 0,
-              "host": "",
-              "port": 0,
-              "tls_timeout": 0
-            },
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/LeafNode"
-              }
-            ]
-          },
-          "leafnodes": {
-            "description": "The number of leaf nodes for the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "max_connections": {
-            "description": "The max connections of the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "max_control_line": {
-            "description": "The max control line of the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "max_payload": {
-            "description": "The max payload of the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "max_pending": {
-            "description": "The max pending of the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "mem": {
-            "description": "The memory usage of the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "now": {
-            "description": "The time now.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "out_bytes": {
-            "description": "The count of outbound bytes for the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "out_msgs": {
-            "description": "The number of outbound messages for the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "ping_interval": {
-            "description": "The ping interval of the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "ping_max": {
-            "description": "The ping max of the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "port": {
-            "description": "The port of the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "proto": {
-            "description": "The protocol version.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "remotes": {
-            "description": "The number of remotes for the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "routes": {
-            "description": "The number of routes for the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "server_id": {
-            "description": "The server ID.",
-            "default": "",
-            "type": "string"
-          },
-          "server_name": {
-            "description": "The server name.",
-            "default": "",
-            "type": "string"
-          },
-          "slow_consumers": {
-            "description": "The number of slow consumers for the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "start": {
-            "description": "When the server was started.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "subscriptions": {
-            "description": "The number of subscriptions for the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "system_account": {
-            "description": "The system account.",
-            "default": "",
-            "type": "string"
-          },
-          "tls_timeout": {
-            "description": "The TLS timeout of the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "total_connections": {
-            "description": "The total number of connections to the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "uptime": {
-            "description": "The uptime of the server.",
-            "default": "",
-            "type": "string"
-          },
-          "version": {
-            "description": "The version of the service.",
-            "default": "",
-            "type": "string"
-          },
-          "write_deadline": {
-            "description": "The write deadline of the server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "required": [
-          "config_load_time",
-          "host",
-          "http_req_stats",
-          "now",
-          "start"
-        ]
       },
       "CountryCode": {
         "description": "An ISO-3166 alpha-2 country code. Always uppercase.",
@@ -21450,32 +20983,6 @@
           "face",
           "plane",
           "vertex"
-        ]
-      },
-      "Environment": {
-        "description": "The environment the server is running in.",
-        "oneOf": [
-          {
-            "description": "The development environment. This is for running locally.",
-            "type": "string",
-            "enum": [
-              "DEVELOPMENT"
-            ]
-          },
-          {
-            "description": "The preview environment. This is deployed to api.dev.zoo.dev.",
-            "type": "string",
-            "enum": [
-              "PREVIEW"
-            ]
-          },
-          {
-            "description": "The production environment.",
-            "type": "string",
-            "enum": [
-              "PRODUCTION"
-            ]
-          }
         ]
       },
       "Error": {
@@ -22764,19 +22271,6 @@
           "user_id"
         ]
       },
-      "FileSystemMetadata": {
-        "description": "Metadata about our file system.\n\nThis is mostly used for internal purposes and debugging.",
-        "type": "object",
-        "properties": {
-          "ok": {
-            "description": "If the file system passed a sanity check.",
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "ok"
-        ]
-      },
       "FileVolume": {
         "description": "A file volume result.",
         "type": "object",
@@ -22868,40 +22362,6 @@
           "updated_at",
           "user_id"
         ]
-      },
-      "Gateway": {
-        "description": "Gateway information.",
-        "type": "object",
-        "properties": {
-          "auth_timeout": {
-            "description": "The auth timeout of the gateway.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "host": {
-            "description": "The host of the gateway.",
-            "default": "",
-            "type": "string"
-          },
-          "name": {
-            "description": "The name of the gateway.",
-            "default": "",
-            "type": "string"
-          },
-          "port": {
-            "description": "The port of the gateway.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "tls_timeout": {
-            "description": "The TLS timeout for the gateway.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          }
-        }
       },
       "GetEntityType": {
         "description": "The response from the `GetEntityType` command.",
@@ -23862,167 +23322,6 @@
           }
         }
       },
-      "Jetstream": {
-        "description": "Jetstream information.",
-        "type": "object",
-        "properties": {
-          "config": {
-            "description": "The Jetstream config.",
-            "default": {
-              "domain": "",
-              "max_memory": 0,
-              "max_storage": 0,
-              "store_dir": ""
-            },
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/JetstreamConfig"
-              }
-            ]
-          },
-          "meta": {
-            "description": "Meta information about the cluster.",
-            "default": {
-              "cluster_size": 0,
-              "leader": "",
-              "name": ""
-            },
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/MetaClusterInfo"
-              }
-            ]
-          },
-          "stats": {
-            "description": "Jetstream statistics.",
-            "default": {
-              "accounts": 0,
-              "api": {
-                "errors": 0,
-                "inflight": 0,
-                "total": 0
-              },
-              "ha_assets": 0,
-              "memory": 0,
-              "reserved_memory": 0,
-              "reserved_store": 0,
-              "store": 0
-            },
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/JetstreamStats"
-              }
-            ]
-          }
-        }
-      },
-      "JetstreamApiStats": {
-        "description": "Jetstream API statistics.",
-        "type": "object",
-        "properties": {
-          "errors": {
-            "description": "The number of errors.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "inflight": {
-            "description": "The number of inflight requests.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "total": {
-            "description": "The number of requests.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "JetstreamConfig": {
-        "description": "Jetstream configuration.",
-        "type": "object",
-        "properties": {
-          "domain": {
-            "description": "The domain.",
-            "default": "",
-            "type": "string"
-          },
-          "max_memory": {
-            "description": "The max memory.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "max_storage": {
-            "description": "The max storage.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "store_dir": {
-            "description": "The store directory.",
-            "default": "",
-            "type": "string"
-          }
-        }
-      },
-      "JetstreamStats": {
-        "description": "Jetstream statistics.",
-        "type": "object",
-        "properties": {
-          "accounts": {
-            "description": "The number of accounts.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "api": {
-            "description": "API stats.",
-            "default": {
-              "errors": 0,
-              "inflight": 0,
-              "total": 0
-            },
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/JetstreamApiStats"
-              }
-            ]
-          },
-          "ha_assets": {
-            "description": "The number of HA assets.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "memory": {
-            "description": "The memory used by the Jetstream server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "reserved_memory": {
-            "description": "The reserved memory for the Jetstream server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "reserved_store": {
-            "description": "The reserved storage for the Jetstream server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "store": {
-            "description": "The storage used by the Jetstream server.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
       "KclCodeCompletionParams": {
         "description": "Extra params for the completions.",
         "type": "object",
@@ -24160,35 +23459,6 @@
           "code"
         ]
       },
-      "LeafNode": {
-        "description": "Leaf node information.",
-        "type": "object",
-        "properties": {
-          "auth_timeout": {
-            "description": "The auth timeout of the leaf node.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "host": {
-            "description": "The host of the leaf node.",
-            "default": "",
-            "type": "string"
-          },
-          "port": {
-            "description": "The port of the leaf node.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "tls_timeout": {
-            "description": "The TLS timeout for the leaf node.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
       "LengthUnit": {
         "type": "number",
         "format": "double"
@@ -24253,77 +23523,6 @@
         "required": [
           "mass",
           "output_unit"
-        ]
-      },
-      "MetaClusterInfo": {
-        "description": "Jetstream statistics.",
-        "type": "object",
-        "properties": {
-          "cluster_size": {
-            "description": "The size of the cluster.",
-            "default": 0,
-            "type": "integer",
-            "format": "int64"
-          },
-          "leader": {
-            "description": "The leader of the cluster.",
-            "default": "",
-            "type": "string"
-          },
-          "name": {
-            "description": "The name of the cluster.",
-            "default": "",
-            "type": "string"
-          }
-        }
-      },
-      "Metadata": {
-        "description": "Metadata about our currently running server.\n\nThis is mostly used for internal purposes and debugging.",
-        "type": "object",
-        "properties": {
-          "cache": {
-            "description": "Metadata about our cache.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CacheMetadata"
-              }
-            ]
-          },
-          "environment": {
-            "description": "The environment we are running in.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Environment"
-              }
-            ]
-          },
-          "fs": {
-            "description": "Metadata about our file system.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/FileSystemMetadata"
-              }
-            ]
-          },
-          "git_hash": {
-            "description": "The git hash of the server.",
-            "type": "string"
-          },
-          "pubsub": {
-            "description": "Metadata about our pub-sub connection.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Connection"
-              }
-            ]
-          }
-        },
-        "required": [
-          "cache",
-          "environment",
-          "fs",
-          "git_hash",
-          "pubsub"
         ]
       },
       "Method": {
