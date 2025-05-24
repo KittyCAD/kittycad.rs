@@ -888,6 +888,51 @@ impl Users {
         }
     }
 
+    #[doc = "Update a subscription for a user.\n\nYou must be a Zoo admin to perform this \
+             request.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or email). \
+             (required)\n\n```rust,no_run\nasync fn example_users_update_subscription_for() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::ZooProductSubscriptions = client\n        .users()\n        \
+             .update_subscription_for(\n            \"some-string\",\n            \
+             &kittycad::types::ZooProductSubscriptionsUserRequest {\n                modeling_app: \
+             Some(kittycad::types::ModelingAppIndividualSubscriptionTier::Pro),\n                \
+             pay_annually: Some(true),\n            },\n        )\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn update_subscription_for<'a>(
+        &'a self,
+        id: &'a str,
+        body: &crate::types::ZooProductSubscriptionsUserRequest,
+    ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "users/{id}/payment/subscriptions".replace("{id}", id)
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Creates a new support/sales ticket from the website contact form. This endpoint is for untrusted\n\nusers and is not authenticated.\n\n```rust,no_run\nasync fn example_users_put_public_form() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_form(&kittycad::types::InquiryForm {\n            company: Some(\"some-string\".to_string()),\n            email: \"email@example.com\".to_string(),\n            first_name: \"some-string\".to_string(),\n            industry: Some(\"some-string\".to_string()),\n            inquiry_type: kittycad::types::InquiryType::OtherSalesInquiry,\n            last_name: \"some-string\".to_string(),\n            message: \"some-string\".to_string(),\n            phone: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn put_public_form<'a>(
