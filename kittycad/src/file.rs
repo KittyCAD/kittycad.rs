@@ -51,6 +51,48 @@ impl File {
         }
     }
 
+    #[doc = "Convert CAD file from one format to another.\n\nThis takes a HTTP multipart body with these fields in this order: 1. The input format, with options (as JSON) 2. The output format, with options (as JSON) 3. The main file, in raw binary (in whatever format you specified in field (1) i.e. input format) 4. Any additional files\n\nThis starts a conversion job and returns the `id` of the operation. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n```rust,no_run\nasync fn example_file_create_conversion_options() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileConversion = client\n        .file()\n        .create_conversion_options(\n            vec![kittycad::types::multipart::Attachment {\n                name: \"thing\".to_string(),\n                filepath: Some(\"myfile.json\".into()),\n                content_type: Some(\"application/json\".to_string()),\n                data: std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            &kittycad::types::ConversionParams {\n                output_format: kittycad::types::OutputFormat3D::Fbx {\n                    created: Some(chrono::Utc::now()),\n                    storage: kittycad::types::FbxStorage::Binary,\n                },\n                src_format: kittycad::types::InputFormat3D::Fbx {},\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn create_conversion_options<'a>(
+        &'a self,
+        attachments: Vec<crate::types::multipart::Attachment>,
+        body: &crate::types::ConversionParams,
+    ) -> Result<crate::types::FileConversion, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!("{}/{}", self.client.base_url, "file/conversion"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        use std::convert::TryInto;
+        let mut form = reqwest::multipart::Form::new();
+        let mut json_part = reqwest::multipart::Part::text(serde_json::to_string(&body)?);
+        json_part = json_part.file_name(format!("{}.json", "body"));
+        json_part = json_part.mime_str("application/json")?;
+        form = form.part("body", json_part);
+        for attachment in attachments {
+            form = form.part(attachment.name.clone(), attachment.try_into()?);
+        }
+
+        req = req.multipart(form);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Convert CAD file with defaults.\n\nIf you wish to specify the conversion options, use \
              the `/file/conversion` endpoint instead.\n\nConvert a CAD file from one format to \
              another. If the file being converted is larger than 25MB, it will be performed \

@@ -3438,6 +3438,42 @@ impl tabled::Tabled for ComponentTransform {
     }
 }
 
+#[doc = "Describes the file to convert (src) and what it should be converted into (output)."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ConversionParams {
+    #[doc = "Describes the output file(s)."]
+    pub output_format: OutputFormat3D,
+    #[doc = "Describes the input file(s)."]
+    pub src_format: InputFormat3D,
+}
+
+impl std::fmt::Display for ConversionParams {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ConversionParams {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.output_format).into(),
+            format!("{:?}", self.src_format).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["output_format".into(), "src_format".into()]
+    }
+}
+
 #[doc = "The resource representing a Coupon."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
