@@ -190,7 +190,7 @@ impl Payments {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = include_total_due {
-            query_params.push(("include_total_due", format!("{}", p)));
+            query_params.push(("include_total_due", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -470,13 +470,13 @@ impl Payments {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "orgs/{id}/payment/balance".replace("{id}", &format!("{}", id))
+                "orgs/{id}/payment/balance".replace("{id}", &format!("{id}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = include_total_due {
-            query_params.push(("include_total_due", format!("{}", p)));
+            query_params.push(("include_total_due", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -512,13 +512,13 @@ impl Payments {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "orgs/{id}/payment/balance".replace("{id}", &format!("{}", id))
+                "orgs/{id}/payment/balance".replace("{id}", &format!("{id}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = include_total_due {
-            query_params.push(("include_total_due", format!("{}", p)));
+            query_params.push(("include_total_due", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -720,7 +720,7 @@ impl Payments {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = include_total_due {
-            query_params.push(("include_total_due", format!("{}", p)));
+            query_params.push(("include_total_due", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -1005,7 +1005,7 @@ impl Payments {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = include_total_due {
-            query_params.push(("include_total_due", format!("{}", p)));
+            query_params.push(("include_total_due", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -1047,7 +1047,7 @@ impl Payments {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = include_total_due {
-            query_params.push(("include_total_due", format!("{}", p)));
+            query_params.push(("include_total_due", format!("{p}")));
         }
 
         req = req.query(&query_params);

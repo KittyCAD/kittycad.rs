@@ -897,14 +897,6 @@
   },
   {
     "op": "add",
-    "path": "/paths/~1user~1onboarding/get/x-rust",
-    "value": {
-      "example": "/// Get your user's onboarding status.\n/// \n/// Checks key part of their api usage to determine their onboarding progress\nasync fn example_users_get_onboarding_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Onboarding = client.users().get_onboarding_self().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_onboarding_self"
-    }
-  },
-  {
-    "op": "add",
     "path": "/paths/~1user~1org/get/x-rust",
     "value": {
       "example": "/// Get a user's org.\n/// \n/// This endpoint requires authentication by any Zoo user. It gets the authenticated user's org.\n/// \n/// If the user is not a member of an org, this endpoint will return a 404.\nasync fn example_orgs_get_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserOrgInfo = client.orgs().get_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",

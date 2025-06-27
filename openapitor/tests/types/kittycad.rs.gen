@@ -3378,16 +3378,16 @@ impl tabled::Tabled for ComplementaryEdges {
 pub struct ComponentTransform {
     #[doc = "Rotate component of the transform. The rotation is specified as an axis and an angle (xyz are the components of the axis, w is the angle in degrees)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub rotate_angle_axis: Option<String>,
+    pub rotate_angle_axis: Option<TransformByForPoint4D>,
     #[doc = "Rotate component of the transform. The rotation is specified as a roll, pitch, yaw."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub rotate_rpy: Option<String>,
+    pub rotate_rpy: Option<TransformByForPoint3D>,
     #[doc = "Scale component of the transform."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub scale: Option<String>,
+    pub scale: Option<TransformByForPoint3D>,
     #[doc = "Translate component of the transform."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub translate: Option<String>,
+    pub translate: Option<TransformByForPoint3D>,
 }
 
 impl std::fmt::Display for ComponentTransform {
@@ -5019,9 +5019,6 @@ pub struct EntityCircularPattern {
     #[doc = "The Face, edge, and entity ids of the patterned entities."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub entity_face_edge_ids: Option<Vec<FaceEdgeInfo>>,
-    #[doc = "The UUIDs of the entities that were created."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub entity_ids: Option<Vec<uuid::Uuid>>,
 }
 
 impl std::fmt::Display for EntityCircularPattern {
@@ -5036,7 +5033,7 @@ impl std::fmt::Display for EntityCircularPattern {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityCircularPattern {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
@@ -5044,16 +5041,11 @@ impl tabled::Tabled for EntityCircularPattern {
             } else {
                 String::new().into()
             },
-            if let Some(entity_ids) = &self.entity_ids {
-                format!("{:?}", entity_ids).into()
-            } else {
-                String::new().into()
-            },
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["entity_face_edge_ids".into(), "entity_ids".into()]
+        vec!["entity_face_edge_ids".into()]
     }
 }
 
@@ -5062,9 +5054,6 @@ impl tabled::Tabled for EntityCircularPattern {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct EntityClone {
-    #[doc = "The UUIDs of the entities that were created."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub entity_ids: Option<Vec<uuid::Uuid>>,
     #[doc = "The Face and Edge Ids of the cloned entity."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub face_edge_ids: Option<Vec<FaceEdgeInfo>>,
@@ -5082,24 +5071,17 @@ impl std::fmt::Display for EntityClone {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityClone {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(entity_ids) = &self.entity_ids {
-                format!("{:?}", entity_ids).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(face_edge_ids) = &self.face_edge_ids {
-                format!("{:?}", face_edge_ids).into()
-            } else {
-                String::new().into()
-            },
-        ]
+        vec![if let Some(face_edge_ids) = &self.face_edge_ids {
+            format!("{:?}", face_edge_ids).into()
+        } else {
+            String::new().into()
+        }]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["entity_ids".into(), "face_edge_ids".into()]
+        vec!["face_edge_ids".into()]
     }
 }
 
@@ -5330,9 +5312,6 @@ pub struct EntityLinearPattern {
     #[doc = "The Face, edge, and entity ids of the patterned entities."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub entity_face_edge_ids: Option<Vec<FaceEdgeInfo>>,
-    #[doc = "The UUIDs of the entities that were created."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub entity_ids: Option<Vec<uuid::Uuid>>,
 }
 
 impl std::fmt::Display for EntityLinearPattern {
@@ -5347,7 +5326,7 @@ impl std::fmt::Display for EntityLinearPattern {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityLinearPattern {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
@@ -5355,16 +5334,11 @@ impl tabled::Tabled for EntityLinearPattern {
             } else {
                 String::new().into()
             },
-            if let Some(entity_ids) = &self.entity_ids {
-                format!("{:?}", entity_ids).into()
-            } else {
-                String::new().into()
-            },
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["entity_face_edge_ids".into(), "entity_ids".into()]
+        vec!["entity_face_edge_ids".into()]
     }
 }
 
@@ -5376,9 +5350,6 @@ pub struct EntityLinearPatternTransform {
     #[doc = "The Face, edge, and entity ids of the patterned entities."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub entity_face_edge_ids: Option<Vec<FaceEdgeInfo>>,
-    #[doc = "The UUIDs of the entities that were created."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub entity_ids: Option<Vec<uuid::Uuid>>,
 }
 
 impl std::fmt::Display for EntityLinearPatternTransform {
@@ -5393,7 +5364,7 @@ impl std::fmt::Display for EntityLinearPatternTransform {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityLinearPatternTransform {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
@@ -5401,16 +5372,11 @@ impl tabled::Tabled for EntityLinearPatternTransform {
             } else {
                 String::new().into()
             },
-            if let Some(entity_ids) = &self.entity_ids {
-                format!("{:?}", entity_ids).into()
-            } else {
-                String::new().into()
-            },
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["entity_face_edge_ids".into(), "entity_ids".into()]
+        vec!["entity_face_edge_ids".into()]
     }
 }
 
@@ -5506,9 +5472,6 @@ pub struct EntityMirror {
     #[doc = "The Face, edge, and entity ids of the patterned entities."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub entity_face_edge_ids: Option<Vec<FaceEdgeInfo>>,
-    #[doc = "The UUIDs of the entities that were created."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub entity_ids: Option<Vec<uuid::Uuid>>,
 }
 
 impl std::fmt::Display for EntityMirror {
@@ -5523,7 +5486,7 @@ impl std::fmt::Display for EntityMirror {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityMirror {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
@@ -5531,16 +5494,11 @@ impl tabled::Tabled for EntityMirror {
             } else {
                 String::new().into()
             },
-            if let Some(entity_ids) = &self.entity_ids {
-                format!("{:?}", entity_ids).into()
-            } else {
-                String::new().into()
-            },
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["entity_face_edge_ids".into(), "entity_ids".into()]
+        vec!["entity_face_edge_ids".into()]
     }
 }
 
@@ -5552,9 +5510,6 @@ pub struct EntityMirrorAcrossEdge {
     #[doc = "The Face, edge, and entity ids of the patterned entities."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub entity_face_edge_ids: Option<Vec<FaceEdgeInfo>>,
-    #[doc = "The UUIDs of the entities that were created."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub entity_ids: Option<Vec<uuid::Uuid>>,
 }
 
 impl std::fmt::Display for EntityMirrorAcrossEdge {
@@ -5569,7 +5524,7 @@ impl std::fmt::Display for EntityMirrorAcrossEdge {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EntityMirrorAcrossEdge {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
@@ -5577,16 +5532,11 @@ impl tabled::Tabled for EntityMirrorAcrossEdge {
             } else {
                 String::new().into()
             },
-            if let Some(entity_ids) = &self.entity_ids {
-                format!("{:?}", entity_ids).into()
-            } else {
-                String::new().into()
-            },
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["entity_face_edge_ids".into(), "entity_ids".into()]
+        vec!["entity_face_edge_ids".into()]
     }
 }
 
@@ -9792,6 +9742,27 @@ pub enum ModelingCmd {
         #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
         target: uuid::Uuid,
     },
+    #[doc = "Command for twist extruding a solid 2d."]
+    #[serde(rename = "twist_extrude")]
+    TwistExtrude {
+        #[doc = "Angle step interval (converted to whole number degrees and bounded between 4° and 90°)"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        angle_step_size: Option<Angle>,
+        #[doc = "Center to twist about (relative to 2D sketch)"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        center_2d: Option<Point2D>,
+        #[doc = "How far off the plane to extrude"]
+        distance: f64,
+        #[doc = "Which IDs should the new faces have? If this isn't given, the engine will generate IDs."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        faces: Option<ExtrudedFaceInfo>,
+        #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
+        target: uuid::Uuid,
+        #[doc = "The twisted surface loft tolerance"]
+        tolerance: f64,
+        #[doc = "Total rotation of the section"]
+        total_rotation_angle: Angle,
+    },
     #[doc = "Extrude the object along a path."]
     #[serde(rename = "sweep")]
     Sweep {
@@ -10845,6 +10816,17 @@ pub enum ModelingCmd {
         #[doc = "The plane or face that the grid will be aligned to. If a face, it must be planar to succeed."]
         reference_id: uuid::Uuid,
     },
+    #[doc = "Set the scale of the grid lines in the video feed."]
+    #[serde(rename = "set_grid_scale")]
+    SetGridScale {
+        #[doc = "Which units the `value` field uses."]
+        units: UnitLength,
+        #[doc = "Distance between grid lines represents this much distance."]
+        value: f64,
+    },
+    #[doc = "Set the grid lines to auto scale. The grid will get larger the further you zoom out, and smaller the more you zoom in."]
+    #[serde(rename = "set_grid_auto_scale")]
+    SetGridAutoScale {},
 }
 
 #[doc = "A graphics command submitted to the KittyCAD engine via the Modeling API."]
@@ -11246,6 +11228,11 @@ pub enum OkModelingCmdResponse {
     Extrude {
         #[doc = "The response from the `Extrude` endpoint."]
         data: Extrude,
+    },
+    #[serde(rename = "twist_extrude")]
+    TwistExtrude {
+        #[doc = "The response from the `TwistExtrude` endpoint."]
+        data: TwistExtrude,
     },
     #[serde(rename = "sweep")]
     Sweep {
@@ -11897,6 +11884,16 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the 'BooleanSubtract'."]
         data: BooleanSubtract,
     },
+    #[serde(rename = "set_grid_scale")]
+    SetGridScale {
+        #[doc = "The response from the 'SetGridScale'."]
+        data: SetGridScale,
+    },
+    #[serde(rename = "set_grid_auto_scale")]
+    SetGridAutoScale {
+        #[doc = "The response from the 'SetGridScale'."]
+        data: SetGridAutoScale,
+    },
 }
 
 #[doc = "The websocket messages this server sends."]
@@ -11960,65 +11957,6 @@ pub enum OkWebSocketResponseData {
         #[doc = "Instance name. This may or may not mean something."]
         name: String,
     },
-}
-
-#[doc = "Onboarding details"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Onboarding {
-    #[doc = "When the user first used the modeling app."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub first_call_from_modeling_app_date: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "When the user first used text-to-CAD."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub first_call_from_text_to_cad_date: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "When the user created their first token."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub first_token_date: Option<chrono::DateTime<chrono::Utc>>,
-}
-
-impl std::fmt::Display for Onboarding {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for Onboarding {
-    const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(first_call_from_modeling_app_date) = &self.first_call_from_modeling_app_date
-            {
-                format!("{:?}", first_call_from_modeling_app_date).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(first_call_from_text_to_cad_date) = &self.first_call_from_text_to_cad_date {
-                format!("{:?}", first_call_from_text_to_cad_date).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(first_token_date) = &self.first_token_date {
-                format!("{:?}", first_token_date).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "first_call_from_modeling_app_date".into(),
-            "first_call_from_text_to_cad_date".into(),
-            "first_token_date".into(),
-        ]
-    }
 }
 
 #[doc = "An organization."]
@@ -14898,6 +14836,34 @@ impl tabled::Tabled for SetDefaultSystemProperties {
     }
 }
 
+#[doc = "The response from the 'SetGridScale'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SetGridAutoScale {}
+
+impl std::fmt::Display for SetGridAutoScale {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SetGridAutoScale {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "The response from the 'SetGridReferencePlane'."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -14916,6 +14882,34 @@ impl std::fmt::Display for SetGridReferencePlane {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for SetGridReferencePlane {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the 'SetGridScale'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SetGridScale {}
+
+impl std::fmt::Display for SetGridScale {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SetGridScale {
     const LENGTH: usize = 0;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
@@ -16942,6 +16936,140 @@ impl tabled::Tabled for Transform {
             "scale".into(),
             "translate".into(),
         ]
+    }
+}
+
+#[doc = "How a property of an object should be transformed."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct TransformByForPoint3D {
+    #[doc = "If true, the transform is applied in local space. If false, the transform is applied in global space."]
+    #[deprecated]
+    pub is_local: bool,
+    #[doc = "What to use as the origin for the transformation. If not provided, will fall back to local or global origin, depending on whatever the `is_local` field was set to."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub origin: Option<OriginType>,
+    #[doc = "The scale, or rotation, or translation."]
+    pub property: Point3D,
+    #[doc = "If true, overwrite the previous value with this. If false, the previous value will be modified. E.g. when translating, `set=true` will set a new location, and `set=false` will translate the current location by the given X/Y/Z."]
+    pub set: bool,
+}
+
+impl std::fmt::Display for TransformByForPoint3D {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for TransformByForPoint3D {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.is_local).into(),
+            if let Some(origin) = &self.origin {
+                format!("{:?}", origin).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.property).into(),
+            format!("{:?}", self.set).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "is_local".into(),
+            "origin".into(),
+            "property".into(),
+            "set".into(),
+        ]
+    }
+}
+
+#[doc = "How a property of an object should be transformed."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct TransformByForPoint4D {
+    #[doc = "If true, the transform is applied in local space. If false, the transform is applied in global space."]
+    #[deprecated]
+    pub is_local: bool,
+    #[doc = "What to use as the origin for the transformation. If not provided, will fall back to local or global origin, depending on whatever the `is_local` field was set to."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub origin: Option<OriginType>,
+    #[doc = "The scale, or rotation, or translation."]
+    pub property: Point4D,
+    #[doc = "If true, overwrite the previous value with this. If false, the previous value will be modified. E.g. when translating, `set=true` will set a new location, and `set=false` will translate the current location by the given X/Y/Z."]
+    pub set: bool,
+}
+
+impl std::fmt::Display for TransformByForPoint4D {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for TransformByForPoint4D {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.is_local).into(),
+            if let Some(origin) = &self.origin {
+                format!("{:?}", origin).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.property).into(),
+            format!("{:?}", self.set).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "is_local".into(),
+            "origin".into(),
+            "property".into(),
+            "set".into(),
+        ]
+    }
+}
+
+#[doc = "The response from the `TwistExtrude` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct TwistExtrude {}
+
+impl std::fmt::Display for TwistExtrude {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for TwistExtrude {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 
