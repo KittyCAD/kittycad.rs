@@ -226,9 +226,9 @@ async fn test_modeling_websocket() {
         Ok((ws, _headers)) => ws,
         Err(crate::types::error::Error::UnexpectedResponse(resp)) => {
             let txt = resp.text().await.unwrap();
-            panic!("Failed to connect to modeling websocket: {}", txt);
+            panic!("Failed to connect to modeling websocket: {txt}");
         }
-        err => panic!("Failed to connect to modeling websocket: {:?}", err),
+        err => panic!("Failed to connect to modeling websocket: {err:?}"),
     };
     let (mut write, mut read) = tokio_tungstenite::WebSocketStream::from_raw_socket(
         ws,
@@ -308,7 +308,7 @@ async fn test_modeling_websocket() {
             // See <https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#pings_and_pongs_the_heartbeat_of_websockets>
             WsMsg::Pong(_) => {}
             other => {
-                panic!("Unexpected websocket message from server: {}", other)
+                panic!("Unexpected websocket message from server: {other}")
             }
         }
     }

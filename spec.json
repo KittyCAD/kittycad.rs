@@ -13226,85 +13226,6 @@
         }
       }
     },
-    "/user/onboarding": {
-      "get": {
-        "tags": [
-          "users",
-          "hidden"
-        ],
-        "summary": "Get your user's onboarding status.",
-        "description": "Checks key part of their api usage to determine their onboarding progress",
-        "operationId": "get_user_onboarding_self",
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Onboarding"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
     "/user/org": {
       "get": {
         "tags": [
@@ -21094,14 +21015,6 @@
             "items": {
               "$ref": "#/components/schemas/FaceEdgeInfo"
             }
-          },
-          "entity_ids": {
-            "description": "The UUIDs of the entities that were created.",
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
           }
         }
       },
@@ -21109,14 +21022,6 @@
         "description": "The response from the `EntityClone` command.",
         "type": "object",
         "properties": {
-          "entity_ids": {
-            "description": "The UUIDs of the entities that were created.",
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
           "face_edge_ids": {
             "description": "The Face and Edge Ids of the cloned entity.",
             "type": "array",
@@ -21243,14 +21148,6 @@
             "items": {
               "$ref": "#/components/schemas/FaceEdgeInfo"
             }
-          },
-          "entity_ids": {
-            "description": "The UUIDs of the entities that were created.",
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
           }
         }
       },
@@ -21263,14 +21160,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/FaceEdgeInfo"
-            }
-          },
-          "entity_ids": {
-            "description": "The UUIDs of the entities that were created.",
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
             }
           }
         }
@@ -21297,14 +21186,6 @@
             "items": {
               "$ref": "#/components/schemas/FaceEdgeInfo"
             }
-          },
-          "entity_ids": {
-            "description": "The UUIDs of the entities that were created.",
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
           }
         }
       },
@@ -21317,14 +21198,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/FaceEdgeInfo"
-            }
-          },
-          "entity_ids": {
-            "description": "The UUIDs of the entities that were created.",
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
             }
           }
         }
@@ -24577,6 +24450,90 @@
             "required": [
               "distance",
               "target",
+              "type"
+            ]
+          },
+          {
+            "description": "Command for twist extruding a solid 2d.",
+            "type": "object",
+            "properties": {
+              "angle_step_size": {
+                "description": "Angle step interval (converted to whole number degrees and bounded between 4° and 90°)",
+                "default": {
+                  "unit": "degrees",
+                  "value": 15.0
+                },
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Angle"
+                  }
+                ]
+              },
+              "center_2d": {
+                "description": "Center to twist about (relative to 2D sketch)",
+                "default": {
+                  "x": 0.0,
+                  "y": 0.0
+                },
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ]
+              },
+              "distance": {
+                "description": "How far off the plane to extrude",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "faces": {
+                "nullable": true,
+                "description": "Which IDs should the new faces have? If this isn't given, the engine will generate IDs.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ExtrudedFaceInfo"
+                  }
+                ]
+              },
+              "target": {
+                "description": "Which sketch to extrude. Must be a closed 2D solid.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ModelingCmdId"
+                  }
+                ]
+              },
+              "tolerance": {
+                "description": "The twisted surface loft tolerance",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "total_rotation_angle": {
+                "description": "Total rotation of the section",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Angle"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "twist_extrude"
+                ]
+              }
+            },
+            "required": [
+              "distance",
+              "target",
+              "tolerance",
+              "total_rotation_angle",
               "type"
             ]
           },
@@ -28405,6 +28362,51 @@
               "reference_id",
               "type"
             ]
+          },
+          {
+            "description": "Set the scale of the grid lines in the video feed.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_grid_scale"
+                ]
+              },
+              "units": {
+                "description": "Which units the `value` field uses.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ]
+              },
+              "value": {
+                "description": "Distance between grid lines represents this much distance.",
+                "type": "number",
+                "format": "float"
+              }
+            },
+            "required": [
+              "type",
+              "units",
+              "value"
+            ]
+          },
+          {
+            "description": "Set the grid lines to auto scale. The grid will get larger the further you zoom out, and smaller the more you zoom in.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_grid_auto_scale"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
           }
         ]
       },
@@ -28638,6 +28640,24 @@
                 "type": "string",
                 "enum": [
                   "extrude"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/TwistExtrude"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "twist_extrude"
                 ]
               }
             },
@@ -30985,6 +31005,42 @@
               "data",
               "type"
             ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SetGridScale"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_grid_scale"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SetGridAutoScale"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_grid_auto_scale"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
           }
         ]
       },
@@ -31279,33 +31335,6 @@
             ]
           }
         ]
-      },
-      "Onboarding": {
-        "description": "Onboarding details",
-        "type": "object",
-        "properties": {
-          "first_call_from_modeling_app_date": {
-            "nullable": true,
-            "title": "DateTime",
-            "description": "When the user first used the modeling app.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "first_call_from_text_to_cad_date": {
-            "nullable": true,
-            "title": "DateTime",
-            "description": "When the user first used text-to-CAD.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "first_token_date": {
-            "nullable": true,
-            "title": "DateTime",
-            "description": "When the user created their first token.",
-            "type": "string",
-            "format": "date-time"
-          }
-        }
       },
       "OppositeForAngle": {
         "type": "string"
@@ -33367,8 +33396,16 @@
         "description": "The response from the `SetDefaultSystemProperties` endpoint.",
         "type": "object"
       },
+      "SetGridAutoScale": {
+        "description": "The response from the 'SetGridScale'.",
+        "type": "object"
+      },
       "SetGridReferencePlane": {
         "description": "The response from the 'SetGridReferencePlane'.",
+        "type": "object"
+      },
+      "SetGridScale": {
+        "description": "The response from the 'SetGridScale'.",
         "type": "object"
       },
       "SetObjectTransform": {
@@ -34635,10 +34672,82 @@
         }
       },
       "TransformByForPoint3d": {
-        "type": "string"
+        "description": "How a property of an object should be transformed.",
+        "type": "object",
+        "properties": {
+          "is_local": {
+            "deprecated": true,
+            "description": "If true, the transform is applied in local space. If false, the transform is applied in global space.",
+            "type": "boolean"
+          },
+          "origin": {
+            "nullable": true,
+            "description": "What to use as the origin for the transformation. If not provided, will fall back to local or global origin, depending on whatever the `is_local` field was set to.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OriginType"
+              }
+            ]
+          },
+          "property": {
+            "description": "The scale, or rotation, or translation.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          },
+          "set": {
+            "description": "If true, overwrite the previous value with this. If false, the previous value will be modified. E.g. when translating, `set=true` will set a new location, and `set=false` will translate the current location by the given X/Y/Z.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "is_local",
+          "property",
+          "set"
+        ]
       },
       "TransformByForPoint4d": {
-        "type": "string"
+        "description": "How a property of an object should be transformed.",
+        "type": "object",
+        "properties": {
+          "is_local": {
+            "deprecated": true,
+            "description": "If true, the transform is applied in local space. If false, the transform is applied in global space.",
+            "type": "boolean"
+          },
+          "origin": {
+            "nullable": true,
+            "description": "What to use as the origin for the transformation. If not provided, will fall back to local or global origin, depending on whatever the `is_local` field was set to.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OriginType"
+              }
+            ]
+          },
+          "property": {
+            "description": "The scale, or rotation, or translation.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point4d"
+              }
+            ]
+          },
+          "set": {
+            "description": "If true, overwrite the previous value with this. If false, the previous value will be modified. E.g. when translating, `set=true` will set a new location, and `set=false` will translate the current location by the given X/Y/Z.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "is_local",
+          "property",
+          "set"
+        ]
+      },
+      "TwistExtrude": {
+        "description": "The response from the `TwistExtrude` endpoint.",
+        "type": "object"
       },
       "UnitAngle": {
         "description": "The valid types of angle formats.",

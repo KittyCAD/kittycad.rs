@@ -214,40 +214,6 @@ impl Users {
         }
     }
 
-    #[doc = "Get your user's onboarding status.\n\nChecks key part of their api usage to determine \
-             their onboarding progress\n\n```rust,no_run\nasync fn \
-             example_users_get_onboarding_self() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::Onboarding = \
-             client.users().get_onboarding_self().await?;\n    println!(\"{:?}\", result);\n    \
-             Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn get_onboarding_self<'a>(
-        &'a self,
-    ) -> Result<crate::types::Onboarding, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!("{}/{}", self.client.base_url, "user/onboarding"),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
-    }
-
     #[doc = "Get the privacy settings for a user.\n\nThis endpoint requires authentication by any \
              Zoo user. It gets the privacy settings for the user.\n\n```rust,no_run\nasync fn \
              example_users_get_privacy_settings() -> anyhow::Result<()> {\n    let client = \
@@ -376,7 +342,7 @@ impl Users {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{}", p)));
+            query_params.push(("limit", format!("{p}")));
         }
 
         if let Some(p) = page_token {
@@ -384,7 +350,7 @@ impl Users {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{}", p)));
+            query_params.push(("sort_by", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -587,7 +553,7 @@ impl Users {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{}", p)));
+            query_params.push(("limit", format!("{p}")));
         }
 
         if let Some(p) = page_token {
@@ -595,7 +561,7 @@ impl Users {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{}", p)));
+            query_params.push(("sort_by", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -703,7 +669,7 @@ impl Users {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{}", p)));
+            query_params.push(("limit", format!("{p}")));
         }
 
         if let Some(p) = page_token {
@@ -711,7 +677,7 @@ impl Users {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{}", p)));
+            query_params.push(("sort_by", format!("{p}")));
         }
 
         req = req.query(&query_params);
