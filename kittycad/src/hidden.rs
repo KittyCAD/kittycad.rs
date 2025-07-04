@@ -12,6 +12,41 @@ impl Hidden {
         Self { client }
     }
 
+    #[doc = "Authenticate using an api-key. This is disabled on production but can be used in dev \
+             to login without email magic.\n\nThis returns a session \
+             token.\n\n```rust,no_run\nasync fn example_hidden_auth_api_key() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::AuthApiKeyResponse = \
+             client.hidden().auth_api_key().await?;\n    println!(\"{:?}\", result);\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn auth_api_key<'a>(
+        &'a self,
+    ) -> Result<crate::types::AuthApiKeyResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!("{}/{}", self.client.base_url, "auth/api-key"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Create an email verification request for a user.\n\n```rust,no_run\nasync fn example_hidden_auth_email() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::VerificationTokenResponse = client\n        .hidden()\n        .auth_email(&kittycad::types::EmailAuthenticationForm {\n            callback_url: Some(\"https://example.com/foo/bar\".to_string()),\n            email: \"email@example.com\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn auth_email<'a>(

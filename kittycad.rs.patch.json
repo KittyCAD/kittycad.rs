@@ -97,6 +97,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1auth~1api-key/post/x-rust",
+    "value": {
+      "example": "/// Authenticate using an api-key. This is disabled on production but can be used in dev to login without email magic.\n/// \n/// This returns a session token.\nasync fn example_hidden_auth_api_key() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AuthApiKeyResponse = client.hidden().auth_api_key().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.auth_api_key"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1auth~1email/post/x-rust",
     "value": {
       "example": "/// Create an email verification request for a user.\nasync fn example_hidden_auth_email() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::VerificationTokenResponse = client\n        .hidden()\n        .auth_email(&kittycad::types::EmailAuthenticationForm {\n            callback_url: Some(\"https://example.com/foo/bar\".to_string()),\n            email: \"email@example.com\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
