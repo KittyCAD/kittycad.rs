@@ -2210,6 +2210,37 @@ pub enum AsyncApiCallType {
     TextToCadMultiFileIteration,
 }
 
+#[doc = "The response from the `/auth/api-key` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AuthApiKeyResponse {
+    #[doc = "The session token"]
+    pub session_token: String,
+}
+
+impl std::fmt::Display for AuthApiKeyResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AuthApiKeyResponse {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.session_token.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["session_token".into()]
+    }
+}
+
 #[doc = "The authentication callback from the OAuth 2.0 client. This is typically posted to the redirect URL as query params after authenticating."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
