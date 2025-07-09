@@ -1167,6 +1167,153 @@
         }
       }
     },
+    "/auth/api-key": {
+      "post": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "Authenticate using an api-key. This is disabled on production but can be used in dev to login without email magic.",
+        "description": "This returns a session token.",
+        "operationId": "auth_api_key",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthApiKeyResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_auth_api_key",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/auth/email": {
       "post": {
         "tags": [
@@ -19367,6 +19514,19 @@
           }
         ]
       },
+      "AuthApiKeyResponse": {
+        "description": "The response from the `/auth/api-key` endpoint.",
+        "type": "object",
+        "properties": {
+          "session_token": {
+            "description": "The session token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_token"
+        ]
+      },
       "AuthCallback": {
         "description": "The authentication callback from the OAuth 2.0 client. This is typically posted to the redirect URL as query params after authenticating.",
         "type": "object",
@@ -21606,6 +21766,25 @@
       "Extrude": {
         "description": "The response from the `Extrude` endpoint.",
         "type": "object"
+      },
+      "ExtrudeMethod": {
+        "description": "Extrusion method determining if the extrusion will be part of the existing object or an entirely new object.",
+        "oneOf": [
+          {
+            "description": "Create a new object that is not connected to the object it is extruded from. This will result in two objects after the operation.",
+            "type": "string",
+            "enum": [
+              "new"
+            ]
+          },
+          {
+            "description": "This extrusion will be part of object it is extruded from. This will result in one object after the operation.",
+            "type": "string",
+            "enum": [
+              "merge"
+            ]
+          }
+        ]
       },
       "ExtrudedFaceInfo": {
         "description": "IDs for the extruded faces.",
@@ -24414,6 +24593,15 @@
                   }
                 ]
               },
+              "extrude_method": {
+                "description": "Should the extrusion create a new object or be part of the existing object. If a new object is created, the command id will be the id of the newly created object.",
+                "default": "merge",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ExtrudeMethod"
+                  }
+                ]
+              },
               "faces": {
                 "nullable": true,
                 "description": "Which IDs should the new faces have? If this isn't given, the engine will generate IDs.",
@@ -26528,7 +26716,7 @@
                 ]
               },
               "uv": {
-                "description": "The 2D paramter-space u,v position to evaluate the surface at",
+                "description": "The 2D parameter-space u,v position to evaluate the surface at",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Point2d"
@@ -26579,7 +26767,7 @@
                 ]
               },
               "uv": {
-                "description": "The 2D paramter-space u,v position to evaluate the surface at",
+                "description": "The 2D parameter-space u,v position to evaluate the surface at",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Point2d"
@@ -26652,9 +26840,9 @@
             "properties": {
               "duration_seconds": {
                 "description": "How many seconds the animation should take.",
-                "default": 0.4000000059604645,
+                "default": 0.4,
                 "type": "number",
-                "format": "float"
+                "format": "double"
               },
               "entity_id": {
                 "description": "Which entity is being changed.",
@@ -32375,6 +32563,122 @@
               "end_radius",
               "reverse",
               "start_radius",
+              "type"
+            ]
+          },
+          {
+            "description": "Adds an elliptical arc segment.",
+            "type": "object",
+            "properties": {
+              "center": {
+                "description": "The center point of the ellipse.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ]
+              },
+              "end_angle": {
+                "description": "End of the path along the perimeter of the ellipse.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Angle"
+                  }
+                ]
+              },
+              "major_radius": {
+                "description": "Major radius of the ellipse (along the x axis).",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "minor_radius": {
+                "description": "Minor radius of the ellipse (along the y axis).",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "start_angle": {
+                "description": "Start of the path along the perimeter of the ellipse.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Angle"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ellipse"
+                ]
+              }
+            },
+            "required": [
+              "center",
+              "end_angle",
+              "major_radius",
+              "minor_radius",
+              "start_angle",
+              "type"
+            ]
+          },
+          {
+            "description": "Adds a generic conic section specified by the end point, interior point and tangents at the start and end of the section.",
+            "type": "object",
+            "properties": {
+              "end": {
+                "description": "End point of the conic.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ]
+              },
+              "end_tangent": {
+                "description": "Tangent at the end of the conic.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ]
+              },
+              "interior": {
+                "description": "Interior point that lies on the conic.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ]
+              },
+              "relative": {
+                "description": "Whether or not the interior and end points are relative to the previous path position.",
+                "type": "boolean"
+              },
+              "start_tangent": {
+                "description": "Tangent at the start of the conic.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "conic_to"
+                ]
+              }
+            },
+            "required": [
+              "end",
+              "end_tangent",
+              "interior",
+              "relative",
+              "start_tangent",
               "type"
             ]
           }
