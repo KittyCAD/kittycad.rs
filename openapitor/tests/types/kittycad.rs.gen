@@ -2210,6 +2210,37 @@ pub enum AsyncApiCallType {
     TextToCadMultiFileIteration,
 }
 
+#[doc = "The response from the `/auth/api-key` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AuthApiKeyResponse {
+    #[doc = "The session token"]
+    pub session_token: String,
+}
+
+impl std::fmt::Display for AuthApiKeyResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AuthApiKeyResponse {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.session_token.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["session_token".into()]
+    }
+}
+
 #[doc = "The authentication callback from the OAuth 2.0 client. This is typically posted to the redirect URL as query params after authenticating."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -6253,6 +6284,31 @@ impl tabled::Tabled for Extrude {
     }
 }
 
+#[doc = "Extrusion method determining if the extrusion will be part of the existing object or an entirely new object."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ExtrudeMethod {
+    #[doc = "Create a new object that is not connected to the object it is extruded from. This will result in two objects after the operation."]
+    #[serde(rename = "new")]
+    #[display("new")]
+    New,
+    #[doc = "This extrusion will be part of object it is extruded from. This will result in one object after the operation."]
+    #[serde(rename = "merge")]
+    #[display("merge")]
+    Merge,
+}
+
 #[doc = "IDs for the extruded faces."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9733,6 +9789,9 @@ pub enum ModelingCmd {
     Extrude {
         #[doc = "How far off the plane to extrude"]
         distance: f64,
+        #[doc = "Should the extrusion create a new object or be part of the existing object. If a new object is created, the command id will be the id of the newly created object."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        extrude_method: Option<ExtrudeMethod>,
         #[doc = "Which IDs should the new faces have? If this isn't given, the engine will generate IDs."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         faces: Option<ExtrudedFaceInfo>,
@@ -10313,7 +10372,7 @@ pub enum ModelingCmd {
     FaceGetPosition {
         #[doc = "Which face is being queried."]
         object_id: uuid::Uuid,
-        #[doc = "The 2D paramter-space u,v position to evaluate the surface at"]
+        #[doc = "The 2D parameter-space u,v position to evaluate the surface at"]
         uv: Point2D,
     },
     #[doc = "Obtains the surface \"center of mass\""]
@@ -10327,7 +10386,7 @@ pub enum ModelingCmd {
     FaceGetGradient {
         #[doc = "Which face is being queried."]
         object_id: uuid::Uuid,
-        #[doc = "The 2D paramter-space u,v position to evaluate the surface at"]
+        #[doc = "The 2D parameter-space u,v position to evaluate the surface at"]
         uv: Point2D,
     },
     #[doc = "Send object to front or back."]
@@ -13027,6 +13086,34 @@ pub enum PathSegment {
         reverse: bool,
         #[doc = "The involute is described between two circles, start_radius is the radius of the inner circle."]
         start_radius: f64,
+    },
+    #[doc = "Adds an elliptical arc segment."]
+    #[serde(rename = "ellipse")]
+    Ellipse {
+        #[doc = "The center point of the ellipse."]
+        center: Point2D,
+        #[doc = "End of the path along the perimeter of the ellipse."]
+        end_angle: Angle,
+        #[doc = "Major radius of the ellipse (along the x axis)."]
+        major_radius: f64,
+        #[doc = "Minor radius of the ellipse (along the y axis)."]
+        minor_radius: f64,
+        #[doc = "Start of the path along the perimeter of the ellipse."]
+        start_angle: Angle,
+    },
+    #[doc = "Adds a generic conic section specified by the end point, interior point and tangents at the start and end of the section."]
+    #[serde(rename = "conic_to")]
+    ConicTo {
+        #[doc = "End point of the conic."]
+        end: Point2D,
+        #[doc = "Tangent at the end of the conic."]
+        end_tangent: Point2D,
+        #[doc = "Interior point that lies on the conic."]
+        interior: Point2D,
+        #[doc = "Whether or not the interior and end points are relative to the previous path position."]
+        relative: bool,
+        #[doc = "Tangent at the start of the conic."]
+        start_tangent: Point2D,
     },
 }
 
