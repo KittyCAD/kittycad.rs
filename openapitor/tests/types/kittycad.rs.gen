@@ -9596,7 +9596,7 @@ pub enum ModelingAppShareLinks {
 pub struct ModelingAppSubscriptionTier {
     #[doc = "Annual discount. The percentage off the monthly price if the user pays annually."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub annual_discount: Option<u32>,
+    pub annual_discount: Option<f64>,
     #[doc = "A description of the tier."]
     pub description: String,
     #[doc = "The Zoo API endpoints that are included when through an approved zoo tool."]
@@ -19960,7 +19960,7 @@ pub enum WorldCoordinateSystem {
 pub struct ZooProductSubscription {
     #[doc = "Annual discount. The percentage off the monthly price if the user pays annually."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub annual_discount: Option<u32>,
+    pub annual_discount: Option<f64>,
     #[doc = "A description of the tier."]
     pub description: String,
     #[doc = "The Zoo API endpoints that are included when through an approved zoo tool."]
