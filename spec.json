@@ -24329,9 +24329,8 @@
           "annual_discount": {
             "nullable": true,
             "description": "Annual discount. The percentage off the monthly price if the user pays annually.",
-            "type": "integer",
-            "format": "uint",
-            "minimum": 0
+            "type": "number",
+            "format": "double"
           },
           "description": {
             "description": "A description of the tier.",
@@ -37608,9 +37607,8 @@
               "annual_discount": {
                 "nullable": true,
                 "description": "Annual discount. The percentage off the monthly price if the user pays annually.",
-                "type": "integer",
-                "format": "uint",
-                "minimum": 0
+                "type": "number",
+                "format": "double"
               },
               "description": {
                 "description": "A description of the tier.",
