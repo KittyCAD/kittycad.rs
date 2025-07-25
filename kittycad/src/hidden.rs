@@ -113,6 +113,41 @@ impl Hidden {
         }
     }
 
+    #[doc = "GET /auth/saml/{org_id}\n\nRedirects the browser straight to the org’s SAML IdP.\n\n**Parameters:**\n\n- `callback_url: Option<String>`: The URL to redirect back to after we have authenticated.\n- `org_id: uuid::Uuid`: The ID of the organisation that owns the IdP. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_hidden_get_auth_saml_by_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .get_auth_saml_by_org(\n            Some(\"https://example.com/foo/bar\".to_string()),\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_auth_saml_by_org<'a>(
+        &'a self,
+        callback_url: Option<String>,
+        org_id: uuid::Uuid,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "auth/saml/org/{org_id}/login".replace("{org_id}", &format!("{org_id}"))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = callback_url {
+            query_params.push(("callback_url", p));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Get a redirect straight to the SAML IdP.\n\nThe UI uses this to avoid having to ask the API anything about the IdP. It already knows the SAML IdP ID from the path, so it can just link to this path and rely on the API to redirect to the actual IdP.\n\n**Parameters:**\n\n- `callback_url: Option<String>`: The URL to redirect back to after we have authenticated.\n- `provider_id: uuid::Uuid`: The ID of the identity provider. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_hidden_get_auth_saml() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .get_auth_saml(\n            Some(\"https://example.com/foo/bar\".to_string()),\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_auth_saml<'a>(
