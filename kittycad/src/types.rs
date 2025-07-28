@@ -2057,6 +2057,8 @@ pub enum AsyncApiCallOutput {
         #[doc = "The time and date the API call was completed."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The conversation ID Conversations group different prompts together."]
+        conversation_id: uuid::Uuid,
         #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The error the function returned, if any."]
@@ -9346,6 +9348,9 @@ pub struct MlPrompt {
     #[doc = "When the prompt was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The id for the conversation related to this prompt."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub conversation_id: Option<uuid::Uuid>,
     #[doc = "The date and time the ML prompt was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error message if the prompt failed."]
@@ -9399,11 +9404,16 @@ impl std::fmt::Display for MlPrompt {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for MlPrompt {
-    const LENGTH: usize = 16;
+    const LENGTH: usize = 17;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
                 format!("{completed_at:?}").into()
+            } else {
+                String::new().into()
+            },
+            if let Some(conversation_id) = &self.conversation_id {
+                format!("{conversation_id:?}").into()
             } else {
                 String::new().into()
             },
@@ -9456,6 +9466,7 @@ impl tabled::Tabled for MlPrompt {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "completed_at".into(),
+            "conversation_id".into(),
             "created_at".into(),
             "error".into(),
             "feedback".into(),
@@ -9682,6 +9693,10 @@ pub enum ModelingAppIndividualSubscriptionTier {
     #[serde(rename = "free")]
     #[display("free")]
     Free,
+    #[doc = "The plus tier."]
+    #[serde(rename = "plus")]
+    #[display("plus")]
+    Plus,
     #[doc = "The pro tier."]
     #[serde(rename = "pro")]
     #[display("pro")]
@@ -9894,6 +9909,10 @@ pub enum ModelingAppSubscriptionTierName {
     #[serde(rename = "free")]
     #[display("free")]
     Free,
+    #[doc = "The plus tier."]
+    #[serde(rename = "plus")]
+    #[display("plus")]
+    Plus,
     #[doc = "The pro tier."]
     #[serde(rename = "pro")]
     #[display("pro")]
@@ -9954,8 +9973,7 @@ pub enum ModelingCmd {
     Extrude {
         #[doc = "How far off the plane to extrude"]
         distance: f64,
-        #[doc = "Should the extrusion create a new object or be part of the existing object. If a \
-                 new object is created, the command id will be the id of the newly created object."]
+        #[doc = "Should the extrusion create a new object or be part of the existing object."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         extrude_method: Option<ExtrudeMethod>,
         #[doc = "Which IDs should the new faces have? If this isn't given, the engine will \
@@ -16998,6 +17016,8 @@ pub struct TextToCadMultiFileIteration {
     #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The conversation ID Conversations group different prompts together."]
+    pub conversation_id: uuid::Uuid,
     #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
@@ -17052,7 +17072,7 @@ impl std::fmt::Display for TextToCadMultiFileIteration {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TextToCadMultiFileIteration {
-    const LENGTH: usize = 16;
+    const LENGTH: usize = 17;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -17060,6 +17080,7 @@ impl tabled::Tabled for TextToCadMultiFileIteration {
             } else {
                 String::new().into()
             },
+            format!("{:?}", self.conversation_id).into(),
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
                 format!("{error:?}").into()
@@ -17109,6 +17130,7 @@ impl tabled::Tabled for TextToCadMultiFileIteration {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "completed_at".into(),
+            "conversation_id".into(),
             "created_at".into(),
             "error".into(),
             "feedback".into(),
@@ -17133,6 +17155,11 @@ impl tabled::Tabled for TextToCadMultiFileIteration {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct TextToCadMultiFileIterationBody {
+    #[doc = "The conversation ID Conversations group different prompts together. This should be \
+             omitted when starting a new conversation. The conversation_id returned in the \
+             response should be used to link future messages in the same conversation."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub conversation_id: Option<uuid::Uuid>,
     #[doc = "The version of kcl to use. If empty, the latest version will be used."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kcl_version: Option<String>,
@@ -17164,9 +17191,14 @@ impl std::fmt::Display for TextToCadMultiFileIterationBody {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TextToCadMultiFileIterationBody {
-    const LENGTH: usize = 4;
+    const LENGTH: usize = 5;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(conversation_id) = &self.conversation_id {
+                format!("{conversation_id:?}").into()
+            } else {
+                String::new().into()
+            },
             if let Some(kcl_version) = &self.kcl_version {
                 format!("{kcl_version:?}").into()
             } else {
@@ -17192,6 +17224,7 @@ impl tabled::Tabled for TextToCadMultiFileIterationBody {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "conversation_id".into(),
             "kcl_version".into(),
             "project_name".into(),
             "prompt".into(),

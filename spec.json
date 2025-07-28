@@ -1571,6 +1571,98 @@
         }
       }
     },
+    "/auth/saml/org/{org_id}/login": {
+      "get": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "GET /auth/saml/{org_id}",
+        "description": "Redirects the browser straight to the org’s SAML IdP.",
+        "operationId": "get_auth_saml_by_org",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "description": "The ID of the organisation that owns the IdP.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "callback_url",
+            "description": "The URL to redirect back to after we have authenticated.",
+            "schema": {
+              "nullable": true,
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Temporary Redirect",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/auth/saml/provider/{provider_id}/login": {
       "get": {
         "tags": [
@@ -19306,6 +19398,14 @@
                 "type": "string",
                 "format": "date-time"
               },
+              "conversation_id": {
+                "description": "The conversation ID Conversations group different prompts together.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ]
+              },
               "created_at": {
                 "title": "DateTime",
                 "description": "The time and date the API call was created.",
@@ -19412,6 +19512,7 @@
               }
             },
             "required": [
+              "conversation_id",
               "created_at",
               "id",
               "model",
@@ -24060,6 +24161,15 @@
             "type": "string",
             "format": "date-time"
           },
+          "conversation_id": {
+            "nullable": true,
+            "description": "The id for the conversation related to this prompt.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
           "created_at": {
             "title": "DateTime",
             "description": "The date and time the ML prompt was created.",
@@ -24269,6 +24379,13 @@
             ]
           },
           {
+            "description": "The plus tier.",
+            "type": "string",
+            "enum": [
+              "plus"
+            ]
+          },
+          {
             "description": "The pro tier.",
             "type": "string",
             "enum": [
@@ -24448,6 +24565,13 @@
             ]
           },
           {
+            "description": "The plus tier.",
+            "type": "string",
+            "enum": [
+              "plus"
+            ]
+          },
+          {
             "description": "The pro tier.",
             "type": "string",
             "enum": [
@@ -24593,7 +24717,7 @@
                 ]
               },
               "extrude_method": {
-                "description": "Should the extrusion create a new object or be part of the existing object. If a new object is created, the command id will be the id of the newly created object.",
+                "description": "Should the extrusion create a new object or be part of the existing object.",
                 "default": "merge",
                 "allOf": [
                   {
@@ -34728,6 +34852,14 @@
             "type": "string",
             "format": "date-time"
           },
+          "conversation_id": {
+            "description": "The conversation ID Conversations group different prompts together.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
           "created_at": {
             "title": "DateTime",
             "description": "The time and date the API call was created.",
@@ -34828,6 +34960,7 @@
           }
         },
         "required": [
+          "conversation_id",
           "created_at",
           "id",
           "model",
@@ -34842,6 +34975,15 @@
         "description": "Body for iterating on models from text prompts.",
         "type": "object",
         "properties": {
+          "conversation_id": {
+            "nullable": true,
+            "description": "The conversation ID Conversations group different prompts together. This should be omitted when starting a new conversation. The conversation_id returned in the response should be used to link future messages in the same conversation.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
           "kcl_version": {
             "nullable": true,
             "description": "The version of kcl to use. If empty, the latest version will be used.",
