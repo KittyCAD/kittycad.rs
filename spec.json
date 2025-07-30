@@ -4230,6 +4230,116 @@
         }
       }
     },
+    "/ml/conversations": {
+      "get": {
+        "tags": [
+          "ml"
+        ],
+        "summary": "List conversations",
+        "description": "This endpoint requires authentication by any Zoo user. It returns the conversations for the authenticated user.\n\nThe conversations are returned in order of creation, with the most recently created conversations first.",
+        "operationId": "list_conversations_for_user",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "schema": {
+              "$ref": "#/components/schemas/CreatedAtSortMode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      }
+    },
     "/ml/convert/proprietary-to-kcl": {
       "post": {
         "tags": [
@@ -15849,6 +15959,14 @@
           },
           {
             "in": "query",
+            "name": "conversation_id",
+            "description": "If specified, only return the prompts for the conversation id given.",
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
             "name": "no_models",
             "description": "If we should return the model file contents or just the metadata.",
             "schema": {
@@ -15913,7 +16031,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TextToCadResultsPage"
+                  "$ref": "#/components/schemas/TextToCadResponseResultsPage"
                 }
               }
             }
@@ -16006,7 +16124,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TextToCad"
+                  "$ref": "#/components/schemas/TextToCadResponse"
                 }
               }
             }
@@ -20364,6 +20482,72 @@
             ]
           }
         }
+      },
+      "Conversation": {
+        "description": "A conversation composed of many ML prompts.",
+        "type": "object",
+        "properties": {
+          "created_at": {
+            "title": "DateTime",
+            "description": "The date and time the conversation was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "first_prompt": {
+            "description": "The prompt that started this conversation.",
+            "type": "string"
+          },
+          "id": {
+            "description": "The unique identifier for the conversation.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The date and time the conversation was last updated.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the conversation.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          }
+        },
+        "required": [
+          "created_at",
+          "first_prompt",
+          "id",
+          "updated_at",
+          "user_id"
+        ]
+      },
+      "ConversationResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Conversation"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
       },
       "ConversionParams": {
         "description": "Describes the file to convert (src) and what it should be converted into (output).",
@@ -35008,7 +35192,36 @@
           }
         }
       },
-      "TextToCadResultsPage": {
+      "TextToCadResponse": {
+        "description": "Type that encompasses all Text-to-CAD response types, including iteration and multi-file iteration.",
+        "anyOf": [
+          {
+            "description": "A response from a text to CAD prompt.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TextToCad"
+              }
+            ]
+          },
+          {
+            "description": "A response from a text to CAD iteration.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TextToCadIteration"
+              }
+            ]
+          },
+          {
+            "description": "A response from a text to CAD multi-file iteration.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TextToCadMultiFileIteration"
+              }
+            ]
+          }
+        ]
+      },
+      "TextToCadResponseResultsPage": {
         "description": "A single page of results",
         "type": "object",
         "properties": {
@@ -35016,7 +35229,7 @@
             "description": "list of items on this page of results",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TextToCad"
+              "$ref": "#/components/schemas/TextToCadResponse"
             }
           },
           "next_page": {
