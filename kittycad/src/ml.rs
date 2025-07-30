@@ -214,6 +214,123 @@ impl Ml {
         }
     }
 
+    #[doc = "List conversations\n\nThis endpoint requires authentication by any Zoo user. It returns the conversations for the authenticated user.\n\nThe conversations are returned in order of creation, with the most recently created conversations first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ml_list_conversations_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ml = client.ml();\n    let mut stream = ml.list_conversations_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn list_conversations_for_user<'a>(
+        &'a self,
+        limit: Option<u32>,
+        page_token: Option<String>,
+        sort_by: Option<crate::types::CreatedAtSortMode>,
+    ) -> Result<crate::types::ConversationResultsPage, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "ml/conversations"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{p}")));
+        }
+
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        if let Some(p) = sort_by {
+            query_params.push(("sort_by", format!("{p}")));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "List conversations\n\nThis endpoint requires authentication by any Zoo user. It returns the conversations for the authenticated user.\n\nThe conversations are returned in order of creation, with the most recently created conversations first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ml_list_conversations_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ml = client.ml();\n    let mut stream = ml.list_conversations_for_user_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    #[cfg(not(feature = "js"))]
+    pub fn list_conversations_for_user_stream<'a>(
+        &'a self,
+        limit: Option<u32>,
+        sort_by: Option<crate::types::CreatedAtSortMode>,
+    ) -> impl futures::Stream<Item = Result<crate::types::Conversation, crate::types::error::Error>>
+           + Unpin
+           + '_ {
+        use futures::{StreamExt, TryFutureExt, TryStreamExt};
+
+        use crate::types::paginate::Pagination;
+        self.list_conversations_for_user(limit, None, sort_by)
+            .map_ok(move |result| {
+                let items = futures::stream::iter(result.items().into_iter().map(Ok));
+                let next_pages = futures::stream::try_unfold(
+                    (None, result),
+                    move |(prev_page_token, new_result)| async move {
+                        if new_result.has_more_pages()
+                            && !new_result.items().is_empty()
+                            && prev_page_token != new_result.next_page_token()
+                        {
+                            async {
+                                let mut req = self.client.client.request(
+                                    http::Method::GET,
+                                    format!("{}/{}", self.client.base_url, "ml/conversations"),
+                                );
+                                req = req.bearer_auth(&self.client.token);
+                                let mut request = req.build()?;
+                                request = new_result.next_page(request)?;
+                                let resp = self.client.client.execute(request).await?;
+                                let status = resp.status();
+                                if status.is_success() {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    serde_json::from_str(&text).map_err(|err| {
+                                        crate::types::error::Error::from_serde_error(
+                                            format_serde_error::SerdeError::new(
+                                                text.to_string(),
+                                                err,
+                                            ),
+                                            status,
+                                        )
+                                    })
+                                } else {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    Err(crate::types::error::Error::Server {
+                                        body: text.to_string(),
+                                        status,
+                                    })
+                                }
+                            }
+                            .map_ok(|result: crate::types::ConversationResultsPage| {
+                                Some((
+                                    futures::stream::iter(result.items().into_iter().map(Ok)),
+                                    (new_result.next_page_token(), result),
+                                ))
+                            })
+                            .await
+                        } else {
+                            Ok(None)
+                        }
+                    },
+                )
+                .try_flatten();
+                items.chain(next_pages)
+            })
+            .try_flatten_stream()
+            .boxed()
+    }
+
     #[doc = "Converts a proprietary CAD format to KCL.\n\nThis endpoint is used to convert a \
              proprietary CAD format to KCL. The file passed MUST have feature tree data.\n\nA STEP \
              file does not have feature tree data, so it will not work. A sldprt file does have \
@@ -385,21 +502,26 @@ impl Ml {
         }
     }
 
-    #[doc = "List text-to-CAD models you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\n\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD models for the authenticated user.\n\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `no_models: Option<bool>`: If we should return the model file contents or just the metadata.\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ml_list_text_to_cad_models_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ml = client.ml();\n    let mut stream = ml.list_text_to_cad_models_for_user_stream(\n        Some(4 as u32),\n        Some(true),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List text-to-CAD models you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\n\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD models for the authenticated user.\n\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.\n\n**Parameters:**\n\n- `conversation_id: Option<uuid::Uuid>`: If specified, only return the prompts for the conversation id given.\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `no_models: Option<bool>`: If we should return the model file contents or just the metadata.\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_ml_list_text_to_cad_models_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadResponseResultsPage = client\n        .ml()\n        .list_text_to_cad_models_for_user(\n            Some(uuid::Uuid::from_str(\n                \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n            )?),\n            Some(4 as u32),\n            Some(true),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_ml_list_text_to_cad_models_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ml = client.ml();\n    let mut stream = ml.list_text_to_cad_models_for_user_stream(\n        Some(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?),\n        Some(4 as u32),\n        Some(true),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list_text_to_cad_models_for_user<'a>(
         &'a self,
+        conversation_id: Option<uuid::Uuid>,
         limit: Option<u32>,
         no_models: Option<bool>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::TextToCadResultsPage, crate::types::error::Error> {
+    ) -> Result<crate::types::TextToCadResponseResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!("{}/{}", self.client.base_url, "user/text-to-cad"),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
+        if let Some(p) = conversation_id {
+            query_params.push(("conversation_id", format!("{p}")));
+        }
+
         if let Some(p) = limit {
             query_params.push(("limit", format!("{p}")));
         }
@@ -436,21 +558,23 @@ impl Ml {
         }
     }
 
-    #[doc = "List text-to-CAD models you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\n\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD models for the authenticated user.\n\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `no_models: Option<bool>`: If we should return the model file contents or just the metadata.\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ml_list_text_to_cad_models_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ml = client.ml();\n    let mut stream = ml.list_text_to_cad_models_for_user_stream(\n        Some(4 as u32),\n        Some(true),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List text-to-CAD models you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\n\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD models for the authenticated user.\n\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.\n\n**Parameters:**\n\n- `conversation_id: Option<uuid::Uuid>`: If specified, only return the prompts for the conversation id given.\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `no_models: Option<bool>`: If we should return the model file contents or just the metadata.\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_ml_list_text_to_cad_models_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadResponseResultsPage = client\n        .ml()\n        .list_text_to_cad_models_for_user(\n            Some(uuid::Uuid::from_str(\n                \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n            )?),\n            Some(4 as u32),\n            Some(true),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_ml_list_text_to_cad_models_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ml = client.ml();\n    let mut stream = ml.list_text_to_cad_models_for_user_stream(\n        Some(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?),\n        Some(4 as u32),\n        Some(true),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     #[cfg(not(feature = "js"))]
     pub fn list_text_to_cad_models_for_user_stream<'a>(
         &'a self,
+        conversation_id: Option<uuid::Uuid>,
         limit: Option<u32>,
         no_models: Option<bool>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> impl futures::Stream<Item = Result<crate::types::TextToCad, crate::types::error::Error>>
-           + Unpin
+    ) -> impl futures::Stream<
+        Item = Result<crate::types::TextToCadResponse, crate::types::error::Error>,
+    > + Unpin
            + '_ {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
-        self.list_text_to_cad_models_for_user(limit, no_models, None, sort_by)
+        self.list_text_to_cad_models_for_user(conversation_id, limit, no_models, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
@@ -489,7 +613,7 @@ impl Ml {
                                     })
                                 }
                             }
-                            .map_ok(|result: crate::types::TextToCadResultsPage| {
+                            .map_ok(|result: crate::types::TextToCadResponseResultsPage| {
                                 Some((
                                     futures::stream::iter(result.items().into_iter().map(Ok)),
                                     (new_result.next_page_token(), result),
@@ -513,8 +637,8 @@ impl Ml {
              uuid::Uuid`: The id of the model to give feedback to. \
              (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
              example_ml_get_text_to_cad_model_for_user() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCad = \
-             client\n        .ml()\n        \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadResponse \
+             = client\n        .ml()\n        \
              .get_text_to_cad_model_for_user(uuid::Uuid::from_str(\n            \
              \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
@@ -522,7 +646,7 @@ impl Ml {
     pub async fn get_text_to_cad_model_for_user<'a>(
         &'a self,
         id: uuid::Uuid,
-    ) -> Result<crate::types::TextToCad, crate::types::error::Error> {
+    ) -> Result<crate::types::TextToCadResponse, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!(

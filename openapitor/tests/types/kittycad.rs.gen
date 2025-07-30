@@ -3471,6 +3471,130 @@ impl tabled::Tabled for ComponentTransform {
     }
 }
 
+#[doc = "A conversation composed of many ML prompts."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Conversation {
+    #[doc = "The date and time the conversation was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The prompt that started this conversation."]
+    pub first_prompt: String,
+    #[doc = "The unique identifier for the conversation."]
+    pub id: uuid::Uuid,
+    #[doc = "The date and time the conversation was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the conversation."]
+    pub user_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for Conversation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Conversation {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.created_at).into(),
+            self.first_prompt.clone().into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.updated_at).into(),
+            format!("{:?}", self.user_id).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "created_at".into(),
+            "first_prompt".into(),
+            "id".into(),
+            "updated_at".into(),
+            "user_id".into(),
+        ]
+    }
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ConversationResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<Conversation>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for ConversationResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for ConversationResultsPage {
+    type Item = Conversation;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ConversationResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
+    }
+}
+
 #[doc = "Describes the file to convert (src) and what it should be converted into (output)."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -16878,19 +17002,230 @@ impl tabled::Tabled for TextToCadMultiFileIterationBody {
     }
 }
 
+#[doc = "Type that encompasses all Text-to-CAD response types, including iteration and multi-file iteration."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct TextToCadResponse {
+    #[doc = "The code for the new model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
+    #[doc = "The time and date the API call was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the API call was created."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "Feedback from the user, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub feedback: Option<MlFeedback>,
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<uuid::Uuid>,
+    #[doc = "The version of kcl to use. If empty, the latest version will be used."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kcl_version: Option<String>,
+    #[doc = "The model being used."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model: Option<TextToCadModel>,
+    #[doc = "The version of the model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_version: Option<String>,
+    #[doc = "The output format of the model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output_format: Option<FileExportFormat>,
+    #[doc = "The output files. Returns a map of the file name to the file contents. The file contents are not encoded since kcl files are not binary."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub outputs: Option<std::collections::HashMap<String, String>>,
+    #[doc = "The prompt for the overall changes. This is optional if you only want changes on specific source ranges. This will apply to all the files."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt: Option<String>,
+    #[doc = "The time and date the API call was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<ApiCallStatus>,
+    #[doc = "The time and date the API call was last updated."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The user ID of the user who created the API call."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<uuid::Uuid>,
+    #[doc = "The original source code for the model, previous to the changes."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub original_source_code: Option<String>,
+    #[doc = "The source ranges the user suggested to change."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_ranges: Option<Vec<SourceRangePrompt>>,
+    #[doc = "The conversation ID Conversations group different prompts together."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub conversation_id: Option<uuid::Uuid>,
+    #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make our models better over time."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_name: Option<String>,
+}
+
+impl std::fmt::Display for TextToCadResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for TextToCadResponse {
+    const LENGTH: usize = 20;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(code) = &self.code {
+                format!("{:?}", code).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(created_at) = &self.created_at {
+                format!("{:?}", created_at).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(error) = &self.error {
+                format!("{:?}", error).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(feedback) = &self.feedback {
+                format!("{:?}", feedback).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(id) = &self.id {
+                format!("{:?}", id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(kcl_version) = &self.kcl_version {
+                format!("{:?}", kcl_version).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(model) = &self.model {
+                format!("{:?}", model).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(model_version) = &self.model_version {
+                format!("{:?}", model_version).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(output_format) = &self.output_format {
+                format!("{:?}", output_format).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(outputs) = &self.outputs {
+                format!("{:?}", outputs).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(prompt) = &self.prompt {
+                format!("{:?}", prompt).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(status) = &self.status {
+                format!("{:?}", status).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(updated_at) = &self.updated_at {
+                format!("{:?}", updated_at).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(original_source_code) = &self.original_source_code {
+                format!("{:?}", original_source_code).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(source_ranges) = &self.source_ranges {
+                format!("{:?}", source_ranges).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(conversation_id) = &self.conversation_id {
+                format!("{:?}", conversation_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(project_name) = &self.project_name {
+                format!("{:?}", project_name).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "code".into(),
+            "completed_at".into(),
+            "created_at".into(),
+            "error".into(),
+            "feedback".into(),
+            "id".into(),
+            "kcl_version".into(),
+            "model".into(),
+            "model_version".into(),
+            "output_format".into(),
+            "outputs".into(),
+            "prompt".into(),
+            "started_at".into(),
+            "status".into(),
+            "updated_at".into(),
+            "user_id".into(),
+            "original_source_code".into(),
+            "source_ranges".into(),
+            "conversation_id".into(),
+            "project_name".into(),
+        ]
+    }
+}
+
 #[doc = "A single page of results"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct TextToCadResultsPage {
+pub struct TextToCadResponseResultsPage {
     #[doc = "list of items on this page of results"]
-    pub items: Vec<TextToCad>,
+    pub items: Vec<TextToCadResponse>,
     #[doc = "token used to fetch the next page of results (if any)"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub next_page: Option<String>,
 }
 
-impl std::fmt::Display for TextToCadResultsPage {
+impl std::fmt::Display for TextToCadResponseResultsPage {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -16901,8 +17236,8 @@ impl std::fmt::Display for TextToCadResultsPage {
 }
 
 #[cfg(feature = "requests")]
-impl crate::types::paginate::Pagination for TextToCadResultsPage {
-    type Item = TextToCad;
+impl crate::types::paginate::Pagination for TextToCadResponseResultsPage {
+    type Item = TextToCadResponse;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
     }
@@ -16933,7 +17268,7 @@ impl crate::types::paginate::Pagination for TextToCadResultsPage {
 }
 
 #[cfg(feature = "tabled")]
-impl tabled::Tabled for TextToCadResultsPage {
+impl tabled::Tabled for TextToCadResponseResultsPage {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
