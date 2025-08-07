@@ -17618,6 +17618,39 @@
         "x-dropshot-websocket": {}
       }
     },
+    "/ws/ml/copilot": {
+      "get": {
+        "tags": [
+          "ml"
+        ],
+        "summary": "Open a websocket to prompt the ML copilot.",
+        "operationId": "ml_copilot_ws",
+        "requestBody": {
+          "description": "Websocket requests",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MlCopilotClientMessage"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "Websocket responses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MlCopilotServerMessage"
+                }
+              }
+            }
+          }
+        },
+        "x-dropshot-websocket": {}
+      }
+    },
     "/ws/modeling/commands": {
       "get": {
         "tags": [
@@ -24301,6 +24334,250 @@
           }
         ]
       },
+      "MlCopilotClientMessage": {
+        "description": "The types of messages that can be sent by the client to the server.",
+        "oneOf": [
+          {
+            "description": "Authentication header request.",
+            "type": "object",
+            "properties": {
+              "headers": {
+                "description": "The authentication header.",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "headers"
+                ]
+              }
+            },
+            "required": [
+              "headers",
+              "type"
+            ]
+          },
+          {
+            "description": "The user message, which contains the content of the user's input.",
+            "type": "object",
+            "properties": {
+              "content": {
+                "description": "The content of the user's message.",
+                "type": "string"
+              },
+              "current_files": {
+                "description": "The current files in the project, if any. This can be used to provide context for the AI. This should be sent in binary format, if the files are not text files, like an imported binary file.",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "format": "uint8",
+                    "minimum": 0
+                  }
+                }
+              },
+              "project_name": {
+                "nullable": true,
+                "description": "The project name, if any. This can be used to associate the message with a specific project.",
+                "type": "string"
+              },
+              "source_ranges": {
+                "description": "The source ranges the user suggested to change. If empty, the content (prompt) will be used and is required.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SourceRangePrompt"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "user"
+                ]
+              }
+            },
+            "required": [
+              "content",
+              "type"
+            ]
+          },
+          {
+            "description": "The system message, which can be used to set the context or instructions for the AI.",
+            "type": "object",
+            "properties": {
+              "command": {
+                "description": "The content of the system message.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/MlCopilotSystemCommand"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "system"
+                ]
+              }
+            },
+            "required": [
+              "command",
+              "type"
+            ]
+          }
+        ]
+      },
+      "MlCopilotServerMessage": {
+        "description": "The types of messages that can be sent by the server to the client.",
+        "oneOf": [
+          {
+            "description": "Delta of the response, e.g. a chunk of text/tokens.",
+            "type": "object",
+            "properties": {
+              "delta": {
+                "description": "The delta text, which is a part of the response that is being streamed.",
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "delta"
+                ]
+              }
+            },
+            "required": [
+              "delta",
+              "type"
+            ]
+          },
+          {
+            "description": "Completed tool call result.",
+            "type": "object",
+            "properties": {
+              "result": {
+                "description": "The result of the tool call.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/MlToolResult"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "tool_output"
+                ]
+              }
+            },
+            "required": [
+              "result",
+              "type"
+            ]
+          },
+          {
+            "description": "Error sent by server.",
+            "type": "object",
+            "properties": {
+              "detail": {
+                "description": "The error message.",
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "error"
+                ]
+              }
+            },
+            "required": [
+              "detail",
+              "type"
+            ]
+          },
+          {
+            "description": "Log / banner text.",
+            "type": "object",
+            "properties": {
+              "text": {
+                "description": "The informational text.",
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "info"
+                ]
+              }
+            },
+            "required": [
+              "text",
+              "type"
+            ]
+          },
+          {
+            "description": "Assistant reasoning / chain-of-thought (if you expose it).",
+            "type": "object",
+            "properties": {
+              "text": {
+                "description": "The reasoning text, which can be used to explain the AI's thought process.",
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "reasoning"
+                ]
+              }
+            },
+            "required": [
+              "text",
+              "type"
+            ]
+          },
+          {
+            "description": "Marks the end of a streamed answer.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "end_of_stream"
+                ]
+              },
+              "whole_response": {
+                "nullable": true,
+                "description": "The whole response text, which is the final output of the AI. This is only relevant if in copilot mode, where the AI is expected to return the whole response at once.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          }
+        ]
+      },
+      "MlCopilotSystemCommand": {
+        "description": "The type of system command that can be sent to the ML Copilot.",
+        "oneOf": [
+          {
+            "description": "Reset the conversation state, by creating a new state.",
+            "type": "string",
+            "enum": [
+              "new"
+            ]
+          },
+          {
+            "description": "Disconnect the client, which can be used to end the session.",
+            "type": "string",
+            "enum": [
+              "bye"
+            ]
+          }
+        ]
+      },
       "MlFeedback": {
         "description": "Human feedback on an ML response.",
         "oneOf": [
@@ -24536,6 +24813,109 @@
             "type": "string",
             "enum": [
               "text_to_kcl_multi_file_iteration"
+            ]
+          }
+        ]
+      },
+      "MlToolResult": {
+        "description": "Responses from tools.",
+        "oneOf": [
+          {
+            "description": "Response from the `TextToCad` tool.",
+            "type": "object",
+            "properties": {
+              "error": {
+                "nullable": true,
+                "description": "Any error that occurred during the tool execution.",
+                "type": "string"
+              },
+              "outputs": {
+                "description": "The output files. Returns a map of the file name to the file contents. The file contents are not encoded since kcl files are not binary.",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "project_name": {
+                "nullable": true,
+                "description": "The name of the project, if any.",
+                "type": "string"
+              },
+              "status_code": {
+                "title": "int32",
+                "description": "The status code of the tool execution.",
+                "type": "integer",
+                "format": "int32"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "text_to_cad"
+                ]
+              }
+            },
+            "required": [
+              "status_code",
+              "type"
+            ]
+          },
+          {
+            "description": "Response from the `EditKclCode` tool.",
+            "type": "object",
+            "properties": {
+              "error": {
+                "nullable": true,
+                "description": "Any error that occurred during the tool execution.",
+                "type": "string"
+              },
+              "outputs": {
+                "description": "The output files. Returns a map of the file name to the file contents. The file contents are not encoded since kcl files are not binary.",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "project_name": {
+                "nullable": true,
+                "description": "The name of the project, if any.",
+                "type": "string"
+              },
+              "status_code": {
+                "title": "int32",
+                "description": "The status code of the tool execution.",
+                "type": "integer",
+                "format": "int32"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "edit_kcl_code"
+                ]
+              }
+            },
+            "required": [
+              "status_code",
+              "type"
+            ]
+          },
+          {
+            "description": "Mechanical knowledge base response.",
+            "type": "object",
+            "properties": {
+              "response": {
+                "description": "The response from the mechanical knowledge base.",
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "mechanical_knowledge_base"
+                ]
+              }
+            },
+            "required": [
+              "response",
+              "type"
             ]
           }
         ]
