@@ -1206,6 +1206,11 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1ws~1ml~1copilot/get/x-rust",
+    "value": {}
+  },
+  {
+    "op": "add",
     "path": "/paths/~1ws~1modeling~1commands/get/x-rust",
     "value": {}
   }

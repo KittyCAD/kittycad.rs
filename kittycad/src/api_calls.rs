@@ -23,7 +23,7 @@ impl ApiCalls {
             format!("{}/{}", self.client.base_url, "api-call-metrics"),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("group_by", format!("{group_by}"))];
+        let query_params = vec![("group_by", format!("{}", group_by))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -59,7 +59,7 @@ impl ApiCalls {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{p}")));
+            query_params.push(("limit", format!("{}", p)));
         }
 
         if let Some(p) = page_token {
@@ -67,7 +67,7 @@ impl ApiCalls {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{p}")));
+            query_params.push(("sort_by", format!("{}", p)));
         }
 
         req = req.query(&query_params);
@@ -173,7 +173,7 @@ impl ApiCalls {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "api-calls/{id}".replace("{id}", &format!("{id}"))
+                "api-calls/{id}".replace("{id}", &format!("{}", id))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -212,7 +212,7 @@ impl ApiCalls {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{p}")));
+            query_params.push(("limit", format!("{}", p)));
         }
 
         if let Some(p) = page_token {
@@ -220,11 +220,11 @@ impl ApiCalls {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{p}")));
+            query_params.push(("sort_by", format!("{}", p)));
         }
 
         if let Some(p) = status {
-            query_params.push(("status", format!("{p}")));
+            query_params.push(("status", format!("{}", p)));
         }
 
         req = req.query(&query_params);
@@ -341,7 +341,7 @@ impl ApiCalls {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "async/operations/{id}".replace("{id}", &format!("{id}"))
+                "async/operations/{id}".replace("{id}", &format!("{}", id))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -379,7 +379,7 @@ impl ApiCalls {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{p}")));
+            query_params.push(("limit", format!("{}", p)));
         }
 
         if let Some(p) = page_token {
@@ -387,7 +387,7 @@ impl ApiCalls {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{p}")));
+            query_params.push(("sort_by", format!("{}", p)));
         }
 
         req = req.query(&query_params);
@@ -493,7 +493,7 @@ impl ApiCalls {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "org/api-calls/{id}".replace("{id}", &format!("{id}"))
+                "org/api-calls/{id}".replace("{id}", &format!("{}", id))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -531,7 +531,7 @@ impl ApiCalls {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{p}")));
+            query_params.push(("limit", format!("{}", p)));
         }
 
         if let Some(p) = page_token {
@@ -539,7 +539,7 @@ impl ApiCalls {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{p}")));
+            query_params.push(("sort_by", format!("{}", p)));
         }
 
         req = req.query(&query_params);
@@ -653,7 +653,7 @@ impl ApiCalls {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/api-calls/{id}".replace("{id}", &format!("{id}"))
+                "user/api-calls/{id}".replace("{id}", &format!("{}", id))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -696,7 +696,7 @@ impl ApiCalls {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{p}")));
+            query_params.push(("limit", format!("{}", p)));
         }
 
         if let Some(p) = page_token {
@@ -704,7 +704,7 @@ impl ApiCalls {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{p}")));
+            query_params.push(("sort_by", format!("{}", p)));
         }
 
         req = req.query(&query_params);

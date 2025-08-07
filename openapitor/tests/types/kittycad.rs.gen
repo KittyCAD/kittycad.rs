@@ -9276,6 +9276,113 @@ pub enum Method {
     Extension,
 }
 
+#[doc = "The types of messages that can be sent by the client to the server."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum MlCopilotClientMessage {
+    #[doc = "Authentication header request."]
+    #[serde(rename = "headers")]
+    Headers {
+        #[doc = "The authentication header."]
+        headers: std::collections::HashMap<String, String>,
+    },
+    #[doc = "The user message, which contains the content of the user's input."]
+    #[serde(rename = "user")]
+    User {
+        #[doc = "The content of the user's message."]
+        content: String,
+        #[doc = "The current files in the project, if any. This can be used to provide context for the AI. This should be sent in binary format, if the files are not text files, like an imported binary file."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        current_files: Option<std::collections::HashMap<String, Vec<u8>>>,
+        #[doc = "The project name, if any. This can be used to associate the message with a specific project."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        project_name: Option<String>,
+        #[doc = "The source ranges the user suggested to change. If empty, the content (prompt) will be used and is required."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        source_ranges: Option<Vec<SourceRangePrompt>>,
+    },
+    #[doc = "The system message, which can be used to set the context or instructions for the AI."]
+    #[serde(rename = "system")]
+    System {
+        #[doc = "The content of the system message."]
+        command: MlCopilotSystemCommand,
+    },
+}
+
+#[doc = "The types of messages that can be sent by the server to the client."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum MlCopilotServerMessage {
+    #[doc = "Delta of the response, e.g. a chunk of text/tokens."]
+    #[serde(rename = "delta")]
+    Delta {
+        #[doc = "The delta text, which is a part of the response that is being streamed."]
+        delta: String,
+    },
+    #[doc = "Completed tool call result."]
+    #[serde(rename = "tool_output")]
+    ToolOutput {
+        #[doc = "The result of the tool call."]
+        result: MlToolResult,
+    },
+    #[doc = "Error sent by server."]
+    #[serde(rename = "error")]
+    Error {
+        #[doc = "The error message."]
+        detail: String,
+    },
+    #[doc = "Log / banner text."]
+    #[serde(rename = "info")]
+    Info {
+        #[doc = "The informational text."]
+        text: String,
+    },
+    #[doc = "Assistant reasoning / chain-of-thought (if you expose it)."]
+    #[serde(rename = "reasoning")]
+    Reasoning {
+        #[doc = "The reasoning text, which can be used to explain the AI's thought process."]
+        text: String,
+    },
+    #[doc = "Marks the end of a streamed answer."]
+    #[serde(rename = "end_of_stream")]
+    EndOfStream {
+        #[doc = "The whole response text, which is the final output of the AI. This is only relevant if in copilot mode, where the AI is expected to return the whole response at once."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        whole_response: Option<String>,
+    },
+}
+
+#[doc = "The type of system command that can be sent to the ML Copilot."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum MlCopilotSystemCommand {
+    #[doc = "Reset the conversation state, by creating a new state."]
+    #[serde(rename = "new")]
+    #[display("new")]
+    New,
+    #[doc = "Disconnect the client, which can be used to end the session."]
+    #[serde(rename = "bye")]
+    #[display("bye")]
+    Bye,
+}
+
 #[doc = "Human feedback on an ML response."]
 #[derive(
     serde :: Serialize,
@@ -9616,6 +9723,51 @@ pub enum MlPromptType {
     #[serde(rename = "text_to_kcl_multi_file_iteration")]
     #[display("text_to_kcl_multi_file_iteration")]
     TextToKclMultiFileIteration,
+}
+
+#[doc = "Responses from tools."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum MlToolResult {
+    #[doc = "Response from the `TextToCad` tool."]
+    #[serde(rename = "text_to_cad")]
+    TextToCad {
+        #[doc = "Any error that occurred during the tool execution."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        error: Option<String>,
+        #[doc = "The output files. Returns a map of the file name to the file contents. The file contents are not encoded since kcl files are not binary."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        outputs: Option<std::collections::HashMap<String, String>>,
+        #[doc = "The name of the project, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        project_name: Option<String>,
+        #[doc = "The status code of the tool execution."]
+        status_code: i32,
+    },
+    #[doc = "Response from the `EditKclCode` tool."]
+    #[serde(rename = "edit_kcl_code")]
+    EditKclCode {
+        #[doc = "Any error that occurred during the tool execution."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        error: Option<String>,
+        #[doc = "The output files. Returns a map of the file name to the file contents. The file contents are not encoded since kcl files are not binary."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        outputs: Option<std::collections::HashMap<String, String>>,
+        #[doc = "The name of the project, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        project_name: Option<String>,
+        #[doc = "The status code of the tool execution."]
+        status_code: i32,
+    },
+    #[doc = "Mechanical knowledge base response."]
+    #[serde(rename = "mechanical_knowledge_base")]
+    MechanicalKnowledgeBase {
+        #[doc = "The response from the mechanical knowledge base."]
+        response: String,
+    },
 }
 
 #[doc = "Type for modeling-app events"]
