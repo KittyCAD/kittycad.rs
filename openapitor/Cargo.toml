@@ -9,7 +9,7 @@ description = "An OpenAPI client generator."
 Inflector = "^0.11.4"
 anyhow = { version = "1", features = ["backtrace"] }
 chrono = { version = "0.4", features = ["serde", "std"], default-features = false }
-clap = { version = "4.5.41", features = ["cargo", "derive", "env", "unicode", "wrap_help"] }
+clap = { version = "4.5.45", features = ["cargo", "derive", "env", "unicode", "wrap_help"] }
 data-encoding = "^2.9.0"
 format_serde_error = "^0.3.0"
 futures-util = "^0.3.31"
@@ -38,13 +38,13 @@ slog-async = "^2.7.0"
 slog-json = "^2.6.1"
 slog-scope = "^4.4.0"
 slog-stdlog = "^4.1.1"
-slog-term = "^2.9.1"
+slog-term = "^2.9.2"
 thiserror = "2"
-url = { version = "^2.5.4", features = ["serde"] }
+url = { version = "^2.5.7", features = ["serde"] }
 uuid = { version = "1", features = ["serde", "v4"] }
 
 [dev-dependencies]
-async-trait = "^0.1.88"
+async-trait = "^0.1.89"
 expectorate = "1"
 # futures is necessary for test-context
 futures = "0.3"
