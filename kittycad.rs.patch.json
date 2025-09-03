@@ -1211,6 +1211,11 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1ws~1ml~1reasoning~1{id}/get/x-rust",
+    "value": {}
+  },
+  {
+    "op": "add",
     "path": "/paths/~1ws~1modeling~1commands/get/x-rust",
     "value": {}
   }

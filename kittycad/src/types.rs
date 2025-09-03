@@ -1978,6 +1978,8 @@ pub enum AsyncApiCallOutput {
         #[doc = "The time and date the API call was completed."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The conversation ID Conversations group different prompts together."]
+        conversation_id: uuid::Uuid,
         #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The error the function returned, if any."]
@@ -2021,6 +2023,8 @@ pub enum AsyncApiCallOutput {
         #[doc = "The time and date the API call was completed."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The conversation ID Conversations group different prompts together."]
+        conversation_id: uuid::Uuid,
         #[doc = "The time and date the API call was created."]
         created_at: chrono::DateTime<chrono::Utc>,
         #[doc = "The error the function returned, if any."]
@@ -9479,41 +9483,23 @@ pub enum MlCopilotClientMessage {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[serde(tag = "type")]
 pub enum MlCopilotServerMessage {
-    #[doc = "Delta of the response, e.g. a chunk of text/tokens."]
-    #[serde(rename = "delta")]
     Delta {
         #[doc = "The delta text, which is a part of the response that is being streamed."]
         delta: String,
     },
-    #[doc = "Completed tool call result."]
-    #[serde(rename = "tool_output")]
     ToolOutput {
         #[doc = "The result of the tool call."]
         result: MlToolResult,
     },
-    #[doc = "Error sent by server."]
-    #[serde(rename = "error")]
     Error {
         #[doc = "The error message."]
         detail: String,
     },
-    #[doc = "Log / banner text."]
-    #[serde(rename = "info")]
     Info {
         #[doc = "The informational text."]
         text: String,
     },
-    #[doc = "Assistant reasoning / chain-of-thought (if you expose it)."]
-    #[serde(rename = "reasoning")]
-    Reasoning {
-        #[doc = "The reasoning text, which can be used to explain the AI's thought process."]
-        text: String,
-    },
-    #[doc = "Marks the end of a streamed answer."]
-    #[serde(rename = "end_of_stream")]
     EndOfStream {
         #[doc = "The whole response text, which is the final output of the AI. This is only \
                  relevant if in copilot mode, where the AI is expected to return the whole \
@@ -13712,9 +13698,9 @@ pub enum PathSegment {
         center: Point2D,
         #[doc = "End of the path along the perimeter of the ellipse."]
         end_angle: Angle,
-        #[doc = "Major radius of the ellipse (along the x axis)."]
-        major_radius: f64,
-        #[doc = "Minor radius of the ellipse (along the y axis)."]
+        #[doc = "Major axis of the ellipse."]
+        major_axis: Point2D,
+        #[doc = "Minor radius of the ellipse."]
         minor_radius: f64,
         #[doc = "Start of the path along the perimeter of the ellipse."]
         start_angle: Angle,
@@ -14062,6 +14048,42 @@ pub enum PlanInterval {
     #[serde(rename = "year")]
     #[display("year")]
     Year,
+}
+
+#[doc = "A step in the design plan."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PlanStep {
+    #[doc = "The edit instructions for the step."]
+    pub edit_instructions: String,
+    #[doc = "The file path it's editing."]
+    pub filepath_to_edit: String,
+}
+
+impl std::fmt::Display for PlanStep {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PlanStep {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.edit_instructions.clone().into(),
+            self.filepath_to_edit.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["edit_instructions".into(), "filepath_to_edit".into()]
+    }
 }
 
 #[doc = "Corresponding coordinates of given window coordinates, intersected on given plane."]
@@ -14456,6 +14478,80 @@ impl tabled::Tabled for RawFile {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["contents".into(), "name".into()]
     }
+}
+
+#[doc = "A message containing reasoning information."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum ReasoningMessage {
+    #[doc = "Plain text reasoning."]
+    #[serde(rename = "text")]
+    Text {
+        #[doc = "The content of the reasoning."]
+        content: String,
+    },
+    #[doc = "Reasoning that contains the KCL docs relevant to the reasoning."]
+    #[serde(rename = "kcl_docs")]
+    KclDocs {
+        #[doc = "The content of the reasoning."]
+        content: String,
+    },
+    #[doc = "Reasoning that contains the KCL code examples relevant to the reasoning."]
+    #[serde(rename = "kcl_code_examples")]
+    KclCodeExamples {
+        #[doc = "The content of the reasoning."]
+        content: String,
+    },
+    #[doc = "Reasoning that contains a feature tree outline."]
+    #[serde(rename = "feature_tree_outline")]
+    FeatureTreeOutline {
+        #[doc = "The content of the reasoning."]
+        content: String,
+    },
+    #[doc = "Reasoning that contains a design plan with steps."]
+    #[serde(rename = "design_plan")]
+    DesignPlan {
+        #[doc = "The steps in the design plan."]
+        steps: Vec<PlanStep>,
+    },
+    #[doc = "Reasoning that contains potential KCL code, this code has not been executed yet. It \
+             might not even compile or be valid KCL code."]
+    #[serde(rename = "generated_kcl_code")]
+    GeneratedKclCode {
+        #[doc = "The content of the reasoning."]
+        code: String,
+    },
+    #[doc = "Reasoning containing an error message from executing the KCL code."]
+    #[serde(rename = "kcl_code_error")]
+    KclCodeError {
+        #[doc = "The error message."]
+        error: String,
+    },
+    #[doc = "A KCL file that is being created by the AI. This might contain invalid KCL code."]
+    #[serde(rename = "created_kcl_file")]
+    CreatedKclFile {
+        #[doc = "The content of the file."]
+        content: String,
+        #[doc = "The file name."]
+        file_name: String,
+    },
+    #[doc = "A KCL file that is being updated by the AI. This might contain invalid KCL code."]
+    #[serde(rename = "updated_kcl_file")]
+    UpdatedKclFile {
+        #[doc = "The content of the file."]
+        content: String,
+        #[doc = "The file name."]
+        file_name: String,
+    },
+    #[doc = "A KCL file that is being deleted by the AI."]
+    #[serde(rename = "deleted_kcl_file")]
+    DeletedKclFile {
+        #[doc = "The file name."]
+        file_name: String,
+    },
 }
 
 #[doc = "The response from the `ReconfigureStream` endpoint."]
@@ -16917,6 +17013,8 @@ pub struct TextToCad {
     #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The conversation ID Conversations group different prompts together."]
+    pub conversation_id: uuid::Uuid,
     #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
@@ -16965,7 +17063,7 @@ impl std::fmt::Display for TextToCad {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TextToCad {
-    const LENGTH: usize = 16;
+    const LENGTH: usize = 17;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(code) = &self.code {
@@ -16978,6 +17076,7 @@ impl tabled::Tabled for TextToCad {
             } else {
                 String::new().into()
             },
+            format!("{:?}", self.conversation_id).into(),
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
                 format!("{:?}", error).into()
@@ -17019,6 +17118,7 @@ impl tabled::Tabled for TextToCad {
         vec![
             "code".into(),
             "completed_at".into(),
+            "conversation_id".into(),
             "created_at".into(),
             "error".into(),
             "feedback".into(),
@@ -17097,6 +17197,8 @@ pub struct TextToCadIteration {
     #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The conversation ID Conversations group different prompts together."]
+    pub conversation_id: uuid::Uuid,
     #[doc = "The time and date the API call was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The error the function returned, if any."]
@@ -17142,7 +17244,7 @@ impl std::fmt::Display for TextToCadIteration {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TextToCadIteration {
-    const LENGTH: usize = 15;
+    const LENGTH: usize = 16;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             self.code.clone().into(),
@@ -17151,6 +17253,7 @@ impl tabled::Tabled for TextToCadIteration {
             } else {
                 String::new().into()
             },
+            format!("{:?}", self.conversation_id).into(),
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
                 format!("{:?}", error).into()
@@ -17187,6 +17290,7 @@ impl tabled::Tabled for TextToCadIteration {
         vec![
             "code".into(),
             "completed_at".into(),
+            "conversation_id".into(),
             "created_at".into(),
             "error".into(),
             "feedback".into(),
@@ -17538,6 +17642,9 @@ pub struct TextToCadResponse {
     #[doc = "The time and date the API call was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The conversation ID Conversations group different prompts together."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub conversation_id: Option<uuid::Uuid>,
     #[doc = "The time and date the API call was created."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub created_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -17588,9 +17695,6 @@ pub struct TextToCadResponse {
     #[doc = "The source ranges the user suggested to change."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source_ranges: Option<Vec<SourceRangePrompt>>,
-    #[doc = "The conversation ID Conversations group different prompts together."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub conversation_id: Option<uuid::Uuid>,
     #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make \
              our models better over time."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -17619,6 +17723,11 @@ impl tabled::Tabled for TextToCadResponse {
             },
             if let Some(completed_at) = &self.completed_at {
                 format!("{:?}", completed_at).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(conversation_id) = &self.conversation_id {
+                format!("{:?}", conversation_id).into()
             } else {
                 String::new().into()
             },
@@ -17702,11 +17811,6 @@ impl tabled::Tabled for TextToCadResponse {
             } else {
                 String::new().into()
             },
-            if let Some(conversation_id) = &self.conversation_id {
-                format!("{:?}", conversation_id).into()
-            } else {
-                String::new().into()
-            },
             if let Some(project_name) = &self.project_name {
                 format!("{:?}", project_name).into()
             } else {
@@ -17719,6 +17823,7 @@ impl tabled::Tabled for TextToCadResponse {
         vec![
             "code".into(),
             "completed_at".into(),
+            "conversation_id".into(),
             "created_at".into(),
             "error".into(),
             "feedback".into(),
@@ -17735,7 +17840,6 @@ impl tabled::Tabled for TextToCadResponse {
             "user_id".into(),
             "original_source_code".into(),
             "source_ranges".into(),
-            "conversation_id".into(),
             "project_name".into(),
         ]
     }
@@ -20611,9 +20715,10 @@ pub struct VerificationTokenResponse {
              is what we are verifying."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub identifier: Option<String>,
-    #[doc = "The URL to redirect to if the user requires SAML authentication."]
+    #[doc = "The URL to redirect to if the user requires SAML authentication or belongs somewhere \
+             else."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub saml_redirect_url: Option<String>,
+    pub redirect_url: Option<String>,
     #[doc = "The date and time the verification token was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
@@ -20641,8 +20746,8 @@ impl tabled::Tabled for VerificationTokenResponse {
             } else {
                 String::new().into()
             },
-            if let Some(saml_redirect_url) = &self.saml_redirect_url {
-                format!("{:?}", saml_redirect_url).into()
+            if let Some(redirect_url) = &self.redirect_url {
+                format!("{:?}", redirect_url).into()
             } else {
                 String::new().into()
             },
@@ -20656,7 +20761,7 @@ impl tabled::Tabled for VerificationTokenResponse {
             "expires".into(),
             "id".into(),
             "identifier".into(),
-            "saml_redirect_url".into(),
+            "redirect_url".into(),
             "updated_at".into(),
         ]
     }
