@@ -1,6 +1,3 @@
 [workspace]
-members = [
-	"kittycad",
-	"openapitor",
-]
+members = ["kittycad", "openapitor"]
 resolver = "2"
