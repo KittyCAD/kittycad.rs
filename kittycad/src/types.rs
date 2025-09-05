@@ -17635,214 +17635,147 @@ impl tabled::Tabled for TextToCadMultiFileIterationBody {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct TextToCadResponse {
-    #[doc = "The code for the new model."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub code: Option<String>,
-    #[doc = "The time and date the API call was completed."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The conversation ID Conversations group different prompts together."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub conversation_id: Option<uuid::Uuid>,
-    #[doc = "The time and date the API call was created."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The error the function returned, if any."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[doc = "Feedback from the user, if any."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub feedback: Option<MlFeedback>,
-    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub id: Option<uuid::Uuid>,
-    #[doc = "The version of kcl to use. If empty, the latest version will be used."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub kcl_version: Option<String>,
-    #[doc = "The model being used."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub model: Option<TextToCadModel>,
-    #[doc = "The version of the model."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub model_version: Option<String>,
-    #[doc = "The output format of the model."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub output_format: Option<FileExportFormat>,
-    #[doc = "The output files. Returns a map of the file name to the file contents. The file \
-             contents are not encoded since kcl files are not binary."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub outputs: Option<std::collections::HashMap<String, String>>,
-    #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
-             specific source ranges. This will apply to all the files."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub prompt: Option<String>,
-    #[doc = "The time and date the API call was started."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub status: Option<ApiCallStatus>,
-    #[doc = "The time and date the API call was last updated."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub updated_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The user ID of the user who created the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<uuid::Uuid>,
-    #[doc = "The original source code for the model, previous to the changes."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub original_source_code: Option<String>,
-    #[doc = "The source ranges the user suggested to change."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub source_ranges: Option<Vec<SourceRangePrompt>>,
-    #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make \
-             our models better over time."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub project_name: Option<String>,
-}
-
-impl std::fmt::Display for TextToCadResponse {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for TextToCadResponse {
-    const LENGTH: usize = 20;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(code) = &self.code {
-                format!("{:?}", code).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(conversation_id) = &self.conversation_id {
-                format!("{:?}", conversation_id).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(created_at) = &self.created_at {
-                format!("{:?}", created_at).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(error) = &self.error {
-                format!("{:?}", error).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(feedback) = &self.feedback {
-                format!("{:?}", feedback).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(id) = &self.id {
-                format!("{:?}", id).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(kcl_version) = &self.kcl_version {
-                format!("{:?}", kcl_version).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(model) = &self.model {
-                format!("{:?}", model).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(model_version) = &self.model_version {
-                format!("{:?}", model_version).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(output_format) = &self.output_format {
-                format!("{:?}", output_format).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(outputs) = &self.outputs {
-                format!("{:?}", outputs).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(prompt) = &self.prompt {
-                format!("{:?}", prompt).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(status) = &self.status {
-                format!("{:?}", status).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(updated_at) = &self.updated_at {
-                format!("{:?}", updated_at).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(user_id) = &self.user_id {
-                format!("{:?}", user_id).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(original_source_code) = &self.original_source_code {
-                format!("{:?}", original_source_code).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(source_ranges) = &self.source_ranges {
-                format!("{:?}", source_ranges).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(project_name) = &self.project_name {
-                format!("{:?}", project_name).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "code".into(),
-            "completed_at".into(),
-            "conversation_id".into(),
-            "created_at".into(),
-            "error".into(),
-            "feedback".into(),
-            "id".into(),
-            "kcl_version".into(),
-            "model".into(),
-            "model_version".into(),
-            "output_format".into(),
-            "outputs".into(),
-            "prompt".into(),
-            "started_at".into(),
-            "status".into(),
-            "updated_at".into(),
-            "user_id".into(),
-            "original_source_code".into(),
-            "source_ranges".into(),
-            "project_name".into(),
-        ]
-    }
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum TextToCadResponse {
+    #[doc = "A response from a text to CAD prompt."]
+    #[serde(rename = "text_to_cad")]
+    TextToCad {
+        #[doc = "The code for the model. This is optional but will be required in the future once \
+                 we are at v1."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        code: Option<String>,
+        #[doc = "The time and date the API call was completed."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The conversation ID Conversations group different prompts together."]
+        conversation_id: uuid::Uuid,
+        #[doc = "The time and date the API call was created."]
+        created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        error: Option<String>,
+        #[doc = "Feedback from the user, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        feedback: Option<MlFeedback>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
+        id: uuid::Uuid,
+        #[doc = "The version of kcl requested."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        kcl_version: Option<String>,
+        #[doc = "The model being used."]
+        model: TextToCadModel,
+        #[doc = "The version of the model."]
+        model_version: String,
+        #[doc = "The output format of the model."]
+        output_format: FileExportFormat,
+        #[doc = "The output of the model in the given file format the user requested, base64 \
+                 encoded. The key of the map is the path of the output file."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        outputs: Option<std::collections::HashMap<String, base64::Base64Data>>,
+        #[doc = "The prompt."]
+        prompt: String,
+        #[doc = "The time and date the API call was started."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
+        status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
+        updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
+        user_id: uuid::Uuid,
+    },
+    #[doc = "A response from a text to CAD iteration."]
+    #[serde(rename = "text_to_cad_iteration")]
+    TextToCadIteration {
+        #[doc = "The code for the new model."]
+        code: String,
+        #[doc = "The time and date the API call was completed."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The conversation ID Conversations group different prompts together."]
+        conversation_id: uuid::Uuid,
+        #[doc = "The time and date the API call was created."]
+        created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        error: Option<String>,
+        #[doc = "Feedback from the user, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        feedback: Option<MlFeedback>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
+        id: uuid::Uuid,
+        #[doc = "The model being used."]
+        model: TextToCadModel,
+        #[doc = "The version of the model."]
+        model_version: String,
+        #[doc = "The original source code for the model, previous to the changes."]
+        original_source_code: String,
+        #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
+                 specific source ranges."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        prompt: Option<String>,
+        #[doc = "The source ranges the user suggested to change."]
+        source_ranges: Vec<SourceRangePrompt>,
+        #[doc = "The time and date the API call was started."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
+        status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
+        updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
+        user_id: uuid::Uuid,
+    },
+    #[doc = "A response from a text to CAD multi-file iteration."]
+    #[serde(rename = "text_to_cad_multi_file_iteration")]
+    TextToCadMultiFileIteration {
+        #[doc = "The time and date the API call was completed."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The conversation ID Conversations group different prompts together."]
+        conversation_id: uuid::Uuid,
+        #[doc = "The time and date the API call was created."]
+        created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        error: Option<String>,
+        #[doc = "Feedback from the user, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        feedback: Option<MlFeedback>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
+        id: uuid::Uuid,
+        #[doc = "The version of kcl to use. If empty, the latest version will be used."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        kcl_version: Option<String>,
+        #[doc = "The model being used."]
+        model: TextToCadModel,
+        #[doc = "The version of the model."]
+        model_version: String,
+        #[doc = "The output files. Returns a map of the file name to the file contents. The file \
+                 contents are not encoded since kcl files are not binary."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        outputs: Option<std::collections::HashMap<String, String>>,
+        #[doc = "The project name. This is used to tie the prompt to a project. Which helps us \
+                 make our models better over time."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        project_name: Option<String>,
+        #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
+                 specific source ranges. This will apply to all the files."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        prompt: Option<String>,
+        #[doc = "The source ranges the user suggested to change."]
+        source_ranges: Vec<SourceRangePrompt>,
+        #[doc = "The time and date the API call was started."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
+        status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
+        updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
+        user_id: uuid::Uuid,
+    },
 }
 
 #[doc = "A single page of results"]
