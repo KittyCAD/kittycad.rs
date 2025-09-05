@@ -29,7 +29,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! kittycad = "0.3.38"
+//! kittycad = "0.3.39"
 //! ```
 //!
 //! ## Basic example
@@ -56,7 +56,7 @@
 //!
 //! let client = Client::new_from_env();
 //! ```
-#![allow(mismatched_lifetime_syntaxes)]
+#![allow(elided_named_lifetimes)]
 #![allow(missing_docs)]
 #![allow(unused_imports)]
 #![allow(clippy::needless_lifetimes)]
@@ -232,7 +232,7 @@ impl Client {
                         client_http1_only,
                     }
                 }
-                (Err(e), _) | (_, Err(e)) => panic!("creating reqwest client failed: {:?}", e),
+                (Err(e), _) | (_, Err(e)) => panic!("creating reqwest client failed: {e:?}"),
             }
         }
         #[cfg(not(feature = "retry"))]
