@@ -3,12 +3,14 @@
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub enum ModelingCmd {
+    #[doc = "Draw a circle."]
     DrawCircle {
         #[doc = "The center of the circle."]
         center: Vec<f64>,
         #[doc = "The radius of the circle."]
         radius: f64,
     },
+    #[doc = "Extrude a sketch."]
     Extrude {
         #[doc = "How far to extrude."]
         distance: f64,

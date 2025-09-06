@@ -9484,22 +9484,29 @@ pub enum MlCopilotClientMessage {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub enum MlCopilotServerMessage {
+    #[doc = "Delta of the response, e.g. a chunk of text/tokens."]
     Delta {
         #[doc = "The delta text, which is a part of the response that is being streamed."]
         delta: String,
     },
+    #[doc = "Completed tool call result."]
     ToolOutput {
         #[doc = "The result of the tool call."]
         result: MlToolResult,
     },
+    #[doc = "Error sent by server."]
     Error {
         #[doc = "The error message."]
         detail: String,
     },
+    #[doc = "Log / banner text."]
     Info {
         #[doc = "The informational text."]
         text: String,
     },
+    #[doc = "Assistant reasoning / chain-of-thought (if you expose it)."]
+    Reasoning(ReasoningMessage),
+    #[doc = "Marks the end of a streamed answer."]
     EndOfStream {
         #[doc = "The whole response text, which is the final output of the AI. This is only \
                  relevant if in copilot mode, where the AI is expected to return the whole \

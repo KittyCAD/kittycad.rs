@@ -397,25 +397,59 @@ impl TypeSpace {
         for one_of in one_ofs {
             // Get the first property in the object.
             let schema = one_of.get_schema_from_reference(&self.spec, true)?;
+            let variant_doc = if let Some(d) = &schema.schema_data.description {
+                let one_of_name = get_type_name(name, data)?;
+                let d_sanitized = sanitize_indents(d, one_of_name.to_string());
+                quote!(#[doc = #d_sanitized])
+            } else {
+                quote!()
+            };
             if let SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
                 if o.properties.len() == 1 {
-                    // Check if the property is a nested object.
+                    // Check if the property is a nested object. If not an object (e.g. a oneOf
+                    // reference), still include it as a single field.
                     for (inner_name, property) in o.properties.iter() {
                         // Let the name be the struct name.
                         let inner_name_ident = format_ident!("{}", proper_name(inner_name));
                         let property_schema =
                             property.get_schema_from_reference(&self.spec, true)?;
-                        if let SchemaKind::Type(openapiv3::Type::Object(o)) =
-                            &property_schema.schema_kind
-                        {
-                            let inner_values =
-                                self.get_object_values(&inner_name_ident, o, false, None)?;
-                            values = quote! {
-                                #values
-                                #inner_name_ident {
-                                    #inner_values
-                                },
-                            };
+                        match &property_schema.schema_kind {
+                            SchemaKind::Type(openapiv3::Type::Object(inner_obj)) => {
+                                let inner_values = self
+                                    .get_object_values(&inner_name_ident, inner_obj, false, None)?;
+                                values = quote! {
+                                    #values
+                                    #variant_doc
+                                    #inner_name_ident {
+                                        #inner_values
+                                    },
+                                };
+                            }
+                            // If the nested property is not an object (e.g. it's a oneOf or a
+                            // reference), create a variant with a single field named after the
+                            // property and typed accordingly.
+                            _ => {
+                                // Prefer the referenced type name if this property is a $ref;
+                                // otherwise infer the name from the expanded schema.
+                                let field_ty = match property {
+                                    openapiv3::ReferenceOr::Reference { .. } => {
+                                        let reference = property.reference()?;
+                                        get_type_name_from_reference(&reference, &self.spec, true)?
+                                    }
+                                    openapiv3::ReferenceOr::Item(_) => get_type_name_for_schema(
+                                        inner_name,
+                                        &property_schema,
+                                        &self.spec,
+                                        true,
+                                    )?,
+                                };
+                                // Render tuple-style variant with single inner type.
+                                values = quote! {
+                                    #values
+                                    #variant_doc
+                                    #inner_name_ident(#field_ty),
+                                };
+                            }
                         }
                     }
                 }
@@ -500,31 +534,21 @@ impl TypeSpace {
             return self.render_enum(name, &enum_schema, data, enum_docs);
         }
 
-        // Check if we only have objects with 1 item and a nested object.
-        let mut is_one_of_nested_object = false;
+        // Check if we only have objects with 1 item (regardless of that property's type).
+        // Some schemas wrap content inside a single-key object whose value may be a $ref or
+        // non-object type (e.g., `ReasoningMessage`). Treat those as nested-object enums so
+        // variants render as `Variant(Type)` or `Variant { field: Type }`.
+        let mut is_one_of_nested_object = true;
         for one_of in one_ofs {
             let schema = one_of.get_schema_from_reference(&self.spec, true)?;
-            if let SchemaKind::Type(openapiv3::Type::Object(o)) = &schema.schema_kind {
-                if o.properties.len() == 1 {
-                    // Check if the property is a nested object.
-                    for (_, property) in o.properties.iter() {
-                        let property_schema =
-                            property.get_schema_from_reference(&self.spec, true)?;
-                        if let SchemaKind::Type(openapiv3::Type::Object(_)) =
-                            &property_schema.schema_kind
-                        {
-                            is_one_of_nested_object = true;
-                        }
-                    }
-                } else {
-                    // This is not an object.
+            match &schema.schema_kind {
+                SchemaKind::Type(openapiv3::Type::Object(o)) if o.properties.len() == 1 => {
+                    // okay, keep checking next
+                }
+                _ => {
                     is_one_of_nested_object = false;
                     break;
                 }
-            } else {
-                // This is not an object.
-                is_one_of_nested_object = false;
-                break;
             }
         }
 
