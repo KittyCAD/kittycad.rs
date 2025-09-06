@@ -276,7 +276,7 @@ pub mod phone_number {
             } else {
                 String::new()
             };
-            write!(f, "{}", s)
+            write!(f, "{s}")
         }
     }
 
@@ -305,40 +305,40 @@ pub mod phone_number {
         fn test_parse_phone_number() {
             let mut phone = "+1-555-555-5555";
             let mut phone_parsed: PhoneNumber =
-                serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+                serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             let mut expected = PhoneNumber(Some(phonenumber::parse(None, phone).unwrap()));
             assert_eq!(phone_parsed, expected);
             let mut expected_str = "+1 555-555-5555";
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
             phone = "555-555-5555";
-            phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+            phone_parsed = serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             assert_eq!(phone_parsed, expected);
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
             phone = "+1 555-555-5555";
-            phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+            phone_parsed = serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             assert_eq!(phone_parsed, expected);
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
             phone = "5555555555";
-            phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+            phone_parsed = serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             assert_eq!(phone_parsed, expected);
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
             phone = "(510) 864-1234";
-            phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+            phone_parsed = serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             expected = PhoneNumber(Some(phonenumber::parse(None, "+15108641234").unwrap()));
             assert_eq!(phone_parsed, expected);
             expected_str = "+1 510-864-1234";
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
             phone = "(510)8641234";
-            phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+            phone_parsed = serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             assert_eq!(phone_parsed, expected);
             expected_str = "+1 510-864-1234";
             assert_eq!(expected_str, serde_json::json!(phone_parsed));
             phone = "";
-            phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+            phone_parsed = serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             assert_eq!(phone_parsed, PhoneNumber(None));
             assert_eq!("", serde_json::json!(phone_parsed));
             phone = "+49 30  1234 1234";
-            phone_parsed = serde_json::from_str(&format!(r#""{}""#, phone)).unwrap();
+            phone_parsed = serde_json::from_str(&format!(r#""{phone}""#)).unwrap();
             expected = PhoneNumber(Some(phonenumber::parse(None, phone).unwrap()));
             assert_eq!(phone_parsed, expected);
             expected_str = "+49 30 12341234";
@@ -441,26 +441,26 @@ pub mod error {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Error::InvalidRequest(s) => {
-                    write!(f, "Invalid Request: {}", s)
+                    write!(f, "Invalid Request: {s}")
                 }
                 #[cfg(feature = "retry")]
                 Error::CommunicationError(e) => {
-                    write!(f, "Communication Error: {}", e)
+                    write!(f, "Communication Error: {e}")
                 }
                 Error::RequestError(e) => {
-                    write!(f, "Request Error: {}", e)
+                    write!(f, "Request Error: {e}")
                 }
                 Error::SerdeError { error, status: _ } => {
-                    write!(f, "Serde Error: {}", error)
+                    write!(f, "Serde Error: {error}")
                 }
                 Error::InvalidResponsePayload { error, response: _ } => {
-                    write!(f, "Invalid Response Payload: {}", error)
+                    write!(f, "Invalid Response Payload: {error}")
                 }
                 Error::Server { body, status } => {
-                    write!(f, "Server Error: {} {}", status, body)
+                    write!(f, "Server Error: {status} {body}")
                 }
                 Error::UnexpectedResponse(r) => {
-                    write!(f, "Unexpected Response: {:?}", r)
+                    write!(f, "Unexpected Response: {r:?}")
                 }
             }
         }
@@ -637,28 +637,28 @@ impl tabled::Tabled for AddressDetails {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(city) = &self.city {
-                format!("{:?}", city).into()
+                format!("{city:?}").into()
             } else {
                 String::new().into()
             },
             self.country.clone().into(),
             if let Some(state) = &self.state {
-                format!("{:?}", state).into()
+                format!("{state:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(street_1) = &self.street_1 {
-                format!("{:?}", street_1).into()
+                format!("{street_1:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(street_2) = &self.street_2 {
-                format!("{:?}", street_2).into()
+                format!("{street_2:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(zip) = &self.zip {
-                format!("{:?}", zip).into()
+                format!("{zip:?}").into()
             } else {
                 String::new().into()
             },
@@ -710,17 +710,17 @@ impl tabled::Tabled for AdjacencyInfo {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(adjacent_info) = &self.adjacent_info {
-                format!("{:?}", adjacent_info).into()
+                format!("{adjacent_info:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(opposite_info) = &self.opposite_info {
-                format!("{:?}", opposite_info).into()
+                format!("{opposite_info:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(original_info) = &self.original_info {
-                format!("{:?}", original_info).into()
+                format!("{original_info:?}").into()
             } else {
                 String::new().into()
             },
@@ -869,27 +869,27 @@ impl tabled::Tabled for AnnotationOptions {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(color) = &self.color {
-                format!("{:?}", color).into()
+                format!("{color:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(line_ends) = &self.line_ends {
-                format!("{:?}", line_ends).into()
+                format!("{line_ends:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(line_width) = &self.line_width {
-                format!("{:?}", line_width).into()
+                format!("{line_width:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(position) = &self.position {
-                format!("{:?}", position).into()
+                format!("{position:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(text) = &self.text {
-                format!("{:?}", text).into()
+                format!("{text:?}").into()
             } else {
                 String::new().into()
             },
@@ -1221,80 +1221,80 @@ impl tabled::Tabled for ApiCallWithPrice {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(duration) = &self.duration {
-                format!("{:?}", duration).into()
+                format!("{duration:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(email) = &self.email {
-                format!("{:?}", email).into()
+                format!("{email:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(endpoint) = &self.endpoint {
-                format!("{:?}", endpoint).into()
+                format!("{endpoint:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(ip_address) = &self.ip_address {
-                format!("{:?}", ip_address).into()
+                format!("{ip_address:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.method).into(),
             if let Some(minutes) = &self.minutes {
-                format!("{:?}", minutes).into()
+                format!("{minutes:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(org_id) = &self.org_id {
-                format!("{:?}", org_id).into()
+                format!("{org_id:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(origin) = &self.origin {
-                format!("{:?}", origin).into()
+                format!("{origin:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(price) = &self.price {
-                format!("{:?}", price).into()
+                format!("{price:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(request_body) = &self.request_body {
-                format!("{:?}", request_body).into()
+                format!("{request_body:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(request_query_params) = &self.request_query_params {
-                format!("{:?}", request_query_params).into()
+                format!("{request_query_params:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(response_body) = &self.response_body {
-                format!("{:?}", response_body).into()
+                format!("{response_body:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(status_code) = &self.status_code {
-                format!("{:?}", status_code).into()
+                format!("{status_code:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(stripe_invoice_item_id) = &self.stripe_invoice_item_id {
-                format!("{:?}", stripe_invoice_item_id).into()
+                format!("{stripe_invoice_item_id:?}").into()
             } else {
                 String::new().into()
             },
@@ -1372,8 +1372,7 @@ impl crate::types::paginate::Pagination for ApiCallWithPriceResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -1394,7 +1393,7 @@ impl tabled::Tabled for ApiCallWithPriceResultsPage {
         vec![
             format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
+                format!("{next_page:?}").into()
             } else {
                 String::new().into()
             },
@@ -1513,7 +1512,7 @@ impl tabled::Tabled for ApiToken {
             format!("{:?}", self.id).into(),
             format!("{:?}", self.is_valid).into(),
             if let Some(label) = &self.label {
-                format!("{:?}", label).into()
+                format!("{label:?}").into()
             } else {
                 String::new().into()
             },
@@ -1575,8 +1574,7 @@ impl crate::types::paginate::Pagination for ApiTokenResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -1597,7 +1595,7 @@ impl tabled::Tabled for ApiTokenResultsPage {
         vec![
             format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
+                format!("{next_page:?}").into()
             } else {
                 String::new().into()
             },
@@ -1634,7 +1632,7 @@ impl tabled::Tabled for AppClientInfo {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![if let Some(url) = &self.url {
-            format!("{:?}", url).into()
+            format!("{url:?}").into()
         } else {
             String::new().into()
         }]
@@ -1702,34 +1700,34 @@ impl tabled::Tabled for AsyncApiCall {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(attempts) = &self.attempts {
-                format!("{:?}", attempts).into()
+                format!("{attempts:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(input) = &self.input {
-                format!("{:?}", input).into()
+                format!("{input:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(output) = &self.output {
-                format!("{:?}", output).into()
+                format!("{output:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -1738,7 +1736,7 @@ impl tabled::Tabled for AsyncApiCall {
             format!("{:?}", self.updated_at).into(),
             format!("{:?}", self.user_id).into(),
             if let Some(worker) = &self.worker {
-                format!("{:?}", worker).into()
+                format!("{worker:?}").into()
             } else {
                 String::new().into()
             },
@@ -2147,8 +2145,7 @@ impl crate::types::paginate::Pagination for AsyncApiCallResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -2169,7 +2166,7 @@ impl tabled::Tabled for AsyncApiCallResultsPage {
         vec![
             format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
+                format!("{next_page:?}").into()
             } else {
                 String::new().into()
             },
@@ -2303,22 +2300,22 @@ impl tabled::Tabled for AuthCallback {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(code) = &self.code {
-                format!("{:?}", code).into()
+                format!("{code:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(id_token) = &self.id_token {
-                format!("{:?}", id_token).into()
+                format!("{id_token:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(state) = &self.state {
-                format!("{:?}", state).into()
+                format!("{state:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(user) = &self.user {
-                format!("{:?}", user).into()
+                format!("{user:?}").into()
             } else {
                 String::new().into()
             },
@@ -2426,12 +2423,12 @@ impl tabled::Tabled for BatchResponse {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(response) = &self.response {
-                format!("{:?}", response).into()
+                format!("{response:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(errors) = &self.errors {
-                format!("{:?}", errors).into()
+                format!("{errors:?}").into()
             } else {
                 String::new().into()
             },
@@ -2475,12 +2472,12 @@ impl tabled::Tabled for BillingInfo {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(address) = &self.address {
-                format!("{:?}", address).into()
+                format!("{address:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name).into()
+                format!("{name:?}").into()
             } else {
                 String::new().into()
             },
@@ -2546,7 +2543,7 @@ impl tabled::Tabled for BooleanIntersection {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![if let Some(extra_solid_ids) = &self.extra_solid_ids {
-            format!("{:?}", extra_solid_ids).into()
+            format!("{extra_solid_ids:?}").into()
         } else {
             String::new().into()
         }]
@@ -2584,7 +2581,7 @@ impl tabled::Tabled for BooleanSubtract {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![if let Some(extra_solid_ids) = &self.extra_solid_ids {
-            format!("{:?}", extra_solid_ids).into()
+            format!("{extra_solid_ids:?}").into()
         } else {
             String::new().into()
         }]
@@ -2622,7 +2619,7 @@ impl tabled::Tabled for BooleanUnion {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![if let Some(extra_solid_ids) = &self.extra_solid_ids {
-            format!("{:?}", extra_solid_ids).into()
+            format!("{extra_solid_ids:?}").into()
         } else {
             String::new().into()
         }]
@@ -2822,14 +2819,14 @@ impl tabled::Tabled for CameraSettings {
         vec![
             format!("{:?}", self.center).into(),
             if let Some(fov_y) = &self.fov_y {
-                format!("{:?}", fov_y).into()
+                format!("{fov_y:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.orientation).into(),
             format!("{:?}", self.ortho).into(),
             if let Some(ortho_scale) = &self.ortho_scale {
-                format!("{:?}", ortho_scale).into()
+                format!("{ortho_scale:?}").into()
             } else {
                 String::new().into()
             },
@@ -2955,42 +2952,42 @@ impl tabled::Tabled for CardDetails {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(brand) = &self.brand {
-                format!("{:?}", brand).into()
+                format!("{brand:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(checks) = &self.checks {
-                format!("{:?}", checks).into()
+                format!("{checks:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(country) = &self.country {
-                format!("{:?}", country).into()
+                format!("{country:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(exp_month) = &self.exp_month {
-                format!("{:?}", exp_month).into()
+                format!("{exp_month:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(exp_year) = &self.exp_year {
-                format!("{:?}", exp_year).into()
+                format!("{exp_year:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(fingerprint) = &self.fingerprint {
-                format!("{:?}", fingerprint).into()
+                format!("{fingerprint:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(funding) = &self.funding {
-                format!("{:?}", funding).into()
+                format!("{funding:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(last_4) = &self.last_4 {
-                format!("{:?}", last_4).into()
+                format!("{last_4:?}").into()
             } else {
                 String::new().into()
             },
@@ -3115,77 +3112,77 @@ impl tabled::Tabled for ClientMetrics {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(rtc_frame_height) = &self.rtc_frame_height {
-                format!("{:?}", rtc_frame_height).into()
+                format!("{rtc_frame_height:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(rtc_frame_width) = &self.rtc_frame_width {
-                format!("{:?}", rtc_frame_width).into()
+                format!("{rtc_frame_width:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(rtc_frames_decoded) = &self.rtc_frames_decoded {
-                format!("{:?}", rtc_frames_decoded).into()
+                format!("{rtc_frames_decoded:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(rtc_frames_dropped) = &self.rtc_frames_dropped {
-                format!("{:?}", rtc_frames_dropped).into()
+                format!("{rtc_frames_dropped:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(rtc_frames_per_second) = &self.rtc_frames_per_second {
-                format!("{:?}", rtc_frames_per_second).into()
+                format!("{rtc_frames_per_second:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(rtc_frames_received) = &self.rtc_frames_received {
-                format!("{:?}", rtc_frames_received).into()
+                format!("{rtc_frames_received:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(rtc_freeze_count) = &self.rtc_freeze_count {
-                format!("{:?}", rtc_freeze_count).into()
+                format!("{rtc_freeze_count:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(rtc_jitter_sec) = &self.rtc_jitter_sec {
-                format!("{:?}", rtc_jitter_sec).into()
+                format!("{rtc_jitter_sec:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(rtc_keyframes_decoded) = &self.rtc_keyframes_decoded {
-                format!("{:?}", rtc_keyframes_decoded).into()
+                format!("{rtc_keyframes_decoded:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(rtc_packets_lost) = &self.rtc_packets_lost {
-                format!("{:?}", rtc_packets_lost).into()
+                format!("{rtc_packets_lost:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(rtc_pause_count) = &self.rtc_pause_count {
-                format!("{:?}", rtc_pause_count).into()
+                format!("{rtc_pause_count:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(rtc_pli_count) = &self.rtc_pli_count {
-                format!("{:?}", rtc_pli_count).into()
+                format!("{rtc_pli_count:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(rtc_stun_rtt_sec) = &self.rtc_stun_rtt_sec {
-                format!("{:?}", rtc_stun_rtt_sec).into()
+                format!("{rtc_stun_rtt_sec:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(rtc_total_freezes_duration_sec) = &self.rtc_total_freezes_duration_sec {
-                format!("{:?}", rtc_total_freezes_duration_sec).into()
+                format!("{rtc_total_freezes_duration_sec:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(rtc_total_pauses_duration_sec) = &self.rtc_total_pauses_duration_sec {
-                format!("{:?}", rtc_total_pauses_duration_sec).into()
+                format!("{rtc_total_pauses_duration_sec:?}").into()
             } else {
                 String::new().into()
             },
@@ -3348,17 +3345,17 @@ impl tabled::Tabled for CodeOutput {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(output_files) = &self.output_files {
-                format!("{:?}", output_files).into()
+                format!("{output_files:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(stderr) = &self.stderr {
-                format!("{:?}", stderr).into()
+                format!("{stderr:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(stdout) = &self.stdout {
-                format!("{:?}", stdout).into()
+                format!("{stdout:?}").into()
             } else {
                 String::new().into()
             },
@@ -3442,7 +3439,7 @@ impl tabled::Tabled for ComplementaryEdges {
         vec![
             format!("{:?}", self.adjacent_ids).into(),
             if let Some(opposite_id) = &self.opposite_id {
-                format!("{:?}", opposite_id).into()
+                format!("{opposite_id:?}").into()
             } else {
                 String::new().into()
             },
@@ -3491,22 +3488,22 @@ impl tabled::Tabled for ComponentTransform {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(rotate_angle_axis) = &self.rotate_angle_axis {
-                format!("{:?}", rotate_angle_axis).into()
+                format!("{rotate_angle_axis:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(rotate_rpy) = &self.rotate_rpy {
-                format!("{:?}", rotate_rpy).into()
+                format!("{rotate_rpy:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(scale) = &self.scale {
-                format!("{:?}", scale).into()
+                format!("{scale:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(translate) = &self.translate {
-                format!("{:?}", translate).into()
+                format!("{translate:?}").into()
             } else {
                 String::new().into()
             },
@@ -3613,8 +3610,7 @@ impl crate::types::paginate::Pagination for ConversationResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -3635,7 +3631,7 @@ impl tabled::Tabled for ConversationResultsPage {
         vec![
             format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
+                format!("{next_page:?}").into()
             } else {
                 String::new().into()
             },
@@ -3728,28 +3724,28 @@ impl tabled::Tabled for Coupon {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(amount_off) = &self.amount_off {
-                format!("{:?}", amount_off).into()
+                format!("{amount_off:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.deleted).into(),
             if let Some(id) = &self.id {
-                format!("{:?}", id).into()
+                format!("{id:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(metadata) = &self.metadata {
-                format!("{:?}", metadata).into()
+                format!("{metadata:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name).into()
+                format!("{name:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(percent_off) = &self.percent_off {
-                format!("{:?}", percent_off).into()
+                format!("{percent_off:?}").into()
             } else {
                 String::new().into()
             },
@@ -3804,7 +3800,7 @@ impl tabled::Tabled for CreateShortlinkRequest {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(password) = &self.password {
-                format!("{:?}", password).into()
+                format!("{password:?}").into()
             } else {
                 String::new().into()
             },
@@ -3910,17 +3906,17 @@ impl tabled::Tabled for CrmData {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(cad_industry) = &self.cad_industry {
-                format!("{:?}", cad_industry).into()
+                format!("{cad_industry:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(cad_user_type) = &self.cad_user_type {
-                format!("{:?}", cad_user_type).into()
+                format!("{cad_user_type:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(number_of_cad_users) = &self.number_of_cad_users {
-                format!("{:?}", number_of_cad_users).into()
+                format!("{number_of_cad_users:?}").into()
             } else {
                 String::new().into()
             },
@@ -4150,39 +4146,39 @@ impl tabled::Tabled for Customer {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(address) = &self.address {
-                format!("{:?}", address).into()
+                format!("{address:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(balance) = &self.balance {
-                format!("{:?}", balance).into()
+                format!("{balance:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(currency) = &self.currency {
-                format!("{:?}", currency).into()
+                format!("{currency:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.delinquent).into(),
             if let Some(email) = &self.email {
-                format!("{:?}", email).into()
+                format!("{email:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(id) = &self.id {
-                format!("{:?}", id).into()
+                format!("{id:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(metadata) = &self.metadata {
-                format!("{:?}", metadata).into()
+                format!("{metadata:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name).into()
+                format!("{name:?}").into()
             } else {
                 String::new().into()
             },
@@ -4279,7 +4275,7 @@ impl tabled::Tabled for CustomerBalance {
             format!("{:?}", self.id).into(),
             format!("{:?}", self.map_id).into(),
             if let Some(modeling_app_enterprise_price) = &self.modeling_app_enterprise_price {
-                format!("{:?}", modeling_app_enterprise_price).into()
+                format!("{modeling_app_enterprise_price:?}").into()
             } else {
                 String::new().into()
             },
@@ -4288,17 +4284,17 @@ impl tabled::Tabled for CustomerBalance {
             format!("{:?}", self.stable_api_credits_remaining).into(),
             format!("{:?}", self.stable_api_credits_remaining_monetary_value).into(),
             if let Some(subscription_details) = &self.subscription_details {
-                format!("{:?}", subscription_details).into()
+                format!("{subscription_details:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(subscription_id) = &self.subscription_id {
-                format!("{:?}", subscription_id).into()
+                format!("{subscription_id:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(total_due) = &self.total_due {
-                format!("{:?}", total_due).into()
+                format!("{total_due:?}").into()
             } else {
                 String::new().into()
             },
@@ -4990,7 +4986,7 @@ impl tabled::Tabled for DiscountCode {
         vec![
             self.code.clone().into(),
             if let Some(expires_at) = &self.expires_at {
-                format!("{:?}", expires_at).into()
+                format!("{expires_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -5138,7 +5134,7 @@ impl tabled::Tabled for EmailAuthenticationForm {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(callback_url) = &self.callback_url {
-                format!("{:?}", callback_url).into()
+                format!("{callback_url:?}").into()
             } else {
                 String::new().into()
             },
@@ -5289,7 +5285,7 @@ impl tabled::Tabled for EntityCircularPattern {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
-                format!("{:?}", entity_face_edge_ids).into()
+                format!("{entity_face_edge_ids:?}").into()
             } else {
                 String::new().into()
             },
@@ -5326,7 +5322,7 @@ impl tabled::Tabled for EntityClone {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![if let Some(face_edge_ids) = &self.face_edge_ids {
-            format!("{:?}", face_edge_ids).into()
+            format!("{face_edge_ids:?}").into()
         } else {
             String::new().into()
         }]
@@ -5582,7 +5578,7 @@ impl tabled::Tabled for EntityLinearPattern {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
-                format!("{:?}", entity_face_edge_ids).into()
+                format!("{entity_face_edge_ids:?}").into()
             } else {
                 String::new().into()
             },
@@ -5620,7 +5616,7 @@ impl tabled::Tabled for EntityLinearPatternTransform {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
-                format!("{:?}", entity_face_edge_ids).into()
+                format!("{entity_face_edge_ids:?}").into()
             } else {
                 String::new().into()
             },
@@ -5742,7 +5738,7 @@ impl tabled::Tabled for EntityMirror {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
-                format!("{:?}", entity_face_edge_ids).into()
+                format!("{entity_face_edge_ids:?}").into()
             } else {
                 String::new().into()
             },
@@ -5780,7 +5776,7 @@ impl tabled::Tabled for EntityMirrorAcrossEdge {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
-                format!("{:?}", entity_face_edge_ids).into()
+                format!("{entity_face_edge_ids:?}").into()
             } else {
                 String::new().into()
             },
@@ -5894,7 +5890,7 @@ impl tabled::Tabled for Error {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(error_code) = &self.error_code {
-                format!("{:?}", error_code).into()
+                format!("{error_code:?}").into()
             } else {
                 String::new().into()
             },
@@ -6038,19 +6034,19 @@ impl tabled::Tabled for Event {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(attachment_uri) = &self.attachment_uri {
-                format!("{:?}", attachment_uri).into()
+                format!("{attachment_uri:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             format!("{:?}", self.event_type).into(),
             if let Some(last_compiled_at) = &self.last_compiled_at {
-                format!("{:?}", last_compiled_at).into()
+                format!("{last_compiled_at:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(project_description) = &self.project_description {
-                format!("{:?}", project_description).into()
+                format!("{project_description:?}").into()
             } else {
                 String::new().into()
             },
@@ -6317,45 +6313,45 @@ impl tabled::Tabled for ExtendedUser {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(block) = &self.block {
-                format!("{:?}", block).into()
+                format!("{block:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.can_train_on_data).into(),
             if let Some(company) = &self.company {
-                format!("{:?}", company).into()
+                format!("{company:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             format!("{:?}", self.deletion_scheduled).into(),
             if let Some(discord) = &self.discord {
-                format!("{:?}", discord).into()
+                format!("{discord:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(email) = &self.email {
-                format!("{:?}", email).into()
+                format!("{email:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(email_verified) = &self.email_verified {
-                format!("{:?}", email_verified).into()
+                format!("{email_verified:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(first_name) = &self.first_name {
-                format!("{:?}", first_name).into()
+                format!("{first_name:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(github) = &self.github {
-                format!("{:?}", github).into()
+                format!("{github:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(hubspot_contact_id) = &self.hubspot_contact_id {
-                format!("{:?}", hubspot_contact_id).into()
+                format!("{hubspot_contact_id:?}").into()
             } else {
                 String::new().into()
             },
@@ -6364,18 +6360,18 @@ impl tabled::Tabled for ExtendedUser {
             format!("{:?}", self.is_onboarded).into(),
             format!("{:?}", self.is_service_account).into(),
             if let Some(last_name) = &self.last_name {
-                format!("{:?}", last_name).into()
+                format!("{last_name:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name).into()
+                format!("{name:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.phone).into(),
             if let Some(stripe_id) = &self.stripe_id {
-                format!("{:?}", stripe_id).into()
+                format!("{stripe_id:?}").into()
             } else {
                 String::new().into()
             },
@@ -6448,8 +6444,7 @@ impl crate::types::paginate::Pagination for ExtendedUserResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -6470,7 +6465,7 @@ impl tabled::Tabled for ExtendedUserResultsPage {
         vec![
             format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
+                format!("{next_page:?}").into()
             } else {
                 String::new().into()
             },
@@ -6571,7 +6566,7 @@ impl tabled::Tabled for ExtrudedFaceInfo {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(bottom) = &self.bottom {
-                format!("{:?}", bottom).into()
+                format!("{bottom:?}").into()
             } else {
                 String::new().into()
             },
@@ -6652,12 +6647,12 @@ impl tabled::Tabled for ExtrusionFaceInfo {
         vec![
             format!("{:?}", self.cap).into(),
             if let Some(curve_id) = &self.curve_id {
-                format!("{:?}", curve_id).into()
+                format!("{curve_id:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(face_id) = &self.face_id {
-                format!("{:?}", face_id).into()
+                format!("{face_id:?}").into()
             } else {
                 String::new().into()
             },
@@ -6845,22 +6840,22 @@ impl tabled::Tabled for FaceIsPlanar {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(origin) = &self.origin {
-                format!("{:?}", origin).into()
+                format!("{origin:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(x_axis) = &self.x_axis {
-                format!("{:?}", x_axis).into()
+                format!("{x_axis:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(y_axis) = &self.y_axis {
-                format!("{:?}", y_axis).into()
+                format!("{y_axis:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(z_axis) = &self.z_axis {
-                format!("{:?}", z_axis).into()
+                format!("{z_axis:?}").into()
             } else {
                 String::new().into()
             },
@@ -6909,7 +6904,7 @@ impl tabled::Tabled for FailureWebSocketResponse {
         vec![
             format!("{:?}", self.errors).into(),
             if let Some(request_id) = &self.request_id {
-                format!("{:?}", request_id).into()
+                format!("{request_id:?}").into()
             } else {
                 String::new().into()
             },
@@ -6996,18 +6991,18 @@ impl tabled::Tabled for FileCenterOfMass {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(center_of_mass) = &self.center_of_mass {
-                format!("{:?}", center_of_mass).into()
+                format!("{center_of_mass:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
@@ -7015,7 +7010,7 @@ impl tabled::Tabled for FileCenterOfMass {
             format!("{:?}", self.output_unit).into(),
             format!("{:?}", self.src_format).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -7098,36 +7093,36 @@ impl tabled::Tabled for FileConversion {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             format!("{:?}", self.output_format).into(),
             if let Some(output_format_options) = &self.output_format_options {
-                format!("{:?}", output_format_options).into()
+                format!("{output_format_options:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(outputs) = &self.outputs {
-                format!("{:?}", outputs).into()
+                format!("{outputs:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.src_format).into(),
             if let Some(src_format_options) = &self.src_format_options {
-                format!("{:?}", src_format_options).into()
+                format!("{src_format_options:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -7210,24 +7205,24 @@ impl tabled::Tabled for FileDensity {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(density) = &self.density {
-                format!("{:?}", density).into()
+                format!("{density:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(material_mass) = &self.material_mass {
-                format!("{:?}", material_mass).into()
+                format!("{material_mass:?}").into()
             } else {
                 String::new().into()
             },
@@ -7235,7 +7230,7 @@ impl tabled::Tabled for FileDensity {
             format!("{:?}", self.output_unit).into(),
             format!("{:?}", self.src_format).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -7417,24 +7412,24 @@ impl tabled::Tabled for FileMass {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(mass) = &self.mass {
-                format!("{:?}", mass).into()
+                format!("{mass:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(material_density) = &self.material_density {
-                format!("{:?}", material_density).into()
+                format!("{material_density:?}").into()
             } else {
                 String::new().into()
             },
@@ -7442,7 +7437,7 @@ impl tabled::Tabled for FileMass {
             format!("{:?}", self.output_unit).into(),
             format!("{:?}", self.src_format).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -7520,13 +7515,13 @@ impl tabled::Tabled for FileSurfaceArea {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
@@ -7534,13 +7529,13 @@ impl tabled::Tabled for FileSurfaceArea {
             format!("{:?}", self.output_unit).into(),
             format!("{:?}", self.src_format).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.status).into(),
             if let Some(surface_area) = &self.surface_area {
-                format!("{:?}", surface_area).into()
+                format!("{surface_area:?}").into()
             } else {
                 String::new().into()
             },
@@ -7615,13 +7610,13 @@ impl tabled::Tabled for FileVolume {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
@@ -7629,7 +7624,7 @@ impl tabled::Tabled for FileVolume {
             format!("{:?}", self.output_unit).into(),
             format!("{:?}", self.src_format).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -7637,7 +7632,7 @@ impl tabled::Tabled for FileVolume {
             format!("{:?}", self.updated_at).into(),
             format!("{:?}", self.user_id).into(),
             if let Some(volume) = &self.volume {
-                format!("{:?}", volume).into()
+                format!("{volume:?}").into()
             } else {
                 String::new().into()
             },
@@ -7996,12 +7991,12 @@ impl tabled::Tabled for HighlightSetEntity {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(entity_id) = &self.entity_id {
-                format!("{:?}", entity_id).into()
+                format!("{entity_id:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(sequence) = &self.sequence {
-                format!("{:?}", sequence).into()
+                format!("{sequence:?}").into()
             } else {
                 String::new().into()
             },
@@ -8045,13 +8040,13 @@ impl tabled::Tabled for IceServer {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(credential) = &self.credential {
-                format!("{:?}", credential).into()
+                format!("{credential:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.urls).into(),
             if let Some(username) = &self.username {
-                format!("{:?}", username).into()
+                format!("{username:?}").into()
             } else {
                 String::new().into()
             },
@@ -8319,14 +8314,14 @@ impl tabled::Tabled for InquiryForm {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(company) = &self.company {
-                format!("{:?}", company).into()
+                format!("{company:?}").into()
             } else {
                 String::new().into()
             },
             self.email.clone().into(),
             self.first_name.clone().into(),
             if let Some(industry) = &self.industry {
-                format!("{:?}", industry).into()
+                format!("{industry:?}").into()
             } else {
                 String::new().into()
             },
@@ -8334,7 +8329,7 @@ impl tabled::Tabled for InquiryForm {
             self.last_name.clone().into(),
             self.message.clone().into(),
             if let Some(phone) = &self.phone {
-                format!("{:?}", phone).into()
+                format!("{phone:?}").into()
             } else {
                 String::new().into()
             },
@@ -8523,115 +8518,115 @@ impl tabled::Tabled for Invoice {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(amount_due) = &self.amount_due {
-                format!("{:?}", amount_due).into()
+                format!("{amount_due:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(amount_paid) = &self.amount_paid {
-                format!("{:?}", amount_paid).into()
+                format!("{amount_paid:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(amount_remaining) = &self.amount_remaining {
-                format!("{:?}", amount_remaining).into()
+                format!("{amount_remaining:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(attempt_count) = &self.attempt_count {
-                format!("{:?}", attempt_count).into()
+                format!("{attempt_count:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.attempted).into(),
             format!("{:?}", self.created_at).into(),
             if let Some(currency) = &self.currency {
-                format!("{:?}", currency).into()
+                format!("{currency:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(customer_email) = &self.customer_email {
-                format!("{:?}", customer_email).into()
+                format!("{customer_email:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(customer_id) = &self.customer_id {
-                format!("{:?}", customer_id).into()
+                format!("{customer_id:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(default_payment_method) = &self.default_payment_method {
-                format!("{:?}", default_payment_method).into()
+                format!("{default_payment_method:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(description) = &self.description {
-                format!("{:?}", description).into()
+                format!("{description:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(discounts) = &self.discounts {
-                format!("{:?}", discounts).into()
+                format!("{discounts:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(id) = &self.id {
-                format!("{:?}", id).into()
+                format!("{id:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(lines) = &self.lines {
-                format!("{:?}", lines).into()
+                format!("{lines:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(metadata) = &self.metadata {
-                format!("{:?}", metadata).into()
+                format!("{metadata:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(number) = &self.number {
-                format!("{:?}", number).into()
+                format!("{number:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.paid).into(),
             if let Some(pdf) = &self.pdf {
-                format!("{:?}", pdf).into()
+                format!("{pdf:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(receipt_number) = &self.receipt_number {
-                format!("{:?}", receipt_number).into()
+                format!("{receipt_number:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(statement_descriptor) = &self.statement_descriptor {
-                format!("{:?}", statement_descriptor).into()
+                format!("{statement_descriptor:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(status) = &self.status {
-                format!("{:?}", status).into()
+                format!("{status:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(subtotal) = &self.subtotal {
-                format!("{:?}", subtotal).into()
+                format!("{subtotal:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(tax) = &self.tax {
-                format!("{:?}", tax).into()
+                format!("{tax:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(total) = &self.total {
-                format!("{:?}", total).into()
+                format!("{total:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(url) = &self.url {
-                format!("{:?}", url).into()
+                format!("{url:?}").into()
             } else {
                 String::new().into()
             },
@@ -8711,32 +8706,32 @@ impl tabled::Tabled for InvoiceLineItem {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(amount) = &self.amount {
-                format!("{:?}", amount).into()
+                format!("{amount:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(currency) = &self.currency {
-                format!("{:?}", currency).into()
+                format!("{currency:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(description) = &self.description {
-                format!("{:?}", description).into()
+                format!("{description:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(id) = &self.id {
-                format!("{:?}", id).into()
+                format!("{id:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(invoice_item) = &self.invoice_item {
-                format!("{:?}", invoice_item).into()
+                format!("{invoice_item:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(metadata) = &self.metadata {
-                format!("{:?}", metadata).into()
+                format!("{metadata:?}").into()
             } else {
                 String::new().into()
             },
@@ -8867,82 +8862,82 @@ impl tabled::Tabled for IpAddrInfo {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(asn) = &self.asn {
-                format!("{:?}", asn).into()
+                format!("{asn:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(city) = &self.city {
-                format!("{:?}", city).into()
+                format!("{city:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(continent_code) = &self.continent_code {
-                format!("{:?}", continent_code).into()
+                format!("{continent_code:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(country) = &self.country {
-                format!("{:?}", country).into()
+                format!("{country:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(country_code) = &self.country_code {
-                format!("{:?}", country_code).into()
+                format!("{country_code:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(country_code_3) = &self.country_code_3 {
-                format!("{:?}", country_code_3).into()
+                format!("{country_code_3:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(ip) = &self.ip {
-                format!("{:?}", ip).into()
+                format!("{ip:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(is_in_european_union) = &self.is_in_european_union {
-                format!("{:?}", is_in_european_union).into()
+                format!("{is_in_european_union:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(latitude) = &self.latitude {
-                format!("{:?}", latitude).into()
+                format!("{latitude:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(longitude) = &self.longitude {
-                format!("{:?}", longitude).into()
+                format!("{longitude:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(offset) = &self.offset {
-                format!("{:?}", offset).into()
+                format!("{offset:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(organization) = &self.organization {
-                format!("{:?}", organization).into()
+                format!("{organization:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(postal_code) = &self.postal_code {
-                format!("{:?}", postal_code).into()
+                format!("{postal_code:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(region) = &self.region {
-                format!("{:?}", region).into()
+                format!("{region:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(region_code) = &self.region_code {
-                format!("{:?}", region_code).into()
+                format!("{region_code:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(timezone) = &self.timezone {
-                format!("{:?}", timezone).into()
+                format!("{timezone:?}").into()
             } else {
                 String::new().into()
             },
@@ -9009,22 +9004,22 @@ impl tabled::Tabled for KclCodeCompletionParams {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(language) = &self.language {
-                format!("{:?}", language).into()
+                format!("{language:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(next_indent) = &self.next_indent {
-                format!("{:?}", next_indent).into()
+                format!("{next_indent:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(prompt_tokens) = &self.prompt_tokens {
-                format!("{:?}", prompt_tokens).into()
+                format!("{prompt_tokens:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(suffix_tokens) = &self.suffix_tokens {
-                format!("{:?}", suffix_tokens).into()
+                format!("{suffix_tokens:?}").into()
             } else {
                 String::new().into()
             },
@@ -9100,48 +9095,48 @@ impl tabled::Tabled for KclCodeCompletionRequest {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(extra) = &self.extra {
-                format!("{:?}", extra).into()
+                format!("{extra:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(max_tokens) = &self.max_tokens {
-                format!("{:?}", max_tokens).into()
+                format!("{max_tokens:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(n) = &self.n {
-                format!("{:?}", n).into()
+                format!("{n:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(nwo) = &self.nwo {
-                format!("{:?}", nwo).into()
+                format!("{nwo:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(prompt) = &self.prompt {
-                format!("{:?}", prompt).into()
+                format!("{prompt:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(stop) = &self.stop {
-                format!("{:?}", stop).into()
+                format!("{stop:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.stream).into(),
             if let Some(suffix) = &self.suffix {
-                format!("{:?}", suffix).into()
+                format!("{suffix:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(temperature) = &self.temperature {
-                format!("{:?}", temperature).into()
+                format!("{temperature:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(top_p) = &self.top_p {
-                format!("{:?}", top_p).into()
+                format!("{top_p:?}").into()
             } else {
                 String::new().into()
             },
@@ -9484,22 +9479,29 @@ pub enum MlCopilotClientMessage {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub enum MlCopilotServerMessage {
+    #[doc = "Delta of the response, e.g. a chunk of text/tokens."]
     Delta {
         #[doc = "The delta text, which is a part of the response that is being streamed."]
         delta: String,
     },
+    #[doc = "Completed tool call result."]
     ToolOutput {
         #[doc = "The result of the tool call."]
         result: MlToolResult,
     },
+    #[doc = "Error sent by server."]
     Error {
         #[doc = "The error message."]
         detail: String,
     },
+    #[doc = "Log / banner text."]
     Info {
         #[doc = "The informational text."]
         text: String,
     },
+    #[doc = "Assistant reasoning / chain-of-thought (if you expose it)."]
+    Reasoning(ReasoningMessage),
+    #[doc = "Marks the end of a streamed answer."]
     EndOfStream {
         #[doc = "The whole response text, which is the final output of the AI. This is only \
                  relevant if in copilot mode, where the AI is expected to return the whole \
@@ -9635,51 +9637,51 @@ impl tabled::Tabled for MlPrompt {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(conversation_id) = &self.conversation_id {
-                format!("{:?}", conversation_id).into()
+                format!("{conversation_id:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(feedback) = &self.feedback {
-                format!("{:?}", feedback).into()
+                format!("{feedback:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(kcl_version) = &self.kcl_version {
-                format!("{:?}", kcl_version).into()
+                format!("{kcl_version:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(metadata) = &self.metadata {
-                format!("{:?}", metadata).into()
+                format!("{metadata:?}").into()
             } else {
                 String::new().into()
             },
             self.model_version.clone().into(),
             if let Some(output_file) = &self.output_file {
-                format!("{:?}", output_file).into()
+                format!("{output_file:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(project_name) = &self.project_name {
-                format!("{:?}", project_name).into()
+                format!("{project_name:?}").into()
             } else {
                 String::new().into()
             },
             self.prompt.clone().into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -9745,17 +9747,17 @@ impl tabled::Tabled for MlPromptMetadata {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(code) = &self.code {
-                format!("{:?}", code).into()
+                format!("{code:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(original_source_code) = &self.original_source_code {
-                format!("{:?}", original_source_code).into()
+                format!("{original_source_code:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(source_ranges) = &self.source_ranges {
-                format!("{:?}", source_ranges).into()
+                format!("{source_ranges:?}").into()
             } else {
                 String::new().into()
             },
@@ -9810,8 +9812,7 @@ impl crate::types::paginate::Pagination for MlPromptResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -9832,7 +9833,7 @@ impl tabled::Tabled for MlPromptResultsPage {
         vec![
             format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
+                format!("{next_page:?}").into()
             } else {
                 String::new().into()
             },
@@ -10096,24 +10097,24 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
-                format!("{:?}", annual_discount).into()
+                format!("{annual_discount:?}").into()
             } else {
                 String::new().into()
             },
             self.description.clone().into(),
             if let Some(endpoints_included) = &self.endpoints_included {
-                format!("{:?}", endpoints_included).into()
+                format!("{endpoints_included:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(features) = &self.features {
-                format!("{:?}", features).into()
+                format!("{features:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(monthly_pay_as_you_go_api_credits) = &self.monthly_pay_as_you_go_api_credits
             {
-                format!("{:?}", monthly_pay_as_you_go_api_credits).into()
+                format!("{monthly_pay_as_you_go_api_credits:?}").into()
             } else {
                 String::new().into()
             },
@@ -10124,13 +10125,13 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
             .into(),
             format!("{:?}", self.name).into(),
             if let Some(pay_as_you_go_api_credit_price) = &self.pay_as_you_go_api_credit_price {
-                format!("{:?}", pay_as_you_go_api_credit_price).into()
+                format!("{pay_as_you_go_api_credit_price:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.price).into(),
             if let Some(share_links) = &self.share_links {
-                format!("{:?}", share_links).into()
+                format!("{share_links:?}").into()
             } else {
                 String::new().into()
             },
@@ -10138,7 +10139,7 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
             format!("{:?}", self.training_data_behavior).into(),
             format!("{:?}", self.type_).into(),
             if let Some(zoo_tools_included) = &self.zoo_tools_included {
-                format!("{:?}", zoo_tools_included).into()
+                format!("{zoo_tools_included:?}").into()
             } else {
                 String::new().into()
             },
@@ -11685,22 +11686,22 @@ impl tabled::Tabled for Oauth2ClientInfo {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(csrf_token) = &self.csrf_token {
-                format!("{:?}", csrf_token).into()
+                format!("{csrf_token:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(oidc_nonce) = &self.oidc_nonce {
-                format!("{:?}", oidc_nonce).into()
+                format!("{oidc_nonce:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(pkce_code_verifier) = &self.pkce_code_verifier {
-                format!("{:?}", pkce_code_verifier).into()
+                format!("{pkce_code_verifier:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(url) = &self.url {
-                format!("{:?}", url).into()
+                format!("{url:?}").into()
             } else {
                 String::new().into()
             },
@@ -12662,42 +12663,42 @@ impl tabled::Tabled for Org {
             if let Some(allow_users_in_domain_to_auto_join) =
                 &self.allow_users_in_domain_to_auto_join
             {
-                format!("{:?}", allow_users_in_domain_to_auto_join).into()
+                format!("{allow_users_in_domain_to_auto_join:?}").into()
             } else {
                 String::new().into()
             },
             self.billing_email.clone().into(),
             if let Some(billing_email_verified) = &self.billing_email_verified {
-                format!("{:?}", billing_email_verified).into()
+                format!("{billing_email_verified:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(block) = &self.block {
-                format!("{:?}", block).into()
+                format!("{block:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.can_train_on_data).into(),
             format!("{:?}", self.created_at).into(),
             if let Some(domain) = &self.domain {
-                format!("{:?}", domain).into()
+                format!("{domain:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(image) = &self.image {
-                format!("{:?}", image).into()
+                format!("{image:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name).into()
+                format!("{name:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.phone).into(),
             if let Some(stripe_id) = &self.stripe_id {
-                format!("{:?}", stripe_id).into()
+                format!("{stripe_id:?}").into()
             } else {
                 String::new().into()
             },
@@ -12768,27 +12769,27 @@ impl tabled::Tabled for OrgDetails {
             if let Some(allow_users_in_domain_to_auto_join) =
                 &self.allow_users_in_domain_to_auto_join
             {
-                format!("{:?}", allow_users_in_domain_to_auto_join).into()
+                format!("{allow_users_in_domain_to_auto_join:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(billing_email) = &self.billing_email {
-                format!("{:?}", billing_email).into()
+                format!("{billing_email:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(domain) = &self.domain {
-                format!("{:?}", domain).into()
+                format!("{domain:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(image) = &self.image {
-                format!("{:?}", image).into()
+                format!("{image:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name).into()
+                format!("{name:?}").into()
             } else {
                 String::new().into()
             },
@@ -12870,45 +12871,45 @@ impl tabled::Tabled for OrgMember {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(company) = &self.company {
-                format!("{:?}", company).into()
+                format!("{company:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(discord) = &self.discord {
-                format!("{:?}", discord).into()
+                format!("{discord:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(email) = &self.email {
-                format!("{:?}", email).into()
+                format!("{email:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(email_verified) = &self.email_verified {
-                format!("{:?}", email_verified).into()
+                format!("{email_verified:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(first_name) = &self.first_name {
-                format!("{:?}", first_name).into()
+                format!("{first_name:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(github) = &self.github {
-                format!("{:?}", github).into()
+                format!("{github:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             self.image.clone().into(),
             if let Some(last_name) = &self.last_name {
-                format!("{:?}", last_name).into()
+                format!("{last_name:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name).into()
+                format!("{name:?}").into()
             } else {
                 String::new().into()
             },
@@ -12977,8 +12978,7 @@ impl crate::types::paginate::Pagination for OrgMemberResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -12999,7 +12999,7 @@ impl tabled::Tabled for OrgMemberResultsPage {
         vec![
             format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
+                format!("{next_page:?}").into()
             } else {
                 String::new().into()
             },
@@ -13050,8 +13050,7 @@ impl crate::types::paginate::Pagination for OrgResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -13072,7 +13071,7 @@ impl tabled::Tabled for OrgResultsPage {
         vec![
             format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
+                format!("{next_page:?}").into()
             } else {
                 String::new().into()
             },
@@ -13199,12 +13198,12 @@ impl tabled::Tabled for OutputFile {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(contents) = &self.contents {
-                format!("{:?}", contents).into()
+                format!("{contents:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name).into()
+                format!("{name:?}").into()
             } else {
                 String::new().into()
             },
@@ -13558,7 +13557,7 @@ impl tabled::Tabled for PathGetSketchTargetUuid {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![if let Some(target_id) = &self.target_id {
-            format!("{:?}", target_id).into()
+            format!("{target_id:?}").into()
         } else {
             String::new().into()
         }]
@@ -13755,7 +13754,7 @@ impl tabled::Tabled for PathSegmentInfo {
         vec![
             format!("{:?}", self.command).into(),
             if let Some(command_id) = &self.command_id {
-                format!("{:?}", command_id).into()
+                format!("{command_id:?}").into()
             } else {
                 String::new().into()
             },
@@ -13843,18 +13842,18 @@ impl tabled::Tabled for PaymentMethod {
         vec![
             format!("{:?}", self.billing_info).into(),
             if let Some(card) = &self.card {
-                format!("{:?}", card).into()
+                format!("{card:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(id) = &self.id {
-                format!("{:?}", id).into()
+                format!("{id:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(metadata) = &self.metadata {
-                format!("{:?}", metadata).into()
+                format!("{metadata:?}").into()
             } else {
                 String::new().into()
             },
@@ -13913,17 +13912,17 @@ impl tabled::Tabled for PaymentMethodCardChecks {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(address_line_1_check) = &self.address_line_1_check {
-                format!("{:?}", address_line_1_check).into()
+                format!("{address_line_1_check:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(address_postal_code_check) = &self.address_postal_code_check {
-                format!("{:?}", address_postal_code_check).into()
+                format!("{address_postal_code_check:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(cvc_check) = &self.cvc_check {
-                format!("{:?}", cvc_check).into()
+                format!("{cvc_check:?}").into()
             } else {
                 String::new().into()
             },
@@ -13995,17 +13994,17 @@ impl tabled::Tabled for PerspectiveCameraParameters {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(fov_y) = &self.fov_y {
-                format!("{:?}", fov_y).into()
+                format!("{fov_y:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(z_far) = &self.z_far {
-                format!("{:?}", z_far).into()
+                format!("{z_far:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(z_near) = &self.z_near {
-                format!("{:?}", z_near).into()
+                format!("{z_near:?}").into()
             } else {
                 String::new().into()
             },
@@ -14111,7 +14110,7 @@ impl tabled::Tabled for PlaneIntersectAndProject {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![if let Some(plane_coordinates) = &self.plane_coordinates {
-            format!("{:?}", plane_coordinates).into()
+            format!("{plane_coordinates:?}").into()
         } else {
             String::new().into()
         }]
@@ -14775,17 +14774,17 @@ impl tabled::Tabled for RtcIceCandidateInit {
         vec![
             self.candidate.clone().into(),
             if let Some(sdp_m_line_index) = &self.sdp_m_line_index {
-                format!("{:?}", sdp_m_line_index).into()
+                format!("{sdp_m_line_index:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(sdp_mid) = &self.sdp_mid {
-                format!("{:?}", sdp_mid).into()
+                format!("{sdp_mid:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(username_fragment) = &self.username_fragment {
-                format!("{:?}", username_fragment).into()
+                format!("{username_fragment:?}").into()
             } else {
                 String::new().into()
             },
@@ -14936,29 +14935,29 @@ impl tabled::Tabled for SamlIdentityProvider {
             format!("{:?}", self.created_at).into(),
             format!("{:?}", self.id).into(),
             if let Some(idp_entity_id) = &self.idp_entity_id {
-                format!("{:?}", idp_entity_id).into()
+                format!("{idp_entity_id:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(idp_metadata_document_string) = &self.idp_metadata_document_string {
-                format!("{:?}", idp_metadata_document_string).into()
+                format!("{idp_metadata_document_string:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.org_id).into(),
             if let Some(private_key) = &self.private_key {
-                format!("{:?}", private_key).into()
+                format!("{private_key:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(public_cert) = &self.public_cert {
-                format!("{:?}", public_cert).into()
+                format!("{public_cert:?}").into()
             } else {
                 String::new().into()
             },
             self.slo_url.clone().into(),
             if let Some(technical_contact_email) = &self.technical_contact_email {
-                format!("{:?}", technical_contact_email).into()
+                format!("{technical_contact_email:?}").into()
             } else {
                 String::new().into()
             },
@@ -15017,18 +15016,18 @@ impl tabled::Tabled for SamlIdentityProviderCreate {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(idp_entity_id) = &self.idp_entity_id {
-                format!("{:?}", idp_entity_id).into()
+                format!("{idp_entity_id:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.idp_metadata_source).into(),
             if let Some(signing_keypair) = &self.signing_keypair {
-                format!("{:?}", signing_keypair).into()
+                format!("{signing_keypair:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(technical_contact_email) = &self.technical_contact_email {
-                format!("{:?}", technical_contact_email).into()
+                format!("{technical_contact_email:?}").into()
             } else {
                 String::new().into()
             },
@@ -15308,7 +15307,7 @@ impl tabled::Tabled for SelectWithPoint {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![if let Some(entity_id) = &self.entity_id {
-            format!("{:?}", entity_id).into()
+            format!("{entity_id:?}").into()
         } else {
             String::new().into()
         }]
@@ -15427,7 +15426,7 @@ impl tabled::Tabled for ServiceAccount {
             format!("{:?}", self.id).into(),
             format!("{:?}", self.is_valid).into(),
             if let Some(label) = &self.label {
-                format!("{:?}", label).into()
+                format!("{label:?}").into()
             } else {
                 String::new().into()
             },
@@ -15489,8 +15488,7 @@ impl crate::types::paginate::Pagination for ServiceAccountResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -15511,7 +15509,7 @@ impl tabled::Tabled for ServiceAccountResultsPage {
         vec![
             format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
+                format!("{next_page:?}").into()
             } else {
                 String::new().into()
             },
@@ -15935,12 +15933,12 @@ impl tabled::Tabled for Shortlink {
             format!("{:?}", self.id).into(),
             self.key.clone().into(),
             if let Some(org_id) = &self.org_id {
-                format!("{:?}", org_id).into()
+                format!("{org_id:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(password_hash) = &self.password_hash {
-                format!("{:?}", password_hash).into()
+                format!("{password_hash:?}").into()
             } else {
                 String::new().into()
             },
@@ -16005,8 +16003,7 @@ impl crate::types::paginate::Pagination for ShortlinkResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -16027,7 +16024,7 @@ impl tabled::Tabled for ShortlinkResultsPage {
         vec![
             format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
+                format!("{next_page:?}").into()
             } else {
                 String::new().into()
             },
@@ -16278,7 +16275,7 @@ impl tabled::Tabled for Solid3DGetCommonEdge {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![if let Some(edge) = &self.edge {
-            format!("{:?}", edge).into()
+            format!("{edge:?}").into()
         } else {
             String::new().into()
         }]
@@ -16346,7 +16343,7 @@ impl tabled::Tabled for Solid3DGetNextAdjacentEdge {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![if let Some(edge) = &self.edge {
-            format!("{:?}", edge).into()
+            format!("{edge:?}").into()
         } else {
             String::new().into()
         }]
@@ -16413,7 +16410,7 @@ impl tabled::Tabled for Solid3DGetPrevAdjacentEdge {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![if let Some(edge) = &self.edge {
-            format!("{:?}", edge).into()
+            format!("{edge:?}").into()
         } else {
             String::new().into()
         }]
@@ -16556,7 +16553,7 @@ impl tabled::Tabled for SourceRangePrompt {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(file) = &self.file {
-                format!("{:?}", file).into()
+                format!("{file:?}").into()
             } else {
                 String::new().into()
             },
@@ -16823,7 +16820,7 @@ impl tabled::Tabled for SuccessWebSocketResponse {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(request_id) = &self.request_id {
-                format!("{:?}", request_id).into()
+                format!("{request_id:?}").into()
             } else {
                 String::new().into()
             },
@@ -17067,30 +17064,30 @@ impl tabled::Tabled for TextToCad {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(code) = &self.code {
-                format!("{:?}", code).into()
+                format!("{code:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.conversation_id).into(),
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(feedback) = &self.feedback {
-                format!("{:?}", feedback).into()
+                format!("{feedback:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(kcl_version) = &self.kcl_version {
-                format!("{:?}", kcl_version).into()
+                format!("{kcl_version:?}").into()
             } else {
                 String::new().into()
             },
@@ -17098,13 +17095,13 @@ impl tabled::Tabled for TextToCad {
             self.model_version.clone().into(),
             format!("{:?}", self.output_format).into(),
             if let Some(outputs) = &self.outputs {
-                format!("{:?}", outputs).into()
+                format!("{outputs:?}").into()
             } else {
                 String::new().into()
             },
             self.prompt.clone().into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -17169,12 +17166,12 @@ impl tabled::Tabled for TextToCadCreateBody {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(kcl_version) = &self.kcl_version {
-                format!("{:?}", kcl_version).into()
+                format!("{kcl_version:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(project_name) = &self.project_name {
-                format!("{:?}", project_name).into()
+                format!("{project_name:?}").into()
             } else {
                 String::new().into()
             },
@@ -17249,19 +17246,19 @@ impl tabled::Tabled for TextToCadIteration {
         vec![
             self.code.clone().into(),
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.conversation_id).into(),
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(feedback) = &self.feedback {
-                format!("{:?}", feedback).into()
+                format!("{feedback:?}").into()
             } else {
                 String::new().into()
             },
@@ -17270,13 +17267,13 @@ impl tabled::Tabled for TextToCadIteration {
             self.model_version.clone().into(),
             self.original_source_code.clone().into(),
             if let Some(prompt) = &self.prompt {
-                format!("{:?}", prompt).into()
+                format!("{prompt:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.source_ranges).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -17346,18 +17343,18 @@ impl tabled::Tabled for TextToCadIterationBody {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(kcl_version) = &self.kcl_version {
-                format!("{:?}", kcl_version).into()
+                format!("{kcl_version:?}").into()
             } else {
                 String::new().into()
             },
             self.original_source_code.clone().into(),
             if let Some(project_name) = &self.project_name {
-                format!("{:?}", project_name).into()
+                format!("{project_name:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(prompt) = &self.prompt {
-                format!("{:?}", prompt).into()
+                format!("{prompt:?}").into()
             } else {
                 String::new().into()
             },
@@ -17473,48 +17470,48 @@ impl tabled::Tabled for TextToCadMultiFileIteration {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.conversation_id).into(),
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(feedback) = &self.feedback {
-                format!("{:?}", feedback).into()
+                format!("{feedback:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(kcl_version) = &self.kcl_version {
-                format!("{:?}", kcl_version).into()
+                format!("{kcl_version:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.model).into(),
             self.model_version.clone().into(),
             if let Some(outputs) = &self.outputs {
-                format!("{:?}", outputs).into()
+                format!("{outputs:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(project_name) = &self.project_name {
-                format!("{:?}", project_name).into()
+                format!("{project_name:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(prompt) = &self.prompt {
-                format!("{:?}", prompt).into()
+                format!("{prompt:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.source_ranges).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -17592,27 +17589,27 @@ impl tabled::Tabled for TextToCadMultiFileIterationBody {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(conversation_id) = &self.conversation_id {
-                format!("{:?}", conversation_id).into()
+                format!("{conversation_id:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(kcl_version) = &self.kcl_version {
-                format!("{:?}", kcl_version).into()
+                format!("{kcl_version:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(project_name) = &self.project_name {
-                format!("{:?}", project_name).into()
+                format!("{project_name:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(prompt) = &self.prompt {
-                format!("{:?}", prompt).into()
+                format!("{prompt:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(source_ranges) = &self.source_ranges {
-                format!("{:?}", source_ranges).into()
+                format!("{source_ranges:?}").into()
             } else {
                 String::new().into()
             },
@@ -17817,8 +17814,7 @@ impl crate::types::paginate::Pagination for TextToCadResponseResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -17839,7 +17835,7 @@ impl tabled::Tabled for TextToCadResponseResultsPage {
         vec![
             format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
+                format!("{next_page:?}").into()
             } else {
                 String::new().into()
             },
@@ -17882,7 +17878,7 @@ impl tabled::Tabled for TokenRevokeRequestForm {
         vec![
             format!("{:?}", self.client_id).into(),
             if let Some(client_secret) = &self.client_secret {
-                format!("{:?}", client_secret).into()
+                format!("{client_secret:?}").into()
             } else {
                 String::new().into()
             },
@@ -17934,17 +17930,17 @@ impl tabled::Tabled for Transform {
         vec![
             format!("{:?}", self.replicate).into(),
             if let Some(rotation) = &self.rotation {
-                format!("{:?}", rotation).into()
+                format!("{rotation:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(scale) = &self.scale {
-                format!("{:?}", scale).into()
+                format!("{scale:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(translate) = &self.translate {
-                format!("{:?}", translate).into()
+                format!("{translate:?}").into()
             } else {
                 String::new().into()
             },
@@ -17999,7 +17995,7 @@ impl tabled::Tabled for TransformByForPoint3D {
         vec![
             format!("{:?}", self.is_local).into(),
             if let Some(origin) = &self.origin {
-                format!("{:?}", origin).into()
+                format!("{origin:?}").into()
             } else {
                 String::new().into()
             },
@@ -18056,7 +18052,7 @@ impl tabled::Tabled for TransformByForPoint4D {
         vec![
             format!("{:?}", self.is_local).into(),
             if let Some(origin) = &self.origin {
-                format!("{:?}", origin).into()
+                format!("{origin:?}").into()
             } else {
                 String::new().into()
             },
@@ -18180,31 +18176,31 @@ impl tabled::Tabled for UnitAngleConversion {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(input) = &self.input {
-                format!("{:?}", input).into()
+                format!("{input:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.input_unit).into(),
             if let Some(output) = &self.output {
-                format!("{:?}", output).into()
+                format!("{output:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.output_unit).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -18333,31 +18329,31 @@ impl tabled::Tabled for UnitAreaConversion {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(input) = &self.input {
-                format!("{:?}", input).into()
+                format!("{input:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.input_unit).into(),
             if let Some(output) = &self.output {
-                format!("{:?}", output).into()
+                format!("{output:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.output_unit).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -18470,31 +18466,31 @@ impl tabled::Tabled for UnitCurrentConversion {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(input) = &self.input {
-                format!("{:?}", input).into()
+                format!("{input:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.input_unit).into(),
             if let Some(output) = &self.output {
-                format!("{:?}", output).into()
+                format!("{output:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.output_unit).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -18640,31 +18636,31 @@ impl tabled::Tabled for UnitEnergyConversion {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(input) = &self.input {
-                format!("{:?}", input).into()
+                format!("{input:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.input_unit).into(),
             if let Some(output) = &self.output {
-                format!("{:?}", output).into()
+                format!("{output:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.output_unit).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -18789,31 +18785,31 @@ impl tabled::Tabled for UnitForceConversion {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(input) = &self.input {
-                format!("{:?}", input).into()
+                format!("{input:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.input_unit).into(),
             if let Some(output) = &self.output {
-                format!("{:?}", output).into()
+                format!("{output:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.output_unit).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -18942,31 +18938,31 @@ impl tabled::Tabled for UnitFrequencyConversion {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(input) = &self.input {
-                format!("{:?}", input).into()
+                format!("{input:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.input_unit).into(),
             if let Some(output) = &self.output {
-                format!("{:?}", output).into()
+                format!("{output:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.output_unit).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -19087,31 +19083,31 @@ impl tabled::Tabled for UnitLengthConversion {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(input) = &self.input {
-                format!("{:?}", input).into()
+                format!("{input:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.input_unit).into(),
             if let Some(output) = &self.output {
-                format!("{:?}", output).into()
+                format!("{output:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.output_unit).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -19220,31 +19216,31 @@ impl tabled::Tabled for UnitMassConversion {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(input) = &self.input {
-                format!("{:?}", input).into()
+                format!("{input:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.input_unit).into(),
             if let Some(output) = &self.output {
-                format!("{:?}", output).into()
+                format!("{output:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.output_unit).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -19369,31 +19365,31 @@ impl tabled::Tabled for UnitPowerConversion {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(input) = &self.input {
-                format!("{:?}", input).into()
+                format!("{input:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.input_unit).into(),
             if let Some(output) = &self.output {
-                format!("{:?}", output).into()
+                format!("{output:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.output_unit).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -19518,31 +19514,31 @@ impl tabled::Tabled for UnitPressureConversion {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(input) = &self.input {
-                format!("{:?}", input).into()
+                format!("{input:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.input_unit).into(),
             if let Some(output) = &self.output {
-                format!("{:?}", output).into()
+                format!("{output:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.output_unit).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -19655,31 +19651,31 @@ impl tabled::Tabled for UnitTemperatureConversion {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(input) = &self.input {
-                format!("{:?}", input).into()
+                format!("{input:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.input_unit).into(),
             if let Some(output) = &self.output {
-                format!("{:?}", output).into()
+                format!("{output:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.output_unit).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -19784,31 +19780,31 @@ impl tabled::Tabled for UnitTorqueConversion {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(input) = &self.input {
-                format!("{:?}", input).into()
+                format!("{input:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.input_unit).into(),
             if let Some(output) = &self.output {
-                format!("{:?}", output).into()
+                format!("{output:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.output_unit).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -19941,31 +19937,31 @@ impl tabled::Tabled for UnitVolumeConversion {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
+                format!("{completed_at:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(error) = &self.error {
-                format!("{:?}", error).into()
+                format!("{error:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(input) = &self.input {
-                format!("{:?}", input).into()
+                format!("{input:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.input_unit).into(),
             if let Some(output) = &self.output {
-                format!("{:?}", output).into()
+                format!("{output:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.output_unit).into(),
             if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
+                format!("{started_at:?}").into()
             } else {
                 String::new().into()
             },
@@ -20088,14 +20084,14 @@ impl tabled::Tabled for UpdatePaymentBalance {
             if let Some(monthly_api_credits_remaining_monetary_value) =
                 &self.monthly_api_credits_remaining_monetary_value
             {
-                format!("{:?}", monthly_api_credits_remaining_monetary_value).into()
+                format!("{monthly_api_credits_remaining_monetary_value:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(stable_api_credits_remaining_monetary_value) =
                 &self.stable_api_credits_remaining_monetary_value
             {
-                format!("{:?}", stable_api_credits_remaining_monetary_value).into()
+                format!("{stable_api_credits_remaining_monetary_value:?}").into()
             } else {
                 String::new().into()
             },
@@ -20143,7 +20139,7 @@ impl tabled::Tabled for UpdateShortlinkRequest {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(password) = &self.password {
-                format!("{:?}", password).into()
+                format!("{password:?}").into()
             } else {
                 String::new().into()
             },
@@ -20203,33 +20199,33 @@ impl tabled::Tabled for UpdateUser {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(company) = &self.company {
-                format!("{:?}", company).into()
+                format!("{company:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(discord) = &self.discord {
-                format!("{:?}", discord).into()
+                format!("{discord:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(first_name) = &self.first_name {
-                format!("{:?}", first_name).into()
+                format!("{first_name:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(github) = &self.github {
-                format!("{:?}", github).into()
+                format!("{github:?}").into()
             } else {
                 String::new().into()
             },
             self.image.clone().into(),
             if let Some(is_onboarded) = &self.is_onboarded {
-                format!("{:?}", is_onboarded).into()
+                format!("{is_onboarded:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(last_name) = &self.last_name {
-                format!("{:?}", last_name).into()
+                format!("{last_name:?}").into()
             } else {
                 String::new().into()
             },
@@ -20327,40 +20323,40 @@ impl tabled::Tabled for User {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(block) = &self.block {
-                format!("{:?}", block).into()
+                format!("{block:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.can_train_on_data).into(),
             if let Some(company) = &self.company {
-                format!("{:?}", company).into()
+                format!("{company:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             format!("{:?}", self.deletion_scheduled).into(),
             if let Some(discord) = &self.discord {
-                format!("{:?}", discord).into()
+                format!("{discord:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(email) = &self.email {
-                format!("{:?}", email).into()
+                format!("{email:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(email_verified) = &self.email_verified {
-                format!("{:?}", email_verified).into()
+                format!("{email_verified:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(first_name) = &self.first_name {
-                format!("{:?}", first_name).into()
+                format!("{first_name:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(github) = &self.github {
-                format!("{:?}", github).into()
+                format!("{github:?}").into()
             } else {
                 String::new().into()
             },
@@ -20369,12 +20365,12 @@ impl tabled::Tabled for User {
             format!("{:?}", self.is_onboarded).into(),
             format!("{:?}", self.is_service_account).into(),
             if let Some(last_name) = &self.last_name {
-                format!("{:?}", last_name).into()
+                format!("{last_name:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name).into()
+                format!("{name:?}").into()
             } else {
                 String::new().into()
             },
@@ -20468,46 +20464,46 @@ impl tabled::Tabled for UserOrgInfo {
             if let Some(allow_users_in_domain_to_auto_join) =
                 &self.allow_users_in_domain_to_auto_join
             {
-                format!("{:?}", allow_users_in_domain_to_auto_join).into()
+                format!("{allow_users_in_domain_to_auto_join:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(billing_email) = &self.billing_email {
-                format!("{:?}", billing_email).into()
+                format!("{billing_email:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(billing_email_verified) = &self.billing_email_verified {
-                format!("{:?}", billing_email_verified).into()
+                format!("{billing_email_verified:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(block) = &self.block {
-                format!("{:?}", block).into()
+                format!("{block:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.created_at).into(),
             if let Some(domain) = &self.domain {
-                format!("{:?}", domain).into()
+                format!("{domain:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.id).into(),
             if let Some(image) = &self.image {
-                format!("{:?}", image).into()
+                format!("{image:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(name) = &self.name {
-                format!("{:?}", name).into()
+                format!("{name:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.phone).into(),
             format!("{:?}", self.role).into(),
             if let Some(stripe_id) = &self.stripe_id {
-                format!("{:?}", stripe_id).into()
+                format!("{stripe_id:?}").into()
             } else {
                 String::new().into()
             },
@@ -20598,8 +20594,7 @@ impl crate::types::paginate::Pagination for UserResultsPage {
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
+                "failed to clone request: {req:?}"
             ))
         })?;
         req.url_mut()
@@ -20620,7 +20615,7 @@ impl tabled::Tabled for UserResultsPage {
         vec![
             format!("{:?}", self.items).into(),
             if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
+                format!("{next_page:?}").into()
             } else {
                 String::new().into()
             },
@@ -20675,12 +20670,12 @@ impl tabled::Tabled for VerificationTokenResponse {
             format!("{:?}", self.expires).into(),
             format!("{:?}", self.id).into(),
             if let Some(identifier) = &self.identifier {
-                format!("{:?}", identifier).into()
+                format!("{identifier:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(redirect_url) = &self.redirect_url {
-                format!("{:?}", redirect_url).into()
+                format!("{redirect_url:?}").into()
             } else {
                 String::new().into()
             },
@@ -20867,22 +20862,22 @@ impl tabled::Tabled for WebSocketResponse {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(request_id) = &self.request_id {
-                format!("{:?}", request_id).into()
+                format!("{request_id:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(resp) = &self.resp {
-                format!("{:?}", resp).into()
+                format!("{resp:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(success) = &self.success {
-                format!("{:?}", success).into()
+                format!("{success:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(errors) = &self.errors {
-                format!("{:?}", errors).into()
+                format!("{errors:?}").into()
             } else {
                 String::new().into()
             },
@@ -20985,24 +20980,24 @@ impl tabled::Tabled for ZooProductSubscription {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
-                format!("{:?}", annual_discount).into()
+                format!("{annual_discount:?}").into()
             } else {
                 String::new().into()
             },
             self.description.clone().into(),
             if let Some(endpoints_included) = &self.endpoints_included {
-                format!("{:?}", endpoints_included).into()
+                format!("{endpoints_included:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(features) = &self.features {
-                format!("{:?}", features).into()
+                format!("{features:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(monthly_pay_as_you_go_api_credits) = &self.monthly_pay_as_you_go_api_credits
             {
-                format!("{:?}", monthly_pay_as_you_go_api_credits).into()
+                format!("{monthly_pay_as_you_go_api_credits:?}").into()
             } else {
                 String::new().into()
             },
@@ -21013,13 +21008,13 @@ impl tabled::Tabled for ZooProductSubscription {
             .into(),
             format!("{:?}", self.name).into(),
             if let Some(pay_as_you_go_api_credit_price) = &self.pay_as_you_go_api_credit_price {
-                format!("{:?}", pay_as_you_go_api_credit_price).into()
+                format!("{pay_as_you_go_api_credit_price:?}").into()
             } else {
                 String::new().into()
             },
             format!("{:?}", self.price).into(),
             if let Some(share_links) = &self.share_links {
-                format!("{:?}", share_links).into()
+                format!("{share_links:?}").into()
             } else {
                 String::new().into()
             },
@@ -21027,7 +21022,7 @@ impl tabled::Tabled for ZooProductSubscription {
             format!("{:?}", self.training_data_behavior).into(),
             format!("{:?}", self.type_).into(),
             if let Some(zoo_tools_included) = &self.zoo_tools_included {
-                format!("{:?}", zoo_tools_included).into()
+                format!("{zoo_tools_included:?}").into()
             } else {
                 String::new().into()
             },
@@ -21115,12 +21110,12 @@ impl tabled::Tabled for ZooProductSubscriptionsOrgRequest {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(modeling_app) = &self.modeling_app {
-                format!("{:?}", modeling_app).into()
+                format!("{modeling_app:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(pay_annually) = &self.pay_annually {
-                format!("{:?}", pay_annually).into()
+                format!("{pay_annually:?}").into()
             } else {
                 String::new().into()
             },
@@ -21162,12 +21157,12 @@ impl tabled::Tabled for ZooProductSubscriptionsUserRequest {
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(modeling_app) = &self.modeling_app {
-                format!("{:?}", modeling_app).into()
+                format!("{modeling_app:?}").into()
             } else {
                 String::new().into()
             },
             if let Some(pay_annually) = &self.pay_annually {
-                format!("{:?}", pay_annually).into()
+                format!("{pay_annually:?}").into()
             } else {
                 String::new().into()
             },
