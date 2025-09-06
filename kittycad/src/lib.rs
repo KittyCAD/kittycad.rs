@@ -56,7 +56,7 @@
 //!
 //! let client = Client::new_from_env();
 //! ```
-#![allow(elided_named_lifetimes)]
+#![allow(mismatched_lifetime_syntaxes)]
 #![allow(missing_docs)]
 #![allow(unused_imports)]
 #![allow(clippy::needless_lifetimes)]
@@ -232,7 +232,7 @@ impl Client {
                         client_http1_only,
                     }
                 }
-                (Err(e), _) | (_, Err(e)) => panic!("creating reqwest client failed: {e:?}"),
+                (Err(e), _) | (_, Err(e)) => panic!("creating reqwest client failed: {:?}", e),
             }
         }
         #[cfg(not(feature = "retry"))]

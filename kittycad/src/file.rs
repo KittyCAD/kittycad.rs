@@ -25,9 +25,9 @@ impl File {
             format!("{}/{}", self.client.base_url, "file/center-of-mass"),
         );
         req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![("src_format", format!("{src_format}"))];
+        let mut query_params = vec![("src_format", format!("{}", src_format))];
         if let Some(p) = output_unit {
-            query_params.push(("output_unit", format!("{p}")));
+            query_params.push(("output_unit", format!("{}", p)));
         }
 
         req = req.query(&query_params);
@@ -124,8 +124,8 @@ impl File {
                 "{}/{}",
                 self.client.base_url,
                 "file/conversion/{src_format}/{output_format}"
-                    .replace("{output_format}", &format!("{output_format}"))
-                    .replace("{src_format}", &format!("{src_format}"))
+                    .replace("{output_format}", &format!("{}", output_format))
+                    .replace("{src_format}", &format!("{}", src_format))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -187,15 +187,15 @@ impl File {
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![
-            ("material_mass", format!("{material_mass}")),
-            ("src_format", format!("{src_format}")),
+            ("material_mass", format!("{}", material_mass)),
+            ("src_format", format!("{}", src_format)),
         ];
         if let Some(p) = material_mass_unit {
-            query_params.push(("material_mass_unit", format!("{p}")));
+            query_params.push(("material_mass_unit", format!("{}", p)));
         }
 
         if let Some(p) = output_unit {
-            query_params.push(("output_unit", format!("{p}")));
+            query_params.push(("output_unit", format!("{}", p)));
         }
 
         req = req.query(&query_params);
@@ -235,15 +235,15 @@ impl File {
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![
-            ("material_density", format!("{material_density}")),
-            ("src_format", format!("{src_format}")),
+            ("material_density", format!("{}", material_density)),
+            ("src_format", format!("{}", src_format)),
         ];
         if let Some(p) = material_density_unit {
-            query_params.push(("material_density_unit", format!("{p}")));
+            query_params.push(("material_density_unit", format!("{}", p)));
         }
 
         if let Some(p) = output_unit {
-            query_params.push(("output_unit", format!("{p}")));
+            query_params.push(("output_unit", format!("{}", p)));
         }
 
         req = req.query(&query_params);
@@ -297,9 +297,9 @@ impl File {
             format!("{}/{}", self.client.base_url, "file/surface-area"),
         );
         req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![("src_format", format!("{src_format}"))];
+        let mut query_params = vec![("src_format", format!("{}", src_format))];
         if let Some(p) = output_unit {
-            query_params.push(("output_unit", format!("{p}")));
+            query_params.push(("output_unit", format!("{}", p)));
         }
 
         req = req.query(&query_params);
@@ -353,9 +353,9 @@ impl File {
             format!("{}/{}", self.client.base_url, "file/volume"),
         );
         req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![("src_format", format!("{src_format}"))];
+        let mut query_params = vec![("src_format", format!("{}", src_format))];
         if let Some(p) = output_unit {
-            query_params.push(("output_unit", format!("{p}")));
+            query_params.push(("output_unit", format!("{}", p)));
         }
 
         req = req.query(&query_params);

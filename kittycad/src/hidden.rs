@@ -125,7 +125,7 @@ impl Hidden {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "auth/saml/org/{org_id}/login".replace("{org_id}", &format!("{org_id}"))
+                "auth/saml/org/{org_id}/login".replace("{org_id}", &format!("{}", org_id))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -161,7 +161,7 @@ impl Hidden {
                 "{}/{}",
                 self.client.base_url,
                 "auth/saml/provider/{provider_id}/login"
-                    .replace("{provider_id}", &format!("{provider_id}"))
+                    .replace("{provider_id}", &format!("{}", provider_id))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -203,7 +203,7 @@ impl Hidden {
                 "{}/{}",
                 self.client.base_url,
                 "auth/saml/provider/{provider_id}/login"
-                    .replace("{provider_id}", &format!("{provider_id}"))
+                    .replace("{provider_id}", &format!("{}", provider_id))
             ),
         );
         req = req.bearer_auth(&self.client.token);

@@ -53,7 +53,7 @@ impl Modeling {
         }
 
         if let Some(p) = fps {
-            query_params.push(("fps", format!("{p}")));
+            query_params.push(("fps", format!("{}", p)));
         }
 
         if let Some(p) = pool {
@@ -61,7 +61,7 @@ impl Modeling {
         }
 
         if let Some(p) = post_effect {
-            query_params.push(("post_effect", format!("{p}")));
+            query_params.push(("post_effect", format!("{}", p)));
         }
 
         if let Some(p) = replay {
@@ -69,23 +69,23 @@ impl Modeling {
         }
 
         if let Some(p) = show_grid {
-            query_params.push(("show_grid", format!("{p}")));
+            query_params.push(("show_grid", format!("{}", p)));
         }
 
         if let Some(p) = unlocked_framerate {
-            query_params.push(("unlocked_framerate", format!("{p}")));
+            query_params.push(("unlocked_framerate", format!("{}", p)));
         }
 
         if let Some(p) = video_res_height {
-            query_params.push(("video_res_height", format!("{p}")));
+            query_params.push(("video_res_height", format!("{}", p)));
         }
 
         if let Some(p) = video_res_width {
-            query_params.push(("video_res_width", format!("{p}")));
+            query_params.push(("video_res_width", format!("{}", p)));
         }
 
         if let Some(p) = webrtc {
-            query_params.push(("webrtc", format!("{p}")));
+            query_params.push(("webrtc", format!("{}", p)));
         }
 
         req = req.query(&query_params);
