@@ -36,12 +36,12 @@ impl Unit {
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/angle/{input_unit}/{output_unit}"
-                    .replace("{input_unit}", &format!("{}", input_unit))
-                    .replace("{output_unit}", &format!("{}", output_unit))
+                    .replace("{input_unit}", &format!("{input_unit}"))
+                    .replace("{output_unit}", &format!("{output_unit}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("value", format!("{}", value))];
+        let query_params = vec![("value", format!("{value}"))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -86,12 +86,12 @@ impl Unit {
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/area/{input_unit}/{output_unit}"
-                    .replace("{input_unit}", &format!("{}", input_unit))
-                    .replace("{output_unit}", &format!("{}", output_unit))
+                    .replace("{input_unit}", &format!("{input_unit}"))
+                    .replace("{output_unit}", &format!("{output_unit}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("value", format!("{}", value))];
+        let query_params = vec![("value", format!("{value}"))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -126,12 +126,12 @@ impl Unit {
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/current/{input_unit}/{output_unit}"
-                    .replace("{input_unit}", &format!("{}", input_unit))
-                    .replace("{output_unit}", &format!("{}", output_unit))
+                    .replace("{input_unit}", &format!("{input_unit}"))
+                    .replace("{output_unit}", &format!("{output_unit}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("value", format!("{}", value))];
+        let query_params = vec![("value", format!("{value}"))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -166,12 +166,12 @@ impl Unit {
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/energy/{input_unit}/{output_unit}"
-                    .replace("{input_unit}", &format!("{}", input_unit))
-                    .replace("{output_unit}", &format!("{}", output_unit))
+                    .replace("{input_unit}", &format!("{input_unit}"))
+                    .replace("{output_unit}", &format!("{output_unit}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("value", format!("{}", value))];
+        let query_params = vec![("value", format!("{value}"))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -216,12 +216,12 @@ impl Unit {
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/force/{input_unit}/{output_unit}"
-                    .replace("{input_unit}", &format!("{}", input_unit))
-                    .replace("{output_unit}", &format!("{}", output_unit))
+                    .replace("{input_unit}", &format!("{input_unit}"))
+                    .replace("{output_unit}", &format!("{output_unit}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("value", format!("{}", value))];
+        let query_params = vec![("value", format!("{value}"))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -256,12 +256,12 @@ impl Unit {
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/frequency/{input_unit}/{output_unit}"
-                    .replace("{input_unit}", &format!("{}", input_unit))
-                    .replace("{output_unit}", &format!("{}", output_unit))
+                    .replace("{input_unit}", &format!("{input_unit}"))
+                    .replace("{output_unit}", &format!("{output_unit}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("value", format!("{}", value))];
+        let query_params = vec![("value", format!("{value}"))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -306,12 +306,12 @@ impl Unit {
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/length/{input_unit}/{output_unit}"
-                    .replace("{input_unit}", &format!("{}", input_unit))
-                    .replace("{output_unit}", &format!("{}", output_unit))
+                    .replace("{input_unit}", &format!("{input_unit}"))
+                    .replace("{output_unit}", &format!("{output_unit}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("value", format!("{}", value))];
+        let query_params = vec![("value", format!("{value}"))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -356,12 +356,12 @@ impl Unit {
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/mass/{input_unit}/{output_unit}"
-                    .replace("{input_unit}", &format!("{}", input_unit))
-                    .replace("{output_unit}", &format!("{}", output_unit))
+                    .replace("{input_unit}", &format!("{input_unit}"))
+                    .replace("{output_unit}", &format!("{output_unit}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("value", format!("{}", value))];
+        let query_params = vec![("value", format!("{value}"))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -396,12 +396,12 @@ impl Unit {
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/power/{input_unit}/{output_unit}"
-                    .replace("{input_unit}", &format!("{}", input_unit))
-                    .replace("{output_unit}", &format!("{}", output_unit))
+                    .replace("{input_unit}", &format!("{input_unit}"))
+                    .replace("{output_unit}", &format!("{output_unit}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("value", format!("{}", value))];
+        let query_params = vec![("value", format!("{value}"))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -436,12 +436,12 @@ impl Unit {
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/pressure/{input_unit}/{output_unit}"
-                    .replace("{input_unit}", &format!("{}", input_unit))
-                    .replace("{output_unit}", &format!("{}", output_unit))
+                    .replace("{input_unit}", &format!("{input_unit}"))
+                    .replace("{output_unit}", &format!("{output_unit}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("value", format!("{}", value))];
+        let query_params = vec![("value", format!("{value}"))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -476,12 +476,12 @@ impl Unit {
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/temperature/{input_unit}/{output_unit}"
-                    .replace("{input_unit}", &format!("{}", input_unit))
-                    .replace("{output_unit}", &format!("{}", output_unit))
+                    .replace("{input_unit}", &format!("{input_unit}"))
+                    .replace("{output_unit}", &format!("{output_unit}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("value", format!("{}", value))];
+        let query_params = vec![("value", format!("{value}"))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -516,12 +516,12 @@ impl Unit {
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/torque/{input_unit}/{output_unit}"
-                    .replace("{input_unit}", &format!("{}", input_unit))
-                    .replace("{output_unit}", &format!("{}", output_unit))
+                    .replace("{input_unit}", &format!("{input_unit}"))
+                    .replace("{output_unit}", &format!("{output_unit}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("value", format!("{}", value))];
+        let query_params = vec![("value", format!("{value}"))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -556,12 +556,12 @@ impl Unit {
                 "{}/{}",
                 self.client.base_url,
                 "unit/conversion/volume/{input_unit}/{output_unit}"
-                    .replace("{input_unit}", &format!("{}", input_unit))
-                    .replace("{output_unit}", &format!("{}", output_unit))
+                    .replace("{input_unit}", &format!("{input_unit}"))
+                    .replace("{output_unit}", &format!("{output_unit}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("value", format!("{}", value))];
+        let query_params = vec![("value", format!("{value}"))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();

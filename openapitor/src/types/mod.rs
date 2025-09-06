@@ -393,6 +393,11 @@ impl TypeSpace {
             quote!()
         };
 
+        // Generic improvement: if the variant name derived from the property name
+        // differs from the JSON property (e.g., `end_of_stream` => `EndOfStream`),
+        // attach `#[serde(rename = "end_of_stream")]` to the variant so external
+        // tagging matches JSON without special-casing types.
+
         let mut values = quote!();
         for one_of in one_ofs {
             // Get the first property in the object.
@@ -415,11 +420,20 @@ impl TypeSpace {
                             property.get_schema_from_reference(&self.spec, true)?;
                         match &property_schema.schema_kind {
                             SchemaKind::Type(openapiv3::Type::Object(inner_obj)) => {
-                                let inner_values = self
-                                    .get_object_values(&inner_name_ident, inner_obj, false, None)?;
+                                let inner_values = self.get_object_values(
+                                    &inner_name_ident,
+                                    inner_obj,
+                                    false,
+                                    None,
+                                )?;
+                                let mut variant_attrs = quote!();
+                                if proper_name(inner_name) != *inner_name {
+                                    variant_attrs = quote!(#[serde(rename = #inner_name)]);
+                                }
                                 values = quote! {
                                     #values
                                     #variant_doc
+                                    #variant_attrs
                                     #inner_name_ident {
                                         #inner_values
                                     },
@@ -443,12 +457,22 @@ impl TypeSpace {
                                         true,
                                     )?,
                                 };
-                                // Render tuple-style variant with single inner type.
-                                values = quote! {
-                                    #values
-                                    #variant_doc
-                                    #inner_name_ident(#field_ty),
-                                };
+                                // Render tuple-style variant with single inner type, and
+                                // add a serde rename if needed to match JSON.
+                                if proper_name(inner_name) != *inner_name {
+                                    values = quote! {
+                                        #values
+                                        #variant_doc
+                                        #[serde(rename = #inner_name)]
+                                        #inner_name_ident(#field_ty),
+                                    };
+                                } else {
+                                    values = quote! {
+                                        #values
+                                        #variant_doc
+                                        #inner_name_ident(#field_ty),
+                                    };
+                                }
                             }
                         }
                     }
