@@ -5,18 +5,14 @@ use futures::TryStreamExt;
 use pretty_assertions::assert_eq;
 use tokio_tungstenite::tungstenite::Message as WsMsg;
 
-use crate::types::{
-    ModelingCmd,
-    PathSegment,
-    Point3D,
-    WebSocketRequest::ModelingCmdReq,
-};
+use crate::types::{ModelingCmd, PathSegment, Point3D, WebSocketRequest::ModelingCmdReq};
 
 #[test]
 fn test_mlcopilot_server_message_serde_roundtrip() {
-    use crate::types::{MlCopilotServerMessage, MlToolResult, ReasoningMessage};
     use pretty_assertions::assert_eq;
     use serde_json::json;
+
+    use crate::types::{MlCopilotServerMessage, MlToolResult, ReasoningMessage};
 
     // Delta
     let msg = MlCopilotServerMessage::Delta {
