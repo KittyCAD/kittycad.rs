@@ -7,6 +7,97 @@ use tokio_tungstenite::tungstenite::Message as WsMsg;
 
 use crate::types::{ModelingCmd, PathSegment, Point3D, WebSocketRequest::ModelingCmdReq};
 
+#[test]
+fn test_mlcopilot_server_message_serde_roundtrip() {
+    use pretty_assertions::assert_eq;
+    use serde_json::json;
+
+    use crate::types::{MlCopilotServerMessage, MlToolResult, ReasoningMessage};
+
+    // Delta
+    let msg = MlCopilotServerMessage::Delta {
+        delta: "hello".to_string(),
+    };
+    let expected = json!({
+        "delta": { "delta": "hello" }
+    });
+    let ser = serde_json::to_value(&msg).unwrap();
+    assert_eq!(ser, expected);
+    let de: MlCopilotServerMessage = serde_json::from_value(expected.clone()).unwrap();
+    assert_eq!(de, msg);
+
+    // Tool output (TextToCad)
+    let msg = MlCopilotServerMessage::ToolOutput {
+        result: MlToolResult::TextToCad {
+            error: None,
+            outputs: None,
+            project_name: Some("proj".into()),
+            status_code: 0,
+        },
+    };
+    let expected = json!({
+        "tool_output": {
+            "result": {
+                "type": "text_to_cad",
+                "status_code": 0,
+                "project_name": "proj"
+            }
+        }
+    });
+    let ser = serde_json::to_value(&msg).unwrap();
+    assert_eq!(ser, expected);
+    let de: MlCopilotServerMessage = serde_json::from_value(expected.clone()).unwrap();
+    assert_eq!(de, msg);
+
+    // Error
+    let msg = MlCopilotServerMessage::Error {
+        detail: "boom".into(),
+    };
+    let expected = json!({
+        "error": { "detail": "boom" }
+    });
+    let ser = serde_json::to_value(&msg).unwrap();
+    assert_eq!(ser, expected);
+    let de: MlCopilotServerMessage = serde_json::from_value(expected.clone()).unwrap();
+    assert_eq!(de, msg);
+
+    // Info
+    let msg = MlCopilotServerMessage::Info {
+        text: "note".into(),
+    };
+    let expected = json!({
+        "info": { "text": "note" }
+    });
+    let ser = serde_json::to_value(&msg).unwrap();
+    assert_eq!(ser, expected);
+    let de: MlCopilotServerMessage = serde_json::from_value(expected.clone()).unwrap();
+    assert_eq!(de, msg);
+
+    // Reasoning (text)
+    let msg = MlCopilotServerMessage::Reasoning(ReasoningMessage::Text {
+        content: "thinking".into(),
+    });
+    let expected = json!({
+        "reasoning": { "type": "text", "content": "thinking" }
+    });
+    let ser = serde_json::to_value(&msg).unwrap();
+    assert_eq!(ser, expected);
+    let de: MlCopilotServerMessage = serde_json::from_value(expected.clone()).unwrap();
+    assert_eq!(de, msg);
+
+    // End of stream (with whole_response)
+    let msg = MlCopilotServerMessage::EndOfStream {
+        whole_response: Some("done".into()),
+    };
+    let expected = json!({
+        "end_of_stream": { "whole_response": "done" }
+    });
+    let ser = serde_json::to_value(&msg).unwrap();
+    assert_eq!(ser, expected);
+    let de: MlCopilotServerMessage = serde_json::from_value(expected).unwrap();
+    assert_eq!(de, msg);
+}
+
 fn test_client() -> crate::Client {
     crate::Client::new_from_env()
 }
