@@ -27675,6 +27675,13 @@
                   }
                 }
               },
+              "forced_tools": {
+                "description": "The user can force specific tools to be used for this message.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/MlCopilotTool"
+                }
+              },
               "project_name": {
                 "nullable": true,
                 "description": "The project name, if any. This can be used to associate the message with a specific project.",
@@ -27728,6 +27735,28 @@
       "MlCopilotServerMessage": {
         "description": "The types of messages that can be sent by the server to the client.",
         "oneOf": [
+          {
+            "description": "The ID of the conversation, which can be used to track the session.",
+            "type": "object",
+            "properties": {
+              "conversation_id": {
+                "type": "object",
+                "properties": {
+                  "conversation_id": {
+                    "description": "The unique identifier for the conversation.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "conversation_id"
+                ]
+              }
+            },
+            "required": [
+              "conversation_id"
+            ],
+            "additionalProperties": false
+          },
           {
             "description": "Delta of the response, e.g. a chunk of text/tokens.",
             "type": "object",
@@ -27870,6 +27899,46 @@
             "type": "string",
             "enum": [
               "bye"
+            ]
+          }
+        ]
+      },
+      "MlCopilotTool": {
+        "description": "The tools that can be used by the ML Copilot.",
+        "oneOf": [
+          {
+            "description": "The tool for generating or editing KCL code based on user prompts.",
+            "type": "string",
+            "enum": [
+              "edit_kcl_code"
+            ]
+          },
+          {
+            "description": "The tool for generating CAD models from textual descriptions.",
+            "type": "string",
+            "enum": [
+              "text_to_cad"
+            ]
+          },
+          {
+            "description": "The tool for querying a mechanical knowledge base.",
+            "type": "string",
+            "enum": [
+              "mechanical_knowledge_base"
+            ]
+          },
+          {
+            "description": "The tool for explaining a KCL file(s).",
+            "type": "string",
+            "enum": [
+              "explain_kcl_file"
+            ]
+          },
+          {
+            "description": "The tool for searching the web for information.",
+            "type": "string",
+            "enum": [
+              "web_search"
             ]
           }
         ]
@@ -28206,6 +28275,26 @@
                 "type": "string",
                 "enum": [
                   "mechanical_knowledge_base"
+                ]
+              }
+            },
+            "required": [
+              "response",
+              "type"
+            ]
+          },
+          {
+            "description": "Explain KCL file response.",
+            "type": "object",
+            "properties": {
+              "response": {
+                "description": "The response from explaining the kcl file.",
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "explain_kcl_file"
                 ]
               }
             },

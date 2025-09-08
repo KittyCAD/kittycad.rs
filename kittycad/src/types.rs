@@ -9462,6 +9462,9 @@ pub enum MlCopilotClientMessage {
                  files, like an imported binary file."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         current_files: Option<std::collections::HashMap<String, Vec<u8>>>,
+        #[doc = "The user can force specific tools to be used for this message."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        forced_tools: Option<Vec<MlCopilotTool>>,
         #[doc = "The project name, if any. This can be used to associate the message with a \
                  specific project."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -9484,6 +9487,12 @@ pub enum MlCopilotClientMessage {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub enum MlCopilotServerMessage {
+    #[doc = "The ID of the conversation, which can be used to track the session."]
+    #[serde(rename = "conversation_id")]
+    ConversationId {
+        #[doc = "The unique identifier for the conversation."]
+        conversation_id: String,
+    },
     #[doc = "Delta of the response, e.g. a chunk of text/tokens."]
     #[serde(rename = "delta")]
     Delta {
@@ -9545,6 +9554,43 @@ pub enum MlCopilotSystemCommand {
     #[serde(rename = "bye")]
     #[display("bye")]
     Bye,
+}
+
+#[doc = "The tools that can be used by the ML Copilot."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum MlCopilotTool {
+    #[doc = "The tool for generating or editing KCL code based on user prompts."]
+    #[serde(rename = "edit_kcl_code")]
+    #[display("edit_kcl_code")]
+    EditKclCode,
+    #[doc = "The tool for generating CAD models from textual descriptions."]
+    #[serde(rename = "text_to_cad")]
+    #[display("text_to_cad")]
+    TextToCad,
+    #[doc = "The tool for querying a mechanical knowledge base."]
+    #[serde(rename = "mechanical_knowledge_base")]
+    #[display("mechanical_knowledge_base")]
+    MechanicalKnowledgeBase,
+    #[doc = "The tool for explaining a KCL file(s)."]
+    #[serde(rename = "explain_kcl_file")]
+    #[display("explain_kcl_file")]
+    ExplainKclFile,
+    #[doc = "The tool for searching the web for information."]
+    #[serde(rename = "web_search")]
+    #[display("web_search")]
+    WebSearch,
 }
 
 #[doc = "Human feedback on an ML response."]
@@ -9933,6 +9979,12 @@ pub enum MlToolResult {
     #[serde(rename = "mechanical_knowledge_base")]
     MechanicalKnowledgeBase {
         #[doc = "The response from the mechanical knowledge base."]
+        response: String,
+    },
+    #[doc = "Explain KCL file response."]
+    #[serde(rename = "explain_kcl_file")]
+    ExplainKclFile {
+        #[doc = "The response from explaining the kcl file."]
         response: String,
     },
 }
