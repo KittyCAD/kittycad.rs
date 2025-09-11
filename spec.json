@@ -37184,6 +37184,26 @@
             ]
           },
           {
+            "description": "Markdown formatted reasoning.",
+            "type": "object",
+            "properties": {
+              "content": {
+                "description": "The content of the reasoning.",
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "markdown"
+                ]
+              }
+            },
+            "required": [
+              "content",
+              "type"
+            ]
+          },
+          {
             "description": "Reasoning that contains the KCL docs relevant to the reasoning.",
             "type": "object",
             "properties": {
