@@ -14225,6 +14225,12 @@ pub enum ReasoningMessage {
         #[doc = "The content of the reasoning."]
         content: String,
     },
+    #[doc = "Markdown formatted reasoning."]
+    #[serde(rename = "markdown")]
+    Markdown {
+        #[doc = "The content of the reasoning."]
+        content: String,
+    },
     #[doc = "Reasoning that contains the KCL docs relevant to the reasoning."]
     #[serde(rename = "kcl_docs")]
     KclDocs {
