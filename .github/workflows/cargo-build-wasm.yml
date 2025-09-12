@@ -5,6 +5,7 @@ on:
       - Cargo.toml
       - Cargo.lock
       - .github/workflows/cargo-build-wasm.yml
+  pull_request:
 name: cargo build (wasm)
 jobs:
   cargobuild:
