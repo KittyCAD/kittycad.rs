@@ -4,10 +4,9 @@ on:
       - spec.json
       - .github/workflows/make-generate.yml
       - VERSION.txt
-name: make-generate
 permissions:
-  packages: read
   contents: write
+name: make-generate
 jobs:
   makegenerate:
     # Check if the PR is not from a fork
@@ -15,6 +14,13 @@ jobs:
     name: make generate
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          # required
+          app-id: ${{ secrets.GH_ORG_APP_ID }}
+          private-key: ${{ secrets.GH_ORG_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
@@ -54,15 +60,15 @@ jobs:
       - name: Check for modified files
         id: git-check
         run: echo ::set-output name=modified::$(if [[ -z $(git status --porcelain --untracked-files=no) ]]; then echo "false"; else echo "true"; fi)
-
       - name: Commit changes, if any
         if: steps.git-check.outputs.modified == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git add .
-          git commit -am "I have generated the library!"
+          git remote set-url origin https://${{ github.actor }}:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           git fetch origin
-          git rebase origin/${{github.event.pull_request.head.ref }} || true
-          git push origin ${{github.event.pull_request.head.ref }}
+          git add .
+          git commit -am "I have generated the latest library!" || true
+          git push origin ${{github.event.pull_request.head.ref }} || true
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
