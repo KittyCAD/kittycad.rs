@@ -14957,7 +14957,7 @@ impl tabled::Tabled for RtcSessionDescription {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct SamlIdentityProvider {
-    #[doc = "The ACS (Assertion Consumer Service) url."]
+    #[doc = "The ACS (Assertion Consumer Service) URL."]
     pub acs_url: String,
     #[doc = "The date and time the SAML identity provider was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
@@ -14979,7 +14979,7 @@ pub struct SamlIdentityProvider {
              to the X509 pair."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub public_cert: Option<base64::Base64Data>,
-    #[doc = "The SLO (Single Logout) url."]
+    #[doc = "The SLO (Single Logout) URL."]
     pub slo_url: String,
     #[doc = "The technical contact email address for the SAML identity provider."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
