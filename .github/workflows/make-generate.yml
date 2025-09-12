@@ -12,9 +12,6 @@ jobs:
     name: make generate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
       - uses: actions/create-github-app-token@v2
         id: app-token
         with:
@@ -22,6 +19,9 @@ jobs:
           app-id: ${{ secrets.GH_ORG_APP_ID }}
           private-key: ${{ secrets.GH_ORG_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
       - name: Install latest stable/nightly
         shell: bash
         run: |
