@@ -18,6 +18,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          # required
+          app-id: ${{ secrets.GH_ORG_APP_ID }}
+          private-key: ${{ secrets.GH_ORG_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
       - name: Install latest stable/nightly
         shell: bash
         run: |
@@ -59,9 +66,11 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git remote set-url origin https://${{ github.actor }}:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           git add .
           git commit -am "I have generated the library!"
           git fetch origin
           git rebase origin/${{github.event.pull_request.head.ref }} || true
           git push origin ${{github.event.pull_request.head.ref }}
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
