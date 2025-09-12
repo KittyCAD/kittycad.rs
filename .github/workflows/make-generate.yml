@@ -5,9 +5,6 @@ on:
       - .github/workflows/make-generate.yml
       - VERSION.txt
 name: make-generate
-permissions:
-  packages: read
-  contents: write
 jobs:
   makegenerate:
     # Check if the PR is not from a fork
