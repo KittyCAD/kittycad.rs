@@ -5,6 +5,7 @@ on:
       - Cargo.toml
       - Cargo.lock
       - .github/workflows/cargo-build-types-only.yml
+  pull_request:
 name: cargo build (types only)
 jobs:
   cargobuild:
