@@ -37566,7 +37566,7 @@
         "properties": {
           "acs_url": {
             "title": "String",
-            "description": "The ACS (Assertion Consumer Service) url.",
+            "description": "The ACS (Assertion Consumer Service) URL.",
             "type": "string",
             "format": "uri"
           },
@@ -37616,7 +37616,7 @@
           },
           "slo_url": {
             "title": "String",
-            "description": "The SLO (Single Logout) url.",
+            "description": "The SLO (Single Logout) URL.",
             "type": "string",
             "format": "uri"
           },
