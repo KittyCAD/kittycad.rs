@@ -27928,13 +27928,6 @@
             ]
           },
           {
-            "description": "The tool for explaining a KCL file(s).",
-            "type": "string",
-            "enum": [
-              "explain_kcl_file"
-            ]
-          },
-          {
             "description": "The tool for searching the web for information.",
             "type": "string",
             "enum": [
@@ -28275,26 +28268,6 @@
                 "type": "string",
                 "enum": [
                   "mechanical_knowledge_base"
-                ]
-              }
-            },
-            "required": [
-              "response",
-              "type"
-            ]
-          },
-          {
-            "description": "Explain KCL file response.",
-            "type": "object",
-            "properties": {
-              "response": {
-                "description": "The response from explaining the kcl file.",
-                "type": "string"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "explain_kcl_file"
                 ]
               }
             },
