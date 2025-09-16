@@ -9583,10 +9583,6 @@ pub enum MlCopilotTool {
     #[serde(rename = "mechanical_knowledge_base")]
     #[display("mechanical_knowledge_base")]
     MechanicalKnowledgeBase,
-    #[doc = "The tool for explaining a KCL file(s)."]
-    #[serde(rename = "explain_kcl_file")]
-    #[display("explain_kcl_file")]
-    ExplainKclFile,
     #[doc = "The tool for searching the web for information."]
     #[serde(rename = "web_search")]
     #[display("web_search")]
@@ -9979,12 +9975,6 @@ pub enum MlToolResult {
     #[serde(rename = "mechanical_knowledge_base")]
     MechanicalKnowledgeBase {
         #[doc = "The response from the mechanical knowledge base."]
-        response: String,
-    },
-    #[doc = "Explain KCL file response."]
-    #[serde(rename = "explain_kcl_file")]
-    ExplainKclFile {
-        #[doc = "The response from explaining the kcl file."]
         response: String,
     },
 }
