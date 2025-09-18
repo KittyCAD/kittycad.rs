@@ -63,8 +63,8 @@ jobs:
       - name: Commit changes, if any
         if: steps.git-check.outputs.modified == 'true'
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
+          git config --local user.email "zoo-github-actions-auth[bot]@users.noreply.github.com"
+          git config --local user.name "zoo-github-actions-auth[bot]"
           git remote set-url origin https://${{ github.actor }}:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           git fetch origin
           git add .
