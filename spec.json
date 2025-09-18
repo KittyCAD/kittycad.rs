@@ -201,7 +201,7 @@
           "ml"
         ],
         "summary": "Generate a CAD model from text.",
-        "description": "Because our source of truth for the resulting model is a STEP file, you will always have STEP file contents when you list your generated models. Any other formats you request here will also be returned when you list your generated models.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nOne thing to note, if you hit the cache, this endpoint will return right away. So you only have to wait if the status is not `Completed` or `Failed`.",
+        "description": "Because our source of truth for the resulting model is a STEP file, you will always have STEP file contents when you list your generated parts. Any other formats you request here will also be returned when you list your generated parts.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nOne thing to note, if you hit the cache, this endpoint will return right away. So you only have to wait if the status is not `Completed` or `Failed`.",
         "operationId": "create_text_to_cad",
         "parameters": [
           {
@@ -5710,7 +5710,7 @@
           "ml"
         ],
         "summary": "Iterate on a multi-file CAD model with a prompt.",
-        "description": "This endpoint can iterate on multi-file models.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it. This endpoint will always return all the code back, including files that were not changed. If your original source code imported a stl/gltf/step/etc file, the output will not include that file since the model will never change non-kcl files. The endpoint will only return the kcl files that were changed.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nInput filepaths will be normalized and re-canonicalized to be under the current working directory -- so returned paths may differ from provided paths, and care must be taken when handling user provided paths.",
+        "description": "This endpoint can iterate on multi-file projects.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it. This endpoint will always return all the code back, including files that were not changed. If your original source code imported a stl/gltf/step/etc file, the output will not include that file since the model will never change non-kcl files. The endpoint will only return the kcl files that were changed.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nInput filepaths will be normalized and re-canonicalized to be under the current working directory -- so returned paths may differ from provided paths, and care must be taken when handling user provided paths.",
         "operationId": "create_text_to_cad_multi_file_iteration",
         "requestBody": {
           "description": "Iteration on a multi-file CAD model",
@@ -18870,9 +18870,9 @@
         "tags": [
           "ml"
         ],
-        "summary": "List text-to-CAD models you've generated.",
-        "description": "This will always return the STEP file contents as well as the format the user originally requested.\n\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD models for the authenticated user.\n\nThe text-to-CAD models are returned in order of creation, with the most recently created text-to-CAD models first.",
-        "operationId": "list_text_to_cad_models_for_user",
+        "summary": "List text-to-CAD parts you've generated.",
+        "description": "This will always return the STEP file contents as well as the format the user originally requested.\n\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD parts for the authenticated user.\n\nThe text-to-CAD parts are returned in order of creation, with the most recently created text-to-CAD parts first.",
+        "operationId": "list_text_to_cad_parts_for_user",
         "parameters": [
           {
             "in": "query",
@@ -18912,7 +18912,7 @@
           {
             "in": "query",
             "name": "no_models",
-            "description": "If we should return the model file contents or just the metadata.",
+            "description": "If we should return the part contents or just the metadata.",
             "schema": {
               "nullable": true,
               "type": "boolean"
@@ -19015,7 +19015,7 @@
         ],
         "summary": "Get a text-to-CAD response.",
         "description": "This endpoint requires authentication by any Zoo user. The user must be the owner of the text-to-CAD model.",
-        "operationId": "get_text_to_cad_model_for_user",
+        "operationId": "get_text_to_cad_parts_for_user",
         "parameters": [
           {
             "in": "path",
@@ -19119,7 +19119,7 @@
         ],
         "summary": "Give feedback to a specific ML response.",
         "description": "This can be a text-to-CAD creation or iteration.\n\nThis endpoint requires authentication by any Zoo user. The user must be the owner of the ML response, in order to give feedback.",
-        "operationId": "create_text_to_cad_model_feedback",
+        "operationId": "create_text_to_cad_part_feedback",
         "parameters": [
           {
             "in": "path",
@@ -19225,7 +19225,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_text_to_cad_model_feedback",
+        "operationId": "options_text_to_cad_part_feedback",
         "parameters": [
           {
             "in": "path",
@@ -38842,7 +38842,7 @@
         ]
       },
       "TextToCadCreateBody": {
-        "description": "Body for generating models from text.",
+        "description": "Body for generating parts from text.",
         "type": "object",
         "properties": {
           "kcl_version": {
@@ -38988,7 +38988,7 @@
         ]
       },
       "TextToCadIterationBody": {
-        "description": "Body for generating models from text.",
+        "description": "Body for generating parts from text.",
         "type": "object",
         "properties": {
           "kcl_version": {

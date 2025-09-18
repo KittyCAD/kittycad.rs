@@ -17210,7 +17210,7 @@ impl tabled::Tabled for TextToCad {
     }
 }
 
-#[doc = "Body for generating models from text."]
+#[doc = "Body for generating parts from text."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -17381,7 +17381,7 @@ impl tabled::Tabled for TextToCadIteration {
     }
 }
 
-#[doc = "Body for generating models from text."]
+#[doc = "Body for generating parts from text."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
