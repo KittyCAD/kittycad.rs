@@ -27869,6 +27869,18 @@
               "end_of_stream": {
                 "type": "object",
                 "properties": {
+                  "completed_at": {
+                    "nullable": true,
+                    "description": "This indicates the time that the server has finished processing the request. This can be used by the client to measure the total time taken for the request. Although this might be passed in other contexts, outside of copilot mode, it is only relevant in copilot mode.",
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "started_at": {
+                    "nullable": true,
+                    "description": "This indicates the time that the server had started processing the request. This can be used by the client to measure the total time taken for the request. Although this might be passed in other contexts, outside of copilot mode, it is only relevant in copilot mode.",
+                    "type": "string",
+                    "format": "date-time"
+                  },
                   "whole_response": {
                     "nullable": true,
                     "description": "The whole response text, which is the final output of the AI. This is only relevant if in copilot mode, where the AI is expected to return the whole response at once.",

@@ -88,6 +88,8 @@ fn test_mlcopilot_server_message_serde_roundtrip() {
     // End of stream (with whole_response)
     let msg = MlCopilotServerMessage::EndOfStream {
         whole_response: Some("done".into()),
+        started_at: None,
+        completed_at: None,
     };
     let expected = json!({
         "end_of_stream": { "whole_response": "done" }

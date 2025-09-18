@@ -9360,6 +9360,12 @@ pub enum MlCopilotServerMessage {
     #[doc = "Marks the end of a streamed answer."]
     #[serde(rename = "end_of_stream")]
     EndOfStream {
+        #[doc = "This indicates the time that the server has finished processing the request. This can be used by the client to measure the total time taken for the request. Although this might be passed in other contexts, outside of copilot mode, it is only relevant in copilot mode."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "This indicates the time that the server had started processing the request. This can be used by the client to measure the total time taken for the request. Although this might be passed in other contexts, outside of copilot mode, it is only relevant in copilot mode."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The whole response text, which is the final output of the AI. This is only relevant if in copilot mode, where the AI is expected to return the whole response at once."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         whole_response: Option<String>,
