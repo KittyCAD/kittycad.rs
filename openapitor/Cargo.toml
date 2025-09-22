@@ -14,7 +14,7 @@ data-encoding = "^2.9.0"
 format_serde_error = "^0.3.0"
 futures-util = "^0.3.31"
 http = "1"
-indexmap = { version = "2.10.0", features = ["serde"] }
+indexmap = { version = "2.11.4", features = ["serde"] }
 json-patch = "4.0.0"
 log = { version = "0.4", features = ["serde"] }
 mime_guess = "2.0.5"
