@@ -654,6 +654,92 @@ impl Users {
             .boxed()
     }
 
+    #[doc = "Get a user.\n\nTo get information about yourself, use `/users/me` as the endpoint. By \
+             doing so you will get the user information for the authenticated \
+             user.\n\nAlternatively, to get information about the authenticated user, use `/user` \
+             endpoint.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or \
+             email). (required)\n\n```rust,no_run\nasync fn example_users_get() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::User = client.users().get(\"some-string\").await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get<'a>(
+        &'a self,
+        id: &'a str,
+    ) -> Result<crate::types::User, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "users/{id}".replace("{id}", id)
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Update a subscription for a user.\n\nYou must be a Zoo admin to perform this \
+             request.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or email). \
+             (required)\n\n```rust,no_run\nasync fn example_users_update_subscription_for() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::ZooProductSubscriptions = client\n        .users()\n        \
+             .update_subscription_for(\n            \"some-string\",\n            \
+             &kittycad::types::ZooProductSubscriptionsUserRequest {\n                modeling_app: \
+             Some(kittycad::types::ModelingAppIndividualSubscriptionTier::Plus),\n                \
+             pay_annually: Some(true),\n            },\n        )\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn update_subscription_for<'a>(
+        &'a self,
+        id: &'a str,
+        body: &crate::types::ZooProductSubscriptionsUserRequest,
+    ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "users/{id}/payment/subscriptions".replace("{id}", id)
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "List users with extended information.\n\nThis endpoint requires authentication by a Zoo employee. The users are returned in order of creation, with the most recently created users first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list_extended<'a>(
@@ -794,92 +880,6 @@ impl Users {
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
-    }
-
-    #[doc = "Get a user.\n\nTo get information about yourself, use `/users/me` as the endpoint. By \
-             doing so you will get the user information for the authenticated \
-             user.\n\nAlternatively, to get information about the authenticated user, use `/user` \
-             endpoint.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or \
-             email). (required)\n\n```rust,no_run\nasync fn example_users_get() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::User = client.users().get(\"some-string\").await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn get<'a>(
-        &'a self,
-        id: &'a str,
-    ) -> Result<crate::types::User, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!(
-                "{}/{}",
-                self.client.base_url,
-                "users/{id}".replace("{id}", id)
-            ),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
-    }
-
-    #[doc = "Update a subscription for a user.\n\nYou must be a Zoo admin to perform this \
-             request.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or email). \
-             (required)\n\n```rust,no_run\nasync fn example_users_update_subscription_for() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::ZooProductSubscriptions = client\n        .users()\n        \
-             .update_subscription_for(\n            \"some-string\",\n            \
-             &kittycad::types::ZooProductSubscriptionsUserRequest {\n                modeling_app: \
-             Some(kittycad::types::ModelingAppIndividualSubscriptionTier::Plus),\n                \
-             pay_annually: Some(true),\n            },\n        )\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn update_subscription_for<'a>(
-        &'a self,
-        id: &'a str,
-        body: &crate::types::ZooProductSubscriptionsUserRequest,
-    ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::PUT,
-            format!(
-                "{}/{}",
-                self.client.base_url,
-                "users/{id}/payment/subscriptions".replace("{id}", id)
-            ),
-        );
-        req = req.bearer_auth(&self.client.token);
-        req = req.json(body);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
