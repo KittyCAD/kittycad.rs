@@ -3,3 +3,6 @@
 .idea
 
 .direnv
+root.cer
+root.pem
+servercert.pfx
