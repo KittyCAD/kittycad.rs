@@ -29,6 +29,40 @@ jobs:
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
 
+      - name: Create local root CA and server cert (untrusted)
+        shell: pwsh
+        run: |
+          ./scripts/win/create-local-ca.ps1 -PfxPath servercert.pfx -PfxPassword 'pass' -NoTrust
+
+      - name: HTTPS smoke fails before trust
+        id: pre_smoke
+        continue-on-error: true
+        shell: pwsh
+        env:
+          NODE_EXTRA_CA_CERTS: ${{ github.workspace }}\root.pem
+          WIN_CA_SMOKE: '1'
+          RUST_BACKTRACE: '1'
+        run: |
+          $job = Start-Job -ScriptBlock { node scripts/https-server.mjs }
+          try {
+            $deadline = (Get-Date).AddSeconds(30)
+            do {
+              $ok = Test-NetConnection -ComputerName 127.0.0.1 -Port 4443 -WarningAction SilentlyContinue -InformationLevel Quiet
+              if (-not $ok) { Start-Sleep -Milliseconds 200 }
+            } while (-not $ok -and (Get-Date) -lt $deadline)
+            if (-not $ok) { throw 'HTTPS server did not become ready in time' }
+            cargo test --test win_ca_smoke -- --nocapture
+          } finally {
+            Stop-Job -Job $job -PassThru | Remove-Job
+          }
+
+      - name: Assert failure without trusted root
+        if: steps.pre_smoke.outcome != 'failure'
+        shell: pwsh
+        run: |
+          Write-Host 'Expected win_ca_smoke to fail before trusting root CA'
+          exit 1
+
       - name: Create and trust local root CA and server cert
         shell: pwsh
         run: |
