@@ -90,6 +90,8 @@ fn test_mlcopilot_server_message_serde_roundtrip() {
         whole_response: Some("done".into()),
         started_at: None,
         completed_at: None,
+        conversation_id: None,
+        id: None,
     };
     let expected = json!({
         "end_of_stream": { "whole_response": "done" }
