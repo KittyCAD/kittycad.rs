@@ -1051,47 +1051,6 @@ impl tabled::Tabled for ApiCallQueryGroup {
     }
 }
 
-#[doc = "The field of an API call to group by."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum ApiCallQueryGroupBy {
-    #[doc = "The email of the user that requested the API call."]
-    #[serde(rename = "email")]
-    #[display("email")]
-    Email,
-    #[doc = "The HTTP method of the API call."]
-    #[serde(rename = "method")]
-    #[display("method")]
-    Method,
-    #[doc = "The endpoint of the API call."]
-    #[serde(rename = "endpoint")]
-    #[display("endpoint")]
-    Endpoint,
-    #[doc = "The user ID of the user that requested the API call."]
-    #[serde(rename = "user_id")]
-    #[display("user_id")]
-    UserId,
-    #[doc = "The origin of the API call. This is parsed from the `Origin` header."]
-    #[serde(rename = "origin")]
-    #[display("origin")]
-    Origin,
-    #[doc = "The IP address of the user making the API call."]
-    #[serde(rename = "ip_address")]
-    #[display("ip_address")]
-    IpAddress,
-}
-
 #[doc = "The status of an async API call."]
 #[derive(
     serde :: Serialize,
@@ -3213,64 +3172,6 @@ impl tabled::Tabled for ClosePath {
     }
 }
 
-#[doc = "The language code is written in.\n\n<details><summary>JSON schema</summary>\n\n```json { \"description\": \"The language code is written in.\", \"oneOf\": [ { \"description\": \"The `go` programming language.\", \"type\": \"string\", \"enum\": [ \"go\" ] }, { \"description\": \"The `python` programming language.\", \"type\": \"string\", \"enum\": [ \"python\" ] }, { \"description\": \"The `node` programming language.\", \"type\": \"string\", \"enum\": [ \"node\" ] } ] } ``` </details>"]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum CodeLanguage {
-    #[doc = "The `go` programming language."]
-    #[serde(rename = "go")]
-    #[display("go")]
-    Go,
-    #[doc = "The `python` programming language."]
-    #[serde(rename = "python")]
-    #[display("python")]
-    Python,
-    #[doc = "The `node` programming language."]
-    #[serde(rename = "node")]
-    #[display("node")]
-    Node,
-}
-
-#[doc = "Code option for running and verifying kcl.\n\n<details><summary>JSON schema</summary>\n\n```json { \"title\": \"CodeOption\", \"description\": \"Code option for running and verifying kcl.\", \"type\": \"string\", \"enum\": [ \"parse\", \"execute\", \"cleanup\", \"mock_execute\" ] } ``` </details>"]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum CodeOption {
-    #[serde(rename = "parse")]
-    #[display("parse")]
-    Parse,
-    #[serde(rename = "execute")]
-    #[display("execute")]
-    Execute,
-    #[serde(rename = "cleanup")]
-    #[display("cleanup")]
-    Cleanup,
-    #[serde(rename = "mock_execute")]
-    #[display("mock_execute")]
-    MockExecute,
-}
-
 #[doc = "Output of the code being executed.\n\n<details><summary>JSON schema</summary>\n\n```json { \"description\": \"Output of the code being executed.\", \"type\": \"object\", \"properties\": { \"output_files\": { \"description\": \"The contents of the files requested if they were passed.\", \"type\": \"array\", \"items\": { \"$ref\": \"#/components/schemas/OutputFile\" } }, \"stderr\": { \"description\": \"The stderr of the code.\", \"default\": \"\", \"type\": \"string\" }, \"stdout\": { \"description\": \"The stdout of the code.\", \"default\": \"\", \"type\": \"string\" } } } ``` </details>"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -3792,31 +3693,6 @@ impl tabled::Tabled for CreateShortlinkResponse {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["key".into(), "url".into()]
     }
-}
-
-#[doc = "Supported set of sort modes for scanning by created_at only.\n\nCurrently, we only support scanning in ascending order."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum CreatedAtSortMode {
-    #[doc = "Sort in increasing order of \"created_at\"."]
-    #[serde(rename = "created_at_ascending")]
-    #[display("created_at_ascending")]
-    CreatedAtAscending,
-    #[doc = "Sort in decreasing order of \"created_at\"."]
-    #[serde(rename = "created_at_descending")]
-    #[display("created_at_descending")]
-    CreatedAtDescending,
 }
 
 #[doc = "The data for subscribing a user to the newsletter."]
@@ -9324,6 +9200,12 @@ pub enum MlCopilotClientMessage {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub enum MlCopilotServerMessage {
+    #[doc = "Session metadata sent by the server right after authentication.\n\nSemantics: - This message is NOT persisted in the database and will NEVER appear in a subsequent `Replay` message. However, we do have the `api_call_id` in the database. - Timing: sent immediately after a client is authenticated on a websocket. Useful for correlating logs and traces."]
+    #[serde(rename = "session_data")]
+    SessionData {
+        #[doc = "The API call id associated with this websocket session."]
+        api_call_id: String,
+    },
     #[doc = "The ID of the conversation, which can be used to track the session."]
     #[serde(rename = "conversation_id")]
     ConversationId {
@@ -9357,12 +9239,24 @@ pub enum MlCopilotServerMessage {
     #[doc = "Assistant reasoning / chain-of-thought (if you expose it)."]
     #[serde(rename = "reasoning")]
     Reasoning(ReasoningMessage),
+    #[doc = "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, and `EndOfStream { .. }`. - Also includes client `User` messages. - The following are NEVER included: `SessionData`, `ConversationId`, or `Delta`. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a BSON-encoded document of this enum: `Replay { messages }`."]
+    #[serde(rename = "replay")]
+    Replay {
+        #[doc = "Canonical bytes (usually JSON) for each message, ordered by prompt creation time, then message sequence number."]
+        messages: Vec<Vec<u8>>,
+    },
     #[doc = "Marks the end of a streamed answer."]
     #[serde(rename = "end_of_stream")]
     EndOfStream {
         #[doc = "This indicates the time that the server has finished processing the request. This can be used by the client to measure the total time taken for the request. Although this might be passed in other contexts, outside of copilot mode, it is only relevant in copilot mode."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The conversation id for this session."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        conversation_id: Option<String>,
+        #[doc = "The ML prompt id for this turn."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        id: Option<uuid::Uuid>,
         #[doc = "This indicates the time that the server had started processing the request. This can be used by the client to measure the total time taken for the request. Although this might be passed in other contexts, outside of copilot mode, it is only relevant in copilot mode."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -9500,6 +9394,9 @@ pub struct MlPrompt {
     pub project_name: Option<String>,
     #[doc = "The prompt."]
     pub prompt: String,
+    #[doc = "Sum of EndOfStream durations, in seconds. Nullable to allow lazy backfill."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub seconds: Option<i64>,
     #[doc = "When the prompt was started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -9526,7 +9423,7 @@ impl std::fmt::Display for MlPrompt {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for MlPrompt {
-    const LENGTH: usize = 17;
+    const LENGTH: usize = 18;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -9573,6 +9470,11 @@ impl tabled::Tabled for MlPrompt {
                 String::new().into()
             },
             self.prompt.clone().into(),
+            if let Some(seconds) = &self.seconds {
+                format!("{:?}", seconds).into()
+            } else {
+                String::new().into()
+            },
             if let Some(started_at) = &self.started_at {
                 format!("{:?}", started_at).into()
             } else {
@@ -9599,6 +9501,7 @@ impl tabled::Tabled for MlPrompt {
             "output_file".into(),
             "project_name".into(),
             "prompt".into(),
+            "seconds".into(),
             "started_at".into(),
             "status".into(),
             "type_".into(),
@@ -9622,6 +9525,9 @@ pub struct MlPromptMetadata {
     #[doc = "The source ranges the user suggested to change."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source_ranges: Option<Vec<SourceRangePrompt>>,
+    #[doc = "The upstream conversation ID, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub upstream_conversation_id: Option<String>,
 }
 
 impl std::fmt::Display for MlPromptMetadata {
@@ -9636,7 +9542,7 @@ impl std::fmt::Display for MlPromptMetadata {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for MlPromptMetadata {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(code) = &self.code {
@@ -9654,6 +9560,11 @@ impl tabled::Tabled for MlPromptMetadata {
             } else {
                 String::new().into()
             },
+            if let Some(upstream_conversation_id) = &self.upstream_conversation_id {
+                format!("{:?}", upstream_conversation_id).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
@@ -9662,6 +9573,7 @@ impl tabled::Tabled for MlPromptMetadata {
             "code".into(),
             "original_source_code".into(),
             "source_ranges".into(),
+            "upstream_conversation_id".into(),
         ]
     }
 }
@@ -9770,6 +9682,10 @@ pub enum MlPromptType {
     #[serde(rename = "text_to_kcl_multi_file_iteration")]
     #[display("text_to_kcl_multi_file_iteration")]
     TextToKclMultiFileIteration,
+    #[doc = "Copilot chat/assist prompts."]
+    #[serde(rename = "copilot")]
+    #[display("copilot")]
+    Copilot,
 }
 
 #[doc = "Responses from tools."]
@@ -14047,32 +13963,6 @@ impl tabled::Tabled for Pong {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["message".into()]
     }
-}
-
-#[doc = "Post effect type"]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum PostEffectType {
-    #[serde(rename = "phosphor")]
-    #[display("phosphor")]
-    Phosphor,
-    #[serde(rename = "ssao")]
-    #[display("ssao")]
-    Ssao,
-    #[serde(rename = "noeffect")]
-    #[display("noeffect")]
-    Noeffect,
 }
 
 #[doc = "Privacy settings for an org or user."]
@@ -20881,4 +20771,154 @@ impl tabled::Tabled for ZoomToFit {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["settings".into()]
     }
+}
+
+#[doc = "The field of an API call to group by."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ApiCallQueryGroupBy {
+    #[doc = "The email of the user that requested the API call."]
+    #[serde(rename = "email")]
+    #[display("email")]
+    Email,
+    #[doc = "The HTTP method of the API call."]
+    #[serde(rename = "method")]
+    #[display("method")]
+    Method,
+    #[doc = "The endpoint of the API call."]
+    #[serde(rename = "endpoint")]
+    #[display("endpoint")]
+    Endpoint,
+    #[doc = "The user ID of the user that requested the API call."]
+    #[serde(rename = "user_id")]
+    #[display("user_id")]
+    UserId,
+    #[doc = "The origin of the API call. This is parsed from the `Origin` header."]
+    #[serde(rename = "origin")]
+    #[display("origin")]
+    Origin,
+    #[doc = "The IP address of the user making the API call."]
+    #[serde(rename = "ip_address")]
+    #[display("ip_address")]
+    IpAddress,
+}
+
+#[doc = "Supported set of sort modes for scanning by created_at only.\n\nCurrently, we only support scanning in ascending order."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CreatedAtSortMode {
+    #[doc = "Sort in increasing order of \"created_at\"."]
+    #[serde(rename = "created_at_ascending")]
+    #[display("created_at_ascending")]
+    CreatedAtAscending,
+    #[doc = "Sort in decreasing order of \"created_at\"."]
+    #[serde(rename = "created_at_descending")]
+    #[display("created_at_descending")]
+    CreatedAtDescending,
+}
+
+#[doc = "The language code is written in.\n\n<details><summary>JSON schema</summary>\n\n```json { \"description\": \"The language code is written in.\", \"oneOf\": [ { \"description\": \"The `go` programming language.\", \"type\": \"string\", \"enum\": [ \"go\" ] }, { \"description\": \"The `python` programming language.\", \"type\": \"string\", \"enum\": [ \"python\" ] }, { \"description\": \"The `node` programming language.\", \"type\": \"string\", \"enum\": [ \"node\" ] } ] } ``` </details>"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CodeLanguage {
+    #[doc = "The `go` programming language."]
+    #[serde(rename = "go")]
+    #[display("go")]
+    Go,
+    #[doc = "The `python` programming language."]
+    #[serde(rename = "python")]
+    #[display("python")]
+    Python,
+    #[doc = "The `node` programming language."]
+    #[serde(rename = "node")]
+    #[display("node")]
+    Node,
+}
+
+#[doc = "Code option for running and verifying kcl.\n\n<details><summary>JSON schema</summary>\n\n```json { \"title\": \"CodeOption\", \"description\": \"Code option for running and verifying kcl.\", \"type\": \"string\", \"enum\": [ \"parse\", \"execute\", \"cleanup\", \"mock_execute\" ] } ``` </details>"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CodeOption {
+    #[serde(rename = "parse")]
+    #[display("parse")]
+    Parse,
+    #[serde(rename = "execute")]
+    #[display("execute")]
+    Execute,
+    #[serde(rename = "cleanup")]
+    #[display("cleanup")]
+    Cleanup,
+    #[serde(rename = "mock_execute")]
+    #[display("mock_execute")]
+    MockExecute,
+}
+
+#[doc = "Post effect type"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum PostEffectType {
+    #[serde(rename = "phosphor")]
+    #[display("phosphor")]
+    Phosphor,
+    #[serde(rename = "ssao")]
+    #[display("ssao")]
+    Ssao,
+    #[serde(rename = "noeffect")]
+    #[display("noeffect")]
+    Noeffect,
 }
