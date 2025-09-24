@@ -1,13 +1,8 @@
 name: win-ca-smoke
-
-permissions:
-  contents: read
-
 on:
   pull_request:
   push:
-    branches: [ main, master ]
-
+    branches: [main, master]
 jobs:
   smoke:
     strategy:

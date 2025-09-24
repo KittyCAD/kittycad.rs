@@ -31,15 +31,11 @@ smoke test:
 
 ```bash
 WIN_CA_SMOKE=1 cargo test --test win_ca_smoke
-
-# Optionally confirm the failure path before trusting the root (run these on Windows or in pwsh):
-pwsh -File ./scripts/win/create-local-ca.ps1 -PfxPath servercert.pfx -PfxPassword pass -NoTrust
-WIN_CA_SMOKE=1 cargo test --test win_ca_smoke || echo "as expected: handshake fails"
-pwsh -File ./scripts/win/create-local-ca.ps1 -PfxPath servercert.pfx -PfxPassword pass
-
-# Clean up cert artifacts when finished
-rm -f root.cer root.pem servercert.pfx
 ```
+
+CI runs provision certificates and the HTTPS test harness via the shared
+`kittycad/gh-action-win-ca` workflow. If you need to reproduce the handshake
+locally on Windows, follow the helper instructions in that repository.
 
 The test defaults to hitting `https://localhost:4443/` and expects an `ok`
 response body. Override `SMOKE_URL`, `SMOKE_ATTEMPTS`, or `SMOKE_DELAY_MS` if
