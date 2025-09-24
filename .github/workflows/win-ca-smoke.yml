@@ -1,8 +1,14 @@
 name: win-ca-smoke
+
+env:
+  RUST_BACKTRACE: '1'
+  SMOKE_URL: 'https://127.0.0.1:4443/' # only needed for the CLI binary
+
 on:
   pull_request:
   push:
-    branches: [main, master]
+    branches: [ main, master ]
+
 jobs:
   smoke:
     strategy:
@@ -15,6 +21,4 @@ jobs:
       setup-rust: true
       pre-test-command: cargo test --test win_ca_smoke -- --nocapture
       post-test-command: cargo test --test win_ca_smoke -- --nocapture
-    env:
-      RUST_BACKTRACE: '1'
     secrets: inherit
