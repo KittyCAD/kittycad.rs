@@ -21,7 +21,7 @@ jobs:
           app-id: ${{ secrets.GH_ORG_APP_ID }}
           private-key: ${{ secrets.GH_ORG_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           # Make sure the value of GITHUB_TOKEN will not be persisted in repo's config
