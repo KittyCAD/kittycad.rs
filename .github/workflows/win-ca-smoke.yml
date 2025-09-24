@@ -10,94 +10,16 @@ on:
 
 jobs:
   smoke:
-    runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
         node: [20, 22]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Rust cache
-        uses: Swatinem/rust-cache@v2
-
-      - name: Create local root CA and server cert (untrusted)
-        shell: pwsh
-        run: |
-          ./scripts/win/create-local-ca.ps1 -PfxPath servercert.pfx -PfxPassword 'pass' -NoTrust
-
-      - name: HTTPS smoke fails before trust
-        id: pre_smoke
-        continue-on-error: true
-        shell: pwsh
-        env:
-          NODE_EXTRA_CA_CERTS: ${{ github.workspace }}\root.pem
-          WIN_CA_SMOKE: '1'
-          RUST_BACKTRACE: '1'
-        run: |
-          $job = Start-Job -ScriptBlock { node scripts/https-server.mjs }
-          try {
-            $deadline = (Get-Date).AddSeconds(30)
-            do {
-              $ok = Test-NetConnection -ComputerName 127.0.0.1 -Port 4443 -WarningAction SilentlyContinue -InformationLevel Quiet
-              if (-not $ok) { Start-Sleep -Milliseconds 200 }
-            } while (-not $ok -and (Get-Date) -lt $deadline)
-            if (-not $ok) { throw 'HTTPS server did not become ready in time' }
-            cargo test --test win_ca_smoke -- --nocapture
-          } finally {
-            Stop-Job -Job $job -PassThru | Remove-Job
-          }
-
-      - name: Assert failure without trusted root
-        if: steps.pre_smoke.outcome != 'failure'
-        shell: pwsh
-        run: |
-          Write-Host 'Expected win_ca_smoke to fail before trusting root CA'
-          exit 1
-
-      - name: Create and trust local root CA and server cert
-        shell: pwsh
-        run: |
-          ./scripts/win/create-local-ca.ps1 -PfxPath servercert.pfx -PfxPassword 'pass'
-
-      - name: HTTPS smoke (start server and run cargo test)
-        shell: pwsh
-        env:
-          NODE_EXTRA_CA_CERTS: ${{ github.workspace }}\root.pem
-          WIN_CA_SMOKE: '1'
-          RUST_BACKTRACE: '1'
-        run: |
-          $job = Start-Job -ScriptBlock { node scripts/https-server.mjs }
-          try {
-            $deadline = (Get-Date).AddSeconds(30)
-            do {
-              $ok = Test-NetConnection -ComputerName 127.0.0.1 -Port 4443 -WarningAction SilentlyContinue -InformationLevel Quiet
-              if (-not $ok) { Start-Sleep -Milliseconds 200 }
-            } while (-not $ok -and (Get-Date) -lt $deadline)
-            if (-not $ok) { throw 'HTTPS server did not become ready in time' }
-            cargo test --test win_ca_smoke -- --nocapture
-          } finally {
-            Stop-Job -Job $job -PassThru | Remove-Job
-          }
-
-      - name: Cleanup local certs
-        if: always()
-        shell: pwsh
-        run: |
-          try {
-            Get-ChildItem -Path Cert:\CurrentUser\Root | Where-Object { $_.Subject -eq 'CN=KittyCAD-Test-Root' } | Remove-Item -Force -ErrorAction SilentlyContinue
-            Get-ChildItem -Path Cert:\CurrentUser\My | Where-Object { $_.Subject -match 'CN=KittyCAD-Test-Root|CN=localhost' } | Remove-Item -Force -ErrorAction SilentlyContinue
-          } catch {}
-          try {
-            Get-ChildItem -Path Cert:\LocalMachine\Root | Where-Object { $_.Subject -eq 'CN=KittyCAD-Test-Root' } | Remove-Item -Force -ErrorAction SilentlyContinue
-            Get-ChildItem -Path Cert:\LocalMachine\My | Where-Object { $_.Subject -match 'CN=KittyCAD-Test-Root|CN=localhost' } | Remove-Item -Force -ErrorAction SilentlyContinue
-          } catch {}
-          Remove-Item -Path servercert.pfx,root.pem,root.cer -Force -ErrorAction SilentlyContinue
+    uses: kittycad/gh-action-win-ca/.github/workflows/win-ca-smoke.yml@main
+    with:
+      node-version: ${{ matrix.node }}
+      setup-rust: true
+      pre-test-command: cargo test --test win_ca_smoke -- --nocapture
+      post-test-command: cargo test --test win_ca_smoke -- --nocapture
+    env:
+      RUST_BACKTRACE: '1'
+    secrets: inherit
