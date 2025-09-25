@@ -5860,6 +5860,7 @@ pub enum Type {
     ModelingAppEvent,
 }
 
+
 #[doc = "An event related to modeling app files"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8921,6 +8922,9 @@ pub struct KclCodeCompletionRequest {
              length of input tokens and generated tokens is limited by the model’s context length."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_tokens: Option<u16>,
+    #[doc = "Zoo provided model, or fine-tuned model which should be used to process this request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_version: Option<String>,
     #[doc = "How many completion choices to generate for each input message."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub n: Option<u8>,
@@ -8928,7 +8932,7 @@ pub struct KclCodeCompletionRequest {
              wanted the same API as GitHub Copilot. It might be used in the future."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub nwo: Option<String>,
-    #[doc = "The prompt for the model."]
+    #[doc = "The prompt for the desired part."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prompt: Option<String>,
     #[doc = "Up to 4 sequences where the API will stop generating further tokens."]
@@ -8939,7 +8943,7 @@ pub struct KclCodeCompletionRequest {
              terminated by a data: [DONE] message."]
     #[serde(default)]
     pub stream: bool,
-    #[doc = "The suffix for the model."]
+    #[doc = "The suffix for the desired part."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub suffix: Option<String>,
     #[doc = "The temperature for the model."]
@@ -8962,7 +8966,7 @@ impl std::fmt::Display for KclCodeCompletionRequest {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for KclCodeCompletionRequest {
-    const LENGTH: usize = 10;
+    const LENGTH: usize = 11;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(extra) = &self.extra {
@@ -8972,6 +8976,11 @@ impl tabled::Tabled for KclCodeCompletionRequest {
             },
             if let Some(max_tokens) = &self.max_tokens {
                 format!("{:?}", max_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(model_version) = &self.model_version {
+                format!("{:?}", model_version).into()
             } else {
                 String::new().into()
             },
@@ -9018,6 +9027,7 @@ impl tabled::Tabled for KclCodeCompletionRequest {
         vec![
             "extra".into(),
             "max_tokens".into(),
+            "model_version".into(),
             "n".into(),
             "nwo".into(),
             "prompt".into(),
@@ -9936,6 +9946,7 @@ pub enum ModelingAppEventType {
     #[default]
     SuccessfulCompileBeforeClose,
 }
+
 
 #[doc = "The subscription tiers we offer for the Modeling App to individuals."]
 #[derive(
@@ -11728,6 +11739,7 @@ pub enum Oauth2GrantType {
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
 
+
 #[doc = "The response from the `ObjectBringToFront` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -13224,6 +13236,7 @@ pub enum OutputFormat2DType {
     Dxf,
 }
 
+
 #[doc = "AutoCAD drawing interchange format."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -13947,6 +13960,7 @@ pub enum PaymentMethodType {
     #[default]
     Card,
 }
+
 
 #[doc = "Defines a perspective view."]
 #[derive(
@@ -17110,11 +17124,14 @@ pub struct TextToCadCreateBody {
     #[doc = "The version of kcl to use. If empty, the latest version will be used."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kcl_version: Option<String>,
+    #[doc = "Zoo provided model, or fine-tuned model which should be used to process this request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_version: Option<String>,
     #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make \
              our models better over time."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub project_name: Option<String>,
-    #[doc = "The prompt for the model."]
+    #[doc = "The prompt for the desired part."]
     pub prompt: String,
 }
 
@@ -17130,11 +17147,16 @@ impl std::fmt::Display for TextToCadCreateBody {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TextToCadCreateBody {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(kcl_version) = &self.kcl_version {
                 format!("{:?}", kcl_version).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(model_version) = &self.model_version {
+                format!("{:?}", model_version).into()
             } else {
                 String::new().into()
             },
@@ -17148,7 +17170,12 @@ impl tabled::Tabled for TextToCadCreateBody {
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["kcl_version".into(), "project_name".into(), "prompt".into()]
+        vec![
+            "kcl_version".into(),
+            "model_version".into(),
+            "project_name".into(),
+            "prompt".into(),
+        ]
     }
 }
 
