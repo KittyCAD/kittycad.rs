@@ -14,18 +14,9 @@ jobs:
     name: make generate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/create-github-app-token@v2
-        id: app-token
-        with:
-          # required
-          app-id: ${{ secrets.GH_ORG_APP_ID }}
-          private-key: ${{ secrets.GH_ORG_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
-          # Make sure the value of GITHUB_TOKEN will not be persisted in repo's config
-          persist-credentials: false
       - name: Install latest stable/nightly
         shell: bash
         run: |
@@ -59,18 +50,10 @@ jobs:
         env:
           KITTYCAD_API_TOKEN: ${{secrets.KITTYCAD_API_TOKEN}}
         shell: bash
-      - name: Check for modified files
-        id: git-check
-        run: echo ::set-output name=modified::$(if [[ -z $(git status --porcelain --untracked-files=no) ]]; then echo "false"; else echo "true"; fi)
-      - name: Commit changes, if any
-        if: steps.git-check.outputs.modified == 'true'
-        run: |
-          git config --local user.email "zoo-github-actions-auth[bot]@users.noreply.github.com"
-          git config --local user.name "zoo-github-actions-auth[bot]"
-          git remote set-url origin https://${{ github.actor }}:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
-          git fetch origin
-          git add .
-          git commit -am "I have generated the latest library!" || true
-          git push origin ${{github.event.pull_request.head.ref }} || true
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+      - name: Commit generated files
+        uses: KittyCAD/gha-actions-public/pr-commit@main
+        with:
+          app-id: ${{ secrets.GH_ORG_APP_ID }}
+          private-key: ${{ secrets.GH_ORG_APP_PRIVATE_KEY }}
+          commit-message: "I have generated the latest library!"
+
