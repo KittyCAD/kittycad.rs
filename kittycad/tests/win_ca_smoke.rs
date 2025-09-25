@@ -3,7 +3,13 @@
 use std::time::Duration;
 
 use anyhow::{anyhow, Context, Result};
+use serde::Deserialize;
 use tokio::time::sleep;
+
+#[derive(Deserialize)]
+struct SmokeStatus {
+    status: String,
+}
 
 #[cfg_attr(not(target_os = "windows"), ignore)]
 #[tokio::test(flavor = "current_thread")]
@@ -46,9 +52,24 @@ async fn win_ca_smoke() -> Result<()> {
                     .await
                     .context("reading body from win-ca smoke target")?;
 
-                if body.trim() == "ok" {
+                let trimmed = body.trim();
+
+                if trimmed.eq_ignore_ascii_case("ok") {
                     println!("win-ca smoke OK");
                     return Ok(());
+                }
+
+                if let Ok(json) = serde_json::from_str::<SmokeStatus>(trimmed) {
+                    if json.status.trim().eq_ignore_ascii_case("ok") {
+                        println!("win-ca smoke OK");
+                        return Ok(());
+                    }
+
+                    return Err(anyhow!(
+                        "unexpected JSON status {:?} from {}",
+                        json.status,
+                        target
+                    ));
                 }
 
                 return Err(anyhow!(
