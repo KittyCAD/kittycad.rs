@@ -18912,6 +18912,15 @@
           {
             "in": "query",
             "name": "no_models",
+            "description": "DEPRECATED: This is the same as `no_parts`, and will be dropped in a future release. Please do not use this.",
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "no_parts",
             "description": "If we should return the part contents or just the metadata.",
             "schema": {
               "nullable": true,
@@ -19015,7 +19024,7 @@
         ],
         "summary": "Get a text-to-CAD response.",
         "description": "This endpoint requires authentication by any Zoo user. The user must be the owner of the text-to-CAD model.",
-        "operationId": "get_text_to_cad_parts_for_user",
+        "operationId": "get_text_to_cad_part_for_user",
         "parameters": [
           {
             "in": "path",
@@ -27331,6 +27340,11 @@
             "format": "uint16",
             "minimum": 0
           },
+          "model_version": {
+            "nullable": true,
+            "description": "Zoo provided model, or fine-tuned model which should be used to process this request.",
+            "type": "string"
+          },
           "n": {
             "nullable": true,
             "description": "How many completion choices to generate for each input message.",
@@ -27344,7 +27358,7 @@
             "type": "string"
           },
           "prompt": {
-            "description": "The prompt for the model.",
+            "description": "The prompt for the desired part.",
             "default": "",
             "type": "string"
           },
@@ -27361,7 +27375,7 @@
             "type": "boolean"
           },
           "suffix": {
-            "description": "The suffix for the model.",
+            "description": "The suffix for the desired part.",
             "default": "",
             "type": "string"
           },
@@ -38845,13 +38859,18 @@
             "description": "The version of kcl to use. If empty, the latest version will be used.",
             "type": "string"
           },
+          "model_version": {
+            "nullable": true,
+            "description": "Zoo provided model, or fine-tuned model which should be used to process this request.",
+            "type": "string"
+          },
           "project_name": {
             "nullable": true,
             "description": "The project name. This is used to tie the prompt to a project. Which helps us make our models better over time.",
             "type": "string"
           },
           "prompt": {
-            "description": "The prompt for the model.",
+            "description": "The prompt for the desired part.",
             "type": "string"
           }
         },
