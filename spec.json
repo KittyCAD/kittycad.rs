@@ -21584,6 +21584,12 @@
             "description": "The response body returned by the API call. We do not store this information if it is above a certain size.",
             "type": "string"
           },
+          "seconds": {
+            "nullable": true,
+            "description": "The number of seconds the API call was billed for.",
+            "type": "integer",
+            "format": "int32"
+          },
           "started_at": {
             "nullable": true,
             "title": "DateTime",
@@ -28431,6 +28437,7 @@
           "monthly_pay_as_you_go_api_credits_monetary_value": {
             "title": "double",
             "description": "The monetary value of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month.",
+            "default": 0.0,
             "type": "number",
             "format": "money-usd"
           },
@@ -28444,7 +28451,7 @@
           },
           "pay_as_you_go_api_credit_price": {
             "title": "double",
-            "description": "The price of an API credit (meaning 1 credit = 1 minute of API usage).",
+            "description": "The price of an API credit (meaning 1 credit = 1 second of API usage).",
             "default": 0.0,
             "type": "number",
             "format": "money-usd"
@@ -28498,7 +28505,6 @@
         },
         "required": [
           "description",
-          "monthly_pay_as_you_go_api_credits_monetary_value",
           "name",
           "price",
           "support_tier",
@@ -42413,6 +42419,7 @@
               "monthly_pay_as_you_go_api_credits_monetary_value": {
                 "title": "double",
                 "description": "The monetary value of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month.",
+                "default": 0.0,
                 "type": "number",
                 "format": "money-usd"
               },
@@ -42426,7 +42433,7 @@
               },
               "pay_as_you_go_api_credit_price": {
                 "title": "double",
-                "description": "The price of an API credit (meaning 1 credit = 1 minute of API usage).",
+                "description": "The price of an API credit (meaning 1 credit = 1 second of API usage).",
                 "default": 0.0,
                 "type": "number",
                 "format": "money-usd"
@@ -42480,7 +42487,6 @@
             },
             "required": [
               "description",
-              "monthly_pay_as_you_go_api_credits_monetary_value",
               "name",
               "price",
               "support_tier",

@@ -1145,6 +1145,9 @@ pub struct ApiCallWithPrice {
              is above a certain size."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub response_body: Option<String>,
+    #[doc = "The number of seconds the API call was billed for."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub seconds: Option<i32>,
     #[doc = "The date and time the API call started billing."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -1176,7 +1179,7 @@ impl std::fmt::Display for ApiCallWithPrice {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ApiCallWithPrice {
-    const LENGTH: usize = 22;
+    const LENGTH: usize = 23;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -1242,6 +1245,11 @@ impl tabled::Tabled for ApiCallWithPrice {
             } else {
                 String::new().into()
             },
+            if let Some(seconds) = &self.seconds {
+                format!("{:?}", seconds).into()
+            } else {
+                String::new().into()
+            },
             if let Some(started_at) = &self.started_at {
                 format!("{:?}", started_at).into()
             } else {
@@ -1281,6 +1289,7 @@ impl tabled::Tabled for ApiCallWithPrice {
             "request_body".into(),
             "request_query_params".into(),
             "response_body".into(),
+            "seconds".into(),
             "started_at".into(),
             "status_code".into(),
             "stripe_invoice_item_id".into(),
@@ -10054,10 +10063,11 @@ pub struct ModelingAppSubscriptionTier {
     pub monthly_pay_as_you_go_api_credits: Option<u64>,
     #[doc = "The monetary value of pay-as-you-go API credits the individual or org gets outside \
              the modeling app per month. This re-ups on the 1st of each month."]
-    pub monthly_pay_as_you_go_api_credits_monetary_value: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub monthly_pay_as_you_go_api_credits_monetary_value: Option<f64>,
     #[doc = "The name of the tier."]
     pub name: ModelingAppSubscriptionTierName,
-    #[doc = "The price of an API credit (meaning 1 credit = 1 minute of API usage)."]
+    #[doc = "The price of an API credit (meaning 1 credit = 1 second of API usage)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pay_as_you_go_api_credit_price: Option<f64>,
     #[doc = "The price of the tier per month. If this is for an individual, this is the price \
@@ -10116,11 +10126,13 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
             } else {
                 String::new().into()
             },
-            format!(
-                "{:?}",
-                self.monthly_pay_as_you_go_api_credits_monetary_value
-            )
-            .into(),
+            if let Some(monthly_pay_as_you_go_api_credits_monetary_value) =
+                &self.monthly_pay_as_you_go_api_credits_monetary_value
+            {
+                format!("{:?}", monthly_pay_as_you_go_api_credits_monetary_value).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.name).into(),
             if let Some(pay_as_you_go_api_credit_price) = &self.pay_as_you_go_api_credit_price {
                 format!("{:?}", pay_as_you_go_api_credit_price).into()
@@ -20936,10 +20948,11 @@ pub struct ZooProductSubscription {
     pub monthly_pay_as_you_go_api_credits: Option<u64>,
     #[doc = "The monetary value of pay-as-you-go API credits the individual or org gets outside \
              the modeling app per month. This re-ups on the 1st of each month."]
-    pub monthly_pay_as_you_go_api_credits_monetary_value: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub monthly_pay_as_you_go_api_credits_monetary_value: Option<f64>,
     #[doc = "The name of the tier."]
     pub name: ModelingAppSubscriptionTierName,
-    #[doc = "The price of an API credit (meaning 1 credit = 1 minute of API usage)."]
+    #[doc = "The price of an API credit (meaning 1 credit = 1 second of API usage)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pay_as_you_go_api_credit_price: Option<f64>,
     #[doc = "The price of the tier per month. If this is for an individual, this is the price \
@@ -20998,11 +21011,13 @@ impl tabled::Tabled for ZooProductSubscription {
             } else {
                 String::new().into()
             },
-            format!(
-                "{:?}",
-                self.monthly_pay_as_you_go_api_credits_monetary_value
-            )
-            .into(),
+            if let Some(monthly_pay_as_you_go_api_credits_monetary_value) =
+                &self.monthly_pay_as_you_go_api_credits_monetary_value
+            {
+                format!("{:?}", monthly_pay_as_you_go_api_credits_monetary_value).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.name).into(),
             if let Some(pay_as_you_go_api_credit_price) = &self.pay_as_you_go_api_credit_price {
                 format!("{:?}", pay_as_you_go_api_credit_price).into()
