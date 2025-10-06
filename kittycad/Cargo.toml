@@ -10,11 +10,11 @@ license = "MIT"
 
 [dependencies]
 anyhow = "1"
-async-trait = { version = "^0.1.89", optional = true }
+async-trait = { version = "^0.1.53", optional = true }
 base64 = "0.22"
 bigdecimal = { version = "0.4", features = ["serde"] }
 bytes = { version = "1", features = ["serde"] }
-clap = { version = "4.5.48", features = ["cargo", "derive", "env", "unicode"], optional = true }
+clap = { version = "4.2.4", features = ["cargo", "derive", "env", "unicode"], optional = true }
 data-encoding = "^2.3.2"
 dirs = { version = "^5.0.1", optional = true }
 format_serde_error = { version = "^0.3.0", optional = true }
@@ -27,7 +27,7 @@ parse-display = "0.10.0"
 phonenumber = "0.3.5"
 rand = { version = "0.9", optional = true }
 getrandom = { version = "0.3" }
-reqwest = { version = "0.12.23", default-features = false, features = ["json", "multipart", "rustls-tls", "rustls-tls-native-roots"], optional = true }
+reqwest = { version = "0.12.14", default-features = false, features = ["json", "multipart", "rustls-tls", "rustls-tls-native-roots"], optional = true }
 reqwest-conditional-middleware = { version = "0.4", optional = true }
 reqwest-middleware = { version = "0.4", optional = true, features = ["json", "multipart", "http2", "rustls-tls"] }
 reqwest-retry = { version = "0.7", optional = true }
@@ -45,7 +45,7 @@ uuid = { version = "1", features = ["serde", "v4", "v7"] }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 chrono = { version = "0.4", default-features = false, features = ["now", "serde", "std"] }
-tokio = { version = "1.47.1", features = ["rt", "macros"] }
+tokio = { version = "1.38.0", features = ["rt", "macros"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 chrono = { version = "0.4", default-features = false, features = ["serde", "std"] }
@@ -55,7 +55,7 @@ expectorate = "1"
 futures-util = "^0.3.26"
 pretty_assertions = "1"
 rand = "0.9"
-tokio = { version = "1.47.1", features = ["rt", "macros"] }
+tokio = { version = "1.38.0", features = ["rt", "macros"] }
 tokio-tungstenite = "0.24"
 
 [features]

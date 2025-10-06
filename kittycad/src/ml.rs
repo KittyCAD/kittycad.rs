@@ -176,13 +176,20 @@ impl Ml {
     #[doc = "Converts a proprietary CAD format to KCL.\n\nThis endpoint is used to convert a \
              proprietary CAD format to KCL. The file passed MUST have feature tree data.\n\nA STEP \
              file does not have feature tree data, so it will not work. A sldprt file does have \
-             feature tree data, so it will work.\n\nInput filepaths will be normalized and \
-             re-canonicalized to be under the current working directory -- so returned paths may \
-             differ from provided paths, and care must be taken when handling user provided \
-             paths.\n\n**Parameters:**\n\n- `code_option: Option<crate::types::CodeOption>`: The \
-             options to run on the code. By default this is set to \
-             `execute`.\n\n```rust,no_run\nasync fn example_ml_create_proprietary_to_kcl() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             feature tree data, so it will work.\n\nThis endpoint is designed to work with any \
+             native proprietary CAD format, for example: - SolidWorks (.sldprt) - Creo (.prt) - \
+             Catia (.catpart) - NX (.prt) - Fusion 360 (.f3d)\n\nThis endpoint is deterministic, \
+             it preserves the original design intent by using the feature tree data. This endpoint \
+             does not use any machine learning or AI.\n\nThis endpoint is currently in beta, and \
+             is only available to users with access to the feature. Please contact support if you \
+             are interested in getting access.\n\nThis endpoint might have limitations and bugs, \
+             please report any issues you encounter. It will be improved over time.\n\nInput \
+             filepaths will be normalized and re-canonicalized to be under the current working \
+             directory -- so returned paths may differ from provided paths, and care must be taken \
+             when handling user provided paths.\n\n**Parameters:**\n\n- `code_option: \
+             Option<crate::types::CodeOption>`: The options to run on the code. By default this is \
+             set to `execute`.\n\n```rust,no_run\nasync fn example_ml_create_proprietary_to_kcl() \
+             -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::KclModel = client\n        .ml()\n        \
              .create_proprietary_to_kcl(\n            vec![kittycad::types::multipart::Attachment \
              {\n                name: \"thing\".to_string(),\n                filepath: \
