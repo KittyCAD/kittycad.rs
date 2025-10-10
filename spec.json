@@ -27348,7 +27348,7 @@
           },
           "model_version": {
             "nullable": true,
-            "description": "Zoo provided model, or fine-tuned model which should be used to process this request.",
+            "description": "Zoo provided model, or custom model which should be used to process this request.",
             "type": "string"
           },
           "n": {
@@ -38867,7 +38867,7 @@
           },
           "model_version": {
             "nullable": true,
-            "description": "Zoo provided model, or fine-tuned model which should be used to process this request.",
+            "description": "Zoo provided model, or custom model which should be used to process this request.",
             "type": "string"
           },
           "project_name": {

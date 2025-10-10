@@ -8931,7 +8931,7 @@ pub struct KclCodeCompletionRequest {
              length of input tokens and generated tokens is limited by the model’s context length."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_tokens: Option<u16>,
-    #[doc = "Zoo provided model, or fine-tuned model which should be used to process this request."]
+    #[doc = "Zoo provided model, or custom model which should be used to process this request."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub model_version: Option<String>,
     #[doc = "How many completion choices to generate for each input message."]
@@ -17136,7 +17136,7 @@ pub struct TextToCadCreateBody {
     #[doc = "The version of kcl to use. If empty, the latest version will be used."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kcl_version: Option<String>,
-    #[doc = "Zoo provided model, or fine-tuned model which should be used to process this request."]
+    #[doc = "Zoo provided model, or custom model which should be used to process this request."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub model_version: Option<String>,
     #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make \
