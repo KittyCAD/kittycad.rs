@@ -342,7 +342,7 @@ impl Users {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{p}")));
+            query_params.push(("limit", format!("{}", p)));
         }
 
         if let Some(p) = page_token {
@@ -350,7 +350,7 @@ impl Users {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{p}")));
+            query_params.push(("sort_by", format!("{}", p)));
         }
 
         req = req.query(&query_params);
@@ -553,7 +553,7 @@ impl Users {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{p}")));
+            query_params.push(("limit", format!("{}", p)));
         }
 
         if let Some(p) = page_token {
@@ -561,7 +561,7 @@ impl Users {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{p}")));
+            query_params.push(("sort_by", format!("{}", p)));
         }
 
         req = req.query(&query_params);
@@ -755,7 +755,7 @@ impl Users {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{p}")));
+            query_params.push(("limit", format!("{}", p)));
         }
 
         if let Some(p) = page_token {
@@ -763,7 +763,7 @@ impl Users {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{p}")));
+            query_params.push(("sort_by", format!("{}", p)));
         }
 
         req = req.query(&query_params);

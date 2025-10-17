@@ -232,7 +232,7 @@ impl Client {
                         client_http1_only,
                     }
                 }
-                (Err(e), _) | (_, Err(e)) => panic!("creating reqwest client failed: {e:?}"),
+                (Err(e), _) | (_, Err(e)) => panic!("creating reqwest client failed: {:?}", e),
             }
         }
         #[cfg(not(feature = "retry"))]
