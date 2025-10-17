@@ -125,7 +125,7 @@ impl Oauth2 {
             format!("{}/{}", self.client.base_url, "oauth2/device/verify"),
         );
         req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![("user_code", user_code.to_string())];
+        let mut query_params = vec![("user_code", format!("{}", user_code))];
         if let Some(p) = app_name {
             query_params.push(("app_name", p));
         }

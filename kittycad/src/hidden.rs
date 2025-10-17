@@ -92,8 +92,8 @@ impl Hidden {
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![
-            ("email", email.to_string()),
-            ("token", token.to_string()),
+            ("email", format!("{}", email)),
+            ("token", format!("{}", token)),
         ];
         if let Some(p) = callback_url {
             query_params.push(("callback_url", p));

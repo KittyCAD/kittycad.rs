@@ -91,7 +91,7 @@ impl Meta {
             format!("{}/{}", self.client.base_url, "community/sso"),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("sig", sig.to_string()), ("sso", sso.to_string())];
+        let query_params = vec![("sig", format!("{}", sig)), ("sso", format!("{}", sso))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
