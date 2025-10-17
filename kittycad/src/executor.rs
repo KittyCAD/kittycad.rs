@@ -36,7 +36,7 @@ impl Executor {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "file/execute/{lang}".replace("{lang}", &format!("{}", lang))
+                "file/execute/{lang}".replace("{lang}", &format!("{lang}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);

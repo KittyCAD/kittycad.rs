@@ -26,13 +26,13 @@ impl Ml {
                 "{}/{}",
                 self.client.base_url,
                 "ai/text-to-cad/{output_format}"
-                    .replace("{output_format}", &format!("{}", output_format))
+                    .replace("{output_format}", &format!("{output_format}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = kcl {
-            query_params.push(("kcl", format!("{}", p)));
+            query_params.push(("kcl", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -71,7 +71,7 @@ impl Ml {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{}", p)));
+            query_params.push(("limit", format!("{p}")));
         }
 
         if let Some(p) = page_token {
@@ -79,7 +79,7 @@ impl Ml {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{}", p)));
+            query_params.push(("sort_by", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -214,7 +214,7 @@ impl Ml {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = code_option {
-            query_params.push(("code_option", format!("{}", p)));
+            query_params.push(("code_option", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -366,7 +366,7 @@ impl Ml {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{}", p)));
+            query_params.push(("limit", format!("{p}")));
         }
 
         if let Some(p) = page_token {
@@ -374,7 +374,7 @@ impl Ml {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{}", p)));
+            query_params.push(("sort_by", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -486,7 +486,7 @@ impl Ml {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "ml-prompts/{id}".replace("{id}", &format!("{}", id))
+                "ml-prompts/{id}".replace("{id}", &format!("{id}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -527,19 +527,19 @@ impl Ml {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = conversation_id {
-            query_params.push(("conversation_id", format!("{}", p)));
+            query_params.push(("conversation_id", format!("{p}")));
         }
 
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{}", p)));
+            query_params.push(("limit", format!("{p}")));
         }
 
         if let Some(p) = no_models {
-            query_params.push(("no_models", format!("{}", p)));
+            query_params.push(("no_models", format!("{p}")));
         }
 
         if let Some(p) = no_parts {
-            query_params.push(("no_parts", format!("{}", p)));
+            query_params.push(("no_parts", format!("{p}")));
         }
 
         if let Some(p) = page_token {
@@ -547,7 +547,7 @@ impl Ml {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{}", p)));
+            query_params.push(("sort_by", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -669,7 +669,7 @@ impl Ml {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/text-to-cad/{id}".replace("{id}", &format!("{}", id))
+                "user/text-to-cad/{id}".replace("{id}", &format!("{id}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -714,11 +714,11 @@ impl Ml {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/text-to-cad/{id}".replace("{id}", &format!("{}", id))
+                "user/text-to-cad/{id}".replace("{id}", &format!("{id}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![("feedback", format!("{}", feedback))];
+        let query_params = vec![("feedback", format!("{feedback}"))];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
@@ -753,11 +753,11 @@ impl Ml {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = conversation_id {
-            query_params.push(("conversation_id", format!("{}", p)));
+            query_params.push(("conversation_id", format!("{p}")));
         }
 
         if let Some(p) = replay {
-            query_params.push(("replay", format!("{}", p)));
+            query_params.push(("replay", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -798,7 +798,7 @@ impl Ml {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "ws/ml/reasoning/{id}".replace("{id}", &format!("{}", id))
+                "ws/ml/reasoning/{id}".replace("{id}", &format!("{id}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
