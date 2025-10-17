@@ -21274,12 +21274,272 @@
           "value"
         ]
       },
+      "AnnotationBasicDimension": {
+        "description": "Parameters for defining an MBD Basic Dimension Annotation state which is measured between two positions in 3D",
+        "type": "object",
+        "properties": {
+          "dimension": {
+            "description": "Basic dimension parameters (symbol and tolerance)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationMbdBasicDimension"
+              }
+            ]
+          },
+          "font_point_size": {
+            "description": "The point size of the fonts used to generate the annotation label.  Very large values can negatively affect performance.",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "font_scale": {
+            "description": "The scale of the font label in 3D space",
+            "type": "number",
+            "format": "float"
+          },
+          "from_entity_id": {
+            "description": "Entity to measure the dimension from",
+            "type": "string",
+            "format": "uuid"
+          },
+          "from_entity_pos": {
+            "description": "Normalized position within the entity to position the dimension from",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point2d"
+              }
+            ]
+          },
+          "offset": {
+            "description": "2D Position offset of the annotation within the plane.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point2d"
+              }
+            ]
+          },
+          "plane_id": {
+            "description": "Orientation plane.  The annotation will lie in this plane which is positioned about the leader position as its origin.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "precision": {
+            "description": "Number of decimal places to use when displaying tolerance and dimension values",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "to_entity_id": {
+            "description": "Entity to measure the dimension to",
+            "type": "string",
+            "format": "uuid"
+          },
+          "to_entity_pos": {
+            "description": "Normalized position within the entity to position the dimension to",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point2d"
+              }
+            ]
+          }
+        },
+        "required": [
+          "dimension",
+          "font_point_size",
+          "font_scale",
+          "from_entity_id",
+          "from_entity_pos",
+          "offset",
+          "plane_id",
+          "precision",
+          "to_entity_id",
+          "to_entity_pos"
+        ]
+      },
+      "AnnotationFeatureControl": {
+        "description": "Parameters for defining an MBD Feature Control Annotation state",
+        "type": "object",
+        "properties": {
+          "control_frame": {
+            "nullable": true,
+            "description": "MBD Control frame for geometric control",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationMbdControlFrame"
+              }
+            ]
+          },
+          "defined_datum": {
+            "nullable": true,
+            "description": "Set if this annotation is defining a datum",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1
+          },
+          "dimension": {
+            "nullable": true,
+            "description": "Basic dimensions",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationMbdBasicDimension"
+              }
+            ]
+          },
+          "entity_id": {
+            "description": "Entity to place the annotation leader from",
+            "type": "string",
+            "format": "uuid"
+          },
+          "entity_pos": {
+            "description": "Normalized position within the entity to position the annotation leader from",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point2d"
+              }
+            ]
+          },
+          "font_point_size": {
+            "description": "The point size of the fonts used to generate the annotation label.  Very large values can negatively affect performance.",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "font_scale": {
+            "description": "The scale of the font label in 3D space",
+            "type": "number",
+            "format": "float"
+          },
+          "leader_type": {
+            "description": "Type of leader to use",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationLineEnd"
+              }
+            ]
+          },
+          "offset": {
+            "description": "2D Position offset of the annotation within the plane.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point2d"
+              }
+            ]
+          },
+          "plane_id": {
+            "description": "Orientation plane.  The annotation will lie in this plane which is positioned about the leader position as its origin.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "precision": {
+            "description": "Number of decimal places to use when displaying tolerance and dimension values",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "prefix": {
+            "nullable": true,
+            "description": "Prefix text which will appear before the basic dimension",
+            "type": "string"
+          },
+          "suffix": {
+            "nullable": true,
+            "description": "Suffix text which will appear after the basic dimension",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id",
+          "entity_pos",
+          "font_point_size",
+          "font_scale",
+          "leader_type",
+          "offset",
+          "plane_id",
+          "precision"
+        ]
+      },
+      "AnnotationFeatureTag": {
+        "description": "Parameters for defining an MBD Feature Tag Annotation state",
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "description": "Entity to place the annotation leader from",
+            "type": "string",
+            "format": "uuid"
+          },
+          "entity_pos": {
+            "description": "Normalized position within the entity to position the annotation leader from",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point2d"
+              }
+            ]
+          },
+          "font_point_size": {
+            "description": "The point size of the fonts used to generate the annotation label.  Very large values can negatively affect performance.",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "font_scale": {
+            "description": "The scale of the font label in 3D space",
+            "type": "number",
+            "format": "float"
+          },
+          "key": {
+            "description": "Tag key",
+            "type": "string"
+          },
+          "leader_type": {
+            "description": "Type of leader to use",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationLineEnd"
+              }
+            ]
+          },
+          "offset": {
+            "description": "2D Position offset of the annotation within the plane.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point2d"
+              }
+            ]
+          },
+          "plane_id": {
+            "description": "Orientation plane.  The annotation will lie in this plane which is positioned about the leader position as its origin.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "show_key": {
+            "description": "Whether or not to display the key on the annotation label",
+            "type": "boolean"
+          },
+          "value": {
+            "description": "Tag value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id",
+          "entity_pos",
+          "font_point_size",
+          "font_scale",
+          "key",
+          "leader_type",
+          "offset",
+          "plane_id",
+          "show_key",
+          "value"
+        ]
+      },
       "AnnotationLineEnd": {
         "description": "Annotation line end type",
         "type": "string",
         "enum": [
           "none",
-          "arrow"
+          "arrow",
+          "dot"
         ]
       },
       "AnnotationLineEndOptions": {
@@ -21308,6 +21568,97 @@
           "start"
         ]
       },
+      "AnnotationMbdBasicDimension": {
+        "description": "Parameters for defining an MBD basic dimension",
+        "type": "object",
+        "properties": {
+          "dimension": {
+            "nullable": true,
+            "description": "The explicitly defined dimension.  Only required if the measurement is not automatically calculated.",
+            "type": "number",
+            "format": "double"
+          },
+          "symbol": {
+            "nullable": true,
+            "description": "Type of symbol to use for this dimension (if required)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MbdSymbol"
+              }
+            ]
+          },
+          "tolerance": {
+            "description": "The tolerance of the dimension",
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "tolerance"
+        ]
+      },
+      "AnnotationMbdControlFrame": {
+        "description": "Parameters for defining an MBD Geometric control frame",
+        "type": "object",
+        "properties": {
+          "diameter_symbol": {
+            "nullable": true,
+            "description": "Diameter symbol (if required) whether the geometric control requires a cylindrical or diameter tolerance",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MbdSymbol"
+              }
+            ]
+          },
+          "modifier": {
+            "nullable": true,
+            "description": "Feature of size or tolerance modifiers",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MbdSymbol"
+              }
+            ]
+          },
+          "primary_datum": {
+            "nullable": true,
+            "description": "Primary datum",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1
+          },
+          "secondary_datum": {
+            "nullable": true,
+            "description": "Secondary datum",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1
+          },
+          "symbol": {
+            "description": "Geometric symbol, the type of geometric control specified",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MbdSymbol"
+              }
+            ]
+          },
+          "tertiary_datum": {
+            "nullable": true,
+            "description": "Tertiary datum",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1
+          },
+          "tolerance": {
+            "description": "Tolerance value - the total tolerance of the geometric control.  The unit is based on the drawing standard.",
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "symbol",
+          "tolerance"
+        ]
+      },
       "AnnotationOptions": {
         "description": "Options for annotations",
         "type": "object",
@@ -21318,6 +21669,33 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/Color"
+              }
+            ]
+          },
+          "dimension": {
+            "nullable": true,
+            "description": "Set as an MBD measured basic dimension annotation",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationBasicDimension"
+              }
+            ]
+          },
+          "feature_control": {
+            "nullable": true,
+            "description": "Set as an MBD Feature control annotation",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationFeatureControl"
+              }
+            ]
+          },
+          "feature_tag": {
+            "nullable": true,
+            "description": "Set as a feature tag annotation",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationFeatureTag"
               }
             ]
           },
@@ -24257,6 +24635,118 @@
           }
         ]
       },
+      "CutTypeV2": {
+        "description": "What kind of cut to perform when cutting an edge.",
+        "oneOf": [
+          {
+            "description": "Round off an edge.",
+            "type": "object",
+            "properties": {
+              "fillet": {
+                "type": "object",
+                "properties": {
+                  "radius": {
+                    "description": "The radius of the fillet.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/LengthUnit"
+                      }
+                    ]
+                  },
+                  "second_length": {
+                    "nullable": true,
+                    "description": "The second length affects the edge length of the second face of the cut. This will cause the fillet to take on the shape of a conic section, instead of an arc.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/LengthUnit"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "radius"
+                ]
+              }
+            },
+            "required": [
+              "fillet"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Cut away an edge.",
+            "type": "object",
+            "properties": {
+              "chamfer": {
+                "type": "object",
+                "properties": {
+                  "angle": {
+                    "nullable": true,
+                    "description": "The angle of the chamfer, default is 45deg.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Angle"
+                      }
+                    ]
+                  },
+                  "distance": {
+                    "description": "The distance from the edge to cut on each face.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/LengthUnit"
+                      }
+                    ]
+                  },
+                  "second_distance": {
+                    "nullable": true,
+                    "description": "The second distance affects the edge length of the second face of the cut.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/LengthUnit"
+                      }
+                    ]
+                  },
+                  "swap": {
+                    "description": "If true, the second distance or angle is applied to the other face of the cut.",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "distance",
+                  "swap"
+                ]
+              }
+            },
+            "required": [
+              "chamfer"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "A custom cut profile.",
+            "type": "object",
+            "properties": {
+              "custom": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "description": "The path that will be used for the custom profile.",
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": [
+                  "path"
+                ]
+              }
+            },
+            "required": [
+              "custom"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
       "DefaultCameraCenterToScene": {
         "description": "The response from the `DefaultCameraCenterToScene` endpoint.",
         "type": "object"
@@ -25333,6 +25823,103 @@
             ]
           }
         ]
+      },
+      "ExtrudeReference": {
+        "description": "Type of reference geometry to extrude to.",
+        "oneOf": [
+          {
+            "description": "Extrudes along the normal of the top face until it is as close to the entity as possible. An entity can be a solid, a path, a face, etc.",
+            "type": "object",
+            "properties": {
+              "entity_reference": {
+                "type": "object",
+                "properties": {
+                  "entity_id": {
+                    "description": "The UUID of the entity to extrude to.",
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": [
+                  "entity_id"
+                ]
+              }
+            },
+            "required": [
+              "entity_reference"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Extrudes until the top face is as close as possible to this given axis.",
+            "type": "object",
+            "properties": {
+              "axis": {
+                "type": "object",
+                "properties": {
+                  "axis": {
+                    "description": "The axis to extrude to.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point3d"
+                      }
+                    ]
+                  },
+                  "point": {
+                    "description": "Point the axis goes through. Defaults to (0, 0, 0).",
+                    "default": {
+                      "x": 0.0,
+                      "y": 0.0,
+                      "z": 0.0
+                    },
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point3d"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "axis"
+                ]
+              }
+            },
+            "required": [
+              "axis"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Extrudes until the top face is as close as possible to this given point.",
+            "type": "object",
+            "properties": {
+              "point": {
+                "type": "object",
+                "properties": {
+                  "point": {
+                    "description": "The point to extrude to.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point3d"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "point"
+                ]
+              }
+            },
+            "required": [
+              "point"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "ExtrudeToReference": {
+        "description": "The response from the `ExtrudeToReference` endpoint.",
+        "type": "object"
       },
       "ExtrudedFaceInfo": {
         "description": "IDs for the extruded faces.",
@@ -27053,6 +27640,11 @@
             "default": false,
             "type": "boolean"
           },
+          "payment_intent_id": {
+            "nullable": true,
+            "description": "Identifier for the payment intent backing this invoice.",
+            "type": "string"
+          },
           "pdf": {
             "nullable": true,
             "description": "The link to download the PDF for the invoice.",
@@ -27492,6 +28084,75 @@
         "required": [
           "mass",
           "output_unit"
+        ]
+      },
+      "MbdSymbol": {
+        "description": "MBD symbol type",
+        "type": "string",
+        "enum": [
+          "none",
+          "arclength",
+          "between",
+          "degrees",
+          "plusminus",
+          "angularity",
+          "cylindricity",
+          "roundness",
+          "concentricity",
+          "straightness",
+          "parallelism",
+          "flatness",
+          "profileofline",
+          "surfaceprofile",
+          "symmetry",
+          "perpendicularity",
+          "runout",
+          "totalrunout",
+          "position",
+          "centerline",
+          "partingline",
+          "isoenvelope",
+          "isoenvelopenony145m",
+          "freestate",
+          "statisticaltolerance",
+          "continuousfeature",
+          "independency",
+          "depth",
+          "start",
+          "leastcondition",
+          "maxcondition",
+          "conicaltaper",
+          "projected",
+          "slope",
+          "micro",
+          "tangentplane",
+          "unilateral",
+          "squarefeature",
+          "countersink",
+          "spotface",
+          "target",
+          "diameter",
+          "radius",
+          "sphericalradius",
+          "sphericaldiameter",
+          "controlledradius",
+          "boxstart",
+          "boxbar",
+          "boxbarbetween",
+          "letterbackwardunderline",
+          "punctuationbackwardunderline",
+          "modifierbackwardunderline",
+          "numericbackwardunderline",
+          "boxend",
+          "datumup",
+          "datumleft",
+          "datumright",
+          "datumdown",
+          "datumtriangle",
+          "halfspace",
+          "quarterspace",
+          "eighthspace",
+          "modifierspace"
         ]
       },
       "Method": {
@@ -28633,6 +29294,11 @@
             "description": "Extend a path by adding a new segment which starts at the path's \"pen\". If no \"pen\" location has been set before (via `MovePen`), then the pen is at the origin.",
             "type": "object",
             "properties": {
+              "label": {
+                "nullable": true,
+                "description": "Optional label to associate with the new path segment.",
+                "type": "string"
+              },
               "path": {
                 "description": "The ID of the command which created the path.",
                 "allOf": [
@@ -28718,6 +29384,57 @@
             },
             "required": [
               "distance",
+              "target",
+              "type"
+            ]
+          },
+          {
+            "description": "Command for extruding a solid 2d to a reference geometry.",
+            "type": "object",
+            "properties": {
+              "extrude_method": {
+                "description": "Should the extrusion create a new object or be part of the existing object.",
+                "default": "merge",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ExtrudeMethod"
+                  }
+                ]
+              },
+              "faces": {
+                "nullable": true,
+                "description": "Which IDs should the new faces have? If this isn't given, the engine will generate IDs.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ExtrudedFaceInfo"
+                  }
+                ]
+              },
+              "reference": {
+                "description": "Reference to extrude to. Extrusion occurs along the target's normal until it is as close to the reference as possible.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ExtrudeReference"
+                  }
+                ]
+              },
+              "target": {
+                "description": "Which sketch to extrude. Must be a closed 2D solid.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ModelingCmdId"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "extrude_to_reference"
+                ]
+              }
+            },
+            "required": [
+              "reference",
               "target",
               "type"
             ]
@@ -29832,7 +30549,8 @@
                 "type": "boolean"
               },
               "length": {
-                "description": "Length of the helix.",
+                "nullable": true,
+                "description": "Length of the helix. If None, the length of the cylinder will be used instead.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/LengthUnit"
@@ -29866,7 +30584,6 @@
             "required": [
               "cylinder_id",
               "is_clockwise",
-              "length",
               "revolutions",
               "type"
             ]
@@ -30756,6 +31473,72 @@
             "required": [
               "object_id",
               "radius",
+              "tolerance",
+              "type"
+            ]
+          },
+          {
+            "description": "Cut the list of given edges with the given cut parameters.",
+            "type": "object",
+            "properties": {
+              "cut_type": {
+                "description": "The cut type and information required to perform the cut.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CutTypeV2"
+                  }
+                ]
+              },
+              "edge_ids": {
+                "description": "Which edges you want to cut.",
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "extra_face_ids": {
+                "description": "What IDs should the resulting faces have? If you've only passed one edge ID, its ID will be the command ID used to send this command, and this field should be empty. If you've passed `n` IDs (to cut `n` edges), then this should be length `n-1`, and the first edge will use the command ID used to send this command.",
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "object_id": {
+                "description": "Which object is being cut.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "strategy": {
+                "description": "Which cutting algorithm to use.",
+                "default": "automatic",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CutStrategy"
+                  }
+                ]
+              },
+              "tolerance": {
+                "description": "The maximum acceptable surface gap computed between the cut surfaces. Must be positive (i.e. greater than zero).",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_cut_edges"
+                ]
+              }
+            },
+            "required": [
+              "cut_type",
+              "object_id",
               "tolerance",
               "type"
             ]
@@ -32921,6 +33704,24 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/ExtrudeToReference"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "extrude_to_reference"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/TwistExtrude"
               },
               "type": {
@@ -33287,6 +34088,24 @@
                 "type": "string",
                 "enum": [
                   "solid3d_fillet_edge"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Solid3dCutEdges"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_cut_edges"
                 ]
               }
             },
@@ -38178,6 +38997,10 @@
       },
       "Solid2dAddHole": {
         "description": "The response from the `Solid2dAddHole` endpoint.",
+        "type": "object"
+      },
+      "Solid3dCutEdges": {
+        "description": "The response from the `Solid3dCutEdges` endpoint.",
         "type": "object"
       },
       "Solid3dFilletEdge": {

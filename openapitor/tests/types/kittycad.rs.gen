@@ -763,6 +763,256 @@ impl tabled::Tabled for Angle {
     }
 }
 
+#[doc = "Parameters for defining an MBD Basic Dimension Annotation state which is measured between two positions in 3D"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AnnotationBasicDimension {
+    #[doc = "Basic dimension parameters (symbol and tolerance)"]
+    pub dimension: AnnotationMbdBasicDimension,
+    #[doc = "The point size of the fonts used to generate the annotation label.  Very large values can negatively affect performance."]
+    pub font_point_size: u32,
+    #[doc = "The scale of the font label in 3D space"]
+    pub font_scale: f64,
+    #[doc = "Entity to measure the dimension from"]
+    pub from_entity_id: uuid::Uuid,
+    #[doc = "Normalized position within the entity to position the dimension from"]
+    pub from_entity_pos: Point2D,
+    #[doc = "2D Position offset of the annotation within the plane."]
+    pub offset: Point2D,
+    #[doc = "Orientation plane.  The annotation will lie in this plane which is positioned about the leader position as its origin."]
+    pub plane_id: uuid::Uuid,
+    #[doc = "Number of decimal places to use when displaying tolerance and dimension values"]
+    pub precision: u32,
+    #[doc = "Entity to measure the dimension to"]
+    pub to_entity_id: uuid::Uuid,
+    #[doc = "Normalized position within the entity to position the dimension to"]
+    pub to_entity_pos: Point2D,
+}
+
+impl std::fmt::Display for AnnotationBasicDimension {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AnnotationBasicDimension {
+    const LENGTH: usize = 10;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.dimension).into(),
+            format!("{:?}", self.font_point_size).into(),
+            format!("{:?}", self.font_scale).into(),
+            format!("{:?}", self.from_entity_id).into(),
+            format!("{:?}", self.from_entity_pos).into(),
+            format!("{:?}", self.offset).into(),
+            format!("{:?}", self.plane_id).into(),
+            format!("{:?}", self.precision).into(),
+            format!("{:?}", self.to_entity_id).into(),
+            format!("{:?}", self.to_entity_pos).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "dimension".into(),
+            "font_point_size".into(),
+            "font_scale".into(),
+            "from_entity_id".into(),
+            "from_entity_pos".into(),
+            "offset".into(),
+            "plane_id".into(),
+            "precision".into(),
+            "to_entity_id".into(),
+            "to_entity_pos".into(),
+        ]
+    }
+}
+
+#[doc = "Parameters for defining an MBD Feature Control Annotation state"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AnnotationFeatureControl {
+    #[doc = "MBD Control frame for geometric control"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub control_frame: Option<AnnotationMbdControlFrame>,
+    #[doc = "Set if this annotation is defining a datum"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub defined_datum: Option<String>,
+    #[doc = "Basic dimensions"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dimension: Option<AnnotationMbdBasicDimension>,
+    #[doc = "Entity to place the annotation leader from"]
+    pub entity_id: uuid::Uuid,
+    #[doc = "Normalized position within the entity to position the annotation leader from"]
+    pub entity_pos: Point2D,
+    #[doc = "The point size of the fonts used to generate the annotation label.  Very large values can negatively affect performance."]
+    pub font_point_size: u32,
+    #[doc = "The scale of the font label in 3D space"]
+    pub font_scale: f64,
+    #[doc = "Type of leader to use"]
+    pub leader_type: AnnotationLineEnd,
+    #[doc = "2D Position offset of the annotation within the plane."]
+    pub offset: Point2D,
+    #[doc = "Orientation plane.  The annotation will lie in this plane which is positioned about the leader position as its origin."]
+    pub plane_id: uuid::Uuid,
+    #[doc = "Number of decimal places to use when displaying tolerance and dimension values"]
+    pub precision: u32,
+    #[doc = "Prefix text which will appear before the basic dimension"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prefix: Option<String>,
+    #[doc = "Suffix text which will appear after the basic dimension"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub suffix: Option<String>,
+}
+
+impl std::fmt::Display for AnnotationFeatureControl {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AnnotationFeatureControl {
+    const LENGTH: usize = 13;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(control_frame) = &self.control_frame {
+                format!("{:?}", control_frame).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(defined_datum) = &self.defined_datum {
+                format!("{:?}", defined_datum).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(dimension) = &self.dimension {
+                format!("{:?}", dimension).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.entity_id).into(),
+            format!("{:?}", self.entity_pos).into(),
+            format!("{:?}", self.font_point_size).into(),
+            format!("{:?}", self.font_scale).into(),
+            format!("{:?}", self.leader_type).into(),
+            format!("{:?}", self.offset).into(),
+            format!("{:?}", self.plane_id).into(),
+            format!("{:?}", self.precision).into(),
+            if let Some(prefix) = &self.prefix {
+                format!("{:?}", prefix).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(suffix) = &self.suffix {
+                format!("{:?}", suffix).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "control_frame".into(),
+            "defined_datum".into(),
+            "dimension".into(),
+            "entity_id".into(),
+            "entity_pos".into(),
+            "font_point_size".into(),
+            "font_scale".into(),
+            "leader_type".into(),
+            "offset".into(),
+            "plane_id".into(),
+            "precision".into(),
+            "prefix".into(),
+            "suffix".into(),
+        ]
+    }
+}
+
+#[doc = "Parameters for defining an MBD Feature Tag Annotation state"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AnnotationFeatureTag {
+    #[doc = "Entity to place the annotation leader from"]
+    pub entity_id: uuid::Uuid,
+    #[doc = "Normalized position within the entity to position the annotation leader from"]
+    pub entity_pos: Point2D,
+    #[doc = "The point size of the fonts used to generate the annotation label.  Very large values can negatively affect performance."]
+    pub font_point_size: u32,
+    #[doc = "The scale of the font label in 3D space"]
+    pub font_scale: f64,
+    #[doc = "Tag key"]
+    pub key: String,
+    #[doc = "Type of leader to use"]
+    pub leader_type: AnnotationLineEnd,
+    #[doc = "2D Position offset of the annotation within the plane."]
+    pub offset: Point2D,
+    #[doc = "Orientation plane.  The annotation will lie in this plane which is positioned about the leader position as its origin."]
+    pub plane_id: uuid::Uuid,
+    #[doc = "Whether or not to display the key on the annotation label"]
+    pub show_key: bool,
+    #[doc = "Tag value"]
+    pub value: String,
+}
+
+impl std::fmt::Display for AnnotationFeatureTag {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AnnotationFeatureTag {
+    const LENGTH: usize = 10;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.entity_id).into(),
+            format!("{:?}", self.entity_pos).into(),
+            format!("{:?}", self.font_point_size).into(),
+            format!("{:?}", self.font_scale).into(),
+            self.key.clone().into(),
+            format!("{:?}", self.leader_type).into(),
+            format!("{:?}", self.offset).into(),
+            format!("{:?}", self.plane_id).into(),
+            format!("{:?}", self.show_key).into(),
+            self.value.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "entity_id".into(),
+            "entity_pos".into(),
+            "font_point_size".into(),
+            "font_scale".into(),
+            "key".into(),
+            "leader_type".into(),
+            "offset".into(),
+            "plane_id".into(),
+            "show_key".into(),
+            "value".into(),
+        ]
+    }
+}
+
 #[doc = "Annotation line end type"]
 #[derive(
     serde :: Serialize,
@@ -784,6 +1034,9 @@ pub enum AnnotationLineEnd {
     #[serde(rename = "arrow")]
     #[display("arrow")]
     Arrow,
+    #[serde(rename = "dot")]
+    #[display("dot")]
+    Dot,
 }
 
 #[doc = "Options for annotation text"]
@@ -822,6 +1075,139 @@ impl tabled::Tabled for AnnotationLineEndOptions {
     }
 }
 
+#[doc = "Parameters for defining an MBD basic dimension"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AnnotationMbdBasicDimension {
+    #[doc = "The explicitly defined dimension.  Only required if the measurement is not automatically calculated."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dimension: Option<f64>,
+    #[doc = "Type of symbol to use for this dimension (if required)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub symbol: Option<MbdSymbol>,
+    #[doc = "The tolerance of the dimension"]
+    pub tolerance: f64,
+}
+
+impl std::fmt::Display for AnnotationMbdBasicDimension {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AnnotationMbdBasicDimension {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(dimension) = &self.dimension {
+                format!("{:?}", dimension).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(symbol) = &self.symbol {
+                format!("{:?}", symbol).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.tolerance).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["dimension".into(), "symbol".into(), "tolerance".into()]
+    }
+}
+
+#[doc = "Parameters for defining an MBD Geometric control frame"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AnnotationMbdControlFrame {
+    #[doc = "Diameter symbol (if required) whether the geometric control requires a cylindrical or diameter tolerance"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub diameter_symbol: Option<MbdSymbol>,
+    #[doc = "Feature of size or tolerance modifiers"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub modifier: Option<MbdSymbol>,
+    #[doc = "Primary datum"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub primary_datum: Option<String>,
+    #[doc = "Secondary datum"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub secondary_datum: Option<String>,
+    #[doc = "Geometric symbol, the type of geometric control specified"]
+    pub symbol: MbdSymbol,
+    #[doc = "Tertiary datum"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tertiary_datum: Option<String>,
+    #[doc = "Tolerance value - the total tolerance of the geometric control.  The unit is based on the drawing standard."]
+    pub tolerance: f64,
+}
+
+impl std::fmt::Display for AnnotationMbdControlFrame {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AnnotationMbdControlFrame {
+    const LENGTH: usize = 7;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(diameter_symbol) = &self.diameter_symbol {
+                format!("{:?}", diameter_symbol).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(modifier) = &self.modifier {
+                format!("{:?}", modifier).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(primary_datum) = &self.primary_datum {
+                format!("{:?}", primary_datum).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(secondary_datum) = &self.secondary_datum {
+                format!("{:?}", secondary_datum).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.symbol).into(),
+            if let Some(tertiary_datum) = &self.tertiary_datum {
+                format!("{:?}", tertiary_datum).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.tolerance).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "diameter_symbol".into(),
+            "modifier".into(),
+            "primary_datum".into(),
+            "secondary_datum".into(),
+            "symbol".into(),
+            "tertiary_datum".into(),
+            "tolerance".into(),
+        ]
+    }
+}
+
 #[doc = "Options for annotations"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -830,6 +1216,15 @@ pub struct AnnotationOptions {
     #[doc = "Color to render the annotation"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub color: Option<Color>,
+    #[doc = "Set as an MBD measured basic dimension annotation"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dimension: Option<AnnotationBasicDimension>,
+    #[doc = "Set as an MBD Feature control annotation"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub feature_control: Option<AnnotationFeatureControl>,
+    #[doc = "Set as a feature tag annotation"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub feature_tag: Option<AnnotationFeatureTag>,
     #[doc = "How to style the start and end of the line"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub line_ends: Option<AnnotationLineEndOptions>,
@@ -856,11 +1251,26 @@ impl std::fmt::Display for AnnotationOptions {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AnnotationOptions {
-    const LENGTH: usize = 5;
+    const LENGTH: usize = 8;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(color) = &self.color {
                 format!("{:?}", color).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(dimension) = &self.dimension {
+                format!("{:?}", dimension).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(feature_control) = &self.feature_control {
+                format!("{:?}", feature_control).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(feature_tag) = &self.feature_tag {
+                format!("{:?}", feature_tag).into()
             } else {
                 String::new().into()
             },
@@ -890,6 +1300,9 @@ impl tabled::Tabled for AnnotationOptions {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "color".into(),
+            "dimension".into(),
+            "feature_control".into(),
+            "feature_tag".into(),
             "line_ends".into(),
             "line_width".into(),
             "position".into(),
@@ -4175,6 +4588,42 @@ pub enum CutType {
     Chamfer,
 }
 
+#[doc = "What kind of cut to perform when cutting an edge."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub enum CutTypeV2 {
+    #[doc = "Round off an edge."]
+    #[serde(rename = "fillet")]
+    Fillet {
+        #[doc = "The radius of the fillet."]
+        radius: f64,
+        #[doc = "The second length affects the edge length of the second face of the cut. This will cause the fillet to take on the shape of a conic section, instead of an arc."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        second_length: Option<f64>,
+    },
+    #[doc = "Cut away an edge."]
+    #[serde(rename = "chamfer")]
+    Chamfer {
+        #[doc = "The angle of the chamfer, default is 45deg."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        angle: Option<Angle>,
+        #[doc = "The distance from the edge to cut on each face."]
+        distance: f64,
+        #[doc = "The second distance affects the edge length of the second face of the cut."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        second_distance: Option<f64>,
+        #[doc = "If true, the second distance or angle is applied to the other face of the cut."]
+        swap: bool,
+    },
+    #[doc = "A custom cut profile."]
+    #[serde(rename = "custom")]
+    Custom {
+        #[doc = "The path that will be used for the custom profile."]
+        path: uuid::Uuid,
+    },
+}
+
 #[doc = "The response from the `DefaultCameraCenterToScene` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -6324,6 +6773,62 @@ pub enum ExtrudeMethod {
     Merge,
 }
 
+#[doc = "Type of reference geometry to extrude to."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub enum ExtrudeReference {
+    #[doc = "Extrudes along the normal of the top face until it is as close to the entity as possible. An entity can be a solid, a path, a face, etc."]
+    #[serde(rename = "entity_reference")]
+    EntityReference {
+        #[doc = "The UUID of the entity to extrude to."]
+        entity_id: uuid::Uuid,
+    },
+    #[doc = "Extrudes until the top face is as close as possible to this given axis."]
+    #[serde(rename = "axis")]
+    Axis {
+        #[doc = "The axis to extrude to."]
+        axis: Point3D,
+        #[doc = "Point the axis goes through. Defaults to (0, 0, 0)."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        point: Option<Point3D>,
+    },
+    #[doc = "Extrudes until the top face is as close as possible to this given point."]
+    #[serde(rename = "point")]
+    Point {
+        #[doc = "The point to extrude to."]
+        point: Point3D,
+    },
+}
+
+#[doc = "The response from the `ExtrudeToReference` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ExtrudeToReference {}
+
+impl std::fmt::Display for ExtrudeToReference {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ExtrudeToReference {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "IDs for the extruded faces."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8214,6 +8719,9 @@ pub struct Invoice {
     #[doc = "Whether payment was successfully collected for this invoice.\n\nAn invoice can be paid (most commonly) with a charge or with credit from the customer's account balance."]
     #[serde(default)]
     pub paid: bool,
+    #[doc = "Identifier for the payment intent backing this invoice."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub payment_intent_id: Option<String>,
     #[doc = "The link to download the PDF for the invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pdf: Option<String>,
@@ -8252,7 +8760,7 @@ impl std::fmt::Display for Invoice {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Invoice {
-    const LENGTH: usize = 25;
+    const LENGTH: usize = 26;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(amount_due) = &self.amount_due {
@@ -8328,6 +8836,11 @@ impl tabled::Tabled for Invoice {
                 String::new().into()
             },
             format!("{:?}", self.paid).into(),
+            if let Some(payment_intent_id) = &self.payment_intent_id {
+                format!("{:?}", payment_intent_id).into()
+            } else {
+                String::new().into()
+            },
             if let Some(pdf) = &self.pdf {
                 format!("{:?}", pdf).into()
             } else {
@@ -8390,6 +8903,7 @@ impl tabled::Tabled for Invoice {
             "metadata".into(),
             "number".into(),
             "paid".into(),
+            "payment_intent_id".into(),
             "pdf".into(),
             "receipt_number".into(),
             "statement_descriptor".into(),
@@ -9115,6 +9629,212 @@ impl tabled::Tabled for Mass {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["mass".into(), "output_unit".into()]
     }
+}
+
+#[doc = "MBD symbol type"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum MbdSymbol {
+    #[serde(rename = "none")]
+    #[display("none")]
+    None,
+    #[serde(rename = "arclength")]
+    #[display("arclength")]
+    Arclength,
+    #[serde(rename = "between")]
+    #[display("between")]
+    Between,
+    #[serde(rename = "degrees")]
+    #[display("degrees")]
+    Degrees,
+    #[serde(rename = "plusminus")]
+    #[display("plusminus")]
+    Plusminus,
+    #[serde(rename = "angularity")]
+    #[display("angularity")]
+    Angularity,
+    #[serde(rename = "cylindricity")]
+    #[display("cylindricity")]
+    Cylindricity,
+    #[serde(rename = "roundness")]
+    #[display("roundness")]
+    Roundness,
+    #[serde(rename = "concentricity")]
+    #[display("concentricity")]
+    Concentricity,
+    #[serde(rename = "straightness")]
+    #[display("straightness")]
+    Straightness,
+    #[serde(rename = "parallelism")]
+    #[display("parallelism")]
+    Parallelism,
+    #[serde(rename = "flatness")]
+    #[display("flatness")]
+    Flatness,
+    #[serde(rename = "profileofline")]
+    #[display("profileofline")]
+    Profileofline,
+    #[serde(rename = "surfaceprofile")]
+    #[display("surfaceprofile")]
+    Surfaceprofile,
+    #[serde(rename = "symmetry")]
+    #[display("symmetry")]
+    Symmetry,
+    #[serde(rename = "perpendicularity")]
+    #[display("perpendicularity")]
+    Perpendicularity,
+    #[serde(rename = "runout")]
+    #[display("runout")]
+    Runout,
+    #[serde(rename = "totalrunout")]
+    #[display("totalrunout")]
+    Totalrunout,
+    #[serde(rename = "position")]
+    #[display("position")]
+    Position,
+    #[serde(rename = "centerline")]
+    #[display("centerline")]
+    Centerline,
+    #[serde(rename = "partingline")]
+    #[display("partingline")]
+    Partingline,
+    #[serde(rename = "isoenvelope")]
+    #[display("isoenvelope")]
+    Isoenvelope,
+    #[serde(rename = "isoenvelopenony145m")]
+    #[display("isoenvelopenony145m")]
+    Isoenvelopenony145M,
+    #[serde(rename = "freestate")]
+    #[display("freestate")]
+    Freestate,
+    #[serde(rename = "statisticaltolerance")]
+    #[display("statisticaltolerance")]
+    Statisticaltolerance,
+    #[serde(rename = "continuousfeature")]
+    #[display("continuousfeature")]
+    Continuousfeature,
+    #[serde(rename = "independency")]
+    #[display("independency")]
+    Independency,
+    #[serde(rename = "depth")]
+    #[display("depth")]
+    Depth,
+    #[serde(rename = "start")]
+    #[display("start")]
+    Start,
+    #[serde(rename = "leastcondition")]
+    #[display("leastcondition")]
+    Leastcondition,
+    #[serde(rename = "maxcondition")]
+    #[display("maxcondition")]
+    Maxcondition,
+    #[serde(rename = "conicaltaper")]
+    #[display("conicaltaper")]
+    Conicaltaper,
+    #[serde(rename = "projected")]
+    #[display("projected")]
+    Projected,
+    #[serde(rename = "slope")]
+    #[display("slope")]
+    Slope,
+    #[serde(rename = "micro")]
+    #[display("micro")]
+    Micro,
+    #[serde(rename = "tangentplane")]
+    #[display("tangentplane")]
+    Tangentplane,
+    #[serde(rename = "unilateral")]
+    #[display("unilateral")]
+    Unilateral,
+    #[serde(rename = "squarefeature")]
+    #[display("squarefeature")]
+    Squarefeature,
+    #[serde(rename = "countersink")]
+    #[display("countersink")]
+    Countersink,
+    #[serde(rename = "spotface")]
+    #[display("spotface")]
+    Spotface,
+    #[serde(rename = "target")]
+    #[display("target")]
+    Target,
+    #[serde(rename = "diameter")]
+    #[display("diameter")]
+    Diameter,
+    #[serde(rename = "radius")]
+    #[display("radius")]
+    Radius,
+    #[serde(rename = "sphericalradius")]
+    #[display("sphericalradius")]
+    Sphericalradius,
+    #[serde(rename = "sphericaldiameter")]
+    #[display("sphericaldiameter")]
+    Sphericaldiameter,
+    #[serde(rename = "controlledradius")]
+    #[display("controlledradius")]
+    Controlledradius,
+    #[serde(rename = "boxstart")]
+    #[display("boxstart")]
+    Boxstart,
+    #[serde(rename = "boxbar")]
+    #[display("boxbar")]
+    Boxbar,
+    #[serde(rename = "boxbarbetween")]
+    #[display("boxbarbetween")]
+    Boxbarbetween,
+    #[serde(rename = "letterbackwardunderline")]
+    #[display("letterbackwardunderline")]
+    Letterbackwardunderline,
+    #[serde(rename = "punctuationbackwardunderline")]
+    #[display("punctuationbackwardunderline")]
+    Punctuationbackwardunderline,
+    #[serde(rename = "modifierbackwardunderline")]
+    #[display("modifierbackwardunderline")]
+    Modifierbackwardunderline,
+    #[serde(rename = "numericbackwardunderline")]
+    #[display("numericbackwardunderline")]
+    Numericbackwardunderline,
+    #[serde(rename = "boxend")]
+    #[display("boxend")]
+    Boxend,
+    #[serde(rename = "datumup")]
+    #[display("datumup")]
+    Datumup,
+    #[serde(rename = "datumleft")]
+    #[display("datumleft")]
+    Datumleft,
+    #[serde(rename = "datumright")]
+    #[display("datumright")]
+    Datumright,
+    #[serde(rename = "datumdown")]
+    #[display("datumdown")]
+    Datumdown,
+    #[serde(rename = "datumtriangle")]
+    #[display("datumtriangle")]
+    Datumtriangle,
+    #[serde(rename = "halfspace")]
+    #[display("halfspace")]
+    Halfspace,
+    #[serde(rename = "quarterspace")]
+    #[display("quarterspace")]
+    Quarterspace,
+    #[serde(rename = "eighthspace")]
+    #[display("eighthspace")]
+    Eighthspace,
+    #[serde(rename = "modifierspace")]
+    #[display("modifierspace")]
+    Modifierspace,
 }
 
 #[doc = "The Request Method (VERB)\n\nThis type also contains constants for a number of common HTTP methods such as GET, POST, etc.\n\nCurrently includes 8 variants representing the 8 methods defined in [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH, and an Extension variant for all extensions."]
@@ -10058,6 +10778,9 @@ pub enum ModelingCmd {
     #[doc = "Extend a path by adding a new segment which starts at the path's \"pen\". If no \"pen\" location has been set before (via `MovePen`), then the pen is at the origin."]
     #[serde(rename = "extend_path")]
     ExtendPath {
+        #[doc = "Optional label to associate with the new path segment."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        label: Option<String>,
         #[doc = "The ID of the command which created the path."]
         path: uuid::Uuid,
         #[doc = "Segment to append to the path. This segment will implicitly begin at the current \"pen\" location."]
@@ -10077,6 +10800,20 @@ pub enum ModelingCmd {
         #[doc = "Should the extrusion also extrude in the opposite direction? If so, this specifies its distance."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         opposite: Option<String>,
+        #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
+        target: uuid::Uuid,
+    },
+    #[doc = "Command for extruding a solid 2d to a reference geometry."]
+    #[serde(rename = "extrude_to_reference")]
+    ExtrudeToReference {
+        #[doc = "Should the extrusion create a new object or be part of the existing object."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        extrude_method: Option<ExtrudeMethod>,
+        #[doc = "Which IDs should the new faces have? If this isn't given, the engine will generate IDs."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        faces: Option<ExtrudedFaceInfo>,
+        #[doc = "Reference to extrude to. Extrusion occurs along the target's normal until it is as close to the reference as possible."]
+        reference: ExtrudeReference,
         #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
         target: uuid::Uuid,
     },
@@ -10385,8 +11122,9 @@ pub enum ModelingCmd {
         cylinder_id: uuid::Uuid,
         #[doc = "Is the helix rotation clockwise?"]
         is_clockwise: bool,
-        #[doc = "Length of the helix."]
-        length: f64,
+        #[doc = "Length of the helix. If None, the length of the cylinder will be used instead."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        length: Option<f64>,
         #[doc = "Number of revolutions."]
         revolutions: f64,
         #[doc = "Start angle."]
@@ -10638,6 +11376,25 @@ pub enum ModelingCmd {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         strategy: Option<CutStrategy>,
         #[doc = "The maximum acceptable surface gap computed between the filleted surfaces. Must be positive (i.e. greater than zero)."]
+        tolerance: f64,
+    },
+    #[doc = "Cut the list of given edges with the given cut parameters."]
+    #[serde(rename = "solid3d_cut_edges")]
+    Solid3DCutEdges {
+        #[doc = "The cut type and information required to perform the cut."]
+        cut_type: CutTypeV2,
+        #[doc = "Which edges you want to cut."]
+        #[serde(default)]
+        edge_ids: Vec<uuid::Uuid>,
+        #[doc = "What IDs should the resulting faces have? If you've only passed one edge ID, its ID will be the command ID used to send this command, and this field should be empty. If you've passed `n` IDs (to cut `n` edges), then this should be length `n-1`, and the first edge will use the command ID used to send this command."]
+        #[serde(default)]
+        extra_face_ids: Vec<uuid::Uuid>,
+        #[doc = "Which object is being cut."]
+        object_id: uuid::Uuid,
+        #[doc = "Which cutting algorithm to use."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        strategy: Option<CutStrategy>,
+        #[doc = "The maximum acceptable surface gap computed between the cut surfaces. Must be positive (i.e. greater than zero)."]
         tolerance: f64,
     },
     #[doc = "Determines whether a brep face is planar and returns its surface-local planar axes if so"]
@@ -11567,6 +12324,11 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `Extrude` endpoint."]
         data: Extrude,
     },
+    #[serde(rename = "extrude_to_reference")]
+    ExtrudeToReference {
+        #[doc = "The response from the `ExtrudeToReference` endpoint."]
+        data: ExtrudeToReference,
+    },
     #[serde(rename = "twist_extrude")]
     TwistExtrude {
         #[doc = "The response from the `TwistExtrude` endpoint."]
@@ -11671,6 +12433,11 @@ pub enum OkModelingCmdResponse {
     Solid3DFilletEdge {
         #[doc = "The response from the `Solid3dFilletEdge` endpoint."]
         data: Solid3DFilletEdge,
+    },
+    #[serde(rename = "solid3d_cut_edges")]
+    Solid3DCutEdges {
+        #[doc = "The response from the `Solid3dCutEdges` endpoint."]
+        data: Solid3DCutEdges,
     },
     #[serde(rename = "send_object")]
     SendObject {
@@ -15748,6 +16515,34 @@ impl std::fmt::Display for Solid2DAddHole {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Solid2DAddHole {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `Solid3dCutEdges` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DCutEdges {}
+
+impl std::fmt::Display for Solid3DCutEdges {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DCutEdges {
     const LENGTH: usize = 0;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![]

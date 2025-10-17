@@ -72,11 +72,7 @@ async fn win_ca_smoke() -> Result<()> {
                     ));
                 }
 
-                return Err(anyhow!(
-                    "unexpected response body {:?} from {}",
-                    body,
-                    target
-                ));
+                return Err(anyhow!("unexpected response body {body:?} from {target}"));
             }
             Err(err) => {
                 last_error = Some(err.to_string());

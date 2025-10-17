@@ -374,6 +374,7 @@ async fn test_modeling_websocket() {
                             end: point,
                             relative: false,
                         },
+                        label: None,
                     },
                     cmd_id: Uuid::new_v4(),
                 })
