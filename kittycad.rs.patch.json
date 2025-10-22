@@ -995,7 +995,7 @@
     "op": "add",
     "path": "/paths/~1user~1payment~1methods~1{id}/delete/x-rust",
     "value": {
-      "example": "/// Delete a payment method for your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It deletes the specified payment method for the authenticated user.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The ID of the payment method. (required)\nasync fn example_payments_delete_method_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_method_for_user(\"some-string\")\n        .await?;\n    Ok(())\n}\n",
+      "example": "/// Delete a payment method for your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It deletes the specified payment method for the authenticated user.\n/// \n/// **Parameters:**\n/// \n/// - `force: Option<bool>`: If true, force the deletion by bypassing our only-payment-method check.\n/// - `id: &'astr`: The ID of the payment method. (required)\nasync fn example_payments_delete_method_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_method_for_user(Some(true), \"some-string\")\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.delete_method_for_user"
     }
   },

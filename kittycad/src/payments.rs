@@ -830,10 +830,19 @@ impl Payments {
         }
     }
 
-    #[doc = "Delete a payment method for your user.\n\nThis endpoint requires authentication by any Zoo user. It deletes the specified payment method for the authenticated user.\n\n**Parameters:**\n\n- `id: &'astr`: The ID of the payment method. (required)\n\n```rust,no_run\nasync fn example_payments_delete_method_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_method_for_user(\"some-string\")\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Delete a payment method for your user.\n\nThis endpoint requires authentication by \
+             any Zoo user. It deletes the specified payment method for the authenticated \
+             user.\n\n**Parameters:**\n\n- `force: Option<bool>`: If true, force the deletion by \
+             bypassing our only-payment-method check.\n- `id: &'astr`: The ID of the payment \
+             method. (required)\n\n```rust,no_run\nasync fn \
+             example_payments_delete_method_for_user() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    client\n        .payments()\n        \
+             .delete_method_for_user(Some(true), \"some-string\")\n        .await?;\n    \
+             Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn delete_method_for_user<'a>(
         &'a self,
+        force: Option<bool>,
         id: &'a str,
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
@@ -845,6 +854,12 @@ impl Payments {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = force {
+            query_params.push(("force", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {

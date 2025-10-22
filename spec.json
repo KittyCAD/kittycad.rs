@@ -17116,6 +17116,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "force",
+            "description": "If true, force the deletion by bypassing our only-payment-method check.",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
