@@ -597,6 +597,102 @@ impl tabled::Tabled for AddOrgMember {
     }
 }
 
+#[doc = "An address for a user."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Address {
+    #[doc = "The city component."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub city: Option<String>,
+    #[doc = "The country component. This is a two-letter ISO country code."]
+    pub country: String,
+    #[doc = "The time and date the address was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The unique identifier of the address."]
+    pub id: uuid::Uuid,
+    #[doc = "The state component."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub state: Option<String>,
+    #[doc = "The first street component."]
+    #[serde(rename = "street1", default, skip_serializing_if = "Option::is_none")]
+    pub street_1: Option<String>,
+    #[doc = "The second street component."]
+    #[serde(rename = "street2", default, skip_serializing_if = "Option::is_none")]
+    pub street_2: Option<String>,
+    #[doc = "The time and date the address was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID that this address belongs to."]
+    pub user_id: uuid::Uuid,
+    #[doc = "The zip component."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub zip: Option<String>,
+}
+
+impl std::fmt::Display for Address {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Address {
+    const LENGTH: usize = 10;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(city) = &self.city {
+                format!("{:?}", city).into()
+            } else {
+                String::new().into()
+            },
+            self.country.clone().into(),
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.id).into(),
+            if let Some(state) = &self.state {
+                format!("{:?}", state).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(street_1) = &self.street_1 {
+                format!("{:?}", street_1).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(street_2) = &self.street_2 {
+                format!("{:?}", street_2).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.updated_at).into(),
+            format!("{:?}", self.user_id).into(),
+            if let Some(zip) = &self.zip {
+                format!("{:?}", zip).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "city".into(),
+            "country".into(),
+            "created_at".into(),
+            "id".into(),
+            "state".into(),
+            "street_1".into(),
+            "street_2".into(),
+            "updated_at".into(),
+            "user_id".into(),
+            "zip".into(),
+        ]
+    }
+}
+
 #[doc = "Address details."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -13520,6 +13616,195 @@ impl tabled::Tabled for Org {
     }
 }
 
+#[doc = "An address for an organization."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrgAddress {
+    #[doc = "The city component."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub city: Option<String>,
+    #[doc = "The country component. This is a two-letter ISO country code."]
+    pub country: String,
+    #[doc = "The time and date the address was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The unique identifier of the address."]
+    pub id: uuid::Uuid,
+    #[doc = "The org ID that this address belongs to."]
+    pub org_id: uuid::Uuid,
+    #[doc = "The state component."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub state: Option<String>,
+    #[doc = "The first street component."]
+    #[serde(rename = "street1", default, skip_serializing_if = "Option::is_none")]
+    pub street_1: Option<String>,
+    #[doc = "The second street component."]
+    #[serde(rename = "street2", default, skip_serializing_if = "Option::is_none")]
+    pub street_2: Option<String>,
+    #[doc = "The time and date the address was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The zip component."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub zip: Option<String>,
+}
+
+impl std::fmt::Display for OrgAddress {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrgAddress {
+    const LENGTH: usize = 10;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(city) = &self.city {
+                format!("{:?}", city).into()
+            } else {
+                String::new().into()
+            },
+            self.country.clone().into(),
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.org_id).into(),
+            if let Some(state) = &self.state {
+                format!("{:?}", state).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(street_1) = &self.street_1 {
+                format!("{:?}", street_1).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(street_2) = &self.street_2 {
+                format!("{:?}", street_2).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.updated_at).into(),
+            if let Some(zip) = &self.zip {
+                format!("{:?}", zip).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "city".into(),
+            "country".into(),
+            "created_at".into(),
+            "id".into(),
+            "org_id".into(),
+            "state".into(),
+            "street_1".into(),
+            "street_2".into(),
+            "updated_at".into(),
+            "zip".into(),
+        ]
+    }
+}
+
+#[doc = "Extra admin-only details for an organization."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrgAdminDetails {
+    #[doc = "Latest billing address stored for the organization."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub address: Option<OrgAddress>,
+    #[doc = "Readable billing address summary."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub address_summary: Option<String>,
+    #[doc = "Block reason when the org is blocked."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub block: Option<BlockReason>,
+    #[doc = "Human-friendly block reason message."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub block_message: Option<String>,
+    #[doc = "Known payment methods on file."]
+    pub payment_methods: Vec<PaymentMethod>,
+    #[doc = "Summaries of the known payment methods."]
+    pub payment_methods_summary: Vec<String>,
+    #[doc = "Stripe customer identifier if one exists."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stripe_customer_id: Option<String>,
+    #[doc = "Direct link to the Stripe customer dashboard."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stripe_dashboard_url: Option<String>,
+}
+
+impl std::fmt::Display for OrgAdminDetails {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrgAdminDetails {
+    const LENGTH: usize = 8;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(address) = &self.address {
+                format!("{:?}", address).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(address_summary) = &self.address_summary {
+                format!("{:?}", address_summary).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(block) = &self.block {
+                format!("{:?}", block).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(block_message) = &self.block_message {
+                format!("{:?}", block_message).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.payment_methods).into(),
+            format!("{:?}", self.payment_methods_summary).into(),
+            if let Some(stripe_customer_id) = &self.stripe_customer_id {
+                format!("{:?}", stripe_customer_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(stripe_dashboard_url) = &self.stripe_dashboard_url {
+                format!("{:?}", stripe_dashboard_url).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "address".into(),
+            "address_summary".into(),
+            "block".into(),
+            "block_message".into(),
+            "payment_methods".into(),
+            "payment_methods_summary".into(),
+            "stripe_customer_id".into(),
+            "stripe_dashboard_url".into(),
+        ]
+    }
+}
+
 #[doc = "The user-modifiable parts of an organization."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -21220,6 +21505,108 @@ impl tabled::Tabled for User {
             "name".into(),
             "phone".into(),
             "updated_at".into(),
+        ]
+    }
+}
+
+#[doc = "Extra admin-only details for a user."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UserAdminDetails {
+    #[doc = "Latest billing address stored for the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub address: Option<Address>,
+    #[doc = "Readable billing address summary."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub address_summary: Option<String>,
+    #[doc = "Block reason when the user is blocked."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub block: Option<BlockReason>,
+    #[doc = "Human-friendly block reason message."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub block_message: Option<String>,
+    #[doc = "Direct or search link to the HubSpot contact record."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hubspot_contact_url: Option<String>,
+    #[doc = "Known payment methods on file."]
+    pub payment_methods: Vec<PaymentMethod>,
+    #[doc = "Summaries of the known payment methods."]
+    pub payment_methods_summary: Vec<String>,
+    #[doc = "Stripe customer identifier if one exists."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stripe_customer_id: Option<String>,
+    #[doc = "Direct link to the Stripe customer dashboard."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stripe_dashboard_url: Option<String>,
+}
+
+impl std::fmt::Display for UserAdminDetails {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for UserAdminDetails {
+    const LENGTH: usize = 9;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(address) = &self.address {
+                format!("{:?}", address).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(address_summary) = &self.address_summary {
+                format!("{:?}", address_summary).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(block) = &self.block {
+                format!("{:?}", block).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(block_message) = &self.block_message {
+                format!("{:?}", block_message).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(hubspot_contact_url) = &self.hubspot_contact_url {
+                format!("{:?}", hubspot_contact_url).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.payment_methods).into(),
+            format!("{:?}", self.payment_methods_summary).into(),
+            if let Some(stripe_customer_id) = &self.stripe_customer_id {
+                format!("{:?}", stripe_customer_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(stripe_dashboard_url) = &self.stripe_dashboard_url {
+                format!("{:?}", stripe_dashboard_url).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "address".into(),
+            "address_summary".into(),
+            "block".into(),
+            "block_message".into(),
+            "hubspot_contact_url".into(),
+            "payment_methods".into(),
+            "payment_methods_summary".into(),
+            "stripe_customer_id".into(),
+            "stripe_dashboard_url".into(),
         ]
     }
 }
