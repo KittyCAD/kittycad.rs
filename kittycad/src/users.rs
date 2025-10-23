@@ -695,6 +695,47 @@ impl Users {
         }
     }
 
+    #[doc = "Get admin-only details for a user.\n\nZoo admins can retrieve extended information \
+             about any user, while non-admins receive a 404 to avoid leaking the existence of the \
+             resource.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or \
+             email). (required)\n\n```rust,no_run\nasync fn example_users_admin_details_get() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::UserAdminDetails =\n        \
+             client.users().admin_details_get(\"some-string\").await?;\n    println!(\"{:?}\", \
+             result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn admin_details_get<'a>(
+        &'a self,
+        id: &'a str,
+    ) -> Result<crate::types::UserAdminDetails, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "users/{id}/admin/details".replace("{id}", id)
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Update a subscription for a user.\n\nYou must be a Zoo admin to perform this \
              request.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or email). \
              (required)\n\n```rust,no_run\nasync fn example_users_update_subscription_for() -> \

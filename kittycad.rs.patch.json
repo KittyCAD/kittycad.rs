@@ -665,6 +665,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1orgs~1{id}~1admin~1details/get/x-rust",
+    "value": {
+      "example": "/// Get admin-only details for an organization.\n/// \n/// Zoo admins can retrieve extended information about any organization, while non-admins receive a 404 to avoid leaking existence.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_orgs_admin_details_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgAdminDetails = client\n        .orgs()\n        .admin_details_get(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.admin_details_get"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1orgs~1{id}~1enterprise~1pricing/put/x-rust",
     "value": {
       "example": "/// Set the enterprise price for an organization.\n/// \n/// You must be a Zoo admin to perform this request.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        .update_enterprise_pricing_for(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::EnterpriseSubscriptionTierPrice::Flat {\n                interval: kittycad::types::PlanInterval::Week,\n                price: 3.14 as f64,\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
@@ -1149,6 +1157,14 @@
     "value": {
       "example": "/// Get a user.\n/// \n/// To get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n/// \n/// Alternatively, to get information about the authenticated user, use `/user` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The user's identifier (uuid or email). (required)\nasync fn example_users_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client.users().get(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1users~1{id}~1admin~1details/get/x-rust",
+    "value": {
+      "example": "/// Get admin-only details for a user.\n/// \n/// Zoo admins can retrieve extended information about any user, while non-admins receive a 404 to avoid leaking the existence of the resource.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The user's identifier (uuid or email). (required)\nasync fn example_users_admin_details_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserAdminDetails =\n        client.users().admin_details_get(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.admin_details_get"
     }
   },
   {

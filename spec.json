@@ -11748,6 +11748,112 @@
         }
       }
     },
+    "/orgs/{id}/admin/details": {
+      "get": {
+        "tags": [
+          "orgs",
+          "hidden"
+        ],
+        "summary": "Get admin-only details for an organization.",
+        "description": "Zoo admins can retrieve extended information about any organization, while non-admins receive a 404 to avoid leaking existence.",
+        "operationId": "org_admin_details_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The organization ID.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgAdminDetails"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/orgs/{id}/enterprise/pricing": {
       "put": {
         "tags": [
@@ -19567,6 +19673,112 @@
         }
       }
     },
+    "/users/{id}/admin/details": {
+      "get": {
+        "tags": [
+          "users",
+          "hidden"
+        ],
+        "summary": "Get admin-only details for a user.",
+        "description": "Zoo admins can retrieve extended information about any user, while non-admins receive a 404 to avoid leaking the existence of the resource.",
+        "operationId": "user_admin_details_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The user's identifier (uuid or email).",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UserIdentifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAdminDetails"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/users/{id}/api-calls": {
       "get": {
         "tags": [
@@ -21187,6 +21399,75 @@
         "required": [
           "email",
           "role"
+        ]
+      },
+      "Address": {
+        "description": "An address for a user.",
+        "type": "object",
+        "properties": {
+          "city": {
+            "description": "The city component.",
+            "type": "string"
+          },
+          "country": {
+            "description": "The country component. This is a two-letter ISO country code.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CountryCode"
+              }
+            ]
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "The time and date the address was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "description": "The unique identifier of the address.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "state": {
+            "description": "The state component.",
+            "type": "string"
+          },
+          "street1": {
+            "description": "The first street component.",
+            "type": "string"
+          },
+          "street2": {
+            "description": "The second street component.",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The time and date the address was last updated.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "description": "The user ID that this address belongs to.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "zip": {
+            "description": "The zip component.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "country",
+          "created_at",
+          "id",
+          "updated_at",
+          "user_id"
         ]
       },
       "AddressDetails": {
@@ -36529,6 +36810,137 @@
           "updated_at"
         ]
       },
+      "OrgAddress": {
+        "description": "An address for an organization.",
+        "type": "object",
+        "properties": {
+          "city": {
+            "description": "The city component.",
+            "type": "string"
+          },
+          "country": {
+            "description": "The country component. This is a two-letter ISO country code.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CountryCode"
+              }
+            ]
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "The time and date the address was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "description": "The unique identifier of the address.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "org_id": {
+            "description": "The org ID that this address belongs to.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "state": {
+            "description": "The state component.",
+            "type": "string"
+          },
+          "street1": {
+            "description": "The first street component.",
+            "type": "string"
+          },
+          "street2": {
+            "description": "The second street component.",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The time and date the address was last updated.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "zip": {
+            "description": "The zip component.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "country",
+          "created_at",
+          "id",
+          "org_id",
+          "updated_at"
+        ]
+      },
+      "OrgAdminDetails": {
+        "description": "Extra admin-only details for an organization.",
+        "type": "object",
+        "properties": {
+          "address": {
+            "nullable": true,
+            "description": "Latest billing address stored for the organization.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrgAddress"
+              }
+            ]
+          },
+          "address_summary": {
+            "nullable": true,
+            "description": "Readable billing address summary.",
+            "type": "string"
+          },
+          "block": {
+            "nullable": true,
+            "description": "Block reason when the org is blocked.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BlockReason"
+              }
+            ]
+          },
+          "block_message": {
+            "nullable": true,
+            "description": "Human-friendly block reason message.",
+            "type": "string"
+          },
+          "payment_methods": {
+            "description": "Known payment methods on file.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentMethod"
+            }
+          },
+          "payment_methods_summary": {
+            "description": "Summaries of the known payment methods.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "stripe_customer_id": {
+            "nullable": true,
+            "description": "Stripe customer identifier if one exists.",
+            "type": "string"
+          },
+          "stripe_dashboard_url": {
+            "nullable": true,
+            "description": "Direct link to the Stripe customer dashboard.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "payment_methods",
+          "payment_methods_summary"
+        ]
+      },
       "OrgDetails": {
         "description": "The user-modifiable parts of an organization.",
         "type": "object",
@@ -42748,6 +43160,73 @@
           "id",
           "image",
           "updated_at"
+        ]
+      },
+      "UserAdminDetails": {
+        "description": "Extra admin-only details for a user.",
+        "type": "object",
+        "properties": {
+          "address": {
+            "nullable": true,
+            "description": "Latest billing address stored for the user.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              }
+            ]
+          },
+          "address_summary": {
+            "nullable": true,
+            "description": "Readable billing address summary.",
+            "type": "string"
+          },
+          "block": {
+            "nullable": true,
+            "description": "Block reason when the user is blocked.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BlockReason"
+              }
+            ]
+          },
+          "block_message": {
+            "nullable": true,
+            "description": "Human-friendly block reason message.",
+            "type": "string"
+          },
+          "hubspot_contact_url": {
+            "nullable": true,
+            "description": "Direct or search link to the HubSpot contact record.",
+            "type": "string"
+          },
+          "payment_methods": {
+            "description": "Known payment methods on file.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentMethod"
+            }
+          },
+          "payment_methods_summary": {
+            "description": "Summaries of the known payment methods.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "stripe_customer_id": {
+            "nullable": true,
+            "description": "Stripe customer identifier if one exists.",
+            "type": "string"
+          },
+          "stripe_dashboard_url": {
+            "nullable": true,
+            "description": "Direct link to the Stripe customer dashboard.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "payment_methods",
+          "payment_methods_summary"
         ]
       },
       "UserOrgInfo": {
