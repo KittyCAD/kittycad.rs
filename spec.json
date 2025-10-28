@@ -24791,22 +24791,6 @@
             "type": "string",
             "format": "date-time"
           },
-          "id": {
-            "description": "The unique identifier for the balance.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "map_id": {
-            "description": "The mapping id of the user or org.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
           "modeling_app_enterprise_price": {
             "nullable": true,
             "description": "The enterprise price for the Modeling App subscription, if they are on the enterprise plan.",
@@ -24817,26 +24801,26 @@
             ]
           },
           "monthly_api_credits_remaining": {
-            "description": "The number of monthly API credits remaining in the balance. This is the number of credits remaining in the balance.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database.",
+            "description": "The number of monthly API credits remaining in the balance.",
             "type": "integer",
             "format": "uint64",
             "minimum": 0
           },
           "monthly_api_credits_remaining_monetary_value": {
             "title": "double",
-            "description": "The monetary value of the monthly API credits remaining in the balance. This gets re-upped every month, but if the credits are not used for a month they do not carry over to the next month.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database.",
+            "description": "The monetary value of the monthly API credits remaining in the balance.",
             "type": "number",
             "format": "money-usd"
           },
           "stable_api_credits_remaining": {
-            "description": "The number of stable API credits remaining in the balance. These do not get reset or re-upped every month. This is separate from the monthly credits. Credits will first pull from the monthly credits, then the stable credits. Stable just means that they do not get reset every month. A user will have stable credits if a Zoo employee granted them credits.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database.",
+            "description": "The number of stable API credits remaining in the balance.",
             "type": "integer",
             "format": "uint64",
             "minimum": 0
           },
           "stable_api_credits_remaining_monetary_value": {
             "title": "double",
-            "description": "The monetary value of stable API credits remaining in the balance. These do not get reset or re-upped every month. This is separate from the monthly credits. Credits will first pull from the monthly credits, then the stable credits. Stable just means that they do not get reset every month. A user will have stable credits if a Zoo employee granted them credits.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database.",
+            "description": "The monetary value of stable API credits remaining in the balance.",
             "type": "number",
             "format": "money-usd"
           },
@@ -24870,8 +24854,6 @@
         },
         "required": [
           "created_at",
-          "id",
-          "map_id",
           "monthly_api_credits_remaining",
           "monthly_api_credits_remaining_monetary_value",
           "stable_api_credits_remaining",
@@ -42968,7 +42950,7 @@
         ]
       },
       "UpdatePaymentBalance": {
-        "description": "The data for updating a balance.",
+        "description": "Payload for updating a user's balance.",
         "type": "object",
         "properties": {
           "monthly_api_credits_remaining_monetary_value": {
