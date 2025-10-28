@@ -4609,36 +4609,17 @@ impl tabled::Tabled for Customer {
 pub struct CustomerBalance {
     #[doc = "The date and time the balance was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The unique identifier for the balance."]
-    pub id: uuid::Uuid,
-    #[doc = "The mapping id of the user or org."]
-    pub map_id: uuid::Uuid,
     #[doc = "The enterprise price for the Modeling App subscription, if they are on the \
              enterprise plan."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub modeling_app_enterprise_price: Option<SubscriptionTierPrice>,
-    #[doc = "The number of monthly API credits remaining in the balance. This is the number of \
-             credits remaining in the balance.\n\nBoth the monetary value and the number of \
-             credits are returned, but they reflect the same value in the database."]
+    #[doc = "The number of monthly API credits remaining in the balance."]
     pub monthly_api_credits_remaining: u64,
-    #[doc = "The monetary value of the monthly API credits remaining in the balance. This gets \
-             re-upped every month, but if the credits are not used for a month they do not carry \
-             over to the next month.\n\nBoth the monetary value and the number of credits are \
-             returned, but they reflect the same value in the database."]
+    #[doc = "The monetary value of the monthly API credits remaining in the balance."]
     pub monthly_api_credits_remaining_monetary_value: f64,
-    #[doc = "The number of stable API credits remaining in the balance. These do not get reset or \
-             re-upped every month. This is separate from the monthly credits. Credits will first \
-             pull from the monthly credits, then the stable credits. Stable just means that they \
-             do not get reset every month. A user will have stable credits if a Zoo employee \
-             granted them credits.\n\nBoth the monetary value and the number of credits are \
-             returned, but they reflect the same value in the database."]
+    #[doc = "The number of stable API credits remaining in the balance."]
     pub stable_api_credits_remaining: u64,
-    #[doc = "The monetary value of stable API credits remaining in the balance. These do not get \
-             reset or re-upped every month. This is separate from the monthly credits. Credits \
-             will first pull from the monthly credits, then the stable credits. Stable just means \
-             that they do not get reset every month. A user will have stable credits if a Zoo \
-             employee granted them credits.\n\nBoth the monetary value and the number of credits \
-             are returned, but they reflect the same value in the database."]
+    #[doc = "The monetary value of stable API credits remaining in the balance."]
     pub stable_api_credits_remaining_monetary_value: f64,
     #[doc = "Details about the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -4667,12 +4648,10 @@ impl std::fmt::Display for CustomerBalance {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CustomerBalance {
-    const LENGTH: usize = 12;
+    const LENGTH: usize = 10;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.created_at).into(),
-            format!("{:?}", self.id).into(),
-            format!("{:?}", self.map_id).into(),
             if let Some(modeling_app_enterprise_price) = &self.modeling_app_enterprise_price {
                 format!("{:?}", modeling_app_enterprise_price).into()
             } else {
@@ -4704,8 +4683,6 @@ impl tabled::Tabled for CustomerBalance {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "created_at".into(),
-            "id".into(),
-            "map_id".into(),
             "modeling_app_enterprise_price".into(),
             "monthly_api_credits_remaining".into(),
             "monthly_api_credits_remaining_monetary_value".into(),
@@ -21154,7 +21131,7 @@ impl tabled::Tabled for UpdateMemberToOrgBody {
     }
 }
 
-#[doc = "The data for updating a balance."]
+#[doc = "Payload for updating a user's balance."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
