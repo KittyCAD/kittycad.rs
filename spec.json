@@ -24801,26 +24801,26 @@
             ]
           },
           "monthly_api_credits_remaining": {
-            "description": "The number of monthly API credits remaining in the balance.",
+            "description": "The number of monthly API credits remaining in the balance. This is the number of credits remaining in the balance.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database.",
             "type": "integer",
             "format": "uint64",
             "minimum": 0
           },
           "monthly_api_credits_remaining_monetary_value": {
             "title": "double",
-            "description": "The monetary value of the monthly API credits remaining in the balance.",
+            "description": "The monetary value of the monthly API credits remaining in the balance. This gets re-upped every month, but if the credits are not used for a month they do not carry over to the next month.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database.",
             "type": "number",
             "format": "money-usd"
           },
           "stable_api_credits_remaining": {
-            "description": "The number of stable API credits remaining in the balance.",
+            "description": "The number of stable API credits remaining in the balance. These do not get reset or re-upped every month. This is separate from the monthly credits. Credits will first pull from the monthly credits, then the stable credits. Stable just means that they do not get reset every month. A user will have stable credits if a Zoo employee granted them credits.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database.",
             "type": "integer",
             "format": "uint64",
             "minimum": 0
           },
           "stable_api_credits_remaining_monetary_value": {
             "title": "double",
-            "description": "The monetary value of stable API credits remaining in the balance.",
+            "description": "The monetary value of stable API credits remaining in the balance. These do not get reset or re-upped every month. This is separate from the monthly credits. Credits will first pull from the monthly credits, then the stable credits. Stable just means that they do not get reset every month. A user will have stable credits if a Zoo employee granted them credits.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database.",
             "type": "number",
             "format": "money-usd"
           },
@@ -28554,10 +28554,28 @@
                   "$ref": "#/components/schemas/MlCopilotTool"
                 }
               },
+              "model": {
+                "nullable": true,
+                "description": "Override the default model with another.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/MlCopilotSupportedModels"
+                  }
+                ]
+              },
               "project_name": {
                 "nullable": true,
                 "description": "The project name, if any. This can be used to associate the message with a specific project.",
                 "type": "string"
+              },
+              "reasoning_effort": {
+                "nullable": true,
+                "description": "Change the default reasoning effort.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/MlReasoningEffort"
+                  }
+                ]
               },
               "source_ranges": {
                 "description": "The source ranges the user suggested to change. If empty, the content (prompt) will be used and is required.",
@@ -28831,6 +28849,46 @@
               "end_of_stream"
             ],
             "additionalProperties": false
+          }
+        ]
+      },
+      "MlCopilotSupportedModels": {
+        "description": "AI models that we support using with the system. In theory any model with reasoning capabilities can work.",
+        "oneOf": [
+          {
+            "description": "gpt-5-nano",
+            "type": "string",
+            "enum": [
+              "gpt5_nano"
+            ]
+          },
+          {
+            "description": "gpt-5-mini",
+            "type": "string",
+            "enum": [
+              "gpt5_mini"
+            ]
+          },
+          {
+            "description": "gpt-5-codex",
+            "type": "string",
+            "enum": [
+              "gpt5_codex"
+            ]
+          },
+          {
+            "description": "gpt-5",
+            "type": "string",
+            "enum": [
+              "gpt5"
+            ]
+          },
+          {
+            "description": "o3",
+            "type": "string",
+            "enum": [
+              "o3"
+            ]
           }
         ]
       },
@@ -29143,6 +29201,32 @@
           }
         ]
       },
+      "MlReasoningEffort": {
+        "description": "Specify the amount of effort used in reasoning. Read the following for more info: https://platform.openai.com/docs/guides/reasoning#how-reasoning-works",
+        "oneOf": [
+          {
+            "description": "Low reasoning",
+            "type": "string",
+            "enum": [
+              "low"
+            ]
+          },
+          {
+            "description": "Medium reasoning",
+            "type": "string",
+            "enum": [
+              "medium"
+            ]
+          },
+          {
+            "description": "High reasoning",
+            "type": "string",
+            "enum": [
+              "high"
+            ]
+          }
+        ]
+      },
       "MlToolResult": {
         "description": "Responses from tools.",
         "oneOf": [
@@ -29258,70 +29342,25 @@
           }
         ]
       },
-      "ModelingAppIndividualSubscriptionTier": {
-        "description": "The subscription tiers we offer for the Modeling App to individuals.",
-        "oneOf": [
-          {
-            "description": "The free tier.",
-            "type": "string",
-            "enum": [
-              "free"
-            ]
-          },
-          {
-            "description": "The plus tier.",
-            "type": "string",
-            "enum": [
-              "plus"
-            ]
-          },
-          {
-            "description": "The pro tier.",
-            "type": "string",
-            "enum": [
-              "pro"
-            ]
-          }
-        ]
-      },
-      "ModelingAppOrganizationSubscriptionTier": {
-        "description": "The subscription tiers we offer for the Modeling App to organizations.",
-        "oneOf": [
-          {
-            "description": "The team tier.",
-            "type": "string",
-            "enum": [
-              "team"
-            ]
-          },
-          {
-            "description": "The enterprise tier.",
-            "type": "string",
-            "enum": [
-              "enterprise"
-            ]
-          }
-        ]
-      },
       "ModelingAppShareLinks": {
-        "description": "The options for sharable links through the modeling app.",
+        "description": "Modeling App share link capabilities.",
         "oneOf": [
           {
-            "description": "Public.",
+            "description": "Publicly accessible share links.",
             "type": "string",
             "enum": [
               "public"
             ]
           },
           {
-            "description": "Password protected.",
+            "description": "Share links guarded by a password.",
             "type": "string",
             "enum": [
               "password_protected"
             ]
           },
           {
-            "description": "Organization only. Links can be made only available to members of the organization.",
+            "description": "Share links restricted to members of the organization.",
             "type": "string",
             "enum": [
               "organization_only"
@@ -29330,7 +29369,7 @@
         ]
       },
       "ModelingAppSubscriptionTier": {
-        "description": "A subscription tier we offer for the Modeling App.",
+        "description": "Rich information about a Modeling App subscription tier.",
         "type": "object",
         "properties": {
           "annual_discount": {
@@ -29341,6 +29380,11 @@
           },
           "description": {
             "description": "A description of the tier.",
+            "type": "string"
+          },
+          "display_name": {
+            "description": "The display name of the tier.",
+            "default": "",
             "type": "string"
           },
           "endpoints_included": {
@@ -29375,11 +29419,7 @@
           },
           "name": {
             "description": "The name of the tier.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ModelingAppSubscriptionTierName"
-              }
-            ]
+            "type": "string"
           },
           "pay_as_you_go_api_credit_price": {
             "title": "double",
@@ -29442,46 +29482,6 @@
           "support_tier",
           "training_data_behavior",
           "type"
-        ]
-      },
-      "ModelingAppSubscriptionTierName": {
-        "description": "An enum representing a Modeling App subscription tier name.",
-        "oneOf": [
-          {
-            "description": "The free tier.",
-            "type": "string",
-            "enum": [
-              "free"
-            ]
-          },
-          {
-            "description": "The plus tier.",
-            "type": "string",
-            "enum": [
-              "plus"
-            ]
-          },
-          {
-            "description": "The pro tier.",
-            "type": "string",
-            "enum": [
-              "pro"
-            ]
-          },
-          {
-            "description": "The team tier.",
-            "type": "string",
-            "enum": [
-              "team"
-            ]
-          },
-          {
-            "description": "The enterprise tier.",
-            "type": "string",
-            "enum": [
-              "enterprise"
-            ]
-          }
         ]
       },
       "ModelingCmd": {
@@ -43685,6 +43685,11 @@
                 "description": "A description of the tier.",
                 "type": "string"
               },
+              "display_name": {
+                "description": "The display name of the tier.",
+                "default": "",
+                "type": "string"
+              },
               "endpoints_included": {
                 "description": "The Zoo API endpoints that are included when through an approved zoo tool.",
                 "type": "array",
@@ -43717,11 +43722,7 @@
               },
               "name": {
                 "description": "The name of the tier.",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/ModelingAppSubscriptionTierName"
-                  }
-                ]
+                "type": "string"
               },
               "pay_as_you_go_api_credit_price": {
                 "title": "double",
@@ -43810,40 +43811,36 @@
         "type": "object",
         "properties": {
           "modeling_app": {
-            "description": "A modeling app subscription.",
-            "default": "team",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ModelingAppOrganizationSubscriptionTier"
-              }
-            ]
+            "description": "Slug of the modeling app subscription tier requested.",
+            "type": "string"
           },
           "pay_annually": {
             "nullable": true,
             "description": "If the customer chooses to pay annually or monthly, we can add that here. The annual discount will apply if there is a discount for the subscription.",
             "type": "boolean"
           }
-        }
+        },
+        "required": [
+          "modeling_app"
+        ]
       },
       "ZooProductSubscriptionsUserRequest": {
         "description": "A struct of Zoo product subscriptions a user can request.",
         "type": "object",
         "properties": {
           "modeling_app": {
-            "description": "A modeling app subscription.",
-            "default": "free",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ModelingAppIndividualSubscriptionTier"
-              }
-            ]
+            "description": "Slug of the modeling app subscription tier requested.",
+            "type": "string"
           },
           "pay_annually": {
             "nullable": true,
             "description": "If the customer chooses to pay annually or monthly, we can add that here. The annual discount will apply if there is a discount for the subscription.",
             "type": "boolean"
           }
-        }
+        },
+        "required": [
+          "modeling_app"
+        ]
       },
       "ZooTool": {
         "description": "The Zoo tools that can make API calls.",
