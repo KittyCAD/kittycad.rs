@@ -539,7 +539,7 @@
     "op": "add",
     "path": "/paths/~1org~1payment~1subscriptions/post/x-rust",
     "value": {
-      "example": "/// Create the subscription for an org.\n/// \n/// This endpoint requires authentication by an org admin. It creates the subscription for the authenticated user's org.\nasync fn example_payments_create_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_org_subscription(&kittycad::types::ZooProductSubscriptionsOrgRequest {\n            modeling_app: Some(kittycad::types::ModelingAppOrganizationSubscriptionTier::Enterprise),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Create the subscription for an org.\n/// \n/// This endpoint requires authentication by an org admin. It creates the subscription for the authenticated user's org.\nasync fn example_payments_create_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_org_subscription(&kittycad::types::ZooProductSubscriptionsOrgRequest {\n            modeling_app: \"some-string\".to_string(),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.create_org_subscription"
     }
   },
@@ -547,7 +547,7 @@
     "op": "add",
     "path": "/paths/~1org~1payment~1subscriptions/put/x-rust",
     "value": {
-      "example": "/// Update the subscription for an org.\n/// \n/// This endpoint requires authentication by an org admin. It updates the subscription for the authenticated user's org.\nasync fn example_payments_update_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_org_subscription(&kittycad::types::ZooProductSubscriptionsOrgRequest {\n            modeling_app: Some(kittycad::types::ModelingAppOrganizationSubscriptionTier::Enterprise),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Update the subscription for an org.\n/// \n/// This endpoint requires authentication by an org admin. It updates the subscription for the authenticated user's org.\nasync fn example_payments_update_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_org_subscription(&kittycad::types::ZooProductSubscriptionsOrgRequest {\n            modeling_app: \"some-string\".to_string(),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.update_org_subscription"
     }
   },
@@ -1019,7 +1019,7 @@
     "op": "add",
     "path": "/paths/~1user~1payment~1subscriptions/post/x-rust",
     "value": {
-      "example": "/// Create the subscription for a user.\n/// \n/// This endpoint requires authentication by any Zoo user. It creates the subscription for the user.\nasync fn example_payments_create_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            modeling_app: Some(kittycad::types::ModelingAppIndividualSubscriptionTier::Plus),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Create the subscription for a user.\n/// \n/// This endpoint requires authentication by any Zoo user. It creates the subscription for the user.\nasync fn example_payments_create_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            modeling_app: \"some-string\".to_string(),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.create_user_subscription"
     }
   },
@@ -1027,7 +1027,7 @@
     "op": "add",
     "path": "/paths/~1user~1payment~1subscriptions/put/x-rust",
     "value": {
-      "example": "/// Update the user's subscription.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates the subscription for the user.\nasync fn example_payments_update_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            modeling_app: Some(kittycad::types::ModelingAppIndividualSubscriptionTier::Plus),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Update the user's subscription.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates the subscription for the user.\nasync fn example_payments_update_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            modeling_app: \"some-string\".to_string(),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.update_user_subscription"
     }
   },
@@ -1195,7 +1195,7 @@
     "op": "add",
     "path": "/paths/~1users~1{id}~1payment~1subscriptions/put/x-rust",
     "value": {
-      "example": "/// Update a subscription for a user.\n/// \n/// You must be a Zoo admin to perform this request.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The user's identifier (uuid or email). (required)\nasync fn example_users_update_subscription_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .users()\n        .update_subscription_for(\n            \"some-string\",\n            &kittycad::types::ZooProductSubscriptionsUserRequest {\n                modeling_app: Some(kittycad::types::ModelingAppIndividualSubscriptionTier::Plus),\n                pay_annually: Some(true),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Update a subscription for a user.\n/// \n/// You must be a Zoo admin to perform this request.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The user's identifier (uuid or email). (required)\nasync fn example_users_update_subscription_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .users()\n        .update_subscription_for(\n            \"some-string\",\n            &kittycad::types::ZooProductSubscriptionsUserRequest {\n                modeling_app: \"some-string\".to_string(),\n                pay_annually: Some(true),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.update_subscription_for"
     }
   },

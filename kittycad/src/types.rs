@@ -4613,13 +4613,28 @@ pub struct CustomerBalance {
              enterprise plan."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub modeling_app_enterprise_price: Option<SubscriptionTierPrice>,
-    #[doc = "The number of monthly API credits remaining in the balance."]
+    #[doc = "The number of monthly API credits remaining in the balance. This is the number of \
+             credits remaining in the balance.\n\nBoth the monetary value and the number of \
+             credits are returned, but they reflect the same value in the database."]
     pub monthly_api_credits_remaining: u64,
-    #[doc = "The monetary value of the monthly API credits remaining in the balance."]
+    #[doc = "The monetary value of the monthly API credits remaining in the balance. This gets \
+             re-upped every month, but if the credits are not used for a month they do not carry \
+             over to the next month.\n\nBoth the monetary value and the number of credits are \
+             returned, but they reflect the same value in the database."]
     pub monthly_api_credits_remaining_monetary_value: f64,
-    #[doc = "The number of stable API credits remaining in the balance."]
+    #[doc = "The number of stable API credits remaining in the balance. These do not get reset or \
+             re-upped every month. This is separate from the monthly credits. Credits will first \
+             pull from the monthly credits, then the stable credits. Stable just means that they \
+             do not get reset every month. A user will have stable credits if a Zoo employee \
+             granted them credits.\n\nBoth the monetary value and the number of credits are \
+             returned, but they reflect the same value in the database."]
     pub stable_api_credits_remaining: u64,
-    #[doc = "The monetary value of stable API credits remaining in the balance."]
+    #[doc = "The monetary value of stable API credits remaining in the balance. These do not get \
+             reset or re-upped every month. This is separate from the monthly credits. Credits \
+             will first pull from the monthly credits, then the stable credits. Stable just means \
+             that they do not get reset every month. A user will have stable credits if a Zoo \
+             employee granted them credits.\n\nBoth the monetary value and the number of credits \
+             are returned, but they reflect the same value in the database."]
     pub stable_api_credits_remaining_monetary_value: f64,
     #[doc = "Details about the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -10155,10 +10170,16 @@ pub enum MlCopilotClientMessage {
         #[doc = "The user can force specific tools to be used for this message."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         forced_tools: Option<Vec<MlCopilotTool>>,
+        #[doc = "Override the default model with another."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        model: Option<MlCopilotSupportedModels>,
         #[doc = "The project name, if any. This can be used to associate the message with a \
                  specific project."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         project_name: Option<String>,
+        #[doc = "Change the default reasoning effort."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        reasoning_effort: Option<MlReasoningEffort>,
         #[doc = "The source ranges the user suggested to change. If empty, the content (prompt) \
                  will be used and is required."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -10265,6 +10286,44 @@ pub enum MlCopilotServerMessage {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         whole_response: Option<String>,
     },
+}
+
+#[doc = "AI models that we support using with the system. In theory any model with reasoning \
+         capabilities can work."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum MlCopilotSupportedModels {
+    #[doc = "gpt-5-nano"]
+    #[serde(rename = "gpt5_nano")]
+    #[display("gpt5_nano")]
+    Gpt5Nano,
+    #[doc = "gpt-5-mini"]
+    #[serde(rename = "gpt5_mini")]
+    #[display("gpt5_mini")]
+    Gpt5Mini,
+    #[doc = "gpt-5-codex"]
+    #[serde(rename = "gpt5_codex")]
+    #[display("gpt5_codex")]
+    Gpt5Codex,
+    #[doc = "gpt-5"]
+    #[serde(rename = "gpt5")]
+    #[display("gpt5")]
+    Gpt5,
+    #[doc = "o3"]
+    #[serde(rename = "o3")]
+    #[display("o3")]
+    O3,
 }
 
 #[doc = "The type of system command that can be sent to the ML Copilot."]
@@ -10690,6 +10749,35 @@ pub enum MlPromptType {
     Copilot,
 }
 
+#[doc = "Specify the amount of effort used in reasoning. Read the following for more info: https://platform.openai.com/docs/guides/reasoning#how-reasoning-works"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum MlReasoningEffort {
+    #[doc = "Low reasoning"]
+    #[serde(rename = "low")]
+    #[display("low")]
+    Low,
+    #[doc = "Medium reasoning"]
+    #[serde(rename = "medium")]
+    #[display("medium")]
+    Medium,
+    #[doc = "High reasoning"]
+    #[serde(rename = "high")]
+    #[display("high")]
+    High,
+}
+
 #[doc = "Responses from tools."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -10762,61 +10850,7 @@ pub enum ModelingAppEventType {
 }
 
 
-#[doc = "The subscription tiers we offer for the Modeling App to individuals."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum ModelingAppIndividualSubscriptionTier {
-    #[doc = "The free tier."]
-    #[serde(rename = "free")]
-    #[display("free")]
-    Free,
-    #[doc = "The plus tier."]
-    #[serde(rename = "plus")]
-    #[display("plus")]
-    Plus,
-    #[doc = "The pro tier."]
-    #[serde(rename = "pro")]
-    #[display("pro")]
-    Pro,
-}
-
-#[doc = "The subscription tiers we offer for the Modeling App to organizations."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum ModelingAppOrganizationSubscriptionTier {
-    #[doc = "The team tier."]
-    #[serde(rename = "team")]
-    #[display("team")]
-    Team,
-    #[doc = "The enterprise tier."]
-    #[serde(rename = "enterprise")]
-    #[display("enterprise")]
-    Enterprise,
-}
-
-#[doc = "The options for sharable links through the modeling app."]
+#[doc = "Modeling App share link capabilities."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -10831,21 +10865,21 @@ pub enum ModelingAppOrganizationSubscriptionTier {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum ModelingAppShareLinks {
-    #[doc = "Public."]
+    #[doc = "Publicly accessible share links."]
     #[serde(rename = "public")]
     #[display("public")]
     Public,
-    #[doc = "Password protected."]
+    #[doc = "Share links guarded by a password."]
     #[serde(rename = "password_protected")]
     #[display("password_protected")]
     PasswordProtected,
-    #[doc = "Organization only. Links can be made only available to members of the organization."]
+    #[doc = "Share links restricted to members of the organization."]
     #[serde(rename = "organization_only")]
     #[display("organization_only")]
     OrganizationOnly,
 }
 
-#[doc = "A subscription tier we offer for the Modeling App."]
+#[doc = "Rich information about a Modeling App subscription tier."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -10855,6 +10889,9 @@ pub struct ModelingAppSubscriptionTier {
     pub annual_discount: Option<f64>,
     #[doc = "A description of the tier."]
     pub description: String,
+    #[doc = "The display name of the tier."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub display_name: Option<String>,
     #[doc = "The Zoo API endpoints that are included when through an approved zoo tool."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub endpoints_included: Option<Vec<ApiEndpoint>>,
@@ -10871,7 +10908,7 @@ pub struct ModelingAppSubscriptionTier {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits_monetary_value: Option<f64>,
     #[doc = "The name of the tier."]
-    pub name: ModelingAppSubscriptionTierName,
+    pub name: String,
     #[doc = "The price of an API credit (meaning 1 credit = 1 second of API usage)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pay_as_you_go_api_credit_price: Option<f64>,
@@ -10906,7 +10943,7 @@ impl std::fmt::Display for ModelingAppSubscriptionTier {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ModelingAppSubscriptionTier {
-    const LENGTH: usize = 14;
+    const LENGTH: usize = 15;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
@@ -10915,6 +10952,11 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
                 String::new().into()
             },
             self.description.clone().into(),
+            if let Some(display_name) = &self.display_name {
+                format!("{:?}", display_name).into()
+            } else {
+                String::new().into()
+            },
             if let Some(endpoints_included) = &self.endpoints_included {
                 format!("{:?}", endpoints_included).into()
             } else {
@@ -10938,7 +10980,7 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.name).into(),
+            self.name.clone().into(),
             if let Some(pay_as_you_go_api_credit_price) = &self.pay_as_you_go_api_credit_price {
                 format!("{:?}", pay_as_you_go_api_credit_price).into()
             } else {
@@ -10965,6 +11007,7 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
         vec![
             "annual_discount".into(),
             "description".into(),
+            "display_name".into(),
             "endpoints_included".into(),
             "features".into(),
             "monthly_pay_as_you_go_api_credits".into(),
@@ -10979,43 +11022,6 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
             "zoo_tools_included".into(),
         ]
     }
-}
-
-#[doc = "An enum representing a Modeling App subscription tier name."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum ModelingAppSubscriptionTierName {
-    #[doc = "The free tier."]
-    #[serde(rename = "free")]
-    #[display("free")]
-    Free,
-    #[doc = "The plus tier."]
-    #[serde(rename = "plus")]
-    #[display("plus")]
-    Plus,
-    #[doc = "The pro tier."]
-    #[serde(rename = "pro")]
-    #[display("pro")]
-    Pro,
-    #[doc = "The team tier."]
-    #[serde(rename = "team")]
-    #[display("team")]
-    Team,
-    #[doc = "The enterprise tier."]
-    #[serde(rename = "enterprise")]
-    #[display("enterprise")]
-    Enterprise,
 }
 
 #[doc = "Commands that the KittyCAD engine can execute."]
@@ -22112,6 +22118,9 @@ pub struct ZooProductSubscription {
     pub annual_discount: Option<f64>,
     #[doc = "A description of the tier."]
     pub description: String,
+    #[doc = "The display name of the tier."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub display_name: Option<String>,
     #[doc = "The Zoo API endpoints that are included when through an approved zoo tool."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub endpoints_included: Option<Vec<ApiEndpoint>>,
@@ -22128,7 +22137,7 @@ pub struct ZooProductSubscription {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits_monetary_value: Option<f64>,
     #[doc = "The name of the tier."]
-    pub name: ModelingAppSubscriptionTierName,
+    pub name: String,
     #[doc = "The price of an API credit (meaning 1 credit = 1 second of API usage)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pay_as_you_go_api_credit_price: Option<f64>,
@@ -22163,7 +22172,7 @@ impl std::fmt::Display for ZooProductSubscription {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ZooProductSubscription {
-    const LENGTH: usize = 14;
+    const LENGTH: usize = 15;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
@@ -22172,6 +22181,11 @@ impl tabled::Tabled for ZooProductSubscription {
                 String::new().into()
             },
             self.description.clone().into(),
+            if let Some(display_name) = &self.display_name {
+                format!("{:?}", display_name).into()
+            } else {
+                String::new().into()
+            },
             if let Some(endpoints_included) = &self.endpoints_included {
                 format!("{:?}", endpoints_included).into()
             } else {
@@ -22195,7 +22209,7 @@ impl tabled::Tabled for ZooProductSubscription {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.name).into(),
+            self.name.clone().into(),
             if let Some(pay_as_you_go_api_credit_price) = &self.pay_as_you_go_api_credit_price {
                 format!("{:?}", pay_as_you_go_api_credit_price).into()
             } else {
@@ -22222,6 +22236,7 @@ impl tabled::Tabled for ZooProductSubscription {
         vec![
             "annual_discount".into(),
             "description".into(),
+            "display_name".into(),
             "endpoints_included".into(),
             "features".into(),
             "monthly_pay_as_you_go_api_credits".into(),
@@ -22274,9 +22289,8 @@ impl tabled::Tabled for ZooProductSubscriptions {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ZooProductSubscriptionsOrgRequest {
-    #[doc = "A modeling app subscription."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub modeling_app: Option<ModelingAppOrganizationSubscriptionTier>,
+    #[doc = "Slug of the modeling app subscription tier requested."]
+    pub modeling_app: String,
     #[doc = "If the customer chooses to pay annually or monthly, we can add that here. The annual \
              discount will apply if there is a discount for the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -22298,11 +22312,7 @@ impl tabled::Tabled for ZooProductSubscriptionsOrgRequest {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            if let Some(modeling_app) = &self.modeling_app {
-                format!("{:?}", modeling_app).into()
-            } else {
-                String::new().into()
-            },
+            self.modeling_app.clone().into(),
             if let Some(pay_annually) = &self.pay_annually {
                 format!("{:?}", pay_annually).into()
             } else {
@@ -22321,9 +22331,8 @@ impl tabled::Tabled for ZooProductSubscriptionsOrgRequest {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ZooProductSubscriptionsUserRequest {
-    #[doc = "A modeling app subscription."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub modeling_app: Option<ModelingAppIndividualSubscriptionTier>,
+    #[doc = "Slug of the modeling app subscription tier requested."]
+    pub modeling_app: String,
     #[doc = "If the customer chooses to pay annually or monthly, we can add that here. The annual \
              discount will apply if there is a discount for the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -22345,11 +22354,7 @@ impl tabled::Tabled for ZooProductSubscriptionsUserRequest {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            if let Some(modeling_app) = &self.modeling_app {
-                format!("{:?}", modeling_app).into()
-            } else {
-                String::new().into()
-            },
+            self.modeling_app.clone().into(),
             if let Some(pay_annually) = &self.pay_annually {
                 format!("{:?}", pay_annually).into()
             } else {

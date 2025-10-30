@@ -743,9 +743,8 @@ impl Users {
              result: kittycad::types::ZooProductSubscriptions = client\n        .users()\n        \
              .update_subscription_for(\n            \"some-string\",\n            \
              &kittycad::types::ZooProductSubscriptionsUserRequest {\n                modeling_app: \
-             Some(kittycad::types::ModelingAppIndividualSubscriptionTier::Plus),\n                \
-             pay_annually: Some(true),\n            },\n        )\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+             \"some-string\".to_string(),\n                pay_annually: Some(true),\n            \
+             },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_subscription_for<'a>(
         &'a self,
