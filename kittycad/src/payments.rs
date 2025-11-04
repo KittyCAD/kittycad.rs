@@ -169,8 +169,8 @@ impl Payments {
         }
     }
 
-    #[doc = "Get balance for your org.\n\nThis endpoint requires authentication by an org admin. \
-             It gets the balance information for the authenticated user's \
+    #[doc = "Get balance for your org.\n\nThis endpoint requires authentication by any member of \
+             an org. It gets the balance information for the authenticated user's \
              org.\n\n**Parameters:**\n\n- `include_total_due: Option<bool>`: If you would like to \
              return the total due for a user. This makes the API call take longer so it is off by \
              default.\n\n```rust,no_run\nasync fn example_payments_get_balance_for_org() -> \
@@ -334,7 +334,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Get the subscription for an org.\n\nThis endpoint requires authentication by an org admin. It gets the subscription for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_get_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions =\n        client.payments().get_org_subscription().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get the subscription for an org.\n\nThis endpoint requires authentication by any member of an org. It gets the subscription for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_get_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions =\n        client.payments().get_org_subscription().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_org_subscription<'a>(
         &'a self,
