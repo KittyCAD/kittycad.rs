@@ -8888,7 +8888,7 @@
           "payments"
         ],
         "summary": "Get balance for your org.",
-        "description": "This endpoint requires authentication by an org admin. It gets the balance information for the authenticated user's org.",
+        "description": "This endpoint requires authentication by any member of an org. It gets the balance information for the authenticated user's org.",
         "operationId": "get_payment_balance_for_org",
         "parameters": [
           {
@@ -9563,7 +9563,7 @@
           "payments"
         ],
         "summary": "Get the subscription for an org.",
-        "description": "This endpoint requires authentication by an org admin. It gets the subscription for the authenticated user's org.",
+        "description": "This endpoint requires authentication by any member of an org. It gets the subscription for the authenticated user's org.",
         "operationId": "get_org_subscription",
         "responses": {
           "200": {
