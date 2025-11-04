@@ -24791,15 +24791,6 @@
             "type": "string",
             "format": "date-time"
           },
-          "modeling_app_enterprise_price": {
-            "nullable": true,
-            "description": "The enterprise price for the Modeling App subscription, if they are on the enterprise plan.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/SubscriptionTierPrice"
-              }
-            ]
-          },
           "monthly_api_credits_remaining": {
             "description": "The number of monthly API credits remaining in the balance. This is the number of credits remaining in the balance.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database.",
             "type": "integer",
@@ -28554,9 +28545,18 @@
                   "$ref": "#/components/schemas/MlCopilotTool"
                 }
               },
+              "mode": {
+                "nullable": true,
+                "description": "Pick a mode for the agent to operate in. Defaults to a fast mode.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/MlCopilotMode"
+                  }
+                ]
+              },
               "model": {
                 "nullable": true,
-                "description": "Override the default model with another.",
+                "description": "Override the default or mode model with another.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/MlCopilotSupportedModels"
@@ -28570,7 +28570,7 @@
               },
               "reasoning_effort": {
                 "nullable": true,
-                "description": "Change the default reasoning effort.",
+                "description": "Change the default or mode reasoning effort.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/MlReasoningEffort"
@@ -28618,6 +28618,25 @@
             "required": [
               "command",
               "type"
+            ]
+          }
+        ]
+      },
+      "MlCopilotMode": {
+        "description": "The mode to have the agent work in.",
+        "oneOf": [
+          {
+            "description": "Use a combination of models and reasoning effort for fast results.",
+            "type": "string",
+            "enum": [
+              "fast"
+            ]
+          },
+          {
+            "description": "Use a model and effort that results in thoughtful responses.",
+            "type": "string",
+            "enum": [
+              "thoughtful"
             ]
           }
         ]
