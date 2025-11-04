@@ -491,7 +491,7 @@
     "op": "add",
     "path": "/paths/~1org~1payment~1balance/get/x-rust",
     "value": {
-      "example": "/// Get balance for your org.\n/// \n/// This endpoint requires authentication by an org admin. It gets the balance information for the authenticated user's org.\n/// \n/// **Parameters:**\n/// \n/// - `include_total_due: Option<bool>`: If you would like to return the total due for a user. This makes the API call take longer so it is off by default.\nasync fn example_payments_get_balance_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance =\n        client.payments().get_balance_for_org(Some(true)).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get balance for your org.\n/// \n/// This endpoint requires authentication by any member of an org. It gets the balance information for the authenticated user's org.\n/// \n/// **Parameters:**\n/// \n/// - `include_total_due: Option<bool>`: If you would like to return the total due for a user. This makes the API call take longer so it is off by default.\nasync fn example_payments_get_balance_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance =\n        client.payments().get_balance_for_org(Some(true)).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_balance_for_org"
     }
   },
@@ -531,7 +531,7 @@
     "op": "add",
     "path": "/paths/~1org~1payment~1subscriptions/get/x-rust",
     "value": {
-      "example": "/// Get the subscription for an org.\n/// \n/// This endpoint requires authentication by an org admin. It gets the subscription for the authenticated user's org.\nasync fn example_payments_get_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions =\n        client.payments().get_org_subscription().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get the subscription for an org.\n/// \n/// This endpoint requires authentication by any member of an org. It gets the subscription for the authenticated user's org.\nasync fn example_payments_get_org_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions =\n        client.payments().get_org_subscription().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_org_subscription"
     }
   },
