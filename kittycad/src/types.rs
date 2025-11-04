@@ -4609,10 +4609,6 @@ impl tabled::Tabled for Customer {
 pub struct CustomerBalance {
     #[doc = "The date and time the balance was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The enterprise price for the Modeling App subscription, if they are on the \
-             enterprise plan."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub modeling_app_enterprise_price: Option<SubscriptionTierPrice>,
     #[doc = "The number of monthly API credits remaining in the balance. This is the number of \
              credits remaining in the balance.\n\nBoth the monetary value and the number of \
              credits are returned, but they reflect the same value in the database."]
@@ -4663,15 +4659,10 @@ impl std::fmt::Display for CustomerBalance {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CustomerBalance {
-    const LENGTH: usize = 10;
+    const LENGTH: usize = 9;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.created_at).into(),
-            if let Some(modeling_app_enterprise_price) = &self.modeling_app_enterprise_price {
-                format!("{:?}", modeling_app_enterprise_price).into()
-            } else {
-                String::new().into()
-            },
             format!("{:?}", self.monthly_api_credits_remaining).into(),
             format!("{:?}", self.monthly_api_credits_remaining_monetary_value).into(),
             format!("{:?}", self.stable_api_credits_remaining).into(),
@@ -4698,7 +4689,6 @@ impl tabled::Tabled for CustomerBalance {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "created_at".into(),
-            "modeling_app_enterprise_price".into(),
             "monthly_api_credits_remaining".into(),
             "monthly_api_credits_remaining_monetary_value".into(),
             "stable_api_credits_remaining".into(),
@@ -10170,14 +10160,17 @@ pub enum MlCopilotClientMessage {
         #[doc = "The user can force specific tools to be used for this message."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         forced_tools: Option<Vec<MlCopilotTool>>,
-        #[doc = "Override the default model with another."]
+        #[doc = "Pick a mode for the agent to operate in. Defaults to a fast mode."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        mode: Option<MlCopilotMode>,
+        #[doc = "Override the default or mode model with another."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         model: Option<MlCopilotSupportedModels>,
         #[doc = "The project name, if any. This can be used to associate the message with a \
                  specific project."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         project_name: Option<String>,
-        #[doc = "Change the default reasoning effort."]
+        #[doc = "Change the default or mode reasoning effort."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         reasoning_effort: Option<MlReasoningEffort>,
         #[doc = "The source ranges the user suggested to change. If empty, the content (prompt) \
@@ -10191,6 +10184,31 @@ pub enum MlCopilotClientMessage {
         #[doc = "The content of the system message."]
         command: MlCopilotSystemCommand,
     },
+}
+
+#[doc = "The mode to have the agent work in."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum MlCopilotMode {
+    #[doc = "Use a combination of models and reasoning effort for fast results."]
+    #[serde(rename = "fast")]
+    #[display("fast")]
+    Fast,
+    #[doc = "Use a model and effort that results in thoughtful responses."]
+    #[serde(rename = "thoughtful")]
+    #[display("thoughtful")]
+    Thoughtful,
 }
 
 #[doc = "The types of messages that can be sent by the server to the client."]
