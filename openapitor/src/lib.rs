@@ -638,7 +638,7 @@ tokio-tungstenite = "0.24"
 
 [features]
 default = ["requests", "retry", "default-tls"]
-default-tls = ["reqwest/rustls-tls"]
+default-tls = ["reqwest/rustls-tls", "reqwest/rustls-tls-native-roots"]
 clap = ["dep:clap"]
 tabled = ["dep:tabled"]
 requests = ["dep:async-trait", "dep:format_serde_error", "dep:futures", "dep:http", "dep:log", "dep:rand", "dep:reqwest", "dep:serde_urlencoded", "dep:tracing"]
