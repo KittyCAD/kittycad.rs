@@ -341,7 +341,8 @@ async fn test_modeling_websocket() {
                 cmd: ModelingCmd::StartPath {},
                 cmd_id: path_id,
             })
-            .unwrap(),
+            .unwrap()
+            .into(),
         ))
         .await
         .unwrap();
@@ -378,7 +379,8 @@ async fn test_modeling_websocket() {
                     },
                     cmd_id: Uuid::new_v4(),
                 })
-                .unwrap(),
+                .unwrap()
+                .into(),
             ))
             .await
             .unwrap();

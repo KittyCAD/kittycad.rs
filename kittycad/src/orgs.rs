@@ -147,7 +147,7 @@ impl Orgs {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{}", p)));
+            query_params.push(("limit", format!("{p}")));
         }
 
         if let Some(p) = page_token {
@@ -155,11 +155,11 @@ impl Orgs {
         }
 
         if let Some(p) = role {
-            query_params.push(("role", format!("{}", p)));
+            query_params.push(("role", format!("{p}")));
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{}", p)));
+            query_params.push(("sort_by", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -316,7 +316,7 @@ impl Orgs {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "org/members/{user_id}".replace("{user_id}", &format!("{}", user_id))
+                "org/members/{user_id}".replace("{user_id}", &format!("{user_id}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -351,7 +351,7 @@ impl Orgs {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "org/members/{user_id}".replace("{user_id}", &format!("{}", user_id))
+                "org/members/{user_id}".replace("{user_id}", &format!("{user_id}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -394,7 +394,7 @@ impl Orgs {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "org/members/{user_id}".replace("{user_id}", &format!("{}", user_id))
+                "org/members/{user_id}".replace("{user_id}", &format!("{user_id}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -618,7 +618,7 @@ impl Orgs {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{}", p)));
+            query_params.push(("limit", format!("{p}")));
         }
 
         if let Some(p) = page_token {
@@ -626,7 +626,7 @@ impl Orgs {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{}", p)));
+            query_params.push(("sort_by", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -735,7 +735,7 @@ impl Orgs {
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
         if let Some(p) = limit {
-            query_params.push(("limit", format!("{}", p)));
+            query_params.push(("limit", format!("{p}")));
         }
 
         if let Some(p) = page_token {
@@ -743,7 +743,7 @@ impl Orgs {
         }
 
         if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{}", p)));
+            query_params.push(("sort_by", format!("{p}")));
         }
 
         req = req.query(&query_params);
@@ -847,7 +847,7 @@ impl Orgs {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "orgs/{id}".replace("{id}", &format!("{}", id))
+                "orgs/{id}".replace("{id}", &format!("{id}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -881,7 +881,7 @@ impl Orgs {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "orgs/{id}/admin/details".replace("{id}", &format!("{}", id))
+                "orgs/{id}/admin/details".replace("{id}", &format!("{id}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -916,7 +916,7 @@ impl Orgs {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "orgs/{id}/enterprise/pricing".replace("{id}", &format!("{}", id))
+                "orgs/{id}/enterprise/pricing".replace("{id}", &format!("{id}"))
             ),
         );
         req = req.bearer_auth(&self.client.token);
