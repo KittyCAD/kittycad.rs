@@ -8905,6 +8905,12 @@ pub struct Invoice {
              to display that invoice as unpaid to your users."]
     #[serde(default)]
     pub attempted: bool,
+    #[doc = "Why this invoice was created (e.g. `subscription_cycle`)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub billing_reason: Option<String>,
+    #[doc = "Invoice collection method as returned by Stripe."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub collection_method: Option<String>,
     #[doc = "Time at which the object was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), \
@@ -8948,9 +8954,6 @@ pub struct Invoice {
              balance."]
     #[serde(default)]
     pub paid: bool,
-    #[doc = "Identifier for the payment intent backing this invoice."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub payment_intent_id: Option<String>,
     #[doc = "The link to download the PDF for the invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pdf: Option<String>,
@@ -8964,6 +8967,9 @@ pub struct Invoice {
              `void`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status: Option<InvoiceStatus>,
+    #[doc = "Subscription ID tied to this invoice, when available."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub subscription_id: Option<String>,
     #[doc = "Total of all subscriptions, invoice items, and prorations on the invoice before any \
              invoice level discount or tax is applied.\n\nItem discounts are already incorporated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -8993,7 +8999,7 @@ impl std::fmt::Display for Invoice {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Invoice {
-    const LENGTH: usize = 26;
+    const LENGTH: usize = 28;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(amount_due) = &self.amount_due {
@@ -9017,6 +9023,16 @@ impl tabled::Tabled for Invoice {
                 String::new().into()
             },
             format!("{:?}", self.attempted).into(),
+            if let Some(billing_reason) = &self.billing_reason {
+                format!("{:?}", billing_reason).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(collection_method) = &self.collection_method {
+                format!("{:?}", collection_method).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.created_at).into(),
             if let Some(currency) = &self.currency {
                 format!("{:?}", currency).into()
@@ -9069,11 +9085,6 @@ impl tabled::Tabled for Invoice {
                 String::new().into()
             },
             format!("{:?}", self.paid).into(),
-            if let Some(payment_intent_id) = &self.payment_intent_id {
-                format!("{:?}", payment_intent_id).into()
-            } else {
-                String::new().into()
-            },
             if let Some(pdf) = &self.pdf {
                 format!("{:?}", pdf).into()
             } else {
@@ -9091,6 +9102,11 @@ impl tabled::Tabled for Invoice {
             },
             if let Some(status) = &self.status {
                 format!("{:?}", status).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(subscription_id) = &self.subscription_id {
+                format!("{:?}", subscription_id).into()
             } else {
                 String::new().into()
             },
@@ -9124,6 +9140,8 @@ impl tabled::Tabled for Invoice {
             "amount_remaining".into(),
             "attempt_count".into(),
             "attempted".into(),
+            "billing_reason".into(),
+            "collection_method".into(),
             "created_at".into(),
             "currency".into(),
             "customer_email".into(),
@@ -9136,11 +9154,11 @@ impl tabled::Tabled for Invoice {
             "metadata".into(),
             "number".into(),
             "paid".into(),
-            "payment_intent_id".into(),
             "pdf".into(),
             "receipt_number".into(),
             "statement_descriptor".into(),
             "status".into(),
+            "subscription_id".into(),
             "subtotal".into(),
             "tax".into(),
             "total".into(),
@@ -10338,10 +10356,10 @@ pub enum MlCopilotSupportedModels {
     #[serde(rename = "gpt5")]
     #[display("gpt5")]
     Gpt5,
-    #[doc = "o3"]
-    #[serde(rename = "o3")]
-    #[display("o3")]
-    O3,
+    #[doc = "o3-mini"]
+    #[serde(rename = "o3_mini")]
+    #[display("o3_mini")]
+    O3Mini,
 }
 
 #[doc = "The type of system command that can be sent to the ML Copilot."]
@@ -12157,6 +12175,20 @@ pub enum ModelingCmd {
                  entity types will be selectable."]
         filter: Vec<EntityType>,
     },
+    #[doc = "Get the ids of a given entity type."]
+    #[serde(rename = "scene_get_entity_ids")]
+    SceneGetEntityIds {
+        #[doc = "The entity types to be queried."]
+        filter: Vec<EntityType>,
+        #[doc = "Skip the first n returned ids. If multiple filters are provided, this skip will \
+                 apply to each filter individually."]
+        skip: u32,
+        #[doc = "Take n ids after any ids skipped. This value must be greater than zero and not \
+                 exceed 1000. If multiple filters are provided, this take will apply to each \
+                 filter individually. If there are fewer than `take` items of the provided filter \
+                 type then the returned list's length will be the smaller value."]
+        take: u32,
+    },
     #[doc = "Use orthographic projection."]
     #[serde(rename = "default_camera_set_orthographic")]
     DefaultCameraSetOrthographic {},
@@ -13182,6 +13214,11 @@ pub enum OkModelingCmdResponse {
     GetEntityType {
         #[doc = "The response from the `GetEntityType` command."]
         data: GetEntityType,
+    },
+    #[serde(rename = "scene_get_entity_ids")]
+    SceneGetEntityIds {
+        #[doc = "The response from the `SceneGetEntityIds` command."]
+        data: SceneGetEntityIds,
     },
     #[serde(rename = "curve_get_control_points")]
     CurveGetControlPoints {
@@ -16132,6 +16169,37 @@ impl tabled::Tabled for SceneClearAll {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
+    }
+}
+
+#[doc = "The response from the `SceneGetEntityIds` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SceneGetEntityIds {
+    #[doc = "The ids of the requested entities."]
+    pub entity_ids: Vec<Vec<uuid::Uuid>>,
+}
+
+impl std::fmt::Display for SceneGetEntityIds {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SceneGetEntityIds {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.entity_ids).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_ids".into()]
     }
 }
 
@@ -22405,10 +22473,6 @@ pub enum ZooTool {
     #[serde(rename = "modeling_app")]
     #[display("modeling_app")]
     ModelingApp,
-    #[doc = "The Diff Chrome Extension."]
-    #[serde(rename = "diff_chrome_extension")]
-    #[display("diff_chrome_extension")]
-    DiffChromeExtension,
     #[doc = "The Text-to-CAD UI."]
     #[serde(rename = "text_to_cad")]
     #[display("text_to_cad")]
