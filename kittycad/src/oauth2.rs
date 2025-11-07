@@ -159,7 +159,8 @@ impl Oauth2 {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "oauth2/provider/{provider}/callback".replace("{provider}", &format!("{provider}"))
+                "oauth2/provider/{provider}/callback"
+                    .replace("{provider}", &format!("{}", provider))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -218,7 +219,8 @@ impl Oauth2 {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "oauth2/provider/{provider}/callback".replace("{provider}", &format!("{provider}"))
+                "oauth2/provider/{provider}/callback"
+                    .replace("{provider}", &format!("{}", provider))
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -257,7 +259,8 @@ impl Oauth2 {
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "oauth2/provider/{provider}/consent".replace("{provider}", &format!("{provider}"))
+                "oauth2/provider/{provider}/consent"
+                    .replace("{provider}", &format!("{}", provider))
             ),
         );
         req = req.bearer_auth(&self.client.token);
