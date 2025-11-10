@@ -4135,6 +4135,86 @@ impl tabled::Tabled for Coupon {
     }
 }
 
+#[doc = "Body for creating a custom ML model."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CreateCustomModel {
+    #[doc = "Org dataset IDs that should be linked to the model. Must contain at least one dataset owned by the org."]
+    pub dataset_ids: Vec<uuid::Uuid>,
+    #[doc = "The model's display name."]
+    pub name: String,
+    #[doc = "The model's system prompt."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub system_prompt: Option<String>,
+}
+
+impl std::fmt::Display for CreateCustomModel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CreateCustomModel {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.dataset_ids).into(),
+            self.name.clone().into(),
+            if let Some(system_prompt) = &self.system_prompt {
+                format!("{:?}", system_prompt).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["dataset_ids".into(), "name".into(), "system_prompt".into()]
+    }
+}
+
+#[doc = "Payload for creating an org dataset."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CreateOrgDataset {
+    #[doc = "The dataset's display name."]
+    pub name: String,
+    #[doc = "Details for accessing the dataset."]
+    pub source: OrgDatasetSource,
+}
+
+impl std::fmt::Display for CreateOrgDataset {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CreateOrgDataset {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.name.clone().into(),
+            format!("{:?}", self.source).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["name".into(), "source".into()]
+    }
+}
+
 #[doc = "Request to create a shortlink."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4423,6 +4503,61 @@ pub enum CurveType {
     Nurbs,
 }
 
+#[doc = "Custom ML model created by a user for an organization."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CustomModel {
+    #[doc = "The date and time the model was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The unique identifier for the model."]
+    pub id: uuid::Uuid,
+    #[doc = "User-provided display name. This is mutable; lookup by ID instead."]
+    pub name: String,
+    #[doc = "The ID of the org owning the model."]
+    pub org_id: uuid::Uuid,
+    #[doc = "User-provided LLM system prompt. This is akin to `AGENTS.md`."]
+    pub system_prompt: String,
+    #[doc = "The date and time the model was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Display for CustomModel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CustomModel {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.id).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.org_id).into(),
+            self.system_prompt.clone().into(),
+            format!("{:?}", self.updated_at).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "created_at".into(),
+            "id".into(),
+            "name".into(),
+            "org_id".into(),
+            "system_prompt".into(),
+            "updated_at".into(),
+        ]
+    }
+}
+
 #[doc = "The resource representing a payment \"Customer\"."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -4701,6 +4836,49 @@ pub enum CutTypeV2 {
         #[doc = "The path that will be used for the custom profile."]
         path: uuid::Uuid,
     },
+}
+
+#[doc = "Aggregated AWS policies required for onboarding an org dataset stored in S3."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct DatasetS3Policies {
+    #[doc = "Optional S3 bucket policy that scopes Zoo's access to the dataset prefix."]
+    pub bucket_policy: serde_json::Value,
+    #[doc = "Inline IAM permission policy the customer should attach to their role."]
+    pub permission_policy: serde_json::Value,
+    #[doc = "IAM trust policy that allows Zoo's account to assume the customer's role."]
+    pub trust_policy: serde_json::Value,
+}
+
+impl std::fmt::Display for DatasetS3Policies {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for DatasetS3Policies {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.bucket_policy).into(),
+            format!("{:?}", self.permission_policy).into(),
+            format!("{:?}", self.trust_policy).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "bucket_policy".into(),
+            "permission_policy".into(),
+            "trust_policy".into(),
+        ]
+    }
 }
 
 #[doc = "The response from the `DefaultCameraCenterToScene` endpoint."]
@@ -5558,31 +5736,6 @@ impl tabled::Tabled for EngineUtilEvaluatePath {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["pos".into()]
     }
-}
-
-#[doc = "The price for an enterprise subscription."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[serde(tag = "type")]
-pub enum EnterpriseSubscriptionTierPrice {
-    #[doc = "A flat price that we publicly list."]
-    #[serde(rename = "flat")]
-    Flat {
-        #[doc = "The interval the price is charged."]
-        interval: PlanInterval,
-        #[doc = "The price."]
-        price: f64,
-    },
-    #[doc = "A per user price that we publicly list."]
-    #[serde(rename = "per_user")]
-    PerUser {
-        #[doc = "The interval the price is charged."]
-        interval: PlanInterval,
-        #[doc = "The price."]
-        price: f64,
-    },
 }
 
 #[doc = "The response from the `EntityCircularPattern` command."]
@@ -10743,6 +10896,12 @@ pub struct ModelingAppSubscriptionTier {
     #[doc = "Features that are included in the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub features: Option<Vec<SubscriptionTierFeature>>,
+    #[doc = "Indicates whether this plan uses custom-quoted pricing."]
+    #[serde(default)]
+    pub is_custom_quote: bool,
+    #[doc = "Indicates whether the plan enables custom ML models."]
+    #[serde(default)]
+    pub ml_custom_models: bool,
     #[doc = "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month. This is equivalent to the monetary value divided by the price of an API credit."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits: Option<u64>,
@@ -10783,7 +10942,7 @@ impl std::fmt::Display for ModelingAppSubscriptionTier {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ModelingAppSubscriptionTier {
-    const LENGTH: usize = 15;
+    const LENGTH: usize = 17;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
@@ -10807,6 +10966,8 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
             } else {
                 String::new().into()
             },
+            format!("{:?}", self.is_custom_quote).into(),
+            format!("{:?}", self.ml_custom_models).into(),
             if let Some(monthly_pay_as_you_go_api_credits) = &self.monthly_pay_as_you_go_api_credits
             {
                 format!("{:?}", monthly_pay_as_you_go_api_credits).into()
@@ -10850,6 +11011,8 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
             "display_name".into(),
             "endpoints_included".into(),
             "features".into(),
+            "is_custom_quote".into(),
+            "ml_custom_models".into(),
             "monthly_pay_as_you_go_api_credits".into(),
             "monthly_pay_as_you_go_api_credits_monetary_value".into(),
             "name".into(),
@@ -13202,6 +13365,9 @@ pub struct Org {
     #[doc = "If we should allow all future users who are created with email addresses from this domain to join the org."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allow_users_in_domain_to_auto_join: Option<bool>,
+    #[doc = "ExternalId our workers supply when assuming customer roles, following AWS guidance for avoiding the [confused deputy problem](https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html). Required before an org can register external datasets."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub aws_external_id: Option<uuid::Uuid>,
     #[doc = "The billing email address of the org."]
     pub billing_email: String,
     #[doc = "The date and time the billing email address was verified."]
@@ -13248,13 +13414,18 @@ impl std::fmt::Display for Org {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Org {
-    const LENGTH: usize = 13;
+    const LENGTH: usize = 14;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(allow_users_in_domain_to_auto_join) =
                 &self.allow_users_in_domain_to_auto_join
             {
                 format!("{:?}", allow_users_in_domain_to_auto_join).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(aws_external_id) = &self.aws_external_id {
+                format!("{:?}", aws_external_id).into()
             } else {
                 String::new().into()
             },
@@ -13300,6 +13471,7 @@ impl tabled::Tabled for Org {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "allow_users_in_domain_to_auto_join".into(),
+            "aws_external_id".into(),
             "billing_email".into(),
             "billing_email_verified".into(),
             "block".into(),
@@ -13502,6 +13674,611 @@ impl tabled::Tabled for OrgAdminDetails {
             "stripe_customer_id".into(),
             "stripe_dashboard_url".into(),
         ]
+    }
+}
+
+#[doc = "Dataset owned by an organization, reusable across multiple features."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrgDataset {
+    #[doc = "Identity we assume when accessing the dataset (AWS role ARN today). Pair this with the org's `aws_external_id` to mitigate the AWS confused deputy risk. See <https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html>."]
+    pub access_role_arn: String,
+    #[doc = "The date and time the dataset was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The unique identifier for the dataset."]
+    pub id: uuid::Uuid,
+    #[doc = "Last recorded sync error message, if dataset access failed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_sync_error: Option<String>,
+    #[doc = "Timestamp for the last sync error."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_sync_error_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "User-provided display name. This is mutable; lookup by ID instead."]
+    pub name: String,
+    #[doc = "The ID of the org owning the dataset."]
+    pub org_id: uuid::Uuid,
+    #[doc = "Fully-qualified URI to the dataset location (e.g. s3://bucket/prefix)."]
+    pub source_uri: String,
+    #[doc = "Storage provider identifier."]
+    pub storage_provider: StorageProvider,
+    #[doc = "The date and time the dataset was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Display for OrgDataset {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrgDataset {
+    const LENGTH: usize = 10;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.access_role_arn.clone().into(),
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.id).into(),
+            if let Some(last_sync_error) = &self.last_sync_error {
+                format!("{:?}", last_sync_error).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(last_sync_error_at) = &self.last_sync_error_at {
+                format!("{:?}", last_sync_error_at).into()
+            } else {
+                String::new().into()
+            },
+            self.name.clone().into(),
+            format!("{:?}", self.org_id).into(),
+            self.source_uri.clone().into(),
+            format!("{:?}", self.storage_provider).into(),
+            format!("{:?}", self.updated_at).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "access_role_arn".into(),
+            "created_at".into(),
+            "id".into(),
+            "last_sync_error".into(),
+            "last_sync_error_at".into(),
+            "name".into(),
+            "org_id".into(),
+            "source_uri".into(),
+            "storage_provider".into(),
+            "updated_at".into(),
+        ]
+    }
+}
+
+#[doc = "Summary statistics for an org dataset's conversions."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrgDatasetConversionStatsResponse {
+    #[doc = "Raw counts keyed by conversion status for diagnostics."]
+    pub by_status: std::collections::HashMap<String, i64>,
+    #[doc = "Dataset identifier."]
+    pub dataset_id: uuid::Uuid,
+    #[doc = "Number of conversions currently in an error state."]
+    pub failures: i64,
+    #[doc = "Number of conversions that completed successfully."]
+    pub successes: i64,
+    #[doc = "Total number of tracked conversions."]
+    pub total: i64,
+}
+
+impl std::fmt::Display for OrgDatasetConversionStatsResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrgDatasetConversionStatsResponse {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.by_status).into(),
+            format!("{:?}", self.dataset_id).into(),
+            format!("{:?}", self.failures).into(),
+            format!("{:?}", self.successes).into(),
+            format!("{:?}", self.total).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "by_status".into(),
+            "dataset_id".into(),
+            "failures".into(),
+            "successes".into(),
+            "total".into(),
+        ]
+    }
+}
+
+#[doc = "Tracks state of `OrgDataset` file conversions."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrgDatasetFileConversion {
+    #[doc = "The date and time the conversion got its current `status`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The date and time the conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The ID of the dataset this file is being converted from."]
+    pub dataset_id: uuid::Uuid,
+    #[doc = "File's ETag from dataset bucket, for detecting whether a file needs to be converted again can be reused when creating new custom ML models."]
+    pub file_etag: String,
+    #[doc = "Location within dataset `path`."]
+    pub file_path: String,
+    #[doc = "Number of bytes, for measuring throughput and debugging conversion errors."]
+    pub file_size: i64,
+    #[doc = "The unique identifier for the conversion."]
+    pub id: uuid::Uuid,
+    #[doc = "Tracks which version the file was processed with. If conversion failed due to an internal error, then it will be retried on converter version change."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub importer_version: Option<String>,
+    #[doc = "Path where the processed file output is stored, when available."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output_path: Option<String>,
+    #[doc = "The date and time the conversion started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "Conversion status."]
+    pub status: OrgDatasetFileConversionStatus,
+    #[doc = "Details associated with `status`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status_message: Option<String>,
+    #[doc = "The date and time the conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Display for OrgDatasetFileConversion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrgDatasetFileConversion {
+    const LENGTH: usize = 13;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.dataset_id).into(),
+            self.file_etag.clone().into(),
+            self.file_path.clone().into(),
+            format!("{:?}", self.file_size).into(),
+            format!("{:?}", self.id).into(),
+            if let Some(importer_version) = &self.importer_version {
+                format!("{:?}", importer_version).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(output_path) = &self.output_path {
+                format!("{:?}", output_path).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.status).into(),
+            if let Some(status_message) = &self.status_message {
+                format!("{:?}", status_message).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.updated_at).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "completed_at".into(),
+            "created_at".into(),
+            "dataset_id".into(),
+            "file_etag".into(),
+            "file_path".into(),
+            "file_size".into(),
+            "id".into(),
+            "importer_version".into(),
+            "output_path".into(),
+            "started_at".into(),
+            "status".into(),
+            "status_message".into(),
+            "updated_at".into(),
+        ]
+    }
+}
+
+#[doc = "Detailed response that bundles conversion metadata with the converted file contents."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrgDatasetFileConversionDetails {
+    #[doc = "Conversion metadata without storage pointers."]
+    pub conversion: OrgDatasetFileConversionSummary,
+    #[doc = "Plain-text contents of the converted artifact."]
+    pub output: String,
+}
+
+impl std::fmt::Display for OrgDatasetFileConversionDetails {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrgDatasetFileConversionDetails {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.conversion).into(),
+            self.output.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["conversion".into(), "output".into()]
+    }
+}
+
+#[doc = "`OrgDatasetFileConversion` status."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum OrgDatasetFileConversionStatus {
+    #[doc = "Pending conversion."]
+    #[serde(rename = "queued")]
+    #[display("queued")]
+    Queued,
+    #[doc = "The file will not be converted."]
+    #[serde(rename = "canceled")]
+    #[display("canceled")]
+    Canceled,
+    #[doc = "The file is currently being converted. If `started_at` passes a certain threshold, we assume it got dropped and will retry."]
+    #[serde(rename = "in_progress")]
+    #[display("in_progress")]
+    InProgress,
+    #[doc = "Conversion finished with the result available at `output_path`."]
+    #[serde(rename = "success")]
+    #[display("success")]
+    Success,
+    #[doc = "Conversion failed due to user providing a broken file, such as it being empty."]
+    #[serde(rename = "error_user")]
+    #[display("error_user")]
+    ErrorUser,
+    #[doc = "Conversion failed because we didn't know how to handle the file. The conversion should be retried with a new converter version."]
+    #[serde(rename = "error_unsupported")]
+    #[display("error_unsupported")]
+    ErrorUnsupported,
+    #[doc = "Conversion failed with some other unrecoverable error. The conversion should be retried with a new converter version."]
+    #[serde(rename = "error_internal")]
+    #[display("error_internal")]
+    ErrorInternal,
+}
+
+#[doc = "Publicly exposed view of a dataset file conversion that omits storage-specific fields."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrgDatasetFileConversionSummary {
+    #[doc = "The date and time the conversion got its current `status`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The date and time the conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The ID of the dataset this file is being converted from."]
+    pub dataset_id: uuid::Uuid,
+    #[doc = "File's ETag from dataset bucket, for detecting whether a file needs to be reconverted."]
+    pub file_etag: String,
+    #[doc = "Location within dataset `path`."]
+    pub file_path: String,
+    #[doc = "Number of bytes, for measuring throughput and debugging conversion errors."]
+    pub file_size: i64,
+    #[doc = "The unique identifier for the conversion."]
+    pub id: uuid::Uuid,
+    #[doc = "Tracks which version processed this file when available."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub importer_version: Option<String>,
+    #[doc = "The date and time the conversion started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "Conversion status."]
+    pub status: OrgDatasetFileConversionStatus,
+    #[doc = "Details associated with `status`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status_message: Option<String>,
+    #[doc = "The date and time the conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Display for OrgDatasetFileConversionSummary {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrgDatasetFileConversionSummary {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.dataset_id).into(),
+            self.file_etag.clone().into(),
+            self.file_path.clone().into(),
+            format!("{:?}", self.file_size).into(),
+            format!("{:?}", self.id).into(),
+            if let Some(importer_version) = &self.importer_version {
+                format!("{:?}", importer_version).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.status).into(),
+            if let Some(status_message) = &self.status_message {
+                format!("{:?}", status_message).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.updated_at).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "completed_at".into(),
+            "created_at".into(),
+            "dataset_id".into(),
+            "file_etag".into(),
+            "file_path".into(),
+            "file_size".into(),
+            "id".into(),
+            "importer_version".into(),
+            "started_at".into(),
+            "status".into(),
+            "status_message".into(),
+            "updated_at".into(),
+        ]
+    }
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrgDatasetFileConversionSummaryResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<OrgDatasetFileConversionSummary>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for OrgDatasetFileConversionSummaryResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for OrgDatasetFileConversionSummaryResultsPage {
+    type Item = OrgDatasetFileConversionSummary;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrgDatasetFileConversionSummaryResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrgDatasetResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<OrgDataset>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for OrgDatasetResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for OrgDatasetResultsPage {
+    type Item = OrgDataset;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrgDatasetResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "Details for accessing an org dataset."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrgDatasetSource {
+    #[doc = "Identity we assume when accessing the dataset. Must be configured with the org's `aws_external_id` per AWS confused deputy guidance. See <https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html>."]
+    pub access_role_arn: String,
+    #[doc = "Storage provider identifier."]
+    pub provider: StorageProvider,
+    #[doc = "Fully-qualified URI for the dataset contents."]
+    pub uri: String,
+}
+
+impl std::fmt::Display for OrgDatasetSource {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrgDatasetSource {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.access_role_arn.clone().into(),
+            format!("{:?}", self.provider).into(),
+            self.uri.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["access_role_arn".into(), "provider".into(), "uri".into()]
     }
 }
 
@@ -17391,6 +18168,33 @@ pub enum StlStorage {
     Binary,
 }
 
+#[doc = "Storage provider identifier for org datasets."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum StorageProvider {
+    #[doc = "Amazon Simple Storage Service."]
+    #[serde(rename = "s3")]
+    #[display("s3")]
+    S3,
+}
+
+impl std::default::Default for StorageProvider {
+    fn default() -> Self {
+        StorageProvider::S3
+    }
+}
+
 #[doc = "The parameters for a new store coupon."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -20766,6 +21570,52 @@ impl tabled::Tabled for UpdateAnnotation {
     }
 }
 
+#[doc = "Body for updating a custom ML model."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UpdateCustomModel {
+    #[doc = "The model's display name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[doc = "The model's system prompt."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub system_prompt: Option<String>,
+}
+
+impl std::fmt::Display for UpdateCustomModel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for UpdateCustomModel {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(name) = &self.name {
+                format!("{:?}", name).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(system_prompt) = &self.system_prompt {
+                format!("{:?}", system_prompt).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["name".into(), "system_prompt".into()]
+    }
+}
+
 #[doc = "Data for updating a member of an org."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -20794,6 +21644,106 @@ impl tabled::Tabled for UpdateMemberToOrgBody {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["role".into()]
+    }
+}
+
+#[doc = "Payload for updating an org dataset."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UpdateOrgDataset {
+    #[doc = "Optional new display name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[doc = "Optional storage connection overrides."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<UpdateOrgDatasetSource>,
+}
+
+impl std::fmt::Display for UpdateOrgDataset {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for UpdateOrgDataset {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(name) = &self.name {
+                format!("{:?}", name).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(source) = &self.source {
+                format!("{:?}", source).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["name".into(), "source".into()]
+    }
+}
+
+#[doc = "Partial update payload for dataset storage details."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UpdateOrgDatasetSource {
+    #[doc = "Updated identity Zoo should assume when reading the dataset."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub access_role_arn: Option<String>,
+    #[doc = "Updated storage provider identifier."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub provider: Option<StorageProvider>,
+    #[doc = "Updated fully-qualified URI for the dataset contents."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub uri: Option<String>,
+}
+
+impl std::fmt::Display for UpdateOrgDatasetSource {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for UpdateOrgDatasetSource {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(access_role_arn) = &self.access_role_arn {
+                format!("{:?}", access_role_arn).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(provider) = &self.provider {
+                format!("{:?}", provider).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(uri) = &self.uri {
+                format!("{:?}", uri).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["access_role_arn".into(), "provider".into(), "uri".into()]
     }
 }
 
@@ -21762,6 +22712,12 @@ pub struct ZooProductSubscription {
     #[doc = "Features that are included in the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub features: Option<Vec<SubscriptionTierFeature>>,
+    #[doc = "Indicates whether this plan uses custom-quoted pricing."]
+    #[serde(default)]
+    pub is_custom_quote: bool,
+    #[doc = "Indicates whether the plan enables custom ML models."]
+    #[serde(default)]
+    pub ml_custom_models: bool,
     #[doc = "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month. This is equivalent to the monetary value divided by the price of an API credit."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits: Option<u64>,
@@ -21802,7 +22758,7 @@ impl std::fmt::Display for ZooProductSubscription {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ZooProductSubscription {
-    const LENGTH: usize = 15;
+    const LENGTH: usize = 17;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
@@ -21826,6 +22782,8 @@ impl tabled::Tabled for ZooProductSubscription {
             } else {
                 String::new().into()
             },
+            format!("{:?}", self.is_custom_quote).into(),
+            format!("{:?}", self.ml_custom_models).into(),
             if let Some(monthly_pay_as_you_go_api_credits) = &self.monthly_pay_as_you_go_api_credits
             {
                 format!("{:?}", monthly_pay_as_you_go_api_credits).into()
@@ -21869,6 +22827,8 @@ impl tabled::Tabled for ZooProductSubscription {
             "display_name".into(),
             "endpoints_included".into(),
             "features".into(),
+            "is_custom_quote".into(),
+            "ml_custom_models".into(),
             "monthly_pay_as_you_go_api_credits".into(),
             "monthly_pay_as_you_go_api_credits_monetary_value".into(),
             "name".into(),

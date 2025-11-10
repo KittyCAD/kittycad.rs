@@ -244,6 +244,172 @@ impl Ml {
         }
     }
 
+    #[doc = "Create a custom ML model that is backed by one or more org datasets.\n\nDataset \
+             readiness is enforced via `OrgDatasetFileConversion::status_counts_for_datasets`: - \
+             At least one conversion must have status `success`. - No conversions may remain in \
+             `queued`. If even a single file is still queued the dataset is treated as “not ready \
+             for training.” - A dataset consisting only of `canceled` or `error_*` entries is \
+             rejected because there’s nothing usable.\n\n```rust,no_run\nuse \
+             std::str::FromStr;\nasync fn example_ml_create_custom_model() -> anyhow::Result<()> \
+             {\n    let client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::CustomModel = client\n        .ml()\n        \
+             .create_custom_model(&kittycad::types::CreateCustomModel {\n            dataset_ids: \
+             vec![uuid::Uuid::from_str(\n                \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n            )?],\n            name: \
+             \"some-string\".to_string(),\n            system_prompt: \
+             Some(\"some-string\".to_string()),\n        })\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn create_custom_model<'a>(
+        &'a self,
+        body: &crate::types::CreateCustomModel,
+    ) -> Result<crate::types::CustomModel, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!("{}/{}", self.client.base_url, "ml/custom/models"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Retrieve the details of a single custom ML model so long as it belongs to the \
+             caller’s organization.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. \
+             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_ml_get_custom_model() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomModel = \
+             client\n        .ml()\n        .get_custom_model(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_custom_model<'a>(
+        &'a self,
+        id: uuid::Uuid,
+    ) -> Result<crate::types::CustomModel, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "ml/custom/models/{id}".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Update mutable metadata (name, system prompt) for a custom ML model owned by the \
+             caller's organization.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. \
+             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_ml_update_custom_model() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomModel = \
+             client\n        .ml()\n        .update_custom_model(\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             &kittycad::types::UpdateCustomModel {\n                name: \
+             Some(\"some-string\".to_string()),\n                system_prompt: \
+             Some(\"some-string\".to_string()),\n            },\n        )\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn update_custom_model<'a>(
+        &'a self,
+        id: uuid::Uuid,
+        body: &crate::types::UpdateCustomModel,
+    ) -> Result<crate::types::CustomModel, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "ml/custom/models/{id}".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "List the org datasets that are currently attached to a custom ML model owned by the caller’s organization.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_ml_list_org_datasets_for_model() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::OrgDataset> = client\n        .ml()\n        .list_org_datasets_for_model(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn list_org_datasets_for_model<'a>(
+        &'a self,
+        id: uuid::Uuid,
+    ) -> Result<Vec<crate::types::OrgDataset>, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "ml/custom/models/{id}/datasets".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Generate code completions for KCL.\n\n```rust,no_run\nasync fn example_ml_create_kcl_code_completions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::KclCodeCompletionResponse = client\n        .ml()\n        .create_kcl_code_completions(&kittycad::types::KclCodeCompletionRequest {\n            extra: Some(kittycad::types::KclCodeCompletionParams {\n                language: Some(\"some-string\".to_string()),\n                next_indent: Some(4 as u8),\n                prompt_tokens: Some(4 as u32),\n                suffix_tokens: Some(4 as u32),\n                trim_by_indentation: true,\n            }),\n            max_tokens: Some(4 as u16),\n            model_version: Some(\"some-string\".to_string()),\n            n: Some(4 as u8),\n            nwo: Some(\"some-string\".to_string()),\n            prompt: Some(\"some-string\".to_string()),\n            stop: Some(vec![\"some-string\".to_string()]),\n            stream: true,\n            suffix: Some(\"some-string\".to_string()),\n            temperature: Some(3.14 as f64),\n            top_p: Some(3.14 as f64),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_kcl_code_completions<'a>(
