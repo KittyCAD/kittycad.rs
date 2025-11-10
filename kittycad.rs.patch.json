@@ -281,6 +281,38 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1ml~1custom~1models/post/x-rust",
+    "value": {
+      "example": "/// Create a custom ML model that is backed by one or more org datasets.\n/// \n/// Dataset readiness is enforced via `OrgDatasetFileConversion::status_counts_for_datasets`: - At least one conversion must have status `success`. - No conversions may remain in `queued`. If even a single file is still queued the dataset is treated as “not ready for training.” - A dataset consisting only of `canceled` or `error_*` entries is rejected because there’s nothing usable.\nuse std::str::FromStr;\nasync fn example_ml_create_custom_model() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomModel = client\n        .ml()\n        .create_custom_model(&kittycad::types::CreateCustomModel {\n            dataset_ids: vec![uuid::Uuid::from_str(\n                \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n            )?],\n            name: \"some-string\".to_string(),\n            system_prompt: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ml/struct.Ml.html#method.create_custom_model"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1ml~1custom~1models~1{id}/get/x-rust",
+    "value": {
+      "example": "/// Retrieve the details of a single custom ML model so long as it belongs to the caller’s organization.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_ml_get_custom_model() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomModel = client\n        .ml()\n        .get_custom_model(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ml/struct.Ml.html#method.get_custom_model"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1ml~1custom~1models~1{id}/put/x-rust",
+    "value": {
+      "example": "/// Update mutable metadata (name, system prompt) for a custom ML model owned by the caller's organization.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_ml_update_custom_model() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomModel = client\n        .ml()\n        .update_custom_model(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateCustomModel {\n                name: Some(\"some-string\".to_string()),\n                system_prompt: Some(\"some-string\".to_string()),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ml/struct.Ml.html#method.update_custom_model"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1ml~1custom~1models~1{id}~1datasets/get/x-rust",
+    "value": {
+      "example": "/// List the org datasets that are currently attached to a custom ML model owned by the caller’s organization.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_ml_list_org_datasets_for_model() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::OrgDataset> = client\n        .ml()\n        .list_org_datasets_for_model(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ml/struct.Ml.html#method.list_org_datasets_for_model"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1ml~1kcl~1completions/post/x-rust",
     "value": {
       "example": "/// Generate code completions for KCL.\nasync fn example_ml_create_kcl_code_completions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::KclCodeCompletionResponse = client\n        .ml()\n        .create_kcl_code_completions(&kittycad::types::KclCodeCompletionRequest {\n            extra: Some(kittycad::types::KclCodeCompletionParams {\n                language: Some(\"some-string\".to_string()),\n                next_indent: Some(4 as u8),\n                prompt_tokens: Some(4 as u32),\n                suffix_tokens: Some(4 as u32),\n                trim_by_indentation: true,\n            }),\n            max_tokens: Some(4 as u16),\n            model_version: Some(\"some-string\".to_string()),\n            n: Some(4 as u8),\n            nwo: Some(\"some-string\".to_string()),\n            prompt: Some(\"some-string\".to_string()),\n            stop: Some(vec![\"some-string\".to_string()]),\n            stream: true,\n            suffix: Some(\"some-string\".to_string()),\n            temperature: Some(3.14 as f64),\n            top_p: Some(3.14 as f64),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
@@ -413,6 +445,86 @@
     "value": {
       "example": "/// Get an API call for an org.\n/// \n/// This endpoint requires authentication by an org admin. It returns details of the requested API call for the user's org.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The ID of the API call. (required)\nuse std::str::FromStr;\nasync fn example_api_calls_get_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPrice = client\n        .api_calls()\n        .get_for_org(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.get_for_org"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1dataset~1s3~1policies/get/x-rust",
+    "value": {
+      "example": "/// Return the IAM policies customers should apply when onboarding an S3 dataset.\n/// \n/// **Parameters:**\n/// \n/// - `role_arn: &'astr`: IAM role ARN customers expect Zoo to assume when reading the dataset. (required)\n/// - `uri: &'astr`: Dataset URI used to scope generated IAM policies. (required)\nasync fn example_orgs_dataset_s_3_policies() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::DatasetS3Policies = client\n        .orgs()\n        .dataset_s_3_policies(\"some-string\", \"some-string\")\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.dataset_s_3_policies"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1datasets/get/x-rust",
+    "value": {
+      "example": "/// List every dataset that belongs to the caller's organization.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_orgs_list_datasets() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetResultsPage = client\n        .orgs()\n        .list_datasets(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_datasets_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_datasets_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.list_datasets"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1datasets/post/x-rust",
+    "value": {
+      "example": "/// Register a new S3 dataset that Zoo can assume into on behalf of the caller's org.\n/// \n/// If the dataset lives in S3, call `/org/dataset/s3/policies` first so you can generate the trust, permission, and bucket policies scoped to your dataset before invoking this endpoint.\nasync fn example_orgs_create_dataset() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDataset = client\n        .orgs()\n        .create_dataset(&kittycad::types::CreateOrgDataset {\n            name: \"some-string\".to_string(),\n            source: kittycad::types::OrgDatasetSource {\n                access_role_arn: \"some-string\".to_string(),\n                provider: kittycad::types::StorageProvider::S3,\n                uri: \"some-string\".to_string(),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.create_dataset"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1datasets~1{id}/get/x-rust",
+    "value": {
+      "example": "/// Fetch a single dataset by id so long as it belongs to the authenticated org.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_orgs_get_dataset() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDataset = client\n        .orgs()\n        .get_dataset(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.get_dataset"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1datasets~1{id}/put/x-rust",
+    "value": {
+      "example": "/// Update dataset metadata or storage credentials for the caller's organization.\n/// \n/// IMPORTANT: Use this endpoint to fix connectivity to the same underlying storage location (e.g. rotating credentials or correcting a typo). Do not repoint an existing dataset at a completely different bucket or provider—create a new dataset instead so conversions in flight keep their original source. This warning applies to every storage backend, not just S3.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_orgs_update_dataset() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDataset = client\n        .orgs()\n        .update_dataset(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateOrgDataset {\n                name: Some(\"some-string\".to_string()),\n                source: Some(kittycad::types::UpdateOrgDatasetSource {\n                    access_role_arn: Some(\"some-string\".to_string()),\n                    provider: Some(kittycad::types::StorageProvider::S3),\n                    uri: Some(\"some-string\".to_string()),\n                }),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.update_dataset"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1datasets~1{id}~1conversions/get/x-rust",
+    "value": {
+      "example": "/// List the file conversions that have been processed for a given dataset owned by the caller's org.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nuse std::str::FromStr;\nasync fn example_orgs_list_dataset_conversions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetFileConversionSummaryResultsPage = client\n        .orgs()\n        .list_dataset_conversions(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_dataset_conversions_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_dataset_conversions_stream(\n        uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.list_dataset_conversions"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1datasets~1{id}~1conversions~1{conversion_id}/get/x-rust",
+    "value": {
+      "example": "/// Fetch the metadata and converted output for a single dataset conversion.\n/// \n/// **Parameters:**\n/// \n/// - `conversion_id: uuid::Uuid`: Conversion identifier. (required)\n/// - `id: uuid::Uuid`: Dataset identifier. (required)\nuse std::str::FromStr;\nasync fn example_orgs_get_dataset_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetFileConversionDetails = client\n        .orgs()\n        .get_dataset_conversion(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.get_dataset_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1datasets~1{id}~1conversions~1{conversion_id}~1retry/post/x-rust",
+    "value": {
+      "example": "/// Retry a specific dataset conversion that failed previously for the caller's org.\n/// \n/// **Parameters:**\n/// \n/// - `conversion_id: uuid::Uuid`: Conversion identifier. (required)\n/// - `id: uuid::Uuid`: Dataset identifier. (required)\nuse std::str::FromStr;\nasync fn example_orgs_retry_dataset_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetFileConversion = client\n        .orgs()\n        .retry_dataset_conversion(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.retry_dataset_conversion"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1datasets~1{id}~1rescan/post/x-rust",
+    "value": {
+      "example": "/// Request a rescan of a dataset that belongs to the caller's org.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_orgs_rescan_dataset() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDataset = client\n        .orgs()\n        .rescan_dataset(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.rescan_dataset"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1datasets~1{id}~1stats/get/x-rust",
+    "value": {
+      "example": "/// Return aggregate conversion stats for a dataset owned by the caller's org.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_orgs_get_dataset_conversion_stats() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetConversionStatsResponse = client\n        .orgs()\n        .get_dataset_conversion_stats(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.get_dataset_conversion_stats"
     }
   },
   {
@@ -675,7 +787,7 @@
     "op": "add",
     "path": "/paths/~1orgs~1{id}~1enterprise~1pricing/put/x-rust",
     "value": {
-      "example": "/// Set the enterprise price for an organization.\n/// \n/// You must be a Zoo admin to perform this request.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        .update_enterprise_pricing_for(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::EnterpriseSubscriptionTierPrice::Flat {\n                interval: kittycad::types::PlanInterval::Week,\n                price: 3.14 as f64,\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Set the enterprise price for an organization.\n/// \n/// You must be a Zoo admin to perform this request.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_orgs_update_enterprise_pricing_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .orgs()\n        .update_enterprise_pricing_for(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::SubscriptionTierPrice::Enterprise {},\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.update_enterprise_pricing_for"
     }
   },
