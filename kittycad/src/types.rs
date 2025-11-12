@@ -10514,6 +10514,18 @@ pub enum MlCopilotSupportedModels {
     #[serde(rename = "o3_mini")]
     #[display("o3_mini")]
     O3Mini,
+    #[doc = "azure o3-mini"]
+    #[serde(rename = "azure_o3_mini")]
+    #[display("azure_o3_mini")]
+    AzureO3Mini,
+    #[doc = "azure gpt-4o"]
+    #[serde(rename = "azure_gpt4o")]
+    #[display("azure_gpt4o")]
+    AzureGpt4O,
+    #[doc = "azure gpt-4o-mini"]
+    #[serde(rename = "azure_gpt4o_mini")]
+    #[display("azure_gpt4o_mini")]
+    AzureGpt4OMini,
 }
 
 #[doc = "The type of system command that can be sent to the ML Copilot."]
