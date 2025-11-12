@@ -31085,6 +31085,27 @@
             "enum": [
               "o3_mini"
             ]
+          },
+          {
+            "description": "azure o3-mini",
+            "type": "string",
+            "enum": [
+              "azure_o3_mini"
+            ]
+          },
+          {
+            "description": "azure gpt-4o",
+            "type": "string",
+            "enum": [
+              "azure_gpt4o"
+            ]
+          },
+          {
+            "description": "azure gpt-4o-mini",
+            "type": "string",
+            "enum": [
+              "azure_gpt4o_mini"
+            ]
           }
         ]
       },
