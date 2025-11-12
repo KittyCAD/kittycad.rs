@@ -5091,6 +5091,615 @@
         }
       }
     },
+    "/ml/custom/models": {
+      "post": {
+        "tags": [
+          "ml"
+        ],
+        "summary": "Create a custom ML model that is backed by one or more org datasets.",
+        "description": "Dataset readiness is enforced via `OrgDatasetFileConversion::status_counts_for_datasets`: - At least one conversion must have status `success`. - No conversions may remain in `queued`. If even a single file is still queued the dataset is treated as “not ready for training.” - A dataset consisting only of `canceled` or `error_*` entries is rejected because there’s nothing usable.",
+        "operationId": "create_custom_model",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCustomModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomModel"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_custom_models",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/ml/custom/models/{id}": {
+      "get": {
+        "tags": [
+          "ml"
+        ],
+        "summary": "Retrieve the details of a single custom ML model so long as it belongs to the caller’s organization.",
+        "operationId": "get_custom_model",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomModel"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ml"
+        ],
+        "summary": "Update mutable metadata (name, system prompt) for a custom ML model owned by the caller's organization.",
+        "operationId": "update_custom_model",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomModel"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_custom_model",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/ml/custom/models/{id}/datasets": {
+      "get": {
+        "tags": [
+          "ml"
+        ],
+        "summary": "List the org datasets that are currently attached to a custom ML model owned by the caller’s organization.",
+        "operationId": "list_org_datasets_for_model",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Array_of_OrgDataset",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrgDataset"
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/ml/kcl/completions": {
       "post": {
         "tags": [
@@ -7670,6 +8279,1513 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiCallWithPrice"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/dataset/s3/policies": {
+      "get": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Return the IAM policies customers should apply when onboarding an S3 dataset.",
+        "operationId": "org_dataset_s3_policies",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "role_arn",
+            "description": "IAM role ARN customers expect Zoo to assume when reading the dataset.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "uri",
+            "description": "Dataset URI used to scope generated IAM policies.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetS3Policies"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/datasets": {
+      "get": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "List every dataset that belongs to the caller's organization.",
+        "operationId": "list_org_datasets",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "schema": {
+              "$ref": "#/components/schemas/CreatedAtSortMode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgDatasetResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      },
+      "post": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Register a new S3 dataset that Zoo can assume into on behalf of the caller's org.",
+        "description": "If the dataset lives in S3, call `/org/dataset/s3/policies` first so you can generate the trust, permission, and bucket policies scoped to your dataset before invoking this endpoint.",
+        "operationId": "create_org_dataset",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrgDataset"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgDataset"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_org_datasets",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/datasets/{id}": {
+      "get": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Fetch a single dataset by id so long as it belongs to the authenticated org.",
+        "operationId": "get_org_dataset",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgDataset"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Update dataset metadata or storage credentials for the caller's organization.",
+        "description": "IMPORTANT: Use this endpoint to fix connectivity to the same underlying storage location (e.g. rotating credentials or correcting a typo). Do not repoint an existing dataset at a completely different bucket or provider—create a new dataset instead so conversions in flight keep their original source. This warning applies to every storage backend, not just S3.",
+        "operationId": "update_org_dataset",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrgDataset"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgDataset"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_org_dataset",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/datasets/{id}/conversions": {
+      "get": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "List the file conversions that have been processed for a given dataset owned by the caller's org.",
+        "operationId": "list_org_dataset_conversions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "schema": {
+              "$ref": "#/components/schemas/CreatedAtSortMode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgDatasetFileConversionSummaryResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      }
+    },
+    "/org/datasets/{id}/conversions/{conversion_id}": {
+      "get": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Fetch the metadata and converted output for a single dataset conversion.",
+        "operationId": "get_org_dataset_conversion",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "conversion_id",
+            "description": "Conversion identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Dataset identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgDatasetFileConversionDetails"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/datasets/{id}/conversions/{conversion_id}/retry": {
+      "post": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Retry a specific dataset conversion that failed previously for the caller's org.",
+        "operationId": "retry_org_dataset_conversion",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "conversion_id",
+            "description": "Conversion identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Dataset identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "successfully enqueued operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgDatasetFileConversion"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_retry_org_dataset_conversion",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "conversion_id",
+            "description": "Conversion identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Dataset identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/datasets/{id}/rescan": {
+      "post": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Request a rescan of a dataset that belongs to the caller's org.",
+        "operationId": "rescan_org_dataset",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "successfully enqueued operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgDataset"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_rescan_org_dataset",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/datasets/{id}/stats": {
+      "get": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Return aggregate conversion stats for a dataset owned by the caller's org.",
+        "operationId": "get_org_dataset_conversion_stats",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgDatasetConversionStatsResponse"
                 }
               }
             }
@@ -11878,7 +13994,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EnterpriseSubscriptionTierPrice"
+                "$ref": "#/components/schemas/SubscriptionTierPrice"
               }
             }
           },
@@ -24569,6 +26685,54 @@
           }
         }
       },
+      "CreateCustomModel": {
+        "description": "Body for creating a custom ML model.",
+        "type": "object",
+        "properties": {
+          "dataset_ids": {
+            "description": "Org dataset IDs that should be linked to the model. Must contain at least one dataset owned by the org.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          "name": {
+            "description": "The model's display name.",
+            "type": "string"
+          },
+          "system_prompt": {
+            "nullable": true,
+            "description": "The model's system prompt.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dataset_ids",
+          "name"
+        ]
+      },
+      "CreateOrgDataset": {
+        "description": "Payload for creating an org dataset.",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "The dataset's display name.",
+            "type": "string"
+          },
+          "source": {
+            "description": "Details for accessing the dataset.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrgDatasetSource"
+              }
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "source"
+        ]
+      },
       "CreateShortlinkRequest": {
         "description": "Request to create a shortlink.",
         "type": "object",
@@ -24707,6 +26871,56 @@
           "line",
           "arc",
           "nurbs"
+        ]
+      },
+      "CustomModel": {
+        "description": "Custom ML model created by a user for an organization.",
+        "type": "object",
+        "properties": {
+          "created_at": {
+            "title": "DateTime",
+            "description": "The date and time the model was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "description": "The unique identifier for the model.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "name": {
+            "description": "User-provided display name. This is mutable; lookup by ID instead.",
+            "type": "string"
+          },
+          "org_id": {
+            "description": "The ID of the org owning the model.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "system_prompt": {
+            "description": "User-provided LLM system prompt. This is akin to `AGENTS.md`.",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The date and time the model was last updated.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "name",
+          "org_id",
+          "system_prompt",
+          "updated_at"
         ]
       },
       "Customer": {
@@ -25007,6 +27221,26 @@
             ],
             "additionalProperties": false
           }
+        ]
+      },
+      "DatasetS3Policies": {
+        "description": "Aggregated AWS policies required for onboarding an org dataset stored in S3.",
+        "type": "object",
+        "properties": {
+          "bucket_policy": {
+            "description": "Optional S3 bucket policy that scopes Zoo's access to the dataset prefix."
+          },
+          "permission_policy": {
+            "description": "Inline IAM permission policy the customer should attach to their role."
+          },
+          "trust_policy": {
+            "description": "IAM trust policy that allows Zoo's account to assume the customer's role."
+          }
+        },
+        "required": [
+          "bucket_policy",
+          "permission_policy",
+          "trust_policy"
         ]
       },
       "DefaultCameraCenterToScene": {
@@ -25396,73 +27630,6 @@
         },
         "required": [
           "pos"
-        ]
-      },
-      "EnterpriseSubscriptionTierPrice": {
-        "description": "The price for an enterprise subscription.",
-        "oneOf": [
-          {
-            "description": "A flat price that we publicly list.",
-            "type": "object",
-            "properties": {
-              "interval": {
-                "description": "The interval the price is charged.",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/PlanInterval"
-                  }
-                ]
-              },
-              "price": {
-                "title": "double",
-                "description": "The price.",
-                "type": "number",
-                "format": "money-usd"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "flat"
-                ]
-              }
-            },
-            "required": [
-              "interval",
-              "price",
-              "type"
-            ]
-          },
-          {
-            "description": "A per user price that we publicly list.",
-            "type": "object",
-            "properties": {
-              "interval": {
-                "description": "The interval the price is charged.",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/PlanInterval"
-                  }
-                ]
-              },
-              "price": {
-                "title": "double",
-                "description": "The price.",
-                "type": "number",
-                "format": "money-usd"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "per_user"
-                ]
-              }
-            },
-            "required": [
-              "interval",
-              "price",
-              "type"
-            ]
-          }
         ]
       },
       "EntityCircularPattern": {
@@ -27836,6 +30003,16 @@
             "default": false,
             "type": "boolean"
           },
+          "billing_reason": {
+            "nullable": true,
+            "description": "Why this invoice was created (e.g. `subscription_cycle`).",
+            "type": "string"
+          },
+          "collection_method": {
+            "nullable": true,
+            "description": "Invoice collection method as returned by Stripe.",
+            "type": "string"
+          },
           "created_at": {
             "description": "Time at which the object was created.",
             "type": "string",
@@ -27902,11 +30079,6 @@
             "default": false,
             "type": "boolean"
           },
-          "payment_intent_id": {
-            "nullable": true,
-            "description": "Identifier for the payment intent backing this invoice.",
-            "type": "string"
-          },
           "pdf": {
             "nullable": true,
             "description": "The link to download the PDF for the invoice.",
@@ -27929,6 +30101,11 @@
                 "$ref": "#/components/schemas/InvoiceStatus"
               }
             ]
+          },
+          "subscription_id": {
+            "nullable": true,
+            "description": "Subscription ID tied to this invoice, when available.",
+            "type": "string"
           },
           "subtotal": {
             "title": "double",
@@ -28903,10 +31080,10 @@
             ]
           },
           {
-            "description": "o3",
+            "description": "o3-mini",
             "type": "string",
             "enum": [
-              "o3"
+              "o3_mini"
             ]
           }
         ]
@@ -29421,6 +31598,16 @@
             },
             "minItems": 0,
             "maxItems": 15
+          },
+          "is_custom_quote": {
+            "description": "Indicates whether this plan uses custom-quoted pricing.",
+            "default": false,
+            "type": "boolean"
+          },
+          "ml_custom_models": {
+            "description": "Indicates whether the plan enables custom ML models.",
+            "default": false,
+            "type": "boolean"
           },
           "monthly_pay_as_you_go_api_credits": {
             "description": "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month. This is equivalent to the monetary value divided by the price of an API credit.",
@@ -33202,6 +35389,44 @@
             ]
           },
           {
+            "description": "Get the ids of a given entity type.",
+            "type": "object",
+            "properties": {
+              "filter": {
+                "description": "The entity types to be queried.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EntityType"
+                }
+              },
+              "skip": {
+                "description": "Skip the first n returned ids. If multiple filters are provided, this skip will apply to each filter individually.",
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              },
+              "take": {
+                "description": "Take n ids after any ids skipped. This value must be greater than zero and not exceed 1000. If multiple filters are provided, this take will apply to each filter individually. If there are fewer than `take` items of the provided filter type then the returned list's length will be the smaller value.",
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 1,
+                "maximum": 1000
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "scene_get_entity_ids"
+                ]
+              }
+            },
+            "required": [
+              "filter",
+              "skip",
+              "take",
+              "type"
+            ]
+          },
+          {
             "description": "Use orthographic projection.",
             "type": "object",
             "properties": {
@@ -35560,6 +37785,24 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/SceneGetEntityIds"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "scene_get_entity_ids"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/CurveGetControlPoints"
               },
               "type": {
@@ -36729,6 +38972,15 @@
             "description": "If we should allow all future users who are created with email addresses from this domain to join the org.",
             "type": "boolean"
           },
+          "aws_external_id": {
+            "nullable": true,
+            "description": "ExternalId our workers supply when assuming customer roles, following AWS guidance for avoiding the [confused deputy problem](https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html). Required before an org can register external datasets.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
           "billing_email": {
             "description": "The billing email address of the org.",
             "type": "string",
@@ -36940,6 +39192,454 @@
         "required": [
           "payment_methods",
           "payment_methods_summary"
+        ]
+      },
+      "OrgDataset": {
+        "description": "Dataset owned by an organization, reusable across multiple features.",
+        "type": "object",
+        "properties": {
+          "access_role_arn": {
+            "description": "Identity we assume when accessing the dataset (AWS role ARN today). Pair this with the org's `aws_external_id` to mitigate the AWS confused deputy risk. See <https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html>.",
+            "type": "string"
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "The date and time the dataset was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "description": "The unique identifier for the dataset.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "last_sync_error": {
+            "nullable": true,
+            "description": "Last recorded sync error message, if dataset access failed.",
+            "type": "string"
+          },
+          "last_sync_error_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "Timestamp for the last sync error.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "description": "User-provided display name. This is mutable; lookup by ID instead.",
+            "type": "string"
+          },
+          "org_id": {
+            "description": "The ID of the org owning the dataset.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "source_uri": {
+            "description": "Fully-qualified URI to the dataset location (e.g. s3://bucket/prefix).",
+            "type": "string"
+          },
+          "storage_provider": {
+            "description": "Storage provider identifier.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StorageProvider"
+              }
+            ]
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The date and time the dataset was last updated.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "access_role_arn",
+          "created_at",
+          "id",
+          "name",
+          "org_id",
+          "source_uri",
+          "storage_provider",
+          "updated_at"
+        ]
+      },
+      "OrgDatasetConversionStatsResponse": {
+        "description": "Summary statistics for an org dataset's conversions.",
+        "type": "object",
+        "properties": {
+          "by_status": {
+            "description": "Raw counts keyed by conversion status for diagnostics.",
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "dataset_id": {
+            "description": "Dataset identifier.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "failures": {
+            "description": "Number of conversions currently in an error state.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "successes": {
+            "description": "Number of conversions that completed successfully.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "total": {
+            "description": "Total number of tracked conversions.",
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "by_status",
+          "dataset_id",
+          "failures",
+          "successes",
+          "total"
+        ]
+      },
+      "OrgDatasetFileConversion": {
+        "description": "Tracks state of `OrgDataset` file conversions.",
+        "type": "object",
+        "properties": {
+          "completed_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The date and time the conversion got its current `status`.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "The date and time the conversion was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "dataset_id": {
+            "description": "The ID of the dataset this file is being converted from.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "file_etag": {
+            "description": "File's ETag from dataset bucket, for detecting whether a file needs to be converted again can be reused when creating new custom ML models.",
+            "type": "string"
+          },
+          "file_path": {
+            "description": "Location within dataset `path`.",
+            "type": "string"
+          },
+          "file_size": {
+            "description": "Number of bytes, for measuring throughput and debugging conversion errors.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "id": {
+            "description": "The unique identifier for the conversion.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "importer_version": {
+            "nullable": true,
+            "description": "Tracks which version the file was processed with. If conversion failed due to an internal error, then it will be retried on converter version change.",
+            "type": "string"
+          },
+          "output_path": {
+            "nullable": true,
+            "description": "Path where the processed file output is stored, when available.",
+            "type": "string"
+          },
+          "started_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The date and time the conversion started.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "description": "Conversion status.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrgDatasetFileConversionStatus"
+              }
+            ]
+          },
+          "status_message": {
+            "nullable": true,
+            "description": "Details associated with `status`.",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The date and time the conversion was last updated.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "created_at",
+          "dataset_id",
+          "file_etag",
+          "file_path",
+          "file_size",
+          "id",
+          "status",
+          "updated_at"
+        ]
+      },
+      "OrgDatasetFileConversionDetails": {
+        "description": "Detailed response that bundles conversion metadata with the converted file contents.",
+        "type": "object",
+        "properties": {
+          "conversion": {
+            "description": "Conversion metadata without storage pointers.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrgDatasetFileConversionSummary"
+              }
+            ]
+          },
+          "output": {
+            "description": "Plain-text contents of the converted artifact.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "conversion",
+          "output"
+        ]
+      },
+      "OrgDatasetFileConversionStatus": {
+        "description": "`OrgDatasetFileConversion` status.",
+        "oneOf": [
+          {
+            "description": "Pending conversion.",
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          {
+            "description": "The file will not be converted.",
+            "type": "string",
+            "enum": [
+              "canceled"
+            ]
+          },
+          {
+            "description": "The file is currently being converted. If `started_at` passes a certain threshold, we assume it got dropped and will retry.",
+            "type": "string",
+            "enum": [
+              "in_progress"
+            ]
+          },
+          {
+            "description": "Conversion finished with the result available at `output_path`.",
+            "type": "string",
+            "enum": [
+              "success"
+            ]
+          },
+          {
+            "description": "Conversion failed due to user providing a broken file, such as it being empty.",
+            "type": "string",
+            "enum": [
+              "error_user"
+            ]
+          },
+          {
+            "description": "Conversion failed because we didn't know how to handle the file. The conversion should be retried with a new converter version.",
+            "type": "string",
+            "enum": [
+              "error_unsupported"
+            ]
+          },
+          {
+            "description": "Conversion failed with some other unrecoverable error. The conversion should be retried with a new converter version.",
+            "type": "string",
+            "enum": [
+              "error_internal"
+            ]
+          }
+        ]
+      },
+      "OrgDatasetFileConversionSummary": {
+        "description": "Publicly exposed view of a dataset file conversion that omits storage-specific fields.",
+        "type": "object",
+        "properties": {
+          "completed_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The date and time the conversion got its current `status`.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "The date and time the conversion was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "dataset_id": {
+            "description": "The ID of the dataset this file is being converted from.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "file_etag": {
+            "description": "File's ETag from dataset bucket, for detecting whether a file needs to be reconverted.",
+            "type": "string"
+          },
+          "file_path": {
+            "description": "Location within dataset `path`.",
+            "type": "string"
+          },
+          "file_size": {
+            "description": "Number of bytes, for measuring throughput and debugging conversion errors.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "id": {
+            "description": "The unique identifier for the conversion.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "importer_version": {
+            "nullable": true,
+            "description": "Tracks which version processed this file when available.",
+            "type": "string"
+          },
+          "started_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The date and time the conversion started.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "description": "Conversion status.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrgDatasetFileConversionStatus"
+              }
+            ]
+          },
+          "status_message": {
+            "nullable": true,
+            "description": "Details associated with `status`.",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The date and time the conversion was last updated.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "created_at",
+          "dataset_id",
+          "file_etag",
+          "file_path",
+          "file_size",
+          "id",
+          "status",
+          "updated_at"
+        ]
+      },
+      "OrgDatasetFileConversionSummaryResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrgDatasetFileConversionSummary"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "OrgDatasetResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrgDataset"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "OrgDatasetSource": {
+        "description": "Details for accessing an org dataset.",
+        "type": "object",
+        "properties": {
+          "access_role_arn": {
+            "description": "Identity we assume when accessing the dataset. Must be configured with the org's `aws_external_id` per AWS confused deputy guidance. See <https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html>.",
+            "type": "string"
+          },
+          "provider": {
+            "description": "Storage provider identifier.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StorageProvider"
+              }
+            ]
+          },
+          "uri": {
+            "description": "Fully-qualified URI for the dataset contents.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_role_arn",
+          "provider",
+          "uri"
         ]
       },
       "OrgDetails": {
@@ -38920,6 +41620,26 @@
         "description": "The response from the `SceneClearAll` endpoint.",
         "type": "object"
       },
+      "SceneGetEntityIds": {
+        "description": "The response from the `SceneGetEntityIds` command.",
+        "type": "object",
+        "properties": {
+          "entity_ids": {
+            "description": "The ids of the requested entities.",
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        },
+        "required": [
+          "entity_ids"
+        ]
+      },
       "SceneSelectionType": {
         "description": "The type of scene selection change",
         "oneOf": [
@@ -39642,6 +42362,18 @@
             "type": "string",
             "enum": [
               "binary"
+            ]
+          }
+        ]
+      },
+      "StorageProvider": {
+        "description": "Storage provider identifier for org datasets.",
+        "oneOf": [
+          {
+            "description": "Amazon Simple Storage Service.",
+            "type": "string",
+            "enum": [
+              "s3"
             ]
           }
         ]
@@ -42951,6 +45683,22 @@
         "description": "The response from the `UpdateAnnotation` endpoint.",
         "type": "object"
       },
+      "UpdateCustomModel": {
+        "description": "Body for updating a custom ML model.",
+        "type": "object",
+        "properties": {
+          "name": {
+            "nullable": true,
+            "description": "The model's display name.",
+            "type": "string"
+          },
+          "system_prompt": {
+            "nullable": true,
+            "description": "The model's system prompt.",
+            "type": "string"
+          }
+        }
+      },
       "UpdateMemberToOrgBody": {
         "description": "Data for updating a member of an org.",
         "type": "object",
@@ -42967,6 +45715,51 @@
         "required": [
           "role"
         ]
+      },
+      "UpdateOrgDataset": {
+        "description": "Payload for updating an org dataset.",
+        "type": "object",
+        "properties": {
+          "name": {
+            "nullable": true,
+            "description": "Optional new display name.",
+            "type": "string"
+          },
+          "source": {
+            "nullable": true,
+            "description": "Optional storage connection overrides.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdateOrgDatasetSource"
+              }
+            ]
+          }
+        }
+      },
+      "UpdateOrgDatasetSource": {
+        "description": "Partial update payload for dataset storage details.",
+        "type": "object",
+        "properties": {
+          "access_role_arn": {
+            "nullable": true,
+            "description": "Updated identity Zoo should assume when reading the dataset.",
+            "type": "string"
+          },
+          "provider": {
+            "nullable": true,
+            "description": "Updated storage provider identifier.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StorageProvider"
+              }
+            ]
+          },
+          "uri": {
+            "nullable": true,
+            "description": "Updated fully-qualified URI for the dataset contents.",
+            "type": "string"
+          }
+        }
       },
       "UpdatePaymentBalance": {
         "description": "Payload for updating a user's balance.",
@@ -43725,6 +46518,16 @@
                 "minItems": 0,
                 "maxItems": 15
               },
+              "is_custom_quote": {
+                "description": "Indicates whether this plan uses custom-quoted pricing.",
+                "default": false,
+                "type": "boolean"
+              },
+              "ml_custom_models": {
+                "description": "Indicates whether the plan enables custom ML models.",
+                "default": false,
+                "type": "boolean"
+              },
               "monthly_pay_as_you_go_api_credits": {
                 "description": "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month. This is equivalent to the monetary value divided by the price of an API credit.",
                 "default": 0,
@@ -43869,13 +46672,6 @@
             "type": "string",
             "enum": [
               "modeling_app"
-            ]
-          },
-          {
-            "description": "The Diff Chrome Extension.",
-            "type": "string",
-            "enum": [
-              "diff_chrome_extension"
             ]
           },
           {
