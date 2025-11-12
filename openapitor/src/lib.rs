@@ -609,7 +609,7 @@ reqwest = {{ version = "0.12", default-features = false, features = ["json", "mu
 reqwest-conditional-middleware = {{ version = "0.4", optional = true }}
 reqwest-middleware = {{ version = "0.4", optional = true, features = ["json", "multipart", "http2"] }}
 reqwest-retry = {{ version = "0.7", optional = true }}
-reqwest-tracing = {{ version = "0.5.4", features = ["opentelemetry_0_24"], optional = true }}
+reqwest-tracing = {{ version = "0.5.4", optional = true }}
 schemars = {{ version = "0.8", features = ["bigdecimal04", "bytes", "chrono", "url", "uuid1"] }}
 serde = {{ version = "1", features = ["derive"] }}
 serde_bytes = "0.11"
