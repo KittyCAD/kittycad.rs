@@ -10428,21 +10428,29 @@ pub enum MlCopilotServerMessage {
         #[doc = "The informational text."]
         text: String,
     },
+    #[doc = "Notification that the KCL project has been updated."]
+    #[serde(rename = "project_updated")]
+    ProjectUpdated {
+        #[doc = "Map of file paths to their latest contents. The file contents are not encoded \
+                 since kcl files are not binary."]
+        files: std::collections::HashMap<String, String>,
+    },
     #[doc = "Assistant reasoning / chain-of-thought (if you expose it)."]
     #[serde(rename = "reasoning")]
     Reasoning(ReasoningMessage),
     #[doc = "Replay containing raw bytes for previously-saved messages for a conversation. \
              Includes server messages and client `User` messages.\n\nInvariants: - Includes \
-             server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, and \
-             `EndOfStream { .. }`. - Also includes client `User` messages. - The following are \
-             NEVER included: `SessionData`, `ConversationId`, or `Delta`. - Ordering is stable: \
-             messages are ordered by prompt creation time within the conversation, then by the \
-             per-prompt `seq` value (monotonically increasing as seen in the original \
-             stream).\n\nWire format: - Each element is canonical serialized bytes (typically \
-             JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - \
-             When delivered as an initial replay over the websocket (upon \
-             `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary \
-             frame containing a BSON-encoded document of this enum: `Replay { messages }`."]
+             server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, \
+             `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Also includes client `User` \
+             messages. - The following are NEVER included: `SessionData`, `ConversationId`, or \
+             `Delta`. - Ordering is stable: messages are ordered by prompt creation time within \
+             the conversation, then by the per-prompt `seq` value (monotonically increasing as \
+             seen in the original stream).\n\nWire format: - Each element is canonical serialized \
+             bytes (typically JSON) for either a `MlCopilotServerMessage` or a \
+             `MlCopilotClientMessage::User`. - When delivered as an initial replay over the \
+             websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single \
+             WebSocket Binary frame containing a BSON-encoded document of this enum: `Replay { \
+             messages }`."]
     #[serde(rename = "replay")]
     Replay {
         #[doc = "Canonical bytes (usually JSON) for each message, ordered by prompt creation \
