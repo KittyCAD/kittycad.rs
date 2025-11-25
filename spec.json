@@ -31252,6 +31252,13 @@
             "enum": [
               "bye"
             ]
+          },
+          {
+            "description": "Interrupt the current prompt that is being processed.",
+            "type": "string",
+            "enum": [
+              "interrupt"
+            ]
           }
         ]
       },

@@ -10692,6 +10692,10 @@ pub enum MlCopilotSystemCommand {
     #[serde(rename = "bye")]
     #[display("bye")]
     Bye,
+    #[doc = "Interrupt the current prompt that is being processed."]
+    #[serde(rename = "interrupt")]
+    #[display("interrupt")]
+    Interrupt,
 }
 
 #[doc = "The tools that can be used by the ML Copilot."]
