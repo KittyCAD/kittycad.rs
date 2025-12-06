@@ -23325,6 +23325,14 @@
           },
           {
             "in": "query",
+            "name": "order_independent_transparency",
+            "description": "Enables nicer visuals for transparent surfaces. This slows down rendering, so it's off by default.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
             "name": "pool",
             "description": "An optional identifier for a pool of engine instances. The 'default' pool is used when none is specified.",
             "schema": {
@@ -26737,11 +26745,6 @@
             "description": "Amount (in the `currency` specified) that will be taken off the subtotal of any invoices for this customer.",
             "type": "number",
             "format": "money-usd"
-          },
-          "deleted": {
-            "description": "Always true for a deleted object.",
-            "default": false,
-            "type": "boolean"
           },
           "id": {
             "description": "Unique identifier for the object.",
@@ -31252,6 +31255,13 @@
             "enum": [
               "bye"
             ]
+          },
+          {
+            "description": "Interrupt the current prompt that is being processed.",
+            "type": "string",
+            "enum": [
+              "interrupt"
+            ]
           }
         ]
       },
@@ -33740,6 +33750,15 @@
                 "type": "number",
                 "format": "float"
               },
+              "backface_color": {
+                "nullable": true,
+                "description": "Color of the backface",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Color"
+                  }
+                ]
+              },
               "color": {
                 "description": "Color of the new material",
                 "allOf": [
@@ -36116,6 +36135,26 @@
                 "type": "string",
                 "enum": [
                   "set_grid_auto_scale"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
+            "description": "Render transparent surfaces more accurately, but this might make rendering slower. Because it can interfere with runtime performance, it defaults to false.",
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "nullable": true,
+                "description": "Enables or disables OIT. If not given, toggles it.",
+                "type": "boolean"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_order_independent_transparency"
                 ]
               }
             },
@@ -38803,6 +38842,24 @@
                 "type": "string",
                 "enum": [
                   "set_grid_auto_scale"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SetOrderIndependentTransparency"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_order_independent_transparency"
                 ]
               }
             },
@@ -42160,6 +42217,19 @@
       "SetObjectTransform": {
         "description": "The response from the `SetObjectTransform` command.",
         "type": "object"
+      },
+      "SetOrderIndependentTransparency": {
+        "description": "The response from the 'SetOrderIndependentTransparency'.",
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "description": "Is it now enabled, or disabled?",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled"
+        ]
       },
       "SetSceneUnits": {
         "description": "The response from the `SetSceneUnits` endpoint.",
