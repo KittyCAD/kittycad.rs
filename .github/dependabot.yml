@@ -8,58 +8,93 @@ updates:
   directory: /
   schedule:
     interval: weekly
-    day: monday
-    time: '03:00'
+    day: saturday
     timezone: America/Los_Angeles
   open-pull-requests-limit: 5
   groups:
     security:
       applies-to: security-updates
+      exclude-patterns:
+      - kittycad*
       update-types:
-      - major
       - minor
       - patch
+    security-major:
+      applies-to: security-updates
+      exclude-patterns:
+      - kittycad*
+      update-types:
+      - major
     patch:
       applies-to: version-updates
+      exclude-patterns:
+      - kittycad*
       update-types:
       - patch
     major:
       applies-to: version-updates
+      exclude-patterns:
+      - kittycad*
       update-types:
       - major
     minor:
       applies-to: version-updates
+      exclude-patterns:
+      - kittycad*
       update-types:
       - minor
       - patch
+  cooldown:
+    default-days: 7
+    exclude:
+    - '*kcl*'
+    - '*zoo*'
+    - '*kittycad*'
 - package-ecosystem: cargo
   directory: /
   schedule:
     interval: weekly
-    day: monday
-    time: '03:00'
+    day: saturday
     timezone: America/Los_Angeles
+  ignore:
+  - dependency-name: kittycad-modeling-cmds
   open-pull-requests-limit: 5
-  reviewers:
-  - adamchalmers
-  - jessfraz
   groups:
     security:
       applies-to: security-updates
+      exclude-patterns:
+      - kittycad*
       update-types:
-      - major
       - minor
       - patch
+    security-major:
+      applies-to: security-updates
+      exclude-patterns:
+      - kittycad*
+      update-types:
+      - major
     patch:
       applies-to: version-updates
+      exclude-patterns:
+      - kittycad*
       update-types:
       - patch
     major:
       applies-to: version-updates
+      exclude-patterns:
+      - kittycad*
       update-types:
       - major
     minor:
       applies-to: version-updates
+      exclude-patterns:
+      - kittycad*
       update-types:
       - minor
       - patch
+  cooldown:
+    default-days: 7
+    exclude:
+    - '*kcl*'
+    - '*zoo*'
+    - '*kittycad*'
