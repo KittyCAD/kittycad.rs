@@ -22,7 +22,7 @@ jobs:
           app-id: ${{ secrets.GH_ORG_APP_ID }}
           private-key: ${{ secrets.GH_ORG_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install latest stable/nightly
         shell: bash
         run: |
@@ -53,7 +53,7 @@ jobs:
             echo "No files changed, proceeding";
           fi
       # Checkout the docs repo since we will want to update the files there.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           repository: 'kittycad/website'
           path: 'website'
