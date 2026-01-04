@@ -2719,6 +2719,7 @@ mod test {
             .find(|(k, _)| k == &"default")
             .unwrap()
             .1
+            .impl_items
             .to_string();
 
         assert!(source_code.contains("pub async fn example_api_websocket_counter"));

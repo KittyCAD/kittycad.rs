@@ -16,6 +16,14 @@ use crate::types::{
     sanitize_indents,
 };
 
+const PARAMS_STRUCT_THRESHOLD: usize = 5;
+
+#[derive(Default, Clone)]
+pub(crate) struct TagFile {
+    pub(crate) module_items: TokenStream,
+    pub(crate) impl_items: TokenStream,
+}
+
 /// Returns example
 fn generate_websocket_fn(
     type_space: &mut crate::types::TypeSpace,
@@ -24,7 +32,7 @@ fn generate_websocket_fn(
     op: &openapiv3::Operation,
     global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
     opts: &crate::Opts,
-) -> Result<(TokenStream, HashMap<String, String>)> {
+) -> Result<(TokenStream, HashMap<String, String>, Option<TokenStream>)> {
     let docs = generate_docs(type_space, name, method, op, global_params)?;
     // Get the function name.
     let fn_name = op.get_fn_name()?;
@@ -32,8 +40,15 @@ fn generate_websocket_fn(
     let response_type = quote!((reqwest::Upgraded, http::HeaderMap));
     // Get the function args.
     let raw_args = get_args(name, method, type_space, op, global_params)?;
+    let params_struct = if should_use_params_struct(&raw_args) {
+        Some(build_params_struct(&fn_name, &raw_args)?)
+    } else {
+        None
+    };
     // Make sure if we have args, we start with a comma.
-    let args = if raw_args.is_empty() {
+    let args = if let Some(params_struct) = &params_struct {
+        params_struct.params_arg.clone()
+    } else if raw_args.is_empty() {
         quote!()
     } else {
         let a = raw_args.iter().map(|(k, v)| {
@@ -70,7 +85,13 @@ fn generate_websocket_fn(
             );
     };
 
+    let params_unpack = params_struct
+        .as_ref()
+        .map(|params_struct| params_struct.unpack_all.clone())
+        .unwrap_or_default();
+
     let function_body = quote! {
+        #params_unpack
         let mut req = self.client.client_http1_only.request(
             http::Method::#method_ident,
             format!("{}/{}", self.client.base_url, #url_path #clean_url),
@@ -104,18 +125,19 @@ fn generate_websocket_fn(
     };
 
     // TODO: Build actual example
-    Ok((function, Default::default()))
+    Ok((
+        function,
+        Default::default(),
+        params_struct.map(|params_struct| params_struct.definition),
+    ))
 }
 
 /// Generate functions for each path operation.
-pub fn generate_files(
+pub(crate) fn generate_files(
     type_space: &mut crate::types::TypeSpace,
     opts: &crate::Opts,
-) -> Result<(
-    BTreeMap<String, proc_macro2::TokenStream>,
-    openapiv3::OpenAPI,
-)> {
-    let mut tag_files: BTreeMap<String, proc_macro2::TokenStream> = Default::default();
+) -> Result<(BTreeMap<String, TagFile>, openapiv3::OpenAPI)> {
+    let mut tag_files: BTreeMap<String, TagFile> = Default::default();
 
     // Make a spec we can modify for the docs.
     let mut new_spec = type_space.spec.clone();
@@ -139,9 +161,12 @@ pub fn generate_files(
 
             let tag = op.get_tag()?;
             let example = if op.extensions.contains_key("x-dropshot-websocket") {
-                let (function, example) =
+                let (function, example, params_struct) =
                     generate_websocket_fn(type_space, name, method, op, global_params, opts)?;
-                add_fn_to_tag(&mut tag_files, &tag, &function)?;
+                if let Some(params_struct) = params_struct {
+                    add_module_item_to_tag(&mut tag_files, &tag, &params_struct)?;
+                }
+                add_impl_item_to_tag(&mut tag_files, &tag, &function)?;
                 example
             } else {
                 // Get the docs.
@@ -163,8 +188,18 @@ pub fn generate_files(
 
                 // Get the function args.
                 let raw_args = get_args(name, method, type_space, op, global_params)?;
+                let params_struct = if should_use_params_struct(&raw_args) {
+                    Some(build_params_struct(&fn_name, &raw_args)?)
+                } else {
+                    None
+                };
+                if let Some(params_struct) = &params_struct {
+                    add_module_item_to_tag(&mut tag_files, &tag, &params_struct.definition)?;
+                }
                 // Make sure if we have args, we start with a comma.
-                let args = if raw_args.is_empty() {
+                let args = if let Some(params_struct) = &params_struct {
+                    params_struct.params_arg.clone()
+                } else if raw_args.is_empty() {
                     quote!()
                 } else {
                     let a = raw_args.iter().map(|(k, v)| {
@@ -194,6 +229,15 @@ pub fn generate_files(
                 // Get the function body.
                 let function_body =
                     get_function_body(type_space, name, method, op, false, opts, global_params)?;
+                let function_body = if let Some(params_struct) = &params_struct {
+                    let params_unpack = params_struct.unpack_all.clone();
+                    quote! {
+                        #params_unpack
+                        #function_body
+                    }
+                } else {
+                    function_body
+                };
 
                 let example_code_fn = generate_example_code_fn(
                     type_space,
@@ -233,7 +277,7 @@ pub fn generate_files(
                     }
                 };
 
-                add_fn_to_tag(&mut tag_files, &tag, &function)?;
+                add_impl_item_to_tag(&mut tag_files, &tag, &function)?;
 
                 // Let's pause here and update our spec with the new function.
                 // Add the docs to our spec.
@@ -264,39 +308,6 @@ pub fn generate_files(
                     // Get the inner args for the function.
                     let page_param_str = pagination_properties.page_param_str()?;
 
-                    // Make sure if we have args, we start with a comma.
-                    // Get the args again without the page param.
-                    let min_args = if raw_args.is_empty() {
-                        quote!()
-                    } else {
-                        let mut a = Vec::new();
-                        for (k, v) in raw_args.iter() {
-                            // Skip the next page arg.
-                            if k != &page_param_str {
-                                let n = format_ident!("{}", k);
-                                a.push(quote!(#n: #v))
-                            }
-                        }
-                        quote!(,#(#a),*)
-                    };
-
-                    let inner_args = if raw_args.is_empty() {
-                        quote!()
-                    } else {
-                        let mut a = Vec::new();
-                        for (k, _v) in raw_args.iter() {
-                            // Skip the next page arg.
-                            if k != &page_param_str {
-                                let n = format_ident!("{}", k);
-                                a.push(quote!(#n))
-                            } else {
-                                // Make the arg none for our page parameter.
-                                a.push(quote!(None))
-                            }
-                        }
-                        quote!(#(#a),*)
-                    };
-
                     // Check if we have a body as an arg.
                     let body_arg = if request_body.is_empty() {
                         quote!()
@@ -309,53 +320,158 @@ pub fn generate_files(
 
                     let item_type = pagination_properties.item_type(false)?;
 
-                    let function = quote! {
-                        #[doc = #docs]
-                        #[tracing::instrument]
-                        #[cfg(not(feature = "js"))]
-                        pub fn #stream_fn_name_ident<'a>(&'a self #min_args #request_body) -> impl futures::Stream<Item = Result<#item_type, crate::types::error::Error>> + Unpin + '_  {
-                            use futures::{StreamExt, TryFutureExt, TryStreamExt};
-                            use crate::types::paginate::Pagination;
-
-                            // Get the result from our main function.
-                            self.#fn_name_ident(#inner_args #body_arg)
-                                .map_ok(move |result| {
-                                    let items = futures::stream::iter(result.items().into_iter().map(Ok));
-
-                                    // Get the next pages.
-                                    let next_pages = futures::stream::try_unfold(
-                                        (None, result),
-                                        move |(prev_page_token, new_result)| async move {
-                                            if new_result.has_more_pages() && !new_result.items().is_empty() && prev_page_token != new_result.next_page_token() {
-                                                // Get the next page, we modify the request directly,
-                                                // so that if we want to generate an API that uses
-                                                // Link headers or any other weird shit it works.
-                                                async {
-                                                    #paginated_function_body
-                                                }.map_ok(|result: #response_type| {
-                                                    Some((futures::stream::iter(
-                                                            result.items().into_iter().map(Ok),
-                                                        ),
-                                                        ( new_result.next_page_token(), result),
-                                                    ))
-                                                })
-                                                .await
-                                            } else {
-                                                // We have no more pages.
-                                                Ok(None)
-                                            }
-                                        }
-                                    )
-                                    .try_flatten();
-
-                                    items.chain(next_pages)
-                                })
-                                .try_flatten_stream()
-                                .boxed()
+                    let function = if let Some(params_struct) = &params_struct {
+                        let params_ty = params_struct.params_ty.clone();
+                        let params_ident = params_struct.ident.clone();
+                        let page_param_ident =
+                            format_ident!("{}", crate::types::clean_property_name(&page_param_str));
+                        let path_params = get_path_params(type_space, op, global_params)?;
+                        let path_param_idents: Vec<proc_macro2::Ident> = path_params
+                            .keys()
+                            .map(|name| {
+                                format_ident!("{}", crate::types::clean_property_name(name))
+                            })
+                            .collect();
+                        let params_unpack = if path_param_idents.is_empty() {
+                            quote!()
+                        } else {
+                            quote! {
+                                let #params_ident { #(#path_param_idents),*, .. } = params;
                             }
+                        };
+
+                        quote! {
+                            #[doc = #docs]
+                            #[tracing::instrument]
+                            #[cfg(not(feature = "js"))]
+                            pub fn #stream_fn_name_ident<'a>(&'a self, params: #params_ty #request_body) -> impl futures::Stream<Item = Result<#item_type, crate::types::error::Error>> + Unpin + '_  {
+                                use futures::{StreamExt, TryFutureExt, TryStreamExt};
+                                use crate::types::paginate::Pagination;
+
+                                let mut params = params;
+                                params.#page_param_ident = Default::default();
+                                let params_for_call = params.clone();
+                                #params_unpack
+
+                                // Get the result from our main function.
+                                self.#fn_name_ident(params_for_call #body_arg)
+                                    .map_ok(move |result| {
+                                        let items = futures::stream::iter(result.items().into_iter().map(Ok));
+
+                                        // Get the next pages.
+                                        let next_pages = futures::stream::try_unfold(
+                                            (None, result),
+                                            move |(prev_page_token, new_result)| async move {
+                                                if new_result.has_more_pages() && !new_result.items().is_empty() && prev_page_token != new_result.next_page_token() {
+                                                    // Get the next page, we modify the request directly,
+                                                    // so that if we want to generate an API that uses
+                                                    // Link headers or any other weird shit it works.
+                                                    async {
+                                                        #paginated_function_body
+                                                    }.map_ok(|result: #response_type| {
+                                                        Some((futures::stream::iter(
+                                                                result.items().into_iter().map(Ok),
+                                                            ),
+                                                            ( new_result.next_page_token(), result),
+                                                        ))
+                                                    })
+                                                    .await
+                                                } else {
+                                                    // We have no more pages.
+                                                    Ok(None)
+                                                }
+                                            }
+                                        )
+                                        .try_flatten();
+
+                                        items.chain(next_pages)
+                                    })
+                                    .try_flatten_stream()
+                                    .boxed()
+                                }
+                        }
+                    } else {
+                        // Make sure if we have args, we start with a comma.
+                        // Get the args again without the page param.
+                        let min_args = if raw_args.is_empty() {
+                            quote!()
+                        } else {
+                            let mut a = Vec::new();
+                            for (k, v) in raw_args.iter() {
+                                // Skip the next page arg.
+                                if k != &page_param_str {
+                                    let n = format_ident!("{}", k);
+                                    a.push(quote!(#n: #v))
+                                }
+                            }
+                            quote!(,#(#a),*)
+                        };
+
+                        let inner_args = if raw_args.is_empty() {
+                            quote!()
+                        } else {
+                            let mut a = Vec::new();
+                            for (k, _v) in raw_args.iter() {
+                                // Skip the next page arg.
+                                if k != &page_param_str {
+                                    let n = format_ident!("{}", k);
+                                    a.push(quote!(#n))
+                                } else {
+                                    // Make the arg none for our page parameter.
+                                    a.push(quote!(None))
+                                }
+                            }
+                            quote!(#(#a),*)
+                        };
+
+                        quote! {
+                            #[doc = #docs]
+                            #[tracing::instrument]
+                            #[cfg(not(feature = "js"))]
+                            pub fn #stream_fn_name_ident<'a>(&'a self #min_args #request_body) -> impl futures::Stream<Item = Result<#item_type, crate::types::error::Error>> + Unpin + '_  {
+                                use futures::{StreamExt, TryFutureExt, TryStreamExt};
+                                use crate::types::paginate::Pagination;
+
+                                // Get the result from our main function.
+                                self.#fn_name_ident(#inner_args #body_arg)
+                                    .map_ok(move |result| {
+                                        let items = futures::stream::iter(result.items().into_iter().map(Ok));
+
+                                        // Get the next pages.
+                                        let next_pages = futures::stream::try_unfold(
+                                            (None, result),
+                                            move |(prev_page_token, new_result)| async move {
+                                                if new_result.has_more_pages() && !new_result.items().is_empty() && prev_page_token != new_result.next_page_token() {
+                                                    // Get the next page, we modify the request directly,
+                                                    // so that if we want to generate an API that uses
+                                                    // Link headers or any other weird shit it works.
+                                                    async {
+                                                        #paginated_function_body
+                                                    }.map_ok(|result: #response_type| {
+                                                        Some((futures::stream::iter(
+                                                                result.items().into_iter().map(Ok),
+                                                            ),
+                                                            ( new_result.next_page_token(), result),
+                                                        ))
+                                                    })
+                                                    .await
+                                                } else {
+                                                    // We have no more pages.
+                                                    Ok(None)
+                                                }
+                                            }
+                                        )
+                                        .try_flatten();
+
+                                        items.chain(next_pages)
+                                    })
+                                    .try_flatten_stream()
+                                    .boxed()
+                                }
+                        }
                     };
 
-                    add_fn_to_tag(&mut tag_files, &tag, &function)?;
+                    add_impl_item_to_tag(&mut tag_files, &tag, &function)?;
                 }
                 example
             };
@@ -1376,29 +1492,156 @@ fn get_pagination_properties(
 }
 
 /// Add a function to our list of tagged functions.
-fn add_fn_to_tag(
-    tag_files: &mut BTreeMap<String, proc_macro2::TokenStream>,
+fn add_impl_item_to_tag(
+    tag_files: &mut BTreeMap<String, TagFile>,
     tag: &str,
-    function: &proc_macro2::TokenStream,
+    item: &proc_macro2::TokenStream,
 ) -> Result<()> {
-    // Add our function to our existing tag file, or create a new one.
-    if let std::collections::btree_map::Entry::Vacant(e) = tag_files.entry(tag.to_string()) {
-        e.insert(function.clone());
+    let entry = tag_files.entry(tag.to_string()).or_default();
+    entry.impl_items = if entry.impl_items.is_empty() {
+        item.clone()
     } else {
-        let current = tag_files
-            .get(tag)
-            .ok_or_else(|| anyhow::anyhow!("failed to find tag file for tag `{}`", tag))?;
-        tag_files.insert(
-            tag.to_string(),
-            quote! {
-                #current
+        let current = entry.impl_items.clone();
+        quote! {
+            #current
 
-                #function
-            },
-        );
-    }
+            #item
+        }
+    };
 
     Ok(())
+}
+
+fn add_module_item_to_tag(
+    tag_files: &mut BTreeMap<String, TagFile>,
+    tag: &str,
+    item: &proc_macro2::TokenStream,
+) -> Result<()> {
+    let entry = tag_files.entry(tag.to_string()).or_default();
+    entry.module_items = if entry.module_items.is_empty() {
+        item.clone()
+    } else {
+        let current = entry.module_items.clone();
+        quote! {
+            #current
+
+            #item
+        }
+    };
+
+    Ok(())
+}
+
+fn should_use_params_struct(raw_args: &BTreeMap<String, TokenStream>) -> bool {
+    raw_args.len() > PARAMS_STRUCT_THRESHOLD
+}
+
+struct ParamsStruct {
+    ident: proc_macro2::Ident,
+    params_ty: TokenStream,
+    params_arg: TokenStream,
+    unpack_all: TokenStream,
+    definition: TokenStream,
+}
+
+fn build_params_struct(
+    fn_name: &str,
+    raw_args: &BTreeMap<String, TokenStream>,
+) -> Result<ParamsStruct> {
+    let ident = format_ident!("{}Params", crate::types::proper_name(fn_name));
+    let mut fields = Vec::new();
+    let mut field_idents = Vec::new();
+    let mut required_fields: Vec<(proc_macro2::Ident, TokenStream)> = Vec::new();
+    let mut needs_lifetime = false;
+    let mut all_optional = true;
+
+    for (name, ty) in raw_args {
+        let field_name = crate::types::clean_property_name(name);
+        let field_ident = format_ident!("{}", field_name);
+        let rendered = ty.rendered()?;
+        if rendered.contains("&'a") || rendered.contains("& 'a") {
+            needs_lifetime = true;
+        }
+
+        if !ty.is_option()? {
+            all_optional = false;
+            required_fields.push((field_ident.clone(), ty.clone()));
+        }
+
+        field_idents.push(field_ident.clone());
+        fields.push(quote!(pub #field_ident: #ty));
+    }
+
+    let struct_generics = if needs_lifetime {
+        quote!(<'a>)
+    } else {
+        quote!()
+    };
+    let impl_generics = struct_generics.clone();
+    let params_ty = if needs_lifetime {
+        quote!(#ident<'a>)
+    } else {
+        quote!(#ident)
+    };
+    let params_arg = quote!(, params: #params_ty);
+
+    let unpack_all = if field_idents.is_empty() {
+        quote!()
+    } else {
+        quote! {
+            let #ident { #(#field_idents),* } = params;
+        }
+    };
+
+    let new_impl = if required_fields.is_empty() {
+        quote!()
+    } else {
+        let new_args = required_fields
+            .iter()
+            .map(|(field_ident, field_ty)| quote!(#field_ident: #field_ty));
+        let field_inits = field_idents.iter().map(|field_ident| {
+            if required_fields
+                .iter()
+                .any(|(required_ident, _)| required_ident == field_ident)
+            {
+                quote!(#field_ident)
+            } else {
+                quote!(#field_ident: Default::default())
+            }
+        });
+        quote! {
+            impl #impl_generics #ident #struct_generics {
+                pub fn new(#(#new_args),*) -> Self {
+                    Self {
+                        #(#field_inits),*
+                    }
+                }
+            }
+        }
+    };
+
+    let derives = if all_optional {
+        quote!(#[derive(Clone, Debug, Default)])
+    } else {
+        quote!(#[derive(Clone, Debug)])
+    };
+
+    let definition = quote! {
+        #derives
+        pub struct #ident #struct_generics {
+            #(#fields,)*
+        }
+
+        #new_impl
+    };
+
+    Ok(ParamsStruct {
+        ident,
+        params_ty,
+        params_arg,
+        unpack_all,
+        definition,
+    })
 }
 
 /// Generate example code for afunction.
@@ -1432,7 +1675,22 @@ fn generate_example_code_fn(
 
     // Get the function args.
     let raw_args = get_example_args(name, method, type_space, op, global_params)?;
-    let args = if raw_args.is_empty() {
+    let use_params_struct = should_use_params_struct(&raw_args);
+    let args = if use_params_struct {
+        if raw_args.is_empty() {
+            quote!()
+        } else {
+            let params_ident = format_ident!("{}Params", crate::types::proper_name(&fn_name));
+            let params_path = quote!(crate::#tag_ident::#params_ident);
+            let params_fields = raw_args.iter().map(|(name, value)| {
+                let field_ident =
+                    format_ident!("{}", crate::types::clean_property_name(name.as_str()));
+                quote!(#field_ident: #value)
+            });
+            let params_value = quote!(#params_path { #(#params_fields),* });
+            quote!(#params_value,)
+        }
+    } else if raw_args.is_empty() {
         quote!()
     } else {
         let a = raw_args.values().map(|v| quote!(#v));
@@ -1489,7 +1747,9 @@ fn generate_example_code_fn(
 
         // We want all the args except for the page_token.
         let page_param_str = pagination_properties.page_param_str()?;
-        let mut min_args = if raw_args.is_empty() {
+        let mut min_args = if use_params_struct {
+            args.clone()
+        } else if raw_args.is_empty() {
             quote!()
         } else {
             let mut a = Vec::new();
@@ -1625,15 +1885,11 @@ fn generate_example_client_env(opts: &crate::Opts) -> String {
 /// usage inside the crate.
 fn fmt_external_example_code(t: &proc_macro2::TokenStream, opts: &crate::Opts) -> Result<String> {
     let rendered = crate::types::get_text_fmt(t)?;
+    let crate_prefix = format!("{}::", opts.code_package_name());
+    let crate_spaced_prefix = format!("{} :: ", opts.code_package_name());
     Ok(rendered
-        .replace(
-            "crate::types::",
-            &format!("{}::types::", opts.code_package_name()),
-        )
-        .replace(
-            "crate :: types :: ",
-            &format!("{}::types::", opts.code_package_name()),
-        ))
+        .replace("crate::", &crate_prefix)
+        .replace("crate :: ", &crate_spaced_prefix))
 }
 
 fn multipart_has_body(request_body: &proc_macro2::TokenStream) -> Result<bool> {
