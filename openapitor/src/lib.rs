@@ -332,11 +332,15 @@ pub fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
         tagrs.push(format!("{}.rs", f));
         let proper_tag_name = crate::types::proper_name(&f);
         let proper_tag_name_ident = format_ident!("{}", proper_tag_name);
+        let module_items = content.module_items;
+        let impl_items = content.impl_items;
 
         let output = quote! {
             use anyhow::Result;
 
             use crate::Client;
+
+            #module_items
 
             #[derive(Clone, Debug)]
             pub struct #proper_tag_name_ident {
@@ -349,7 +353,7 @@ pub fn generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<()> {
                     Self { client }
                 }
 
-                #content
+                #impl_items
             }
         };
         // TODO: make fmt
