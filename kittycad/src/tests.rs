@@ -315,7 +315,7 @@ async fn test_modeling_websocket() {
 
     let ws = match client
         .modeling()
-        .commands_ws(None, None, None, None, None, None, None, None, None, None)
+        .commands_ws(crate::modeling::CommandsWsParams::default())
         .await
     {
         Ok((ws, _headers)) => ws,

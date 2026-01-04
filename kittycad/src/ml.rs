@@ -1,6 +1,16 @@
 use anyhow::Result;
 
 use crate::Client;
+#[derive(Clone, Debug, Default)]
+pub struct ListTextToCadPartsForUserParams {
+    pub conversation_id: Option<uuid::Uuid>,
+    pub limit: Option<u32>,
+    pub no_models: Option<bool>,
+    pub no_parts: Option<bool>,
+    pub page_token: Option<String>,
+    pub sort_by: Option<crate::types::CreatedAtSortMode>,
+}
+
 #[derive(Clone, Debug)]
 pub struct Ml {
     pub client: Client,
@@ -675,17 +685,20 @@ impl Ml {
         }
     }
 
-    #[doc = "List text-to-CAD parts you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\n\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD parts for the authenticated user.\n\nThe text-to-CAD parts are returned in order of creation, with the most recently created text-to-CAD parts first.\n\n**Parameters:**\n\n- `conversation_id: Option<uuid::Uuid>`: If specified, only return the prompts for the conversation id given.\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `no_models: Option<bool>`: DEPRECATED: This is the same as `no_parts`, and will be dropped in a future release. Please do not use this.\n- `no_parts: Option<bool>`: If we should return the part contents or just the metadata.\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_ml_list_text_to_cad_parts_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadResponseResultsPage = client\n        .ml()\n        .list_text_to_cad_parts_for_user(\n            Some(uuid::Uuid::from_str(\n                \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n            )?),\n            Some(4 as u32),\n            Some(true),\n            Some(true),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_ml_list_text_to_cad_parts_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ml = client.ml();\n    let mut stream = ml.list_text_to_cad_parts_for_user_stream(\n        Some(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?),\n        Some(4 as u32),\n        Some(true),\n        Some(true),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List text-to-CAD parts you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\n\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD parts for the authenticated user.\n\nThe text-to-CAD parts are returned in order of creation, with the most recently created text-to-CAD parts first.\n\n**Parameters:**\n\n- `conversation_id: Option<uuid::Uuid>`: If specified, only return the prompts for the conversation id given.\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `no_models: Option<bool>`: DEPRECATED: This is the same as `no_parts`, and will be dropped in a future release. Please do not use this.\n- `no_parts: Option<bool>`: If we should return the part contents or just the metadata.\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_ml_list_text_to_cad_parts_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadResponseResultsPage = client\n        .ml()\n        .list_text_to_cad_parts_for_user(kittycad::ml::ListTextToCadPartsForUserParams {\n            conversation_id: Some(uuid::Uuid::from_str(\n                \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n            )?),\n            limit: Some(4 as u32),\n            no_models: Some(true),\n            no_parts: Some(true),\n            page_token: Some(\"some-string\".to_string()),\n            sort_by: Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_ml_list_text_to_cad_parts_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ml = client.ml();\n    let mut stream =\n        ml.list_text_to_cad_parts_for_user_stream(kittycad::ml::ListTextToCadPartsForUserParams {\n            conversation_id: Some(uuid::Uuid::from_str(\n                \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n            )?),\n            limit: Some(4 as u32),\n            no_models: Some(true),\n            no_parts: Some(true),\n            page_token: Some(\"some-string\".to_string()),\n            sort_by: Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        });\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list_text_to_cad_parts_for_user<'a>(
         &'a self,
-        conversation_id: Option<uuid::Uuid>,
-        limit: Option<u32>,
-        no_models: Option<bool>,
-        no_parts: Option<bool>,
-        page_token: Option<String>,
-        sort_by: Option<crate::types::CreatedAtSortMode>,
+        params: ListTextToCadPartsForUserParams,
     ) -> Result<crate::types::TextToCadResponseResultsPage, crate::types::error::Error> {
+        let ListTextToCadPartsForUserParams {
+            conversation_id,
+            limit,
+            no_models,
+            no_parts,
+            page_token,
+            sort_by,
+        } = params;
         let mut req = self.client.client.request(
             http::Method::GET,
             format!("{}/{}", self.client.base_url, "user/text-to-cad"),
@@ -736,16 +749,12 @@ impl Ml {
         }
     }
 
-    #[doc = "List text-to-CAD parts you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\n\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD parts for the authenticated user.\n\nThe text-to-CAD parts are returned in order of creation, with the most recently created text-to-CAD parts first.\n\n**Parameters:**\n\n- `conversation_id: Option<uuid::Uuid>`: If specified, only return the prompts for the conversation id given.\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `no_models: Option<bool>`: DEPRECATED: This is the same as `no_parts`, and will be dropped in a future release. Please do not use this.\n- `no_parts: Option<bool>`: If we should return the part contents or just the metadata.\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_ml_list_text_to_cad_parts_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadResponseResultsPage = client\n        .ml()\n        .list_text_to_cad_parts_for_user(\n            Some(uuid::Uuid::from_str(\n                \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n            )?),\n            Some(4 as u32),\n            Some(true),\n            Some(true),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_ml_list_text_to_cad_parts_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ml = client.ml();\n    let mut stream = ml.list_text_to_cad_parts_for_user_stream(\n        Some(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?),\n        Some(4 as u32),\n        Some(true),\n        Some(true),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List text-to-CAD parts you've generated.\n\nThis will always return the STEP file contents as well as the format the user originally requested.\n\nThis endpoint requires authentication by any Zoo user. It returns the text-to-CAD parts for the authenticated user.\n\nThe text-to-CAD parts are returned in order of creation, with the most recently created text-to-CAD parts first.\n\n**Parameters:**\n\n- `conversation_id: Option<uuid::Uuid>`: If specified, only return the prompts for the conversation id given.\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `no_models: Option<bool>`: DEPRECATED: This is the same as `no_parts`, and will be dropped in a future release. Please do not use this.\n- `no_parts: Option<bool>`: If we should return the part contents or just the metadata.\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_ml_list_text_to_cad_parts_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadResponseResultsPage = client\n        .ml()\n        .list_text_to_cad_parts_for_user(kittycad::ml::ListTextToCadPartsForUserParams {\n            conversation_id: Some(uuid::Uuid::from_str(\n                \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n            )?),\n            limit: Some(4 as u32),\n            no_models: Some(true),\n            no_parts: Some(true),\n            page_token: Some(\"some-string\".to_string()),\n            sort_by: Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_ml_list_text_to_cad_parts_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ml = client.ml();\n    let mut stream =\n        ml.list_text_to_cad_parts_for_user_stream(kittycad::ml::ListTextToCadPartsForUserParams {\n            conversation_id: Some(uuid::Uuid::from_str(\n                \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n            )?),\n            limit: Some(4 as u32),\n            no_models: Some(true),\n            no_parts: Some(true),\n            page_token: Some(\"some-string\".to_string()),\n            sort_by: Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        });\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     #[cfg(not(feature = "js"))]
     pub fn list_text_to_cad_parts_for_user_stream<'a>(
         &'a self,
-        conversation_id: Option<uuid::Uuid>,
-        limit: Option<u32>,
-        no_models: Option<bool>,
-        no_parts: Option<bool>,
-        sort_by: Option<crate::types::CreatedAtSortMode>,
+        params: ListTextToCadPartsForUserParams,
     ) -> impl futures::Stream<
         Item = Result<crate::types::TextToCadResponse, crate::types::error::Error>,
     > + Unpin
@@ -753,66 +762,65 @@ impl Ml {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
-        self.list_text_to_cad_parts_for_user(
-            conversation_id,
-            limit,
-            no_models,
-            no_parts,
-            None,
-            sort_by,
-        )
-        .map_ok(move |result| {
-            let items = futures::stream::iter(result.items().into_iter().map(Ok));
-            let next_pages = futures::stream::try_unfold(
-                (None, result),
-                move |(prev_page_token, new_result)| async move {
-                    if new_result.has_more_pages()
-                        && !new_result.items().is_empty()
-                        && prev_page_token != new_result.next_page_token()
-                    {
-                        async {
-                            let mut req = self.client.client.request(
-                                http::Method::GET,
-                                format!("{}/{}", self.client.base_url, "user/text-to-cad"),
-                            );
-                            req = req.bearer_auth(&self.client.token);
-                            let mut request = req.build()?;
-                            request = new_result.next_page(request)?;
-                            let resp = self.client.client.execute(request).await?;
-                            let status = resp.status();
-                            if status.is_success() {
-                                let text = resp.text().await.unwrap_or_default();
-                                serde_json::from_str(&text).map_err(|err| {
-                                    crate::types::error::Error::from_serde_error(
-                                        format_serde_error::SerdeError::new(text.to_string(), err),
+        let mut params = params;
+        params.page_token = Default::default();
+        let params_for_call = params.clone();
+        self.list_text_to_cad_parts_for_user(params_for_call)
+            .map_ok(move |result| {
+                let items = futures::stream::iter(result.items().into_iter().map(Ok));
+                let next_pages = futures::stream::try_unfold(
+                    (None, result),
+                    move |(prev_page_token, new_result)| async move {
+                        if new_result.has_more_pages()
+                            && !new_result.items().is_empty()
+                            && prev_page_token != new_result.next_page_token()
+                        {
+                            async {
+                                let mut req = self.client.client.request(
+                                    http::Method::GET,
+                                    format!("{}/{}", self.client.base_url, "user/text-to-cad"),
+                                );
+                                req = req.bearer_auth(&self.client.token);
+                                let mut request = req.build()?;
+                                request = new_result.next_page(request)?;
+                                let resp = self.client.client.execute(request).await?;
+                                let status = resp.status();
+                                if status.is_success() {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    serde_json::from_str(&text).map_err(|err| {
+                                        crate::types::error::Error::from_serde_error(
+                                            format_serde_error::SerdeError::new(
+                                                text.to_string(),
+                                                err,
+                                            ),
+                                            status,
+                                        )
+                                    })
+                                } else {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    Err(crate::types::error::Error::Server {
+                                        body: text.to_string(),
                                         status,
-                                    )
-                                })
-                            } else {
-                                let text = resp.text().await.unwrap_or_default();
-                                Err(crate::types::error::Error::Server {
-                                    body: text.to_string(),
-                                    status,
-                                })
+                                    })
+                                }
                             }
+                            .map_ok(|result: crate::types::TextToCadResponseResultsPage| {
+                                Some((
+                                    futures::stream::iter(result.items().into_iter().map(Ok)),
+                                    (new_result.next_page_token(), result),
+                                ))
+                            })
+                            .await
+                        } else {
+                            Ok(None)
                         }
-                        .map_ok(|result: crate::types::TextToCadResponseResultsPage| {
-                            Some((
-                                futures::stream::iter(result.items().into_iter().map(Ok)),
-                                (new_result.next_page_token(), result),
-                            ))
-                        })
-                        .await
-                    } else {
-                        Ok(None)
-                    }
-                },
-            )
-            .try_flatten();
-            items.chain(next_pages)
-        })
-        .try_flatten_stream()
-        .boxed()
+                    },
+                )
+                .try_flatten();
+                items.chain(next_pages)
+            })
+            .try_flatten_stream()
+            .boxed()
     }
 
     #[doc = "Get a text-to-CAD response.\n\nThis endpoint requires authentication by any Zoo user. \
@@ -903,13 +911,15 @@ impl Ml {
              parameters via `MlCopilotQuery`. See the field documentation on that struct for \
              details, including replay behavior and wire format.\n\n**Parameters:**\n\n- \
              `conversation_id: Option<uuid::Uuid>`: Conversation to replay (UUID). Required when \
-             `replay` is `true`.\n- `replay: Option<bool>`: If `true`, emit MsgPack Replay for the \
-             specified conversation and continue."]
+             `replay` is `true`.\n- `pr: Option<u64>`: Optional Pull Request number to route \
+             traffic.\n- `replay: Option<bool>`: If `true`, emit MsgPack Replay for the specified \
+             conversation and continue."]
     #[tracing::instrument]
     #[cfg(not(target_arch = "wasm32"))]
     pub async fn copilot_ws<'a>(
         &'a self,
         conversation_id: Option<uuid::Uuid>,
+        pr: Option<u64>,
         replay: Option<bool>,
     ) -> Result<(reqwest::Upgraded, http::HeaderMap), crate::types::error::Error> {
         let mut req = self.client.client_http1_only.request(
@@ -920,6 +930,10 @@ impl Ml {
         let mut query_params = vec![];
         if let Some(p) = conversation_id {
             query_params.push(("conversation_id", format!("{}", p)));
+        }
+
+        if let Some(p) = pr {
+            query_params.push(("pr", format!("{}", p)));
         }
 
         if let Some(p) = replay {
