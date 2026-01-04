@@ -542,6 +542,89 @@ impl Payments {
         }
     }
 
+    #[doc = "Update the subscription for any org (admin override).\n\nThis endpoint requires \
+             authentication by a Zoo admin. It updates the subscription for the specified \
+             org.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. \
+             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_payments_update_org_subscription_for_any_org() -> anyhow::Result<()> {\n    \
+             let client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        \
+             .update_org_subscription_for_any_org(\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             &kittycad::types::ZooProductSubscriptionsOrgRequest {\n                modeling_app: \
+             \"some-string\".to_string(),\n                pay_annually: Some(true),\n            \
+             },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn update_org_subscription_for_any_org<'a>(
+        &'a self,
+        id: uuid::Uuid,
+        body: &crate::types::ZooProductSubscriptionsOrgRequest,
+    ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "orgs/{id}/payment/subscriptions".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Create or update a price for a subscription plan.\n\nYou must be a Zoo admin to perform this request.\n\n**Parameters:**\n\n- `slug: &'astr` (required)\n\n```rust,no_run\nasync fn example_payments_upsert_subscription_plan_price() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::SubscriptionPlanPriceRecord = client\n        .payments()\n        .upsert_subscription_plan_price(\n            \"some-string\",\n            &kittycad::types::PriceUpsertRequest {\n                active: true,\n                billing_model: kittycad::types::SubscriptionPlanBillingModel::PerUser,\n                cadence: kittycad::types::PlanInterval::Year,\n                unit_amount: 3.14 as f64,\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn upsert_subscription_plan_price<'a>(
+        &'a self,
+        slug: &'a str,
+        body: &crate::types::PriceUpsertRequest,
+    ) -> Result<crate::types::SubscriptionPlanPriceRecord, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "subscription-plans/{slug}/prices".replace("{slug}", slug)
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Get payment info about your user.\n\nThis includes billing address, phone, and \
              name.\n\nThis endpoint requires authentication by any Zoo user. It gets the payment \
              information for the authenticated user.\n\n```rust,no_run\nasync fn \
@@ -860,6 +943,40 @@ impl Payments {
         }
 
         req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Set the default payment method for your user.\n\nThis endpoint requires \
+             authentication by any Zoo user. It sets the default payment method for the \
+             authenticated user.\n\n**Parameters:**\n\n- `id: &'astr`: The ID of the payment \
+             method. (required)\n\n```rust,no_run\nasync fn \
+             example_payments_set_default_method_for_user() -> anyhow::Result<()> {\n    let \
+             client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        \
+             .set_default_method_for_user(\"some-string\")\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn set_default_method_for_user<'a>(
+        &'a self,
+        id: &'a str,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/payment/methods/{id}/default".replace("{id}", id)
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
