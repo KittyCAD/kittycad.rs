@@ -26670,6 +26670,25 @@
           }
         ]
       },
+      "BodyType": {
+        "description": "Body type determining if the operation will create a solid or a surface.",
+        "oneOf": [
+          {
+            "description": "Create a body that has two caps, creating a solid object.",
+            "type": "string",
+            "enum": [
+              "solid"
+            ]
+          },
+          {
+            "description": "Create only the surface of the body without any caps.",
+            "type": "string",
+            "enum": [
+              "surface"
+            ]
+          }
+        ]
+      },
       "BooleanIntersection": {
         "description": "The response from the 'BooleanIntersection'.",
         "type": "object",
@@ -30569,6 +30588,24 @@
             "description": "ISO 10303-21 (STEP) format.",
             "type": "object",
             "properties": {
+              "coords": {
+                "description": "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html",
+                "default": {
+                  "forward": {
+                    "axis": "y",
+                    "direction": "negative"
+                  },
+                  "up": {
+                    "axis": "z",
+                    "direction": "positive"
+                  }
+                },
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/System"
+                  }
+                ]
+              },
               "split_closed_faces": {
                 "description": "Splits all closed faces into two open faces.\n\nDefaults to `false` but is implicitly `true` when importing into the engine.",
                 "default": false,
@@ -32662,6 +32699,15 @@
             "description": "Command for extruding a solid 2d.",
             "type": "object",
             "properties": {
+              "body_type": {
+                "description": "Should this extrude create a solid body or a surface?",
+                "default": "solid",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/BodyType"
+                  }
+                ]
+              },
               "distance": {
                 "description": "How far off the plane to extrude",
                 "allOf": [
@@ -32722,6 +32768,15 @@
             "description": "Command for extruding a solid 2d to a reference geometry.",
             "type": "object",
             "properties": {
+              "body_type": {
+                "description": "Should this extrude create a solid body or a surface?",
+                "default": "solid",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/BodyType"
+                  }
+                ]
+              },
               "extrude_method": {
                 "description": "Should the extrusion create a new object or be part of the existing object.",
                 "default": "merge",
@@ -32782,6 +32837,15 @@
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Angle"
+                  }
+                ]
+              },
+              "body_type": {
+                "description": "Should this extrude create a solid body or a surface?",
+                "default": "solid",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/BodyType"
                   }
                 ]
               },
@@ -32933,6 +32997,15 @@
                 "description": "If true, the axis is interpreted within the 2D space of the solid 2D's plane",
                 "type": "boolean"
               },
+              "body_type": {
+                "description": "Should this extrude create a solid body or a surface?",
+                "default": "solid",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/BodyType"
+                  }
+                ]
+              },
               "opposite": {
                 "description": "Should the revolution also revolve in the opposite direction along the given axis? If so, this specifies its angle.",
                 "default": "None",
@@ -33036,6 +33109,15 @@
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Angle"
+                  }
+                ]
+              },
+              "body_type": {
+                "description": "Should this extrude create a solid body or a surface?",
+                "default": "solid",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/BodyType"
                   }
                 ]
               },
@@ -35435,6 +35517,15 @@
             "description": "Set the default system properties used when a specific property isn't set.",
             "type": "object",
             "properties": {
+              "backface_color": {
+                "nullable": true,
+                "description": "The default color to use for all backfaces",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Color"
+                  }
+                ]
+              },
               "color": {
                 "nullable": true,
                 "description": "The default system color.",
