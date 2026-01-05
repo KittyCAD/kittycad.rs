@@ -3047,6 +3047,31 @@ pub enum BlockReason {
     PaymentMethodFailed,
 }
 
+#[doc = "Body type determining if the operation will create a solid or a surface."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum BodyType {
+    #[doc = "Create a body that has two caps, creating a solid object."]
+    #[serde(rename = "solid")]
+    #[display("solid")]
+    Solid,
+    #[doc = "Create only the surface of the body without any caps."]
+    #[serde(rename = "surface")]
+    #[display("surface")]
+    Surface,
+}
+
 #[doc = "The response from the 'BooleanIntersection'."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9054,6 +9079,10 @@ pub enum InputFormat3D {
     #[doc = "ISO 10303-21 (STEP) format."]
     #[serde(rename = "step")]
     Step {
+        #[doc = "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        coords: Option<System>,
         #[doc = "Splits all closed faces into two open faces.\n\nDefaults to `false` but is \
                  implicitly `true` when importing into the engine."]
         #[serde(default)]
@@ -11499,6 +11528,9 @@ pub enum ModelingCmd {
     #[doc = "Command for extruding a solid 2d."]
     #[serde(rename = "extrude")]
     Extrude {
+        #[doc = "Should this extrude create a solid body or a surface?"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        body_type: Option<BodyType>,
         #[doc = "How far off the plane to extrude"]
         distance: f64,
         #[doc = "Should the extrusion create a new object or be part of the existing object."]
@@ -11518,6 +11550,9 @@ pub enum ModelingCmd {
     #[doc = "Command for extruding a solid 2d to a reference geometry."]
     #[serde(rename = "extrude_to_reference")]
     ExtrudeToReference {
+        #[doc = "Should this extrude create a solid body or a surface?"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        body_type: Option<BodyType>,
         #[doc = "Should the extrusion create a new object or be part of the existing object."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         extrude_method: Option<ExtrudeMethod>,
@@ -11538,6 +11573,9 @@ pub enum ModelingCmd {
                  and 90°)"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         angle_step_size: Option<Angle>,
+        #[doc = "Should this extrude create a solid body or a surface?"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        body_type: Option<BodyType>,
         #[doc = "Center to twist about (relative to 2D sketch)"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         center_2d: Option<Point2D>,
@@ -11580,6 +11618,9 @@ pub enum ModelingCmd {
         axis: Point3D,
         #[doc = "If true, the axis is interpreted within the 2D space of the solid 2D's plane"]
         axis_is_2d: bool,
+        #[doc = "Should this extrude create a solid body or a surface?"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        body_type: Option<BodyType>,
         #[doc = "Should the revolution also revolve in the opposite direction along the given \
                  axis? If so, this specifies its angle."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -11610,6 +11651,9 @@ pub enum ModelingCmd {
     RevolveAboutEdge {
         #[doc = "The signed angle of revolution (in degrees, must be <= 360 in either direction)"]
         angle: Angle,
+        #[doc = "Should this extrude create a solid body or a surface?"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        body_type: Option<BodyType>,
         #[doc = "The edge to use as the axis of revolution, must be linear and lie in the plane \
                  of the solid"]
         edge_id: uuid::Uuid,
@@ -12336,6 +12380,9 @@ pub enum ModelingCmd {
     #[doc = "Set the default system properties used when a specific property isn't set."]
     #[serde(rename = "set_default_system_properties")]
     SetDefaultSystemProperties {
+        #[doc = "The default color to use for all backfaces"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        backface_color: Option<Color>,
         #[doc = "The default system color."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         color: Option<Color>,
