@@ -32519,7 +32519,7 @@
           },
           "pay_as_you_go_api_credit_price": {
             "title": "double",
-            "description": "The price of an API credit (meaning 1 credit = 1 second of API usage).",
+            "description": "The price of an API credit.",
             "default": 0.0,
             "type": "number",
             "format": "money-usd"
@@ -47795,7 +47795,7 @@
               },
               "pay_as_you_go_api_credit_price": {
                 "title": "double",
-                "description": "The price of an API credit (meaning 1 credit = 1 second of API usage).",
+                "description": "The price of an API credit.",
                 "default": 0.0,
                 "type": "number",
                 "format": "money-usd"
