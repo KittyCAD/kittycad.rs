@@ -11155,7 +11155,7 @@ pub struct ModelingAppSubscriptionTier {
     pub monthly_pay_as_you_go_api_credits_monetary_value: Option<f64>,
     #[doc = "The name of the tier."]
     pub name: String,
-    #[doc = "The price of an API credit (meaning 1 credit = 1 second of API usage)."]
+    #[doc = "The price of an API credit."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pay_as_you_go_api_credit_price: Option<f64>,
     #[doc = "The price of the tier per month. If this is for an individual, this is the price they pay. If this is for an organization, this is the price the organization pays per member in the org. This is in USD."]
@@ -23357,7 +23357,7 @@ pub struct ZooProductSubscription {
     pub monthly_pay_as_you_go_api_credits_monetary_value: Option<f64>,
     #[doc = "The name of the tier."]
     pub name: String,
-    #[doc = "The price of an API credit (meaning 1 credit = 1 second of API usage)."]
+    #[doc = "The price of an API credit."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pay_as_you_go_api_credit_price: Option<f64>,
     #[doc = "The price of the tier per month. If this is for an individual, this is the price they pay. If this is for an organization, this is the price the organization pays per member in the org. This is in USD."]
