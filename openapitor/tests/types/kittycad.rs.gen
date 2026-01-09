@@ -10593,6 +10593,14 @@ pub enum MlCopilotSystemCommand {
     #[serde(rename = "interrupt")]
     #[display("interrupt")]
     Interrupt,
+    #[doc = "Cancel the current prompt that is being processed."]
+    #[serde(rename = "cancel")]
+    #[display("cancel")]
+    Cancel,
+    #[doc = "Answer now, which forces the AI to finish the current response."]
+    #[serde(rename = "answer_now")]
+    #[display("answer_now")]
+    AnswerNow,
 }
 
 #[doc = "The tools that can be used by the ML Copilot."]
