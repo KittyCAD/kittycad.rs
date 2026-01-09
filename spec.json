@@ -31994,6 +31994,20 @@
             "enum": [
               "interrupt"
             ]
+          },
+          {
+            "description": "Cancel the current prompt that is being processed.",
+            "type": "string",
+            "enum": [
+              "cancel"
+            ]
+          },
+          {
+            "description": "Answer now, which forces the AI to finish the current response.",
+            "type": "string",
+            "enum": [
+              "answer_now"
+            ]
           }
         ]
       },
