@@ -34,7 +34,35 @@ pub fn sanitize_indents(s: &str, name: String) -> std::borrow::Cow<'_, str> {
     if new_str.is_empty() {
         format!("{}.", name).into()
     } else {
-        new_str
+        let mut out = String::new();
+        let mut in_fence = false;
+        let ends_with_newline = new_str.ends_with('\n');
+        for (idx, line) in new_str.lines().enumerate() {
+            if idx > 0 {
+                out.push('\n');
+            }
+            let trimmed = line.trim();
+            if trimmed.starts_with("```") {
+                if trimmed == "```" {
+                    if in_fence {
+                        out.push_str("```");
+                        in_fence = false;
+                    } else {
+                        out.push_str("```text");
+                        in_fence = true;
+                    }
+                } else {
+                    out.push_str(line);
+                    in_fence = !in_fence;
+                }
+            } else {
+                out.push_str(line);
+            }
+        }
+        if ends_with_newline {
+            out.push('\n');
+        }
+        out.into()
     }
 }
 
@@ -2028,6 +2056,10 @@ pub fn clean_property_name(s: &str) -> String {
 
     prop = inflector::cases::snakecase::to_snake_case(&prop);
 
+    if prop.chars().next().is_some_and(|c| c.is_ascii_digit()) {
+        prop = format!("field_{prop}");
+    }
+
     // Account for reserved keywords in rust.
     if prop == "ref"
         || prop == "type"
@@ -2497,12 +2529,12 @@ pub(crate) fn get_schema_from_any(data: &SchemaData, any: &AnySchema) -> Option<
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use pretty_assertions::assert_eq;
 
     #[test]
     fn test_generate_kittycad_types() {
-        let result = super::generate_types(
+        let result = crate::types::generate_types(
             &crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
             Default::default(),
         )
@@ -2513,7 +2545,7 @@ mod test {
     #[test]
     #[ignore] // Some sort of circular loop.
     fn test_generate_github_types() {
-        let result = super::generate_types(
+        let result = crate::types::generate_types(
             &crate::load_json_spec(include_str!("../../tests/api.github.com.json")).unwrap(),
             Default::default(),
         )
@@ -2523,7 +2555,7 @@ mod test {
 
     #[test]
     fn test_generate_oxide_types() {
-        let result = super::generate_types(
+        let result = crate::types::generate_types(
             &crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
             Default::default(),
         )
@@ -2533,25 +2565,47 @@ mod test {
 
     #[test]
     fn test_proper_name_number() {
-        assert_eq!(super::proper_name("1"), "One");
-        assert_eq!(super::proper_name("2"), "Two");
-        assert_eq!(super::proper_name("100"), "OneHundred");
-        assert_eq!(super::proper_name("2FaDisabled"), "TwoFaDisabled");
+        assert_eq!(crate::types::proper_name("1"), "One");
+        assert_eq!(crate::types::proper_name("2"), "Two");
+        assert_eq!(crate::types::proper_name("100"), "OneHundred");
+        assert_eq!(crate::types::proper_name("2FaDisabled"), "TwoFaDisabled");
     }
 
     #[test]
     fn test_proper_name_kebab() {
-        assert_eq!(super::proper_name("kebab-case"), "KebabCase");
+        assert_eq!(crate::types::proper_name("kebab-case"), "KebabCase");
         assert_eq!(
-            super::proper_name("webhook-config-insecure-ssl"),
+            crate::types::proper_name("webhook-config-insecure-ssl"),
             "WebhookConfigInsecureSsl"
         );
     }
 
     #[test]
     fn test_clean_property_name() {
-        assert_eq!(super::clean_property_name("+1"), "plus_one");
-        assert_eq!(super::clean_property_name("-1"), "minus_one");
+        assert_eq!(crate::types::clean_property_name("+1"), "plus_one");
+        assert_eq!(crate::types::clean_property_name("-1"), "minus_one");
+        assert_eq!(crate::types::clean_property_name("400"), "field_400");
+        assert_eq!(
+            crate::types::clean_property_name("3dModel"),
+            "field_3d_model"
+        );
+    }
+
+    #[test]
+    fn test_sanitize_indents_plain_fence() {
+        let input = "Example\n    ```\n    curl https://example.com\n    ```\n";
+        let output = crate::types::sanitize_indents(input, "Example".to_string());
+        assert_eq!(
+            output.as_ref(),
+            "Example\n```text\ncurl https://example.com\n```\n"
+        );
+    }
+
+    #[test]
+    fn test_sanitize_indents_preserves_language_fence() {
+        let input = "Example\n```json\n{\"ok\":true}\n```\n";
+        let output = crate::types::sanitize_indents(input, "Example".to_string());
+        assert_eq!(output.as_ref(), input);
     }
 
     #[test]
@@ -2560,7 +2614,7 @@ mod test {
 
         let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
 
-        let mut type_space = super::TypeSpace {
+        let mut type_space = crate::types::TypeSpace {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
             rendered: quote!(),
@@ -2571,7 +2625,7 @@ mod test {
 
         expectorate::assert_contents(
             "tests/types/oxide.router-route.rs.gen",
-            &super::get_text_fmt(&type_space.rendered).unwrap(),
+            &crate::types::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
 
@@ -2600,7 +2654,7 @@ mod test {
 
         let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
 
-        let mut type_space = super::TypeSpace {
+        let mut type_space = crate::types::TypeSpace {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
             rendered: quote!(),
@@ -2611,7 +2665,7 @@ mod test {
 
         expectorate::assert_contents(
             "tests/types/oxide.ip-net.rs.gen",
-            &super::get_text_fmt(&type_space.rendered).unwrap(),
+            &crate::types::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
 
@@ -2621,7 +2675,7 @@ mod test {
 
         let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
 
-        let mut type_space = super::TypeSpace {
+        let mut type_space = crate::types::TypeSpace {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
             rendered: quote!(),
@@ -2634,7 +2688,7 @@ mod test {
 
         expectorate::assert_contents(
             "tests/types/oxide.vpc-filewall-rule-target.rs.gen",
-            &super::get_text_fmt(&type_space.rendered).unwrap(),
+            &crate::types::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
 
@@ -2644,7 +2698,7 @@ mod test {
 
         let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
 
-        let mut type_space = super::TypeSpace {
+        let mut type_space = crate::types::TypeSpace {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
             rendered: quote!(),
@@ -2657,7 +2711,7 @@ mod test {
 
         expectorate::assert_contents(
             "tests/types/kittycad.async-api-call-output.rs.gen",
-            &super::get_text_fmt(&type_space.rendered).unwrap(),
+            &crate::types::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
 
@@ -2688,7 +2742,7 @@ mod test {
 
         let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
 
-        let mut type_space = super::TypeSpace {
+        let mut type_space = crate::types::TypeSpace {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../tests/oxide.json")).unwrap(),
             rendered: quote!(),
@@ -2699,7 +2753,7 @@ mod test {
 
         expectorate::assert_contents(
             "tests/types/oxide.digest.rs.gen",
-            &super::get_text_fmt(&type_space.rendered).unwrap(),
+            &crate::types::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
 
@@ -2707,7 +2761,7 @@ mod test {
     fn test_websocket() {
         let schema = include_str!("../../tests/types/input/websocket.json");
         let spec: openapiv3::OpenAPI = serde_json::from_str(schema).unwrap();
-        let mut type_space = super::generate_types(&spec, Default::default()).unwrap();
+        let mut type_space = crate::types::generate_types(&spec, Default::default()).unwrap();
 
         let files = crate::functions::generate_files(&mut type_space, &Default::default())
             .unwrap()
@@ -2739,7 +2793,7 @@ mod test {
             date_time_format: Some("%Y-%m-%dT%H:%M:%S".to_string()),
             ..Default::default()
         };
-        let mut type_space = super::TypeSpace {
+        let mut type_space = crate::types::TypeSpace {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
             rendered: quote!(),
@@ -2750,7 +2804,7 @@ mod test {
 
         expectorate::assert_contents(
             "tests/types/kittycad.file-density-date-time-override-output.rs.gen",
-            &super::get_text_fmt(&type_space.rendered).unwrap(),
+            &crate::types::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
 
@@ -2760,7 +2814,7 @@ mod test {
 
         let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
 
-        let mut type_space = super::TypeSpace {
+        let mut type_space = crate::types::TypeSpace {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
             rendered: quote!(),
@@ -2771,7 +2825,7 @@ mod test {
 
         expectorate::assert_contents(
             "tests/types/kittycad.account-provider-output.rs.gen",
-            &super::get_text_fmt(&type_space.rendered).unwrap(),
+            &crate::types::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
 
@@ -2781,7 +2835,7 @@ mod test {
 
         let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
 
-        let mut type_space = super::TypeSpace {
+        let mut type_space = crate::types::TypeSpace {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
             rendered: quote!(),
@@ -2792,7 +2846,7 @@ mod test {
 
         expectorate::assert_contents(
             "tests/types/kittycad.drawing-cmd-output.rs.gen",
-            &super::get_text_fmt(&type_space.rendered).unwrap(),
+            &crate::types::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
 
@@ -2802,7 +2856,7 @@ mod test {
 
         let schema = serde_json::from_str::<openapiv3::Schema>(schema).unwrap();
 
-        let mut type_space = super::TypeSpace {
+        let mut type_space = crate::types::TypeSpace {
             types: indexmap::map::IndexMap::new(),
             spec: crate::load_json_spec(include_str!("../../../spec.json")).unwrap(),
             rendered: quote!(),
@@ -2815,7 +2869,7 @@ mod test {
 
         expectorate::assert_contents(
             "tests/types/kittycad.subscription-tier-type.rs.gen",
-            &super::get_text_fmt(&type_space.rendered).unwrap(),
+            &crate::types::get_text_fmt(&type_space.rendered).unwrap(),
         );
     }
 }

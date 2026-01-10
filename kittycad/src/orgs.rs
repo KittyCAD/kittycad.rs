@@ -151,10 +151,7 @@ impl Orgs {
             format!("{}/{}", self.client.base_url, "org/dataset/s3/policies"),
         );
         req = req.bearer_auth(&self.client.token);
-        let query_params = vec![
-            ("role_arn", role_arn.to_string()),
-            ("uri", uri.to_string()),
-        ];
+        let query_params = vec![("role_arn", role_arn.to_string()), ("uri", uri.to_string())];
         req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();

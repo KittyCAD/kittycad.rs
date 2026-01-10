@@ -490,7 +490,10 @@ impl SchemaRenderExt for openapiv3::ReferenceOr<Box<openapiv3::Schema>> {
                     }
                     openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
                         if o.properties.is_empty() {
-                            Ok(false)
+                            Ok(!matches!(
+                                o.additional_properties,
+                                Some(openapiv3::AdditionalProperties::Schema(_))
+                            ))
                         } else {
                             Ok(true)
                         }
@@ -584,4 +587,42 @@ fn singular(s: &str) -> String {
     }
 
     s.to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use openapiv3::{
+        AdditionalProperties, ObjectType, ReferenceOr, Schema, SchemaKind, StringType, Type,
+    };
+
+    use crate::types::exts::SchemaRenderExt;
+
+    #[test]
+    fn test_schema_render_empty_object_without_additional_properties() {
+        let object = ObjectType::default();
+        let schema = Schema {
+            schema_data: Default::default(),
+            schema_kind: SchemaKind::Type(Type::Object(object)),
+        };
+        let schema_ref = ReferenceOr::Item(Box::new(schema));
+        assert!(schema_ref.should_render().unwrap());
+    }
+
+    #[test]
+    fn test_schema_render_empty_object_with_schema_additional_properties() {
+        let mut object = ObjectType::default();
+        let additional_schema = Schema {
+            schema_data: Default::default(),
+            schema_kind: SchemaKind::Type(Type::String(StringType::default())),
+        };
+        object.additional_properties = Some(AdditionalProperties::Schema(Box::new(
+            ReferenceOr::Item(additional_schema),
+        )));
+        let schema = Schema {
+            schema_data: Default::default(),
+            schema_kind: SchemaKind::Type(Type::Object(object)),
+        };
+        let schema_ref = ReferenceOr::Item(Box::new(schema));
+        assert!(!schema_ref.should_render().unwrap());
+    }
 }
