@@ -490,7 +490,10 @@ impl SchemaRenderExt for openapiv3::ReferenceOr<Box<openapiv3::Schema>> {
                     }
                     openapiv3::SchemaKind::Type(openapiv3::Type::Object(o)) => {
                         if o.properties.is_empty() {
-                            Ok(false)
+                            Ok(!matches!(
+                                o.additional_properties,
+                                Some(openapiv3::AdditionalProperties::Schema(_))
+                            ))
                         } else {
                             Ok(true)
                         }

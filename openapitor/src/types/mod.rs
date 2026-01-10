@@ -34,7 +34,35 @@ pub fn sanitize_indents(s: &str, name: String) -> std::borrow::Cow<'_, str> {
     if new_str.is_empty() {
         format!("{}.", name).into()
     } else {
-        new_str
+        let mut out = String::new();
+        let mut in_fence = false;
+        let ends_with_newline = new_str.ends_with('\n');
+        for (idx, line) in new_str.lines().enumerate() {
+            if idx > 0 {
+                out.push('\n');
+            }
+            let trimmed = line.trim();
+            if trimmed.starts_with("```") {
+                if trimmed == "```" {
+                    if in_fence {
+                        out.push_str("```");
+                        in_fence = false;
+                    } else {
+                        out.push_str("```text");
+                        in_fence = true;
+                    }
+                } else {
+                    out.push_str(line);
+                    in_fence = !in_fence;
+                }
+            } else {
+                out.push_str(line);
+            }
+        }
+        if ends_with_newline {
+            out.push('\n');
+        }
+        out.into()
     }
 }
 
@@ -2027,6 +2055,10 @@ pub fn clean_property_name(s: &str) -> String {
     }
 
     prop = inflector::cases::snakecase::to_snake_case(&prop);
+
+    if prop.chars().next().is_some_and(|c| c.is_ascii_digit()) {
+        prop = format!("field_{prop}");
+    }
 
     // Account for reserved keywords in rust.
     if prop == "ref"

@@ -8,7 +8,8 @@ use inflector::cases::screamingsnakecase::to_screaming_snake_case;
 fn generate_docs_openapi_info(spec: &openapiv3::OpenAPI, opts: &crate::Opts) -> Result<String> {
     let mut desc = String::new();
     if let Some(d) = &spec.info.description {
-        desc = d.replace('\n', "\n//! ");
+        let sanitized = crate::types::sanitize_indents(d, "API description".to_string());
+        desc = sanitized.replace('\n', "\n//! ");
     }
 
     let mut tos = String::new();
