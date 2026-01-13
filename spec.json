@@ -1882,9 +1882,7 @@
             "name": "callback_url",
             "description": "The URL to redirect back to after we have authenticated.",
             "schema": {
-              "nullable": true,
-              "type": "string",
-              "format": "uri"
+              "$ref": "#/components/schemas/LenientUrl"
             }
           }
         ],
@@ -1990,9 +1988,7 @@
             "name": "callback_url",
             "description": "The URL to redirect back to after we have authenticated.",
             "schema": {
-              "nullable": true,
-              "type": "string",
-              "format": "uri"
+              "$ref": "#/components/schemas/LenientUrl"
             }
           }
         ],
@@ -31299,6 +31295,11 @@
       "LengthUnit": {
         "type": "number",
         "format": "double"
+      },
+      "LenientUrl": {
+        "nullable": true,
+        "type": "string",
+        "format": "uri"
       },
       "Loft": {
         "description": "The response from the `Loft` command.",
