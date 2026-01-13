@@ -6755,6 +6755,7 @@ pub enum Type {
     ModelingAppEvent,
 }
 
+
 #[doc = "An event related to modeling app files"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -11303,6 +11304,7 @@ pub enum ModelingAppEventType {
     SuccessfulCompileBeforeClose,
 }
 
+
 #[doc = "Modeling App share link capabilities."]
 #[derive(
     serde :: Serialize,
@@ -13110,6 +13112,7 @@ pub enum Oauth2GrantType {
     #[default]
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
+
 
 #[doc = "The response from the `ObjectBringToFront` endpoint."]
 #[derive(
@@ -15469,6 +15472,7 @@ pub enum OutputFormat2DType {
     Dxf,
 }
 
+
 #[doc = "AutoCAD drawing interchange format."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -16192,6 +16196,7 @@ pub enum PaymentMethodType {
     #[default]
     Card,
 }
+
 
 #[doc = "Defines a perspective view."]
 #[derive(
@@ -19023,6 +19028,7 @@ pub enum StorageProvider {
     #[default]
     S3,
 }
+
 
 #[doc = "The parameters for a new store coupon."]
 #[derive(
