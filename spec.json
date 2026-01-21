@@ -31537,6 +31537,13 @@
             "description": "The user message, which contains the content of the user's input.",
             "type": "object",
             "properties": {
+              "additional_files": {
+                "description": "The user can send additional files like images or PDFs to provide more context.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/MlCopilotFile"
+                }
+              },
               "content": {
                 "description": "The content of the user's message.",
                 "type": "string"
@@ -31632,29 +31639,6 @@
             },
             "required": [
               "command",
-              "type"
-            ]
-          },
-          {
-            "description": "Files sent from the client to the server.",
-            "type": "object",
-            "properties": {
-              "files": {
-                "description": "The list of files being sent.",
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/MlCopilotFile"
-                }
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "files"
-                ]
-              }
-            },
-            "required": [
-              "files",
               "type"
             ]
           }
