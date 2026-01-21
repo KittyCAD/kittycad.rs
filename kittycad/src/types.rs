@@ -10589,6 +10589,55 @@ pub enum MlCopilotClientMessage {
         #[doc = "The content of the system message."]
         command: MlCopilotSystemCommand,
     },
+    #[doc = "Files sent from the client to the server."]
+    #[serde(rename = "files")]
+    Files {
+        #[doc = "The list of files being sent."]
+        files: Vec<MlCopilotFile>,
+    },
+}
+
+#[doc = "A file that can be transferred between the client and server."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct MlCopilotFile {
+    #[doc = "The file contents as binary data."]
+    #[serde(
+        serialize_with = "serde_bytes::serialize",
+        deserialize_with = "serde_bytes::deserialize"
+    )]
+    pub data: Vec<u8>,
+    #[doc = "The MIME type of the file (e.g., \"image/png\", \"application/pdf\", \"model/stl\")."]
+    pub mimetype: String,
+    #[doc = "The name of the file."]
+    pub name: String,
+}
+
+impl std::fmt::Display for MlCopilotFile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for MlCopilotFile {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.data).into(),
+            self.mimetype.clone().into(),
+            self.name.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["data".into(), "mimetype".into(), "name".into()]
+    }
 }
 
 #[doc = "The mode to have the agent work in."]
@@ -10716,6 +10765,12 @@ pub enum MlCopilotServerMessage {
                  response at once."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         whole_response: Option<String>,
+    },
+    #[doc = "Files sent from the server to the client."]
+    #[serde(rename = "files")]
+    Files {
+        #[doc = "The list of files being sent."]
+        files: Vec<MlCopilotFile>,
     },
 }
 
