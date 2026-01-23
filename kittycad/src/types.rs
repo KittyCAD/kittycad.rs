@@ -10555,6 +10555,9 @@ pub enum MlCopilotClientMessage {
     #[doc = "The user message, which contains the content of the user's input."]
     #[serde(rename = "user")]
     User {
+        #[doc = "The user can send additional files like images or PDFs to provide more context."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        additional_files: Option<Vec<MlCopilotFile>>,
         #[doc = "The content of the user's message."]
         content: String,
         #[doc = "The current files in the project, if any. This can be used to provide context \
@@ -10588,12 +10591,6 @@ pub enum MlCopilotClientMessage {
     System {
         #[doc = "The content of the system message."]
         command: MlCopilotSystemCommand,
-    },
-    #[doc = "Files sent from the client to the server."]
-    #[serde(rename = "files")]
-    Files {
-        #[doc = "The list of files being sent."]
-        files: Vec<MlCopilotFile>,
     },
 }
 
