@@ -31831,6 +31831,26 @@
             "additionalProperties": false
           },
           {
+            "description": "Notification that the backend is shutting down.",
+            "type": "object",
+            "properties": {
+              "backend_shutdown": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "nullable": true,
+                    "description": "The reason given for the backend shutdown.",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "required": [
+              "backend_shutdown"
+            ],
+            "additionalProperties": false
+          },
+          {
             "description": "Notification that the KCL project has been updated.",
             "type": "object",
             "properties": {
@@ -31869,7 +31889,7 @@
             "additionalProperties": false
           },
           {
-            "description": "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Also includes client `User` messages. - The following are NEVER included: `SessionData`, `ConversationId`, or `Delta`. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`.",
+            "description": "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Also includes client `User` messages. - The following are NEVER included: `SessionData`, `ConversationId`, `Delta`, or `BackendShutdown`. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`.",
             "type": "object",
             "properties": {
               "replay": {
