@@ -364,7 +364,7 @@ impl Ml {
              Some(\"myfile.json\".into()),\n                content_type: \
              Some(\"application/json\".to_string()),\n                data: \
              std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            \
-             Some(kittycad::types::CodeOption::Cleanup),\n        )\n        .await?;\n    \
+             Some(kittycad::types::CodeOption::MockExecute),\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_proprietary_to_kcl<'a>(
