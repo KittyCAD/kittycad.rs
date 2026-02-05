@@ -12991,7 +12991,7 @@
           "service-accounts"
         ],
         "summary": "List service accounts for your org.",
-        "description": "This endpoint requires authentication by an org admin. It returns the service accounts for the organization.\n\nThe service accounts are returned in order of creation, with the most recently created service accounts first.",
+        "description": "This endpoint requires authentication by an org member. It returns the service accounts for the organization.\n\nThe service accounts are returned in order of creation, with the most recently created service accounts first.",
         "operationId": "list_service_accounts_for_org",
         "parameters": [
           {
@@ -13115,7 +13115,7 @@
           "service-accounts"
         ],
         "summary": "Create a new service account for your org.",
-        "description": "This endpoint requires authentication by an org admin. It creates a new service account for the organization.",
+        "description": "This endpoint requires authentication by an org member. It creates a new service account for the organization.",
         "operationId": "create_service_account_for_org",
         "parameters": [
           {
@@ -13305,7 +13305,7 @@
           "service-accounts"
         ],
         "summary": "Get an service account for your org.",
-        "description": "This endpoint requires authentication by an org admin. It returns details of the requested service account for the organization.",
+        "description": "This endpoint requires authentication by an org member. It returns details of the requested service account for the organization.",
         "operationId": "get_service_account_for_org",
         "parameters": [
           {
@@ -13408,7 +13408,7 @@
           "service-accounts"
         ],
         "summary": "Delete an service account for your org.",
-        "description": "This endpoint requires authentication by an org admin. It deletes the requested service account for the organization.\n\nThis endpoint does not actually delete the service account from the database. It merely marks the token as invalid. We still want to keep the service account in the database for historical purposes.",
+        "description": "This endpoint requires authentication by an org member. It deletes the requested service account for the organization.\n\nThis endpoint does not actually delete the service account from the database. It merely marks the token as invalid. We still want to keep the service account in the database for historical purposes.",
         "operationId": "delete_service_account_for_org",
         "parameters": [
           {
@@ -24303,6 +24303,12 @@
         "description": "Parameters for defining an MBD Basic Dimension Annotation state which is measured between two positions in 3D",
         "type": "object",
         "properties": {
+          "arrow_scale": {
+            "description": "The scale of the dimension arrows. Defaults to 1.",
+            "default": 1.0,
+            "type": "number",
+            "format": "float"
+          },
           "dimension": {
             "description": "Basic dimension parameters (symbol and tolerance)",
             "allOf": [
@@ -24434,6 +24440,12 @@
             "type": "number",
             "format": "float"
           },
+          "leader_scale": {
+            "description": "The scale of the leader (dot or arrow). Defaults to 1.",
+            "default": 1.0,
+            "type": "number",
+            "format": "float"
+          },
           "leader_type": {
             "description": "Type of leader to use",
             "allOf": [
@@ -24514,6 +24526,12 @@
           "key": {
             "description": "Tag key",
             "type": "string"
+          },
+          "leader_scale": {
+            "description": "The scale of the leader (dot or arrow). Defaults to 1.",
+            "default": 1.0,
+            "type": "number",
+            "format": "float"
           },
           "leader_type": {
             "description": "Type of leader to use",
@@ -26667,23 +26685,37 @@
         ]
       },
       "BodyType": {
-        "description": "Body type determining if the operation will create a solid or a surface.",
+        "description": "Body type determining if the operation will create a manifold (solid) body or a non-manifold collection of surfaces.",
         "oneOf": [
           {
-            "description": "Create a body that has two caps, creating a solid object.",
+            "description": "Defines a body that is manifold.",
             "type": "string",
             "enum": [
               "solid"
             ]
           },
           {
-            "description": "Create only the surface of the body without any caps.",
+            "description": "Defines a body that is non-manifold (an open collection of connected surfaces).",
             "type": "string",
             "enum": [
               "surface"
             ]
           }
         ]
+      },
+      "BooleanImprint": {
+        "description": "The response from the 'BooleanImprint'.",
+        "type": "object",
+        "properties": {
+          "extra_solid_ids": {
+            "description": "If the operation produced just one body, then its ID will be the ID of the modeling command request. But if any extra bodies are produced, then their IDs will be included here.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
       },
       "BooleanIntersection": {
         "description": "The response from the 'BooleanIntersection'.",
@@ -27141,13 +27173,12 @@
         ]
       },
       "CodeOption": {
-        "description": "Code option for running and verifying kcl.\n\n<details><summary>JSON schema</summary>\n\n```json { \"title\": \"CodeOption\", \"description\": \"Code option for running and verifying kcl.\", \"type\": \"string\", \"enum\": [ \"parse\", \"execute\", \"cleanup\", \"mock_execute\" ] } ``` </details>",
+        "description": "`CodeOption`\n\n<details><summary>JSON schema</summary>\n\n```json { \"type\": \"string\", \"enum\": [ \"parse\", \"mock_execute\", \"execute\" ] } ``` </details>",
         "type": "string",
         "enum": [
           "parse",
-          "execute",
-          "cleanup",
-          "mock_execute"
+          "mock_execute",
+          "execute"
         ]
       },
       "CodeOutput": {
@@ -27496,6 +27527,10 @@
           "name",
           "source"
         ]
+      },
+      "CreateRegion": {
+        "description": "The response from the 'CreateRegion'. The region should have an ID taken from the ID of the 'CreateRegion' modeling command.",
+        "type": "object"
       },
       "CreateShortlinkRequest": {
         "description": "Request to create a shortlink.",
@@ -28441,6 +28476,10 @@
           }
         }
       },
+      "EntityDeleteChildren": {
+        "description": "The response from the `EntityDeleteChildren` command.",
+        "type": "object"
+      },
       "EntityFade": {
         "description": "The response from the `EntityFade` endpoint.",
         "type": "object"
@@ -28502,6 +28541,21 @@
           "min_distance"
         ]
       },
+      "EntityGetIndex": {
+        "description": "The response from the `EntityGetIndex` command.",
+        "type": "object",
+        "properties": {
+          "entity_index": {
+            "description": "The child index of the entity.",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "entity_index"
+        ]
+      },
       "EntityGetNumChildren": {
         "description": "The response from the `EntityGetNumChildren` command.",
         "type": "object",
@@ -28529,6 +28583,30 @@
         },
         "required": [
           "entity_id"
+        ]
+      },
+      "EntityGetPrimitiveIndex": {
+        "description": "The response from the `EntityGetPrimitiveIndex` command.",
+        "type": "object",
+        "properties": {
+          "entity_type": {
+            "description": "The type of this entity.  Helps infer whether this is an edge or a face index.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EntityType"
+              }
+            ]
+          },
+          "primitive_index": {
+            "description": "The primitive index of the entity.",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "entity_type",
+          "primitive_index"
         ]
       },
       "EntityGetSketchPaths": {
@@ -31831,6 +31909,26 @@
             "additionalProperties": false
           },
           {
+            "description": "Notification that the backend is shutting down.",
+            "type": "object",
+            "properties": {
+              "backend_shutdown": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "nullable": true,
+                    "description": "The reason given for the backend shutdown.",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "required": [
+              "backend_shutdown"
+            ],
+            "additionalProperties": false
+          },
+          {
             "description": "Notification that the KCL project has been updated.",
             "type": "object",
             "properties": {
@@ -31869,7 +31967,7 @@
             "additionalProperties": false
           },
           {
-            "description": "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Also includes client `User` messages. - The following are NEVER included: `SessionData`, `ConversationId`, or `Delta`. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`.",
+            "description": "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Also includes client `User` messages. - The following are NEVER included: `SessionData`, `ConversationId`, `Delta`, or `BackendShutdown`. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`.",
             "type": "object",
             "properties": {
               "replay": {
@@ -32809,6 +32907,11 @@
                   }
                 ]
               },
+              "merge_coplanar_faces": {
+                "nullable": true,
+                "description": "Only used if the extrusion is created from a face and extrude_method = Merge If true, coplanar faces will be merged and seams will be hidden. Otherwise, seams between the extrusion and original body will be shown.",
+                "type": "boolean"
+              },
               "opposite": {
                 "description": "Should the extrusion also extrude in the opposite direction? If so, this specifies its distance.",
                 "default": "None",
@@ -33176,6 +33279,104 @@
             ]
           },
           {
+            "description": "Command for joining a Surface (non-manifold) body back to a Solid. All of the surfaces should already be contained within the body mated topologically. This operation should be the final step after a sequence of Solid modeling commands such as BooleanImprint, EntityDeleteChildren, Solid3dFlipFace If successful, the new body type will become \"Solid\".",
+            "type": "object",
+            "properties": {
+              "object_id": {
+                "description": "Which Solid3D is being joined.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_join"
+                ]
+              }
+            },
+            "required": [
+              "object_id",
+              "type"
+            ]
+          },
+          {
+            "description": "What is the UUID of this body's n-th edge?",
+            "type": "object",
+            "properties": {
+              "edge_index": {
+                "description": "The primitive index of the edge being queried.",
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              },
+              "object_id": {
+                "description": "The Solid3D parent who owns the edge",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_get_edge_uuid"
+                ]
+              }
+            },
+            "required": [
+              "edge_index",
+              "object_id",
+              "type"
+            ]
+          },
+          {
+            "description": "What is the UUID of this body's n-th face?",
+            "type": "object",
+            "properties": {
+              "face_index": {
+                "description": "The primitive index of the face being queried.",
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              },
+              "object_id": {
+                "description": "The Solid3D parent who owns the face",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_get_face_uuid"
+                ]
+              }
+            },
+            "required": [
+              "face_index",
+              "object_id",
+              "type"
+            ]
+          },
+          {
+            "description": "Retrieves the body type.",
+            "type": "object",
+            "properties": {
+              "object_id": {
+                "description": "The Solid3D whose body type is being queried.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_get_body_type"
+                ]
+              }
+            },
+            "required": [
+              "object_id",
+              "type"
+            ]
+          },
+          {
             "description": "Command for revolving a solid 2d about a brep edge",
             "type": "object",
             "properties": {
@@ -33255,6 +33456,15 @@
               "bez_approximate_rational": {
                 "description": "Attempt to approximate rational curves (such as arcs) using a bezier. This will remove banding around interpolations between arcs and non-arcs.  It may produce errors in other scenarios Over time, this field won't be necessary.",
                 "type": "boolean"
+              },
+              "body_type": {
+                "description": "Should this loft create a solid body or a surface?",
+                "default": "solid",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/BodyType"
+                  }
+                ]
               },
               "section_ids": {
                 "description": "The closed section curves to create a lofted solid from. Currently, these must be Solid2Ds",
@@ -33776,6 +33986,79 @@
             },
             "required": [
               "child_index",
+              "entity_id",
+              "type"
+            ]
+          },
+          {
+            "description": "What is this entity's child index within its parent",
+            "type": "object",
+            "properties": {
+              "entity_id": {
+                "description": "ID of the entity being queried.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_get_index"
+                ]
+              }
+            },
+            "required": [
+              "entity_id",
+              "type"
+            ]
+          },
+          {
+            "description": "What is this edge or face entity's primitive index within its parent body's edges or faces array respectively",
+            "type": "object",
+            "properties": {
+              "entity_id": {
+                "description": "ID of the entity being queried.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_get_primitive_index"
+                ]
+              }
+            },
+            "required": [
+              "entity_id",
+              "type"
+            ]
+          },
+          {
+            "description": "Attempts to delete children entity from an entity. Note that this API may change the body type of certain entities from Solid to Surface.",
+            "type": "object",
+            "properties": {
+              "child_entity_ids": {
+                "description": "ID of the entity's child being deleted",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "uniqueItems": true
+              },
+              "entity_id": {
+                "description": "ID of the entity being modified",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_delete_children"
+                ]
+              }
+            },
+            "required": [
+              "child_entity_ids",
               "entity_id",
               "type"
             ]
@@ -34694,6 +34977,54 @@
             },
             "required": [
               "edge_id",
+              "object_id",
+              "type"
+            ]
+          },
+          {
+            "description": "Flips (reverses) a brep that is \"inside-out\".",
+            "type": "object",
+            "properties": {
+              "object_id": {
+                "description": "Which object is being flipped.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_flip"
+                ]
+              }
+            },
+            "required": [
+              "object_id",
+              "type"
+            ]
+          },
+          {
+            "description": "Flips (reverses) a face.  If the solid3d body type is \"Solid\", then body type will become non-manifold (\"Surface\").",
+            "type": "object",
+            "properties": {
+              "face_id": {
+                "description": "Which face you want to flip.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "object_id": {
+                "description": "Which object is being queried.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_flip_face"
+                ]
+              }
+            },
+            "required": [
+              "face_id",
               "object_id",
               "type"
             ]
@@ -36866,6 +37197,39 @@
             ]
           },
           {
+            "description": "Create a new non-manifold body by intersecting all the input bodies, cutting and splitting all the faces at the intersection boundaries.",
+            "type": "object",
+            "properties": {
+              "body_ids": {
+                "description": "Which input bodies to intersect.  Inputs with non-solid body types are permitted",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "tolerance": {
+                "description": "The maximum acceptable surface gap between the intersected bodies. Must be positive (i.e. greater than zero).",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "boolean_imprint"
+                ]
+              }
+            },
+            "required": [
+              "body_ids",
+              "tolerance",
+              "type"
+            ]
+          },
+          {
             "description": "Make a new path by offsetting an object by a given distance. The new path's ID will be the ID of this command.",
             "type": "object",
             "properties": {
@@ -37020,6 +37384,74 @@
               }
             },
             "required": [
+              "type"
+            ]
+          },
+          {
+            "description": "Create a region bounded by the intersection of various paths. The region should have an ID taken from the ID of the 'CreateRegion' modeling command.",
+            "type": "object",
+            "properties": {
+              "curve_clockwise": {
+                "description": "By default, curve counterclockwise at intersections. If this is true, instead curve clockwise.",
+                "default": false,
+                "type": "boolean"
+              },
+              "intersection_index": {
+                "description": "At which intersection between `segment` and `intersection_segment` should we stop following the `segment` and start following `intersection_segment`? Defaults to -1, which means the last intersection.",
+                "default": -1,
+                "type": "integer",
+                "format": "int32"
+              },
+              "intersection_segment": {
+                "description": "Second segment to follow to find the region. Intersects the first segment.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "object_id": {
+                "description": "Which sketch object to create the region from.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "segment": {
+                "description": "First segment to follow to find the region.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "create_region"
+                ]
+              }
+            },
+            "required": [
+              "intersection_segment",
+              "object_id",
+              "segment",
+              "type"
+            ]
+          },
+          {
+            "description": "The user clicked on a point in the window, returns the region the user clicked on, if any.",
+            "type": "object",
+            "properties": {
+              "selected_at_window": {
+                "description": "Where in the window was selected",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "select_region_from_point"
+                ]
+              }
+            },
+            "required": [
+              "selected_at_window",
               "type"
             ]
           }
@@ -37345,6 +37777,78 @@
                 "type": "string",
                 "enum": [
                   "solid3d_shell_face"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Solid3dJoin"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_join"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Solid3dGetEdgeUuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_get_edge_uuid"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Solid3dGetFaceUuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_get_face_uuid"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Solid3dGetBodyType"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_get_body_type"
                 ]
               }
             },
@@ -38311,6 +38815,60 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/EntityGetIndex"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_get_index"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityGetPrimitiveIndex"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_get_primitive_index"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EntityDeleteChildren"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entity_delete_children"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/EntityGetNumChildren"
               },
               "type": {
@@ -38713,6 +39271,42 @@
                 "type": "string",
                 "enum": [
                   "solid3d_get_all_edge_faces"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Solid3dFlip"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_flip"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Solid3dFlipFace"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_flip_face"
                 ]
               }
             },
@@ -39679,6 +40273,24 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/BooleanImprint"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "boolean_imprint"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/SetGridScale"
               },
               "type": {
@@ -39721,6 +40333,42 @@
                 "type": "string",
                 "enum": [
                   "set_order_independent_transparency"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/CreateRegion"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "create_region"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SelectRegionFromPoint"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "select_region_from_point"
                 ]
               }
             },
@@ -42858,6 +43506,21 @@
           "entity_ids"
         ]
       },
+      "SelectRegionFromPoint": {
+        "description": "The response from the 'SelectRegionFromPoint'. If there are multiple ways to construct this region, this chooses arbitrarily.",
+        "type": "object",
+        "properties": {
+          "region": {
+            "nullable": true,
+            "description": "The region the user clicked on. If they clicked an open space which isn't a region, this returns None.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SelectedRegion"
+              }
+            ]
+          }
+        }
+      },
       "SelectRemove": {
         "description": "The response from the `SelectRemove` endpoint.",
         "type": "object"
@@ -42877,6 +43540,37 @@
             "format": "uuid"
           }
         }
+      },
+      "SelectedRegion": {
+        "description": "The region a user clicked on.",
+        "type": "object",
+        "properties": {
+          "curve_clockwise": {
+            "description": "By default (when this is false), curve counterclockwise at intersections. If this is true, instead curve clockwise.",
+            "default": false,
+            "type": "boolean"
+          },
+          "intersection_index": {
+            "description": "At which intersection between `segment` and `intersection_segment` should we stop following the `segment` and start following `intersection_segment`? Defaults to -1, which means the last intersection.",
+            "default": -1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "intersection_segment": {
+            "description": "Second segment to follow to find the region. Intersects the first segment.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "segment": {
+            "description": "First segment to follow to find the region.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "intersection_segment",
+          "segment"
+        ]
       },
       "Selection": {
         "description": "Data item selection.",
@@ -43315,6 +44009,14 @@
         "description": "The response from the `Solid3dFilletEdge` endpoint.",
         "type": "object"
       },
+      "Solid3dFlip": {
+        "description": "The response from the `Solid3dFlip` command.",
+        "type": "object"
+      },
+      "Solid3dFlipFace": {
+        "description": "The response from the `Solid3dFlipFace` command.",
+        "type": "object"
+      },
       "Solid3dGetAdjacencyInfo": {
         "description": "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces) This includes the opposite and adjacent faces and edges.",
         "type": "object",
@@ -43365,6 +44067,23 @@
           "edges"
         ]
       },
+      "Solid3dGetBodyType": {
+        "description": "The response from the `Solid3dGetBodyType` endpoint.",
+        "type": "object",
+        "properties": {
+          "body_type": {
+            "description": "The body type",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BodyType"
+              }
+            ]
+          }
+        },
+        "required": [
+          "body_type"
+        ]
+      },
       "Solid3dGetCommonEdge": {
         "description": "The response from the `Solid3DGetCommonEdge` command.",
         "type": "object",
@@ -43376,6 +44095,20 @@
             "format": "uuid"
           }
         }
+      },
+      "Solid3dGetEdgeUuid": {
+        "description": "The response from the `Solid3dGetEdgeUuid` endpoint.",
+        "type": "object",
+        "properties": {
+          "edge_id": {
+            "description": "The UUID of the edge.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "edge_id"
+        ]
       },
       "Solid3dGetExtrusionFaceInfo": {
         "description": "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces)",
@@ -43391,6 +44124,20 @@
         },
         "required": [
           "faces"
+        ]
+      },
+      "Solid3dGetFaceUuid": {
+        "description": "The response from the `Solid3dGetFaceUuid` endpoint.",
+        "type": "object",
+        "properties": {
+          "face_id": {
+            "description": "The UUID of the face.",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "face_id"
         ]
       },
       "Solid3dGetNextAdjacentEdge": {
@@ -43430,6 +44177,10 @@
             "format": "uuid"
           }
         }
+      },
+      "Solid3dJoin": {
+        "description": "The response from the `Solid3dJoin` endpoint.",
+        "type": "object"
       },
       "Solid3dShellFace": {
         "description": "The response from the `Solid3dShellFace` endpoint.",

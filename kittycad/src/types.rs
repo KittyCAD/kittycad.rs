@@ -874,6 +874,9 @@ impl tabled::Tabled for Angle {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AnnotationBasicDimension {
+    #[doc = "The scale of the dimension arrows. Defaults to 1."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub arrow_scale: Option<f64>,
     #[doc = "Basic dimension parameters (symbol and tolerance)"]
     pub dimension: AnnotationMbdBasicDimension,
     #[doc = "The point size of the fonts used to generate the annotation label.  Very large \
@@ -910,9 +913,14 @@ impl std::fmt::Display for AnnotationBasicDimension {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AnnotationBasicDimension {
-    const LENGTH: usize = 10;
+    const LENGTH: usize = 11;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(arrow_scale) = &self.arrow_scale {
+                format!("{:?}", arrow_scale).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.dimension).into(),
             format!("{:?}", self.font_point_size).into(),
             format!("{:?}", self.font_scale).into(),
@@ -928,6 +936,7 @@ impl tabled::Tabled for AnnotationBasicDimension {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "arrow_scale".into(),
             "dimension".into(),
             "font_point_size".into(),
             "font_scale".into(),
@@ -965,6 +974,9 @@ pub struct AnnotationFeatureControl {
     pub font_point_size: u32,
     #[doc = "The scale of the font label in 3D space"]
     pub font_scale: f64,
+    #[doc = "The scale of the leader (dot or arrow). Defaults to 1."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub leader_scale: Option<f64>,
     #[doc = "Type of leader to use"]
     pub leader_type: AnnotationLineEnd,
     #[doc = "2D Position offset of the annotation within the plane."]
@@ -994,7 +1006,7 @@ impl std::fmt::Display for AnnotationFeatureControl {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AnnotationFeatureControl {
-    const LENGTH: usize = 13;
+    const LENGTH: usize = 14;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(control_frame) = &self.control_frame {
@@ -1016,6 +1028,11 @@ impl tabled::Tabled for AnnotationFeatureControl {
             format!("{:?}", self.entity_pos).into(),
             format!("{:?}", self.font_point_size).into(),
             format!("{:?}", self.font_scale).into(),
+            if let Some(leader_scale) = &self.leader_scale {
+                format!("{:?}", leader_scale).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.leader_type).into(),
             format!("{:?}", self.offset).into(),
             format!("{:?}", self.plane_id).into(),
@@ -1042,6 +1059,7 @@ impl tabled::Tabled for AnnotationFeatureControl {
             "entity_pos".into(),
             "font_point_size".into(),
             "font_scale".into(),
+            "leader_scale".into(),
             "leader_type".into(),
             "offset".into(),
             "plane_id".into(),
@@ -1068,6 +1086,9 @@ pub struct AnnotationFeatureTag {
     pub font_scale: f64,
     #[doc = "Tag key"]
     pub key: String,
+    #[doc = "The scale of the leader (dot or arrow). Defaults to 1."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub leader_scale: Option<f64>,
     #[doc = "Type of leader to use"]
     pub leader_type: AnnotationLineEnd,
     #[doc = "2D Position offset of the annotation within the plane."]
@@ -1093,7 +1114,7 @@ impl std::fmt::Display for AnnotationFeatureTag {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AnnotationFeatureTag {
-    const LENGTH: usize = 10;
+    const LENGTH: usize = 11;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.entity_id).into(),
@@ -1101,6 +1122,11 @@ impl tabled::Tabled for AnnotationFeatureTag {
             format!("{:?}", self.font_point_size).into(),
             format!("{:?}", self.font_scale).into(),
             self.key.clone().into(),
+            if let Some(leader_scale) = &self.leader_scale {
+                format!("{:?}", leader_scale).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.leader_type).into(),
             format!("{:?}", self.offset).into(),
             format!("{:?}", self.plane_id).into(),
@@ -1116,6 +1142,7 @@ impl tabled::Tabled for AnnotationFeatureTag {
             "font_point_size".into(),
             "font_scale".into(),
             "key".into(),
+            "leader_scale".into(),
             "leader_type".into(),
             "offset".into(),
             "plane_id".into(),
@@ -3047,7 +3074,8 @@ pub enum BlockReason {
     PaymentMethodFailed,
 }
 
-#[doc = "Body type determining if the operation will create a solid or a surface."]
+#[doc = "Body type determining if the operation will create a manifold (solid) body or a \
+         non-manifold collection of surfaces."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -3062,14 +3090,52 @@ pub enum BlockReason {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum BodyType {
-    #[doc = "Create a body that has two caps, creating a solid object."]
+    #[doc = "Defines a body that is manifold."]
     #[serde(rename = "solid")]
     #[display("solid")]
     Solid,
-    #[doc = "Create only the surface of the body without any caps."]
+    #[doc = "Defines a body that is non-manifold (an open collection of connected surfaces)."]
     #[serde(rename = "surface")]
     #[display("surface")]
     Surface,
+}
+
+#[doc = "The response from the 'BooleanImprint'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BooleanImprint {
+    #[doc = "If the operation produced just one body, then its ID will be the ID of the modeling \
+             command request. But if any extra bodies are produced, then their IDs will be \
+             included here."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub extra_solid_ids: Option<Vec<uuid::Uuid>>,
+}
+
+impl std::fmt::Display for BooleanImprint {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BooleanImprint {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![if let Some(extra_solid_ids) = &self.extra_solid_ids {
+            format!("{:?}", extra_solid_ids).into()
+        } else {
+            String::new().into()
+        }]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["extra_solid_ids".into()]
+    }
 }
 
 #[doc = "The response from the 'BooleanIntersection'."]
@@ -3831,10 +3897,8 @@ pub enum CodeLanguage {
     Node,
 }
 
-#[doc = "Code option for running and verifying kcl.\n\n<details><summary>JSON \
-         schema</summary>\n\n```json { \"title\": \"CodeOption\", \"description\": \"Code option \
-         for running and verifying kcl.\", \"type\": \"string\", \"enum\": [ \"parse\", \
-         \"execute\", \"cleanup\", \"mock_execute\" ] } ``` </details>"]
+#[doc = "`CodeOption`\n\n<details><summary>JSON schema</summary>\n\n```json { \"type\": \
+         \"string\", \"enum\": [ \"parse\", \"mock_execute\", \"execute\" ] } ``` </details>"]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -3852,15 +3916,12 @@ pub enum CodeOption {
     #[serde(rename = "parse")]
     #[display("parse")]
     Parse,
-    #[serde(rename = "execute")]
-    #[display("execute")]
-    Execute,
-    #[serde(rename = "cleanup")]
-    #[display("cleanup")]
-    Cleanup,
     #[serde(rename = "mock_execute")]
     #[display("mock_execute")]
     MockExecute,
+    #[serde(rename = "execute")]
+    #[display("execute")]
+    Execute,
 }
 
 #[doc = "Output of the code being executed.\n\n<details><summary>JSON schema</summary>\n\n```json \
@@ -4435,6 +4496,35 @@ impl tabled::Tabled for CreateOrgDataset {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["name".into(), "source".into()]
+    }
+}
+
+#[doc = "The response from the 'CreateRegion'. The region should have an ID taken from the ID of \
+         the 'CreateRegion' modeling command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CreateRegion {}
+
+impl std::fmt::Display for CreateRegion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CreateRegion {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 
@@ -6099,6 +6189,34 @@ impl tabled::Tabled for EntityClone {
     }
 }
 
+#[doc = "The response from the `EntityDeleteChildren` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityDeleteChildren {}
+
+impl std::fmt::Display for EntityDeleteChildren {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityDeleteChildren {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "The response from the `EntityFade` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -6225,6 +6343,37 @@ impl tabled::Tabled for EntityGetDistance {
     }
 }
 
+#[doc = "The response from the `EntityGetIndex` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityGetIndex {
+    #[doc = "The child index of the entity."]
+    pub entity_index: u32,
+}
+
+impl std::fmt::Display for EntityGetIndex {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityGetIndex {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.entity_index).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_index".into()]
+    }
+}
+
 #[doc = "The response from the `EntityGetNumChildren` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -6284,6 +6433,42 @@ impl tabled::Tabled for EntityGetParentId {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["entity_id".into()]
+    }
+}
+
+#[doc = "The response from the `EntityGetPrimitiveIndex` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityGetPrimitiveIndex {
+    #[doc = "The type of this entity.  Helps infer whether this is an edge or a face index."]
+    pub entity_type: EntityType,
+    #[doc = "The primitive index of the entity."]
+    pub primitive_index: u32,
+}
+
+impl std::fmt::Display for EntityGetPrimitiveIndex {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityGetPrimitiveIndex {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.entity_type).into(),
+            format!("{:?}", self.primitive_index).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_type".into(), "primitive_index".into()]
     }
 }
 
@@ -10707,6 +10892,13 @@ pub enum MlCopilotServerMessage {
         #[doc = "The informational text."]
         text: String,
     },
+    #[doc = "Notification that the backend is shutting down."]
+    #[serde(rename = "backend_shutdown")]
+    BackendShutdown {
+        #[doc = "The reason given for the backend shutdown."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        reason: Option<String>,
+    },
     #[doc = "Notification that the KCL project has been updated."]
     #[serde(rename = "project_updated")]
     ProjectUpdated {
@@ -10721,15 +10913,15 @@ pub enum MlCopilotServerMessage {
              Includes server messages and client `User` messages.\n\nInvariants: - Includes \
              server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, \
              `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Also includes client `User` \
-             messages. - The following are NEVER included: `SessionData`, `ConversationId`, or \
-             `Delta`. - Ordering is stable: messages are ordered by prompt creation time within \
-             the conversation, then by the per-prompt `seq` value (monotonically increasing as \
-             seen in the original stream).\n\nWire format: - Each element is canonical serialized \
-             bytes (typically JSON) for either a `MlCopilotServerMessage` or a \
-             `MlCopilotClientMessage::User`. - When delivered as an initial replay over the \
-             websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single \
-             WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { \
-             messages }`."]
+             messages. - The following are NEVER included: `SessionData`, `ConversationId`, \
+             `Delta`, or `BackendShutdown`. - Ordering is stable: messages are ordered by prompt \
+             creation time within the conversation, then by the per-prompt `seq` value \
+             (monotonically increasing as seen in the original stream).\n\nWire format: - Each \
+             element is canonical serialized bytes (typically JSON) for either a \
+             `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an \
+             initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the \
+             server sends a single WebSocket Binary frame containing a MsgPack-encoded document \
+             of this enum: `Replay { messages }`."]
     #[serde(rename = "replay")]
     Replay {
         #[doc = "Canonical bytes (usually JSON) for each message, ordered by prompt creation \
@@ -11600,6 +11792,11 @@ pub enum ModelingCmd {
                  generate IDs."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         faces: Option<ExtrudedFaceInfo>,
+        #[doc = "Only used if the extrusion is created from a face and extrude_method = Merge If \
+                 true, coplanar faces will be merged and seams will be hidden. Otherwise, seams \
+                 between the extrusion and original body will be shown."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        merge_coplanar_faces: Option<bool>,
         #[doc = "Should the extrusion also extrude in the opposite direction? If so, this \
                  specifies its distance."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -11706,6 +11903,38 @@ pub enum ModelingCmd {
         #[doc = "How thick the shell should be. Smaller values mean a thinner shell."]
         shell_thickness: f64,
     },
+    #[doc = "Command for joining a Surface (non-manifold) body back to a Solid. All of the \
+             surfaces should already be contained within the body mated topologically. This \
+             operation should be the final step after a sequence of Solid modeling commands such \
+             as BooleanImprint, EntityDeleteChildren, Solid3dFlipFace If successful, the new body \
+             type will become \"Solid\"."]
+    #[serde(rename = "solid3d_join")]
+    Solid3DJoin {
+        #[doc = "Which Solid3D is being joined."]
+        object_id: uuid::Uuid,
+    },
+    #[doc = "What is the UUID of this body's n-th edge?"]
+    #[serde(rename = "solid3d_get_edge_uuid")]
+    Solid3DGetEdgeUuid {
+        #[doc = "The primitive index of the edge being queried."]
+        edge_index: u32,
+        #[doc = "The Solid3D parent who owns the edge"]
+        object_id: uuid::Uuid,
+    },
+    #[doc = "What is the UUID of this body's n-th face?"]
+    #[serde(rename = "solid3d_get_face_uuid")]
+    Solid3DGetFaceUuid {
+        #[doc = "The primitive index of the face being queried."]
+        face_index: u32,
+        #[doc = "The Solid3D parent who owns the face"]
+        object_id: uuid::Uuid,
+    },
+    #[doc = "Retrieves the body type."]
+    #[serde(rename = "solid3d_get_body_type")]
+    Solid3DGetBodyType {
+        #[doc = "The Solid3D whose body type is being queried."]
+        object_id: uuid::Uuid,
+    },
     #[doc = "Command for revolving a solid 2d about a brep edge"]
     #[serde(rename = "revolve_about_edge")]
     RevolveAboutEdge {
@@ -11738,6 +11967,9 @@ pub enum ModelingCmd {
                  remove banding around interpolations between arcs and non-arcs.  It may produce \
                  errors in other scenarios Over time, this field won't be necessary."]
         bez_approximate_rational: bool,
+        #[doc = "Should this loft create a solid body or a surface?"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        body_type: Option<BodyType>,
         #[doc = "The closed section curves to create a lofted solid from. Currently, these must \
                  be Solid2Ds"]
         section_ids: Vec<uuid::Uuid>,
@@ -11885,6 +12117,28 @@ pub enum ModelingCmd {
         #[doc = "Index into the entity's list of children."]
         child_index: u32,
         #[doc = "ID of the entity being queried."]
+        entity_id: uuid::Uuid,
+    },
+    #[doc = "What is this entity's child index within its parent"]
+    #[serde(rename = "entity_get_index")]
+    EntityGetIndex {
+        #[doc = "ID of the entity being queried."]
+        entity_id: uuid::Uuid,
+    },
+    #[doc = "What is this edge or face entity's primitive index within its parent body's edges or \
+             faces array respectively"]
+    #[serde(rename = "entity_get_primitive_index")]
+    EntityGetPrimitiveIndex {
+        #[doc = "ID of the entity being queried."]
+        entity_id: uuid::Uuid,
+    },
+    #[doc = "Attempts to delete children entity from an entity. Note that this API may change the \
+             body type of certain entities from Solid to Surface."]
+    #[serde(rename = "entity_delete_children")]
+    EntityDeleteChildren {
+        #[doc = "ID of the entity's child being deleted"]
+        child_entity_ids: Vec<uuid::Uuid>,
+        #[doc = "ID of the entity being modified"]
         entity_id: uuid::Uuid,
     },
     #[doc = "What are all UUIDs of this entity's children?"]
@@ -12156,6 +12410,21 @@ pub enum ModelingCmd {
     Solid3DGetAllEdgeFaces {
         #[doc = "Which edge you want the faces of."]
         edge_id: uuid::Uuid,
+        #[doc = "Which object is being queried."]
+        object_id: uuid::Uuid,
+    },
+    #[doc = "Flips (reverses) a brep that is \"inside-out\"."]
+    #[serde(rename = "solid3d_flip")]
+    Solid3DFlip {
+        #[doc = "Which object is being flipped."]
+        object_id: uuid::Uuid,
+    },
+    #[doc = "Flips (reverses) a face.  If the solid3d body type is \"Solid\", then body type will \
+             become non-manifold (\"Surface\")."]
+    #[serde(rename = "solid3d_flip_face")]
+    Solid3DFlipFace {
+        #[doc = "Which face you want to flip."]
+        face_id: uuid::Uuid,
         #[doc = "Which object is being queried."]
         object_id: uuid::Uuid,
     },
@@ -12830,6 +13099,16 @@ pub enum ModelingCmd {
         #[doc = "Will be cut out from the 'target'."]
         tool_ids: Vec<uuid::Uuid>,
     },
+    #[doc = "Create a new non-manifold body by intersecting all the input bodies, cutting and \
+             splitting all the faces at the intersection boundaries."]
+    #[serde(rename = "boolean_imprint")]
+    BooleanImprint {
+        #[doc = "Which input bodies to intersect.  Inputs with non-solid body types are permitted"]
+        body_ids: Vec<uuid::Uuid>,
+        #[doc = "The maximum acceptable surface gap between the intersected bodies. Must be \
+                 positive (i.e. greater than zero)."]
+        tolerance: f64,
+    },
     #[doc = "Make a new path by offsetting an object by a given distance. The new path's ID will \
              be the ID of this command."]
     #[serde(rename = "make_offset_path")]
@@ -12881,6 +13160,33 @@ pub enum ModelingCmd {
         #[doc = "Enables or disables OIT. If not given, toggles it."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         enabled: Option<bool>,
+    },
+    #[doc = "Create a region bounded by the intersection of various paths. The region should have \
+             an ID taken from the ID of the 'CreateRegion' modeling command."]
+    #[serde(rename = "create_region")]
+    CreateRegion {
+        #[doc = "By default, curve counterclockwise at intersections. If this is true, instead \
+                 curve clockwise."]
+        #[serde(default)]
+        curve_clockwise: bool,
+        #[doc = "At which intersection between `segment` and `intersection_segment` should we \
+                 stop following the `segment` and start following `intersection_segment`? \
+                 Defaults to -1, which means the last intersection."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        intersection_index: Option<i32>,
+        #[doc = "Second segment to follow to find the region. Intersects the first segment."]
+        intersection_segment: uuid::Uuid,
+        #[doc = "Which sketch object to create the region from."]
+        object_id: uuid::Uuid,
+        #[doc = "First segment to follow to find the region."]
+        segment: uuid::Uuid,
+    },
+    #[doc = "The user clicked on a point in the window, returns the region the user clicked on, \
+             if any."]
+    #[serde(rename = "select_region_from_point")]
+    SelectRegionFromPoint {
+        #[doc = "Where in the window was selected"]
+        selected_at_window: Point2D,
     },
 }
 
@@ -13312,6 +13618,26 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `Solid3dShellFace` endpoint."]
         data: Solid3DShellFace,
     },
+    #[serde(rename = "solid3d_join")]
+    Solid3DJoin {
+        #[doc = "The response from the `Solid3dJoin` endpoint."]
+        data: Solid3DJoin,
+    },
+    #[serde(rename = "solid3d_get_edge_uuid")]
+    Solid3DGetEdgeUuid {
+        #[doc = "The response from the `Solid3dGetEdgeUuid` endpoint."]
+        data: Solid3DGetEdgeUuid,
+    },
+    #[serde(rename = "solid3d_get_face_uuid")]
+    Solid3DGetFaceUuid {
+        #[doc = "The response from the `Solid3dGetFaceUuid` endpoint."]
+        data: Solid3DGetFaceUuid,
+    },
+    #[serde(rename = "solid3d_get_body_type")]
+    Solid3DGetBodyType {
+        #[doc = "The response from the `Solid3dGetBodyType` endpoint."]
+        data: Solid3DGetBodyType,
+    },
     #[serde(rename = "revolve_about_edge")]
     RevolveAboutEdge {
         #[doc = "The response from the `RevolveAboutEdge` endpoint."]
@@ -13577,6 +13903,21 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `EntityGetChildUuid` command."]
         data: EntityGetChildUuid,
     },
+    #[serde(rename = "entity_get_index")]
+    EntityGetIndex {
+        #[doc = "The response from the `EntityGetIndex` command."]
+        data: EntityGetIndex,
+    },
+    #[serde(rename = "entity_get_primitive_index")]
+    EntityGetPrimitiveIndex {
+        #[doc = "The response from the `EntityGetPrimitiveIndex` command."]
+        data: EntityGetPrimitiveIndex,
+    },
+    #[serde(rename = "entity_delete_children")]
+    EntityDeleteChildren {
+        #[doc = "The response from the `EntityDeleteChildren` command."]
+        data: EntityDeleteChildren,
+    },
     #[serde(rename = "entity_get_num_children")]
     EntityGetNumChildren {
         #[doc = "The response from the `EntityGetNumChildren` command."]
@@ -13694,6 +14035,16 @@ pub enum OkModelingCmdResponse {
     Solid3DGetAllEdgeFaces {
         #[doc = "The response from the `Solid3dGetAllEdgeFaces` command."]
         data: Solid3DGetAllEdgeFaces,
+    },
+    #[serde(rename = "solid3d_flip")]
+    Solid3DFlip {
+        #[doc = "The response from the `Solid3dFlip` command."]
+        data: Solid3DFlip,
+    },
+    #[serde(rename = "solid3d_flip_face")]
+    Solid3DFlipFace {
+        #[doc = "The response from the `Solid3dFlipFace` command."]
+        data: Solid3DFlipFace,
     },
     #[serde(rename = "solid3d_get_all_opposite_edges")]
     Solid3DGetAllOppositeEdges {
@@ -13965,6 +14316,11 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the 'BooleanSubtract'."]
         data: BooleanSubtract,
     },
+    #[serde(rename = "boolean_imprint")]
+    BooleanImprint {
+        #[doc = "The response from the 'BooleanImprint'."]
+        data: BooleanImprint,
+    },
     #[serde(rename = "set_grid_scale")]
     SetGridScale {
         #[doc = "The response from the 'SetGridScale'."]
@@ -13979,6 +14335,18 @@ pub enum OkModelingCmdResponse {
     SetOrderIndependentTransparency {
         #[doc = "The response from the 'SetOrderIndependentTransparency'."]
         data: SetOrderIndependentTransparency,
+    },
+    #[serde(rename = "create_region")]
+    CreateRegion {
+        #[doc = "The response from the 'CreateRegion'. The region should have an ID taken from \
+                 the ID of the 'CreateRegion' modeling command."]
+        data: CreateRegion,
+    },
+    #[serde(rename = "select_region_from_point")]
+    SelectRegionFromPoint {
+        #[doc = "The response from the 'SelectRegionFromPoint'. If there are multiple ways to \
+                 construct this region, this chooses arbitrarily."]
+        data: SelectRegionFromPoint,
     },
 }
 
@@ -17603,6 +17971,44 @@ impl tabled::Tabled for SelectGet {
     }
 }
 
+#[doc = "The response from the 'SelectRegionFromPoint'. If there are multiple ways to construct \
+         this region, this chooses arbitrarily."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SelectRegionFromPoint {
+    #[doc = "The region the user clicked on. If they clicked an open space which isn't a region, \
+             this returns None."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub region: Option<SelectedRegion>,
+}
+
+impl std::fmt::Display for SelectRegionFromPoint {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SelectRegionFromPoint {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![if let Some(region) = &self.region {
+            format!("{:?}", region).into()
+        } else {
+            String::new().into()
+        }]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["region".into()]
+    }
+}
+
 #[doc = "The response from the `SelectRemove` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -17692,6 +18098,62 @@ impl tabled::Tabled for SelectWithPoint {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["entity_id".into()]
+    }
+}
+
+#[doc = "The region a user clicked on."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SelectedRegion {
+    #[doc = "By default (when this is false), curve counterclockwise at intersections. If this is \
+             true, instead curve clockwise."]
+    #[serde(default)]
+    pub curve_clockwise: bool,
+    #[doc = "At which intersection between `segment` and `intersection_segment` should we stop \
+             following the `segment` and start following `intersection_segment`? Defaults to -1, \
+             which means the last intersection."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub intersection_index: Option<i32>,
+    #[doc = "Second segment to follow to find the region. Intersects the first segment."]
+    pub intersection_segment: uuid::Uuid,
+    #[doc = "First segment to follow to find the region."]
+    pub segment: uuid::Uuid,
+}
+
+impl std::fmt::Display for SelectedRegion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SelectedRegion {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.curve_clockwise).into(),
+            if let Some(intersection_index) = &self.intersection_index {
+                format!("{:?}", intersection_index).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.intersection_segment).into(),
+            format!("{:?}", self.segment).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "curve_clockwise".into(),
+            "intersection_index".into(),
+            "intersection_segment".into(),
+            "segment".into(),
+        ]
     }
 }
 
@@ -18594,6 +19056,62 @@ impl tabled::Tabled for Solid3DFilletEdge {
     }
 }
 
+#[doc = "The response from the `Solid3dFlip` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DFlip {}
+
+impl std::fmt::Display for Solid3DFlip {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DFlip {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `Solid3dFlipFace` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DFlipFace {}
+
+impl std::fmt::Display for Solid3DFlipFace {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DFlipFace {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment \
          ids and extrusion faces) This includes the opposite and adjacent faces and edges."]
 #[derive(
@@ -18688,6 +19206,37 @@ impl tabled::Tabled for Solid3DGetAllOppositeEdges {
     }
 }
 
+#[doc = "The response from the `Solid3dGetBodyType` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DGetBodyType {
+    #[doc = "The body type"]
+    pub body_type: BodyType,
+}
+
+impl std::fmt::Display for Solid3DGetBodyType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DGetBodyType {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.body_type).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["body_type".into()]
+    }
+}
+
 #[doc = "The response from the `Solid3DGetCommonEdge` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -18724,6 +19273,37 @@ impl tabled::Tabled for Solid3DGetCommonEdge {
     }
 }
 
+#[doc = "The response from the `Solid3dGetEdgeUuid` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DGetEdgeUuid {
+    #[doc = "The UUID of the edge."]
+    pub edge_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for Solid3DGetEdgeUuid {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DGetEdgeUuid {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.edge_id).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["edge_id".into()]
+    }
+}
+
 #[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment \
          ids and extrusion faces)"]
 #[derive(
@@ -18753,6 +19333,37 @@ impl tabled::Tabled for Solid3DGetExtrusionFaceInfo {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["faces".into()]
+    }
+}
+
+#[doc = "The response from the `Solid3dGetFaceUuid` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DGetFaceUuid {
+    #[doc = "The UUID of the face."]
+    pub face_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for Solid3DGetFaceUuid {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DGetFaceUuid {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.face_id).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["face_id".into()]
     }
 }
 
@@ -18856,6 +19467,34 @@ impl tabled::Tabled for Solid3DGetPrevAdjacentEdge {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["edge".into()]
+    }
+}
+
+#[doc = "The response from the `Solid3dJoin` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DJoin {}
+
+impl std::fmt::Display for Solid3DJoin {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DJoin {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 
