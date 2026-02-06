@@ -10612,6 +10612,9 @@ pub struct MlCopilotFile {
         deserialize_with = "serde_bytes::deserialize"
     )]
     pub data: Vec<u8>,
+    #[doc = "Optional metadata associated with the file."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<std::collections::HashMap<String, String>>,
     #[doc = "The MIME type of the file (e.g., \"image/png\", \"application/pdf\", \"model/stl\")."]
     pub mimetype: String,
     #[doc = "The name of the file."]
@@ -10630,17 +10633,27 @@ impl std::fmt::Display for MlCopilotFile {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for MlCopilotFile {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.data).into(),
+            if let Some(metadata) = &self.metadata {
+                format!("{:?}", metadata).into()
+            } else {
+                String::new().into()
+            },
             self.mimetype.clone().into(),
             self.name.clone().into(),
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["data".into(), "mimetype".into(), "name".into()]
+        vec![
+            "data".into(),
+            "metadata".into(),
+            "mimetype".into(),
+            "name".into(),
+        ]
     }
 }
 
