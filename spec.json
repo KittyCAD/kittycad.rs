@@ -31735,6 +31735,14 @@
               "minimum": 0
             }
           },
+          "metadata": {
+            "nullable": true,
+            "description": "Optional metadata associated with the file.",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
           "mimetype": {
             "description": "The MIME type of the file (e.g., \"image/png\", \"application/pdf\", \"model/stl\").",
             "type": "string"
