@@ -10612,6 +10612,9 @@ pub struct MlCopilotFile {
         deserialize_with = "serde_bytes::deserialize"
     )]
     pub data: Vec<u8>,
+    #[doc = "Optional blob storage path for the file contents."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub data_ref: Option<String>,
     #[doc = "Optional metadata associated with the file."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub metadata: Option<std::collections::HashMap<String, String>>,
@@ -10633,10 +10636,15 @@ impl std::fmt::Display for MlCopilotFile {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for MlCopilotFile {
-    const LENGTH: usize = 4;
+    const LENGTH: usize = 5;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.data).into(),
+            if let Some(data_ref) = &self.data_ref {
+                format!("{:?}", data_ref).into()
+            } else {
+                String::new().into()
+            },
             if let Some(metadata) = &self.metadata {
                 format!("{:?}", metadata).into()
             } else {
@@ -10650,6 +10658,7 @@ impl tabled::Tabled for MlCopilotFile {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "data".into(),
+            "data_ref".into(),
             "metadata".into(),
             "mimetype".into(),
             "name".into(),
@@ -10739,7 +10748,7 @@ pub enum MlCopilotServerMessage {
     #[doc = "Assistant reasoning / chain-of-thought (if you expose it)."]
     #[serde(rename = "reasoning")]
     Reasoning(ReasoningMessage),
-    #[doc = "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Also includes client `User` messages. - The following are NEVER included: `SessionData`, `ConversationId`, `Delta`, or `BackendShutdown`. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`."]
+    #[doc = "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Also includes client `User` messages. - The following are NEVER included: `SessionData`, `ConversationId`, `Delta`, or `BackendShutdown`. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`."]
     #[serde(rename = "replay")]
     Replay {
         #[doc = "Canonical bytes (usually JSON) for each message, ordered by prompt creation time, then message sequence number."]
