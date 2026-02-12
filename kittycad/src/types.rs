@@ -11167,7 +11167,8 @@ pub struct MlPrompt {
     pub metadata: Option<MlPromptMetadata>,
     #[doc = "The version of the model."]
     pub model_version: String,
-    #[doc = "The output file. In the case of TextToCad this is a link to a file in a GCP bucket."]
+    #[doc = "The output directory reference for generated files. Stored as `blob://bucket/key` \
+             for new rows; legacy rows may contain a key-only value."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub output_file: Option<String>,
     #[doc = "The name of the project, if any. This allows us to group prompts together that come \
@@ -14918,7 +14919,8 @@ pub struct OrgDatasetFileConversion {
              internal error, then it will be retried on converter version change."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub importer_version: Option<String>,
-    #[doc = "Path where the processed file output is stored, when available."]
+    #[doc = "Location reference where the processed file output is stored, when available. New \
+             records use `blob://bucket/key`; legacy records may still contain key-only values."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub output_path: Option<String>,
     #[doc = "The date and time the conversion started."]
@@ -15338,12 +15340,15 @@ impl tabled::Tabled for OrgDatasetResultsPage {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct OrgDatasetSource {
-    #[doc = "Identity we assume when accessing the dataset. Must be configured with the org's `aws_external_id` per AWS confused deputy guidance. See <https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html>."]
-    pub access_role_arn: String,
+    #[doc = "Identity we assume when accessing the dataset. Required when `provider` is `s3`; ignored for Zoo-managed datasets. Must be configured with the org's `aws_external_id` per AWS confused deputy guidance. See <https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html>."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub access_role_arn: Option<String>,
     #[doc = "Storage provider identifier."]
     pub provider: StorageProvider,
-    #[doc = "Fully-qualified URI for the dataset contents."]
-    pub uri: String,
+    #[doc = "Fully-qualified URI for the dataset contents. Required when `provider` is `s3`; \
+             ignored for Zoo-managed datasets."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub uri: Option<String>,
 }
 
 impl std::fmt::Display for OrgDatasetSource {
@@ -15361,9 +15366,17 @@ impl tabled::Tabled for OrgDatasetSource {
     const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            self.access_role_arn.clone().into(),
+            if let Some(access_role_arn) = &self.access_role_arn {
+                format!("{:?}", access_role_arn).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.provider).into(),
-            self.uri.clone().into(),
+            if let Some(uri) = &self.uri {
+                format!("{:?}", uri).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
@@ -19733,15 +19746,16 @@ pub enum StlStorage {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[derive(Default)]
 pub enum StorageProvider {
     #[doc = "Amazon Simple Storage Service."]
     #[serde(rename = "s3")]
     #[display("s3")]
-    #[default]
     S3,
+    #[doc = "Zoo-managed dataset storage backed by the API's internal object store."]
+    #[serde(rename = "zoo_managed")]
+    #[display("zoo_managed")]
+    ZooManaged,
 }
-
 
 #[doc = "The parameters for a new store coupon."]
 #[derive(
@@ -23655,6 +23669,42 @@ impl tabled::Tabled for UpdateUser {
             "last_name".into(),
             "phone".into(),
         ]
+    }
+}
+
+#[doc = "Response payload for uploading files into a Zoo-managed dataset."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UploadOrgDatasetFilesResponse {
+    #[doc = "Number of conversion jobs newly queued."]
+    pub queued_conversions: u32,
+    #[doc = "Number of files accepted and stored."]
+    pub uploaded_files: u32,
+}
+
+impl std::fmt::Display for UploadOrgDatasetFilesResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for UploadOrgDatasetFilesResponse {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.queued_conversions).into(),
+            format!("{:?}", self.uploaded_files).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["queued_conversions".into(), "uploaded_files".into()]
     }
 }
 

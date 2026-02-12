@@ -292,18 +292,7 @@ impl Orgs {
             .boxed()
     }
 
-    #[doc = "Register a new S3 dataset that Zoo can assume into on behalf of the caller's \
-             org.\n\nIf the dataset lives in S3, call `/org/dataset/s3/policies` first so you can \
-             generate the trust, permission, and bucket policies scoped to your dataset before \
-             invoking this endpoint.\n\n```rust,no_run\nasync fn example_orgs_create_dataset() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::OrgDataset = client\n        .orgs()\n        \
-             .create_dataset(&kittycad::types::CreateOrgDataset {\n            name: \
-             \"some-string\".to_string(),\n            source: kittycad::types::OrgDatasetSource \
-             {\n                access_role_arn: \"some-string\".to_string(),\n                \
-             provider: kittycad::types::StorageProvider::S3,\n                uri: \
-             \"some-string\".to_string(),\n            },\n        })\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Register a new org dataset.\n\nIf the dataset lives in S3, call `/org/dataset/s3/policies` first so you can generate the trust, permission, and bucket policies scoped to your dataset before invoking this endpoint.\n\n```rust,no_run\nasync fn example_orgs_create_dataset() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDataset = client\n        .orgs()\n        .create_dataset(&kittycad::types::CreateOrgDataset {\n            name: \"some-string\".to_string(),\n            source: kittycad::types::OrgDatasetSource {\n                access_role_arn: Some(\"some-string\".to_string()),\n                provider: kittycad::types::StorageProvider::ZooManaged,\n                uri: Some(\"some-string\".to_string()),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_dataset<'a>(
         &'a self,
@@ -375,7 +364,7 @@ impl Orgs {
         }
     }
 
-    #[doc = "Update dataset metadata or storage credentials for the caller's organization.\n\nIMPORTANT: Use this endpoint to fix connectivity to the same underlying storage location (e.g. rotating credentials or correcting a typo). Do not repoint an existing dataset at a completely different bucket or provider—create a new dataset instead so conversions in flight keep their original source. This warning applies to every storage backend, not just S3.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_update_dataset() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDataset = client\n        .orgs()\n        .update_dataset(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateOrgDataset {\n                name: Some(\"some-string\".to_string()),\n                source: Some(kittycad::types::UpdateOrgDatasetSource {\n                    access_role_arn: Some(\"some-string\".to_string()),\n                    provider: Some(kittycad::types::StorageProvider::S3),\n                    uri: Some(\"some-string\".to_string()),\n                }),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update dataset metadata or storage credentials for the caller's organization.\n\nIMPORTANT: Use this endpoint to fix connectivity to the same underlying storage location (e.g. rotating credentials or correcting a typo). Do not repoint an existing dataset at a completely different bucket or provider—create a new dataset instead so conversions in flight keep their original source. This warning applies to every storage backend, not just S3.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_update_dataset() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDataset = client\n        .orgs()\n        .update_dataset(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateOrgDataset {\n                name: Some(\"some-string\".to_string()),\n                source: Some(kittycad::types::UpdateOrgDatasetSource {\n                    access_role_arn: Some(\"some-string\".to_string()),\n                    provider: Some(kittycad::types::StorageProvider::ZooManaged),\n                    uri: Some(\"some-string\".to_string()),\n                }),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_dataset<'a>(
         &'a self,
@@ -678,6 +667,48 @@ impl Orgs {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Upload source files into a Zoo-managed dataset.\n\nThis endpoint accepts `multipart/form-data` where each file part becomes a source object in the dataset. Paths are normalized and must be relative.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_upload_dataset_files() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UploadOrgDatasetFilesResponse = client\n        .orgs()\n        .upload_dataset_files(\n            vec![kittycad::types::multipart::Attachment {\n                name: \"thing\".to_string(),\n                filepath: Some(\"myfile.json\".into()),\n                content_type: Some(\"application/json\".to_string()),\n                data: std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn upload_dataset_files<'a>(
+        &'a self,
+        attachments: Vec<crate::types::multipart::Attachment>,
+        id: uuid::Uuid,
+    ) -> Result<crate::types::UploadOrgDatasetFilesResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "org/datasets/{id}/uploads".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        use std::convert::TryInto;
+        let mut form = reqwest::multipart::Form::new();
+        for attachment in attachments {
+            form = form.part(attachment.name.clone(), attachment.try_into()?);
+        }
+
+        req = req.multipart(form);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
