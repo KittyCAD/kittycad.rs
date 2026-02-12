@@ -8529,7 +8529,7 @@
         "tags": [
           "orgs"
         ],
-        "summary": "Register a new S3 dataset that Zoo can assume into on behalf of the caller's org.",
+        "summary": "Register a new org dataset.",
         "description": "If the dataset lives in S3, call `/org/dataset/s3/policies` first so you can generate the trust, permission, and bucket policies scoped to your dataset before invoking this endpoint.",
         "operationId": "create_org_dataset",
         "requestBody": {
@@ -9878,6 +9878,218 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OrgDatasetConversionStatsResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/org/datasets/{id}/uploads": {
+      "post": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Upload source files into a Zoo-managed dataset.",
+        "description": "This endpoint accepts `multipart/form-data` where each file part becomes a source object in the dataset. Paths are normalized and must be relative.",
+        "operationId": "upload_org_dataset_files",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "successfully enqueued operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadOrgDatasetFilesResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_upload_org_dataset_files",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -32317,7 +32529,7 @@
           },
           "output_file": {
             "nullable": true,
-            "description": "The output file. In the case of TextToCad this is a link to a file in a GCP bucket.",
+            "description": "The output directory reference for generated files. Stored as `blob://bucket/key` for new rows; legacy rows may contain a key-only value.",
             "type": "string"
           },
           "project_name": {
@@ -41103,7 +41315,7 @@
           },
           "output_path": {
             "nullable": true,
-            "description": "Path where the processed file output is stored, when available.",
+            "description": "Location reference where the processed file output is stored, when available. New records use `blob://bucket/key`; legacy records may still contain key-only values.",
             "type": "string"
           },
           "started_at": {
@@ -41356,7 +41568,8 @@
         "type": "object",
         "properties": {
           "access_role_arn": {
-            "description": "Identity we assume when accessing the dataset. Must be configured with the org's `aws_external_id` per AWS confused deputy guidance. See <https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html>.",
+            "nullable": true,
+            "description": "Identity we assume when accessing the dataset. Required when `provider` is `s3`; ignored for Zoo-managed datasets. Must be configured with the org's `aws_external_id` per AWS confused deputy guidance. See <https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html>.",
             "type": "string"
           },
           "provider": {
@@ -41368,14 +41581,13 @@
             ]
           },
           "uri": {
-            "description": "Fully-qualified URI for the dataset contents.",
+            "nullable": true,
+            "description": "Fully-qualified URI for the dataset contents. Required when `provider` is `s3`; ignored for Zoo-managed datasets.",
             "type": "string"
           }
         },
         "required": [
-          "access_role_arn",
-          "provider",
-          "uri"
+          "provider"
         ]
       },
       "OrgDatasetStatus": {
@@ -44305,6 +44517,13 @@
             "type": "string",
             "enum": [
               "s3"
+            ]
+          },
+          {
+            "description": "Zoo-managed dataset storage backed by the API's internal object store.",
+            "type": "string",
+            "enum": [
+              "zoo_managed"
             ]
           }
         ]
@@ -47887,6 +48106,28 @@
         },
         "required": [
           "image"
+        ]
+      },
+      "UploadOrgDatasetFilesResponse": {
+        "description": "Response payload for uploading files into a Zoo-managed dataset.",
+        "type": "object",
+        "properties": {
+          "queued_conversions": {
+            "description": "Number of conversion jobs newly queued.",
+            "type": "integer",
+            "format": "uint",
+            "minimum": 0
+          },
+          "uploaded_files": {
+            "description": "Number of files accepted and stored.",
+            "type": "integer",
+            "format": "uint",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "queued_conversions",
+          "uploaded_files"
         ]
       },
       "User": {
