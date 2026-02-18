@@ -14549,7 +14549,7 @@ pub struct OrgDatasetFileConversionDetails {
     pub metadata: Option<serde_json::Value>,
     #[doc = "Snapshot images for the original source model."]
     pub original_snapshot_images: Vec<OrgDatasetSnapshotImage>,
-    #[doc = "Plain-text contents of the converted artifact."]
+    #[doc = "Plain-text contents of the converted artifact, when available."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub output: Option<String>,
     #[doc = "Current step in the conversion pipeline."]
