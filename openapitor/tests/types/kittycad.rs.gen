@@ -14690,8 +14690,6 @@ pub struct OrgDatasetFileConversionSummary {
     pub metadata: Option<serde_json::Value>,
     #[doc = "Current step in the conversion pipeline."]
     pub phase: OrgDatasetFileConversionPhase,
-    #[doc = "Numeric index for `phase` so clients do not need to hardcode enum ordering.\n\nMapping: - `0`: `queued` - `1`: `snapshot_original` - `2`: `convert_raw_kcl` - `3`: `snapshot_raw_kcl` - `4`: `salon` - `5`: `snapshot_salon_kcl` - `6`: `completed`"]
-    pub phase_index: u8,
     #[doc = "The date and time the conversion started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -14716,7 +14714,7 @@ impl std::fmt::Display for OrgDatasetFileConversionSummary {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgDatasetFileConversionSummary {
-    const LENGTH: usize = 15;
+    const LENGTH: usize = 14;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -14741,7 +14739,6 @@ impl tabled::Tabled for OrgDatasetFileConversionSummary {
                 String::new().into()
             },
             format!("{:?}", self.phase).into(),
-            format!("{:?}", self.phase_index).into(),
             if let Some(started_at) = &self.started_at {
                 format!("{:?}", started_at).into()
             } else {
@@ -14769,7 +14766,6 @@ impl tabled::Tabled for OrgDatasetFileConversionSummary {
             "importer_version".into(),
             "metadata".into(),
             "phase".into(),
-            "phase_index".into(),
             "started_at".into(),
             "status".into(),
             "status_message".into(),
