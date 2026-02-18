@@ -9128,7 +9128,7 @@
           "orgs"
         ],
         "summary": "List the file conversions that have been processed for a given dataset owned by the caller's org.",
-        "description": "This endpoint returns lightweight conversion summaries only (including `phase`), and intentionally omits converted KCL output and snapshot image payloads for speed.",
+        "description": "This endpoint returns lightweight conversion summaries only (including `phase`), and intentionally omits converted KCL output and snapshot image payloads for speed. Use the optional `filter` query parameter to filter results (example: `?filter=status:success`).",
         "operationId": "list_org_dataset_conversions",
         "parameters": [
           {
@@ -9138,6 +9138,15 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "filter",
+            "description": "Optional filter string for conversions (example: `status:success`).",
+            "schema": {
+              "nullable": true,
+              "type": "string"
             }
           },
           {
@@ -41409,13 +41418,56 @@
         "description": "Detailed response that bundles conversion metadata with converted file and snapshot contents.",
         "type": "object",
         "properties": {
-          "conversion": {
-            "description": "Conversion metadata without storage pointers.",
+          "completed_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The date and time the conversion got its current `status`.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "The date and time the conversion was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "dataset_id": {
+            "description": "The ID of the dataset this file is being converted from.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/OrgDatasetFileConversionSummary"
+                "$ref": "#/components/schemas/Uuid"
               }
             ]
+          },
+          "file_etag": {
+            "description": "File's ETag from dataset bucket, for detecting whether a file needs to be reconverted.",
+            "type": "string"
+          },
+          "file_path": {
+            "description": "Location within dataset `path`.",
+            "type": "string"
+          },
+          "file_size": {
+            "description": "Number of bytes, for measuring throughput and debugging conversion errors.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "id": {
+            "description": "The unique identifier for the conversion.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "importer_version": {
+            "nullable": true,
+            "description": "Tracks which version processed this file when available.",
+            "type": "string"
+          },
+          "metadata": {
+            "nullable": true,
+            "description": "Additional per-conversion metadata as string key-value pairs."
           },
           "original_snapshot_images": {
             "description": "Snapshot images for the original source model.",
@@ -41425,7 +41477,21 @@
             }
           },
           "output": {
+            "nullable": true,
             "description": "Plain-text contents of the converted artifact.",
+            "type": "string"
+          },
+          "phase": {
+            "description": "Current step in the conversion pipeline.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrgDatasetFileConversionPhase"
+              }
+            ]
+          },
+          "raw_kcl_output": {
+            "nullable": true,
+            "description": "Plain-text contents of the raw KCL artifact, when available.",
             "type": "string"
           },
           "raw_kcl_snapshot_images": {
@@ -41435,20 +41501,58 @@
               "$ref": "#/components/schemas/OrgDatasetSnapshotImage"
             }
           },
+          "salon_kcl_output": {
+            "nullable": true,
+            "description": "Plain-text contents of the salon/refactored KCL artifact, when available.",
+            "type": "string"
+          },
           "salon_kcl_snapshot_images": {
             "description": "Snapshot images for the salon/refactored KCL model.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/OrgDatasetSnapshotImage"
             }
+          },
+          "started_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The date and time the conversion started.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "description": "Conversion status.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrgDatasetFileConversionStatus"
+              }
+            ]
+          },
+          "status_message": {
+            "nullable": true,
+            "description": "Details associated with `status`.",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The date and time the conversion was last updated.",
+            "type": "string",
+            "format": "date-time"
           }
         },
         "required": [
-          "conversion",
+          "created_at",
+          "dataset_id",
+          "file_etag",
+          "file_path",
+          "file_size",
+          "id",
           "original_snapshot_images",
-          "output",
+          "phase",
           "raw_kcl_snapshot_images",
-          "salon_kcl_snapshot_images"
+          "salon_kcl_snapshot_images",
+          "status",
+          "updated_at"
         ]
       },
       "OrgDatasetFileConversionPhase": {

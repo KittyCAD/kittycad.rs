@@ -14900,16 +14900,55 @@ impl tabled::Tabled for OrgDatasetConversionStatsResponse {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct OrgDatasetFileConversionDetails {
-    #[doc = "Conversion metadata without storage pointers."]
-    pub conversion: OrgDatasetFileConversionSummary,
+    #[doc = "The date and time the conversion got its current `status`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The date and time the conversion was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The ID of the dataset this file is being converted from."]
+    pub dataset_id: uuid::Uuid,
+    #[doc = "File's ETag from dataset bucket, for detecting whether a file needs to be \
+             reconverted."]
+    pub file_etag: String,
+    #[doc = "Location within dataset `path`."]
+    pub file_path: String,
+    #[doc = "Number of bytes, for measuring throughput and debugging conversion errors."]
+    pub file_size: i64,
+    #[doc = "The unique identifier for the conversion."]
+    pub id: uuid::Uuid,
+    #[doc = "Tracks which version processed this file when available."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub importer_version: Option<String>,
+    #[doc = "Additional per-conversion metadata as string key-value pairs."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<serde_json::Value>,
     #[doc = "Snapshot images for the original source model."]
     pub original_snapshot_images: Vec<OrgDatasetSnapshotImage>,
     #[doc = "Plain-text contents of the converted artifact."]
-    pub output: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<String>,
+    #[doc = "Current step in the conversion pipeline."]
+    pub phase: OrgDatasetFileConversionPhase,
+    #[doc = "Plain-text contents of the raw KCL artifact, when available."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub raw_kcl_output: Option<String>,
     #[doc = "Snapshot images for the raw KCL model."]
     pub raw_kcl_snapshot_images: Vec<OrgDatasetSnapshotImage>,
+    #[doc = "Plain-text contents of the salon/refactored KCL artifact, when available."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub salon_kcl_output: Option<String>,
     #[doc = "Snapshot images for the salon/refactored KCL model."]
     pub salon_kcl_snapshot_images: Vec<OrgDatasetSnapshotImage>,
+    #[doc = "The date and time the conversion started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "Conversion status."]
+    pub status: OrgDatasetFileConversionStatus,
+    #[doc = "Details associated with `status`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status_message: Option<String>,
+    #[doc = "The date and time the conversion was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
 impl std::fmt::Display for OrgDatasetFileConversionDetails {
@@ -14924,24 +14963,86 @@ impl std::fmt::Display for OrgDatasetFileConversionDetails {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgDatasetFileConversionDetails {
-    const LENGTH: usize = 5;
+    const LENGTH: usize = 20;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.conversion).into(),
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.dataset_id).into(),
+            self.file_etag.clone().into(),
+            self.file_path.clone().into(),
+            format!("{:?}", self.file_size).into(),
+            format!("{:?}", self.id).into(),
+            if let Some(importer_version) = &self.importer_version {
+                format!("{:?}", importer_version).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(metadata) = &self.metadata {
+                format!("{:?}", metadata).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.original_snapshot_images).into(),
-            self.output.clone().into(),
+            if let Some(output) = &self.output {
+                format!("{:?}", output).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.phase).into(),
+            if let Some(raw_kcl_output) = &self.raw_kcl_output {
+                format!("{:?}", raw_kcl_output).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.raw_kcl_snapshot_images).into(),
+            if let Some(salon_kcl_output) = &self.salon_kcl_output {
+                format!("{:?}", salon_kcl_output).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.salon_kcl_snapshot_images).into(),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.status).into(),
+            if let Some(status_message) = &self.status_message {
+                format!("{:?}", status_message).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.updated_at).into(),
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            "conversion".into(),
+            "completed_at".into(),
+            "created_at".into(),
+            "dataset_id".into(),
+            "file_etag".into(),
+            "file_path".into(),
+            "file_size".into(),
+            "id".into(),
+            "importer_version".into(),
+            "metadata".into(),
             "original_snapshot_images".into(),
             "output".into(),
+            "phase".into(),
+            "raw_kcl_output".into(),
             "raw_kcl_snapshot_images".into(),
+            "salon_kcl_output".into(),
             "salon_kcl_snapshot_images".into(),
+            "started_at".into(),
+            "status".into(),
+            "status_message".into(),
+            "updated_at".into(),
         ]
     }
 }
