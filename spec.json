@@ -41566,42 +41566,70 @@
             ]
           },
           {
-            "description": "Phase index `1`: creating a snapshot of the original source model.",
+            "description": "Phase index `1`: generating original file metadata.",
+            "type": "string",
+            "enum": [
+              "zoo_generated_original_metadata"
+            ]
+          },
+          {
+            "description": "Phase index `2`: creating a snapshot of the original source model.",
             "type": "string",
             "enum": [
               "snapshot_original"
             ]
           },
           {
-            "description": "Phase index `2`: converting the source model into raw KCL.",
+            "description": "Phase index `3`: discovering optional user-provided metadata files (`.json`, `.yaml`, `.yml`, `.toml`, `.txt`) stored next to the source CAD file.",
+            "type": "string",
+            "enum": [
+              "user_provided_metadata"
+            ]
+          },
+          {
+            "description": "Phase index `4`: converting the source model into raw KCL.",
             "type": "string",
             "enum": [
               "convert_raw_kcl"
             ]
           },
           {
-            "description": "Phase index `3`: creating a snapshot of the raw KCL result.",
+            "description": "Phase index `5`: generating raw KCL metadata.",
+            "type": "string",
+            "enum": [
+              "zoo_generated_raw_kcl_metadata"
+            ]
+          },
+          {
+            "description": "Phase index `6`: creating a snapshot of the raw KCL result.",
             "type": "string",
             "enum": [
               "snapshot_raw_kcl"
             ]
           },
           {
-            "description": "Phase index `4`: running the salon/refactor step that produces polished KCL.",
+            "description": "Phase index `7`: running the salon/refactor step that produces polished KCL.",
             "type": "string",
             "enum": [
               "salon"
             ]
           },
           {
-            "description": "Phase index `5`: creating a snapshot of the salon/refactored KCL.",
+            "description": "Phase index `8`: generating salon KCL metadata.",
+            "type": "string",
+            "enum": [
+              "zoo_generated_salon_kcl_metadata"
+            ]
+          },
+          {
+            "description": "Phase index `9`: creating a snapshot of the salon/refactored KCL.",
             "type": "string",
             "enum": [
               "snapshot_salon_kcl"
             ]
           },
           {
-            "description": "Phase index `6`: conversion finished successfully.",
+            "description": "Phase index `10`: conversion finished successfully.",
             "type": "string",
             "enum": [
               "completed"
