@@ -15066,27 +15066,44 @@ pub enum OrgDatasetFileConversionPhase {
     #[serde(rename = "queued")]
     #[display("queued")]
     Queued,
-    #[doc = "Phase index `1`: creating a snapshot of the original source model."]
+    #[doc = "Phase index `1`: generating original file metadata."]
+    #[serde(rename = "zoo_generated_original_metadata")]
+    #[display("zoo_generated_original_metadata")]
+    ZooGeneratedOriginalMetadata,
+    #[doc = "Phase index `2`: creating a snapshot of the original source model."]
     #[serde(rename = "snapshot_original")]
     #[display("snapshot_original")]
     SnapshotOriginal,
-    #[doc = "Phase index `2`: converting the source model into raw KCL."]
+    #[doc = "Phase index `3`: discovering optional user-provided metadata files (`.json`, \
+             `.yaml`, `.yml`, `.toml`, `.txt`) stored next to the source CAD file."]
+    #[serde(rename = "user_provided_metadata")]
+    #[display("user_provided_metadata")]
+    UserProvidedMetadata,
+    #[doc = "Phase index `4`: converting the source model into raw KCL."]
     #[serde(rename = "convert_raw_kcl")]
     #[display("convert_raw_kcl")]
     ConvertRawKcl,
-    #[doc = "Phase index `3`: creating a snapshot of the raw KCL result."]
+    #[doc = "Phase index `5`: generating raw KCL metadata."]
+    #[serde(rename = "zoo_generated_raw_kcl_metadata")]
+    #[display("zoo_generated_raw_kcl_metadata")]
+    ZooGeneratedRawKclMetadata,
+    #[doc = "Phase index `6`: creating a snapshot of the raw KCL result."]
     #[serde(rename = "snapshot_raw_kcl")]
     #[display("snapshot_raw_kcl")]
     SnapshotRawKcl,
-    #[doc = "Phase index `4`: running the salon/refactor step that produces polished KCL."]
+    #[doc = "Phase index `7`: running the salon/refactor step that produces polished KCL."]
     #[serde(rename = "salon")]
     #[display("salon")]
     Salon,
-    #[doc = "Phase index `5`: creating a snapshot of the salon/refactored KCL."]
+    #[doc = "Phase index `8`: generating salon KCL metadata."]
+    #[serde(rename = "zoo_generated_salon_kcl_metadata")]
+    #[display("zoo_generated_salon_kcl_metadata")]
+    ZooGeneratedSalonKclMetadata,
+    #[doc = "Phase index `9`: creating a snapshot of the salon/refactored KCL."]
     #[serde(rename = "snapshot_salon_kcl")]
     #[display("snapshot_salon_kcl")]
     SnapshotSalonKcl,
-    #[doc = "Phase index `6`: conversion finished successfully."]
+    #[doc = "Phase index `10`: conversion finished successfully."]
     #[serde(rename = "completed")]
     #[display("completed")]
     Completed,
