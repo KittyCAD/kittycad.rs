@@ -41478,7 +41478,7 @@
           },
           "output": {
             "nullable": true,
-            "description": "Plain-text contents of the converted artifact.",
+            "description": "Plain-text contents of the converted artifact, when available.",
             "type": "string"
           },
           "phase": {
