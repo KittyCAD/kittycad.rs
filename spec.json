@@ -9128,6 +9128,7 @@
           "orgs"
         ],
         "summary": "List the file conversions that have been processed for a given dataset owned by the caller's org.",
+        "description": "This endpoint returns lightweight conversion summaries only (including `phase` and `phase_index`), and intentionally omits converted KCL output and snapshot image payloads for speed.",
         "operationId": "list_org_dataset_conversions",
         "parameters": [
           {
@@ -9262,6 +9263,7 @@
           "orgs"
         ],
         "summary": "Fetch the metadata and converted output for a single dataset conversion.",
+        "description": "Unlike list/search endpoints, this returns the full conversion payload: latest output text plus decoded snapshot image payloads for original, raw-KCL, and salon-KCL stages.",
         "operationId": "get_org_dataset_conversion",
         "parameters": [
           {
@@ -9369,13 +9371,13 @@
         }
       }
     },
-    "/org/datasets/{id}/conversions/{conversion_id}/retry": {
+    "/org/datasets/{id}/conversions/{conversion_id}/retrigger": {
       "post": {
         "tags": [
           "orgs"
         ],
-        "summary": "Retry a specific dataset conversion that failed previously for the caller's org.",
-        "operationId": "retry_org_dataset_conversion",
+        "summary": "Retrigger a specific dataset conversion for the caller's org.",
+        "operationId": "retrigger_org_dataset_conversion",
         "parameters": [
           {
             "in": "path",
@@ -9397,8 +9399,8 @@
           }
         ],
         "responses": {
-          "202": {
-            "description": "successfully enqueued operation",
+          "204": {
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -9464,13 +9466,6 @@
                   "type": "string"
                 }
               }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrgDatasetFileConversion"
-                }
-              }
             }
           },
           "4XX": {
@@ -9487,7 +9482,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_retry_org_dataset_conversion",
+        "operationId": "options_retrigger_org_dataset_conversion",
         "parameters": [
           {
             "in": "path",
@@ -9587,13 +9582,13 @@
         }
       }
     },
-    "/org/datasets/{id}/rescan": {
+    "/org/datasets/{id}/retrigger": {
       "post": {
         "tags": [
           "orgs"
         ],
-        "summary": "Request a rescan of a dataset that belongs to the caller's org.",
-        "operationId": "rescan_org_dataset",
+        "summary": "Request a retrigger of conversions for a dataset that belongs to the caller's org.",
+        "operationId": "retrigger_org_dataset",
         "parameters": [
           {
             "in": "path",
@@ -9603,11 +9598,20 @@
             "schema": {
               "$ref": "#/components/schemas/Uuid"
             }
+          },
+          {
+            "in": "query",
+            "name": "statuses",
+            "description": "Optional comma-separated set of conversion statuses to retrigger.\n\nExample: `statuses=success,in_progress` If omitted, we retrigger all non-success conversions, but only retrigger `in_progress` conversions that have been running for more than 5 minutes.",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
           }
         ],
         "responses": {
-          "202": {
-            "description": "successfully enqueued operation",
+          "204": {
+            "description": "resource updated",
             "headers": {
               "Access-Control-Allow-Credentials": {
                 "description": "Access-Control-Allow-Credentials header.",
@@ -9673,13 +9677,6 @@
                   "type": "string"
                 }
               }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrgDataset"
-                }
-              }
             }
           },
           "4XX": {
@@ -9696,7 +9693,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_rescan_org_dataset",
+        "operationId": "options_retrigger_org_dataset",
         "parameters": [
           {
             "in": "path",
@@ -9784,6 +9781,152 @@
           "5XX": {
             "$ref": "#/components/responses/Error"
           }
+        }
+      }
+    },
+    "/org/datasets/{id}/search/conversions": {
+      "get": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Search dataset conversions by conversion ID or file path.",
+        "description": "Supports partial and full matching and may return multiple results.",
+        "operationId": "search_org_dataset_conversions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "description": "Search text matched against conversion id or file path.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "description": "Requested sort mode for matched conversions.",
+            "schema": {
+              "$ref": "#/components/schemas/ConversionSortMode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgDatasetFileConversionSummaryResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-dropshot-pagination": {
+          "required": [
+            "q"
+          ]
         }
       }
     },
@@ -41262,102 +41405,8 @@
           "total"
         ]
       },
-      "OrgDatasetFileConversion": {
-        "description": "Tracks state of `OrgDataset` file conversions.",
-        "type": "object",
-        "properties": {
-          "completed_at": {
-            "nullable": true,
-            "title": "DateTime",
-            "description": "The date and time the conversion got its current `status`.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "created_at": {
-            "title": "DateTime",
-            "description": "The date and time the conversion was created.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "dataset_id": {
-            "description": "The ID of the dataset this file is being converted from.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "file_etag": {
-            "description": "File's ETag from dataset bucket, for detecting whether a file needs to be converted again can be reused when creating new custom ML models.",
-            "type": "string"
-          },
-          "file_path": {
-            "description": "Location within dataset `path`.",
-            "type": "string"
-          },
-          "file_size": {
-            "description": "Number of bytes, for measuring throughput and debugging conversion errors.",
-            "type": "integer",
-            "format": "int64"
-          },
-          "id": {
-            "description": "The unique identifier for the conversion.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "importer_version": {
-            "nullable": true,
-            "description": "Tracks which version the file was processed with. If conversion failed due to an internal error, then it will be retried on converter version change.",
-            "type": "string"
-          },
-          "output_path": {
-            "nullable": true,
-            "description": "Location reference where the processed file output is stored, when available. New records use `blob://bucket/key`; legacy records may still contain key-only values.",
-            "type": "string"
-          },
-          "started_at": {
-            "nullable": true,
-            "title": "DateTime",
-            "description": "The date and time the conversion started.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "status": {
-            "description": "Conversion status.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/OrgDatasetFileConversionStatus"
-              }
-            ]
-          },
-          "status_message": {
-            "nullable": true,
-            "description": "Details associated with `status`.",
-            "type": "string"
-          },
-          "updated_at": {
-            "title": "DateTime",
-            "description": "The date and time the conversion was last updated.",
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "created_at",
-          "dataset_id",
-          "file_etag",
-          "file_path",
-          "file_size",
-          "id",
-          "status",
-          "updated_at"
-        ]
-      },
       "OrgDatasetFileConversionDetails": {
-        "description": "Detailed response that bundles conversion metadata with the converted file contents.",
+        "description": "Detailed response that bundles conversion metadata with converted file and snapshot contents.",
         "type": "object",
         "properties": {
           "conversion": {
@@ -41368,14 +41417,92 @@
               }
             ]
           },
+          "original_snapshot_images": {
+            "description": "Snapshot images for the original source model.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrgDatasetSnapshotImage"
+            }
+          },
           "output": {
             "description": "Plain-text contents of the converted artifact.",
             "type": "string"
+          },
+          "raw_kcl_snapshot_images": {
+            "description": "Snapshot images for the raw KCL model.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrgDatasetSnapshotImage"
+            }
+          },
+          "salon_kcl_snapshot_images": {
+            "description": "Snapshot images for the salon/refactored KCL model.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrgDatasetSnapshotImage"
+            }
           }
         },
         "required": [
           "conversion",
-          "output"
+          "original_snapshot_images",
+          "output",
+          "raw_kcl_snapshot_images",
+          "salon_kcl_snapshot_images"
+        ]
+      },
+      "OrgDatasetFileConversionPhase": {
+        "description": "Fine-grained pipeline stage for org dataset file conversions.",
+        "oneOf": [
+          {
+            "description": "Phase index `0`: waiting for a worker to begin processing this conversion.",
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          {
+            "description": "Phase index `1`: creating a snapshot of the original source model.",
+            "type": "string",
+            "enum": [
+              "snapshot_original"
+            ]
+          },
+          {
+            "description": "Phase index `2`: converting the source model into raw KCL.",
+            "type": "string",
+            "enum": [
+              "convert_raw_kcl"
+            ]
+          },
+          {
+            "description": "Phase index `3`: creating a snapshot of the raw KCL result.",
+            "type": "string",
+            "enum": [
+              "snapshot_raw_kcl"
+            ]
+          },
+          {
+            "description": "Phase index `4`: running the salon/refactor step that produces polished KCL.",
+            "type": "string",
+            "enum": [
+              "salon"
+            ]
+          },
+          {
+            "description": "Phase index `5`: creating a snapshot of the salon/refactored KCL.",
+            "type": "string",
+            "enum": [
+              "snapshot_salon_kcl"
+            ]
+          },
+          {
+            "description": "Phase index `6`: conversion finished successfully.",
+            "type": "string",
+            "enum": [
+              "completed"
+            ]
+          }
         ]
       },
       "OrgDatasetFileConversionStatus": {
@@ -41483,6 +41610,24 @@
             "description": "Tracks which version processed this file when available.",
             "type": "string"
           },
+          "metadata": {
+            "nullable": true,
+            "description": "Additional per-conversion metadata as string key-value pairs."
+          },
+          "phase": {
+            "description": "Current step in the conversion pipeline.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrgDatasetFileConversionPhase"
+              }
+            ]
+          },
+          "phase_index": {
+            "description": "Numeric index for `phase` so clients do not need to hardcode enum ordering.\n\nMapping: - `0`: `queued` - `1`: `snapshot_original` - `2`: `convert_raw_kcl` - `3`: `snapshot_raw_kcl` - `4`: `salon` - `5`: `snapshot_salon_kcl` - `6`: `completed`",
+            "type": "integer",
+            "format": "uint8",
+            "minimum": 0
+          },
           "started_at": {
             "nullable": true,
             "title": "DateTime",
@@ -41517,6 +41662,8 @@
           "file_path",
           "file_size",
           "id",
+          "phase",
+          "phase_index",
           "status",
           "updated_at"
         ]
@@ -41561,6 +41708,26 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "OrgDatasetSnapshotImage": {
+        "description": "Detailed response that bundles conversion metadata with the converted file contents.",
+        "type": "object",
+        "properties": {
+          "data_base64": {
+            "title": "String",
+            "description": "Base64-encoded image bytes.",
+            "type": "string",
+            "format": "byte"
+          },
+          "mime_type": {
+            "description": "MIME type of the stored image.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "data_base64",
+          "mime_type"
         ]
       },
       "OrgDatasetSource": {
