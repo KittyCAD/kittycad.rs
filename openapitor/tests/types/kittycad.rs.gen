@@ -14521,123 +14521,21 @@ impl tabled::Tabled for OrgDatasetConversionStatsResponse {
     }
 }
 
-#[doc = "Tracks state of `OrgDataset` file conversions."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct OrgDatasetFileConversion {
-    #[doc = "The date and time the conversion got its current `status`."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The date and time the conversion was created."]
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The ID of the dataset this file is being converted from."]
-    pub dataset_id: uuid::Uuid,
-    #[doc = "File's ETag from dataset bucket, for detecting whether a file needs to be converted again can be reused when creating new custom ML models."]
-    pub file_etag: String,
-    #[doc = "Location within dataset `path`."]
-    pub file_path: String,
-    #[doc = "Number of bytes, for measuring throughput and debugging conversion errors."]
-    pub file_size: i64,
-    #[doc = "The unique identifier for the conversion."]
-    pub id: uuid::Uuid,
-    #[doc = "Tracks which version the file was processed with. If conversion failed due to an internal error, then it will be retried on converter version change."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub importer_version: Option<String>,
-    #[doc = "Location reference where the processed file output is stored, when available. New records use `blob://bucket/key`; legacy records may still contain key-only values."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub output_path: Option<String>,
-    #[doc = "The date and time the conversion started."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "Conversion status."]
-    pub status: OrgDatasetFileConversionStatus,
-    #[doc = "Details associated with `status`."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub status_message: Option<String>,
-    #[doc = "The date and time the conversion was last updated."]
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-}
-
-impl std::fmt::Display for OrgDatasetFileConversion {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for OrgDatasetFileConversion {
-    const LENGTH: usize = 13;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.created_at).into(),
-            format!("{:?}", self.dataset_id).into(),
-            self.file_etag.clone().into(),
-            self.file_path.clone().into(),
-            format!("{:?}", self.file_size).into(),
-            format!("{:?}", self.id).into(),
-            if let Some(importer_version) = &self.importer_version {
-                format!("{:?}", importer_version).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(output_path) = &self.output_path {
-                format!("{:?}", output_path).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.status).into(),
-            if let Some(status_message) = &self.status_message {
-                format!("{:?}", status_message).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.updated_at).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "completed_at".into(),
-            "created_at".into(),
-            "dataset_id".into(),
-            "file_etag".into(),
-            "file_path".into(),
-            "file_size".into(),
-            "id".into(),
-            "importer_version".into(),
-            "output_path".into(),
-            "started_at".into(),
-            "status".into(),
-            "status_message".into(),
-            "updated_at".into(),
-        ]
-    }
-}
-
-#[doc = "Detailed response that bundles conversion metadata with the converted file contents."]
+#[doc = "Detailed response that bundles conversion metadata with converted file and snapshot contents."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct OrgDatasetFileConversionDetails {
     #[doc = "Conversion metadata without storage pointers."]
     pub conversion: OrgDatasetFileConversionSummary,
+    #[doc = "Snapshot images for the original source model."]
+    pub original_snapshot_images: Vec<OrgDatasetSnapshotImage>,
     #[doc = "Plain-text contents of the converted artifact."]
     pub output: String,
+    #[doc = "Snapshot images for the raw KCL model."]
+    pub raw_kcl_snapshot_images: Vec<OrgDatasetSnapshotImage>,
+    #[doc = "Snapshot images for the salon/refactored KCL model."]
+    pub salon_kcl_snapshot_images: Vec<OrgDatasetSnapshotImage>,
 }
 
 impl std::fmt::Display for OrgDatasetFileConversionDetails {
@@ -14652,17 +14550,71 @@ impl std::fmt::Display for OrgDatasetFileConversionDetails {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgDatasetFileConversionDetails {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 5;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.conversion).into(),
+            format!("{:?}", self.original_snapshot_images).into(),
             self.output.clone().into(),
+            format!("{:?}", self.raw_kcl_snapshot_images).into(),
+            format!("{:?}", self.salon_kcl_snapshot_images).into(),
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["conversion".into(), "output".into()]
+        vec![
+            "conversion".into(),
+            "original_snapshot_images".into(),
+            "output".into(),
+            "raw_kcl_snapshot_images".into(),
+            "salon_kcl_snapshot_images".into(),
+        ]
     }
+}
+
+#[doc = "Fine-grained pipeline stage for org dataset file conversions."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum OrgDatasetFileConversionPhase {
+    #[doc = "Phase index `0`: waiting for a worker to begin processing this conversion."]
+    #[serde(rename = "queued")]
+    #[display("queued")]
+    Queued,
+    #[doc = "Phase index `1`: creating a snapshot of the original source model."]
+    #[serde(rename = "snapshot_original")]
+    #[display("snapshot_original")]
+    SnapshotOriginal,
+    #[doc = "Phase index `2`: converting the source model into raw KCL."]
+    #[serde(rename = "convert_raw_kcl")]
+    #[display("convert_raw_kcl")]
+    ConvertRawKcl,
+    #[doc = "Phase index `3`: creating a snapshot of the raw KCL result."]
+    #[serde(rename = "snapshot_raw_kcl")]
+    #[display("snapshot_raw_kcl")]
+    SnapshotRawKcl,
+    #[doc = "Phase index `4`: running the salon/refactor step that produces polished KCL."]
+    #[serde(rename = "salon")]
+    #[display("salon")]
+    Salon,
+    #[doc = "Phase index `5`: creating a snapshot of the salon/refactored KCL."]
+    #[serde(rename = "snapshot_salon_kcl")]
+    #[display("snapshot_salon_kcl")]
+    SnapshotSalonKcl,
+    #[doc = "Phase index `6`: conversion finished successfully."]
+    #[serde(rename = "completed")]
+    #[display("completed")]
+    Completed,
 }
 
 #[doc = "`OrgDatasetFileConversion` status."]
@@ -14733,6 +14685,13 @@ pub struct OrgDatasetFileConversionSummary {
     #[doc = "Tracks which version processed this file when available."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub importer_version: Option<String>,
+    #[doc = "Additional per-conversion metadata as string key-value pairs."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<serde_json::Value>,
+    #[doc = "Current step in the conversion pipeline."]
+    pub phase: OrgDatasetFileConversionPhase,
+    #[doc = "Numeric index for `phase` so clients do not need to hardcode enum ordering.\n\nMapping: - `0`: `queued` - `1`: `snapshot_original` - `2`: `convert_raw_kcl` - `3`: `snapshot_raw_kcl` - `4`: `salon` - `5`: `snapshot_salon_kcl` - `6`: `completed`"]
+    pub phase_index: u8,
     #[doc = "The date and time the conversion started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -14757,7 +14716,7 @@ impl std::fmt::Display for OrgDatasetFileConversionSummary {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgDatasetFileConversionSummary {
-    const LENGTH: usize = 12;
+    const LENGTH: usize = 15;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -14776,6 +14735,13 @@ impl tabled::Tabled for OrgDatasetFileConversionSummary {
             } else {
                 String::new().into()
             },
+            if let Some(metadata) = &self.metadata {
+                format!("{:?}", metadata).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.phase).into(),
+            format!("{:?}", self.phase_index).into(),
             if let Some(started_at) = &self.started_at {
                 format!("{:?}", started_at).into()
             } else {
@@ -14801,6 +14767,9 @@ impl tabled::Tabled for OrgDatasetFileConversionSummary {
             "file_size".into(),
             "id".into(),
             "importer_version".into(),
+            "metadata".into(),
+            "phase".into(),
+            "phase_index".into(),
             "started_at".into(),
             "status".into(),
             "status_message".into(),
@@ -14952,6 +14921,43 @@ impl tabled::Tabled for OrgDatasetResultsPage {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "Detailed response that bundles conversion metadata with the converted file contents."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrgDatasetSnapshotImage {
+    #[doc = "Base64-encoded image bytes."]
+    #[serde(rename = "data_base64")]
+    pub data_base_64: base64::Base64Data,
+    #[doc = "MIME type of the stored image."]
+    pub mime_type: String,
+}
+
+impl std::fmt::Display for OrgDatasetSnapshotImage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrgDatasetSnapshotImage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.data_base_64).into(),
+            self.mime_type.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["data_base_64".into(), "mime_type".into()]
     }
 }
 
