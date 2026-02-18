@@ -4870,7 +4870,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MlPromptResultsPage"
+                  "$ref": "#/components/schemas/MlPromptResponseResultsPage"
                 }
               }
             }
@@ -4980,7 +4980,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MlPrompt"
+                  "$ref": "#/components/schemas/MlPromptResponse"
                 }
               }
             }
@@ -32613,8 +32613,36 @@
           }
         ]
       },
-      "MlPrompt": {
-        "description": "A ML prompt.",
+      "MlPromptMetadata": {
+        "description": "Metadata for a ML prompt.",
+        "type": "object",
+        "properties": {
+          "code": {
+            "nullable": true,
+            "description": "Code for the model.",
+            "type": "string"
+          },
+          "original_source_code": {
+            "nullable": true,
+            "description": "The original source code for the model.",
+            "type": "string"
+          },
+          "source_ranges": {
+            "description": "The source ranges the user suggested to change.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRangePrompt"
+            }
+          },
+          "upstream_conversation_id": {
+            "nullable": true,
+            "description": "The upstream conversation ID, if any.",
+            "type": "string"
+          }
+        }
+      },
+      "MlPromptResponse": {
+        "description": "ML prompt response payload for admin endpoints. This schema intentionally excludes internal linkage fields.",
         "type": "object",
         "properties": {
           "completed_at": {
@@ -32626,7 +32654,7 @@
           },
           "conversation_id": {
             "nullable": true,
-            "description": "The id for the conversation related to this prompt.",
+            "description": "The conversation associated with this prompt, if any.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Uuid"
@@ -32681,12 +32709,12 @@
           },
           "output_file": {
             "nullable": true,
-            "description": "The output directory reference for generated files. Stored as `blob://bucket/key` for new rows; legacy rows may contain a key-only value.",
+            "description": "The output directory reference for generated files.",
             "type": "string"
           },
           "project_name": {
             "nullable": true,
-            "description": "The name of the project, if any. This allows us to group prompts together that come from the same project and user.",
+            "description": "The name of the project, if any.",
             "type": "string"
           },
           "prompt": {
@@ -32695,7 +32723,7 @@
           },
           "seconds": {
             "nullable": true,
-            "description": "Sum of EndOfStream durations, in seconds. Nullable to allow lazy backfill.",
+            "description": "Sum of EndOfStream durations, in seconds.",
             "type": "integer",
             "format": "int64"
           },
@@ -32748,35 +32776,7 @@
           "user_id"
         ]
       },
-      "MlPromptMetadata": {
-        "description": "Metadata for a ML prompt.",
-        "type": "object",
-        "properties": {
-          "code": {
-            "nullable": true,
-            "description": "Code for the model.",
-            "type": "string"
-          },
-          "original_source_code": {
-            "nullable": true,
-            "description": "The original source code for the model.",
-            "type": "string"
-          },
-          "source_ranges": {
-            "description": "The source ranges the user suggested to change.",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SourceRangePrompt"
-            }
-          },
-          "upstream_conversation_id": {
-            "nullable": true,
-            "description": "The upstream conversation ID, if any.",
-            "type": "string"
-          }
-        }
-      },
-      "MlPromptResultsPage": {
+      "MlPromptResponseResultsPage": {
         "description": "A single page of results",
         "type": "object",
         "properties": {
@@ -32784,7 +32784,7 @@
             "description": "list of items on this page of results",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MlPrompt"
+              "$ref": "#/components/schemas/MlPromptResponse"
             }
           },
           "next_page": {
@@ -41566,70 +41566,42 @@
             ]
           },
           {
-            "description": "Phase index `1`: generating original file metadata.",
-            "type": "string",
-            "enum": [
-              "zoo_generated_original_metadata"
-            ]
-          },
-          {
-            "description": "Phase index `2`: creating a snapshot of the original source model.",
+            "description": "Phase index `1`: creating a snapshot of the original source model.",
             "type": "string",
             "enum": [
               "snapshot_original"
             ]
           },
           {
-            "description": "Phase index `3`: discovering optional user-provided metadata files (`.json`, `.yaml`, `.yml`, `.toml`, `.txt`) stored next to the source CAD file.",
-            "type": "string",
-            "enum": [
-              "user_provided_metadata"
-            ]
-          },
-          {
-            "description": "Phase index `4`: converting the source model into raw KCL.",
+            "description": "Phase index `2`: converting the source model into raw KCL.",
             "type": "string",
             "enum": [
               "convert_raw_kcl"
             ]
           },
           {
-            "description": "Phase index `5`: generating raw KCL metadata.",
-            "type": "string",
-            "enum": [
-              "zoo_generated_raw_kcl_metadata"
-            ]
-          },
-          {
-            "description": "Phase index `6`: creating a snapshot of the raw KCL result.",
+            "description": "Phase index `3`: creating a snapshot of the raw KCL result.",
             "type": "string",
             "enum": [
               "snapshot_raw_kcl"
             ]
           },
           {
-            "description": "Phase index `7`: running the salon/refactor step that produces polished KCL.",
+            "description": "Phase index `4`: running the salon/refactor step that produces polished KCL.",
             "type": "string",
             "enum": [
               "salon"
             ]
           },
           {
-            "description": "Phase index `8`: generating salon KCL metadata.",
-            "type": "string",
-            "enum": [
-              "zoo_generated_salon_kcl_metadata"
-            ]
-          },
-          {
-            "description": "Phase index `9`: creating a snapshot of the salon/refactored KCL.",
+            "description": "Phase index `5`: creating a snapshot of the salon/refactored KCL.",
             "type": "string",
             "enum": [
               "snapshot_salon_kcl"
             ]
           },
           {
-            "description": "Phase index `10`: conversion finished successfully.",
+            "description": "Phase index `6`: conversion finished successfully.",
             "type": "string",
             "enum": [
               "completed"
