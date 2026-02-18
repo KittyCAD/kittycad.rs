@@ -11138,15 +11138,83 @@ pub enum MlFeedback {
     Rejected,
 }
 
-#[doc = "A ML prompt."]
+#[doc = "Metadata for a ML prompt."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct MlPrompt {
+pub struct MlPromptMetadata {
+    #[doc = "Code for the model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
+    #[doc = "The original source code for the model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub original_source_code: Option<String>,
+    #[doc = "The source ranges the user suggested to change."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_ranges: Option<Vec<SourceRangePrompt>>,
+    #[doc = "The upstream conversation ID, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub upstream_conversation_id: Option<String>,
+}
+
+impl std::fmt::Display for MlPromptMetadata {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for MlPromptMetadata {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(code) = &self.code {
+                format!("{:?}", code).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(original_source_code) = &self.original_source_code {
+                format!("{:?}", original_source_code).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(source_ranges) = &self.source_ranges {
+                format!("{:?}", source_ranges).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(upstream_conversation_id) = &self.upstream_conversation_id {
+                format!("{:?}", upstream_conversation_id).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "code".into(),
+            "original_source_code".into(),
+            "source_ranges".into(),
+            "upstream_conversation_id".into(),
+        ]
+    }
+}
+
+#[doc = "ML prompt response payload for admin endpoints. This schema intentionally excludes \
+         internal linkage fields."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct MlPromptResponse {
     #[doc = "When the prompt was completed."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The id for the conversation related to this prompt."]
+    #[doc = "The conversation associated with this prompt, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub conversation_id: Option<uuid::Uuid>,
     #[doc = "The date and time the ML prompt was created."]
@@ -11167,17 +11235,15 @@ pub struct MlPrompt {
     pub metadata: Option<MlPromptMetadata>,
     #[doc = "The version of the model."]
     pub model_version: String,
-    #[doc = "The output directory reference for generated files. Stored as `blob://bucket/key` \
-             for new rows; legacy rows may contain a key-only value."]
+    #[doc = "The output directory reference for generated files."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub output_file: Option<String>,
-    #[doc = "The name of the project, if any. This allows us to group prompts together that come \
-             from the same project and user."]
+    #[doc = "The name of the project, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub project_name: Option<String>,
     #[doc = "The prompt."]
     pub prompt: String,
-    #[doc = "Sum of EndOfStream durations, in seconds. Nullable to allow lazy backfill."]
+    #[doc = "Sum of EndOfStream durations, in seconds."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub seconds: Option<i64>,
     #[doc = "When the prompt was started."]
@@ -11194,7 +11260,7 @@ pub struct MlPrompt {
     pub user_id: uuid::Uuid,
 }
 
-impl std::fmt::Display for MlPrompt {
+impl std::fmt::Display for MlPromptResponse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -11205,7 +11271,7 @@ impl std::fmt::Display for MlPrompt {
 }
 
 #[cfg(feature = "tabled")]
-impl tabled::Tabled for MlPrompt {
+impl tabled::Tabled for MlPromptResponse {
     const LENGTH: usize = 18;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
@@ -11294,86 +11360,19 @@ impl tabled::Tabled for MlPrompt {
     }
 }
 
-#[doc = "Metadata for a ML prompt."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct MlPromptMetadata {
-    #[doc = "Code for the model."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub code: Option<String>,
-    #[doc = "The original source code for the model."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub original_source_code: Option<String>,
-    #[doc = "The source ranges the user suggested to change."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub source_ranges: Option<Vec<SourceRangePrompt>>,
-    #[doc = "The upstream conversation ID, if any."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub upstream_conversation_id: Option<String>,
-}
-
-impl std::fmt::Display for MlPromptMetadata {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for MlPromptMetadata {
-    const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(code) = &self.code {
-                format!("{:?}", code).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(original_source_code) = &self.original_source_code {
-                format!("{:?}", original_source_code).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(source_ranges) = &self.source_ranges {
-                format!("{:?}", source_ranges).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(upstream_conversation_id) = &self.upstream_conversation_id {
-                format!("{:?}", upstream_conversation_id).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "code".into(),
-            "original_source_code".into(),
-            "source_ranges".into(),
-            "upstream_conversation_id".into(),
-        ]
-    }
-}
-
 #[doc = "A single page of results"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct MlPromptResultsPage {
+pub struct MlPromptResponseResultsPage {
     #[doc = "list of items on this page of results"]
-    pub items: Vec<MlPrompt>,
+    pub items: Vec<MlPromptResponse>,
     #[doc = "token used to fetch the next page of results (if any)"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub next_page: Option<String>,
 }
 
-impl std::fmt::Display for MlPromptResultsPage {
+impl std::fmt::Display for MlPromptResponseResultsPage {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -11384,8 +11383,8 @@ impl std::fmt::Display for MlPromptResultsPage {
 }
 
 #[cfg(feature = "requests")]
-impl crate::types::paginate::Pagination for MlPromptResultsPage {
-    type Item = MlPrompt;
+impl crate::types::paginate::Pagination for MlPromptResponseResultsPage {
+    type Item = MlPromptResponse;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
     }
@@ -11416,7 +11415,7 @@ impl crate::types::paginate::Pagination for MlPromptResultsPage {
 }
 
 #[cfg(feature = "tabled")]
-impl tabled::Tabled for MlPromptResultsPage {
+impl tabled::Tabled for MlPromptResponseResultsPage {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
@@ -15066,44 +15065,27 @@ pub enum OrgDatasetFileConversionPhase {
     #[serde(rename = "queued")]
     #[display("queued")]
     Queued,
-    #[doc = "Phase index `1`: generating original file metadata."]
-    #[serde(rename = "zoo_generated_original_metadata")]
-    #[display("zoo_generated_original_metadata")]
-    ZooGeneratedOriginalMetadata,
-    #[doc = "Phase index `2`: creating a snapshot of the original source model."]
+    #[doc = "Phase index `1`: creating a snapshot of the original source model."]
     #[serde(rename = "snapshot_original")]
     #[display("snapshot_original")]
     SnapshotOriginal,
-    #[doc = "Phase index `3`: discovering optional user-provided metadata files (`.json`, \
-             `.yaml`, `.yml`, `.toml`, `.txt`) stored next to the source CAD file."]
-    #[serde(rename = "user_provided_metadata")]
-    #[display("user_provided_metadata")]
-    UserProvidedMetadata,
-    #[doc = "Phase index `4`: converting the source model into raw KCL."]
+    #[doc = "Phase index `2`: converting the source model into raw KCL."]
     #[serde(rename = "convert_raw_kcl")]
     #[display("convert_raw_kcl")]
     ConvertRawKcl,
-    #[doc = "Phase index `5`: generating raw KCL metadata."]
-    #[serde(rename = "zoo_generated_raw_kcl_metadata")]
-    #[display("zoo_generated_raw_kcl_metadata")]
-    ZooGeneratedRawKclMetadata,
-    #[doc = "Phase index `6`: creating a snapshot of the raw KCL result."]
+    #[doc = "Phase index `3`: creating a snapshot of the raw KCL result."]
     #[serde(rename = "snapshot_raw_kcl")]
     #[display("snapshot_raw_kcl")]
     SnapshotRawKcl,
-    #[doc = "Phase index `7`: running the salon/refactor step that produces polished KCL."]
+    #[doc = "Phase index `4`: running the salon/refactor step that produces polished KCL."]
     #[serde(rename = "salon")]
     #[display("salon")]
     Salon,
-    #[doc = "Phase index `8`: generating salon KCL metadata."]
-    #[serde(rename = "zoo_generated_salon_kcl_metadata")]
-    #[display("zoo_generated_salon_kcl_metadata")]
-    ZooGeneratedSalonKclMetadata,
-    #[doc = "Phase index `9`: creating a snapshot of the salon/refactored KCL."]
+    #[doc = "Phase index `5`: creating a snapshot of the salon/refactored KCL."]
     #[serde(rename = "snapshot_salon_kcl")]
     #[display("snapshot_salon_kcl")]
     SnapshotSalonKcl,
-    #[doc = "Phase index `10`: conversion finished successfully."]
+    #[doc = "Phase index `6`: conversion finished successfully."]
     #[serde(rename = "completed")]
     #[display("completed")]
     Completed,

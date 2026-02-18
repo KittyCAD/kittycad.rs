@@ -73,7 +73,7 @@ impl Ml {
         limit: Option<u32>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::MlPromptResultsPage, crate::types::error::Error> {
+    ) -> Result<crate::types::MlPromptResponseResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!("{}/{}", self.client.base_url, "ml-prompts"),
@@ -119,8 +119,9 @@ impl Ml {
         &'a self,
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> impl futures::Stream<Item = Result<crate::types::MlPrompt, crate::types::error::Error>>
-           + Unpin
+    ) -> impl futures::Stream<
+        Item = Result<crate::types::MlPromptResponse, crate::types::error::Error>,
+    > + Unpin
            + '_ {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
@@ -164,7 +165,7 @@ impl Ml {
                                     })
                                 }
                             }
-                            .map_ok(|result: crate::types::MlPromptResultsPage| {
+                            .map_ok(|result: crate::types::MlPromptResponseResultsPage| {
                                 Some((
                                     futures::stream::iter(result.items().into_iter().map(Ok)),
                                     (new_result.next_page_token(), result),
@@ -187,15 +188,15 @@ impl Ml {
              employee.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The id of the model to give \
              feedback to. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
              example_ml_get_prompt() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::MlPrompt = \
-             client\n        .ml()\n        .get_prompt(uuid::Uuid::from_str(\n            \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::MlPromptResponse \
+             = client\n        .ml()\n        .get_prompt(uuid::Uuid::from_str(\n            \
              \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_prompt<'a>(
         &'a self,
         id: uuid::Uuid,
-    ) -> Result<crate::types::MlPrompt, crate::types::error::Error> {
+    ) -> Result<crate::types::MlPromptResponse, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!(
