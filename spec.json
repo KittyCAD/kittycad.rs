@@ -9128,7 +9128,7 @@
           "orgs"
         ],
         "summary": "List the file conversions that have been processed for a given dataset owned by the caller's org.",
-        "description": "This endpoint returns lightweight conversion summaries only (including `phase` and `phase_index`), and intentionally omits converted KCL output and snapshot image payloads for speed.",
+        "description": "This endpoint returns lightweight conversion summaries only (including `phase`), and intentionally omits converted KCL output and snapshot image payloads for speed.",
         "operationId": "list_org_dataset_conversions",
         "parameters": [
           {
@@ -9790,7 +9790,7 @@
           "orgs"
         ],
         "summary": "Search dataset conversions by conversion ID or file path.",
-        "description": "Supports partial and full matching and may return multiple results.",
+        "description": "Supports exact conversion-ID matching and fuzzy file-path matching.",
         "operationId": "search_org_dataset_conversions",
         "parameters": [
           {
@@ -41622,12 +41622,6 @@
               }
             ]
           },
-          "phase_index": {
-            "description": "Numeric index for `phase` so clients do not need to hardcode enum ordering.\n\nMapping: - `0`: `queued` - `1`: `snapshot_original` - `2`: `convert_raw_kcl` - `3`: `snapshot_raw_kcl` - `4`: `salon` - `5`: `snapshot_salon_kcl` - `6`: `completed`",
-            "type": "integer",
-            "format": "uint8",
-            "minimum": 0
-          },
           "started_at": {
             "nullable": true,
             "title": "DateTime",
@@ -41663,7 +41657,6 @@
           "file_size",
           "id",
           "phase",
-          "phase_index",
           "status",
           "updated_at"
         ]
