@@ -513,6 +513,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1org~1datasets~1{id}~1conversions~1{conversion_id}~1original/get/x-rust",
+    "value": {
+      "example": "/// Download the original source file for a specific dataset conversion.\n/// \n/// **Parameters:**\n/// \n/// - `conversion_id: uuid::Uuid`: Conversion identifier. (required)\n/// - `id: uuid::Uuid`: Dataset identifier. (required)\nuse std::str::FromStr;\nasync fn example_orgs_download_dataset_conversion_original() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .orgs()\n        .download_dataset_conversion_original(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.download_dataset_conversion_original"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1org~1datasets~1{id}~1conversions~1{conversion_id}~1retrigger/post/x-rust",
     "value": {
       "example": "/// Retrigger a specific dataset conversion for the caller's org.\n/// \n/// **Parameters:**\n/// \n/// - `conversion_id: uuid::Uuid`: Conversion identifier. (required)\n/// - `id: uuid::Uuid`: Dataset identifier. (required)\nuse std::str::FromStr;\nasync fn example_orgs_retrigger_dataset_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .orgs()\n        .retrigger_dataset_conversion(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n",

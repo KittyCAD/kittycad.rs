@@ -553,6 +553,46 @@ impl Orgs {
         }
     }
 
+    #[doc = "Download the original source file for a specific dataset \
+             conversion.\n\n**Parameters:**\n\n- `conversion_id: uuid::Uuid`: Conversion \
+             identifier. (required)\n- `id: uuid::Uuid`: Dataset identifier. \
+             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_orgs_download_dataset_conversion_original() -> anyhow::Result<()> {\n    let \
+             client = kittycad::Client::new_from_env();\n    client\n        .orgs()\n        \
+             .download_dataset_conversion_original(\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        \
+             .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn download_dataset_conversion_original<'a>(
+        &'a self,
+        conversion_id: uuid::Uuid,
+        id: uuid::Uuid,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "org/datasets/{id}/conversions/{conversion_id}/original"
+                    .replace("{conversion_id}", &format!("{}", conversion_id))
+                    .replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Retrigger a specific dataset conversion for the caller's org.\n\n**Parameters:**\n\n- \
              `conversion_id: uuid::Uuid`: Conversion identifier. (required)\n- `id: uuid::Uuid`: \
              Dataset identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
