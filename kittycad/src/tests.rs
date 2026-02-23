@@ -123,30 +123,51 @@ fn kittycad_coord_system() -> crate::types::System {
 
 async fn create_async_file_conversion(client: &crate::Client) -> crate::types::FileConversion {
     let body = include_bytes!("../../assets/in_obj.obj");
-    client
-        .file()
-        .create_conversion_options(
-            vec![crate::types::multipart::Attachment {
-                name: "file".to_string(),
-                filepath: Some("in_obj.obj".into()),
-                content_type: Some("application/octet-stream".to_string()),
-                data: body.to_vec(),
-            }],
-            &crate::types::ConversionParams {
-                output_format: crate::types::OutputFormat3D::Step {
-                    coords: Some(kittycad_coord_system()),
-                    created: None,
-                    presentation: None,
-                    units: None,
-                },
-                src_format: crate::types::InputFormat3D::Obj {
-                    coords: kittycad_coord_system(),
-                    units: crate::types::UnitLength::Mm,
-                },
-            },
+    let conversion_params = crate::types::ConversionParams {
+        output_format: crate::types::OutputFormat3D::Step {
+            coords: Some(kittycad_coord_system()),
+            created: None,
+            presentation: None,
+            units: None,
+        },
+        src_format: crate::types::InputFormat3D::Obj {
+            coords: kittycad_coord_system(),
+            units: crate::types::UnitLength::Mm,
+        },
+    };
+
+    let mut form = reqwest::multipart::Form::new();
+    let mut json_part =
+        reqwest::multipart::Part::text(serde_json::to_string(&conversion_params).unwrap());
+    json_part = json_part.file_name("body.json");
+    json_part = json_part.mime_str("application/json").unwrap();
+    form = form.part("body", json_part);
+
+    let mut file_part = reqwest::multipart::Part::bytes(body.to_vec());
+    file_part = file_part.file_name("in_obj.obj");
+    file_part = file_part.mime_str("application/octet-stream").unwrap();
+    form = form.part("file", file_part);
+
+    let response = client
+        .client
+        .request(
+            http::Method::POST,
+            format!("{}/{}", client.base_url, "file/conversion"),
         )
+        .bearer_auth(&client.token)
+        .header(reqwest::header::CACHE_CONTROL, "no-cache")
+        .multipart(form)
+        .send()
         .await
-        .unwrap()
+        .unwrap();
+
+    let status = response.status();
+    let text = response.text().await.unwrap_or_default();
+    if !status.is_success() {
+        panic!("create_async_file_conversion failed with status {status}: {text}");
+    }
+
+    serde_json::from_str(&text).unwrap()
 }
 
 #[cfg(not(feature = "js"))]
