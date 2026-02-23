@@ -3048,6 +3048,30 @@ impl tabled::Tabled for BillingInfo {
     }
 }
 
+#[doc = "What kind of blend to do"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[derive(Default)]
+pub enum BlendType {
+    #[doc = "Use the tangent of the surfaces to calculate the blend."]
+    #[serde(rename = "tangent")]
+    #[display("tangent")]
+    #[default]
+    Tangent,
+}
+
+
 #[doc = "The reason for blocking a user."]
 #[derive(
     serde :: Serialize,
@@ -8665,6 +8689,59 @@ impl tabled::Tabled for FileVolume {
     }
 }
 
+#[doc = "An edge id and an upper and lower percentage bound of the edge."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FractionOfEdge {
+    #[doc = "The id of the edge"]
+    pub edge_id: uuid::Uuid,
+    #[doc = "A value between [0.0, 1.0] (default 0.0) that is a percentage along the edge. This \
+             bound will control how much of the edge is used during the blend. If lower_bound is \
+             larger than upper_bound, the edge is effectively \"flipped\"."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lower_bound: Option<f64>,
+    #[doc = "A value between [0.0, 1.0] (default 1.0) that is a percentage along the edge. This \
+             bound will control how much of the edge is used during the blend. If lower_bound is \
+             larger than upper_bound, the edge is effectively \"flipped\"."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub upper_bound: Option<f64>,
+}
+
+impl std::fmt::Display for FractionOfEdge {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FractionOfEdge {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.edge_id).into(),
+            if let Some(lower_bound) = &self.lower_bound {
+                format!("{:?}", lower_bound).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(upper_bound) = &self.upper_bound {
+                format!("{:?}", upper_bound).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["edge_id".into(), "lower_bound".into(), "upper_bound".into()]
+    }
+}
+
 #[doc = "The response from the `GetEntityType` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -11855,7 +11932,8 @@ pub enum ModelingCmd {
         #[doc = "Should this extrude create a solid body or a surface?"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         body_type: Option<BodyType>,
-        #[doc = "Center to twist about (relative to 2D sketch)"]
+        #[doc = "Center to twist about (relative to plane's origin) Defaults to `[0, 0]` i.e. the \
+                 plane's origin"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         center_2d: Option<Point2D>,
         #[doc = "How far off the plane to extrude"]
@@ -11874,6 +11952,9 @@ pub enum ModelingCmd {
     #[doc = "Extrude the object along a path."]
     #[serde(rename = "sweep")]
     Sweep {
+        #[doc = "Should this sweep create a solid body or a surface?"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        body_type: Option<BodyType>,
         #[doc = "What is this sweep relative to?"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         relative_to: Option<RelativeTo>,
@@ -11934,6 +12015,15 @@ pub enum ModelingCmd {
     Solid3DJoin {
         #[doc = "Which Solid3D is being joined."]
         object_id: uuid::Uuid,
+    },
+    #[doc = "Command for creating a blend between the edge of two given surfaces"]
+    #[serde(rename = "surface_blend")]
+    SurfaceBlend {
+        #[doc = "The type of blend to use."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        blend_type: Option<BlendType>,
+        #[doc = "The two surfaces that the blend will span between"]
+        surfaces: Vec<SurfaceEdgeReference>,
     },
     #[doc = "What is the UUID of this body's n-th edge?"]
     #[serde(rename = "solid3d_get_edge_uuid")]
@@ -13093,6 +13183,9 @@ pub enum ModelingCmd {
              of the input solids will be included in the output solid."]
     #[serde(rename = "boolean_union")]
     BooleanUnion {
+        #[doc = "If true, non-contiguous bodies in the result will be returned as separate objects"]
+        #[serde(default)]
+        separate_bodies: bool,
         #[doc = "Which solids to union together. Cannot be empty."]
         solid_ids: Vec<uuid::Uuid>,
         #[doc = "The maximum acceptable surface gap computed between the joined solids. Must be \
@@ -13103,6 +13196,9 @@ pub enum ModelingCmd {
              of the input solids where they all overlap will be the output solid."]
     #[serde(rename = "boolean_intersection")]
     BooleanIntersection {
+        #[doc = "If true, non-contiguous bodies in the result will be returned as separate objects"]
+        #[serde(default)]
+        separate_bodies: bool,
         #[doc = "Which solids to intersect together"]
         solid_ids: Vec<uuid::Uuid>,
         #[doc = "The maximum acceptable surface gap computed between the joined solids. Must be \
@@ -13113,6 +13209,9 @@ pub enum ModelingCmd {
              be cut from. The 'tool' is what will be cut out from 'target'."]
     #[serde(rename = "boolean_subtract")]
     BooleanSubtract {
+        #[doc = "If true, non-contiguous bodies in the result will be returned as separate objects"]
+        #[serde(default)]
+        separate_bodies: bool,
         #[doc = "Geometry to cut out from."]
         target_ids: Vec<uuid::Uuid>,
         #[doc = "The maximum acceptable surface gap computed between the target and the solids \
@@ -13127,6 +13226,10 @@ pub enum ModelingCmd {
     BooleanImprint {
         #[doc = "Which input bodies to intersect.  Inputs with non-solid body types are permitted"]
         body_ids: Vec<uuid::Uuid>,
+        #[doc = "If true, bodies will be separated into multiple objects at their intersection \
+                 boundaries."]
+        #[serde(default)]
+        separate_bodies: bool,
         #[doc = "The maximum acceptable surface gap between the intersected bodies. Must be \
                  positive (i.e. greater than zero)."]
         tolerance: f64,
@@ -13644,6 +13747,11 @@ pub enum OkModelingCmdResponse {
     Solid3DJoin {
         #[doc = "The response from the `Solid3dJoin` endpoint."]
         data: Solid3DJoin,
+    },
+    #[serde(rename = "surface_blend")]
+    SurfaceBlend {
+        #[doc = "The response from the `SurfaceBlend` endpoint."]
+        data: SurfaceBlend,
     },
     #[serde(rename = "solid3d_get_edge_uuid")]
     Solid3DGetEdgeUuid {
@@ -16051,7 +16159,8 @@ pub enum OutputFormat2DType {
 )]
 pub struct OutputFormat2D {
     #[doc = "Export storage."]
-    pub storage: DxfStorage,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub storage: Option<DxfStorage>,
     #[serde(rename = "type")]
     pub type_: OutputFormat2DType,
 }
@@ -16071,7 +16180,11 @@ impl tabled::Tabled for OutputFormat2D {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.storage).into(),
+            if let Some(storage) = &self.storage {
+                format!("{:?}", storage).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.type_).into(),
         ]
     }
@@ -16134,10 +16247,17 @@ pub enum OutputFormat3D {
     Step {
         #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate \
                  system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
-        coords: System,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        coords: Option<System>,
         #[doc = "Timestamp override."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         created: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "Presentation style."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        presentation: Option<StepPresentation>,
+        #[doc = "Export length unit.\n\nDefaults to meters."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        units: Option<UnitLength>,
     },
     #[doc = "*ST**ereo**L**ithography format."]
     #[serde(rename = "stl")]
@@ -19824,6 +19944,32 @@ impl tabled::Tabled for StartPath {
     }
 }
 
+#[doc = "Describes the presentation style of the EXPRESS exchange format."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum StepPresentation {
+    #[doc = "Condenses the text to reduce the size of the file."]
+    #[serde(rename = "compact")]
+    #[display("compact")]
+    Compact,
+    #[doc = "Add extra spaces to make the text more easily readable.\n\nThis is the default \
+             setting."]
+    #[serde(rename = "pretty")]
+    #[display("pretty")]
+    Pretty,
+}
+
 #[doc = "Export storage."]
 #[derive(
     serde :: Serialize,
@@ -20282,6 +20428,70 @@ impl tabled::Tabled for SurfaceArea {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["output_unit".into(), "surface_area".into()]
+    }
+}
+
+#[doc = "The response from the `SurfaceBlend` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SurfaceBlend {}
+
+impl std::fmt::Display for SurfaceBlend {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SurfaceBlend {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "An object id, that corresponds to a surface body, and a list of edges of the surface."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SurfaceEdgeReference {
+    #[doc = "A list of the edge ids that belong to the body."]
+    pub edges: Vec<FractionOfEdge>,
+    #[doc = "The id of the body."]
+    pub object_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for SurfaceEdgeReference {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SurfaceEdgeReference {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.edges).into(),
+            format!("{:?}", self.object_id).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["edges".into(), "object_id".into()]
     }
 }
 
@@ -21358,12 +21568,7 @@ impl tabled::Tabled for Transform {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct TransformByForPoint3D {
-    #[doc = "If true, the transform is applied in local space. If false, the transform is applied \
-             in global space."]
-    #[deprecated]
-    pub is_local: bool,
-    #[doc = "What to use as the origin for the transformation. If not provided, will fall back to \
-             local or global origin, depending on whatever the `is_local` field was set to."]
+    #[doc = "What to use as the origin for the transformation."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub origin: Option<OriginType>,
     #[doc = "The scale, or rotation, or translation."]
@@ -21386,10 +21591,9 @@ impl std::fmt::Display for TransformByForPoint3D {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TransformByForPoint3D {
-    const LENGTH: usize = 4;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.is_local).into(),
             if let Some(origin) = &self.origin {
                 format!("{:?}", origin).into()
             } else {
@@ -21401,12 +21605,7 @@ impl tabled::Tabled for TransformByForPoint3D {
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "is_local".into(),
-            "origin".into(),
-            "property".into(),
-            "set".into(),
-        ]
+        vec!["origin".into(), "property".into(), "set".into()]
     }
 }
 
@@ -21415,12 +21614,7 @@ impl tabled::Tabled for TransformByForPoint3D {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct TransformByForPoint4D {
-    #[doc = "If true, the transform is applied in local space. If false, the transform is applied \
-             in global space."]
-    #[deprecated]
-    pub is_local: bool,
-    #[doc = "What to use as the origin for the transformation. If not provided, will fall back to \
-             local or global origin, depending on whatever the `is_local` field was set to."]
+    #[doc = "What to use as the origin for the transformation."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub origin: Option<OriginType>,
     #[doc = "The scale, or rotation, or translation."]
@@ -21443,10 +21637,9 @@ impl std::fmt::Display for TransformByForPoint4D {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TransformByForPoint4D {
-    const LENGTH: usize = 4;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.is_local).into(),
             if let Some(origin) = &self.origin {
                 format!("{:?}", origin).into()
             } else {
@@ -21458,12 +21651,7 @@ impl tabled::Tabled for TransformByForPoint4D {
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "is_local".into(),
-            "origin".into(),
-            "property".into(),
-            "set".into(),
-        ]
+        vec!["origin".into(), "property".into(), "set".into()]
     }
 }
 
