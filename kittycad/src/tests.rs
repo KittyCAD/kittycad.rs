@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 #[cfg(not(feature = "js"))]
 use futures::TryStreamExt;
 use pretty_assertions::assert_eq;
@@ -106,6 +104,72 @@ fn test_client() -> crate::Client {
     crate::Client::new_from_env()
 }
 
+fn one_of_fixture() -> crate::types::AsyncApiCallOutput {
+    serde_json::from_str(include_str!("../tests/one_of.json")).unwrap()
+}
+
+fn kittycad_coord_system() -> crate::types::System {
+    crate::types::System {
+        forward: crate::types::AxisDirectionPair {
+            axis: crate::types::Axis::Y,
+            direction: crate::types::Direction::Negative,
+        },
+        up: crate::types::AxisDirectionPair {
+            axis: crate::types::Axis::Z,
+            direction: crate::types::Direction::Positive,
+        },
+    }
+}
+
+async fn create_async_file_conversion(client: &crate::Client) -> crate::types::FileConversion {
+    let body = include_bytes!("../../assets/in_obj.obj");
+    let conversion_params = crate::types::ConversionParams {
+        output_format: crate::types::OutputFormat3D::Step {
+            coords: Some(kittycad_coord_system()),
+            created: None,
+            presentation: None,
+            units: None,
+        },
+        src_format: crate::types::InputFormat3D::Obj {
+            coords: kittycad_coord_system(),
+            units: crate::types::UnitLength::Mm,
+        },
+    };
+
+    let mut form = reqwest::multipart::Form::new();
+    let mut json_part =
+        reqwest::multipart::Part::text(serde_json::to_string(&conversion_params).unwrap());
+    json_part = json_part.file_name("body.json");
+    json_part = json_part.mime_str("application/json").unwrap();
+    form = form.part("body", json_part);
+
+    let mut file_part = reqwest::multipart::Part::bytes(body.to_vec());
+    file_part = file_part.file_name("in_obj.obj");
+    file_part = file_part.mime_str("application/octet-stream").unwrap();
+    form = form.part("file", file_part);
+
+    let response = client
+        .client
+        .request(
+            http::Method::POST,
+            format!("{}/{}", client.base_url, "file/conversion"),
+        )
+        .bearer_auth(&client.token)
+        .header(reqwest::header::CACHE_CONTROL, "no-cache")
+        .multipart(form)
+        .send()
+        .await
+        .unwrap();
+
+    let status = response.status();
+    let text = response.text().await.unwrap_or_default();
+    if !status.is_success() {
+        panic!("create_async_file_conversion failed with status {status}: {text}");
+    }
+
+    serde_json::from_str(&text).unwrap()
+}
+
 #[cfg(not(feature = "js"))]
 #[tokio::test]
 async fn test_list_org_members_stream() {
@@ -178,23 +242,25 @@ async fn test_create_file_volume() {
 #[tokio::test]
 async fn test_get_status_of_async_operation() {
     let client = test_client();
+    let conversion = create_async_file_conversion(&client).await;
 
-    let _result = client
+    let result = client
         .api_calls()
-        .get_async_operation(uuid::Uuid::from_str("23a9759f-ee9b-47de-9a55-deb1ed035793").unwrap())
+        .get_async_operation(conversion.id)
         .await
         .unwrap();
+
+    match result {
+        crate::types::AsyncApiCallOutput::FileConversion { id, .. } => {
+            assert_eq!(id, conversion.id);
+        }
+        other => panic!("expected file_conversion result, got {other:?}"),
+    }
 }
 
 #[tokio::test]
 async fn serialize_one_of() {
-    let client = test_client();
-
-    let result = client
-        .api_calls()
-        .get_async_operation(uuid::Uuid::from_str("23a9759f-ee9b-47de-9a55-deb1ed035793").unwrap())
-        .await
-        .unwrap();
+    let result = one_of_fixture();
 
     expectorate::assert_contents(
         "tests/one_of.json",
@@ -205,13 +271,7 @@ async fn serialize_one_of() {
 #[cfg(feature = "tabled")]
 #[tokio::test]
 async fn tabled_one_of() {
-    let client = test_client();
-
-    let result = client
-        .api_calls()
-        .get_async_operation(uuid::Uuid::from_str("23a9759f-ee9b-47de-9a55-deb1ed035793").unwrap())
-        .await
-        .unwrap();
+    let result = one_of_fixture();
 
     expectorate::assert_contents(
         "tests/tabled_one_of.txt",
