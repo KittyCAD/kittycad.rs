@@ -134,7 +134,7 @@ async fn create_async_file_conversion(client: &crate::Client) -> crate::types::F
             }],
             &crate::types::ConversionParams {
                 output_format: crate::types::OutputFormat3D::Step {
-                    coords: None,
+                    coords: Some(kittycad_coord_system()),
                     created: None,
                     presentation: None,
                     units: None,
