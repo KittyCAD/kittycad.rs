@@ -1099,6 +1099,34 @@ impl Users {
         }
     }
 
+    #[doc = "Requests public email marketing consent for an email address.\n\n```rust,no_run\nasync fn example_users_put_public_email_marketing_consent_request() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_email_marketing_consent_request(&kittycad::types::Subscribe {\n            email: \"email@example.com\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn put_public_email_marketing_consent_request<'a>(
+        &'a self,
+        body: &crate::types::Subscribe,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url, "website/email-marketing-consent/request"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Creates a new support/sales ticket from the website contact form. This endpoint is for untrusted\n\nusers and is not authenticated.\n\n```rust,no_run\nasync fn example_users_put_public_form() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_form(&kittycad::types::InquiryForm {\n            cad_platforms: Some(vec![\"some-string\".to_string()]),\n            company: Some(\"some-string\".to_string()),\n            email: \"email@example.com\".to_string(),\n            first_name: \"some-string\".to_string(),\n            industry: Some(\"some-string\".to_string()),\n            inquiry_type: kittycad::types::InquiryType::OtherSalesInquiry,\n            job_title: Some(\"some-string\".to_string()),\n            last_name: \"some-string\".to_string(),\n            message: \"some-string\".to_string(),\n            num_cad_users: Some(\"some-string\".to_string()),\n            phone: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn put_public_form<'a>(
@@ -1124,7 +1152,8 @@ impl Users {
         }
     }
 
-    #[doc = "Subscribes a user to the newsletter.\n\n```rust,no_run\nasync fn \
+    #[doc = "Subscribes a user to the newsletter.\n\nLegacy compatibility path while clients \
+             migrate to `/website/email-marketing-consent/request`.\n\n```rust,no_run\nasync fn \
              example_users_put_public_subscribe() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    client\n        .users()\n        \
              .put_public_subscribe(&kittycad::types::Subscribe {\n            email: \
