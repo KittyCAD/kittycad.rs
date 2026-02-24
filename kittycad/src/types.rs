@@ -1722,16 +1722,9 @@ pub struct ApiCallWithPrice {
     #[doc = "The price of the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub price: Option<f64>,
-    #[doc = "The request body sent by the API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub request_body: Option<String>,
     #[doc = "The request query params sent by the API call."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub request_query_params: Option<String>,
-    #[doc = "The response body returned by the API call. We do not store this information if it \
-             is above a certain size."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub response_body: Option<String>,
     #[doc = "The number of seconds the API call was billed for."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub seconds: Option<i32>,
@@ -1766,7 +1759,7 @@ impl std::fmt::Display for ApiCallWithPrice {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ApiCallWithPrice {
-    const LENGTH: usize = 23;
+    const LENGTH: usize = 21;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -1817,18 +1810,8 @@ impl tabled::Tabled for ApiCallWithPrice {
             } else {
                 String::new().into()
             },
-            if let Some(request_body) = &self.request_body {
-                format!("{:?}", request_body).into()
-            } else {
-                String::new().into()
-            },
             if let Some(request_query_params) = &self.request_query_params {
                 format!("{:?}", request_query_params).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(response_body) = &self.response_body {
-                format!("{:?}", response_body).into()
             } else {
                 String::new().into()
             },
@@ -1873,9 +1856,7 @@ impl tabled::Tabled for ApiCallWithPrice {
             "org_id".into(),
             "origin".into(),
             "price".into(),
-            "request_body".into(),
             "request_query_params".into(),
-            "response_body".into(),
             "seconds".into(),
             "started_at".into(),
             "status_code".into(),
