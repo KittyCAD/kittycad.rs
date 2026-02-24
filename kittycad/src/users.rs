@@ -131,6 +131,131 @@ impl Users {
         }
     }
 
+    #[doc = "Get email marketing consent state for the authenticated \
+             user.\n\n```rust,no_run\nasync fn example_users_email_marketing_consent_get() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::EmailMarketingConsentState =\n        \
+             client.users().email_marketing_consent_get().await?;\n    println!(\"{:?}\", \
+             result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn email_marketing_consent_get<'a>(
+        &'a self,
+    ) -> Result<crate::types::EmailMarketingConsentState, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url, "user/email-marketing-consent"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Record explicit decline for email marketing consent.\n\n```rust,no_run\nasync fn \
+             example_users_email_marketing_consent_decline_post() -> anyhow::Result<()> {\n    let \
+             client = kittycad::Client::new_from_env();\n    client\n        .users()\n        \
+             .email_marketing_consent_decline_post()\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn email_marketing_consent_decline_post<'a>(
+        &'a self,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url, "user/email-marketing-consent/decline"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Request email marketing opt-in and send a confirmation \
+             email.\n\n```rust,no_run\nasync fn \
+             example_users_email_marketing_consent_request_post() -> anyhow::Result<()> {\n    let \
+             client = kittycad::Client::new_from_env();\n    client\n        .users()\n        \
+             .email_marketing_consent_request_post()\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn email_marketing_consent_request_post<'a>(
+        &'a self,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url, "user/email-marketing-consent/request"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Mark the email-marketing modal as seen/dismissed for the authenticated \
+             user.\n\n```rust,no_run\nasync fn example_users_email_marketing_consent_seen_post() \
+             -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
+             client.users().email_marketing_consent_seen_post().await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn email_marketing_consent_seen_post<'a>(
+        &'a self,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url, "user/email-marketing-consent/seen"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Get extended information about your user.\n\nGet the user information for the authenticated user.\n\nAlternatively, you can also use the `/users-extended/me` endpoint.\n\n```rust,no_run\nasync fn example_users_get_self_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUser = client.users().get_self_extended().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_self_extended<'a>(
