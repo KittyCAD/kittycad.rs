@@ -5951,6 +5951,144 @@ impl tabled::Tabled for EmailAuthenticationForm {
     }
 }
 
+#[doc = "Request payload for confirming a double-opt-in token."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EmailMarketingConfirmTokenBody {
+    #[doc = "The token id from the confirmation email."]
+    pub token: String,
+}
+
+impl std::fmt::Display for EmailMarketingConfirmTokenBody {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EmailMarketingConfirmTokenBody {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.token.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["token".into()]
+    }
+}
+
+#[doc = "Public view of an authenticated user's email marketing consent state."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EmailMarketingConsentState {
+    #[doc = "Time the double opt-in confirmation completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub confirmed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "Whether the user is currently subscribed to marketing email."]
+    pub is_subscribed: bool,
+    #[doc = "First time the in-app prompt was seen."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt_seen_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "Time the latest opt-in request email was sent."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub requested_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "Whether the website should show the modal for this user."]
+    pub should_show_prompt: bool,
+    #[doc = "Current consent state."]
+    pub status: EmailMarketingConsentStatus,
+}
+
+impl std::fmt::Display for EmailMarketingConsentState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EmailMarketingConsentState {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(confirmed_at) = &self.confirmed_at {
+                format!("{:?}", confirmed_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.is_subscribed).into(),
+            if let Some(prompt_seen_at) = &self.prompt_seen_at {
+                format!("{:?}", prompt_seen_at).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(requested_at) = &self.requested_at {
+                format!("{:?}", requested_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.should_show_prompt).into(),
+            format!("{:?}", self.status).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "confirmed_at".into(),
+            "is_subscribed".into(),
+            "prompt_seen_at".into(),
+            "requested_at".into(),
+            "should_show_prompt".into(),
+            "status".into(),
+        ]
+    }
+}
+
+#[doc = "Email marketing consent state for a user."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum EmailMarketingConsentStatus {
+    #[doc = "No choice has been made yet."]
+    #[serde(rename = "unknown")]
+    #[display("unknown")]
+    Unknown,
+    #[doc = "User has seen and dismissed the modal without deciding."]
+    #[serde(rename = "dismissed")]
+    #[display("dismissed")]
+    Dismissed,
+    #[doc = "User requested opt-in and must confirm via email."]
+    #[serde(rename = "pending")]
+    #[display("pending")]
+    Pending,
+    #[doc = "User explicitly confirmed via email flow."]
+    #[serde(rename = "confirmed")]
+    #[display("confirmed")]
+    Confirmed,
+    #[doc = "User explicitly declined."]
+    #[serde(rename = "declined")]
+    #[display("declined")]
+    Declined,
+}
+
 #[doc = "The response from the `EnableDryRun` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,

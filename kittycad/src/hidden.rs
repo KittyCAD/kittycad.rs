@@ -78,6 +78,39 @@ impl Hidden {
         }
     }
 
+    #[doc = "Consume a confirmation token and finalize double opt-in.\n\n```rust,no_run\nasync fn \
+             example_hidden_auth_email_marketing_confirm_post() -> anyhow::Result<()> {\n    let \
+             client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        \
+             .auth_email_marketing_confirm_post(&kittycad::types::EmailMarketingConfirmTokenBody \
+             {\n            token: \"some-string\".to_string(),\n        })\n        .await?;\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn auth_email_marketing_confirm_post<'a>(
+        &'a self,
+        body: &crate::types::EmailMarketingConfirmTokenBody,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url, "auth/email-marketing/confirm"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Listen for callbacks for email authentication for users.\n\n**Parameters:**\n\n- `callback_url: Option<String>`: The URL to redirect back to after we have authenticated.\n- `email: &'astr`: The user's email. (required)\n- `token: &'astr`: The verification token. (required)\n\n```rust,no_run\nasync fn example_hidden_auth_email_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .auth_email_callback(\n            Some(\"https://example.com/foo/bar\".to_string()),\n            \"email@example.com\",\n            \"some-string\",\n        )\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn auth_email_callback<'a>(
@@ -91,7 +124,10 @@ impl Hidden {
             format!("{}/{}", self.client.base_url, "auth/email/callback"),
         );
         req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![("email", email.to_string()), ("token", token.to_string())];
+        let mut query_params = vec![
+            ("email", email.to_string()),
+            ("token", token.to_string()),
+        ];
         if let Some(p) = callback_url {
             query_params.push(("callback_url", p));
         }

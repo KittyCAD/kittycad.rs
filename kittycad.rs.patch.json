@@ -113,6 +113,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1auth~1email-marketing~1confirm/post/x-rust",
+    "value": {
+      "example": "/// Consume a confirmation token and finalize double opt-in.\nasync fn example_hidden_auth_email_marketing_confirm_post() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .auth_email_marketing_confirm_post(&kittycad::types::EmailMarketingConfirmTokenBody {\n            token: \"some-string\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.auth_email_marketing_confirm_post"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1auth~1email~1callback/get/x-rust",
     "value": {
       "example": "/// Listen for callbacks for email authentication for users.\n/// \n/// **Parameters:**\n/// \n/// - `callback_url: Option<String>`: The URL to redirect back to after we have authenticated.\n/// - `email: &'astr`: The user's email. (required)\n/// - `token: &'astr`: The verification token. (required)\nasync fn example_hidden_auth_email_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .auth_email_callback(\n            Some(\"https://example.com/foo/bar\".to_string()),\n            \"email@example.com\",\n            \"some-string\",\n        )\n        .await?;\n    Ok(())\n}\n",
@@ -1053,6 +1061,38 @@
     "value": {
       "example": "/// Update properties in the CRM\nasync fn example_users_patch_crm() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .patch_crm(&kittycad::types::CrmData {\n            cad_industry: Some(\"some-string\".to_string()),\n            cad_user_type: Some(\"some-string\".to_string()),\n            number_of_cad_users: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.patch_crm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1email-marketing-consent/get/x-rust",
+    "value": {
+      "example": "/// Get email marketing consent state for the authenticated user.\nasync fn example_users_email_marketing_consent_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::EmailMarketingConsentState =\n        client.users().email_marketing_consent_get().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.email_marketing_consent_get"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1email-marketing-consent~1decline/post/x-rust",
+    "value": {
+      "example": "/// Record explicit decline for email marketing consent.\nasync fn example_users_email_marketing_consent_decline_post() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .email_marketing_consent_decline_post()\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.email_marketing_consent_decline_post"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1email-marketing-consent~1request/post/x-rust",
+    "value": {
+      "example": "/// Request email marketing opt-in and send a confirmation email.\nasync fn example_users_email_marketing_consent_request_post() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .email_marketing_consent_request_post()\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.email_marketing_consent_request_post"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1email-marketing-consent~1seen/post/x-rust",
+    "value": {
+      "example": "/// Mark the email-marketing modal as seen/dismissed for the authenticated user.\nasync fn example_users_email_marketing_consent_seen_post() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.users().email_marketing_consent_seen_post().await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.email_marketing_consent_seen_post"
     }
   },
   {
