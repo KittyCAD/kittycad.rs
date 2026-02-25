@@ -1419,7 +1419,7 @@
     "op": "add",
     "path": "/paths/~1website~1email-marketing-consent~1request/put/x-rust",
     "value": {
-      "example": "/// Requests public email marketing consent for an email address.\nasync fn example_users_put_public_email_marketing_consent_request() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_email_marketing_consent_request(&kittycad::types::Subscribe {\n            email: \"email@example.com\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n",
+      "example": "/// Requests public email marketing consent for an email address.\nasync fn example_users_put_public_email_marketing_consent_request() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_email_marketing_consent_request(\n            &kittycad::types::PublicEmailMarketingConsentRequest {\n                email: \"email@example.com\".to_string(),\n            },\n        )\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.put_public_email_marketing_consent_request"
     }
   },
@@ -1429,14 +1429,6 @@
     "value": {
       "example": "/// Creates a new support/sales ticket from the website contact form. This endpoint is for untrusted\n/// \n/// users and is not authenticated.\nasync fn example_users_put_public_form() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_form(&kittycad::types::InquiryForm {\n            cad_platforms: Some(vec![\"some-string\".to_string()]),\n            company: Some(\"some-string\".to_string()),\n            email: \"email@example.com\".to_string(),\n            first_name: \"some-string\".to_string(),\n            industry: Some(\"some-string\".to_string()),\n            inquiry_type: kittycad::types::InquiryType::OtherSalesInquiry,\n            job_title: Some(\"some-string\".to_string()),\n            last_name: \"some-string\".to_string(),\n            message: \"some-string\".to_string(),\n            num_cad_users: Some(\"some-string\".to_string()),\n            phone: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.put_public_form"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1website~1subscribe/put/x-rust",
-    "value": {
-      "example": "/// Subscribes a user to the newsletter.\n/// \n/// Legacy compatibility path while clients migrate to `/website/email-marketing-consent/request`.\nasync fn example_users_put_public_subscribe() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_subscribe(&kittycad::types::Subscribe {\n            email: \"email@example.com\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.put_public_subscribe"
     }
   },
   {

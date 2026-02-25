@@ -1099,11 +1099,11 @@ impl Users {
         }
     }
 
-    #[doc = "Requests public email marketing consent for an email address.\n\n```rust,no_run\nasync fn example_users_put_public_email_marketing_consent_request() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_email_marketing_consent_request(&kittycad::types::Subscribe {\n            email: \"email@example.com\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Requests public email marketing consent for an email address.\n\n```rust,no_run\nasync fn example_users_put_public_email_marketing_consent_request() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_email_marketing_consent_request(\n            &kittycad::types::PublicEmailMarketingConsentRequest {\n                email: \"email@example.com\".to_string(),\n            },\n        )\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn put_public_email_marketing_consent_request<'a>(
         &'a self,
-        body: &crate::types::Subscribe,
+        body: &crate::types::PublicEmailMarketingConsentRequest,
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::PUT,
@@ -1136,36 +1136,6 @@ impl Users {
         let mut req = self.client.client.request(
             http::Method::PUT,
             format!("{}/{}", self.client.base_url, "website/form"),
-        );
-        req = req.bearer_auth(&self.client.token);
-        req = req.json(body);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            Ok(())
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
-    }
-
-    #[doc = "Subscribes a user to the newsletter.\n\nLegacy compatibility path while clients \
-             migrate to `/website/email-marketing-consent/request`.\n\n```rust,no_run\nasync fn \
-             example_users_put_public_subscribe() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    client\n        .users()\n        \
-             .put_public_subscribe(&kittycad::types::Subscribe {\n            email: \
-             \"email@example.com\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn put_public_subscribe<'a>(
-        &'a self,
-        body: &crate::types::Subscribe,
-    ) -> Result<(), crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::PUT,
-            format!("{}/{}", self.client.base_url, "website/subscribe"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);

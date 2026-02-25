@@ -17126,6 +17126,37 @@ impl tabled::Tabled for ProjectPointsToPlane {
     }
 }
 
+#[doc = "The data for subscribing a user to the newsletter."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PublicEmailMarketingConsentRequest {
+    #[doc = "The email"]
+    pub email: String,
+}
+
+impl std::fmt::Display for PublicEmailMarketingConsentRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PublicEmailMarketingConsentRequest {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.email.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["email".into()]
+    }
+}
+
 #[doc = "A raw file with unencoded contents to be passed over binary websockets. When raw files come back for exports it is sent as binary/bson, not text/json."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -19727,37 +19758,6 @@ impl tabled::Tabled for StoreCouponParams {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["percent_off".into()]
-    }
-}
-
-#[doc = "The data for subscribing a user to the newsletter."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Subscribe {
-    #[doc = "The email"]
-    pub email: String,
-}
-
-impl std::fmt::Display for Subscribe {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for Subscribe {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![self.email.clone().into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["email".into()]
     }
 }
 
