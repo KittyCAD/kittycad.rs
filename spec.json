@@ -49956,6 +49956,21 @@
         "description": "Extra admin-only details for a user.",
         "type": "object",
         "properties": {
+          "active_api_tokens_count": {
+            "description": "Count of valid API tokens.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "active_device_tokens_count": {
+            "description": "Count of active (non-expired) device access tokens.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "active_sessions_count": {
+            "description": "Count of active (non-expired) sessions.",
+            "type": "integer",
+            "format": "int64"
+          },
           "address": {
             "nullable": true,
             "description": "Latest billing address stored for the user.",
@@ -50015,6 +50030,9 @@
           }
         },
         "required": [
+          "active_api_tokens_count",
+          "active_device_tokens_count",
+          "active_sessions_count",
           "payment_methods",
           "payment_methods_summary"
         ]
