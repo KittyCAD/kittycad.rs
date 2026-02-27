@@ -24293,6 +24293,12 @@ impl tabled::Tabled for User {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UserAdminDetails {
+    #[doc = "Count of valid API tokens."]
+    pub active_api_tokens_count: i64,
+    #[doc = "Count of active (non-expired) device access tokens."]
+    pub active_device_tokens_count: i64,
+    #[doc = "Count of active (non-expired) sessions."]
+    pub active_sessions_count: i64,
     #[doc = "Latest billing address stored for the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub address: Option<Address>,
@@ -24332,9 +24338,12 @@ impl std::fmt::Display for UserAdminDetails {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UserAdminDetails {
-    const LENGTH: usize = 9;
+    const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            format!("{:?}", self.active_api_tokens_count).into(),
+            format!("{:?}", self.active_device_tokens_count).into(),
+            format!("{:?}", self.active_sessions_count).into(),
             if let Some(address) = &self.address {
                 format!("{:?}", address).into()
             } else {
@@ -24377,6 +24386,9 @@ impl tabled::Tabled for UserAdminDetails {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "active_api_tokens_count".into(),
+            "active_device_tokens_count".into(),
+            "active_sessions_count".into(),
             "address".into(),
             "address_summary".into(),
             "block".into(),
