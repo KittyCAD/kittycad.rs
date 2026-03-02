@@ -18020,6 +18020,47 @@ impl tabled::Tabled for RtcSessionDescription {
     }
 }
 
+#[doc = "The type of sales inquiry for website sales forms."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum SalesInquiryType {
+    #[doc = "Inquiries related to pilots (on the enterprise page)."]
+    #[serde(rename = "pilot_inquiry")]
+    #[display("pilot_inquiry")]
+    PilotInquiry,
+    #[doc = "General inquiry about the service or product."]
+    #[serde(rename = "general_inquiry")]
+    #[display("general_inquiry")]
+    GeneralInquiry,
+    #[doc = "Questions related to sales or purchasing."]
+    #[serde(rename = "sales_question")]
+    #[display("sales_question")]
+    SalesQuestion,
+    #[doc = "Inquiry from a developer, typically technical in nature."]
+    #[serde(rename = "developer_inquiry")]
+    #[display("developer_inquiry")]
+    DeveloperInquiry,
+    #[doc = "Opportunity for partnership or collaboration."]
+    #[serde(rename = "partnership_opportunity")]
+    #[display("partnership_opportunity")]
+    PartnershipOpportunity,
+    #[doc = "Other inquiries related to sales that do not fit predefined categories."]
+    #[serde(rename = "other_sales_inquiry")]
+    #[display("other_sales_inquiry")]
+    OtherSalesInquiry,
+}
+
 #[doc = "A SAML identity provider."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -20483,6 +20524,35 @@ impl tabled::Tabled for SuccessWebSocketResponse {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["request_id".into(), "resp".into(), "success".into()]
     }
+}
+
+#[doc = "The type of support inquiry for website support forms."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum SupportInquiryType {
+    #[doc = "Request for technical support or troubleshooting."]
+    #[serde(rename = "technical_support")]
+    #[display("technical_support")]
+    TechnicalSupport,
+    #[doc = "Questions or requests related to account management."]
+    #[serde(rename = "account_management")]
+    #[display("account_management")]
+    AccountManagement,
+    #[doc = "Other support-related inquiries that do not fit predefined categories."]
+    #[serde(rename = "other_support_inquiry")]
+    #[display("other_support_inquiry")]
+    OtherSupportInquiry,
 }
 
 #[doc = "The support tier the subscription provides."]
@@ -24978,6 +25048,180 @@ impl tabled::Tabled for WebSocketResponse {
             "resp".into(),
             "success".into(),
             "errors".into(),
+        ]
+    }
+}
+
+#[doc = "Request body for website sales form submissions."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct WebsiteSalesForm {
+    #[doc = "The CAD platforms (used for pilot inquiries)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cad_platforms: Option<Vec<String>>,
+    #[doc = "The company name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub company: Option<String>,
+    #[doc = "The email address of the user."]
+    pub email: String,
+    #[doc = "The first name of the user."]
+    pub first_name: String,
+    #[doc = "The industry of the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub industry: Option<String>,
+    #[doc = "The type of sales inquiry."]
+    pub inquiry_type: SalesInquiryType,
+    #[doc = "The job title (used for pilot inquiries)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job_title: Option<String>,
+    #[doc = "The last name of the user."]
+    pub last_name: String,
+    #[doc = "The message content."]
+    pub message: String,
+    #[doc = "The number of CAD users (used for pilot inquiries)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub num_cad_users: Option<String>,
+    #[doc = "The phone number of the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+}
+
+impl std::fmt::Display for WebsiteSalesForm {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for WebsiteSalesForm {
+    const LENGTH: usize = 11;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(cad_platforms) = &self.cad_platforms {
+                format!("{:?}", cad_platforms).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(company) = &self.company {
+                format!("{:?}", company).into()
+            } else {
+                String::new().into()
+            },
+            self.email.clone().into(),
+            self.first_name.clone().into(),
+            if let Some(industry) = &self.industry {
+                format!("{:?}", industry).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.inquiry_type).into(),
+            if let Some(job_title) = &self.job_title {
+                format!("{:?}", job_title).into()
+            } else {
+                String::new().into()
+            },
+            self.last_name.clone().into(),
+            self.message.clone().into(),
+            if let Some(num_cad_users) = &self.num_cad_users {
+                format!("{:?}", num_cad_users).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(phone) = &self.phone {
+                format!("{:?}", phone).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "cad_platforms".into(),
+            "company".into(),
+            "email".into(),
+            "first_name".into(),
+            "industry".into(),
+            "inquiry_type".into(),
+            "job_title".into(),
+            "last_name".into(),
+            "message".into(),
+            "num_cad_users".into(),
+            "phone".into(),
+        ]
+    }
+}
+
+#[doc = "Request body for website support form submissions."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct WebsiteSupportForm {
+    #[doc = "Optional company metadata."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub company: Option<String>,
+    #[doc = "The email address of the user."]
+    pub email: String,
+    #[doc = "The first name of the user."]
+    pub first_name: String,
+    #[doc = "The type of support inquiry."]
+    pub inquiry_type: SupportInquiryType,
+    #[doc = "The last name of the user."]
+    pub last_name: String,
+    #[doc = "The message content."]
+    pub message: String,
+    #[doc = "Optional phone metadata."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+}
+
+impl std::fmt::Display for WebsiteSupportForm {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for WebsiteSupportForm {
+    const LENGTH: usize = 7;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(company) = &self.company {
+                format!("{:?}", company).into()
+            } else {
+                String::new().into()
+            },
+            self.email.clone().into(),
+            self.first_name.clone().into(),
+            format!("{:?}", self.inquiry_type).into(),
+            self.last_name.clone().into(),
+            self.message.clone().into(),
+            if let Some(phone) = &self.phone {
+                format!("{:?}", phone).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "company".into(),
+            "email".into(),
+            "first_name".into(),
+            "inquiry_type".into(),
+            "last_name".into(),
+            "message".into(),
+            "phone".into(),
         ]
     }
 }
