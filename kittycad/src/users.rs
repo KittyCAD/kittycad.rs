@@ -1151,4 +1151,54 @@ impl Users {
             })
         }
     }
+
+    #[doc = "Creates a new sales ticket in the internal help desk from the website sales form.\n\nThis endpoint accepts optional authentication.\n\n```rust,no_run\nasync fn example_users_put_public_sales_form() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_sales_form(&kittycad::types::WebsiteSalesForm {\n            cad_platforms: Some(vec![\"some-string\".to_string()]),\n            company: Some(\"some-string\".to_string()),\n            email: \"email@example.com\".to_string(),\n            first_name: \"some-string\".to_string(),\n            industry: Some(\"some-string\".to_string()),\n            inquiry_type: kittycad::types::SalesInquiryType::DeveloperInquiry,\n            job_title: Some(\"some-string\".to_string()),\n            last_name: \"some-string\".to_string(),\n            message: \"some-string\".to_string(),\n            num_cad_users: Some(\"some-string\".to_string()),\n            phone: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn put_public_sales_form<'a>(
+        &'a self,
+        body: &crate::types::WebsiteSalesForm,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!("{}/{}", self.client.base_url, "website/forms/sales"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Creates a new support ticket in the internal help desk from the website support form.\n\nThis endpoint accepts optional authentication.\n\n```rust,no_run\nasync fn example_users_put_public_support_form() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_support_form(&kittycad::types::WebsiteSupportForm {\n            company: Some(\"some-string\".to_string()),\n            email: \"email@example.com\".to_string(),\n            first_name: \"some-string\".to_string(),\n            inquiry_type: kittycad::types::SupportInquiryType::AccountManagement,\n            last_name: \"some-string\".to_string(),\n            message: \"some-string\".to_string(),\n            phone: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn put_public_support_form<'a>(
+        &'a self,
+        body: &crate::types::WebsiteSupportForm,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!("{}/{}", self.client.base_url, "website/forms/support"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
 }
