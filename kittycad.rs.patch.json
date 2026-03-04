@@ -1433,6 +1433,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1website~1forms~1cad-user-info/put/x-rust",
+    "value": {
+      "example": "/// Stores authenticated CAD user info form data for the current user.\nasync fn example_users_put_cad_info_form() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_cad_info_form(&kittycad::types::WebsiteCadUserInfoForm {\n            cad_industry: Some(kittycad::types::CadIndustry::Construction),\n            cad_user_type: Some(kittycad::types::CadUserType::Hobbyist),\n            company_size: Some(kittycad::types::CompanySize::FiveHundredOneToOneThousand),\n            how_did_you_find_us: Some(kittycad::types::CadDiscoverySource::Instagram),\n            how_did_you_find_us_other: Some(\"some-string\".to_string()),\n            number_of_cad_users: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.put_cad_info_form"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1website~1forms~1sales/put/x-rust",
     "value": {
       "example": "/// Creates a new sales ticket in the internal help desk from the website sales form.\n/// \n/// This endpoint accepts optional authentication.\nasync fn example_users_put_public_sales_form() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_sales_form(&kittycad::types::WebsiteSalesForm {\n            cad_platforms: Some(vec![\"some-string\".to_string()]),\n            company: Some(\"some-string\".to_string()),\n            email: \"email@example.com\".to_string(),\n            first_name: \"some-string\".to_string(),\n            industry: Some(\"some-string\".to_string()),\n            inquiry_type: kittycad::types::SalesInquiryType::DeveloperInquiry,\n            job_title: Some(\"some-string\".to_string()),\n            last_name: \"some-string\".to_string(),\n            message: \"some-string\".to_string(),\n            num_cad_users: Some(\"some-string\".to_string()),\n            phone: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n",

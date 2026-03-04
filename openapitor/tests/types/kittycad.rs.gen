@@ -3219,6 +3219,149 @@ impl tabled::Tabled for BooleanUnion {
     }
 }
 
+#[doc = "Strict acquisition-source enum used by the website CAD user info form."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CadDiscoverySource {
+    #[doc = "Found via Google search."]
+    #[serde(rename = "google")]
+    #[display("google")]
+    Google,
+    #[doc = "Found via X/Twitter."]
+    #[serde(rename = "x")]
+    #[display("x")]
+    X,
+    #[doc = "Found via TikTok."]
+    #[serde(rename = "tiktok")]
+    #[display("tiktok")]
+    Tiktok,
+    #[doc = "Found via Reddit."]
+    #[serde(rename = "reddit")]
+    #[display("reddit")]
+    Reddit,
+    #[doc = "Found via Payload Space."]
+    #[serde(rename = "payload_space")]
+    #[display("payload_space")]
+    PayloadSpace,
+    #[doc = "Found via YouTube."]
+    #[serde(rename = "youtube")]
+    #[display("youtube")]
+    Youtube,
+    #[doc = "Found via Instagram."]
+    #[serde(rename = "instagram")]
+    #[display("instagram")]
+    Instagram,
+    #[doc = "Found via Facebook."]
+    #[serde(rename = "facebook")]
+    #[display("facebook")]
+    Facebook,
+    #[doc = "Found through friend referral or word of mouth."]
+    #[serde(rename = "word_of_mouth")]
+    #[display("word_of_mouth")]
+    WordOfMouth,
+    #[doc = "Found through another source described in free text."]
+    #[serde(rename = "other")]
+    #[display("other")]
+    Other,
+}
+
+#[doc = "Strict CAD industry enum for onboarding/CRM form submissions."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CadIndustry {
+    #[doc = "Mechanical engineering."]
+    #[serde(rename = "mechanical_engineering")]
+    #[display("mechanical_engineering")]
+    MechanicalEngineering,
+    #[doc = "Manufacturing."]
+    #[serde(rename = "manufacturing")]
+    #[display("manufacturing")]
+    Manufacturing,
+    #[doc = "Automotive."]
+    #[serde(rename = "automotive")]
+    #[display("automotive")]
+    Automotive,
+    #[doc = "Aerospace."]
+    #[serde(rename = "aerospace")]
+    #[display("aerospace")]
+    Aerospace,
+    #[doc = "Civil engineering."]
+    #[serde(rename = "civil_engineering")]
+    #[display("civil_engineering")]
+    CivilEngineering,
+    #[doc = "Electrical engineering."]
+    #[serde(rename = "electrical_engineering")]
+    #[display("electrical_engineering")]
+    ElectricalEngineering,
+    #[doc = "Construction."]
+    #[serde(rename = "construction")]
+    #[display("construction")]
+    Construction,
+    #[doc = "Product design."]
+    #[serde(rename = "product_design")]
+    #[display("product_design")]
+    ProductDesign,
+    #[doc = "Architecture."]
+    #[serde(rename = "architecture")]
+    #[display("architecture")]
+    Architecture,
+    #[doc = "Other industry."]
+    #[serde(rename = "other")]
+    #[display("other")]
+    Other,
+}
+
+#[doc = "Strict CAD user-type enum for onboarding/CRM form submissions."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CadUserType {
+    #[doc = "Student or researcher persona."]
+    #[serde(rename = "student_or_researcher")]
+    #[display("student_or_researcher")]
+    StudentOrResearcher,
+    #[doc = "Hobbyist persona."]
+    #[serde(rename = "hobbyist")]
+    #[display("hobbyist")]
+    Hobbyist,
+    #[doc = "Professional persona."]
+    #[serde(rename = "professional")]
+    #[display("professional")]
+    Professional,
+}
+
 #[doc = "The response from the `CameraDragEnd` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -3977,6 +4120,51 @@ impl tabled::Tabled for Color {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["a".into(), "b".into(), "g".into(), "r".into()]
     }
+}
+
+#[doc = "Strict company-size enum for onboarding/CRM form submissions."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CompanySize {
+    #[doc = "1-10 people."]
+    #[serde(rename = "one_to_ten")]
+    #[display("one_to_ten")]
+    OneToTen,
+    #[doc = "11-50 people."]
+    #[serde(rename = "eleven_to_fifty")]
+    #[display("eleven_to_fifty")]
+    ElevenToFifty,
+    #[doc = "51-200 people."]
+    #[serde(rename = "fifty_one_to_two_hundred")]
+    #[display("fifty_one_to_two_hundred")]
+    FiftyOneToTwoHundred,
+    #[doc = "201-500 people."]
+    #[serde(rename = "two_hundred_one_to_five_hundred")]
+    #[display("two_hundred_one_to_five_hundred")]
+    TwoHundredOneToFiveHundred,
+    #[doc = "501-1000 people."]
+    #[serde(rename = "five_hundred_one_to_one_thousand")]
+    #[display("five_hundred_one_to_one_thousand")]
+    FiveHundredOneToOneThousand,
+    #[doc = "1000+ people."]
+    #[serde(rename = "one_thousand_plus")]
+    #[display("one_thousand_plus")]
+    OneThousandPlus,
+    #[doc = "Other company size."]
+    #[serde(rename = "other")]
+    #[display("other")]
+    Other,
 }
 
 #[doc = "Struct to contain the edge information of a wall of an extrude/rotate/loft/sweep."]
@@ -23898,6 +24086,9 @@ pub struct UserAdminDetails {
     #[doc = "Human-friendly block reason message."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub block_message: Option<String>,
+    #[doc = "CAD user info collected from website onboarding/CRM form."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cad_user_info: Option<UserCadInfoAdminDetails>,
     #[doc = "Direct or search link to the HubSpot contact record."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hubspot_contact_url: Option<String>,
@@ -23925,7 +24116,7 @@ impl std::fmt::Display for UserAdminDetails {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UserAdminDetails {
-    const LENGTH: usize = 12;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.active_api_tokens_count).into(),
@@ -23948,6 +24139,11 @@ impl tabled::Tabled for UserAdminDetails {
             },
             if let Some(block_message) = &self.block_message {
                 format!("{:?}", block_message).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(cad_user_info) = &self.cad_user_info {
+                format!("{:?}", cad_user_info).into()
             } else {
                 String::new().into()
             },
@@ -23980,11 +24176,97 @@ impl tabled::Tabled for UserAdminDetails {
             "address_summary".into(),
             "block".into(),
             "block_message".into(),
+            "cad_user_info".into(),
             "hubspot_contact_url".into(),
             "payment_methods".into(),
             "payment_methods_summary".into(),
             "stripe_customer_id".into(),
             "stripe_dashboard_url".into(),
+        ]
+    }
+}
+
+#[doc = "CAD user info details for admin surfaces."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UserCadInfoAdminDetails {
+    #[doc = "CAD industry selection."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cad_industry: Option<CadIndustry>,
+    #[doc = "CAD user persona/type."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cad_user_type: Option<CadUserType>,
+    #[doc = "Company size selection."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub company_size: Option<CompanySize>,
+    #[doc = "Acquisition source selection."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub how_did_you_find_us: Option<CadDiscoverySource>,
+    #[doc = "Free-text acquisition source when `other` was selected."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub how_did_you_find_us_other: Option<String>,
+    #[doc = "Number of CAD users."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub number_of_cad_users: Option<String>,
+}
+
+impl std::fmt::Display for UserCadInfoAdminDetails {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for UserCadInfoAdminDetails {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(cad_industry) = &self.cad_industry {
+                format!("{:?}", cad_industry).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(cad_user_type) = &self.cad_user_type {
+                format!("{:?}", cad_user_type).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(company_size) = &self.company_size {
+                format!("{:?}", company_size).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(how_did_you_find_us) = &self.how_did_you_find_us {
+                format!("{:?}", how_did_you_find_us).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(how_did_you_find_us_other) = &self.how_did_you_find_us_other {
+                format!("{:?}", how_did_you_find_us_other).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(number_of_cad_users) = &self.number_of_cad_users {
+                format!("{:?}", number_of_cad_users).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "cad_industry".into(),
+            "cad_user_type".into(),
+            "company_size".into(),
+            "how_did_you_find_us".into(),
+            "how_did_you_find_us_other".into(),
+            "number_of_cad_users".into(),
         ]
     }
 }
@@ -24550,6 +24832,91 @@ impl tabled::Tabled for WebSocketResponse {
             "resp".into(),
             "success".into(),
             "errors".into(),
+        ]
+    }
+}
+
+#[doc = "Request body for authenticated website CAD user info form submissions."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct WebsiteCadUserInfoForm {
+    #[doc = "The industry of the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cad_industry: Option<CadIndustry>,
+    #[doc = "The user type."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cad_user_type: Option<CadUserType>,
+    #[doc = "Optional company size metadata."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub company_size: Option<CompanySize>,
+    #[doc = "How the user found Zoo."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub how_did_you_find_us: Option<CadDiscoverySource>,
+    #[doc = "Optional free-text value when \"Other\" is selected."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub how_did_you_find_us_other: Option<String>,
+    #[doc = "The number of CAD users."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub number_of_cad_users: Option<String>,
+}
+
+impl std::fmt::Display for WebsiteCadUserInfoForm {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for WebsiteCadUserInfoForm {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(cad_industry) = &self.cad_industry {
+                format!("{:?}", cad_industry).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(cad_user_type) = &self.cad_user_type {
+                format!("{:?}", cad_user_type).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(company_size) = &self.company_size {
+                format!("{:?}", company_size).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(how_did_you_find_us) = &self.how_did_you_find_us {
+                format!("{:?}", how_did_you_find_us).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(how_did_you_find_us_other) = &self.how_did_you_find_us_other {
+                format!("{:?}", how_did_you_find_us_other).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(number_of_cad_users) = &self.number_of_cad_users {
+                format!("{:?}", number_of_cad_users).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "cad_industry".into(),
+            "cad_user_type".into(),
+            "company_size".into(),
+            "how_did_you_find_us".into(),
+            "how_did_you_find_us_other".into(),
+            "number_of_cad_users".into(),
         ]
     }
 }
