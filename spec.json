@@ -25269,6 +25269,188 @@
         }
       }
     },
+    "/website/forms/cad-user-info": {
+      "put": {
+        "tags": [
+          "users",
+          "hidden"
+        ],
+        "summary": "Stores authenticated CAD user info form data for the current user.",
+        "operationId": "put_user_cad_user_info_form",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebsiteCadUserInfoForm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_put_user_cad_user_info_form",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/website/forms/sales": {
       "put": {
         "tags": [
@@ -28633,6 +28815,182 @@
           }
         }
       },
+      "CadDiscoverySource": {
+        "description": "Strict acquisition-source enum used by the website CAD user info form.",
+        "oneOf": [
+          {
+            "description": "Found via Google search.",
+            "type": "string",
+            "enum": [
+              "google"
+            ]
+          },
+          {
+            "description": "Found via X/Twitter.",
+            "type": "string",
+            "enum": [
+              "x"
+            ]
+          },
+          {
+            "description": "Found via TikTok.",
+            "type": "string",
+            "enum": [
+              "tiktok"
+            ]
+          },
+          {
+            "description": "Found via Reddit.",
+            "type": "string",
+            "enum": [
+              "reddit"
+            ]
+          },
+          {
+            "description": "Found via Payload Space.",
+            "type": "string",
+            "enum": [
+              "payload_space"
+            ]
+          },
+          {
+            "description": "Found via YouTube.",
+            "type": "string",
+            "enum": [
+              "youtube"
+            ]
+          },
+          {
+            "description": "Found via Instagram.",
+            "type": "string",
+            "enum": [
+              "instagram"
+            ]
+          },
+          {
+            "description": "Found via Facebook.",
+            "type": "string",
+            "enum": [
+              "facebook"
+            ]
+          },
+          {
+            "description": "Found through friend referral or word of mouth.",
+            "type": "string",
+            "enum": [
+              "word_of_mouth"
+            ]
+          },
+          {
+            "description": "Found through another source described in free text.",
+            "type": "string",
+            "enum": [
+              "other"
+            ]
+          }
+        ]
+      },
+      "CadIndustry": {
+        "description": "Strict CAD industry enum for onboarding/CRM form submissions.",
+        "oneOf": [
+          {
+            "description": "Mechanical engineering.",
+            "type": "string",
+            "enum": [
+              "mechanical_engineering"
+            ]
+          },
+          {
+            "description": "Manufacturing.",
+            "type": "string",
+            "enum": [
+              "manufacturing"
+            ]
+          },
+          {
+            "description": "Automotive.",
+            "type": "string",
+            "enum": [
+              "automotive"
+            ]
+          },
+          {
+            "description": "Aerospace.",
+            "type": "string",
+            "enum": [
+              "aerospace"
+            ]
+          },
+          {
+            "description": "Civil engineering.",
+            "type": "string",
+            "enum": [
+              "civil_engineering"
+            ]
+          },
+          {
+            "description": "Electrical engineering.",
+            "type": "string",
+            "enum": [
+              "electrical_engineering"
+            ]
+          },
+          {
+            "description": "Construction.",
+            "type": "string",
+            "enum": [
+              "construction"
+            ]
+          },
+          {
+            "description": "Product design.",
+            "type": "string",
+            "enum": [
+              "product_design"
+            ]
+          },
+          {
+            "description": "Architecture.",
+            "type": "string",
+            "enum": [
+              "architecture"
+            ]
+          },
+          {
+            "description": "Other industry.",
+            "type": "string",
+            "enum": [
+              "other"
+            ]
+          }
+        ]
+      },
+      "CadUserType": {
+        "description": "Strict CAD user-type enum for onboarding/CRM form submissions.",
+        "oneOf": [
+          {
+            "description": "Student or researcher persona.",
+            "type": "string",
+            "enum": [
+              "student_or_researcher"
+            ]
+          },
+          {
+            "description": "Hobbyist persona.",
+            "type": "string",
+            "enum": [
+              "hobbyist"
+            ]
+          },
+          {
+            "description": "Professional persona.",
+            "type": "string",
+            "enum": [
+              "professional"
+            ]
+          }
+        ]
+      },
       "CameraDragEnd": {
         "description": "The response from the `CameraDragEnd` command.",
         "type": "object",
@@ -29108,6 +29466,60 @@
           "b",
           "g",
           "r"
+        ]
+      },
+      "CompanySize": {
+        "description": "Strict company-size enum for onboarding/CRM form submissions.",
+        "oneOf": [
+          {
+            "description": "1-10 people.",
+            "type": "string",
+            "enum": [
+              "one_to_ten"
+            ]
+          },
+          {
+            "description": "11-50 people.",
+            "type": "string",
+            "enum": [
+              "eleven_to_fifty"
+            ]
+          },
+          {
+            "description": "51-200 people.",
+            "type": "string",
+            "enum": [
+              "fifty_one_to_two_hundred"
+            ]
+          },
+          {
+            "description": "201-500 people.",
+            "type": "string",
+            "enum": [
+              "two_hundred_one_to_five_hundred"
+            ]
+          },
+          {
+            "description": "501-1000 people.",
+            "type": "string",
+            "enum": [
+              "five_hundred_one_to_one_thousand"
+            ]
+          },
+          {
+            "description": "1000+ people.",
+            "type": "string",
+            "enum": [
+              "one_thousand_plus"
+            ]
+          },
+          {
+            "description": "Other company size.",
+            "type": "string",
+            "enum": [
+              "other"
+            ]
+          }
         ]
       },
       "ComplementaryEdges": {
@@ -50445,6 +50857,15 @@
             "description": "Human-friendly block reason message.",
             "type": "string"
           },
+          "cad_user_info": {
+            "nullable": true,
+            "description": "CAD user info collected from website onboarding/CRM form.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserCadInfoAdminDetails"
+              }
+            ]
+          },
           "hubspot_contact_url": {
             "nullable": true,
             "description": "Direct or search link to the HubSpot contact record.",
@@ -50482,6 +50903,58 @@
           "payment_methods",
           "payment_methods_summary"
         ]
+      },
+      "UserCadInfoAdminDetails": {
+        "description": "CAD user info details for admin surfaces.",
+        "type": "object",
+        "properties": {
+          "cad_industry": {
+            "nullable": true,
+            "description": "CAD industry selection.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CadIndustry"
+              }
+            ]
+          },
+          "cad_user_type": {
+            "nullable": true,
+            "description": "CAD user persona/type.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CadUserType"
+              }
+            ]
+          },
+          "company_size": {
+            "nullable": true,
+            "description": "Company size selection.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CompanySize"
+              }
+            ]
+          },
+          "how_did_you_find_us": {
+            "nullable": true,
+            "description": "Acquisition source selection.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CadDiscoverySource"
+              }
+            ]
+          },
+          "how_did_you_find_us_other": {
+            "nullable": true,
+            "description": "Free-text acquisition source when `other` was selected.",
+            "type": "string"
+          },
+          "number_of_cad_users": {
+            "nullable": true,
+            "description": "Number of CAD users.",
+            "type": "string"
+          }
+        }
       },
       "UserFeature": {
         "type": "string",
@@ -50975,6 +51448,58 @@
             ]
           }
         ]
+      },
+      "WebsiteCadUserInfoForm": {
+        "description": "Request body for authenticated website CAD user info form submissions.",
+        "type": "object",
+        "properties": {
+          "cad_industry": {
+            "nullable": true,
+            "description": "The industry of the user.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CadIndustry"
+              }
+            ]
+          },
+          "cad_user_type": {
+            "nullable": true,
+            "description": "The user type.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CadUserType"
+              }
+            ]
+          },
+          "company_size": {
+            "nullable": true,
+            "description": "Optional company size metadata.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CompanySize"
+              }
+            ]
+          },
+          "how_did_you_find_us": {
+            "nullable": true,
+            "description": "How the user found Zoo.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CadDiscoverySource"
+              }
+            ]
+          },
+          "how_did_you_find_us_other": {
+            "nullable": true,
+            "description": "Optional free-text value when \"Other\" is selected.",
+            "type": "string"
+          },
+          "number_of_cad_users": {
+            "nullable": true,
+            "description": "The number of CAD users.",
+            "type": "string"
+          }
+        }
       },
       "WebsiteSalesForm": {
         "description": "Request body for website sales form submissions.",
