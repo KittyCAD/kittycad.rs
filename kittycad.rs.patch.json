@@ -1065,14 +1065,6 @@
   },
   {
     "op": "add",
-    "path": "/paths/~1user~1crm/patch/x-rust",
-    "value": {
-      "example": "/// Update properties in the CRM\nasync fn example_users_patch_crm() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .patch_crm(&kittycad::types::CrmData {\n            cad_industry: Some(\"some-string\".to_string()),\n            cad_user_type: Some(\"some-string\".to_string()),\n            number_of_cad_users: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.patch_crm"
-    }
-  },
-  {
-    "op": "add",
     "path": "/paths/~1user~1email-marketing-consent/get/x-rust",
     "value": {
       "example": "/// Get email marketing consent state for the authenticated user.\nasync fn example_users_email_marketing_consent_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::EmailMarketingConsentState =\n        client.users().email_marketing_consent_get().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
@@ -1117,14 +1109,6 @@
     "value": {
       "example": "/// List user-visible feature flags enabled for the authenticated user.\n/// \n/// Returns only features that are marked as safe for exposure to clients and currently resolved to `true` for the requesting user (including org overrides).\nasync fn example_users_features_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserFeatureList = client.users().features_get().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.features_get"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1user~1form/put/x-rust",
-    "value": {
-      "example": "/// Create a new support/sales ticket from the website contact form. This endpoint is authenticated.\n/// \n/// It gets attached to the user's account.\nasync fn example_users_put_form_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_form_self(&kittycad::types::InquiryForm {\n            cad_platforms: Some(vec![\"some-string\".to_string()]),\n            company: Some(\"some-string\".to_string()),\n            email: \"email@example.com\".to_string(),\n            first_name: \"some-string\".to_string(),\n            industry: Some(\"some-string\".to_string()),\n            inquiry_type: kittycad::types::InquiryType::OtherSalesInquiry,\n            job_title: Some(\"some-string\".to_string()),\n            last_name: \"some-string\".to_string(),\n            message: \"some-string\".to_string(),\n            num_cad_users: Some(\"some-string\".to_string()),\n            phone: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.put_form_self"
     }
   },
   {
@@ -1421,14 +1405,6 @@
     "value": {
       "example": "/// Requests public email marketing consent for an email address.\nasync fn example_users_put_public_email_marketing_consent_request() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_email_marketing_consent_request(\n            &kittycad::types::PublicEmailMarketingConsentRequest {\n                email: \"email@example.com\".to_string(),\n            },\n        )\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.put_public_email_marketing_consent_request"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1website~1form/put/x-rust",
-    "value": {
-      "example": "/// Creates a new support/sales ticket from the website contact form. This endpoint is for untrusted\n/// \n/// users and is not authenticated.\nasync fn example_users_put_public_form() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_form(&kittycad::types::InquiryForm {\n            cad_platforms: Some(vec![\"some-string\".to_string()]),\n            company: Some(\"some-string\".to_string()),\n            email: \"email@example.com\".to_string(),\n            first_name: \"some-string\".to_string(),\n            industry: Some(\"some-string\".to_string()),\n            inquiry_type: kittycad::types::InquiryType::OtherSalesInquiry,\n            job_title: Some(\"some-string\".to_string()),\n            last_name: \"some-string\".to_string(),\n            message: \"some-string\".to_string(),\n            num_cad_users: Some(\"some-string\".to_string()),\n            phone: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.put_public_form"
     }
   },
   {

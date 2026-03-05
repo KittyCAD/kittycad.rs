@@ -101,36 +101,6 @@ impl Users {
         }
     }
 
-    #[doc = "Update properties in the CRM\n\n```rust,no_run\nasync fn example_users_patch_crm() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
-             client\n        .users()\n        .patch_crm(&kittycad::types::CrmData {\n            \
-             cad_industry: Some(\"some-string\".to_string()),\n            cad_user_type: \
-             Some(\"some-string\".to_string()),\n            number_of_cad_users: \
-             Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn patch_crm<'a>(
-        &'a self,
-        body: &crate::types::CrmData,
-    ) -> Result<(), crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::PATCH,
-            format!("{}/{}", self.client.base_url, "user/crm"),
-        );
-        req = req.bearer_auth(&self.client.token);
-        req = req.json(body);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            Ok(())
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
-    }
-
     #[doc = "Get email marketing consent state for the authenticated \
              user.\n\n```rust,no_run\nasync fn example_users_email_marketing_consent_get() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
@@ -311,31 +281,6 @@ impl Users {
                     status,
                 )
             })
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
-    }
-
-    #[doc = "Create a new support/sales ticket from the website contact form. This endpoint is authenticated.\n\nIt gets attached to the user's account.\n\n```rust,no_run\nasync fn example_users_put_form_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_form_self(&kittycad::types::InquiryForm {\n            cad_platforms: Some(vec![\"some-string\".to_string()]),\n            company: Some(\"some-string\".to_string()),\n            email: \"email@example.com\".to_string(),\n            first_name: \"some-string\".to_string(),\n            industry: Some(\"some-string\".to_string()),\n            inquiry_type: kittycad::types::InquiryType::OtherSalesInquiry,\n            job_title: Some(\"some-string\".to_string()),\n            last_name: \"some-string\".to_string(),\n            message: \"some-string\".to_string(),\n            num_cad_users: Some(\"some-string\".to_string()),\n            phone: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn put_form_self<'a>(
-        &'a self,
-        body: &crate::types::InquiryForm,
-    ) -> Result<(), crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::PUT,
-            format!("{}/{}", self.client.base_url, "user/form"),
-        );
-        req = req.bearer_auth(&self.client.token);
-        req = req.json(body);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            Ok(())
         } else {
             let text = resp.text().await.unwrap_or_default();
             Err(crate::types::error::Error::Server {
@@ -1111,31 +1056,6 @@ impl Users {
                 "{}/{}",
                 self.client.base_url, "website/email-marketing-consent/request"
             ),
-        );
-        req = req.bearer_auth(&self.client.token);
-        req = req.json(body);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            Ok(())
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
-    }
-
-    #[doc = "Creates a new support/sales ticket from the website contact form. This endpoint is for untrusted\n\nusers and is not authenticated.\n\n```rust,no_run\nasync fn example_users_put_public_form() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_form(&kittycad::types::InquiryForm {\n            cad_platforms: Some(vec![\"some-string\".to_string()]),\n            company: Some(\"some-string\".to_string()),\n            email: \"email@example.com\".to_string(),\n            first_name: \"some-string\".to_string(),\n            industry: Some(\"some-string\".to_string()),\n            inquiry_type: kittycad::types::InquiryType::OtherSalesInquiry,\n            job_title: Some(\"some-string\".to_string()),\n            last_name: \"some-string\".to_string(),\n            message: \"some-string\".to_string(),\n            num_cad_users: Some(\"some-string\".to_string()),\n            phone: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn put_public_form<'a>(
-        &'a self,
-        body: &crate::types::InquiryForm,
-    ) -> Result<(), crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::PUT,
-            format!("{}/{}", self.client.base_url, "website/form"),
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
