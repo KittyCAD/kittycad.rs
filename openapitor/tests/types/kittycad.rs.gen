@@ -3219,6 +3219,42 @@ impl tabled::Tabled for BooleanUnion {
     }
 }
 
+#[doc = "The response from the 'BoundingBox'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BoundingBox {
+    #[doc = "Center of the box."]
+    pub center: Point3D,
+    #[doc = "Dimensions of the box along each axis."]
+    pub dimensions: Point3D,
+}
+
+impl std::fmt::Display for BoundingBox {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BoundingBox {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.center).into(),
+            format!("{:?}", self.dimensions).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["center".into(), "dimensions".into()]
+    }
+}
+
 #[doc = "Strict acquisition-source enum used by the website CAD user info form."]
 #[derive(
     serde :: Serialize,
@@ -3971,6 +4007,42 @@ impl tabled::Tabled for ClosePath {
     }
 }
 
+#[doc = "The response from the 'ClosestEdge'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ClosestEdge {
+    #[doc = "The ID of the edge closest to the point given in the request. If there are no edges in the scene, returns None."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edge_id: Option<uuid::Uuid>,
+}
+
+impl std::fmt::Display for ClosestEdge {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ClosestEdge {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![if let Some(edge_id) = &self.edge_id {
+            format!("{:?}", edge_id).into()
+        } else {
+            String::new().into()
+        }]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["edge_id".into()]
+    }
+}
+
 #[doc = "The language code is written in.\n\n<details><summary>JSON schema</summary>\n\n```json { \"description\": \"The language code is written in.\", \"oneOf\": [ { \"description\": \"The `go` programming language.\", \"type\": \"string\", \"enum\": [ \"go\" ] }, { \"description\": \"The `python` programming language.\", \"type\": \"string\", \"enum\": [ \"python\" ] }, { \"description\": \"The `node` programming language.\", \"type\": \"string\", \"enum\": [ \"node\" ] } ] } ``` </details>"]
 #[derive(
     serde :: Serialize,
@@ -4650,6 +4722,34 @@ impl std::fmt::Display for CreateRegion {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CreateRegion {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the 'CreateRegionFromQueryPoint'. The region should have an ID taken from the ID of the 'CreateRegionFromQueryPoint' modeling command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CreateRegionFromQueryPoint {}
+
+impl std::fmt::Display for CreateRegionFromQueryPoint {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CreateRegionFromQueryPoint {
     const LENGTH: usize = 0;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
@@ -12965,13 +13065,19 @@ pub enum ModelingCmd {
     #[doc = "Create a new non-manifold body by intersecting all the input bodies, cutting and splitting all the faces at the intersection boundaries."]
     #[serde(rename = "boolean_imprint")]
     BooleanImprint {
-        #[doc = "Which input bodies to intersect.  Inputs with non-solid body types are permitted"]
+        #[doc = "Which target input bodies to intersect. Inputs with non-solid body types are permitted"]
         body_ids: Vec<uuid::Uuid>,
-        #[doc = "If true, bodies will be separated into multiple objects at their intersection boundaries."]
+        #[doc = "If true, the provided tool bodies will not be modified"]
+        #[serde(default)]
+        keep_tools: bool,
+        #[doc = "If true, target bodies will be separated into multiple objects at their intersection boundaries."]
         #[serde(default)]
         separate_bodies: bool,
         #[doc = "The maximum acceptable surface gap between the intersected bodies. Must be positive (i.e. greater than zero)."]
         tolerance: f64,
+        #[doc = "If provided, only these bodies will be used to intersect with the target bodies in body_ids, Otherwise, all bodies in body_ids will be intersected with themselves."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        tool_ids: Option<Vec<uuid::Uuid>>,
     },
     #[doc = "Make a new path by offsetting an object by a given distance. The new path's ID will be the ID of this command."]
     #[serde(rename = "make_offset_path")]
@@ -13034,11 +13140,50 @@ pub enum ModelingCmd {
         #[doc = "First segment to follow to find the region."]
         segment: uuid::Uuid,
     },
+    #[doc = "Create a region with a query point. The region should have an ID taken from the ID of the 'CreateRegionFromQueryPoint' modeling command."]
+    #[serde(rename = "create_region_from_query_point")]
+    CreateRegionFromQueryPoint {
+        #[doc = "Which sketch object to create the region from."]
+        object_id: uuid::Uuid,
+        #[doc = "The query point (in the same coordinates as the sketch itself) if a possible sketch region contains this point, then that region will be created"]
+        query_point: Point2D,
+    },
+    #[doc = "Finds a suitable point inside the region for calling such that CreateRegionFromQueryPoint will generate an identical region."]
+    #[serde(rename = "region_get_query_point")]
+    RegionGetQueryPoint {
+        #[doc = "Which region to search within"]
+        region_id: uuid::Uuid,
+    },
     #[doc = "The user clicked on a point in the window, returns the region the user clicked on, if any."]
     #[serde(rename = "select_region_from_point")]
     SelectRegionFromPoint {
         #[doc = "Where in the window was selected"]
         selected_at_window: Point2D,
+    },
+    #[doc = "Get the smallest box that could contain the given parts."]
+    #[serde(rename = "bounding_box")]
+    BoundingBox {
+        #[doc = "IDs of the entities to be included in the box. If this is empty, then all entities are included (the entire scene)."]
+        entity_ids: Vec<uuid::Uuid>,
+    },
+    #[doc = "Offset a surface by a given distance."]
+    #[serde(rename = "offset_surface")]
+    OffsetSurface {
+        #[doc = "The distance to offset the surface by."]
+        distance: f64,
+        #[doc = "Flip the newly created face."]
+        flip: bool,
+        #[doc = "The surface to offset."]
+        surface_id: uuid::Uuid,
+    },
+    #[doc = "Returns the closest edge to this point."]
+    #[serde(rename = "closest_edge")]
+    ClosestEdge {
+        #[doc = "Find the edge closest to this point. Assumed to be in absolute coordinates, relative to global (scene) origin."]
+        closest_to: Point3D,
+        #[doc = "The body whose edges are being queried. If not given, will search all bodies in the scene."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        object_id: Option<uuid::Uuid>,
     },
 }
 
@@ -13397,6 +13542,34 @@ impl std::fmt::Display for ObjectVisible {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ObjectVisible {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the 'OffsetSurface'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OffsetSurface {}
+
+impl std::fmt::Display for OffsetSurface {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OffsetSurface {
     const LENGTH: usize = 0;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
@@ -14187,10 +14360,35 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the 'CreateRegion'. The region should have an ID taken from the ID of the 'CreateRegion' modeling command."]
         data: CreateRegion,
     },
+    #[serde(rename = "create_region_from_query_point")]
+    CreateRegionFromQueryPoint {
+        #[doc = "The response from the 'CreateRegionFromQueryPoint'. The region should have an ID taken from the ID of the 'CreateRegionFromQueryPoint' modeling command."]
+        data: CreateRegionFromQueryPoint,
+    },
+    #[serde(rename = "region_get_query_point")]
+    RegionGetQueryPoint {
+        #[doc = "The response from 'RegionGetQueryPoint' modeling command."]
+        data: RegionGetQueryPoint,
+    },
     #[serde(rename = "select_region_from_point")]
     SelectRegionFromPoint {
         #[doc = "The response from the 'SelectRegionFromPoint'. If there are multiple ways to construct this region, this chooses arbitrarily."]
         data: SelectRegionFromPoint,
+    },
+    #[serde(rename = "bounding_box")]
+    BoundingBox {
+        #[doc = "The response from the 'BoundingBox'."]
+        data: BoundingBox,
+    },
+    #[serde(rename = "offset_surface")]
+    OffsetSurface {
+        #[doc = "The response from the 'OffsetSurface'."]
+        data: OffsetSurface,
+    },
+    #[serde(rename = "closest_edge")]
+    ClosestEdge {
+        #[doc = "The response from the 'ClosestEdge'."]
+        data: ClosestEdge,
     },
 }
 
@@ -17268,6 +17466,37 @@ impl tabled::Tabled for ReconfigureStream {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
+    }
+}
+
+#[doc = "The response from 'RegionGetQueryPoint' modeling command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct RegionGetQueryPoint {
+    #[doc = "A point that is inside of the queried region, in the same coordinate frame as the sketch itself"]
+    pub query_point: Point2D,
+}
+
+impl std::fmt::Display for RegionGetQueryPoint {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for RegionGetQueryPoint {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.query_point).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["query_point".into()]
     }
 }
 
