@@ -30825,11 +30825,6 @@
             "description": "The user's GitHub handle.",
             "type": "string"
           },
-          "hubspot_contact_id": {
-            "nullable": true,
-            "description": "The user's Hubspot ID. This is mostly used for internal mapping.",
-            "type": "string"
-          },
           "id": {
             "description": "The unique identifier for the user.",
             "allOf": [
@@ -50157,11 +50152,6 @@
                 "$ref": "#/components/schemas/UserCadInfoAdminDetails"
               }
             ]
-          },
-          "hubspot_contact_url": {
-            "nullable": true,
-            "description": "Direct or search link to the HubSpot contact record.",
-            "type": "string"
           },
           "payment_methods": {
             "description": "Known payment methods on file.",
