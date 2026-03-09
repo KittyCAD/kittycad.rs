@@ -7387,9 +7387,6 @@ pub struct ExtendedUser {
     #[doc = "The user's GitHub handle."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub github: Option<String>,
-    #[doc = "The user's Hubspot ID. This is mostly used for internal mapping."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub hubspot_contact_id: Option<String>,
     #[doc = "The unique identifier for the user."]
     pub id: uuid::Uuid,
     #[doc = "The image avatar for the user. This is a URL."]
@@ -7428,7 +7425,7 @@ impl std::fmt::Display for ExtendedUser {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ExtendedUser {
-    const LENGTH: usize = 20;
+    const LENGTH: usize = 19;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(block) = &self.block {
@@ -7469,11 +7466,6 @@ impl tabled::Tabled for ExtendedUser {
             } else {
                 String::new().into()
             },
-            if let Some(hubspot_contact_id) = &self.hubspot_contact_id {
-                format!("{:?}", hubspot_contact_id).into()
-            } else {
-                String::new().into()
-            },
             format!("{:?}", self.id).into(),
             self.image.clone().into(),
             format!("{:?}", self.is_onboarded).into(),
@@ -7510,7 +7502,6 @@ impl tabled::Tabled for ExtendedUser {
             "email_verified".into(),
             "first_name".into(),
             "github".into(),
-            "hubspot_contact_id".into(),
             "id".into(),
             "image".into(),
             "is_onboarded".into(),
@@ -23873,9 +23864,6 @@ pub struct UserAdminDetails {
     #[doc = "CAD user info collected from website onboarding/CRM form."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cad_user_info: Option<UserCadInfoAdminDetails>,
-    #[doc = "Direct or search link to the HubSpot contact record."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub hubspot_contact_url: Option<String>,
     #[doc = "Known payment methods on file."]
     pub payment_methods: Vec<PaymentMethod>,
     #[doc = "Summaries of the known payment methods."]
@@ -23900,7 +23888,7 @@ impl std::fmt::Display for UserAdminDetails {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UserAdminDetails {
-    const LENGTH: usize = 13;
+    const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.active_api_tokens_count).into(),
@@ -23931,11 +23919,6 @@ impl tabled::Tabled for UserAdminDetails {
             } else {
                 String::new().into()
             },
-            if let Some(hubspot_contact_url) = &self.hubspot_contact_url {
-                format!("{:?}", hubspot_contact_url).into()
-            } else {
-                String::new().into()
-            },
             format!("{:?}", self.payment_methods).into(),
             format!("{:?}", self.payment_methods_summary).into(),
             if let Some(stripe_customer_id) = &self.stripe_customer_id {
@@ -23961,7 +23944,6 @@ impl tabled::Tabled for UserAdminDetails {
             "block".into(),
             "block_message".into(),
             "cad_user_info".into(),
-            "hubspot_contact_url".into(),
             "payment_methods".into(),
             "payment_methods_summary".into(),
             "stripe_customer_id".into(),
