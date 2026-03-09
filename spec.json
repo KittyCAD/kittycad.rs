@@ -28267,6 +28267,32 @@
           }
         }
       },
+      "BoundingBox": {
+        "description": "The response from the 'BoundingBox'.",
+        "type": "object",
+        "properties": {
+          "center": {
+            "description": "Center of the box.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          },
+          "dimensions": {
+            "description": "Dimensions of the box along each axis.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          }
+        },
+        "required": [
+          "center",
+          "dimensions"
+        ]
+      },
       "CadDiscoverySource": {
         "description": "Strict acquisition-source enum used by the website CAD user info form.",
         "oneOf": [
@@ -28830,6 +28856,18 @@
           "face_id"
         ]
       },
+      "ClosestEdge": {
+        "description": "The response from the 'ClosestEdge'.",
+        "type": "object",
+        "properties": {
+          "edge_id": {
+            "nullable": true,
+            "description": "The ID of the edge closest to the point given in the request. If there are no edges in the scene, returns None.",
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "CodeLanguage": {
         "description": "The language code is written in.\n\n<details><summary>JSON schema</summary>\n\n```json { \"description\": \"The language code is written in.\", \"oneOf\": [ { \"description\": \"The `go` programming language.\", \"type\": \"string\", \"enum\": [ \"go\" ] }, { \"description\": \"The `python` programming language.\", \"type\": \"string\", \"enum\": [ \"python\" ] }, { \"description\": \"The `node` programming language.\", \"type\": \"string\", \"enum\": [ \"node\" ] } ] } ``` </details>",
         "oneOf": [
@@ -29268,6 +29306,10 @@
       },
       "CreateRegion": {
         "description": "The response from the 'CreateRegion'. The region should have an ID taken from the ID of the 'CreateRegion' modeling command.",
+        "type": "object"
+      },
+      "CreateRegionFromQueryPoint": {
+        "description": "The response from the 'CreateRegionFromQueryPoint'. The region should have an ID taken from the ID of the 'CreateRegionFromQueryPoint' modeling command.",
         "type": "object"
       },
       "CreateShortlinkRequest": {
@@ -38983,15 +39025,20 @@
             "type": "object",
             "properties": {
               "body_ids": {
-                "description": "Which input bodies to intersect.  Inputs with non-solid body types are permitted",
+                "description": "Which target input bodies to intersect. Inputs with non-solid body types are permitted",
                 "type": "array",
                 "items": {
                   "type": "string",
                   "format": "uuid"
                 }
               },
+              "keep_tools": {
+                "description": "If true, the provided tool bodies will not be modified",
+                "default": false,
+                "type": "boolean"
+              },
               "separate_bodies": {
-                "description": "If true, bodies will be separated into multiple objects at their intersection boundaries.",
+                "description": "If true, target bodies will be separated into multiple objects at their intersection boundaries.",
                 "default": false,
                 "type": "boolean"
               },
@@ -39002,6 +39049,15 @@
                     "$ref": "#/components/schemas/LengthUnit"
                   }
                 ]
+              },
+              "tool_ids": {
+                "nullable": true,
+                "description": "If provided, only these bodies will be used to intersect with the target bodies in body_ids, Otherwise, all bodies in body_ids will be intersected with themselves.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
               },
               "type": {
                 "type": "string",
@@ -39219,6 +39275,57 @@
             ]
           },
           {
+            "description": "Create a region with a query point. The region should have an ID taken from the ID of the 'CreateRegionFromQueryPoint' modeling command.",
+            "type": "object",
+            "properties": {
+              "object_id": {
+                "description": "Which sketch object to create the region from.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "query_point": {
+                "description": "The query point (in the same coordinates as the sketch itself) if a possible sketch region contains this point, then that region will be created",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point2d"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "create_region_from_query_point"
+                ]
+              }
+            },
+            "required": [
+              "object_id",
+              "query_point",
+              "type"
+            ]
+          },
+          {
+            "description": "Finds a suitable point inside the region for calling such that CreateRegionFromQueryPoint will generate an identical region.",
+            "type": "object",
+            "properties": {
+              "region_id": {
+                "description": "Which region to search within",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "region_get_query_point"
+                ]
+              }
+            },
+            "required": [
+              "region_id",
+              "type"
+            ]
+          },
+          {
             "description": "The user clicked on a point in the window, returns the region the user clicked on, if any.",
             "type": "object",
             "properties": {
@@ -39239,6 +39346,95 @@
             },
             "required": [
               "selected_at_window",
+              "type"
+            ]
+          },
+          {
+            "description": "Get the smallest box that could contain the given parts.",
+            "type": "object",
+            "properties": {
+              "entity_ids": {
+                "description": "IDs of the entities to be included in the box. If this is empty, then all entities are included (the entire scene).",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "bounding_box"
+                ]
+              }
+            },
+            "required": [
+              "entity_ids",
+              "type"
+            ]
+          },
+          {
+            "description": "Offset a surface by a given distance.",
+            "type": "object",
+            "properties": {
+              "distance": {
+                "description": "The distance to offset the surface by.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "flip": {
+                "description": "Flip the newly created face.",
+                "type": "boolean"
+              },
+              "surface_id": {
+                "description": "The surface to offset.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "offset_surface"
+                ]
+              }
+            },
+            "required": [
+              "distance",
+              "flip",
+              "surface_id",
+              "type"
+            ]
+          },
+          {
+            "description": "Returns the closest edge to this point.",
+            "type": "object",
+            "properties": {
+              "closest_to": {
+                "description": "Find the edge closest to this point. Assumed to be in absolute coordinates, relative to global (scene) origin.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Point3d"
+                  }
+                ]
+              },
+              "object_id": {
+                "nullable": true,
+                "description": "The body whose edges are being queried. If not given, will search all bodies in the scene.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "closest_edge"
+                ]
+              }
+            },
+            "required": [
+              "closest_to",
               "type"
             ]
           }
@@ -39372,6 +39568,10 @@
       },
       "ObjectVisible": {
         "description": "The response from the `ObjectVisible` endpoint.",
+        "type": "object"
+      },
+      "OffsetSurface": {
+        "description": "The response from the 'OffsetSurface'.",
         "type": "object"
       },
       "OkModelingCmdResponse": {
@@ -42168,12 +42368,102 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/CreateRegionFromQueryPoint"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "create_region_from_query_point"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/RegionGetQueryPoint"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "region_get_query_point"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/SelectRegionFromPoint"
               },
               "type": {
                 "type": "string",
                 "enum": [
                   "select_region_from_point"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/BoundingBox"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "bounding_box"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/OffsetSurface"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "offset_surface"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ClosestEdge"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "closest_edge"
                 ]
               }
             },
@@ -45129,6 +45419,23 @@
       "ReconfigureStream": {
         "description": "The response from the `ReconfigureStream` endpoint.",
         "type": "object"
+      },
+      "RegionGetQueryPoint": {
+        "description": "The response from 'RegionGetQueryPoint' modeling command.",
+        "type": "object",
+        "properties": {
+          "query_point": {
+            "description": "A point that is inside of the queried region, in the same coordinate frame as the sketch itself",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point2d"
+              }
+            ]
+          }
+        },
+        "required": [
+          "query_point"
+        ]
       },
       "RelativeTo": {
         "description": "What is the given geometry relative to?",
