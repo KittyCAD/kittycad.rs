@@ -28388,6 +28388,13 @@
             "enum": [
               "payment_method_failed"
             ]
+          },
+          {
+            "description": "The user repeatedly upgraded and downgraded to recycle free-plan credits.",
+            "type": "string",
+            "enum": [
+              "upgrade_downgrade_abuse"
+            ]
           }
         ]
       },

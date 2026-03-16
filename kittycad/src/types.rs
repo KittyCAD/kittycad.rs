@@ -3081,6 +3081,10 @@ pub enum BlockReason {
     #[serde(rename = "payment_method_failed")]
     #[display("payment_method_failed")]
     PaymentMethodFailed,
+    #[doc = "The user repeatedly upgraded and downgraded to recycle free-plan credits."]
+    #[serde(rename = "upgrade_downgrade_abuse")]
+    #[display("upgrade_downgrade_abuse")]
+    UpgradeDowngradeAbuse,
 }
 
 #[doc = "Body type determining if the operation will create a manifold (solid) body or a \
