@@ -409,6 +409,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1oauth2~1verify-account-linking/get/x-rust",
+    "value": {
+      "example": "/// Verify OAuth account linking and complete the authentication.\n/// \n/// This endpoint is called when a user clicks the verification link sent to their email after attempting to log in with OAuth when an existing account with the same email was found. This endpoint validates the token, links the OAuth account to the user, and creates a session.\n/// \n/// **Parameters:**\n/// \n/// - `callback_url: Option<String>`: Optional callback URL to redirect to after verification\n/// - `token: &'astr`: The verification token from the email (required)\nasync fn example_oauth2_verify_oauth_account_linking() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .verify_oauth_account_linking(Some(\"some-string\".to_string()), \"some-string\")\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.verify_oauth_account_linking"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1org/delete/x-rust",
     "value": {
       "example": "/// Delete an org.\n/// \n/// In order to delete an org, you must first delete all of its members, except yourself.\n/// \n/// You must also have no outstanding invoices or unpaid balances.\n/// \n/// This endpoint requires authentication by an org admin. It deletes the authenticated user's org.\nasync fn example_orgs_delete() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.orgs().delete().await?;\n    Ok(())\n}\n",

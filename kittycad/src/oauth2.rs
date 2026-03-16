@@ -313,4 +313,38 @@ impl Oauth2 {
             })
         }
     }
+
+    #[doc = "Verify OAuth account linking and complete the authentication.\n\nThis endpoint is called when a user clicks the verification link sent to their email after attempting to log in with OAuth when an existing account with the same email was found. This endpoint validates the token, links the OAuth account to the user, and creates a session.\n\n**Parameters:**\n\n- `callback_url: Option<String>`: Optional callback URL to redirect to after verification\n- `token: &'astr`: The verification token from the email (required)\n\n```rust,no_run\nasync fn example_oauth2_verify_oauth_account_linking() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .verify_oauth_account_linking(Some(\"some-string\".to_string()), \"some-string\")\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn verify_oauth_account_linking<'a>(
+        &'a self,
+        callback_url: Option<String>,
+        token: &'a str,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url, "oauth2/verify-account-linking"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![("token", token.to_string())];
+        if let Some(p) = callback_url {
+            query_params.push(("callback_url", p));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
 }
