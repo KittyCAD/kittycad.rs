@@ -625,6 +625,46 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1org~1oauth2~1apps/get/x-rust",
+    "value": {
+      "example": "/// List org OAuth apps.\n/// \n/// This endpoint requires authentication by an org member. It lists the organization's active public OAuth apps.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_oauth2_list_org_oauth_2_apps() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponseResultsPage = client\n        .oauth2()\n        .list_org_oauth_2_apps(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_oauth2_list_org_oauth_2_apps_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut oauth2 = client.oauth2();\n    let mut stream = oauth2.list_org_oauth_2_apps_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.list_org_oauth_2_apps"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1oauth2~1apps/post/x-rust",
+    "value": {
+      "example": "/// Create an org OAuth app.\n/// \n/// This endpoint requires authentication by an org admin. It creates an active public device-flow app owned by the authenticated organization.\nasync fn example_oauth2_create_org_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .create_org_oauth_2_app(&kittycad::types::CreateOAuth2AppRequest {\n            name: \"some-string\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.create_org_oauth_2_app"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1oauth2~1apps~1{client_id}/delete/x-rust",
+    "value": {
+      "example": "/// Delete an org OAuth app.\n/// \n/// This endpoint requires authentication by an org admin. It deactivates the organization's active public OAuth app.\n/// \n/// **Parameters:**\n/// \n/// - `client_id: uuid::Uuid`: The OAuth client identifier. (required)\nuse std::str::FromStr;\nasync fn example_oauth2_delete_org_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .delete_org_oauth_2_app(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.delete_org_oauth_2_app"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1oauth2~1apps~1{client_id}/get/x-rust",
+    "value": {
+      "example": "/// Get an org OAuth app.\n/// \n/// This endpoint requires authentication by an org member. It returns the organization's active public OAuth app by client ID.\n/// \n/// **Parameters:**\n/// \n/// - `client_id: uuid::Uuid`: The OAuth client identifier. (required)\nuse std::str::FromStr;\nasync fn example_oauth2_get_org_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .get_org_oauth_2_app(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.get_org_oauth_2_app"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1oauth2~1apps~1{client_id}/put/x-rust",
+    "value": {
+      "example": "/// Update an org OAuth app.\n/// \n/// This endpoint requires authentication by an org admin. It updates the name of the organization's active public OAuth app.\n/// \n/// **Parameters:**\n/// \n/// - `client_id: uuid::Uuid`: The OAuth client identifier. (required)\nuse std::str::FromStr;\nasync fn example_oauth2_update_org_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .update_org_oauth_2_app(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateOAuth2AppRequest {\n                name: \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.update_org_oauth_2_app"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1org~1payment/delete/x-rust",
     "value": {
       "example": "/// Delete payment info for your org.\n/// \n/// This includes billing address, phone, and name.\n/// \n/// This endpoint requires authentication by an org admin. It deletes the payment information for the authenticated user's org.\nasync fn example_payments_delete_information_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.payments().delete_information_for_org().await?;\n    Ok(())\n}\n",
@@ -1011,7 +1051,7 @@
     "op": "add",
     "path": "/paths/~1user/get/x-rust",
     "value": {
-      "example": "/// Get your user.\n/// \n/// Get the user information for the authenticated user.\n/// \n/// Alternatively, you can also use the `/users/me` endpoint.\nasync fn example_users_get_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client.users().get_self().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get your user.\n/// \n/// Get the user information for the authenticated user.\n/// \n/// Alternatively, you can also use the `/users/me` endpoint.\nasync fn example_users_get_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserResponse = client.users().get_self().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_self"
     }
   },
@@ -1019,7 +1059,7 @@
     "op": "add",
     "path": "/paths/~1user/put/x-rust",
     "value": {
-      "example": "/// Update your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates information about the authenticated user.\nuse std::str::FromStr;\nasync fn example_users_update_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client\n        .users()\n        .update_self(&kittycad::types::UpdateUser {\n            company: Some(\"some-string\".to_string()),\n            discord: Some(\"some-string\".to_string()),\n            first_name: Some(\"some-string\".to_string()),\n            github: Some(\"some-string\".to_string()),\n            image: \"https://example.com/foo/bar\".to_string(),\n            is_onboarded: Some(true),\n            last_name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Update your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates information about the authenticated user.\nuse std::str::FromStr;\nasync fn example_users_update_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserResponse = client\n        .users()\n        .update_self(&kittycad::types::UpdateUser {\n            company: Some(\"some-string\".to_string()),\n            discord: Some(\"some-string\".to_string()),\n            first_name: Some(\"some-string\".to_string()),\n            github: Some(\"some-string\".to_string()),\n            image: \"https://example.com/foo/bar\".to_string(),\n            is_onboarded: Some(true),\n            last_name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.update_self"
     }
   },
@@ -1117,6 +1157,46 @@
     "value": {
       "example": "/// List user-visible feature flags enabled for the authenticated user.\n/// \n/// Returns only features that are marked as safe for exposure to clients and currently resolved to `true` for the requesting user (including org overrides).\nasync fn example_users_features_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserFeatureList = client.users().features_get().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.features_get"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1oauth2~1apps/get/x-rust",
+    "value": {
+      "example": "/// List personal OAuth apps.\n/// \n/// This endpoint requires authentication by any Zoo user. It lists the authenticated user's active public OAuth apps.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_oauth2_list_user_oauth_2_apps() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponseResultsPage = client\n        .oauth2()\n        .list_user_oauth_2_apps(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_oauth2_list_user_oauth_2_apps_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut oauth2 = client.oauth2();\n    let mut stream = oauth2.list_user_oauth_2_apps_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.list_user_oauth_2_apps"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1oauth2~1apps/post/x-rust",
+    "value": {
+      "example": "/// Create a personal OAuth app.\n/// \n/// This endpoint requires authentication by any Zoo user. It creates an active public device-flow app owned by the authenticated user.\nasync fn example_oauth2_create_user_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .create_user_oauth_2_app(&kittycad::types::CreateOAuth2AppRequest {\n            name: \"some-string\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.create_user_oauth_2_app"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1oauth2~1apps~1{client_id}/delete/x-rust",
+    "value": {
+      "example": "/// Delete a personal OAuth app.\n/// \n/// This endpoint requires authentication by any Zoo user. It deactivates the authenticated user's active public OAuth app.\n/// \n/// **Parameters:**\n/// \n/// - `client_id: uuid::Uuid`: The OAuth client identifier. (required)\nuse std::str::FromStr;\nasync fn example_oauth2_delete_user_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .delete_user_oauth_2_app(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.delete_user_oauth_2_app"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1oauth2~1apps~1{client_id}/get/x-rust",
+    "value": {
+      "example": "/// Get a personal OAuth app.\n/// \n/// This endpoint requires authentication by any Zoo user. It returns the authenticated user's active public OAuth app by client ID.\n/// \n/// **Parameters:**\n/// \n/// - `client_id: uuid::Uuid`: The OAuth client identifier. (required)\nuse std::str::FromStr;\nasync fn example_oauth2_get_user_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .get_user_oauth_2_app(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.get_user_oauth_2_app"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1oauth2~1apps~1{client_id}/put/x-rust",
+    "value": {
+      "example": "/// Update a personal OAuth app.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates the name of the authenticated user's active public OAuth app.\n/// \n/// **Parameters:**\n/// \n/// - `client_id: uuid::Uuid`: The OAuth client identifier. (required)\nuse std::str::FromStr;\nasync fn example_oauth2_update_user_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .update_user_oauth_2_app(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateOAuth2AppRequest {\n                name: \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/oauth2/struct.Oauth2.html#method.update_user_oauth_2_app"
     }
   },
   {
@@ -1339,7 +1419,7 @@
     "op": "add",
     "path": "/paths/~1users/get/x-rust",
     "value": {
-      "example": "/// List users.\n/// \n/// This endpoint requires authentication by a Zoo employee. The users are returned in order of creation, with the most recently created users first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_users_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserResultsPage = client\n        .users()\n        .list(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "example": "/// List users.\n/// \n/// This endpoint requires authentication by a Zoo employee. The users are returned in order of creation, with the most recently created users first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_users_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserResponseResultsPage = client\n        .users()\n        .list(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.list"
     }
   },
@@ -1363,7 +1443,7 @@
     "op": "add",
     "path": "/paths/~1users~1{id}/get/x-rust",
     "value": {
-      "example": "/// Get a user.\n/// \n/// To get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n/// \n/// Alternatively, to get information about the authenticated user, use `/user` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The user's identifier (uuid or email). (required)\nasync fn example_users_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client.users().get(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get a user.\n/// \n/// To get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n/// \n/// Alternatively, to get information about the authenticated user, use `/user` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The user's identifier (uuid or email). (required)\nasync fn example_users_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserResponse = client.users().get(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get"
     }
   },

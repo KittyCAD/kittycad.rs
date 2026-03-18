@@ -347,4 +347,548 @@ impl Oauth2 {
             })
         }
     }
+
+    #[doc = "List org OAuth apps.\n\nThis endpoint requires authentication by an org member. It lists the organization's active public OAuth apps.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_oauth2_list_org_oauth_2_apps_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut oauth2 = client.oauth2();\n    let mut stream = oauth2.list_org_oauth_2_apps_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn list_org_oauth_2_apps<'a>(
+        &'a self,
+        limit: Option<u32>,
+        page_token: Option<String>,
+        sort_by: Option<crate::types::CreatedAtSortMode>,
+    ) -> Result<crate::types::Oauth2AppResponseResultsPage, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "org/oauth2/apps"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        if let Some(p) = sort_by {
+            query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "List org OAuth apps.\n\nThis endpoint requires authentication by an org member. It lists the organization's active public OAuth apps.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_oauth2_list_org_oauth_2_apps_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut oauth2 = client.oauth2();\n    let mut stream = oauth2.list_org_oauth_2_apps_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    #[cfg(not(feature = "js"))]
+    pub fn list_org_oauth_2_apps_stream<'a>(
+        &'a self,
+        limit: Option<u32>,
+        sort_by: Option<crate::types::CreatedAtSortMode>,
+    ) -> impl futures::Stream<
+        Item = Result<crate::types::Oauth2AppResponse, crate::types::error::Error>,
+    > + Unpin
+           + '_ {
+        use futures::{StreamExt, TryFutureExt, TryStreamExt};
+
+        use crate::types::paginate::Pagination;
+        self.list_org_oauth_2_apps(limit, None, sort_by)
+            .map_ok(move |result| {
+                let items = futures::stream::iter(result.items().into_iter().map(Ok));
+                let next_pages = futures::stream::try_unfold(
+                    (None, result),
+                    move |(prev_page_token, new_result)| async move {
+                        if new_result.has_more_pages()
+                            && !new_result.items().is_empty()
+                            && prev_page_token != new_result.next_page_token()
+                        {
+                            async {
+                                let mut req = self.client.client.request(
+                                    http::Method::GET,
+                                    format!("{}/{}", self.client.base_url, "org/oauth2/apps"),
+                                );
+                                req = req.bearer_auth(&self.client.token);
+                                let mut request = req.build()?;
+                                request = new_result.next_page(request)?;
+                                let resp = self.client.client.execute(request).await?;
+                                let status = resp.status();
+                                if status.is_success() {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    serde_json::from_str(&text).map_err(|err| {
+                                        crate::types::error::Error::from_serde_error(
+                                            format_serde_error::SerdeError::new(
+                                                text.to_string(),
+                                                err,
+                                            ),
+                                            status,
+                                        )
+                                    })
+                                } else {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    Err(crate::types::error::Error::Server {
+                                        body: text.to_string(),
+                                        status,
+                                    })
+                                }
+                            }
+                            .map_ok(|result: crate::types::Oauth2AppResponseResultsPage| {
+                                Some((
+                                    futures::stream::iter(result.items().into_iter().map(Ok)),
+                                    (new_result.next_page_token(), result),
+                                ))
+                            })
+                            .await
+                        } else {
+                            Ok(None)
+                        }
+                    },
+                )
+                .try_flatten();
+                items.chain(next_pages)
+            })
+            .try_flatten_stream()
+            .boxed()
+    }
+
+    #[doc = "Create an org OAuth app.\n\nThis endpoint requires authentication by an org admin. It \
+             creates an active public device-flow app owned by the authenticated \
+             organization.\n\n```rust,no_run\nasync fn example_oauth2_create_org_oauth_2_app() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        \
+             .create_org_oauth_2_app(&kittycad::types::CreateOAuth2AppRequest {\n            name: \
+             \"some-string\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", \
+             result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn create_org_oauth_2_app<'a>(
+        &'a self,
+        body: &crate::types::CreateOAuth2AppRequest,
+    ) -> Result<crate::types::Oauth2AppResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!("{}/{}", self.client.base_url, "org/oauth2/apps"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Get an org OAuth app.\n\nThis endpoint requires authentication by an org member. It returns the organization's active public OAuth app by client ID.\n\n**Parameters:**\n\n- `client_id: uuid::Uuid`: The OAuth client identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_get_org_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .get_org_oauth_2_app(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_org_oauth_2_app<'a>(
+        &'a self,
+        client_id: uuid::Uuid,
+    ) -> Result<crate::types::Oauth2AppResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "org/oauth2/apps/{client_id}".replace("{client_id}", &format!("{}", client_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Update an org OAuth app.\n\nThis endpoint requires authentication by an org admin. It \
+             updates the name of the organization's active public OAuth \
+             app.\n\n**Parameters:**\n\n- `client_id: uuid::Uuid`: The OAuth client identifier. \
+             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_oauth2_update_org_oauth_2_app() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse \
+             = client\n        .oauth2()\n        .update_org_oauth_2_app(\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             &kittycad::types::UpdateOAuth2AppRequest {\n                name: \
+             \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn update_org_oauth_2_app<'a>(
+        &'a self,
+        client_id: uuid::Uuid,
+        body: &crate::types::UpdateOAuth2AppRequest,
+    ) -> Result<crate::types::Oauth2AppResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "org/oauth2/apps/{client_id}".replace("{client_id}", &format!("{}", client_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Delete an org OAuth app.\n\nThis endpoint requires authentication by an org admin. It \
+             deactivates the organization's active public OAuth app.\n\n**Parameters:**\n\n- \
+             `client_id: uuid::Uuid`: The OAuth client identifier. \
+             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_oauth2_delete_org_oauth_2_app() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        \
+             .delete_org_oauth_2_app(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn delete_org_oauth_2_app<'a>(
+        &'a self,
+        client_id: uuid::Uuid,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::DELETE,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "org/oauth2/apps/{client_id}".replace("{client_id}", &format!("{}", client_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "List personal OAuth apps.\n\nThis endpoint requires authentication by any Zoo user. It lists the authenticated user's active public OAuth apps.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_oauth2_list_user_oauth_2_apps_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut oauth2 = client.oauth2();\n    let mut stream = oauth2.list_user_oauth_2_apps_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn list_user_oauth_2_apps<'a>(
+        &'a self,
+        limit: Option<u32>,
+        page_token: Option<String>,
+        sort_by: Option<crate::types::CreatedAtSortMode>,
+    ) -> Result<crate::types::Oauth2AppResponseResultsPage, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "user/oauth2/apps"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        if let Some(p) = sort_by {
+            query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "List personal OAuth apps.\n\nThis endpoint requires authentication by any Zoo user. It lists the authenticated user's active public OAuth apps.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_oauth2_list_user_oauth_2_apps_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut oauth2 = client.oauth2();\n    let mut stream = oauth2.list_user_oauth_2_apps_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    #[cfg(not(feature = "js"))]
+    pub fn list_user_oauth_2_apps_stream<'a>(
+        &'a self,
+        limit: Option<u32>,
+        sort_by: Option<crate::types::CreatedAtSortMode>,
+    ) -> impl futures::Stream<
+        Item = Result<crate::types::Oauth2AppResponse, crate::types::error::Error>,
+    > + Unpin
+           + '_ {
+        use futures::{StreamExt, TryFutureExt, TryStreamExt};
+
+        use crate::types::paginate::Pagination;
+        self.list_user_oauth_2_apps(limit, None, sort_by)
+            .map_ok(move |result| {
+                let items = futures::stream::iter(result.items().into_iter().map(Ok));
+                let next_pages = futures::stream::try_unfold(
+                    (None, result),
+                    move |(prev_page_token, new_result)| async move {
+                        if new_result.has_more_pages()
+                            && !new_result.items().is_empty()
+                            && prev_page_token != new_result.next_page_token()
+                        {
+                            async {
+                                let mut req = self.client.client.request(
+                                    http::Method::GET,
+                                    format!("{}/{}", self.client.base_url, "user/oauth2/apps"),
+                                );
+                                req = req.bearer_auth(&self.client.token);
+                                let mut request = req.build()?;
+                                request = new_result.next_page(request)?;
+                                let resp = self.client.client.execute(request).await?;
+                                let status = resp.status();
+                                if status.is_success() {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    serde_json::from_str(&text).map_err(|err| {
+                                        crate::types::error::Error::from_serde_error(
+                                            format_serde_error::SerdeError::new(
+                                                text.to_string(),
+                                                err,
+                                            ),
+                                            status,
+                                        )
+                                    })
+                                } else {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    Err(crate::types::error::Error::Server {
+                                        body: text.to_string(),
+                                        status,
+                                    })
+                                }
+                            }
+                            .map_ok(|result: crate::types::Oauth2AppResponseResultsPage| {
+                                Some((
+                                    futures::stream::iter(result.items().into_iter().map(Ok)),
+                                    (new_result.next_page_token(), result),
+                                ))
+                            })
+                            .await
+                        } else {
+                            Ok(None)
+                        }
+                    },
+                )
+                .try_flatten();
+                items.chain(next_pages)
+            })
+            .try_flatten_stream()
+            .boxed()
+    }
+
+    #[doc = "Create a personal OAuth app.\n\nThis endpoint requires authentication by any Zoo \
+             user. It creates an active public device-flow app owned by the authenticated \
+             user.\n\n```rust,no_run\nasync fn example_oauth2_create_user_oauth_2_app() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        \
+             .create_user_oauth_2_app(&kittycad::types::CreateOAuth2AppRequest {\n            \
+             name: \"some-string\".to_string(),\n        })\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn create_user_oauth_2_app<'a>(
+        &'a self,
+        body: &crate::types::CreateOAuth2AppRequest,
+    ) -> Result<crate::types::Oauth2AppResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!("{}/{}", self.client.base_url, "user/oauth2/apps"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Get a personal OAuth app.\n\nThis endpoint requires authentication by any Zoo user. It returns the authenticated user's active public OAuth app by client ID.\n\n**Parameters:**\n\n- `client_id: uuid::Uuid`: The OAuth client identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_get_user_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .get_user_oauth_2_app(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_user_oauth_2_app<'a>(
+        &'a self,
+        client_id: uuid::Uuid,
+    ) -> Result<crate::types::Oauth2AppResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/oauth2/apps/{client_id}".replace("{client_id}", &format!("{}", client_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Update a personal OAuth app.\n\nThis endpoint requires authentication by any Zoo \
+             user. It updates the name of the authenticated user's active public OAuth \
+             app.\n\n**Parameters:**\n\n- `client_id: uuid::Uuid`: The OAuth client identifier. \
+             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_oauth2_update_user_oauth_2_app() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse \
+             = client\n        .oauth2()\n        .update_user_oauth_2_app(\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             &kittycad::types::UpdateOAuth2AppRequest {\n                name: \
+             \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn update_user_oauth_2_app<'a>(
+        &'a self,
+        client_id: uuid::Uuid,
+        body: &crate::types::UpdateOAuth2AppRequest,
+    ) -> Result<crate::types::Oauth2AppResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/oauth2/apps/{client_id}".replace("{client_id}", &format!("{}", client_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Delete a personal OAuth app.\n\nThis endpoint requires authentication by any Zoo \
+             user. It deactivates the authenticated user's active public OAuth \
+             app.\n\n**Parameters:**\n\n- `client_id: uuid::Uuid`: The OAuth client identifier. \
+             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_oauth2_delete_user_oauth_2_app() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        \
+             .delete_user_oauth_2_app(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn delete_user_oauth_2_app<'a>(
+        &'a self,
+        client_id: uuid::Uuid,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::DELETE,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/oauth2/apps/{client_id}".replace("{client_id}", &format!("{}", client_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
 }
