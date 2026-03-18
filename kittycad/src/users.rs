@@ -16,10 +16,12 @@ impl Users {
              user.\n\nAlternatively, you can also use the `/users/me` \
              endpoint.\n\n```rust,no_run\nasync fn example_users_get_self() -> anyhow::Result<()> \
              {\n    let client = kittycad::Client::new_from_env();\n    let result: \
-             kittycad::types::User = client.users().get_self().await?;\n    println!(\"{:?}\", \
-             result);\n    Ok(())\n}\n```"]
+             kittycad::types::UserResponse = client.users().get_self().await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
-    pub async fn get_self<'a>(&'a self) -> Result<crate::types::User, crate::types::error::Error> {
+    pub async fn get_self<'a>(
+        &'a self,
+    ) -> Result<crate::types::UserResponse, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!("{}/{}", self.client.base_url, "user"),
@@ -44,12 +46,12 @@ impl Users {
         }
     }
 
-    #[doc = "Update your user.\n\nThis endpoint requires authentication by any Zoo user. It updates information about the authenticated user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_users_update_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::User = client\n        .users()\n        .update_self(&kittycad::types::UpdateUser {\n            company: Some(\"some-string\".to_string()),\n            discord: Some(\"some-string\".to_string()),\n            first_name: Some(\"some-string\".to_string()),\n            github: Some(\"some-string\".to_string()),\n            image: \"https://example.com/foo/bar\".to_string(),\n            is_onboarded: Some(true),\n            last_name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update your user.\n\nThis endpoint requires authentication by any Zoo user. It updates information about the authenticated user.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_users_update_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserResponse = client\n        .users()\n        .update_self(&kittycad::types::UpdateUser {\n            company: Some(\"some-string\".to_string()),\n            discord: Some(\"some-string\".to_string()),\n            first_name: Some(\"some-string\".to_string()),\n            github: Some(\"some-string\".to_string()),\n            image: \"https://example.com/foo/bar\".to_string(),\n            is_onboarded: Some(true),\n            last_name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_self<'a>(
         &'a self,
         body: &crate::types::UpdateUser,
-    ) -> Result<crate::types::User, crate::types::error::Error> {
+    ) -> Result<crate::types::UserResponse, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::PUT,
             format!("{}/{}", self.client.base_url, "user"),
@@ -650,7 +652,7 @@ impl Users {
         limit: Option<u32>,
         page_token: Option<String>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::UserResultsPage, crate::types::error::Error> {
+    ) -> Result<crate::types::UserResponseResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!("{}/{}", self.client.base_url, "users"),
@@ -696,8 +698,9 @@ impl Users {
         &'a self,
         limit: Option<u32>,
         sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> impl futures::Stream<Item = Result<crate::types::User, crate::types::error::Error>> + Unpin + '_
-    {
+    ) -> impl futures::Stream<Item = Result<crate::types::UserResponse, crate::types::error::Error>>
+           + Unpin
+           + '_ {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
@@ -740,7 +743,7 @@ impl Users {
                                     })
                                 }
                             }
-                            .map_ok(|result: crate::types::UserResultsPage| {
+                            .map_ok(|result: crate::types::UserResponseResultsPage| {
                                 Some((
                                     futures::stream::iter(result.items().into_iter().map(Ok)),
                                     (new_result.next_page_token(), result),
@@ -918,19 +921,12 @@ impl Users {
         }
     }
 
-    #[doc = "Get a user.\n\nTo get information about yourself, use `/users/me` as the endpoint. By \
-             doing so you will get the user information for the authenticated \
-             user.\n\nAlternatively, to get information about the authenticated user, use `/user` \
-             endpoint.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or \
-             email). (required)\n\n```rust,no_run\nasync fn example_users_get() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::User = client.users().get(\"some-string\").await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Get a user.\n\nTo get information about yourself, use `/users/me` as the endpoint. By doing so you will get the user information for the authenticated user.\n\nAlternatively, to get information about the authenticated user, use `/user` endpoint.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or email). (required)\n\n```rust,no_run\nasync fn example_users_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserResponse = client.users().get(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get<'a>(
         &'a self,
         id: &'a str,
-    ) -> Result<crate::types::User, crate::types::error::Error> {
+    ) -> Result<crate::types::UserResponse, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!(

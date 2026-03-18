@@ -4676,6 +4676,37 @@ impl tabled::Tabled for CreateCustomModel {
     }
 }
 
+#[doc = "Request body for creating a public device-flow app."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CreateOAuth2AppRequest {
+    #[doc = "The display name of the app."]
+    pub name: String,
+}
+
+impl std::fmt::Display for CreateOAuth2AppRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CreateOAuth2AppRequest {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.name.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["name".into()]
+    }
+}
+
 #[doc = "Payload for creating an org dataset."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -13382,6 +13413,200 @@ impl tabled::Tabled for NewAnnotation {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
+    }
+}
+
+#[doc = "The type of an OAuth 2.0 client."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Oauth2AppClientType {
+    #[doc = "A public client."]
+    #[serde(rename = "public")]
+    #[display("public")]
+    Public,
+    #[doc = "A confidential client."]
+    #[serde(rename = "confidential")]
+    #[display("confidential")]
+    Confidential,
+}
+
+#[doc = "An OAuth 2.0 grant type allowed for an app."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Oauth2AppGrantType {
+    #[doc = "OAuth 2.0 Device Authorization Grant."]
+    #[serde(rename = "device_code")]
+    #[display("device_code")]
+    DeviceCode,
+    #[doc = "OAuth 2.0 Authorization Code Grant."]
+    #[serde(rename = "authorization_code")]
+    #[display("authorization_code")]
+    AuthorizationCode,
+    #[doc = "OAuth 2.0 Refresh Token Grant."]
+    #[serde(rename = "refresh_token")]
+    #[display("refresh_token")]
+    RefreshToken,
+    #[doc = "OAuth 2.0 Client Credentials Grant."]
+    #[serde(rename = "client_credentials")]
+    #[display("client_credentials")]
+    ClientCredentials,
+}
+
+#[doc = "API response for a managed OAuth app."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Oauth2AppResponse {
+    #[doc = "The OAuth 2.0 client identifier."]
+    pub client_id: uuid::Uuid,
+    #[doc = "The client type."]
+    pub client_type: Oauth2AppClientType,
+    #[doc = "When the app record was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Whether this app is first-party."]
+    pub first_party: bool,
+    #[doc = "The OAuth grant types this app can use."]
+    pub grant_types: Vec<Oauth2AppGrantType>,
+    #[doc = "Whether this app is active."]
+    pub is_active: bool,
+    #[doc = "The display name of the app."]
+    pub name: String,
+    #[doc = "When the app record was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Display for Oauth2AppResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Oauth2AppResponse {
+    const LENGTH: usize = 8;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.client_id).into(),
+            format!("{:?}", self.client_type).into(),
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.first_party).into(),
+            format!("{:?}", self.grant_types).into(),
+            format!("{:?}", self.is_active).into(),
+            self.name.clone().into(),
+            format!("{:?}", self.updated_at).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "client_id".into(),
+            "client_type".into(),
+            "created_at".into(),
+            "first_party".into(),
+            "grant_types".into(),
+            "is_active".into(),
+            "name".into(),
+            "updated_at".into(),
+        ]
+    }
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Oauth2AppResponseResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<Oauth2AppResponse>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for Oauth2AppResponseResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for Oauth2AppResponseResultsPage {
+    type Item = Oauth2AppResponse;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Oauth2AppResponseResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -23601,6 +23826,37 @@ impl tabled::Tabled for UpdateMemberToOrgBody {
     }
 }
 
+#[doc = "Request body for updating a public device-flow app."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UpdateOAuth2AppRequest {
+    #[doc = "The new display name of the app."]
+    pub name: String,
+}
+
+impl std::fmt::Display for UpdateOAuth2AppRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for UpdateOAuth2AppRequest {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.name.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["name".into()]
+    }
+}
+
 #[doc = "Payload for updating an org dataset."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -23922,159 +24178,6 @@ impl tabled::Tabled for UploadOrgDatasetFilesResponse {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["queued_conversions".into(), "uploaded_files".into()]
-    }
-}
-
-#[doc = "A user."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct User {
-    #[doc = "If the user should be blocked and the reason why."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub block: Option<BlockReason>,
-    #[doc = "If we can train on the user's data. If the user is a member of an organization, the organization's setting will override this."]
-    #[serde(default)]
-    pub can_train_on_data: bool,
-    #[doc = "The user's company."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub company: Option<String>,
-    #[doc = "The date and time the user was created."]
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "If the user is scheduled for deletion."]
-    #[serde(default)]
-    pub deletion_scheduled: bool,
-    #[doc = "The user's Discord handle."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub discord: Option<String>,
-    #[doc = "The email address of the user."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-    #[doc = "The date and time the email address was verified."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub email_verified: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The user's first name."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub first_name: Option<String>,
-    #[doc = "The user's GitHub handle."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub github: Option<String>,
-    #[doc = "The unique identifier for the user."]
-    pub id: uuid::Uuid,
-    #[doc = "The image avatar for the user. This is a URL."]
-    pub image: String,
-    #[doc = "If the user has finished onboarding."]
-    #[serde(default)]
-    pub is_onboarded: bool,
-    #[doc = "If the user is tied to a service account."]
-    #[serde(default)]
-    pub is_service_account: bool,
-    #[doc = "The user's last name."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub last_name: Option<String>,
-    #[doc = "The name of the user. This is auto populated at first from the authentication provider (if there was a name). It can be updated by the user by updating their `first_name` and `last_name` fields."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
-    #[doc = "The user's phone number."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub phone: phone_number::PhoneNumber,
-    #[doc = "The date and time the user was last updated."]
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-}
-
-impl std::fmt::Display for User {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for User {
-    const LENGTH: usize = 18;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(block) = &self.block {
-                format!("{:?}", block).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.can_train_on_data).into(),
-            if let Some(company) = &self.company {
-                format!("{:?}", company).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.created_at).into(),
-            format!("{:?}", self.deletion_scheduled).into(),
-            if let Some(discord) = &self.discord {
-                format!("{:?}", discord).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(email) = &self.email {
-                format!("{:?}", email).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(email_verified) = &self.email_verified {
-                format!("{:?}", email_verified).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(first_name) = &self.first_name {
-                format!("{:?}", first_name).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(github) = &self.github {
-                format!("{:?}", github).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.id).into(),
-            self.image.clone().into(),
-            format!("{:?}", self.is_onboarded).into(),
-            format!("{:?}", self.is_service_account).into(),
-            if let Some(last_name) = &self.last_name {
-                format!("{:?}", last_name).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(name) = &self.name {
-                format!("{:?}", name).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.phone).into(),
-            format!("{:?}", self.updated_at).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "block".into(),
-            "can_train_on_data".into(),
-            "company".into(),
-            "created_at".into(),
-            "deletion_scheduled".into(),
-            "discord".into(),
-            "email".into(),
-            "email_verified".into(),
-            "first_name".into(),
-            "github".into(),
-            "id".into(),
-            "image".into(),
-            "is_onboarded".into(),
-            "is_service_account".into(),
-            "last_name".into(),
-            "name".into(),
-            "phone".into(),
-            "updated_at".into(),
-        ]
     }
 }
 
@@ -24512,19 +24615,181 @@ pub enum UserOrgRole {
     Member,
 }
 
+#[doc = "Public user payload returned by the API."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UserResponse {
+    #[doc = "If the user should be blocked and the reason why."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub block: Option<BlockReason>,
+    #[doc = "Human-friendly block reason message."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub block_message: Option<String>,
+    #[doc = "If we can train on the user's data. If the user is a member of an organization, the organization's setting will override this."]
+    #[serde(default)]
+    pub can_train_on_data: bool,
+    #[doc = "The user's company."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub company: Option<String>,
+    #[doc = "The date and time the user was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "If the user is scheduled for deletion."]
+    #[serde(default)]
+    pub deletion_scheduled: bool,
+    #[doc = "The user's Discord handle."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub discord: Option<String>,
+    #[doc = "The email address of the user."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+    #[doc = "The date and time the email address was verified."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub email_verified: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The user's first name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_name: Option<String>,
+    #[doc = "The user's GitHub handle."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub github: Option<String>,
+    #[doc = "The unique identifier for the user."]
+    pub id: uuid::Uuid,
+    #[doc = "The image avatar for the user. This is a URL."]
+    pub image: String,
+    #[doc = "If the user has finished onboarding."]
+    #[serde(default)]
+    pub is_onboarded: bool,
+    #[doc = "If the user is tied to a service account."]
+    #[serde(default)]
+    pub is_service_account: bool,
+    #[doc = "The user's last name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_name: Option<String>,
+    #[doc = "The name of the user. This is auto populated at first from the authentication provider (if there was a name). It can be updated by the user by updating their `first_name` and `last_name` fields."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[doc = "The user's phone number."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phone: phone_number::PhoneNumber,
+    #[doc = "The date and time the user was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Display for UserResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for UserResponse {
+    const LENGTH: usize = 19;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(block) = &self.block {
+                format!("{:?}", block).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(block_message) = &self.block_message {
+                format!("{:?}", block_message).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.can_train_on_data).into(),
+            if let Some(company) = &self.company {
+                format!("{:?}", company).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.deletion_scheduled).into(),
+            if let Some(discord) = &self.discord {
+                format!("{:?}", discord).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(email) = &self.email {
+                format!("{:?}", email).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(email_verified) = &self.email_verified {
+                format!("{:?}", email_verified).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(first_name) = &self.first_name {
+                format!("{:?}", first_name).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(github) = &self.github {
+                format!("{:?}", github).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.id).into(),
+            self.image.clone().into(),
+            format!("{:?}", self.is_onboarded).into(),
+            format!("{:?}", self.is_service_account).into(),
+            if let Some(last_name) = &self.last_name {
+                format!("{:?}", last_name).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(name) = &self.name {
+                format!("{:?}", name).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.phone).into(),
+            format!("{:?}", self.updated_at).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "block".into(),
+            "block_message".into(),
+            "can_train_on_data".into(),
+            "company".into(),
+            "created_at".into(),
+            "deletion_scheduled".into(),
+            "discord".into(),
+            "email".into(),
+            "email_verified".into(),
+            "first_name".into(),
+            "github".into(),
+            "id".into(),
+            "image".into(),
+            "is_onboarded".into(),
+            "is_service_account".into(),
+            "last_name".into(),
+            "name".into(),
+            "phone".into(),
+            "updated_at".into(),
+        ]
+    }
+}
+
 #[doc = "A single page of results"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct UserResultsPage {
+pub struct UserResponseResultsPage {
     #[doc = "list of items on this page of results"]
-    pub items: Vec<User>,
+    pub items: Vec<UserResponse>,
     #[doc = "token used to fetch the next page of results (if any)"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub next_page: Option<String>,
 }
 
-impl std::fmt::Display for UserResultsPage {
+impl std::fmt::Display for UserResponseResultsPage {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -24535,8 +24800,8 @@ impl std::fmt::Display for UserResultsPage {
 }
 
 #[cfg(feature = "requests")]
-impl crate::types::paginate::Pagination for UserResultsPage {
-    type Item = User;
+impl crate::types::paginate::Pagination for UserResponseResultsPage {
+    type Item = UserResponse;
     fn has_more_pages(&self) -> bool {
         self.next_page.is_some()
     }
@@ -24567,7 +24832,7 @@ impl crate::types::paginate::Pagination for UserResultsPage {
 }
 
 #[cfg(feature = "tabled")]
-impl tabled::Tabled for UserResultsPage {
+impl tabled::Tabled for UserResponseResultsPage {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
