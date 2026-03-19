@@ -36596,6 +36596,13 @@
                 "enum": [
                   "sweep"
                 ]
+              },
+              "version": {
+                "nullable": true,
+                "description": "What version of the sweeping algorithm to use. If None, or zero, the engine's default algorithm will be used",
+                "type": "integer",
+                "format": "uint8",
+                "minimum": 0
               }
             },
             "required": [
@@ -41040,6 +41047,15 @@
                   "type": "string",
                   "format": "uuid"
                 }
+              },
+              "output_unit": {
+                "description": "The output unit for the box's dimensions. Defaults to millimeters.",
+                "default": "mm",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ]
               },
               "type": {
                 "type": "string",
