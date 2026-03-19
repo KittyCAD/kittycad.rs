@@ -10582,6 +10582,135 @@
         }
       }
     },
+    "/org/datasets/{id}/search/semantic": {
+      "get": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "Run semantic search across chunked conversion outputs for a dataset.",
+        "description": "This embeds the query text with the org-dataset embedding model and returns top chunk matches ranked by cosine similarity.",
+        "operationId": "search_org_dataset_semantic",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Max number of matching chunks to return.\n\nDefaults to 10 and is capped at 100.",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "description": "Natural-language query text to embed and search.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Array_of_OrgDatasetSemanticSearchMatch",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrgDatasetSemanticSearchMatch"
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/org/datasets/{id}/stats": {
       "get": {
         "tags": [
@@ -45383,6 +45512,45 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "OrgDatasetSemanticSearchMatch": {
+        "description": "Semantic-search match returned for an org dataset chunk.",
+        "type": "object",
+        "properties": {
+          "chunk_index": {
+            "description": "Zero-based chunk ordinal in the conversion output.",
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "description": "Chunk text used for matching.",
+            "type": "string"
+          },
+          "conversion_id": {
+            "description": "Matching conversion id.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "similarity": {
+            "description": "Cosine-similarity score in roughly [-1, 1].",
+            "type": "number",
+            "format": "double"
+          },
+          "source_file_path": {
+            "description": "Source path for the conversion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chunk_index",
+          "content",
+          "conversion_id",
+          "similarity",
+          "source_file_path"
         ]
       },
       "OrgDatasetSnapshotImage": {
