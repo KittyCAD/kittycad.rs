@@ -16063,6 +16063,57 @@ impl tabled::Tabled for OrgDatasetResultsPage {
     }
 }
 
+#[doc = "Semantic-search match returned for an org dataset chunk."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrgDatasetSemanticSearchMatch {
+    #[doc = "Zero-based chunk ordinal in the conversion output."]
+    pub chunk_index: i32,
+    #[doc = "Chunk text used for matching."]
+    pub content: String,
+    #[doc = "Matching conversion id."]
+    pub conversion_id: uuid::Uuid,
+    #[doc = "Cosine-similarity score in roughly [-1, 1]."]
+    pub similarity: f64,
+    #[doc = "Source path for the conversion."]
+    pub source_file_path: String,
+}
+
+impl std::fmt::Display for OrgDatasetSemanticSearchMatch {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrgDatasetSemanticSearchMatch {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.chunk_index).into(),
+            self.content.clone().into(),
+            format!("{:?}", self.conversion_id).into(),
+            format!("{:?}", self.similarity).into(),
+            self.source_file_path.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "chunk_index".into(),
+            "content".into(),
+            "conversion_id".into(),
+            "similarity".into(),
+            "source_file_path".into(),
+        ]
+    }
+}
+
 #[doc = "Detailed response that bundles conversion metadata with the converted file contents."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,

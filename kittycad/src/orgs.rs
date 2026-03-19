@@ -788,6 +788,60 @@ impl Orgs {
         self . search_dataset_conversions (id , limit , None , q , sort_by) . map_ok (move | result | { let items = futures :: stream :: iter (result . items () . into_iter () . map (Ok)) ; let next_pages = futures :: stream :: try_unfold ((None , result) , move | (prev_page_token , new_result) | async move { if new_result . has_more_pages () && ! new_result . items () . is_empty () && prev_page_token != new_result . next_page_token () { async { let mut req = self . client . client . request (http :: Method :: GET , format ! ("{}/{}" , self . client . base_url , "org/datasets/{id}/search/conversions" . replace ("{id}" , & format ! ("{}" , id))) ,) ; req = req . bearer_auth (& self . client . token) ; let mut request = req . build () ? ; request = new_result . next_page (request) ? ; let resp = self . client . client . execute (request) . await ? ; let status = resp . status () ; if status . is_success () { let text = resp . text () . await . unwrap_or_default () ; serde_json :: from_str (& text) . map_err (| err | crate :: types :: error :: Error :: from_serde_error (format_serde_error :: SerdeError :: new (text . to_string () , err) , status)) } else { let text = resp . text () . await . unwrap_or_default () ; Err (crate :: types :: error :: Error :: Server { body : text . to_string () , status }) } } . map_ok (| result : crate :: types :: OrgDatasetFileConversionSummaryResultsPage | { Some ((futures :: stream :: iter (result . items () . into_iter () . map (Ok) ,) , (new_result . next_page_token () , result) ,)) }) . await } else { Ok (None) } }) . try_flatten () ; items . chain (next_pages) }) . try_flatten_stream () . boxed ()
     }
 
+    #[doc = "Run semantic search across chunked conversion outputs for a dataset.\n\nThis embeds \
+             the query text with the org-dataset embedding model and returns top chunk matches \
+             ranked by cosine similarity.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The \
+             identifier. (required)\n- `limit: Option<u32>`: Max number of matching chunks to \
+             return.\n\nDefaults to 10 and is capped at 100.\n- `q: &'astr`: Natural-language \
+             query text to embed and search. (required)\n\n```rust,no_run\nuse \
+             std::str::FromStr;\nasync fn example_orgs_search_dataset_semantic() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: Vec<kittycad::types::OrgDatasetSemanticSearchMatch> = client\n        \
+             .orgs()\n        .search_dataset_semantic(\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 \
+             as u32),\n            \"some-string\",\n        )\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn search_dataset_semantic<'a>(
+        &'a self,
+        id: uuid::Uuid,
+        limit: Option<u32>,
+        q: &'a str,
+    ) -> Result<Vec<crate::types::OrgDatasetSemanticSearchMatch>, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "org/datasets/{id}/search/semantic".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![("q", q.to_string())];
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Return aggregate conversion stats for a dataset owned by the caller's \
              org.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. \
              (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
