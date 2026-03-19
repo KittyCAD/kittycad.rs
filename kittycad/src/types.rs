@@ -12199,6 +12199,10 @@ pub enum ModelingCmd {
         tolerance: f64,
         #[doc = "Path along which to sweep."]
         trajectory: uuid::Uuid,
+        #[doc = "What version of the sweeping algorithm to use. If None, or zero, the engine's \
+                 default algorithm will be used"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        version: Option<u8>,
     },
     #[doc = "Command for revolving a solid 2d."]
     #[serde(rename = "revolve")]
@@ -13576,6 +13580,9 @@ pub enum ModelingCmd {
         #[doc = "IDs of the entities to be included in the box. If this is empty, then all \
                  entities are included (the entire scene)."]
         entity_ids: Vec<uuid::Uuid>,
+        #[doc = "The output unit for the box's dimensions. Defaults to millimeters."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        output_unit: Option<UnitLength>,
     },
     #[doc = "Offset a surface by a given distance."]
     #[serde(rename = "offset_surface")]
