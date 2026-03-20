@@ -11031,6 +11031,9 @@ pub enum Method {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum MlCopilotClientMessage {
+    #[doc = "The client-to-server Ping to ensure the copilot protocol stays alive."]
+    #[serde(rename = "ping")]
+    Ping {},
     #[doc = "Authentication header request."]
     #[serde(rename = "headers")]
     Headers {
@@ -11178,6 +11181,9 @@ pub enum MlCopilotMode {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub enum MlCopilotServerMessage {
+    #[doc = "Pong response to a Ping message."]
+    #[serde(rename = "pong")]
+    Pong {},
     #[doc = "Session metadata sent by the server right after authentication.\n\nSemantics: - This \
              message is NOT persisted in the database and will NEVER appear in a subsequent \
              `Replay` message. However, we do have the `api_call_id` in the database. - Timing: \

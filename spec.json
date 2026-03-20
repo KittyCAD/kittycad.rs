@@ -35139,6 +35139,21 @@
         "description": "The types of messages that can be sent by the client to the server.",
         "oneOf": [
           {
+            "description": "The client-to-server Ping to ensure the copilot protocol stays alive.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ping"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
             "description": "Authentication header request.",
             "type": "object",
             "properties": {
@@ -35340,6 +35355,19 @@
       "MlCopilotServerMessage": {
         "description": "The types of messages that can be sent by the server to the client.",
         "oneOf": [
+          {
+            "description": "Pong response to a Ping message.",
+            "type": "object",
+            "properties": {
+              "pong": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "pong"
+            ],
+            "additionalProperties": false
+          },
           {
             "description": "Session metadata sent by the server right after authentication.\n\nSemantics: - This message is NOT persisted in the database and will NEVER appear in a subsequent `Replay` message. However, we do have the `api_call_id` in the database. - Timing: sent immediately after a client is authenticated on a websocket. Useful for correlating logs and traces.",
             "type": "object",
