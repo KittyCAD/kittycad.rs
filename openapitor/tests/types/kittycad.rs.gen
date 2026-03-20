@@ -9607,6 +9607,9 @@ pub struct Invoice {
     #[doc = "The amount, in USD, that was paid."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub amount_paid: Option<f64>,
+    #[doc = "Total amount refunded across all captured charges linked to this invoice."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub amount_refunded: Option<f64>,
     #[doc = "The amount remaining, in USD, that is due."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub amount_remaining: Option<f64>,
@@ -9663,6 +9666,9 @@ pub struct Invoice {
     #[doc = "This is the transaction number that appears on email receipts sent for this invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub receipt_number: Option<String>,
+    #[doc = "Refund summary for the invoice's payments, when any refunds have posted."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub refund_status: Option<InvoiceRefundStatus>,
     #[doc = "Extra information about an invoice for the customer's credit card statement."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub statement_descriptor: Option<String>,
@@ -9698,7 +9704,7 @@ impl std::fmt::Display for Invoice {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Invoice {
-    const LENGTH: usize = 28;
+    const LENGTH: usize = 30;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(amount_due) = &self.amount_due {
@@ -9708,6 +9714,11 @@ impl tabled::Tabled for Invoice {
             },
             if let Some(amount_paid) = &self.amount_paid {
                 format!("{:?}", amount_paid).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(amount_refunded) = &self.amount_refunded {
+                format!("{:?}", amount_refunded).into()
             } else {
                 String::new().into()
             },
@@ -9794,6 +9805,11 @@ impl tabled::Tabled for Invoice {
             } else {
                 String::new().into()
             },
+            if let Some(refund_status) = &self.refund_status {
+                format!("{:?}", refund_status).into()
+            } else {
+                String::new().into()
+            },
             if let Some(statement_descriptor) = &self.statement_descriptor {
                 format!("{:?}", statement_descriptor).into()
             } else {
@@ -9836,6 +9852,7 @@ impl tabled::Tabled for Invoice {
         vec![
             "amount_due".into(),
             "amount_paid".into(),
+            "amount_refunded".into(),
             "amount_remaining".into(),
             "attempt_count".into(),
             "attempted".into(),
@@ -9855,6 +9872,7 @@ impl tabled::Tabled for Invoice {
             "paid".into(),
             "pdf".into(),
             "receipt_number".into(),
+            "refund_status".into(),
             "statement_descriptor".into(),
             "status".into(),
             "subscription_id".into(),
@@ -9949,6 +9967,31 @@ impl tabled::Tabled for InvoiceLineItem {
             "metadata".into(),
         ]
     }
+}
+
+#[doc = "Summary of the refund state for an invoice's captured payments."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum InvoiceRefundStatus {
+    #[doc = "Some, but not all, captured funds tied to the invoice were refunded."]
+    #[serde(rename = "partially_refunded")]
+    #[display("partially_refunded")]
+    PartiallyRefunded,
+    #[doc = "All captured funds tied to the invoice were refunded."]
+    #[serde(rename = "refunded")]
+    #[display("refunded")]
+    Refunded,
 }
 
 #[doc = "An enum representing the possible values of an `Invoice`'s `status` field."]
