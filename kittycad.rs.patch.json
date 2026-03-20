@@ -569,6 +569,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1org~1datasets~1{id}~1search~1semantic/get/x-rust",
+    "value": {
+      "example": "/// Run semantic search across chunked conversion outputs for a dataset.\n/// \n/// This embeds the query text with the org-dataset embedding model and returns top chunk matches ranked by cosine similarity.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\n/// - `limit: Option<u32>`: Max number of matching chunks to return.\n/// \n/// Defaults to 10 and is capped at 100.\n/// - `q: &'astr`: Natural-language query text to embed and search. (required)\nuse std::str::FromStr;\nasync fn example_orgs_search_dataset_semantic() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::OrgDatasetSemanticSearchMatch> = client\n        .orgs()\n        .search_dataset_semantic(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as u32),\n            \"some-string\",\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.search_dataset_semantic"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1org~1datasets~1{id}~1stats/get/x-rust",
     "value": {
       "example": "/// Return aggregate conversion stats for a dataset owned by the caller's org.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_orgs_get_dataset_conversion_stats() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetConversionStatsResponse = client\n        .orgs()\n        .get_dataset_conversion_stats(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
