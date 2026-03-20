@@ -34438,6 +34438,13 @@
             "type": "number",
             "format": "money-usd"
           },
+          "amount_refunded": {
+            "title": "double",
+            "description": "Total amount refunded across all captured charges linked to this invoice.",
+            "default": 0.0,
+            "type": "number",
+            "format": "money-usd"
+          },
           "amount_remaining": {
             "title": "double",
             "description": "The amount remaining, in USD, that is due.",
@@ -34543,6 +34550,15 @@
             "description": "This is the transaction number that appears on email receipts sent for this invoice.",
             "type": "string"
           },
+          "refund_status": {
+            "nullable": true,
+            "description": "Refund summary for the invoice's payments, when any refunds have posted.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceRefundStatus"
+              }
+            ]
+          },
           "statement_descriptor": {
             "description": "Extra information about an invoice for the customer's credit card statement.",
             "type": "string"
@@ -34634,6 +34650,25 @@
             }
           }
         }
+      },
+      "InvoiceRefundStatus": {
+        "description": "Summary of the refund state for an invoice's captured payments.",
+        "oneOf": [
+          {
+            "description": "Some, but not all, captured funds tied to the invoice were refunded.",
+            "type": "string",
+            "enum": [
+              "partially_refunded"
+            ]
+          },
+          {
+            "description": "All captured funds tied to the invoice were refunded.",
+            "type": "string",
+            "enum": [
+              "refunded"
+            ]
+          }
+        ]
       },
       "InvoiceStatus": {
         "description": "An enum representing the possible values of an `Invoice`'s `status` field.",
