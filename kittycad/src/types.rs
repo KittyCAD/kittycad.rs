@@ -11411,6 +11411,10 @@ pub enum MlCopilotSystemCommand {
     #[serde(rename = "bye")]
     #[display("bye")]
     Bye,
+    #[doc = "Continue a previously-started turn after the client reconnects."]
+    #[serde(rename = "continue")]
+    #[display("continue")]
+    Continue,
     #[doc = "Interrupt the current prompt that is being processed."]
     #[serde(rename = "interrupt")]
     #[display("interrupt")]
