@@ -36051,6 +36051,13 @@
             ]
           },
           {
+            "description": "Continue a previously-started turn after the client reconnects.",
+            "type": "string",
+            "enum": [
+              "continue"
+            ]
+          },
+          {
             "description": "Interrupt the current prompt that is being processed.",
             "type": "string",
             "enum": [
