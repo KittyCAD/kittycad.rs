@@ -15239,6 +15239,14 @@ pub struct OrgDatasetFileConversionDetails {
     #[doc = "Tracks which version processed this file when available."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub importer_version: Option<String>,
+    #[doc = "Plain-text contents of the admin-provided manual KCL override, when available."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub manual_kcl_override: Option<String>,
+    #[doc = "Indicates whether a persisted manual KCL override will be used instead of regenerating KCL automatically."]
+    pub manual_kcl_override_active: bool,
+    #[doc = "Timestamp when the manual KCL override was last updated."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub manual_kcl_override_updated_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "Additional per-conversion metadata as string key-value pairs."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub metadata: Option<serde_json::Value>,
@@ -15283,7 +15291,7 @@ impl std::fmt::Display for OrgDatasetFileConversionDetails {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgDatasetFileConversionDetails {
-    const LENGTH: usize = 20;
+    const LENGTH: usize = 23;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -15299,6 +15307,17 @@ impl tabled::Tabled for OrgDatasetFileConversionDetails {
             format!("{:?}", self.id).into(),
             if let Some(importer_version) = &self.importer_version {
                 format!("{:?}", importer_version).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(manual_kcl_override) = &self.manual_kcl_override {
+                format!("{:?}", manual_kcl_override).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.manual_kcl_override_active).into(),
+            if let Some(manual_kcl_override_updated_at) = &self.manual_kcl_override_updated_at {
+                format!("{:?}", manual_kcl_override_updated_at).into()
             } else {
                 String::new().into()
             },
@@ -15351,6 +15370,9 @@ impl tabled::Tabled for OrgDatasetFileConversionDetails {
             "file_size".into(),
             "id".into(),
             "importer_version".into(),
+            "manual_kcl_override".into(),
+            "manual_kcl_override_active".into(),
+            "manual_kcl_override_updated_at".into(),
             "metadata".into(),
             "original_snapshot_images".into(),
             "output".into(),
@@ -15398,31 +15420,35 @@ pub enum OrgDatasetFileConversionPhase {
     #[serde(rename = "user_provided_metadata")]
     #[display("user_provided_metadata")]
     UserProvidedMetadata,
-    #[doc = "Phase index `4`: converting the source model into raw KCL."]
+    #[doc = "Phase index `4`: loading a persisted manual KCL override instead of regenerating KCL automatically."]
+    #[serde(rename = "manual_kcl_override")]
+    #[display("manual_kcl_override")]
+    ManualKclOverride,
+    #[doc = "Phase index `5`: converting the source model into raw KCL."]
     #[serde(rename = "convert_raw_kcl")]
     #[display("convert_raw_kcl")]
     ConvertRawKcl,
-    #[doc = "Phase index `5`: generating raw KCL metadata."]
+    #[doc = "Phase index `6`: generating raw KCL metadata."]
     #[serde(rename = "zoo_generated_raw_kcl_metadata")]
     #[display("zoo_generated_raw_kcl_metadata")]
     ZooGeneratedRawKclMetadata,
-    #[doc = "Phase index `6`: creating a snapshot of the raw KCL result."]
+    #[doc = "Phase index `7`: creating a snapshot of the raw KCL result."]
     #[serde(rename = "snapshot_raw_kcl")]
     #[display("snapshot_raw_kcl")]
     SnapshotRawKcl,
-    #[doc = "Phase index `7`: running the salon/refactor step that produces polished KCL."]
+    #[doc = "Phase index `8`: running the salon/refactor step that produces polished KCL."]
     #[serde(rename = "salon")]
     #[display("salon")]
     Salon,
-    #[doc = "Phase index `8`: generating salon KCL metadata."]
+    #[doc = "Phase index `9`: generating salon KCL metadata."]
     #[serde(rename = "zoo_generated_salon_kcl_metadata")]
     #[display("zoo_generated_salon_kcl_metadata")]
     ZooGeneratedSalonKclMetadata,
-    #[doc = "Phase index `9`: creating a snapshot of the salon/refactored KCL."]
+    #[doc = "Phase index `10`: creating a snapshot of the salon/refactored KCL."]
     #[serde(rename = "snapshot_salon_kcl")]
     #[display("snapshot_salon_kcl")]
     SnapshotSalonKcl,
-    #[doc = "Phase index `10`: conversion finished successfully."]
+    #[doc = "Phase index `11`: conversion finished successfully."]
     #[serde(rename = "completed")]
     #[display("completed")]
     Completed,
@@ -15496,6 +15522,11 @@ pub struct OrgDatasetFileConversionSummary {
     #[doc = "Tracks which version processed this file when available."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub importer_version: Option<String>,
+    #[doc = "Indicates whether a persisted manual KCL override will be used instead of regenerating KCL automatically."]
+    pub manual_kcl_override_active: bool,
+    #[doc = "Timestamp when the manual KCL override was last updated."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub manual_kcl_override_updated_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "Additional per-conversion metadata as string key-value pairs."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub metadata: Option<serde_json::Value>,
@@ -15525,7 +15556,7 @@ impl std::fmt::Display for OrgDatasetFileConversionSummary {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgDatasetFileConversionSummary {
-    const LENGTH: usize = 14;
+    const LENGTH: usize = 16;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -15541,6 +15572,12 @@ impl tabled::Tabled for OrgDatasetFileConversionSummary {
             format!("{:?}", self.id).into(),
             if let Some(importer_version) = &self.importer_version {
                 format!("{:?}", importer_version).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.manual_kcl_override_active).into(),
+            if let Some(manual_kcl_override_updated_at) = &self.manual_kcl_override_updated_at {
+                format!("{:?}", manual_kcl_override_updated_at).into()
             } else {
                 String::new().into()
             },
@@ -15575,6 +15612,8 @@ impl tabled::Tabled for OrgDatasetFileConversionSummary {
             "file_size".into(),
             "id".into(),
             "importer_version".into(),
+            "manual_kcl_override_active".into(),
+            "manual_kcl_override_updated_at".into(),
             "metadata".into(),
             "phase".into(),
             "started_at".into(),

@@ -45518,6 +45518,22 @@
             "description": "Tracks which version processed this file when available.",
             "type": "string"
           },
+          "manual_kcl_override": {
+            "nullable": true,
+            "description": "Plain-text contents of the admin-provided manual KCL override, when available.",
+            "type": "string"
+          },
+          "manual_kcl_override_active": {
+            "description": "Indicates whether a persisted manual KCL override will be used instead of regenerating KCL automatically.",
+            "type": "boolean"
+          },
+          "manual_kcl_override_updated_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "Timestamp when the manual KCL override was last updated.",
+            "type": "string",
+            "format": "date-time"
+          },
           "metadata": {
             "nullable": true,
             "description": "Additional per-conversion metadata as string key-value pairs."
@@ -45600,6 +45616,7 @@
           "file_path",
           "file_size",
           "id",
+          "manual_kcl_override_active",
           "original_snapshot_images",
           "phase",
           "raw_kcl_snapshot_images",
@@ -45640,49 +45657,56 @@
             ]
           },
           {
-            "description": "Phase index `4`: converting the source model into raw KCL.",
+            "description": "Phase index `4`: loading a persisted manual KCL override instead of regenerating KCL automatically.",
+            "type": "string",
+            "enum": [
+              "manual_kcl_override"
+            ]
+          },
+          {
+            "description": "Phase index `5`: converting the source model into raw KCL.",
             "type": "string",
             "enum": [
               "convert_raw_kcl"
             ]
           },
           {
-            "description": "Phase index `5`: generating raw KCL metadata.",
+            "description": "Phase index `6`: generating raw KCL metadata.",
             "type": "string",
             "enum": [
               "zoo_generated_raw_kcl_metadata"
             ]
           },
           {
-            "description": "Phase index `6`: creating a snapshot of the raw KCL result.",
+            "description": "Phase index `7`: creating a snapshot of the raw KCL result.",
             "type": "string",
             "enum": [
               "snapshot_raw_kcl"
             ]
           },
           {
-            "description": "Phase index `7`: running the salon/refactor step that produces polished KCL.",
+            "description": "Phase index `8`: running the salon/refactor step that produces polished KCL.",
             "type": "string",
             "enum": [
               "salon"
             ]
           },
           {
-            "description": "Phase index `8`: generating salon KCL metadata.",
+            "description": "Phase index `9`: generating salon KCL metadata.",
             "type": "string",
             "enum": [
               "zoo_generated_salon_kcl_metadata"
             ]
           },
           {
-            "description": "Phase index `9`: creating a snapshot of the salon/refactored KCL.",
+            "description": "Phase index `10`: creating a snapshot of the salon/refactored KCL.",
             "type": "string",
             "enum": [
               "snapshot_salon_kcl"
             ]
           },
           {
-            "description": "Phase index `10`: conversion finished successfully.",
+            "description": "Phase index `11`: conversion finished successfully.",
             "type": "string",
             "enum": [
               "completed"
@@ -45795,6 +45819,17 @@
             "description": "Tracks which version processed this file when available.",
             "type": "string"
           },
+          "manual_kcl_override_active": {
+            "description": "Indicates whether a persisted manual KCL override will be used instead of regenerating KCL automatically.",
+            "type": "boolean"
+          },
+          "manual_kcl_override_updated_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "Timestamp when the manual KCL override was last updated.",
+            "type": "string",
+            "format": "date-time"
+          },
           "metadata": {
             "nullable": true,
             "description": "Additional per-conversion metadata as string key-value pairs."
@@ -45841,6 +45876,7 @@
           "file_path",
           "file_size",
           "id",
+          "manual_kcl_override_active",
           "phase",
           "status",
           "updated_at"
