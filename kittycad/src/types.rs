@@ -25057,6 +25057,9 @@ impl tabled::Tabled for UserCadInfoAdminDetails {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UserFeature {
+    #[serde(rename = "aquarium")]
+    #[display("aquarium")]
+    Aquarium,
     #[serde(rename = "proprietary_to_kcl_conversion_beta")]
     #[display("proprietary_to_kcl_conversion_beta")]
     ProprietaryToKclConversionBeta,
