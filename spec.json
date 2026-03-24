@@ -35484,6 +35484,38 @@
             ]
           },
           {
+            "description": "Updates the active project context without creating a new prompt.",
+            "type": "object",
+            "properties": {
+              "current_files": {
+                "description": "The current files in the project, if any. This can be used to provide context for the AI. This should be sent in binary format if the files are not text files, like an imported binary file.",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "format": "uint8",
+                    "minimum": 0
+                  }
+                }
+              },
+              "project_name": {
+                "nullable": true,
+                "description": "The project name, if any.",
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "project_context"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
             "description": "The user message, which contains the content of the user's input.",
             "type": "object",
             "properties": {
@@ -45866,7 +45898,7 @@
             "format": "int32"
           },
           "content": {
-            "description": "Chunk text used for matching.",
+            "description": "Full converted output text for the matched conversion, when available.",
             "type": "string"
           },
           "conversion_id": {
