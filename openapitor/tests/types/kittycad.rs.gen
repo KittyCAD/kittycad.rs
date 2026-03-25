@@ -10474,6 +10474,101 @@ impl tabled::Tabled for KclModel {
     }
 }
 
+#[doc = "Logical role of a file stored under a KCL project."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum KclProjectFileRole {
+    #[doc = "The root `project.toml` manifest."]
+    #[serde(rename = "project_toml")]
+    #[display("project_toml")]
+    ProjectToml,
+    #[doc = "A project source file such as `.kcl`."]
+    #[serde(rename = "project_file")]
+    #[display("project_file")]
+    ProjectFile,
+    #[doc = "A preview image generated or uploaded for the gallery."]
+    #[serde(rename = "preview_image")]
+    #[display("preview_image")]
+    PreviewImage,
+}
+
+#[doc = "Preview generation status for a KCL project."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum KclProjectPreviewStatus {
+    #[doc = "A preview has not been generated yet."]
+    #[serde(rename = "pending")]
+    #[display("pending")]
+    Pending,
+    #[doc = "The preview is available for display."]
+    #[serde(rename = "ready")]
+    #[display("ready")]
+    Ready,
+    #[doc = "Preview generation failed and needs attention."]
+    #[serde(rename = "failed")]
+    #[display("failed")]
+    Failed,
+}
+
+#[doc = "Publication workflow state for a KCL project."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum KclProjectPublicationStatus {
+    #[doc = "The project is not yet submitted for review."]
+    #[serde(rename = "draft")]
+    #[display("draft")]
+    Draft,
+    #[doc = "The project is awaiting moderation review."]
+    #[serde(rename = "pending_review")]
+    #[display("pending_review")]
+    PendingReview,
+    #[doc = "The project is publicly visible in the gallery."]
+    #[serde(rename = "published")]
+    #[display("published")]
+    Published,
+    #[doc = "The project was reviewed and rejected."]
+    #[serde(rename = "rejected")]
+    #[display("rejected")]
+    Rejected,
+    #[doc = "The project was removed from public display."]
+    #[serde(rename = "deleted")]
+    #[display("deleted")]
+    Deleted,
+}
+
 #[doc = "The response from the `Loft` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -17624,6 +17719,57 @@ impl tabled::Tabled for PrivacySettings {
     }
 }
 
+#[doc = "Active category metadata available for project submission flows."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectCategoryResponse {
+    #[doc = "Optional helper text shown to users choosing a category."]
+    pub description: String,
+    #[doc = "Human-readable category name."]
+    pub display_name: String,
+    #[doc = "Unique category identifier."]
+    pub id: uuid::Uuid,
+    #[doc = "Stable URL-safe category slug."]
+    pub slug: String,
+    #[doc = "Sort order used when presenting categories in clients."]
+    pub sort_order: i64,
+}
+
+impl std::fmt::Display for ProjectCategoryResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectCategoryResponse {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.description.clone().into(),
+            self.display_name.clone().into(),
+            format!("{:?}", self.id).into(),
+            self.slug.clone().into(),
+            format!("{:?}", self.sort_order).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "description".into(),
+            "display_name".into(),
+            "id".into(),
+            "slug".into(),
+            "sort_order".into(),
+        ]
+    }
+}
+
 #[doc = "The response from the `ProjectEntityToPlane` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -17655,6 +17801,78 @@ impl tabled::Tabled for ProjectEntityToPlane {
     }
 }
 
+#[doc = "Owner-visible metadata for one stored project file."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectFileResponse {
+    #[doc = "File size in bytes."]
+    pub byte_size: i64,
+    #[doc = "Stored MIME type."]
+    pub content_type: String,
+    #[doc = "File creation timestamp."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Logical role within the project."]
+    pub file_role: KclProjectFileRole,
+    #[doc = "Unique file identifier."]
+    pub id: uuid::Uuid,
+    #[doc = "Relative path as seen inside the project."]
+    pub relative_path: String,
+    #[doc = "Hex-encoded SHA-256 of the stored contents, when known."]
+    #[serde(rename = "sha256", default, skip_serializing_if = "Option::is_none")]
+    pub sha_256: Option<String>,
+    #[doc = "Stable ordering hint."]
+    pub sort_order: i64,
+    #[doc = "File last update timestamp."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Display for ProjectFileResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectFileResponse {
+    const LENGTH: usize = 9;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.byte_size).into(),
+            self.content_type.clone().into(),
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.file_role).into(),
+            format!("{:?}", self.id).into(),
+            self.relative_path.clone().into(),
+            if let Some(sha_256) = &self.sha_256 {
+                format!("{:?}", sha_256).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.sort_order).into(),
+            format!("{:?}", self.updated_at).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "byte_size".into(),
+            "content_type".into(),
+            "created_at".into(),
+            "file_role".into(),
+            "id".into(),
+            "relative_path".into(),
+            "sha_256".into(),
+            "sort_order".into(),
+            "updated_at".into(),
+        ]
+    }
+}
+
 #[doc = "The response from the `ProjectPointsToPlane` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -17683,6 +17901,224 @@ impl tabled::Tabled for ProjectPointsToPlane {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["projected_points".into()]
+    }
+}
+
+#[doc = "Owner-visible project detail payload."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectResponse {
+    #[doc = "Selected category identifiers associated with the project."]
+    pub category_ids: Vec<uuid::Uuid>,
+    #[doc = "When the project row was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "User-facing project description."]
+    pub description: String,
+    #[doc = "Relative path to the entrypoint KCL file."]
+    pub entrypoint_path: String,
+    #[doc = "Project files currently stored for the owner-visible draft."]
+    pub files: Vec<ProjectFileResponse>,
+    #[doc = "Unique project identifier."]
+    pub id: uuid::Uuid,
+    #[doc = "Current preview generation state."]
+    pub preview_status: KclProjectPreviewStatus,
+    #[doc = "Height of the primary preview image in pixels."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub primary_preview_height: Option<i32>,
+    #[doc = "Relative path to the primary preview image, when one exists."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub primary_preview_path: Option<String>,
+    #[doc = "Renderer or asset version tag for the primary preview image."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub primary_preview_version: Option<String>,
+    #[doc = "Width of the primary preview image in pixels."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub primary_preview_width: Option<i32>,
+    #[doc = "Relative path to the project's manifest file."]
+    pub project_toml_path: String,
+    #[doc = "Current publication workflow state."]
+    pub publication_status: KclProjectPublicationStatus,
+    #[doc = "User-facing project title."]
+    pub title: String,
+    #[doc = "When the project row was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Display for ProjectResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectResponse {
+    const LENGTH: usize = 15;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.category_ids).into(),
+            format!("{:?}", self.created_at).into(),
+            self.description.clone().into(),
+            self.entrypoint_path.clone().into(),
+            format!("{:?}", self.files).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.preview_status).into(),
+            if let Some(primary_preview_height) = &self.primary_preview_height {
+                format!("{:?}", primary_preview_height).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(primary_preview_path) = &self.primary_preview_path {
+                format!("{:?}", primary_preview_path).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(primary_preview_version) = &self.primary_preview_version {
+                format!("{:?}", primary_preview_version).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(primary_preview_width) = &self.primary_preview_width {
+                format!("{:?}", primary_preview_width).into()
+            } else {
+                String::new().into()
+            },
+            self.project_toml_path.clone().into(),
+            format!("{:?}", self.publication_status).into(),
+            self.title.clone().into(),
+            format!("{:?}", self.updated_at).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "category_ids".into(),
+            "created_at".into(),
+            "description".into(),
+            "entrypoint_path".into(),
+            "files".into(),
+            "id".into(),
+            "preview_status".into(),
+            "primary_preview_height".into(),
+            "primary_preview_path".into(),
+            "primary_preview_version".into(),
+            "primary_preview_width".into(),
+            "project_toml_path".into(),
+            "publication_status".into(),
+            "title".into(),
+            "updated_at".into(),
+        ]
+    }
+}
+
+#[doc = "Owner-visible project summary payload."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectSummaryResponse {
+    #[doc = "Selected category identifiers associated with the project."]
+    pub category_ids: Vec<uuid::Uuid>,
+    #[doc = "When the project row was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "User-facing project description."]
+    pub description: String,
+    #[doc = "Relative path to the entrypoint KCL file."]
+    pub entrypoint_path: String,
+    #[doc = "Unique project identifier."]
+    pub id: uuid::Uuid,
+    #[doc = "Current preview generation state."]
+    pub preview_status: KclProjectPreviewStatus,
+    #[doc = "Height of the primary preview image in pixels."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub primary_preview_height: Option<i32>,
+    #[doc = "Relative path to the primary preview image, when one exists."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub primary_preview_path: Option<String>,
+    #[doc = "Renderer or asset version tag for the primary preview image."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub primary_preview_version: Option<String>,
+    #[doc = "Width of the primary preview image in pixels."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub primary_preview_width: Option<i32>,
+    #[doc = "Relative path to the project's manifest file."]
+    pub project_toml_path: String,
+    #[doc = "Current publication workflow state."]
+    pub publication_status: KclProjectPublicationStatus,
+    #[doc = "User-facing project title."]
+    pub title: String,
+    #[doc = "When the project row was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Display for ProjectSummaryResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectSummaryResponse {
+    const LENGTH: usize = 14;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.category_ids).into(),
+            format!("{:?}", self.created_at).into(),
+            self.description.clone().into(),
+            self.entrypoint_path.clone().into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.preview_status).into(),
+            if let Some(primary_preview_height) = &self.primary_preview_height {
+                format!("{:?}", primary_preview_height).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(primary_preview_path) = &self.primary_preview_path {
+                format!("{:?}", primary_preview_path).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(primary_preview_version) = &self.primary_preview_version {
+                format!("{:?}", primary_preview_version).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(primary_preview_width) = &self.primary_preview_width {
+                format!("{:?}", primary_preview_width).into()
+            } else {
+                String::new().into()
+            },
+            self.project_toml_path.clone().into(),
+            format!("{:?}", self.publication_status).into(),
+            self.title.clone().into(),
+            format!("{:?}", self.updated_at).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "category_ids".into(),
+            "created_at".into(),
+            "description".into(),
+            "entrypoint_path".into(),
+            "id".into(),
+            "preview_status".into(),
+            "primary_preview_height".into(),
+            "primary_preview_path".into(),
+            "primary_preview_version".into(),
+            "primary_preview_width".into(),
+            "project_toml_path".into(),
+            "publication_status".into(),
+            "title".into(),
+            "updated_at".into(),
+        ]
     }
 }
 
