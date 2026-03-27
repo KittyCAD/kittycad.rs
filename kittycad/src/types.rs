@@ -7657,6 +7657,9 @@ pub struct ExtendedUser {
     pub stripe_id: Option<String>,
     #[doc = "The date and time the user was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Public username/handle for community-facing features."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub username: Option<String>,
 }
 
 impl std::fmt::Display for ExtendedUser {
@@ -7671,7 +7674,7 @@ impl std::fmt::Display for ExtendedUser {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ExtendedUser {
-    const LENGTH: usize = 19;
+    const LENGTH: usize = 20;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(block) = &self.block {
@@ -7733,6 +7736,11 @@ impl tabled::Tabled for ExtendedUser {
                 String::new().into()
             },
             format!("{:?}", self.updated_at).into(),
+            if let Some(username) = &self.username {
+                format!("{:?}", username).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
@@ -7757,6 +7765,7 @@ impl tabled::Tabled for ExtendedUser {
             "phone".into(),
             "stripe_id".into(),
             "updated_at".into(),
+            "username".into(),
         ]
     }
 }
@@ -10721,7 +10730,11 @@ pub enum KclProjectPreviewStatus {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum KclProjectPublicationStatus {
-    #[doc = "The project is not yet submitted for review."]
+    #[doc = "The project is owner-visible only and not intended for publication."]
+    #[serde(rename = "private")]
+    #[display("private")]
+    Private,
+    #[doc = "The project is being prepared for publication but is not yet submitted."]
     #[serde(rename = "draft")]
     #[display("draft")]
     Draft,
@@ -25779,6 +25792,9 @@ pub struct UserResponse {
     pub phone: phone_number::PhoneNumber,
     #[doc = "The date and time the user was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Public username/handle for community-facing features."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub username: Option<String>,
 }
 
 impl std::fmt::Display for UserResponse {
@@ -25793,7 +25809,7 @@ impl std::fmt::Display for UserResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UserResponse {
-    const LENGTH: usize = 19;
+    const LENGTH: usize = 20;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(block) = &self.block {
@@ -25855,6 +25871,11 @@ impl tabled::Tabled for UserResponse {
             },
             format!("{:?}", self.phone).into(),
             format!("{:?}", self.updated_at).into(),
+            if let Some(username) = &self.username {
+                format!("{:?}", username).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
@@ -25879,6 +25900,7 @@ impl tabled::Tabled for UserResponse {
             "name".into(),
             "phone".into(),
             "updated_at".into(),
+            "username".into(),
         ]
     }
 }

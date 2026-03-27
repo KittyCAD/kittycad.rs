@@ -24296,7 +24296,7 @@
         "tags": [
           "users"
         ],
-        "summary": "Replace one of the authenticated user's draft projects.",
+        "summary": "Replace one of the authenticated user's projects.",
         "operationId": "update_user_project",
         "parameters": [
           {
@@ -33575,6 +33575,11 @@
             "description": "The date and time the user was last updated.",
             "type": "string",
             "format": "date-time"
+          },
+          "username": {
+            "description": "Public username/handle for community-facing features.",
+            "default": "",
+            "type": "string"
           }
         },
         "required": [
@@ -35866,7 +35871,14 @@
         "description": "Publication workflow state for a KCL project.",
         "oneOf": [
           {
-            "description": "The project is not yet submitted for review.",
+            "description": "The project is owner-visible only and not intended for publication.",
+            "type": "string",
+            "enum": [
+              "private"
+            ]
+          },
+          {
+            "description": "The project is being prepared for publication but is not yet submitted.",
             "type": "string",
             "enum": [
               "draft"
@@ -54107,6 +54119,11 @@
             "description": "The date and time the user was last updated.",
             "type": "string",
             "format": "date-time"
+          },
+          "username": {
+            "description": "Public username/handle for community-facing features.",
+            "default": "",
+            "type": "string"
           }
         },
         "required": [
