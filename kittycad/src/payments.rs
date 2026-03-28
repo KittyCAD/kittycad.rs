@@ -302,7 +302,7 @@ impl Payments {
 
     #[doc = "Delete a payment method for your org.\n\nThis endpoint requires authentication by an \
              org admin. It deletes the specified payment method for the authenticated user's \
-             org.\n\n**Parameters:**\n\n- `id: &'astr`: The ID of the payment method. \
+             org.\n\n**Parameters:**\n\n- `id: &'astr`: Stripe payment method identifier. \
              (required)\n\n```rust,no_run\nasync fn example_payments_delete_method_for_org() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
              client\n        .payments()\n        .delete_method_for_org(\"some-string\")\n        \
@@ -915,13 +915,12 @@ impl Payments {
 
     #[doc = "Delete a payment method for your user.\n\nThis endpoint requires authentication by \
              any Zoo user. It deletes the specified payment method for the authenticated \
-             user.\n\n**Parameters:**\n\n- `force: Option<bool>`: If true, force the deletion by \
-             bypassing our only-payment-method check.\n- `id: &'astr`: The ID of the payment \
-             method. (required)\n\n```rust,no_run\nasync fn \
-             example_payments_delete_method_for_user() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    client\n        .payments()\n        \
-             .delete_method_for_user(Some(true), \"some-string\")\n        .await?;\n    \
-             Ok(())\n}\n```"]
+             user.\n\n**Parameters:**\n\n- `force: Option<bool>`: Force deletion even when it is \
+             the last payment method on file.\n- `id: &'astr`: Stripe payment method identifier. \
+             (required)\n\n```rust,no_run\nasync fn example_payments_delete_method_for_user() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
+             client\n        .payments()\n        .delete_method_for_user(Some(true), \
+             \"some-string\")\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn delete_method_for_user<'a>(
         &'a self,
@@ -958,8 +957,8 @@ impl Payments {
 
     #[doc = "Set the default payment method for your user.\n\nThis endpoint requires \
              authentication by any Zoo user. It sets the default payment method for the \
-             authenticated user.\n\n**Parameters:**\n\n- `id: &'astr`: The ID of the payment \
-             method. (required)\n\n```rust,no_run\nasync fn \
+             authenticated user.\n\n**Parameters:**\n\n- `id: &'astr`: Stripe payment method \
+             identifier. (required)\n\n```rust,no_run\nasync fn \
              example_payments_set_default_method_for_user() -> anyhow::Result<()> {\n    let \
              client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        \
              .set_default_method_for_user(\"some-string\")\n        .await?;\n    Ok(())\n}\n```"]

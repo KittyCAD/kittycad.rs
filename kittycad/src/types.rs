@@ -2983,6 +2983,474 @@ impl tabled::Tabled for BatchResponse {
     }
 }
 
+#[doc = "How often a contract is expected to bill or renew operationally."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum BillingCadence {
+    #[doc = "The contract is managed on an annual cycle."]
+    #[serde(rename = "annual")]
+    #[display("annual")]
+    Annual,
+    #[doc = "The contract is managed on a quarterly cycle."]
+    #[serde(rename = "quarterly")]
+    #[display("quarterly")]
+    Quarterly,
+    #[doc = "The contract is managed on a monthly cycle."]
+    #[serde(rename = "monthly")]
+    #[display("monthly")]
+    Monthly,
+    #[doc = "The contract does not follow a fixed automated cadence."]
+    #[serde(rename = "manual")]
+    #[display("manual")]
+    Manual,
+}
+
+#[doc = "How commitment funds are shared across contract items."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum BillingCommitmentScope {
+    #[doc = "One shared commitment pool may fund multiple contract items."]
+    #[serde(rename = "pooled")]
+    #[display("pooled")]
+    Pooled,
+    #[doc = "Each contract item effectively manages its own commitment budget."]
+    #[serde(rename = "per_item")]
+    #[display("per_item")]
+    PerItem,
+}
+
+#[doc = "Serialized line-item payload for a contract definition."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BillingContractItemInput {
+    #[doc = "Whether the item should participate in billing decisions immediately."]
+    #[serde(default)]
+    pub active: bool,
+    #[doc = "Optional normalization rule used before rating usage."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub billing_unit_granularity: Option<BillingUnitGranularity>,
+    #[doc = "Canonical item code so later metering can find the right price row."]
+    pub code: BillingItemCode,
+    #[doc = "Human-readable name shown in finance tooling."]
+    pub display_name: String,
+    #[doc = "Fixed fee charged for the item when the kind is `fixed_fee`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fixed_fee_amount: Option<f64>,
+    #[doc = "Whether usage from this item may burn down contract commitment."]
+    #[serde(default)]
+    pub is_commitment_eligible: bool,
+    #[doc = "Pricing model for this item."]
+    pub kind: BillingItemKind,
+    #[doc = "Pricing tiers for usage-rated items."]
+    #[serde(default)]
+    pub rate_tiers: Vec<BillingRateTierInput>,
+    #[doc = "Base measurement unit for pricing and usage."]
+    pub unit: BillingUnit,
+}
+
+impl std::fmt::Display for BillingContractItemInput {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BillingContractItemInput {
+    const LENGTH: usize = 9;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.active).into(),
+            if let Some(billing_unit_granularity) = &self.billing_unit_granularity {
+                format!("{:?}", billing_unit_granularity).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.code).into(),
+            self.display_name.clone().into(),
+            if let Some(fixed_fee_amount) = &self.fixed_fee_amount {
+                format!("{:?}", fixed_fee_amount).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.is_commitment_eligible).into(),
+            format!("{:?}", self.kind).into(),
+            format!("{:?}", self.rate_tiers).into(),
+            format!("{:?}", self.unit).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "active".into(),
+            "billing_unit_granularity".into(),
+            "code".into(),
+            "display_name".into(),
+            "fixed_fee_amount".into(),
+            "is_commitment_eligible".into(),
+            "kind".into(),
+            "rate_tiers".into(),
+            "unit".into(),
+        ]
+    }
+}
+
+#[doc = "Serialized line item returned from a stored contract."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BillingContractItemView {
+    #[doc = "Whether the item is active."]
+    pub active: bool,
+    #[doc = "Optional normalization rule for usage."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub billing_unit_granularity: Option<BillingUnitGranularity>,
+    #[doc = "Canonical item code."]
+    pub code: BillingItemCode,
+    #[doc = "Human-readable item name."]
+    pub display_name: String,
+    #[doc = "Fixed fee charged for the item when applicable."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fixed_fee_amount: Option<f64>,
+    #[doc = "Database identifier for the contract item row."]
+    pub id: uuid::Uuid,
+    #[doc = "Whether this item can consume commitment."]
+    pub is_commitment_eligible: bool,
+    #[doc = "Pricing model for the item."]
+    pub kind: BillingItemKind,
+    #[doc = "Usage tiers for the item."]
+    pub rate_tiers: Vec<BillingRateTierView>,
+    #[doc = "Measurement unit for the item."]
+    pub unit: BillingUnit,
+}
+
+impl std::fmt::Display for BillingContractItemView {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BillingContractItemView {
+    const LENGTH: usize = 10;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.active).into(),
+            if let Some(billing_unit_granularity) = &self.billing_unit_granularity {
+                format!("{:?}", billing_unit_granularity).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.code).into(),
+            self.display_name.clone().into(),
+            if let Some(fixed_fee_amount) = &self.fixed_fee_amount {
+                format!("{:?}", fixed_fee_amount).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.is_commitment_eligible).into(),
+            format!("{:?}", self.kind).into(),
+            format!("{:?}", self.rate_tiers).into(),
+            format!("{:?}", self.unit).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "active".into(),
+            "billing_unit_granularity".into(),
+            "code".into(),
+            "display_name".into(),
+            "fixed_fee_amount".into(),
+            "id".into(),
+            "is_commitment_eligible".into(),
+            "kind".into(),
+            "rate_tiers".into(),
+            "unit".into(),
+        ]
+    }
+}
+
+#[doc = "Lifecycle state for a billing contract."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum BillingContractStatus {
+    #[doc = "Contract terms are still being assembled and should not drive billing yet."]
+    #[serde(rename = "draft")]
+    #[display("draft")]
+    Draft,
+    #[doc = "Contract is committed for a future start date and should not drive billing yet."]
+    #[serde(rename = "scheduled")]
+    #[display("scheduled")]
+    Scheduled,
+    #[doc = "Contract is in force and may be used for rating and funding decisions."]
+    #[serde(rename = "active")]
+    #[display("active")]
+    Active,
+    #[doc = "Contract finished its intended term and is no longer accruing new periods."]
+    #[serde(rename = "closed")]
+    #[display("closed")]
+    Closed,
+    #[doc = "Contract was intentionally terminated before completing its intended term."]
+    #[serde(rename = "canceled")]
+    #[display("canceled")]
+    Canceled,
+}
+
+#[doc = "Complete contract payload used to create or replace an org's contract."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BillingContractUpsert {
+    #[doc = "Operational cadence used for finance workflows."]
+    pub billing_cadence: BillingCadence,
+    #[doc = "Whether commitment is shared or item-scoped."]
+    pub commitment_scope: BillingCommitmentScope,
+    #[doc = "Contract currency shared by every money field in this definition."]
+    pub currency: String,
+    #[doc = "Free-form finance note for discounts or negotiated pricing."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub discount_description: Option<String>,
+    #[doc = "Timestamp when the contract starts to apply."]
+    pub effective_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Provider-owned customer reference, when one already exists."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub external_customer_id: Option<String>,
+    #[doc = "Billable items attached to the contract."]
+    pub items: Vec<BillingContractItemInput>,
+    #[doc = "Human-readable contract label."]
+    pub name: String,
+    #[doc = "Internal notes about the contract."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
+    #[doc = "Period schedule for the contract term."]
+    pub periods: Vec<BillingPeriodInput>,
+    #[doc = "Downstream provider responsible for collecting the invoice."]
+    pub provider: BillingProvider,
+    #[doc = "What should happen to unused commitment when a period ends."]
+    pub rollover_policy: BillingRolloverPolicy,
+    #[doc = "Lifecycle state for the new contract."]
+    pub status: BillingContractStatus,
+    #[doc = "Timestamp when the contract term ends."]
+    pub term_end_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Display for BillingContractUpsert {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BillingContractUpsert {
+    const LENGTH: usize = 14;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.billing_cadence).into(),
+            format!("{:?}", self.commitment_scope).into(),
+            self.currency.clone().into(),
+            if let Some(discount_description) = &self.discount_description {
+                format!("{:?}", discount_description).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.effective_at).into(),
+            if let Some(external_customer_id) = &self.external_customer_id {
+                format!("{:?}", external_customer_id).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.items).into(),
+            self.name.clone().into(),
+            if let Some(notes) = &self.notes {
+                format!("{:?}", notes).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.periods).into(),
+            format!("{:?}", self.provider).into(),
+            format!("{:?}", self.rollover_policy).into(),
+            format!("{:?}", self.status).into(),
+            format!("{:?}", self.term_end_at).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "billing_cadence".into(),
+            "commitment_scope".into(),
+            "currency".into(),
+            "discount_description".into(),
+            "effective_at".into(),
+            "external_customer_id".into(),
+            "items".into(),
+            "name".into(),
+            "notes".into(),
+            "periods".into(),
+            "provider".into(),
+            "rollover_policy".into(),
+            "status".into(),
+            "term_end_at".into(),
+        ]
+    }
+}
+
+#[doc = "Serialized contract snapshot returned from the database."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BillingContractView {
+    #[doc = "Billing account identifier that owns the contract."]
+    pub account_id: uuid::Uuid,
+    #[doc = "Operational cadence for finance workflows."]
+    pub billing_cadence: BillingCadence,
+    #[doc = "Whether commitment is shared or item-scoped."]
+    pub commitment_scope: BillingCommitmentScope,
+    #[doc = "Billing contract identifier."]
+    pub contract_id: uuid::Uuid,
+    #[doc = "Currency shared by every money field in the contract."]
+    pub currency: String,
+    #[doc = "Discount note associated with the contract."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub discount_description: Option<String>,
+    #[doc = "Timestamp when the contract started applying."]
+    pub effective_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Provider-owned customer reference, when one exists."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub external_customer_id: Option<String>,
+    #[doc = "Billable items attached to the contract."]
+    pub items: Vec<BillingContractItemView>,
+    #[doc = "Human-readable contract label."]
+    pub name: String,
+    #[doc = "Internal notes for the contract."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
+    #[doc = "Period schedule for the contract."]
+    pub periods: Vec<BillingPeriodView>,
+    #[doc = "Downstream invoice provider."]
+    pub provider: BillingProvider,
+    #[doc = "What happens to unused commitment when a period ends."]
+    pub rollover_policy: BillingRolloverPolicy,
+    #[doc = "Lifecycle state for the contract."]
+    pub status: BillingContractStatus,
+    #[doc = "Timestamp when the contract term ends."]
+    pub term_end_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Display for BillingContractView {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BillingContractView {
+    const LENGTH: usize = 16;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.account_id).into(),
+            format!("{:?}", self.billing_cadence).into(),
+            format!("{:?}", self.commitment_scope).into(),
+            format!("{:?}", self.contract_id).into(),
+            self.currency.clone().into(),
+            if let Some(discount_description) = &self.discount_description {
+                format!("{:?}", discount_description).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.effective_at).into(),
+            if let Some(external_customer_id) = &self.external_customer_id {
+                format!("{:?}", external_customer_id).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.items).into(),
+            self.name.clone().into(),
+            if let Some(notes) = &self.notes {
+                format!("{:?}", notes).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.periods).into(),
+            format!("{:?}", self.provider).into(),
+            format!("{:?}", self.rollover_policy).into(),
+            format!("{:?}", self.status).into(),
+            format!("{:?}", self.term_end_at).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "account_id".into(),
+            "billing_cadence".into(),
+            "commitment_scope".into(),
+            "contract_id".into(),
+            "currency".into(),
+            "discount_description".into(),
+            "effective_at".into(),
+            "external_customer_id".into(),
+            "items".into(),
+            "name".into(),
+            "notes".into(),
+            "periods".into(),
+            "provider".into(),
+            "rollover_policy".into(),
+            "status".into(),
+            "term_end_at".into(),
+        ]
+    }
+}
+
 #[doc = "The billing information for payments."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -3031,6 +3499,446 @@ impl tabled::Tabled for BillingInfo {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["address".into(), "name".into(), "phone".into()]
     }
+}
+
+#[doc = "Canonical product or service code for a contract item."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum BillingItemCode {
+    #[doc = "Fixed or recurring enterprise support entitlement."]
+    #[serde(rename = "enterprise_support")]
+    #[display("enterprise_support")]
+    EnterpriseSupport,
+    #[doc = "Full deployment environment or similar managed environment charge."]
+    #[serde(rename = "fde")]
+    #[display("fde")]
+    Fde,
+    #[doc = "GovCloud-specific management or hosting charge."]
+    #[serde(rename = "govcloud_management")]
+    #[display("govcloud_management")]
+    GovcloudManagement,
+    #[doc = "Billing for the first successful conversion of a file version."]
+    #[serde(rename = "file_ingestion_conversion")]
+    #[display("file_ingestion_conversion")]
+    FileIngestionConversion,
+    #[doc = "Contract-rated API usage credits."]
+    #[serde(rename = "licensed_api_credits")]
+    #[display("licensed_api_credits")]
+    LicensedApiCredits,
+}
+
+#[doc = "Pricing model used by a contract item."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum BillingItemKind {
+    #[doc = "A flat amount that does not vary with measured usage."]
+    #[serde(rename = "fixed_fee")]
+    #[display("fixed_fee")]
+    FixedFee,
+    #[doc = "Usage is rated by one or more explicit pricing tiers."]
+    #[serde(rename = "usage_tiered")]
+    #[display("usage_tiered")]
+    UsageTiered,
+    #[doc = "Usage burns down a commitment bucket before any overage path."]
+    #[serde(rename = "usage_commitment_bucket")]
+    #[display("usage_commitment_bucket")]
+    UsageCommitmentBucket,
+}
+
+#[doc = "Serialized billing period payload for a contract definition."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BillingPeriodInput {
+    #[doc = "New commitment funded for this period."]
+    pub commitment_amount: f64,
+    #[doc = "Exclusive period end timestamp."]
+    pub period_end_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Sequence index for the period inside the contract."]
+    pub period_index: i32,
+    #[doc = "Inclusive period start timestamp."]
+    pub period_start_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Commitment carried in from an earlier period."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rollover_in_amount: Option<f64>,
+    #[doc = "Commitment intentionally rolled out to a later period."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rollover_out_amount: Option<f64>,
+    #[doc = "Operational status for the period."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<BillingPeriodStatus>,
+}
+
+impl std::fmt::Display for BillingPeriodInput {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BillingPeriodInput {
+    const LENGTH: usize = 7;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.commitment_amount).into(),
+            format!("{:?}", self.period_end_at).into(),
+            format!("{:?}", self.period_index).into(),
+            format!("{:?}", self.period_start_at).into(),
+            if let Some(rollover_in_amount) = &self.rollover_in_amount {
+                format!("{:?}", rollover_in_amount).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(rollover_out_amount) = &self.rollover_out_amount {
+                format!("{:?}", rollover_out_amount).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(status) = &self.status {
+                format!("{:?}", status).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "commitment_amount".into(),
+            "period_end_at".into(),
+            "period_index".into(),
+            "period_start_at".into(),
+            "rollover_in_amount".into(),
+            "rollover_out_amount".into(),
+            "status".into(),
+        ]
+    }
+}
+
+#[doc = "Operational status for a contract billing period."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum BillingPeriodStatus {
+    #[doc = "Period is active and may still accrue usage or adjustments."]
+    #[serde(rename = "open")]
+    #[display("open")]
+    Open,
+    #[doc = "Period is finalized and should be treated as read-only for billing purposes."]
+    #[serde(rename = "closed")]
+    #[display("closed")]
+    Closed,
+}
+
+#[doc = "Serialized billing period returned from a stored contract."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BillingPeriodView {
+    #[doc = "New commitment funded for this period."]
+    pub commitment_amount: f64,
+    #[doc = "Database identifier for the period row."]
+    pub id: uuid::Uuid,
+    #[doc = "Exclusive period end timestamp."]
+    pub period_end_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Sequence index for the period inside the contract."]
+    pub period_index: i32,
+    #[doc = "Inclusive period start timestamp."]
+    pub period_start_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Commitment carried in from a previous period."]
+    pub rollover_in_amount: f64,
+    #[doc = "Commitment intentionally rolled out to a later period."]
+    pub rollover_out_amount: f64,
+    #[doc = "Operational status for the period."]
+    pub status: BillingPeriodStatus,
+}
+
+impl std::fmt::Display for BillingPeriodView {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BillingPeriodView {
+    const LENGTH: usize = 8;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.commitment_amount).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.period_end_at).into(),
+            format!("{:?}", self.period_index).into(),
+            format!("{:?}", self.period_start_at).into(),
+            format!("{:?}", self.rollover_in_amount).into(),
+            format!("{:?}", self.rollover_out_amount).into(),
+            format!("{:?}", self.status).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "commitment_amount".into(),
+            "id".into(),
+            "period_end_at".into(),
+            "period_index".into(),
+            "period_start_at".into(),
+            "rollover_in_amount".into(),
+            "rollover_out_amount".into(),
+            "status".into(),
+        ]
+    }
+}
+
+#[doc = "Billing provider that owns downstream invoice or statement delivery."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum BillingProvider {
+    #[doc = "Charges are ultimately collected through Stripe."]
+    #[serde(rename = "stripe")]
+    #[display("stripe")]
+    Stripe,
+    #[doc = "Charges are collected outside Stripe, usually by finance or contract workflow."]
+    #[serde(rename = "manual_invoice")]
+    #[display("manual_invoice")]
+    ManualInvoice,
+}
+
+#[doc = "Serialized rate tier payload for a usage-rated contract item."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BillingRateTierInput {
+    #[doc = "Exclusive upper bound for the tier, or `None` when the tier is open-ended."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tier_end_exclusive: Option<i64>,
+    #[doc = "First billable quantity in this tier."]
+    pub tier_start_inclusive: i64,
+    #[doc = "Price to charge for each unit that lands in this tier."]
+    pub unit_price: f64,
+}
+
+impl std::fmt::Display for BillingRateTierInput {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BillingRateTierInput {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(tier_end_exclusive) = &self.tier_end_exclusive {
+                format!("{:?}", tier_end_exclusive).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.tier_start_inclusive).into(),
+            format!("{:?}", self.unit_price).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "tier_end_exclusive".into(),
+            "tier_start_inclusive".into(),
+            "unit_price".into(),
+        ]
+    }
+}
+
+#[doc = "Serialized rate tier returned from a stored contract."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BillingRateTierView {
+    #[doc = "Database identifier for the tier row."]
+    pub id: uuid::Uuid,
+    #[doc = "Exclusive upper bound for the tier, or `None` when the tier is open-ended."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tier_end_exclusive: Option<i64>,
+    #[doc = "First billable quantity in this tier."]
+    pub tier_start_inclusive: i64,
+    #[doc = "Price charged for each unit in the tier."]
+    pub unit_price: f64,
+}
+
+impl std::fmt::Display for BillingRateTierView {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BillingRateTierView {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.id).into(),
+            if let Some(tier_end_exclusive) = &self.tier_end_exclusive {
+                format!("{:?}", tier_end_exclusive).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.tier_start_inclusive).into(),
+            format!("{:?}", self.unit_price).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "id".into(),
+            "tier_end_exclusive".into(),
+            "tier_start_inclusive".into(),
+            "unit_price".into(),
+        ]
+    }
+}
+
+#[doc = "What happens to unused commitment when a contract period closes."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum BillingRolloverPolicy {
+    #[doc = "Unused commitment expires at the end of the period."]
+    #[serde(rename = "none")]
+    #[display("none")]
+    None,
+    #[doc = "Unused year-one commitment may roll once into year two, but not beyond."]
+    #[serde(rename = "year1_to_year2_once")]
+    #[display("year1_to_year2_once")]
+    Year1ToYear2Once,
+}
+
+#[doc = "Base unit that measured usage or pricing is expressed in."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum BillingUnit {
+    #[doc = "Quantity is counted in files."]
+    #[serde(rename = "file")]
+    #[display("file")]
+    File,
+    #[doc = "Quantity is counted in whole or rounded minutes."]
+    #[serde(rename = "minute")]
+    #[display("minute")]
+    Minute,
+    #[doc = "Quantity is counted in seconds."]
+    #[serde(rename = "second")]
+    #[display("second")]
+    Second,
+    #[doc = "Quantity is counted in years."]
+    #[serde(rename = "year")]
+    #[display("year")]
+    Year,
+    #[doc = "Quantity is counted once per billing period."]
+    #[serde(rename = "period")]
+    #[display("period")]
+    Period,
+}
+
+#[doc = "Optional finer-grained measurement rule for a billed unit."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum BillingUnitGranularity {
+    #[doc = "Usage should be normalized or rounded at the minute level."]
+    #[serde(rename = "minute")]
+    #[display("minute")]
+    Minute,
+    #[doc = "Usage should be normalized or rounded at the second level."]
+    #[serde(rename = "second")]
+    #[display("second")]
+    Second,
 }
 
 #[doc = "What kind of blend to do"]
@@ -9793,8 +10701,7 @@ pub struct Invoice {
     pub collection_method: Option<String>,
     #[doc = "Time at which the object was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), \
-             in lowercase."]
+    #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub currency: Option<String>,
     #[doc = "The email address for the customer. Until the invoice is finalized, this field will \
@@ -10070,8 +10977,7 @@ pub struct InvoiceLineItem {
     #[doc = "The amount, in USD."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub amount: Option<f64>,
-    #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), \
-             in lowercase."]
+    #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub currency: Option<String>,
     #[doc = "The description."]
@@ -12089,6 +12995,9 @@ pub struct ModelingAppSubscriptionTier {
     #[doc = "Annual discount. The percentage off the monthly price if the user pays annually."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub annual_discount: Option<f64>,
+    #[doc = "Indicates how billing collection is routed for this plan."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub billing_mode: Option<SubscriptionBillingMode>,
     #[doc = "A description of the tier."]
     pub description: String,
     #[doc = "The display name of the tier."]
@@ -12151,11 +13060,16 @@ impl std::fmt::Display for ModelingAppSubscriptionTier {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ModelingAppSubscriptionTier {
-    const LENGTH: usize = 17;
+    const LENGTH: usize = 18;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
                 format!("{:?}", annual_discount).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(billing_mode) = &self.billing_mode {
+                format!("{:?}", billing_mode).into()
             } else {
                 String::new().into()
             },
@@ -12216,6 +13130,7 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "annual_discount".into(),
+            "billing_mode".into(),
             "description".into(),
             "display_name".into(),
             "endpoints_included".into(),
@@ -21328,6 +22243,31 @@ pub enum SubscriptionActionType {
     SetupIntent,
 }
 
+#[doc = "How a subscription plan is billed operationally."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum SubscriptionBillingMode {
+    #[doc = "Standard self-serve billing through the normal subscription flow."]
+    #[serde(rename = "standard")]
+    #[display("standard")]
+    Standard,
+    #[doc = "Contract-managed billing controlled outside the standard subscription flow."]
+    #[serde(rename = "contract")]
+    #[display("contract")]
+    Contract,
+}
+
 #[doc = "Billing model for a modeling-app plan price."]
 #[derive(
     serde :: Serialize,
@@ -26534,6 +27474,9 @@ pub struct ZooProductSubscription {
     #[doc = "Annual discount. The percentage off the monthly price if the user pays annually."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub annual_discount: Option<f64>,
+    #[doc = "Indicates how billing collection is routed for this plan."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub billing_mode: Option<SubscriptionBillingMode>,
     #[doc = "A description of the tier."]
     pub description: String,
     #[doc = "The display name of the tier."]
@@ -26596,11 +27539,16 @@ impl std::fmt::Display for ZooProductSubscription {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ZooProductSubscription {
-    const LENGTH: usize = 17;
+    const LENGTH: usize = 18;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
                 format!("{:?}", annual_discount).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(billing_mode) = &self.billing_mode {
+                format!("{:?}", billing_mode).into()
             } else {
                 String::new().into()
             },
@@ -26661,6 +27609,7 @@ impl tabled::Tabled for ZooProductSubscription {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "annual_discount".into(),
+            "billing_mode".into(),
             "description".into(),
             "display_name".into(),
             "endpoints_included".into(),

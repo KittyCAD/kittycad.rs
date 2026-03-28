@@ -731,7 +731,7 @@
     "op": "add",
     "path": "/paths/~1org~1payment~1methods~1{id}/delete/x-rust",
     "value": {
-      "example": "/// Delete a payment method for your org.\n/// \n/// This endpoint requires authentication by an org admin. It deletes the specified payment method for the authenticated user's org.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The ID of the payment method. (required)\nasync fn example_payments_delete_method_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_method_for_org(\"some-string\")\n        .await?;\n    Ok(())\n}\n",
+      "example": "/// Delete a payment method for your org.\n/// \n/// This endpoint requires authentication by an org admin. It deletes the specified payment method for the authenticated user's org.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: Stripe payment method identifier. (required)\nasync fn example_payments_delete_method_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_method_for_org(\"some-string\")\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.delete_method_for_org"
     }
   },
@@ -877,6 +877,22 @@
     "value": {
       "example": "/// Get admin-only details for an organization.\n/// \n/// Zoo admins can retrieve extended information about any organization, while non-admins receive a 404 to avoid leaking existence.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_orgs_admin_details_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgAdminDetails = client\n        .orgs()\n        .admin_details_get(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.admin_details_get"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1orgs~1{id}~1billing~1contract/get/x-rust",
+    "value": {
+      "example": "/// Get the billing contract for an organization.\n/// \n/// This endpoint requires Zoo admin authentication. It returns the active contract for the organization, or the latest draft when no active contract exists.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_orgs_get_billing_contract_for_any() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::BillingContractView = client\n        .orgs()\n        .get_billing_contract_for_any(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.get_billing_contract_for_any"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1orgs~1{id}~1billing~1contract/put/x-rust",
+    "value": {
+      "example": "/// Create or replace the billing contract for an organization.\n/// \n/// This endpoint requires Zoo admin authentication. It upserts the contract definition used for admin-managed enterprise billing.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_orgs_upsert_billing_contract_for_any() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::BillingContractView = client\n        .orgs()\n        .upsert_billing_contract_for_any(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::BillingContractUpsert {\n                billing_cadence: kittycad::types::BillingCadence::Monthly,\n                commitment_scope: kittycad::types::BillingCommitmentScope::PerItem,\n                currency: \"some-string\".to_string(),\n                discount_description: Some(\"some-string\".to_string()),\n                effective_at: chrono::Utc::now(),\n                external_customer_id: Some(\"some-string\".to_string()),\n                items: vec![kittycad::types::BillingContractItemInput {\n                    active: true,\n                    billing_unit_granularity: Some(kittycad::types::BillingUnitGranularity::Second),\n                    code: kittycad::types::BillingItemCode::FileIngestionConversion,\n                    display_name: \"some-string\".to_string(),\n                    fixed_fee_amount: Some(3.14 as f64),\n                    is_commitment_eligible: true,\n                    kind: kittycad::types::BillingItemKind::UsageTiered,\n                    rate_tiers: vec![kittycad::types::BillingRateTierInput {\n                        tier_end_exclusive: Some(4 as i64),\n                        tier_start_inclusive: 4 as i64,\n                        unit_price: 3.14 as f64,\n                    }],\n                    unit: kittycad::types::BillingUnit::Year,\n                }],\n                name: \"some-string\".to_string(),\n                notes: Some(\"some-string\".to_string()),\n                periods: vec![kittycad::types::BillingPeriodInput {\n                    commitment_amount: 3.14 as f64,\n                    period_end_at: chrono::Utc::now(),\n                    period_index: 4 as i32,\n                    period_start_at: chrono::Utc::now(),\n                    rollover_in_amount: Some(3.14 as f64),\n                    rollover_out_amount: Some(3.14 as f64),\n                    status: Some(kittycad::types::BillingPeriodStatus::Closed),\n                }],\n                provider: kittycad::types::BillingProvider::ManualInvoice,\n                rollover_policy: kittycad::types::BillingRolloverPolicy::Year1ToYear2Once,\n                status: kittycad::types::BillingContractStatus::Closed,\n                term_end_at: chrono::Utc::now(),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.upsert_billing_contract_for_any"
     }
   },
   {
@@ -1299,7 +1315,7 @@
     "op": "add",
     "path": "/paths/~1user~1payment~1methods~1{id}/delete/x-rust",
     "value": {
-      "example": "/// Delete a payment method for your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It deletes the specified payment method for the authenticated user.\n/// \n/// **Parameters:**\n/// \n/// - `force: Option<bool>`: If true, force the deletion by bypassing our only-payment-method check.\n/// - `id: &'astr`: The ID of the payment method. (required)\nasync fn example_payments_delete_method_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_method_for_user(Some(true), \"some-string\")\n        .await?;\n    Ok(())\n}\n",
+      "example": "/// Delete a payment method for your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It deletes the specified payment method for the authenticated user.\n/// \n/// **Parameters:**\n/// \n/// - `force: Option<bool>`: Force deletion even when it is the last payment method on file.\n/// - `id: &'astr`: Stripe payment method identifier. (required)\nasync fn example_payments_delete_method_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .delete_method_for_user(Some(true), \"some-string\")\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.delete_method_for_user"
     }
   },
@@ -1307,7 +1323,7 @@
     "op": "add",
     "path": "/paths/~1user~1payment~1methods~1{id}~1default/post/x-rust",
     "value": {
-      "example": "/// Set the default payment method for your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It sets the default payment method for the authenticated user.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: The ID of the payment method. (required)\nasync fn example_payments_set_default_method_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .set_default_method_for_user(\"some-string\")\n        .await?;\n    Ok(())\n}\n",
+      "example": "/// Set the default payment method for your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It sets the default payment method for the authenticated user.\n/// \n/// **Parameters:**\n/// \n/// - `id: &'astr`: Stripe payment method identifier. (required)\nasync fn example_payments_set_default_method_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .set_default_method_for_user(\"some-string\")\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.set_default_method_for_user"
     }
   },
