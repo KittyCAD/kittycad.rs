@@ -1699,6 +1699,85 @@ impl Orgs {
         }
     }
 
+    #[doc = "Get the billing contract for an organization.\n\nThis endpoint requires Zoo admin \
+             authentication. It returns the active contract for the organization, or the latest \
+             draft when no active contract exists.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The \
+             organization ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_orgs_get_billing_contract_for_any() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::BillingContractView = client\n        .orgs()\n        \
+             .get_billing_contract_for_any(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_billing_contract_for_any<'a>(
+        &'a self,
+        id: uuid::Uuid,
+    ) -> Result<crate::types::BillingContractView, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "orgs/{id}/billing/contract".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Create or replace the billing contract for an organization.\n\nThis endpoint requires Zoo admin authentication. It upserts the contract definition used for admin-managed enterprise billing.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_upsert_billing_contract_for_any() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::BillingContractView = client\n        .orgs()\n        .upsert_billing_contract_for_any(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::BillingContractUpsert {\n                billing_cadence: kittycad::types::BillingCadence::Monthly,\n                commitment_scope: kittycad::types::BillingCommitmentScope::PerItem,\n                currency: \"some-string\".to_string(),\n                discount_description: Some(\"some-string\".to_string()),\n                effective_at: chrono::Utc::now(),\n                external_customer_id: Some(\"some-string\".to_string()),\n                items: vec![kittycad::types::BillingContractItemInput {\n                    active: true,\n                    billing_unit_granularity: Some(kittycad::types::BillingUnitGranularity::Second),\n                    code: kittycad::types::BillingItemCode::FileIngestionConversion,\n                    display_name: \"some-string\".to_string(),\n                    fixed_fee_amount: Some(3.14 as f64),\n                    is_commitment_eligible: true,\n                    kind: kittycad::types::BillingItemKind::UsageTiered,\n                    rate_tiers: vec![kittycad::types::BillingRateTierInput {\n                        tier_end_exclusive: Some(4 as i64),\n                        tier_start_inclusive: 4 as i64,\n                        unit_price: 3.14 as f64,\n                    }],\n                    unit: kittycad::types::BillingUnit::Year,\n                }],\n                name: \"some-string\".to_string(),\n                notes: Some(\"some-string\".to_string()),\n                periods: vec![kittycad::types::BillingPeriodInput {\n                    commitment_amount: 3.14 as f64,\n                    period_end_at: chrono::Utc::now(),\n                    period_index: 4 as i32,\n                    period_start_at: chrono::Utc::now(),\n                    rollover_in_amount: Some(3.14 as f64),\n                    rollover_out_amount: Some(3.14 as f64),\n                    status: Some(kittycad::types::BillingPeriodStatus::Closed),\n                }],\n                provider: kittycad::types::BillingProvider::ManualInvoice,\n                rollover_policy: kittycad::types::BillingRolloverPolicy::Year1ToYear2Once,\n                status: kittycad::types::BillingContractStatus::Closed,\n                term_end_at: chrono::Utc::now(),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn upsert_billing_contract_for_any<'a>(
+        &'a self,
+        id: uuid::Uuid,
+        body: &crate::types::BillingContractUpsert,
+    ) -> Result<crate::types::BillingContractView, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "orgs/{id}/billing/contract".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Get a user's org.\n\nThis endpoint requires authentication by any Zoo user. It gets \
              the authenticated user's org.\n\nIf the user is not a member of an org, this endpoint \
              will return a 404.\n\n```rust,no_run\nasync fn example_orgs_get_user() -> \
