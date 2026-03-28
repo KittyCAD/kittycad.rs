@@ -13251,7 +13251,7 @@
           {
             "in": "path",
             "name": "id",
-            "description": "The ID of the payment method.",
+            "description": "Stripe payment method identifier.",
             "required": true,
             "schema": {
               "type": "string"
@@ -13347,7 +13347,7 @@
           {
             "in": "path",
             "name": "id",
-            "description": "The ID of the payment method.",
+            "description": "Stripe payment method identifier.",
             "required": true,
             "schema": {
               "type": "string"
@@ -15717,6 +15717,322 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OrgAdminDetails"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/orgs/{id}/billing/contract": {
+      "get": {
+        "tags": [
+          "orgs",
+          "hidden"
+        ],
+        "summary": "Get the billing contract for an organization.",
+        "description": "This endpoint requires Zoo admin authentication. It returns the active contract for the organization, or the latest draft when no active contract exists.",
+        "operationId": "get_billing_contract_for_any_org",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The organization ID.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingContractView"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "orgs",
+          "hidden"
+        ],
+        "summary": "Create or replace the billing contract for an organization.",
+        "description": "This endpoint requires Zoo admin authentication. It upserts the contract definition used for admin-managed enterprise billing.",
+        "operationId": "upsert_billing_contract_for_any_org",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The organization ID.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BillingContractUpsert"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingContractView"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_billing_contract_for_any_org",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The organization ID.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -22769,7 +23085,7 @@
           {
             "in": "path",
             "name": "id",
-            "description": "The ID of the payment method.",
+            "description": "Stripe payment method identifier.",
             "required": true,
             "schema": {
               "type": "string"
@@ -22778,7 +23094,7 @@
           {
             "in": "query",
             "name": "force",
-            "description": "If true, force the deletion by bypassing our only-payment-method check.",
+            "description": "Force deletion even when it is the last payment method on file.",
             "schema": {
               "type": "boolean"
             }
@@ -22873,7 +23189,7 @@
           {
             "in": "path",
             "name": "id",
-            "description": "The ID of the payment method.",
+            "description": "Stripe payment method identifier.",
             "required": true,
             "schema": {
               "type": "string"
@@ -22971,7 +23287,7 @@
           {
             "in": "path",
             "name": "id",
-            "description": "The ID of the payment method.",
+            "description": "Stripe payment method identifier.",
             "required": true,
             "schema": {
               "type": "string"
@@ -23067,7 +23383,7 @@
           {
             "in": "path",
             "name": "id",
-            "description": "The ID of the payment method.",
+            "description": "Stripe payment method identifier.",
             "required": true,
             "schema": {
               "type": "string"
@@ -30774,6 +31090,509 @@
           }
         ]
       },
+      "BillingCadence": {
+        "description": "How often a contract is expected to bill or renew operationally.",
+        "oneOf": [
+          {
+            "description": "The contract is managed on an annual cycle.",
+            "type": "string",
+            "enum": [
+              "annual"
+            ]
+          },
+          {
+            "description": "The contract is managed on a quarterly cycle.",
+            "type": "string",
+            "enum": [
+              "quarterly"
+            ]
+          },
+          {
+            "description": "The contract is managed on a monthly cycle.",
+            "type": "string",
+            "enum": [
+              "monthly"
+            ]
+          },
+          {
+            "description": "The contract does not follow a fixed automated cadence.",
+            "type": "string",
+            "enum": [
+              "manual"
+            ]
+          }
+        ]
+      },
+      "BillingCommitmentScope": {
+        "description": "How commitment funds are shared across contract items.",
+        "oneOf": [
+          {
+            "description": "One shared commitment pool may fund multiple contract items.",
+            "type": "string",
+            "enum": [
+              "pooled"
+            ]
+          },
+          {
+            "description": "Each contract item effectively manages its own commitment budget.",
+            "type": "string",
+            "enum": [
+              "per_item"
+            ]
+          }
+        ]
+      },
+      "BillingContractItemInput": {
+        "description": "Serialized line-item payload for a contract definition.",
+        "type": "object",
+        "properties": {
+          "active": {
+            "description": "Whether the item should participate in billing decisions immediately.",
+            "default": true,
+            "type": "boolean"
+          },
+          "billing_unit_granularity": {
+            "nullable": true,
+            "description": "Optional normalization rule used before rating usage.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingUnitGranularity"
+              }
+            ]
+          },
+          "code": {
+            "description": "Canonical item code so later metering can find the right price row.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingItemCode"
+              }
+            ]
+          },
+          "display_name": {
+            "description": "Human-readable name shown in finance tooling.",
+            "type": "string"
+          },
+          "fixed_fee_amount": {
+            "nullable": true,
+            "title": "double",
+            "description": "Fixed fee charged for the item when the kind is `fixed_fee`.",
+            "type": "number",
+            "format": "money-usd"
+          },
+          "is_commitment_eligible": {
+            "description": "Whether usage from this item may burn down contract commitment.",
+            "default": false,
+            "type": "boolean"
+          },
+          "kind": {
+            "description": "Pricing model for this item.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingItemKind"
+              }
+            ]
+          },
+          "rate_tiers": {
+            "description": "Pricing tiers for usage-rated items.",
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BillingRateTierInput"
+            }
+          },
+          "unit": {
+            "description": "Base measurement unit for pricing and usage.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingUnit"
+              }
+            ]
+          }
+        },
+        "required": [
+          "code",
+          "display_name",
+          "kind",
+          "unit"
+        ]
+      },
+      "BillingContractItemView": {
+        "description": "Serialized line item returned from a stored contract.",
+        "type": "object",
+        "properties": {
+          "active": {
+            "description": "Whether the item is active.",
+            "type": "boolean"
+          },
+          "billing_unit_granularity": {
+            "nullable": true,
+            "description": "Optional normalization rule for usage.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingUnitGranularity"
+              }
+            ]
+          },
+          "code": {
+            "description": "Canonical item code.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingItemCode"
+              }
+            ]
+          },
+          "display_name": {
+            "description": "Human-readable item name.",
+            "type": "string"
+          },
+          "fixed_fee_amount": {
+            "nullable": true,
+            "title": "double",
+            "description": "Fixed fee charged for the item when applicable.",
+            "type": "number",
+            "format": "money-usd"
+          },
+          "id": {
+            "description": "Database identifier for the contract item row.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "is_commitment_eligible": {
+            "description": "Whether this item can consume commitment.",
+            "type": "boolean"
+          },
+          "kind": {
+            "description": "Pricing model for the item.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingItemKind"
+              }
+            ]
+          },
+          "rate_tiers": {
+            "description": "Usage tiers for the item.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BillingRateTierView"
+            }
+          },
+          "unit": {
+            "description": "Measurement unit for the item.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingUnit"
+              }
+            ]
+          }
+        },
+        "required": [
+          "active",
+          "code",
+          "display_name",
+          "id",
+          "is_commitment_eligible",
+          "kind",
+          "rate_tiers",
+          "unit"
+        ]
+      },
+      "BillingContractStatus": {
+        "description": "Lifecycle state for a billing contract.",
+        "oneOf": [
+          {
+            "description": "Contract terms are still being assembled and should not drive billing yet.",
+            "type": "string",
+            "enum": [
+              "draft"
+            ]
+          },
+          {
+            "description": "Contract is committed for a future start date and should not drive billing yet.",
+            "type": "string",
+            "enum": [
+              "scheduled"
+            ]
+          },
+          {
+            "description": "Contract is in force and may be used for rating and funding decisions.",
+            "type": "string",
+            "enum": [
+              "active"
+            ]
+          },
+          {
+            "description": "Contract finished its intended term and is no longer accruing new periods.",
+            "type": "string",
+            "enum": [
+              "closed"
+            ]
+          },
+          {
+            "description": "Contract was intentionally terminated before completing its intended term.",
+            "type": "string",
+            "enum": [
+              "canceled"
+            ]
+          }
+        ]
+      },
+      "BillingContractUpsert": {
+        "description": "Complete contract payload used to create or replace an org's contract.",
+        "type": "object",
+        "properties": {
+          "billing_cadence": {
+            "description": "Operational cadence used for finance workflows.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingCadence"
+              }
+            ]
+          },
+          "commitment_scope": {
+            "description": "Whether commitment is shared or item-scoped.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingCommitmentScope"
+              }
+            ]
+          },
+          "currency": {
+            "description": "Contract currency shared by every money field in this definition.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Currency"
+              }
+            ]
+          },
+          "discount_description": {
+            "nullable": true,
+            "description": "Free-form finance note for discounts or negotiated pricing.",
+            "type": "string"
+          },
+          "effective_at": {
+            "title": "DateTime",
+            "description": "Timestamp when the contract starts to apply.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "external_customer_id": {
+            "nullable": true,
+            "description": "Provider-owned customer reference, when one already exists.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingExternalCustomerId"
+              }
+            ]
+          },
+          "items": {
+            "description": "Billable items attached to the contract.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BillingContractItemInput"
+            }
+          },
+          "name": {
+            "description": "Human-readable contract label.",
+            "type": "string"
+          },
+          "notes": {
+            "nullable": true,
+            "description": "Internal notes about the contract.",
+            "type": "string"
+          },
+          "periods": {
+            "description": "Period schedule for the contract term.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BillingPeriodInput"
+            }
+          },
+          "provider": {
+            "description": "Downstream provider responsible for collecting the invoice.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingProvider"
+              }
+            ]
+          },
+          "rollover_policy": {
+            "description": "What should happen to unused commitment when a period ends.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingRolloverPolicy"
+              }
+            ]
+          },
+          "status": {
+            "description": "Lifecycle state for the new contract.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingContractStatus"
+              }
+            ]
+          },
+          "term_end_at": {
+            "title": "DateTime",
+            "description": "Timestamp when the contract term ends.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "billing_cadence",
+          "commitment_scope",
+          "currency",
+          "effective_at",
+          "items",
+          "name",
+          "periods",
+          "provider",
+          "rollover_policy",
+          "status",
+          "term_end_at"
+        ]
+      },
+      "BillingContractView": {
+        "description": "Serialized contract snapshot returned from the database.",
+        "type": "object",
+        "properties": {
+          "account_id": {
+            "description": "Billing account identifier that owns the contract.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "billing_cadence": {
+            "description": "Operational cadence for finance workflows.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingCadence"
+              }
+            ]
+          },
+          "commitment_scope": {
+            "description": "Whether commitment is shared or item-scoped.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingCommitmentScope"
+              }
+            ]
+          },
+          "contract_id": {
+            "description": "Billing contract identifier.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "currency": {
+            "description": "Currency shared by every money field in the contract.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Currency"
+              }
+            ]
+          },
+          "discount_description": {
+            "nullable": true,
+            "description": "Discount note associated with the contract.",
+            "type": "string"
+          },
+          "effective_at": {
+            "title": "DateTime",
+            "description": "Timestamp when the contract started applying.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "external_customer_id": {
+            "nullable": true,
+            "description": "Provider-owned customer reference, when one exists.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingExternalCustomerId"
+              }
+            ]
+          },
+          "items": {
+            "description": "Billable items attached to the contract.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BillingContractItemView"
+            }
+          },
+          "name": {
+            "description": "Human-readable contract label.",
+            "type": "string"
+          },
+          "notes": {
+            "nullable": true,
+            "description": "Internal notes for the contract.",
+            "type": "string"
+          },
+          "periods": {
+            "description": "Period schedule for the contract.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BillingPeriodView"
+            }
+          },
+          "provider": {
+            "description": "Downstream invoice provider.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingProvider"
+              }
+            ]
+          },
+          "rollover_policy": {
+            "description": "What happens to unused commitment when a period ends.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingRolloverPolicy"
+              }
+            ]
+          },
+          "status": {
+            "description": "Lifecycle state for the contract.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingContractStatus"
+              }
+            ]
+          },
+          "term_end_at": {
+            "title": "DateTime",
+            "description": "Timestamp when the contract term ends.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "account_id",
+          "billing_cadence",
+          "commitment_scope",
+          "contract_id",
+          "currency",
+          "effective_at",
+          "items",
+          "name",
+          "periods",
+          "provider",
+          "rollover_policy",
+          "status",
+          "term_end_at"
+        ]
+      },
+      "BillingExternalCustomerId": {
+        "description": "Provider-owned customer reference for downstream invoicing systems.",
+        "type": "string"
+      },
       "BillingInfo": {
         "description": "The billing information for payments.",
         "type": "object",
@@ -30799,6 +31618,404 @@
             "format": "phone"
           }
         }
+      },
+      "BillingItemCode": {
+        "description": "Canonical product or service code for a contract item.",
+        "oneOf": [
+          {
+            "description": "Fixed or recurring enterprise support entitlement.",
+            "type": "string",
+            "enum": [
+              "enterprise_support"
+            ]
+          },
+          {
+            "description": "Full deployment environment or similar managed environment charge.",
+            "type": "string",
+            "enum": [
+              "fde"
+            ]
+          },
+          {
+            "description": "GovCloud-specific management or hosting charge.",
+            "type": "string",
+            "enum": [
+              "govcloud_management"
+            ]
+          },
+          {
+            "description": "Billing for the first successful conversion of a file version.",
+            "type": "string",
+            "enum": [
+              "file_ingestion_conversion"
+            ]
+          },
+          {
+            "description": "Contract-rated API usage credits.",
+            "type": "string",
+            "enum": [
+              "licensed_api_credits"
+            ]
+          }
+        ]
+      },
+      "BillingItemKind": {
+        "description": "Pricing model used by a contract item.",
+        "oneOf": [
+          {
+            "description": "A flat amount that does not vary with measured usage.",
+            "type": "string",
+            "enum": [
+              "fixed_fee"
+            ]
+          },
+          {
+            "description": "Usage is rated by one or more explicit pricing tiers.",
+            "type": "string",
+            "enum": [
+              "usage_tiered"
+            ]
+          },
+          {
+            "description": "Usage burns down a commitment bucket before any overage path.",
+            "type": "string",
+            "enum": [
+              "usage_commitment_bucket"
+            ]
+          }
+        ]
+      },
+      "BillingPeriodIndex": {
+        "description": "Non-negative index of a billing period inside a contract.",
+        "type": "integer",
+        "format": "int32"
+      },
+      "BillingPeriodInput": {
+        "description": "Serialized billing period payload for a contract definition.",
+        "type": "object",
+        "properties": {
+          "commitment_amount": {
+            "title": "double",
+            "description": "New commitment funded for this period.",
+            "type": "number",
+            "format": "money-usd"
+          },
+          "period_end_at": {
+            "title": "DateTime",
+            "description": "Exclusive period end timestamp.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "period_index": {
+            "description": "Sequence index for the period inside the contract.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingPeriodIndex"
+              }
+            ]
+          },
+          "period_start_at": {
+            "title": "DateTime",
+            "description": "Inclusive period start timestamp.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "rollover_in_amount": {
+            "nullable": true,
+            "title": "double",
+            "description": "Commitment carried in from an earlier period.",
+            "type": "number",
+            "format": "money-usd"
+          },
+          "rollover_out_amount": {
+            "nullable": true,
+            "title": "double",
+            "description": "Commitment intentionally rolled out to a later period.",
+            "type": "number",
+            "format": "money-usd"
+          },
+          "status": {
+            "nullable": true,
+            "description": "Operational status for the period.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingPeriodStatus"
+              }
+            ]
+          }
+        },
+        "required": [
+          "commitment_amount",
+          "period_end_at",
+          "period_index",
+          "period_start_at"
+        ]
+      },
+      "BillingPeriodStatus": {
+        "description": "Operational status for a contract billing period.",
+        "oneOf": [
+          {
+            "description": "Period is active and may still accrue usage or adjustments.",
+            "type": "string",
+            "enum": [
+              "open"
+            ]
+          },
+          {
+            "description": "Period is finalized and should be treated as read-only for billing purposes.",
+            "type": "string",
+            "enum": [
+              "closed"
+            ]
+          }
+        ]
+      },
+      "BillingPeriodView": {
+        "description": "Serialized billing period returned from a stored contract.",
+        "type": "object",
+        "properties": {
+          "commitment_amount": {
+            "title": "double",
+            "description": "New commitment funded for this period.",
+            "type": "number",
+            "format": "money-usd"
+          },
+          "id": {
+            "description": "Database identifier for the period row.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "period_end_at": {
+            "title": "DateTime",
+            "description": "Exclusive period end timestamp.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "period_index": {
+            "description": "Sequence index for the period inside the contract.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingPeriodIndex"
+              }
+            ]
+          },
+          "period_start_at": {
+            "title": "DateTime",
+            "description": "Inclusive period start timestamp.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "rollover_in_amount": {
+            "title": "double",
+            "description": "Commitment carried in from a previous period.",
+            "type": "number",
+            "format": "money-usd"
+          },
+          "rollover_out_amount": {
+            "title": "double",
+            "description": "Commitment intentionally rolled out to a later period.",
+            "type": "number",
+            "format": "money-usd"
+          },
+          "status": {
+            "description": "Operational status for the period.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingPeriodStatus"
+              }
+            ]
+          }
+        },
+        "required": [
+          "commitment_amount",
+          "id",
+          "period_end_at",
+          "period_index",
+          "period_start_at",
+          "rollover_in_amount",
+          "rollover_out_amount",
+          "status"
+        ]
+      },
+      "BillingProvider": {
+        "description": "Billing provider that owns downstream invoice or statement delivery.",
+        "oneOf": [
+          {
+            "description": "Charges are ultimately collected through Stripe.",
+            "type": "string",
+            "enum": [
+              "stripe"
+            ]
+          },
+          {
+            "description": "Charges are collected outside Stripe, usually by finance or contract workflow.",
+            "type": "string",
+            "enum": [
+              "manual_invoice"
+            ]
+          }
+        ]
+      },
+      "BillingQuantity": {
+        "description": "Non-negative quantity used for tier boundaries and later usage counts.",
+        "type": "integer",
+        "format": "int64"
+      },
+      "BillingRateTierInput": {
+        "description": "Serialized rate tier payload for a usage-rated contract item.",
+        "type": "object",
+        "properties": {
+          "tier_end_exclusive": {
+            "nullable": true,
+            "description": "Exclusive upper bound for the tier, or `None` when the tier is open-ended.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingQuantity"
+              }
+            ]
+          },
+          "tier_start_inclusive": {
+            "description": "First billable quantity in this tier.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingQuantity"
+              }
+            ]
+          },
+          "unit_price": {
+            "title": "double",
+            "description": "Price to charge for each unit that lands in this tier.",
+            "type": "number",
+            "format": "money-usd"
+          }
+        },
+        "required": [
+          "tier_start_inclusive",
+          "unit_price"
+        ]
+      },
+      "BillingRateTierView": {
+        "description": "Serialized rate tier returned from a stored contract.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Database identifier for the tier row.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "tier_end_exclusive": {
+            "nullable": true,
+            "description": "Exclusive upper bound for the tier, or `None` when the tier is open-ended.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingQuantity"
+              }
+            ]
+          },
+          "tier_start_inclusive": {
+            "description": "First billable quantity in this tier.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BillingQuantity"
+              }
+            ]
+          },
+          "unit_price": {
+            "title": "double",
+            "description": "Price charged for each unit in the tier.",
+            "type": "number",
+            "format": "money-usd"
+          }
+        },
+        "required": [
+          "id",
+          "tier_start_inclusive",
+          "unit_price"
+        ]
+      },
+      "BillingRolloverPolicy": {
+        "description": "What happens to unused commitment when a contract period closes.",
+        "oneOf": [
+          {
+            "description": "Unused commitment expires at the end of the period.",
+            "type": "string",
+            "enum": [
+              "none"
+            ]
+          },
+          {
+            "description": "Unused year-one commitment may roll once into year two, but not beyond.",
+            "type": "string",
+            "enum": [
+              "year1_to_year2_once"
+            ]
+          }
+        ]
+      },
+      "BillingUnit": {
+        "description": "Base unit that measured usage or pricing is expressed in.",
+        "oneOf": [
+          {
+            "description": "Quantity is counted in files.",
+            "type": "string",
+            "enum": [
+              "file"
+            ]
+          },
+          {
+            "description": "Quantity is counted in whole or rounded minutes.",
+            "type": "string",
+            "enum": [
+              "minute"
+            ]
+          },
+          {
+            "description": "Quantity is counted in seconds.",
+            "type": "string",
+            "enum": [
+              "second"
+            ]
+          },
+          {
+            "description": "Quantity is counted in years.",
+            "type": "string",
+            "enum": [
+              "year"
+            ]
+          },
+          {
+            "description": "Quantity is counted once per billing period.",
+            "type": "string",
+            "enum": [
+              "period"
+            ]
+          }
+        ]
+      },
+      "BillingUnitGranularity": {
+        "description": "Optional finer-grained measurement rule for a billed unit.",
+        "oneOf": [
+          {
+            "description": "Usage should be normalized or rounded at the minute level.",
+            "type": "string",
+            "enum": [
+              "minute"
+            ]
+          },
+          {
+            "description": "Usage should be normalized or rounded at the second level.",
+            "type": "string",
+            "enum": [
+              "second"
+            ]
+          }
+        ]
       },
       "BlendType": {
         "description": "What kind of blend to do",
@@ -32034,7 +33251,7 @@
         ]
       },
       "Currency": {
-        "description": "Currency is the list of supported currencies. Always lowercase.\n\nThis comes from the Stripe API docs: For more details see <https://support.stripe.com/questions/which-currencies-does-stripe-support>.",
+        "description": "A billing currency code.\n\nThis is intentionally billing-owned instead of Stripe-owned, so contract and manual invoice flows can use the same validated type without reaching back into a provider-specific crate.",
         "type": "string"
       },
       "CurveGetControlPoints": {
@@ -32186,7 +33403,7 @@
           },
           "currency": {
             "description": "Three-letter ISO code for the currency the customer can be charged in for recurring billing purposes.",
-            "default": "usd",
+            "default": "USD",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Currency"
@@ -35340,8 +36557,8 @@
             "format": "date-time"
           },
           "currency": {
-            "description": "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase.",
-            "default": "usd",
+            "description": "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html).",
+            "default": "USD",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Currency"
@@ -35481,8 +36698,8 @@
             "format": "money-usd"
           },
           "currency": {
-            "description": "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase.",
-            "default": "usd",
+            "description": "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html).",
+            "default": "USD",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Currency"
@@ -37272,6 +38489,15 @@
             "description": "Annual discount. The percentage off the monthly price if the user pays annually.",
             "type": "number",
             "format": "double"
+          },
+          "billing_mode": {
+            "description": "Indicates how billing collection is routed for this plan.",
+            "default": "standard",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SubscriptionBillingMode"
+              }
+            ]
           },
           "description": {
             "description": "A description of the tier.",
@@ -50104,6 +51330,25 @@
           }
         ]
       },
+      "SubscriptionBillingMode": {
+        "description": "How a subscription plan is billed operationally.",
+        "oneOf": [
+          {
+            "description": "Standard self-serve billing through the normal subscription flow.",
+            "type": "string",
+            "enum": [
+              "standard"
+            ]
+          },
+          {
+            "description": "Contract-managed billing controlled outside the standard subscription flow.",
+            "type": "string",
+            "enum": [
+              "contract"
+            ]
+          }
+        ]
+      },
       "SubscriptionPlanBillingModel": {
         "description": "Billing model for a modeling-app plan price.",
         "oneOf": [
@@ -54660,6 +55905,15 @@
                 "description": "Annual discount. The percentage off the monthly price if the user pays annually.",
                 "type": "number",
                 "format": "double"
+              },
+              "billing_mode": {
+                "description": "Indicates how billing collection is routed for this plan.",
+                "default": "standard",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SubscriptionBillingMode"
+                  }
+                ]
               },
               "description": {
                 "description": "A description of the tier.",
