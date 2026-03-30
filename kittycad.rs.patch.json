@@ -1145,6 +1145,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1user~1client-errors/post/x-rust",
+    "value": {
+      "example": "/// Report a client-originated error.\n/// \n/// This endpoint requires authentication by any Zoo user. It accepts a structured client error payload and writes it to the server logs for triage.\nasync fn example_users_report_client_error() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ClientErrorReportAccepted = client\n        .users()\n        .report_client_error(&kittycad::types::ClientErrorReport {\n            client: \"some-string\".to_string(),\n            code: Some(\"some-string\".to_string()),\n            error_name: Some(\"some-string\".to_string()),\n            message: \"some-string\".to_string(),\n            release: \"some-string\".to_string(),\n            route: Some(\"some-string\".to_string()),\n            stack: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.report_client_error"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1user~1email-marketing-consent/get/x-rust",
     "value": {
       "example": "/// Get email marketing consent state for the authenticated user.\nasync fn example_users_email_marketing_consent_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::EmailMarketingConsentState =\n        client.users().email_marketing_consent_get().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
