@@ -4766,6 +4766,116 @@ impl tabled::Tabled for CenterOfMass {
     }
 }
 
+#[doc = "Structured client-side error report sent by authenticated clients."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ClientErrorReport {
+    #[doc = "Stable identifier for the client application reporting the error."]
+    pub client: String,
+    #[doc = "Optional application-defined error code or fingerprint."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
+    #[doc = "Optional JavaScript/runtime error name."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error_name: Option<String>,
+    #[doc = "Human-readable error message."]
+    pub message: String,
+    #[doc = "Client release/version string."]
+    pub release: String,
+    #[doc = "Optional route/path where the error occurred."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub route: Option<String>,
+    #[doc = "Optional stack trace or equivalent debug context."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stack: Option<String>,
+}
+
+impl std::fmt::Display for ClientErrorReport {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ClientErrorReport {
+    const LENGTH: usize = 7;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.client.clone().into(),
+            if let Some(code) = &self.code {
+                format!("{:?}", code).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(error_name) = &self.error_name {
+                format!("{:?}", error_name).into()
+            } else {
+                String::new().into()
+            },
+            self.message.clone().into(),
+            self.release.clone().into(),
+            if let Some(route) = &self.route {
+                format!("{:?}", route).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(stack) = &self.stack {
+                format!("{:?}", stack).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "client".into(),
+            "code".into(),
+            "error_name".into(),
+            "message".into(),
+            "release".into(),
+            "route".into(),
+            "stack".into(),
+        ]
+    }
+}
+
+#[doc = "Response acknowledging that the error report was accepted for logging."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ClientErrorReportAccepted {
+    #[doc = "Whether the report was accepted."]
+    pub accepted: bool,
+}
+
+impl std::fmt::Display for ClientErrorReportAccepted {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ClientErrorReportAccepted {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.accepted).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["accepted".into()]
+    }
+}
+
 #[doc = "ClientMetrics contains information regarding the state of the peer."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
