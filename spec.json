@@ -25007,6 +25007,36 @@
         }
       }
     },
+    "/user/projects/{id}/download": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Download one of the authenticated user's projects as a tar archive.",
+        "operationId": "download_user_project",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "*/*": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/session/{token}": {
       "get": {
         "tags": [
