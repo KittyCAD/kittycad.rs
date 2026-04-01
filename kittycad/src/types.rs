@@ -5827,7 +5827,11 @@ impl tabled::Tabled for CreateOrgDataset {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct CreateRegion {}
+pub struct CreateRegion {
+    #[doc = "a mapping from the curves within this region to the source component segment curves \
+             they were split from"]
+    pub region_mapping: std::collections::HashMap<String, uuid::Uuid>,
+}
 
 impl std::fmt::Display for CreateRegion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -5841,13 +5845,13 @@ impl std::fmt::Display for CreateRegion {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CreateRegion {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![format!("{:?}", self.region_mapping).into()]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["region_mapping".into()]
     }
 }
 
@@ -5856,7 +5860,11 @@ impl tabled::Tabled for CreateRegion {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct CreateRegionFromQueryPoint {}
+pub struct CreateRegionFromQueryPoint {
+    #[doc = "a mapping from the curves within this region to the source component segment curves \
+             they were split from"]
+    pub region_mapping: std::collections::HashMap<String, uuid::Uuid>,
+}
 
 impl std::fmt::Display for CreateRegionFromQueryPoint {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -5870,13 +5878,13 @@ impl std::fmt::Display for CreateRegionFromQueryPoint {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CreateRegionFromQueryPoint {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![format!("{:?}", self.region_mapping).into()]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["region_mapping".into()]
     }
 }
 
@@ -13449,6 +13457,15 @@ pub enum ModelingCmd {
         #[doc = "Which Solid3D is being joined."]
         object_id: uuid::Uuid,
     },
+    #[doc = "Command for joining multiple Surfaces (non-manifold) to a Solid."]
+    #[serde(rename = "solid3d_multi_join")]
+    Solid3DMultiJoin {
+        #[doc = "Which bodies are being joined."]
+        object_ids: Vec<uuid::Uuid>,
+        #[doc = "The maximum acceptable surface gap computed between the joints. Must be positive \
+                 (i.e. greater than zero)."]
+        tolerance: f64,
+    },
     #[doc = "Command for creating a blend between the edge of two given surfaces"]
     #[serde(rename = "surface_blend")]
     SurfaceBlend {
@@ -15459,6 +15476,11 @@ pub enum OkModelingCmdResponse {
     Solid3DJoin {
         #[doc = "The response from the `Solid3dJoin` endpoint."]
         data: Solid3DJoin,
+    },
+    #[serde(rename = "solid3d_multi_join")]
+    Solid3DMultiJoin {
+        #[doc = "The response from the `Solid3dMultiJoin` endpoint."]
+        data: Solid3DMultiJoin,
     },
     #[serde(rename = "surface_blend")]
     SurfaceBlend {
@@ -19391,18 +19413,9 @@ pub struct ProjectResponse {
     pub id: uuid::Uuid,
     #[doc = "Current preview generation state."]
     pub preview_status: KclProjectPreviewStatus,
-    #[doc = "Height of the primary preview image in pixels."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub primary_preview_height: Option<i32>,
     #[doc = "Relative path to the primary preview image, when one exists."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub primary_preview_path: Option<String>,
-    #[doc = "Renderer or asset version tag for the primary preview image."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub primary_preview_version: Option<String>,
-    #[doc = "Width of the primary preview image in pixels."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub primary_preview_width: Option<i32>,
     #[doc = "Relative path to the project's manifest file."]
     pub project_toml_path: String,
     #[doc = "Current publication workflow state."]
@@ -19425,7 +19438,7 @@ impl std::fmt::Display for ProjectResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ProjectResponse {
-    const LENGTH: usize = 15;
+    const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.category_ids).into(),
@@ -19435,23 +19448,8 @@ impl tabled::Tabled for ProjectResponse {
             format!("{:?}", self.files).into(),
             format!("{:?}", self.id).into(),
             format!("{:?}", self.preview_status).into(),
-            if let Some(primary_preview_height) = &self.primary_preview_height {
-                format!("{:?}", primary_preview_height).into()
-            } else {
-                String::new().into()
-            },
             if let Some(primary_preview_path) = &self.primary_preview_path {
                 format!("{:?}", primary_preview_path).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(primary_preview_version) = &self.primary_preview_version {
-                format!("{:?}", primary_preview_version).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(primary_preview_width) = &self.primary_preview_width {
-                format!("{:?}", primary_preview_width).into()
             } else {
                 String::new().into()
             },
@@ -19471,10 +19469,7 @@ impl tabled::Tabled for ProjectResponse {
             "files".into(),
             "id".into(),
             "preview_status".into(),
-            "primary_preview_height".into(),
             "primary_preview_path".into(),
-            "primary_preview_version".into(),
-            "primary_preview_width".into(),
             "project_toml_path".into(),
             "publication_status".into(),
             "title".into(),
@@ -19500,18 +19495,9 @@ pub struct ProjectSummaryResponse {
     pub id: uuid::Uuid,
     #[doc = "Current preview generation state."]
     pub preview_status: KclProjectPreviewStatus,
-    #[doc = "Height of the primary preview image in pixels."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub primary_preview_height: Option<i32>,
     #[doc = "Relative path to the primary preview image, when one exists."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub primary_preview_path: Option<String>,
-    #[doc = "Renderer or asset version tag for the primary preview image."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub primary_preview_version: Option<String>,
-    #[doc = "Width of the primary preview image in pixels."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub primary_preview_width: Option<i32>,
     #[doc = "Relative path to the project's manifest file."]
     pub project_toml_path: String,
     #[doc = "Current publication workflow state."]
@@ -19534,7 +19520,7 @@ impl std::fmt::Display for ProjectSummaryResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ProjectSummaryResponse {
-    const LENGTH: usize = 14;
+    const LENGTH: usize = 11;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.category_ids).into(),
@@ -19543,23 +19529,8 @@ impl tabled::Tabled for ProjectSummaryResponse {
             self.entrypoint_path.clone().into(),
             format!("{:?}", self.id).into(),
             format!("{:?}", self.preview_status).into(),
-            if let Some(primary_preview_height) = &self.primary_preview_height {
-                format!("{:?}", primary_preview_height).into()
-            } else {
-                String::new().into()
-            },
             if let Some(primary_preview_path) = &self.primary_preview_path {
                 format!("{:?}", primary_preview_path).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(primary_preview_version) = &self.primary_preview_version {
-                format!("{:?}", primary_preview_version).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(primary_preview_width) = &self.primary_preview_width {
-                format!("{:?}", primary_preview_width).into()
             } else {
                 String::new().into()
             },
@@ -19578,10 +19549,7 @@ impl tabled::Tabled for ProjectSummaryResponse {
             "entrypoint_path".into(),
             "id".into(),
             "preview_status".into(),
-            "primary_preview_height".into(),
             "primary_preview_path".into(),
-            "primary_preview_version".into(),
-            "primary_preview_width".into(),
             "project_toml_path".into(),
             "publication_status".into(),
             "title".into(),
@@ -22036,6 +22004,34 @@ impl std::fmt::Display for Solid3DJoin {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Solid3DJoin {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `Solid3dMultiJoin` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DMultiJoin {}
+
+impl std::fmt::Display for Solid3DMultiJoin {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DMultiJoin {
     const LENGTH: usize = 0;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
