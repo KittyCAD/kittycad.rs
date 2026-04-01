@@ -1943,21 +1943,21 @@
           },
           {
             "in": "query",
+            "name": "token",
+            "description": "The verification token.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "email",
             "description": "The user's email.",
             "required": true,
             "schema": {
               "type": "string",
               "format": "email"
-            }
-          },
-          {
-            "in": "query",
-            "name": "token",
-            "description": "The verification token.",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -2465,8 +2465,8 @@
         "parameters": [
           {
             "in": "query",
-            "name": "sig",
-            "description": "The signature for the given payload",
+            "name": "sso",
+            "description": "The nonce and redirect URL sent to us by Discourse",
             "required": true,
             "schema": {
               "type": "string"
@@ -2474,8 +2474,8 @@
           },
           {
             "in": "query",
-            "name": "sso",
-            "description": "The nonce and redirect URL sent to us by Discourse",
+            "name": "sig",
+            "description": "The signature for the given payload",
             "required": true,
             "schema": {
               "type": "string"
@@ -2756,19 +2756,19 @@
         "parameters": [
           {
             "in": "query",
-            "name": "output_unit",
-            "description": "The output unit for the center of mass.",
-            "schema": {
-              "$ref": "#/components/schemas/UnitLength"
-            }
-          },
-          {
-            "in": "query",
             "name": "src_format",
             "description": "The format of the file.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/FileImportFormat"
+            }
+          },
+          {
+            "in": "query",
+            "name": "output_unit",
+            "description": "The output unit for the center of mass.",
+            "schema": {
+              "$ref": "#/components/schemas/UnitLength"
             }
           }
         ],
@@ -3155,20 +3155,20 @@
         "parameters": [
           {
             "in": "path",
-            "name": "output_format",
-            "description": "The format the file should be converted to.",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/FileExportFormat"
-            }
-          },
-          {
-            "in": "path",
             "name": "src_format",
             "description": "The format of the file to convert.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/FileImportFormat"
+            }
+          },
+          {
+            "in": "path",
+            "name": "output_format",
+            "description": "The format the file should be converted to.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FileExportFormat"
             }
           }
         ],
@@ -3278,20 +3278,20 @@
         "parameters": [
           {
             "in": "path",
-            "name": "output_format",
-            "description": "The format the file should be converted to.",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/FileExportFormat"
-            }
-          },
-          {
-            "in": "path",
             "name": "src_format",
             "description": "The format of the file to convert.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/FileImportFormat"
+            }
+          },
+          {
+            "in": "path",
+            "name": "output_format",
+            "description": "The format the file should be converted to.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FileExportFormat"
             }
           }
         ],
@@ -3385,6 +3385,15 @@
         "parameters": [
           {
             "in": "query",
+            "name": "src_format",
+            "description": "The format of the file.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FileImportFormat"
+            }
+          },
+          {
+            "in": "query",
             "name": "material_mass",
             "description": "The material mass.",
             "required": true,
@@ -3407,15 +3416,6 @@
             "description": "The output unit for the density.",
             "schema": {
               "$ref": "#/components/schemas/UnitDensity"
-            }
-          },
-          {
-            "in": "query",
-            "name": "src_format",
-            "description": "The format of the file.",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/FileImportFormat"
             }
           }
         ],
@@ -3833,6 +3833,15 @@
         "parameters": [
           {
             "in": "query",
+            "name": "src_format",
+            "description": "The format of the file.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FileImportFormat"
+            }
+          },
+          {
+            "in": "query",
             "name": "material_density",
             "description": "The material density.",
             "required": true,
@@ -3855,15 +3864,6 @@
             "description": "The output unit for the mass.",
             "schema": {
               "$ref": "#/components/schemas/UnitMass"
-            }
-          },
-          {
-            "in": "query",
-            "name": "src_format",
-            "description": "The format of the file.",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/FileImportFormat"
             }
           }
         ],
@@ -4060,19 +4060,19 @@
         "parameters": [
           {
             "in": "query",
-            "name": "output_unit",
-            "description": "The output unit for the surface area.",
-            "schema": {
-              "$ref": "#/components/schemas/UnitArea"
-            }
-          },
-          {
-            "in": "query",
             "name": "src_format",
             "description": "The format of the file.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/FileImportFormat"
+            }
+          },
+          {
+            "in": "query",
+            "name": "output_unit",
+            "description": "The output unit for the surface area.",
+            "schema": {
+              "$ref": "#/components/schemas/UnitArea"
             }
           }
         ],
@@ -4269,19 +4269,19 @@
         "parameters": [
           {
             "in": "query",
-            "name": "output_unit",
-            "description": "The output unit for the volume.",
-            "schema": {
-              "$ref": "#/components/schemas/UnitVolume"
-            }
-          },
-          {
-            "in": "query",
             "name": "src_format",
             "description": "The format of the file.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/FileImportFormat"
+            }
+          },
+          {
+            "in": "query",
+            "name": "output_unit",
+            "description": "The output unit for the volume.",
+            "schema": {
+              "$ref": "#/components/schemas/UnitVolume"
             }
           }
         ],
@@ -6911,19 +6911,19 @@
         "parameters": [
           {
             "in": "query",
-            "name": "app_name",
-            "description": "The originating app's name",
+            "name": "user_code",
+            "description": "The user code.",
+            "required": true,
             "schema": {
-              "nullable": true,
               "type": "string"
             }
           },
           {
             "in": "query",
-            "name": "user_code",
-            "description": "The user code.",
-            "required": true,
+            "name": "app_name",
+            "description": "The originating app's name",
             "schema": {
+              "nullable": true,
               "type": "string"
             }
           }
@@ -7035,18 +7035,18 @@
           },
           {
             "in": "query",
-            "name": "id_token",
-            "description": "For Apple only, a JSON web token containing the user’s identity information.",
+            "name": "state",
+            "description": "The state that we had passed in through the user consent URL.",
             "schema": {
-              "nullable": true,
               "type": "string"
             }
           },
           {
             "in": "query",
-            "name": "state",
-            "description": "The state that we had passed in through the user consent URL.",
+            "name": "id_token",
+            "description": "For Apple only, a JSON web token containing the user’s identity information.",
             "schema": {
+              "nullable": true,
               "type": "string"
             }
           },
@@ -7583,19 +7583,19 @@
         "parameters": [
           {
             "in": "query",
-            "name": "callback_url",
-            "description": "Optional callback URL to redirect to after verification",
+            "name": "token",
+            "description": "The verification token from the email",
+            "required": true,
             "schema": {
-              "nullable": true,
               "type": "string"
             }
           },
           {
             "in": "query",
-            "name": "token",
-            "description": "The verification token from the email",
-            "required": true,
+            "name": "callback_url",
+            "description": "Optional callback URL to redirect to after verification",
             "schema": {
+              "nullable": true,
               "type": "string"
             }
           }
@@ -8475,8 +8475,8 @@
         "parameters": [
           {
             "in": "query",
-            "name": "role_arn",
-            "description": "IAM role ARN customers expect Zoo to assume when reading the dataset.",
+            "name": "uri",
+            "description": "Dataset URI used to scope generated IAM policies.",
             "required": true,
             "schema": {
               "type": "string"
@@ -8484,8 +8484,8 @@
           },
           {
             "in": "query",
-            "name": "uri",
-            "description": "Dataset URI used to scope generated IAM policies.",
+            "name": "role_arn",
+            "description": "IAM role ARN customers expect Zoo to assume when reading the dataset.",
             "required": true,
             "schema": {
               "type": "string"
@@ -9445,15 +9445,6 @@
           },
           {
             "in": "query",
-            "name": "filter",
-            "description": "Optional filter string for conversions (example: `status:success`).",
-            "schema": {
-              "nullable": true,
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "limit",
             "description": "Maximum number of items returned by a single call",
             "schema": {
@@ -9477,6 +9468,15 @@
             "name": "sort_by",
             "schema": {
               "$ref": "#/components/schemas/ConversionSortMode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "filter",
+            "description": "Optional filter string for conversions (example: `status:success`).",
+            "schema": {
+              "nullable": true,
+              "type": "string"
             }
           }
         ],
@@ -9580,8 +9580,8 @@
         "parameters": [
           {
             "in": "path",
-            "name": "conversion_id",
-            "description": "Conversion identifier.",
+            "name": "id",
+            "description": "Dataset identifier.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/Uuid"
@@ -9589,8 +9589,8 @@
           },
           {
             "in": "path",
-            "name": "id",
-            "description": "Dataset identifier.",
+            "name": "conversion_id",
+            "description": "Conversion identifier.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/Uuid"
@@ -9693,8 +9693,8 @@
         "parameters": [
           {
             "in": "path",
-            "name": "conversion_id",
-            "description": "Conversion identifier.",
+            "name": "id",
+            "description": "Dataset identifier.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/Uuid"
@@ -9702,8 +9702,8 @@
           },
           {
             "in": "path",
-            "name": "id",
-            "description": "Dataset identifier.",
+            "name": "conversion_id",
+            "description": "Conversion identifier.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/Uuid"
@@ -9731,8 +9731,8 @@
         "parameters": [
           {
             "in": "path",
-            "name": "conversion_id",
-            "description": "Conversion identifier.",
+            "name": "id",
+            "description": "Dataset identifier.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/Uuid"
@@ -9740,8 +9740,8 @@
           },
           {
             "in": "path",
-            "name": "id",
-            "description": "Dataset identifier.",
+            "name": "conversion_id",
+            "description": "Conversion identifier.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/Uuid"
@@ -9837,8 +9837,8 @@
         "parameters": [
           {
             "in": "path",
-            "name": "conversion_id",
-            "description": "Conversion identifier.",
+            "name": "id",
+            "description": "Dataset identifier.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/Uuid"
@@ -9846,8 +9846,8 @@
           },
           {
             "in": "path",
-            "name": "id",
-            "description": "Dataset identifier.",
+            "name": "conversion_id",
+            "description": "Conversion identifier.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/Uuid"
@@ -9942,8 +9942,8 @@
         "parameters": [
           {
             "in": "path",
-            "name": "conversion_id",
-            "description": "Conversion identifier.",
+            "name": "id",
+            "description": "Dataset identifier.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/Uuid"
@@ -9951,8 +9951,8 @@
           },
           {
             "in": "path",
-            "name": "id",
-            "description": "Dataset identifier.",
+            "name": "conversion_id",
+            "description": "Conversion identifier.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/Uuid"
@@ -10406,6 +10406,15 @@
           },
           {
             "in": "query",
+            "name": "q",
+            "description": "Natural-language query text to embed and search.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "limit",
             "description": "Max number of matching chunks to return.\n\nDefaults to 10 and is capped at 100.",
             "schema": {
@@ -10413,15 +10422,6 @@
               "type": "integer",
               "format": "uint32",
               "minimum": 0
-            }
-          },
-          {
-            "in": "query",
-            "name": "q",
-            "description": "Natural-language query text to embed and search.",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -25895,14 +25895,6 @@
           },
           {
             "in": "query",
-            "name": "conversation_id",
-            "description": "If specified, only return the prompts for the conversation id given.",
-            "schema": {
-              "$ref": "#/components/schemas/Uuid"
-            }
-          },
-          {
-            "in": "query",
             "name": "no_models",
             "description": "DEPRECATED: This is the same as `no_parts`, and will be dropped in a future release. Please do not use this.",
             "schema": {
@@ -25917,6 +25909,14 @@
             "schema": {
               "nullable": true,
               "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "conversation_id",
+            "description": "If specified, only return the prompts for the conversation id given.",
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
             }
           }
         ],
@@ -28469,21 +28469,21 @@
         "parameters": [
           {
             "in": "query",
+            "name": "replay",
+            "description": "If `true`, emit MsgPack Replay for the specified conversation and continue.",
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
             "name": "conversation_id",
             "description": "Conversation to replay (UUID). Required when `replay` is `true`.",
             "schema": {
               "nullable": true,
               "type": "string",
               "format": "uuid"
-            }
-          },
-          {
-            "in": "query",
-            "name": "replay",
-            "description": "If `true`, emit MsgPack Replay for the specified conversation and continue.",
-            "schema": {
-              "nullable": true,
-              "type": "boolean"
             }
           },
           {
@@ -28580,11 +28580,22 @@
         "parameters": [
           {
             "in": "query",
-            "name": "api_call_id",
-            "description": "API Call ID for distributed tracing",
+            "name": "video_res_width",
+            "description": "Width of the video feed. Must be a multiple of 4.",
             "schema": {
-              "nullable": true,
-              "type": "string"
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "video_res_height",
+            "description": "Height of the video feed. Must be a multiple of 4.",
+            "schema": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0
             }
           },
           {
@@ -28599,8 +28610,24 @@
           },
           {
             "in": "query",
-            "name": "order_independent_transparency",
-            "description": "Enables nicer visuals for transparent surfaces. This slows down rendering, so it's off by default.",
+            "name": "unlocked_framerate",
+            "description": "If true, engine will render video frames as fast as it can.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "post_effect",
+            "description": "Engine Post effects (such as SSAO)",
+            "schema": {
+              "$ref": "#/components/schemas/PostEffectType"
+            }
+          },
+          {
+            "in": "query",
+            "name": "webrtc",
+            "description": "If true, will start a webrtc connection.",
             "schema": {
               "type": "boolean"
             }
@@ -28616,10 +28643,10 @@
           },
           {
             "in": "query",
-            "name": "post_effect",
-            "description": "Engine Post effects (such as SSAO)",
+            "name": "show_grid",
+            "description": "If true, will show the grid at the start of the session.",
             "schema": {
-              "$ref": "#/components/schemas/PostEffectType"
+              "type": "boolean"
             }
           },
           {
@@ -28633,44 +28660,17 @@
           },
           {
             "in": "query",
-            "name": "show_grid",
-            "description": "If true, will show the grid at the start of the session.",
+            "name": "api_call_id",
+            "description": "API Call ID for distributed tracing",
             "schema": {
-              "type": "boolean"
+              "nullable": true,
+              "type": "string"
             }
           },
           {
             "in": "query",
-            "name": "unlocked_framerate",
-            "description": "If true, engine will render video frames as fast as it can.",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "in": "query",
-            "name": "video_res_height",
-            "description": "Height of the video feed. Must be a multiple of 4.",
-            "schema": {
-              "type": "integer",
-              "format": "uint32",
-              "minimum": 0
-            }
-          },
-          {
-            "in": "query",
-            "name": "video_res_width",
-            "description": "Width of the video feed. Must be a multiple of 4.",
-            "schema": {
-              "type": "integer",
-              "format": "uint32",
-              "minimum": 0
-            }
-          },
-          {
-            "in": "query",
-            "name": "webrtc",
-            "description": "If true, will start a webrtc connection.",
+            "name": "order_independent_transparency",
+            "description": "Enables nicer visuals for transparent surfaces. This slows down rendering, so it's off by default.",
             "schema": {
               "type": "boolean"
             }
@@ -33456,11 +33456,37 @@
       },
       "CreateRegion": {
         "description": "The response from the 'CreateRegion'. The region should have an ID taken from the ID of the 'CreateRegion' modeling command.",
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "region_mapping": {
+            "description": "a mapping from the curves within this region to the source component segment curves they were split from",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "region_mapping"
+        ]
       },
       "CreateRegionFromQueryPoint": {
         "description": "The response from the 'CreateRegionFromQueryPoint'. The region should have an ID taken from the ID of the 'CreateRegionFromQueryPoint' modeling command.",
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "region_mapping": {
+            "description": "a mapping from the curves within this region to the source component segment curves they were split from",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "region_mapping"
+        ]
       },
       "CreateShortlinkRequest": {
         "description": "Request to create a shortlink.",
@@ -39451,6 +39477,39 @@
             ]
           },
           {
+            "description": "Command for joining multiple Surfaces (non-manifold) to a Solid.",
+            "type": "object",
+            "properties": {
+              "object_ids": {
+                "description": "Which bodies are being joined.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "tolerance": {
+                "description": "The maximum acceptable surface gap computed between the joints. Must be positive (i.e. greater than zero).",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_multi_join"
+                ]
+              }
+            },
+            "required": [
+              "object_ids",
+              "tolerance",
+              "type"
+            ]
+          },
+          {
             "description": "Command for creating a blend between the edge of two given surfaces",
             "type": "object",
             "properties": {
@@ -44303,6 +44362,24 @@
                 "type": "string",
                 "enum": [
                   "solid3d_join"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/Solid3dMultiJoin"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "solid3d_multi_join"
                 ]
               }
             },
@@ -49890,27 +49967,10 @@
               }
             ]
           },
-          "primary_preview_height": {
-            "nullable": true,
-            "description": "Height of the primary preview image in pixels.",
-            "type": "integer",
-            "format": "int32"
-          },
           "primary_preview_path": {
             "nullable": true,
             "description": "Relative path to the primary preview image, when one exists.",
             "type": "string"
-          },
-          "primary_preview_version": {
-            "nullable": true,
-            "description": "Renderer or asset version tag for the primary preview image.",
-            "type": "string"
-          },
-          "primary_preview_width": {
-            "nullable": true,
-            "description": "Width of the primary preview image in pixels.",
-            "type": "integer",
-            "format": "int32"
           },
           "project_toml_path": {
             "description": "Relative path to the project's manifest file.",
@@ -49990,27 +50050,10 @@
               }
             ]
           },
-          "primary_preview_height": {
-            "nullable": true,
-            "description": "Height of the primary preview image in pixels.",
-            "type": "integer",
-            "format": "int32"
-          },
           "primary_preview_path": {
             "nullable": true,
             "description": "Relative path to the primary preview image, when one exists.",
             "type": "string"
-          },
-          "primary_preview_version": {
-            "nullable": true,
-            "description": "Renderer or asset version tag for the primary preview image.",
-            "type": "string"
-          },
-          "primary_preview_width": {
-            "nullable": true,
-            "description": "Width of the primary preview image in pixels.",
-            "type": "integer",
-            "format": "int32"
           },
           "project_toml_path": {
             "description": "Relative path to the project's manifest file.",
@@ -51427,6 +51470,10 @@
       },
       "Solid3dJoin": {
         "description": "The response from the `Solid3dJoin` endpoint.",
+        "type": "object"
+      },
+      "Solid3dMultiJoin": {
+        "description": "The response from the `Solid3dMultiJoin` endpoint.",
         "type": "object"
       },
       "Solid3dShellFace": {
