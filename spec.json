@@ -29680,7 +29680,6 @@
           "ip_address": {
             "title": "String",
             "description": "The ip address of the origin.",
-            "default": "",
             "type": "string",
             "format": "ip"
           },
@@ -37111,7 +37110,6 @@
           "ip": {
             "title": "String",
             "description": "IP address of the user.",
-            "default": "",
             "type": "string",
             "format": "ip"
           },
