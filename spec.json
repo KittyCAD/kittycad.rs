@@ -17103,6 +17103,217 @@
         }
       }
     },
+    "/projects/public": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "List publicly visible community projects for the website/gallery.",
+        "operationId": "list_public_projects",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Array_of_PublicProjectResponse",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicProjectResponse"
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_public_projects",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/projects/public/{id}/thumbnail": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Fetch the public thumbnail for a published project.",
+        "operationId": "get_public_project_thumbnail",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "*/*": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/store/coupon": {
       "post": {
         "tags": [
@@ -25033,6 +25244,206 @@
                 "schema": {}
               }
             }
+          }
+        }
+      }
+    },
+    "/user/projects/{id}/publish": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Submit one of the authenticated user's projects for public review.",
+        "operationId": "publish_user_project",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_publish_user_project",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
           }
         }
       }
@@ -50103,6 +50514,75 @@
         },
         "required": [
           "email"
+        ]
+      },
+      "PublicProjectOwnerResponse": {
+        "description": "Public creator metadata for community project listings.",
+        "type": "object",
+        "properties": {
+          "username": {
+            "description": "Community-facing username/handle.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username"
+        ]
+      },
+      "PublicProjectResponse": {
+        "description": "Public community project metadata for gallery listings.",
+        "type": "object",
+        "properties": {
+          "categories": {
+            "description": "Selected public categories.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectCategoryResponse"
+            }
+          },
+          "description": {
+            "description": "Public project description.",
+            "type": "string"
+          },
+          "id": {
+            "description": "Unique project identifier.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "owner": {
+            "description": "Public creator metadata.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicProjectOwnerResponse"
+              }
+            ]
+          },
+          "preview_url": {
+            "nullable": true,
+            "description": "Stable public thumbnail URL, when one exists.",
+            "type": "string"
+          },
+          "published_at": {
+            "title": "DateTime",
+            "description": "When the project was published publicly.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "title": {
+            "description": "Public project title.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "categories",
+          "description",
+          "id",
+          "owner",
+          "published_at",
+          "title"
         ]
       },
       "RawFile": {

@@ -19589,6 +19589,101 @@ impl tabled::Tabled for PublicEmailMarketingConsentRequest {
     }
 }
 
+#[doc = "Public creator metadata for community project listings."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PublicProjectOwnerResponse {
+    #[doc = "Community-facing username/handle."]
+    pub username: String,
+}
+
+impl std::fmt::Display for PublicProjectOwnerResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PublicProjectOwnerResponse {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.username.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["username".into()]
+    }
+}
+
+#[doc = "Public community project metadata for gallery listings."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PublicProjectResponse {
+    #[doc = "Selected public categories."]
+    pub categories: Vec<ProjectCategoryResponse>,
+    #[doc = "Public project description."]
+    pub description: String,
+    #[doc = "Unique project identifier."]
+    pub id: uuid::Uuid,
+    #[doc = "Public creator metadata."]
+    pub owner: PublicProjectOwnerResponse,
+    #[doc = "Stable public thumbnail URL, when one exists."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub preview_url: Option<String>,
+    #[doc = "When the project was published publicly."]
+    pub published_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Public project title."]
+    pub title: String,
+}
+
+impl std::fmt::Display for PublicProjectResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PublicProjectResponse {
+    const LENGTH: usize = 7;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.categories).into(),
+            self.description.clone().into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.owner).into(),
+            if let Some(preview_url) = &self.preview_url {
+                format!("{:?}", preview_url).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.published_at).into(),
+            self.title.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "categories".into(),
+            "description".into(),
+            "id".into(),
+            "owner".into(),
+            "preview_url".into(),
+            "published_at".into(),
+            "title".into(),
+        ]
+    }
+}
+
 #[doc = "A raw file with unencoded contents to be passed over binary websockets. When raw files \
          come back for exports it is sent as binary/bson, not text/json."]
 #[derive(

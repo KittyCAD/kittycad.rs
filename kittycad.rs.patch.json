@@ -953,6 +953,22 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1projects~1public/get/x-rust",
+    "value": {
+      "example": "/// List publicly visible community projects for the website/gallery.\nasync fn example_users_list_public_projects() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::PublicProjectResponse> =\n        client.users().list_public_projects().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.list_public_projects"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1projects~1public~1{id}~1thumbnail/get/x-rust",
+    "value": {
+      "example": "/// Fetch the public thumbnail for a published project.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_users_get_public_project_thumbnail() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .get_public_project_thumbnail(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_public_project_thumbnail"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1store~1coupon/post/x-rust",
     "value": {
       "example": "/// Create a new store coupon.\n/// \n/// This endpoint requires authentication by a Zoo employee. It creates a new store coupon.\nasync fn example_store_create_coupon() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::DiscountCode = client\n        .store()\n        .create_coupon(&kittycad::types::StoreCouponParams {\n            percent_off: 4 as u32,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
@@ -1421,6 +1437,14 @@
     "value": {
       "example": "/// Download one of the authenticated user's projects as a tar archive.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_users_download_project() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .download_project(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.download_project"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1projects~1{id}~1publish/post/x-rust",
+    "value": {
+      "example": "/// Submit one of the authenticated user's projects for public review.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_users_publish_project() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectResponse = client\n        .users()\n        .publish_project(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.publish_project"
     }
   },
   {
