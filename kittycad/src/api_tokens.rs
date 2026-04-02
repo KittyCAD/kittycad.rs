@@ -71,7 +71,8 @@ impl ApiTokens {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
-        self.list_for_user(limit, None, sort_by)
+        let stream = self
+            .list_for_user(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
@@ -125,8 +126,16 @@ impl ApiTokens {
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream()
-            .boxed()
+            .try_flatten_stream();
+        #[cfg(target_arch = "wasm32")]
+        {
+            stream.boxed_local()
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            stream.boxed()
+        }
     }
 
     #[doc = "Create a new API token for your user.\n\nThis endpoint requires authentication by any \
