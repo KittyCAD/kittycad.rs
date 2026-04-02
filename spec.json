@@ -39234,11 +39234,6 @@
             "minItems": 0,
             "maxItems": 15
           },
-          "is_custom_quote": {
-            "description": "Indicates whether this plan uses custom-quoted pricing.",
-            "default": false,
-            "type": "boolean"
-          },
           "ml_custom_models": {
             "description": "Indicates whether the plan enables custom ML models.",
             "default": false,
@@ -52323,13 +52318,13 @@
             ]
           },
           {
-            "description": "Enterprise: The price is not listed and the user needs to contact sales.",
+            "description": "Contract-managed pricing. The price is not self-serve and the customer must contact sales.",
             "type": "object",
             "properties": {
               "type": {
                 "type": "string",
                 "enum": [
-                  "enterprise"
+                  "contract"
                 ]
               }
             },
@@ -56739,11 +56734,6 @@
                 },
                 "minItems": 0,
                 "maxItems": 15
-              },
-              "is_custom_quote": {
-                "description": "Indicates whether this plan uses custom-quoted pricing.",
-                "default": false,
-                "type": "boolean"
               },
               "ml_custom_models": {
                 "description": "Indicates whether the plan enables custom ML models.",
