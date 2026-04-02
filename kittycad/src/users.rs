@@ -41,6 +41,75 @@ impl Users {
         }
     }
 
+    #[doc = "List publicly visible community projects for the \
+             website/gallery.\n\n```rust,no_run\nasync fn example_users_list_public_projects() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: Vec<kittycad::types::PublicProjectResponse> =\n        \
+             client.users().list_public_projects().await?;\n    println!(\"{:?}\", result);\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn list_public_projects<'a>(
+        &'a self,
+    ) -> Result<Vec<crate::types::PublicProjectResponse>, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "projects/public"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Fetch the public thumbnail for a published project.\n\n**Parameters:**\n\n- `id: \
+             uuid::Uuid`: The identifier. (required)\n\n```rust,no_run\nuse \
+             std::str::FromStr;\nasync fn example_users_get_public_project_thumbnail() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
+             client\n        .users()\n        \
+             .get_public_project_thumbnail(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_public_project_thumbnail<'a>(
+        &'a self,
+        id: uuid::Uuid,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "projects/public/{id}/thumbnail".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Get your user.\n\nGet the user information for the authenticated \
              user.\n\nAlternatively, you can also use the `/users/me` \
              endpoint.\n\n```rust,no_run\nasync fn example_users_get_self() -> anyhow::Result<()> \
@@ -633,6 +702,47 @@ impl Users {
         let status = resp.status();
         if status.is_success() {
             Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Submit one of the authenticated user's projects for public \
+             review.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. \
+             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_users_publish_project() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectResponse = \
+             client\n        .users()\n        .publish_project(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn publish_project<'a>(
+        &'a self,
+        id: uuid::Uuid,
+    ) -> Result<crate::types::ProjectResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/projects/{id}/publish".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
         } else {
             let text = resp.text().await.unwrap_or_default();
             Err(crate::types::error::Error::Server {
