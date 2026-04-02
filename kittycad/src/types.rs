@@ -13127,9 +13127,6 @@ pub struct ModelingAppSubscriptionTier {
     #[doc = "Features that are included in the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub features: Option<Vec<SubscriptionTierFeature>>,
-    #[doc = "Indicates whether this plan uses custom-quoted pricing."]
-    #[serde(default)]
-    pub is_custom_quote: bool,
     #[doc = "Indicates whether the plan enables custom ML models."]
     #[serde(default)]
     pub ml_custom_models: bool,
@@ -13178,7 +13175,7 @@ impl std::fmt::Display for ModelingAppSubscriptionTier {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ModelingAppSubscriptionTier {
-    const LENGTH: usize = 18;
+    const LENGTH: usize = 17;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
@@ -13207,7 +13204,6 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.is_custom_quote).into(),
             format!("{:?}", self.ml_custom_models).into(),
             if let Some(monthly_pay_as_you_go_api_credits) = &self.monthly_pay_as_you_go_api_credits
             {
@@ -13253,7 +13249,6 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
             "display_name".into(),
             "endpoints_included".into(),
             "features".into(),
-            "is_custom_quote".into(),
             "ml_custom_models".into(),
             "monthly_pay_as_you_go_api_credits".into(),
             "monthly_pay_as_you_go_api_credits_monetary_value".into(),
@@ -22625,9 +22620,10 @@ pub enum SubscriptionTierPrice {
         #[doc = "The price."]
         price: f64,
     },
-    #[doc = "Enterprise: The price is not listed and the user needs to contact sales."]
-    #[serde(rename = "enterprise")]
-    Enterprise {},
+    #[doc = "Contract-managed pricing. The price is not self-serve and the customer must contact \
+             sales."]
+    #[serde(rename = "contract")]
+    Contract {},
 }
 
 #[doc = "An enum representing a subscription tier type."]
@@ -27689,9 +27685,6 @@ pub struct ZooProductSubscription {
     #[doc = "Features that are included in the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub features: Option<Vec<SubscriptionTierFeature>>,
-    #[doc = "Indicates whether this plan uses custom-quoted pricing."]
-    #[serde(default)]
-    pub is_custom_quote: bool,
     #[doc = "Indicates whether the plan enables custom ML models."]
     #[serde(default)]
     pub ml_custom_models: bool,
@@ -27740,7 +27733,7 @@ impl std::fmt::Display for ZooProductSubscription {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ZooProductSubscription {
-    const LENGTH: usize = 18;
+    const LENGTH: usize = 17;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
@@ -27769,7 +27762,6 @@ impl tabled::Tabled for ZooProductSubscription {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.is_custom_quote).into(),
             format!("{:?}", self.ml_custom_models).into(),
             if let Some(monthly_pay_as_you_go_api_credits) = &self.monthly_pay_as_you_go_api_credits
             {
@@ -27815,7 +27807,6 @@ impl tabled::Tabled for ZooProductSubscription {
             "display_name".into(),
             "endpoints_included".into(),
             "features".into(),
-            "is_custom_quote".into(),
             "ml_custom_models".into(),
             "monthly_pay_as_you_go_api_credits".into(),
             "monthly_pay_as_you_go_api_credits_monetary_value".into(),
