@@ -55727,6 +55727,10 @@
             "default": "",
             "type": "string",
             "format": "phone"
+          },
+          "username": {
+            "description": "Public username/handle for community-facing features. Empty clears it.",
+            "type": "string"
           }
         },
         "required": [
