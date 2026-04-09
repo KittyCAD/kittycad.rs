@@ -313,7 +313,7 @@ impl Orgs {
             .boxed()
     }
 
-    #[doc = "Register a new org dataset.\n\nIf the dataset lives in S3, call `/org/dataset/s3/policies` first so you can generate the trust, permission, and bucket policies scoped to your dataset before invoking this endpoint.\n\n```rust,no_run\nasync fn example_orgs_create_dataset() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDataset = client\n        .orgs()\n        .create_dataset(&kittycad::types::CreateOrgDataset {\n            name: \"some-string\".to_string(),\n            source: kittycad::types::OrgDatasetSource {\n                access_role_arn: Some(\"some-string\".to_string()),\n                provider: kittycad::types::StorageProvider::ZooManaged,\n                uri: Some(\"some-string\".to_string()),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Register a new org dataset.\n\nIf the dataset lives in S3, call `/org/dataset/s3/policies` first so you can generate the trust, permission, and bucket policies scoped to your dataset before invoking this endpoint.\n\n```rust,no_run\nasync fn example_orgs_create_dataset() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDataset = client\n        .orgs()\n        .create_dataset(&kittycad::types::CreateOrgDataset {\n            description: Some(\"some-string\".to_string()),\n            name: \"some-string\".to_string(),\n            require_raw_kcl_similarity_score_for_success: true,\n            source: kittycad::types::OrgDatasetSource {\n                access_role_arn: Some(\"some-string\".to_string()),\n                provider: kittycad::types::StorageProvider::ZooManaged,\n                uri: Some(\"some-string\".to_string()),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_dataset<'a>(
         &'a self,
@@ -385,7 +385,7 @@ impl Orgs {
         }
     }
 
-    #[doc = "Update dataset metadata or storage credentials for the caller's organization.\n\nIMPORTANT: Use this endpoint to fix connectivity to the same underlying storage location (e.g. rotating credentials or correcting a typo). Do not repoint an existing dataset at a completely different bucket or provider—create a new dataset instead so conversions in flight keep their original source. This warning applies to every storage backend, not just S3.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_update_dataset() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDataset = client\n        .orgs()\n        .update_dataset(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateOrgDataset {\n                name: Some(\"some-string\".to_string()),\n                source: Some(kittycad::types::UpdateOrgDatasetSource {\n                    access_role_arn: Some(\"some-string\".to_string()),\n                    provider: Some(kittycad::types::StorageProvider::ZooManaged),\n                    uri: Some(\"some-string\".to_string()),\n                }),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update dataset metadata or storage credentials for the caller's organization.\n\nIMPORTANT: Use this endpoint to fix connectivity to the same underlying storage location (e.g. rotating credentials or correcting a typo). Do not repoint an existing dataset at a completely different bucket or provider—create a new dataset instead so conversions in flight keep their original source. This warning applies to every storage backend, not just S3.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_update_dataset() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDataset = client\n        .orgs()\n        .update_dataset(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateOrgDataset {\n                description: Some(\"some-string\".to_string()),\n                name: Some(\"some-string\".to_string()),\n                require_raw_kcl_similarity_score_for_success: Some(true),\n                source: Some(kittycad::types::UpdateOrgDatasetSource {\n                    access_role_arn: Some(\"some-string\".to_string()),\n                    provider: Some(kittycad::types::StorageProvider::ZooManaged),\n                    uri: Some(\"some-string\".to_string()),\n                }),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_dataset<'a>(
         &'a self,
@@ -1611,40 +1611,6 @@ impl Orgs {
             })
             .try_flatten_stream()
             .boxed()
-    }
-
-    #[doc = "Get admin-only details for an organization.\n\nZoo admins can retrieve extended information about any organization, while non-admins receive a 404 to avoid leaking existence.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_admin_details_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgAdminDetails = client\n        .orgs()\n        .admin_details_get(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn admin_details_get<'a>(
-        &'a self,
-        id: uuid::Uuid,
-    ) -> Result<crate::types::OrgAdminDetails, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!(
-                "{}/{}",
-                self.client.base_url,
-                "orgs/{id}/admin/details".replace("{id}", &format!("{}", id))
-            ),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
     }
 
     #[doc = "Get the billing contract for an organization.\n\nThis endpoint requires Zoo admin \
