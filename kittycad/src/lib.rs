@@ -124,6 +124,11 @@ pub mod orgs;
 /// FROM: <https://zoo.dev/docs/api/payments>
 #[cfg(feature = "requests")]
 pub mod payments;
+/// Operations for user-owned projects, public project discovery, publishing, voting, and share links.
+///
+/// FROM: <https://zoo.dev/docs/api/projects>
+#[cfg(feature = "requests")]
+pub mod projects;
 /// Service accounts allow organizations to call the API. Organization admins can create, delete, and list the service accounts for their org. Service accounts are scoped to an organization not individual users, these are better to use for automations than individual API tokens, since they won't stop working when an individual leaves the company.
 ///
 /// FROM: <https://zoo.dev/docs/api/service-accounts>
@@ -479,6 +484,13 @@ impl Client {
     /// FROM: <https://zoo.dev/docs/api/payments>
     pub fn payments(&self) -> payments::Payments {
         payments::Payments::new(self.clone())
+    }
+
+    /// Operations for user-owned projects, public project discovery, publishing, voting, and share links.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/projects>
+    pub fn projects(&self) -> projects::Projects {
+        projects::Projects::new(self.clone())
     }
 
     /// Service accounts allow organizations to call the API. Organization admins can create, delete, and list the service accounts for their org. Service accounts are scoped to an organization not individual users, these are better to use for automations than individual API tokens, since they won't stop working when an individual leaves the company.

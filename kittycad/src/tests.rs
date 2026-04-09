@@ -100,8 +100,23 @@ fn test_mlcopilot_server_message_serde_roundtrip() {
     assert_eq!(de, msg);
 }
 
-fn test_client() -> crate::Client {
-    crate::Client::new_from_env()
+fn test_client(test_name: &str) -> Option<crate::Client> {
+    let has_token = std::env::var("KITTYCAD_API_TOKEN")
+        .ok()
+        .filter(|token| !token.is_empty())
+        .or_else(|| {
+            std::env::var("ZOO_API_TOKEN")
+                .ok()
+                .filter(|token| !token.is_empty())
+        })
+        .is_some();
+
+    if !has_token {
+        eprintln!("skipping {test_name}: set KITTYCAD_API_TOKEN or ZOO_API_TOKEN");
+        return None;
+    }
+
+    Some(crate::Client::new_from_env())
 }
 
 fn one_of_fixture() -> crate::types::AsyncApiCallOutput {
@@ -173,7 +188,9 @@ async fn create_async_file_conversion(client: &crate::Client) -> crate::types::F
 #[cfg(not(feature = "js"))]
 #[tokio::test]
 async fn test_list_org_members_stream() {
-    let client = test_client();
+    let Some(client) = test_client("test_list_org_members_stream") else {
+        return;
+    };
 
     let orgs = client.orgs();
     let mut stream = orgs.list_members_stream(None, None, None);
@@ -198,7 +215,9 @@ async fn test_list_org_members_stream() {
 
 #[tokio::test]
 async fn test_create_file_conversion() {
-    let client = test_client();
+    let Some(client) = test_client("test_create_file_conversion") else {
+        return;
+    };
     let body = include_bytes!("../../assets/in_obj.obj");
 
     let conversion = client
@@ -220,7 +239,9 @@ async fn test_create_file_conversion() {
 
 #[tokio::test]
 async fn test_create_file_volume() {
-    let client = test_client();
+    let Some(client) = test_client("test_create_file_volume") else {
+        return;
+    };
     let body = include_bytes!("../../assets/in_obj.obj");
 
     let result = client
@@ -241,7 +262,9 @@ async fn test_create_file_volume() {
 
 #[tokio::test]
 async fn test_get_status_of_async_operation() {
-    let client = test_client();
+    let Some(client) = test_client("test_get_status_of_async_operation") else {
+        return;
+    };
     let conversion = create_async_file_conversion(&client).await;
 
     let result = client
@@ -282,7 +305,9 @@ async fn tabled_one_of() {
 #[tokio::test]
 #[cfg(not(feature = "js"))]
 async fn test_stream() {
-    let client = test_client();
+    let Some(client) = test_client("test_stream") else {
+        return;
+    };
 
     let limit = 2;
     let api_calls = client.api_calls();
@@ -319,6 +344,7 @@ fn test_empty_phone_number() {
         discord: Some("@example-company".to_string()),
         image: "".to_string(),
         is_onboarded: Default::default(),
+        username: None,
     };
 
     assert_eq!(
@@ -361,7 +387,9 @@ fn test_empty_phone_number() {
 
 #[tokio::test]
 async fn test_user_self() {
-    let client = test_client();
+    let Some(client) = test_client("test_user_self") else {
+        return;
+    };
 
     let _result = client.users().get_self().await.unwrap();
 }
@@ -371,7 +399,9 @@ async fn test_modeling_websocket() {
     use futures::{SinkExt, StreamExt};
     use uuid::Uuid;
 
-    let client = test_client();
+    let Some(client) = test_client("test_modeling_websocket") else {
+        return;
+    };
 
     let ws = match client
         .modeling()

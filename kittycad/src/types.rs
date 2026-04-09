@@ -5822,6 +5822,42 @@ impl tabled::Tabled for CreateOrgDataset {
     }
 }
 
+#[doc = "Request payload for creating a new project share link."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CreateProjectShareLinkRequest {
+    #[doc = "Access policy for the generated share link."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub access_mode: Option<KclProjectShareLinkAccessMode>,
+}
+
+impl std::fmt::Display for CreateProjectShareLinkRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CreateProjectShareLinkRequest {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![if let Some(access_mode) = &self.access_mode {
+            format!("{:?}", access_mode).into()
+        } else {
+            String::new().into()
+        }]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["access_mode".into()]
+    }
+}
+
 #[doc = "The response from the 'CreateRegion'. The region should have an ID taken from the ID of \
          the 'CreateRegion' modeling command."]
 #[derive(
@@ -11778,6 +11814,31 @@ pub enum KclProjectPublicationStatus {
     #[serde(rename = "deleted")]
     #[display("deleted")]
     Deleted,
+}
+
+#[doc = "Access policy for a shared project download link."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum KclProjectShareLinkAccessMode {
+    #[doc = "Anyone holding the URL can download the project."]
+    #[serde(rename = "anyone_with_link")]
+    #[display("anyone_with_link")]
+    AnyoneWithLink,
+    #[doc = "Only members of the owner's organization can use the URL."]
+    #[serde(rename = "organization_only")]
+    #[display("organization_only")]
+    OrganizationOnly,
 }
 
 #[doc = "The response from the `Loft` command."]
@@ -19473,6 +19534,57 @@ impl tabled::Tabled for ProjectResponse {
     }
 }
 
+#[doc = "Owner-visible share-link metadata for project downloads."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectShareLinkResponse {
+    #[doc = "Access policy for the share link."]
+    pub access_mode: KclProjectShareLinkAccessMode,
+    #[doc = "Share-link creation timestamp."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Opaque identifier used in the public shared URL."]
+    pub key: String,
+    #[doc = "Share-link last update timestamp."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Fully-qualified URL that can be shared."]
+    pub url: String,
+}
+
+impl std::fmt::Display for ProjectShareLinkResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectShareLinkResponse {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.access_mode).into(),
+            format!("{:?}", self.created_at).into(),
+            self.key.clone().into(),
+            format!("{:?}", self.updated_at).into(),
+            self.url.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "access_mode".into(),
+            "created_at".into(),
+            "key".into(),
+            "updated_at".into(),
+            "url".into(),
+        ]
+    }
+}
+
 #[doc = "Owner-visible project summary payload."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -19626,6 +19738,8 @@ pub struct PublicProjectResponse {
     pub description: String,
     #[doc = "Unique project identifier."]
     pub id: uuid::Uuid,
+    #[doc = "Current total public like count for the project."]
+    pub like_count: i64,
     #[doc = "Public creator metadata."]
     pub owner: PublicProjectOwnerResponse,
     #[doc = "Stable public thumbnail URL, when one exists."]
@@ -19649,12 +19763,13 @@ impl std::fmt::Display for PublicProjectResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for PublicProjectResponse {
-    const LENGTH: usize = 7;
+    const LENGTH: usize = 8;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.categories).into(),
             self.description.clone().into(),
             format!("{:?}", self.id).into(),
+            format!("{:?}", self.like_count).into(),
             format!("{:?}", self.owner).into(),
             if let Some(preview_url) = &self.preview_url {
                 format!("{:?}", preview_url).into()
@@ -19671,11 +19786,48 @@ impl tabled::Tabled for PublicProjectResponse {
             "categories".into(),
             "description".into(),
             "id".into(),
+            "like_count".into(),
             "owner".into(),
             "preview_url".into(),
             "published_at".into(),
             "title".into(),
         ]
+    }
+}
+
+#[doc = "Signed-in viewer vote state for a public project."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PublicProjectVoteResponse {
+    #[doc = "Current total public like count for the project."]
+    pub like_count: i64,
+    #[doc = "Whether the authenticated viewer currently likes the project."]
+    pub liked: bool,
+}
+
+impl std::fmt::Display for PublicProjectVoteResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PublicProjectVoteResponse {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.like_count).into(),
+            format!("{:?}", self.liked).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["like_count".into(), "liked".into()]
     }
 }
 
@@ -26328,6 +26480,9 @@ pub struct UpdateUser {
     #[doc = "The user's phone number."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub phone: phone_number::PhoneNumber,
+    #[doc = "Public username/handle for community-facing features. Empty clears it."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub username: Option<String>,
 }
 
 impl std::fmt::Display for UpdateUser {
@@ -26342,7 +26497,7 @@ impl std::fmt::Display for UpdateUser {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UpdateUser {
-    const LENGTH: usize = 8;
+    const LENGTH: usize = 9;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(company) = &self.company {
@@ -26377,6 +26532,11 @@ impl tabled::Tabled for UpdateUser {
                 String::new().into()
             },
             format!("{:?}", self.phone).into(),
+            if let Some(username) = &self.username {
+                format!("{:?}", username).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
@@ -26390,6 +26550,7 @@ impl tabled::Tabled for UpdateUser {
             "is_onboarded".into(),
             "last_name".into(),
             "phone".into(),
+            "username".into(),
         ]
     }
 }
