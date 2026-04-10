@@ -19265,6 +19265,37 @@ impl tabled::Tabled for PublicEmailMarketingConsentRequest {
     }
 }
 
+#[doc = "Request body for public mailing-list membership changes."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PublicMailingListMembershipRequest {
+    #[doc = "Email address to add or remove."]
+    pub email: String,
+}
+
+impl std::fmt::Display for PublicMailingListMembershipRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PublicMailingListMembershipRequest {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.email.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["email".into()]
+    }
+}
+
 #[doc = "Public creator metadata for community project listings."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -26304,9 +26335,9 @@ pub enum UserFeature {
     #[serde(rename = "proprietary_to_kcl_conversion_beta")]
     #[display("proprietary_to_kcl_conversion_beta")]
     ProprietaryToKclConversionBeta,
-    #[serde(rename = "new_sketch_mode")]
-    #[display("new_sketch_mode")]
-    NewSketchMode,
+    #[serde(rename = "classic_sketch_mode")]
+    #[display("classic_sketch_mode")]
+    ClassicSketchMode,
 }
 
 #[doc = "Enabled features surfaced to end users."]
