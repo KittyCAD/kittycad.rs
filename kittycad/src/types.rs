@@ -19450,6 +19450,68 @@ impl tabled::Tabled for ProjectPointsToPlane {
     }
 }
 
+#[doc = "Owner-facing publication metadata for a project."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectPublicationInfoResponse {
+    #[doc = "Whether the current editable draft differs from the last live version."]
+    pub has_unpublished_changes: bool,
+    #[doc = "When a version of this project most recently became public."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_published_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "Last version that successfully went live for this project."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_published_version_id: Option<uuid::Uuid>,
+    #[doc = "When the current version was most recently submitted for review."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub submitted_at: Option<chrono::DateTime<chrono::Utc>>,
+}
+
+impl std::fmt::Display for ProjectPublicationInfoResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectPublicationInfoResponse {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.has_unpublished_changes).into(),
+            if let Some(last_published_at) = &self.last_published_at {
+                format!("{:?}", last_published_at).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(last_published_version_id) = &self.last_published_version_id {
+                format!("{:?}", last_published_version_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(submitted_at) = &self.submitted_at {
+                format!("{:?}", submitted_at).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "has_unpublished_changes".into(),
+            "last_published_at".into(),
+            "last_published_version_id".into(),
+            "submitted_at".into(),
+        ]
+    }
+}
+
 #[doc = "Owner-visible project detail payload."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -19474,6 +19536,8 @@ pub struct ProjectResponse {
     pub primary_preview_path: Option<String>,
     #[doc = "Relative path to the project's manifest file."]
     pub project_toml_path: String,
+    #[doc = "Owner-facing publication metadata for the current and last live version."]
+    pub publication: ProjectPublicationInfoResponse,
     #[doc = "Current publication workflow state."]
     pub publication_status: KclProjectPublicationStatus,
     #[doc = "User-facing project title."]
@@ -19494,7 +19558,7 @@ impl std::fmt::Display for ProjectResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ProjectResponse {
-    const LENGTH: usize = 12;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.category_ids).into(),
@@ -19510,6 +19574,7 @@ impl tabled::Tabled for ProjectResponse {
                 String::new().into()
             },
             self.project_toml_path.clone().into(),
+            format!("{:?}", self.publication).into(),
             format!("{:?}", self.publication_status).into(),
             self.title.clone().into(),
             format!("{:?}", self.updated_at).into(),
@@ -19527,6 +19592,7 @@ impl tabled::Tabled for ProjectResponse {
             "preview_status".into(),
             "primary_preview_path".into(),
             "project_toml_path".into(),
+            "publication".into(),
             "publication_status".into(),
             "title".into(),
             "updated_at".into(),
@@ -19607,6 +19673,8 @@ pub struct ProjectSummaryResponse {
     pub primary_preview_path: Option<String>,
     #[doc = "Relative path to the project's manifest file."]
     pub project_toml_path: String,
+    #[doc = "Owner-facing publication metadata for the current and last live version."]
+    pub publication: ProjectPublicationInfoResponse,
     #[doc = "Current publication workflow state."]
     pub publication_status: KclProjectPublicationStatus,
     #[doc = "User-facing project title."]
@@ -19627,7 +19695,7 @@ impl std::fmt::Display for ProjectSummaryResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ProjectSummaryResponse {
-    const LENGTH: usize = 11;
+    const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.category_ids).into(),
@@ -19642,6 +19710,7 @@ impl tabled::Tabled for ProjectSummaryResponse {
                 String::new().into()
             },
             self.project_toml_path.clone().into(),
+            format!("{:?}", self.publication).into(),
             format!("{:?}", self.publication_status).into(),
             self.title.clone().into(),
             format!("{:?}", self.updated_at).into(),
@@ -19658,6 +19727,7 @@ impl tabled::Tabled for ProjectSummaryResponse {
             "preview_status".into(),
             "primary_preview_path".into(),
             "project_toml_path".into(),
+            "publication".into(),
             "publication_status".into(),
             "title".into(),
             "updated_at".into(),
