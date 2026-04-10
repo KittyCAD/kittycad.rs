@@ -1099,6 +1099,81 @@ impl Users {
         }
     }
 
+    #[doc = "Publicly subscribe an email address to a mailing list by \
+             slug.\n\n**Parameters:**\n\n- `slug: &'astr`: Stable public list slug. \
+             (required)\n\n```rust,no_run\nasync fn \
+             example_users_put_public_mailing_list_subscribe() -> anyhow::Result<()> {\n    let \
+             client = kittycad::Client::new_from_env();\n    client\n        .users()\n        \
+             .put_public_mailing_list_subscribe(\n            \"some-string\",\n            \
+             &kittycad::types::PublicMailingListMembershipRequest {\n                email: \
+             \"email@example.com\".to_string(),\n            },\n        )\n        .await?;\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn put_public_mailing_list_subscribe<'a>(
+        &'a self,
+        slug: &'a str,
+        body: &crate::types::PublicMailingListMembershipRequest,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "website/email-marketing-lists/{slug}/subscribe".replace("{slug}", slug)
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Publicly remove an email address from a mailing list by slug.\n\n**Parameters:**\n\n- \
+             `slug: &'astr`: Stable public list slug. (required)\n\n```rust,no_run\nasync fn \
+             example_users_put_public_mailing_list_unsubscribe() -> anyhow::Result<()> {\n    let \
+             client = kittycad::Client::new_from_env();\n    client\n        .users()\n        \
+             .put_public_mailing_list_unsubscribe(\n            \"some-string\",\n            \
+             &kittycad::types::PublicMailingListMembershipRequest {\n                email: \
+             \"email@example.com\".to_string(),\n            },\n        )\n        .await?;\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn put_public_mailing_list_unsubscribe<'a>(
+        &'a self,
+        slug: &'a str,
+        body: &crate::types::PublicMailingListMembershipRequest,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "website/email-marketing-lists/{slug}/unsubscribe".replace("{slug}", slug)
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Stores authenticated CAD user info form data for the current user.\n\n```rust,no_run\nasync fn example_users_put_cad_info_form() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_cad_info_form(&kittycad::types::WebsiteCadUserInfoForm {\n            cad_industry: Some(kittycad::types::CadIndustry::Construction),\n            cad_user_type: Some(kittycad::types::CadUserType::Hobbyist),\n            company_size: Some(kittycad::types::CompanySize::FiveHundredOneToOneThousand),\n            how_did_you_find_us: Some(kittycad::types::CadDiscoverySource::Instagram),\n            how_did_you_find_us_other: Some(\"some-string\".to_string()),\n            number_of_cad_users: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn put_cad_info_form<'a>(

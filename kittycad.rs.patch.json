@@ -1665,6 +1665,22 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1website~1email-marketing-lists~1{slug}~1subscribe/put/x-rust",
+    "value": {
+      "example": "/// Publicly subscribe an email address to a mailing list by slug.\n/// \n/// **Parameters:**\n/// \n/// - `slug: &'astr`: Stable public list slug. (required)\nasync fn example_users_put_public_mailing_list_subscribe() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_mailing_list_subscribe(\n            \"some-string\",\n            &kittycad::types::PublicMailingListMembershipRequest {\n                email: \"email@example.com\".to_string(),\n            },\n        )\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.put_public_mailing_list_subscribe"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1website~1email-marketing-lists~1{slug}~1unsubscribe/put/x-rust",
+    "value": {
+      "example": "/// Publicly remove an email address from a mailing list by slug.\n/// \n/// **Parameters:**\n/// \n/// - `slug: &'astr`: Stable public list slug. (required)\nasync fn example_users_put_public_mailing_list_unsubscribe() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_public_mailing_list_unsubscribe(\n            \"some-string\",\n            &kittycad::types::PublicMailingListMembershipRequest {\n                email: \"email@example.com\".to_string(),\n            },\n        )\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.put_public_mailing_list_unsubscribe"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1website~1forms~1cad-user-info/put/x-rust",
     "value": {
       "example": "/// Stores authenticated CAD user info form data for the current user.\nasync fn example_users_put_cad_info_form() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .users()\n        .put_cad_info_form(&kittycad::types::WebsiteCadUserInfoForm {\n            cad_industry: Some(kittycad::types::CadIndustry::Construction),\n            cad_user_type: Some(kittycad::types::CadUserType::Hobbyist),\n            company_size: Some(kittycad::types::CompanySize::FiveHundredOneToOneThousand),\n            how_did_you_find_us: Some(kittycad::types::CadDiscoverySource::Instagram),\n            how_did_you_find_us_other: Some(\"some-string\".to_string()),\n            number_of_cad_users: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n",
