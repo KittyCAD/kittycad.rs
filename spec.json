@@ -51721,6 +51721,42 @@
           "projected_points"
         ]
       },
+      "ProjectPublicationInfoResponse": {
+        "description": "Owner-facing publication metadata for a project.",
+        "type": "object",
+        "properties": {
+          "has_unpublished_changes": {
+            "description": "Whether the current editable draft differs from the last live version.",
+            "type": "boolean"
+          },
+          "last_published_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "When a version of this project most recently became public.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_published_version_id": {
+            "nullable": true,
+            "description": "Last version that successfully went live for this project.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "submitted_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "When the current version was most recently submitted for review.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "has_unpublished_changes"
+        ]
+      },
       "ProjectResponse": {
         "description": "Owner-visible project detail payload.",
         "type": "object",
@@ -51778,6 +51814,14 @@
             "description": "Relative path to the project's manifest file.",
             "type": "string"
           },
+          "publication": {
+            "description": "Owner-facing publication metadata for the current and last live version.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProjectPublicationInfoResponse"
+              }
+            ]
+          },
           "publication_status": {
             "description": "Current publication workflow state.",
             "allOf": [
@@ -51806,6 +51850,7 @@
           "id",
           "preview_status",
           "project_toml_path",
+          "publication",
           "publication_status",
           "title",
           "updated_at"
@@ -51903,6 +51948,14 @@
             "description": "Relative path to the project's manifest file.",
             "type": "string"
           },
+          "publication": {
+            "description": "Owner-facing publication metadata for the current and last live version.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProjectPublicationInfoResponse"
+              }
+            ]
+          },
           "publication_status": {
             "description": "Current publication workflow state.",
             "allOf": [
@@ -51930,6 +51983,7 @@
           "id",
           "preview_status",
           "project_toml_path",
+          "publication",
           "publication_status",
           "title",
           "updated_at"
