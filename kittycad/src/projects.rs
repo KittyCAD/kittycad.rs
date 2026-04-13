@@ -561,4 +561,38 @@ impl Projects {
             })
         }
     }
+
+    #[doc = "Fetch the authenticated owner's current project thumbnail.\n\n**Parameters:**\n\n- \
+             `id: uuid::Uuid`: The identifier. (required)\n\n```rust,no_run\nuse \
+             std::str::FromStr;\nasync fn example_projects_get_thumbnail() -> anyhow::Result<()> \
+             {\n    let client = kittycad::Client::new_from_env();\n    client\n        \
+             .projects()\n        .get_thumbnail(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_thumbnail<'a>(
+        &'a self,
+        id: uuid::Uuid,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/projects/{id}/thumbnail".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
 }

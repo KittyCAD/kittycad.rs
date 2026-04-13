@@ -14133,6 +14133,9 @@ pub enum ModelingCmd {
         #[doc = "The maximum acceptable surface gap computed between the filleted surfaces. Must \
                  be positive (i.e. greater than zero)."]
         tolerance: f64,
+        #[doc = "If true, use the legacy CSG algorithm."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        use_legacy: Option<bool>,
     },
     #[doc = "Cut the list of given edges with the given cut parameters."]
     #[serde(rename = "solid3d_cut_edges")]
@@ -14156,6 +14159,9 @@ pub enum ModelingCmd {
         #[doc = "The maximum acceptable surface gap computed between the cut surfaces. Must be \
                  positive (i.e. greater than zero)."]
         tolerance: f64,
+        #[doc = "If true, use the legacy CSG algorithm."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        use_legacy: Option<bool>,
     },
     #[doc = "Determines whether a brep face is planar and returns its surface-local planar axes \
              if so"]
@@ -14333,6 +14339,12 @@ pub enum ModelingCmd {
         #[doc = "The default system color."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         color: Option<Color>,
+        #[doc = "The default color to use for highlight"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        highlight_color: Option<Color>,
+        #[doc = "The default color to use for selection"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        selection_color: Option<Color>,
     },
     #[doc = "Get type of the given curve."]
     #[serde(rename = "curve_get_type")]
@@ -14697,6 +14709,9 @@ pub enum ModelingCmd {
         #[doc = "The maximum acceptable surface gap computed between the joined solids. Must be \
                  positive (i.e. greater than zero)."]
         tolerance: f64,
+        #[doc = "If true, use the legacy CSG algorithm."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        use_legacy: Option<bool>,
     },
     #[doc = "Create a new solid from intersecting several other solids. In other words, the part \
              of the input solids where they all overlap will be the output solid."]
@@ -14710,6 +14725,9 @@ pub enum ModelingCmd {
         #[doc = "The maximum acceptable surface gap computed between the joined solids. Must be \
                  positive (i.e. greater than zero)."]
         tolerance: f64,
+        #[doc = "If true, use the legacy CSG algorithm."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        use_legacy: Option<bool>,
     },
     #[doc = "Create a new solid from subtracting several other solids. The 'target' is what will \
              be cut from. The 'tool' is what will be cut out from 'target'."]
@@ -14725,6 +14743,9 @@ pub enum ModelingCmd {
         tolerance: f64,
         #[doc = "Will be cut out from the 'target'."]
         tool_ids: Vec<uuid::Uuid>,
+        #[doc = "If true, use the legacy CSG algorithm."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        use_legacy: Option<bool>,
     },
     #[doc = "Create a new non-manifold body by intersecting all the input bodies, cutting and \
              splitting all the faces at the intersection boundaries."]
@@ -14748,6 +14769,9 @@ pub enum ModelingCmd {
                  themselves."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         tool_ids: Option<Vec<uuid::Uuid>>,
+        #[doc = "If true, use the legacy CSG algorithm."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        use_legacy: Option<bool>,
     },
     #[doc = "Make a new path by offsetting an object by a given distance. The new path's ID will \
              be the ID of this command."]
@@ -19531,9 +19555,9 @@ pub struct ProjectResponse {
     pub id: uuid::Uuid,
     #[doc = "Current preview generation state."]
     pub preview_status: KclProjectPreviewStatus,
-    #[doc = "Relative path to the primary preview image, when one exists."]
+    #[doc = "Stable authenticated thumbnail URL, when one exists."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub primary_preview_path: Option<String>,
+    pub preview_url: Option<String>,
     #[doc = "Relative path to the project's manifest file."]
     pub project_toml_path: String,
     #[doc = "Owner-facing publication metadata for the current and last live version."]
@@ -19568,8 +19592,8 @@ impl tabled::Tabled for ProjectResponse {
             format!("{:?}", self.files).into(),
             format!("{:?}", self.id).into(),
             format!("{:?}", self.preview_status).into(),
-            if let Some(primary_preview_path) = &self.primary_preview_path {
-                format!("{:?}", primary_preview_path).into()
+            if let Some(preview_url) = &self.preview_url {
+                format!("{:?}", preview_url).into()
             } else {
                 String::new().into()
             },
@@ -19590,7 +19614,7 @@ impl tabled::Tabled for ProjectResponse {
             "files".into(),
             "id".into(),
             "preview_status".into(),
-            "primary_preview_path".into(),
+            "preview_url".into(),
             "project_toml_path".into(),
             "publication".into(),
             "publication_status".into(),
@@ -19668,9 +19692,9 @@ pub struct ProjectSummaryResponse {
     pub id: uuid::Uuid,
     #[doc = "Current preview generation state."]
     pub preview_status: KclProjectPreviewStatus,
-    #[doc = "Relative path to the primary preview image, when one exists."]
+    #[doc = "Stable authenticated thumbnail URL, when one exists."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub primary_preview_path: Option<String>,
+    pub preview_url: Option<String>,
     #[doc = "Relative path to the project's manifest file."]
     pub project_toml_path: String,
     #[doc = "Owner-facing publication metadata for the current and last live version."]
@@ -19704,8 +19728,8 @@ impl tabled::Tabled for ProjectSummaryResponse {
             self.entrypoint_path.clone().into(),
             format!("{:?}", self.id).into(),
             format!("{:?}", self.preview_status).into(),
-            if let Some(primary_preview_path) = &self.primary_preview_path {
-                format!("{:?}", primary_preview_path).into()
+            if let Some(preview_url) = &self.preview_url {
+                format!("{:?}", preview_url).into()
             } else {
                 String::new().into()
             },
@@ -19725,7 +19749,7 @@ impl tabled::Tabled for ProjectSummaryResponse {
             "entrypoint_path".into(),
             "id".into(),
             "preview_status".into(),
-            "primary_preview_path".into(),
+            "preview_url".into(),
             "project_toml_path".into(),
             "publication".into(),
             "publication_status".into(),
@@ -19841,6 +19865,9 @@ pub struct PublicProjectResponse {
     pub id: uuid::Uuid,
     #[doc = "Current total public like count for the project."]
     pub like_count: i64,
+    #[doc = "Whether the authenticated viewer currently likes the project."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub liked: Option<bool>,
     #[doc = "Public creator metadata."]
     pub owner: PublicProjectOwnerResponse,
     #[doc = "Stable public thumbnail URL, when one exists."]
@@ -19864,13 +19891,18 @@ impl std::fmt::Display for PublicProjectResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for PublicProjectResponse {
-    const LENGTH: usize = 8;
+    const LENGTH: usize = 9;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.categories).into(),
             self.description.clone().into(),
             format!("{:?}", self.id).into(),
             format!("{:?}", self.like_count).into(),
+            if let Some(liked) = &self.liked {
+                format!("{:?}", liked).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.owner).into(),
             if let Some(preview_url) = &self.preview_url {
                 format!("{:?}", preview_url).into()
@@ -19888,6 +19920,7 @@ impl tabled::Tabled for PublicProjectResponse {
             "description".into(),
             "id".into(),
             "like_count".into(),
+            "liked".into(),
             "owner".into(),
             "preview_url".into(),
             "published_at".into(),
