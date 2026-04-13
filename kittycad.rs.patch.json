@@ -1505,6 +1505,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1user~1projects~1{id}~1thumbnail/get/x-rust",
+    "value": {
+      "example": "/// Fetch the authenticated owner's current project thumbnail.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_projects_get_thumbnail() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .projects()\n        .get_thumbnail(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.get_thumbnail"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1user~1session~1{token}/get/x-rust",
     "value": {
       "example": "/// Get a session for your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It returns details of the requested API token for the user.\n/// \n/// **Parameters:**\n/// \n/// - `token: &'astr`: The API token. (required)\nasync fn example_users_get_session_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Session = client.users().get_session_for(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
