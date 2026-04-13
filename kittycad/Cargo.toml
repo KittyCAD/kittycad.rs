@@ -29,7 +29,7 @@ rand = { version = "0.9", optional = true }
 getrandom = { version = "0.3" }
 reqwest = { version = "0.12", default-features = false, features = ["json", "multipart"], optional = true }
 reqwest-conditional-middleware = { version = "0.4", optional = true }
-reqwest-middleware = { version = "0.4", optional = true, features = ["json", "multipart", "http2"] }
+reqwest-middleware = { version = "0.5", optional = true, features = ["json", "multipart", "http2"] }
 reqwest-retry = { version = "0.7", optional = true }
 reqwest-tracing = { version = "0.5.4", optional = true }
 schemars = { version = "0.8", features = ["bigdecimal04", "bytes", "chrono", "url", "uuid1"] }
