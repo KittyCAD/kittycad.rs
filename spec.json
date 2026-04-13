@@ -26402,6 +26402,132 @@
         }
       }
     },
+    "/user/projects/{id}/thumbnail": {
+      "get": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Fetch the authenticated owner's current project thumbnail.",
+        "operationId": "get_project_thumbnail",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "*/*": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_project_thumbnail",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/user/session/{token}": {
       "get": {
         "tags": [
@@ -43341,6 +43467,10 @@
                 "enum": [
                   "solid3d_fillet_edge"
                 ]
+              },
+              "use_legacy": {
+                "description": "If true, use the legacy CSG algorithm.",
+                "type": "boolean"
               }
             },
             "required": [
@@ -43407,6 +43537,10 @@
                 "enum": [
                   "solid3d_cut_edges"
                 ]
+              },
+              "use_legacy": {
+                "description": "If true, use the legacy CSG algorithm.",
+                "type": "boolean"
               }
             },
             "required": [
@@ -43981,6 +44115,24 @@
               "color": {
                 "nullable": true,
                 "description": "The default system color.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Color"
+                  }
+                ]
+              },
+              "highlight_color": {
+                "nullable": true,
+                "description": "The default color to use for highlight",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Color"
+                  }
+                ]
+              },
+              "selection_color": {
+                "nullable": true,
+                "description": "The default color to use for selection",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Color"
@@ -45164,6 +45316,10 @@
                 "enum": [
                   "boolean_union"
                 ]
+              },
+              "use_legacy": {
+                "description": "If true, use the legacy CSG algorithm.",
+                "type": "boolean"
               }
             },
             "required": [
@@ -45202,6 +45358,10 @@
                 "enum": [
                   "boolean_intersection"
                 ]
+              },
+              "use_legacy": {
+                "description": "If true, use the legacy CSG algorithm.",
+                "type": "boolean"
               }
             },
             "required": [
@@ -45248,6 +45408,10 @@
                 "enum": [
                   "boolean_subtract"
                 ]
+              },
+              "use_legacy": {
+                "description": "If true, use the legacy CSG algorithm.",
+                "type": "boolean"
               }
             },
             "required": [
@@ -45301,6 +45465,10 @@
                 "enum": [
                   "boolean_imprint"
                 ]
+              },
+              "use_legacy": {
+                "description": "If true, use the legacy CSG algorithm.",
+                "type": "boolean"
               }
             },
             "required": [
@@ -51805,9 +51973,9 @@
               }
             ]
           },
-          "primary_preview_path": {
+          "preview_url": {
             "nullable": true,
-            "description": "Relative path to the primary preview image, when one exists.",
+            "description": "Stable authenticated thumbnail URL, when one exists.",
             "type": "string"
           },
           "project_toml_path": {
@@ -51939,9 +52107,9 @@
               }
             ]
           },
-          "primary_preview_path": {
+          "preview_url": {
             "nullable": true,
-            "description": "Relative path to the primary preview image, when one exists.",
+            "description": "Stable authenticated thumbnail URL, when one exists.",
             "type": "string"
           },
           "project_toml_path": {
@@ -52057,6 +52225,11 @@
             "description": "Current total public like count for the project.",
             "type": "integer",
             "format": "int64"
+          },
+          "liked": {
+            "nullable": true,
+            "description": "Whether the authenticated viewer currently likes the project.",
+            "type": "boolean"
           },
           "owner": {
             "description": "Public creator metadata.",
