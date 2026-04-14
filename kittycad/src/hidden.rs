@@ -278,14 +278,17 @@ impl Hidden {
         }
     }
 
-    #[doc = "Download a project using a share link.\n\n**Parameters:**\n\n- `key: &'astr`: \
-             Share-link key. (required)\n\n```rust,no_run\nasync fn \
+    #[doc = "Download a project using a share link.\n\n**Parameters:**\n\n- `format: \
+             Option<crate::types::ProjectArchiveFormat>`: Archive format to return. Defaults to \
+             `tar`.\n- `key: &'astr`: Share-link key. (required)\n\n```rust,no_run\nasync fn \
              example_hidden_download_shared_project() -> anyhow::Result<()> {\n    let client = \
              kittycad::Client::new_from_env();\n    client\n        .hidden()\n        \
-             .download_shared_project(\"some-string\")\n        .await?;\n    Ok(())\n}\n```"]
+             .download_shared_project(Some(kittycad::types::ProjectArchiveFormat::Zip), \
+             \"some-string\")\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn download_shared_project<'a>(
         &'a self,
+        format: Option<crate::types::ProjectArchiveFormat>,
         key: &'a str,
     ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
@@ -297,6 +300,12 @@ impl Hidden {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = format {
+            query_params.push(("format", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {

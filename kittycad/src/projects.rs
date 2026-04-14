@@ -80,6 +80,82 @@ impl Projects {
         }
     }
 
+    #[doc = "Get one publicly visible community project.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: \
+             The identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_projects_get_public() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::PublicProjectResponse = client\n        .projects()\n        \
+             .get_public(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_public<'a>(
+        &'a self,
+        id: uuid::Uuid,
+    ) -> Result<crate::types::PublicProjectResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "projects/public/{id}".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Download a published public project as a tar archive.\n\n**Parameters:**\n\n- `format: Option<crate::types::ProjectArchiveFormat>`: Archive format to return. Defaults to `tar`.\n- `id: uuid::Uuid`: The identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_projects_download_public() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .projects()\n        .download_public(\n            Some(kittycad::types::ProjectArchiveFormat::Zip),\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn download_public<'a>(
+        &'a self,
+        format: Option<crate::types::ProjectArchiveFormat>,
+        id: uuid::Uuid,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "projects/public/{id}/download".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = format {
+            query_params.push(("format", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Fetch the public thumbnail for a published project.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_projects_get_public_thumbnail() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .projects()\n        .get_public_thumbnail(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_public_thumbnail<'a>(
@@ -363,16 +439,13 @@ impl Projects {
         }
     }
 
-    #[doc = "Download one of the authenticated user's projects as a tar \
-             archive.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. \
-             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
-             example_projects_download() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    client\n        .projects()\n        \
-             .download(uuid::Uuid::from_str(\n            \
-             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
-             Ok(())\n}\n```"]
+    #[doc = "Download one of the authenticated user's projects as a tar archive.\n\n**Parameters:**\n\n- `format: Option<crate::types::ProjectArchiveFormat>`: Archive format to return. Defaults to `tar`.\n- `id: uuid::Uuid`: The identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_projects_download() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .projects()\n        .download(\n            Some(kittycad::types::ProjectArchiveFormat::Zip),\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
-    pub async fn download<'a>(&'a self, id: uuid::Uuid) -> Result<(), crate::types::error::Error> {
+    pub async fn download<'a>(
+        &'a self,
+        format: Option<crate::types::ProjectArchiveFormat>,
+        id: uuid::Uuid,
+    ) -> Result<(), crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!(
@@ -382,6 +455,12 @@ impl Projects {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = format {
+            query_params.push(("format", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
