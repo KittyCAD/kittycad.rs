@@ -19289,6 +19289,31 @@ impl tabled::Tabled for PrivacySettings {
     }
 }
 
+#[doc = "Archive formats supported by project download endpoints."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ProjectArchiveFormat {
+    #[doc = "Return a tar archive."]
+    #[serde(rename = "tar")]
+    #[display("tar")]
+    Tar,
+    #[doc = "Return a zip archive."]
+    #[serde(rename = "zip")]
+    #[display("zip")]
+    Zip,
+}
+
 #[doc = "Active category metadata available for project submission flows."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
