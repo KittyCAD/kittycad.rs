@@ -103,6 +103,40 @@ impl Users {
         }
     }
 
+    #[doc = "Gets authenticated CAD user info form data for the current \
+             user.\n\n```rust,no_run\nasync fn example_users_get_cad_info_form() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::WebsiteCadUserInfoForm = \
+             client.users().get_cad_info_form().await?;\n    println!(\"{:?}\", result);\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_cad_info_form<'a>(
+        &'a self,
+    ) -> Result<crate::types::WebsiteCadUserInfoForm, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "user/cad-user-info"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Report a client-originated error.\n\nThis endpoint requires authentication by any Zoo user. It accepts a structured client error payload and writes it to the server logs for triage.\n\n```rust,no_run\nasync fn example_users_report_client_error() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ClientErrorReportAccepted = client\n        .users()\n        .report_client_error(&kittycad::types::ClientErrorReport {\n            client: \"some-string\".to_string(),\n            code: Some(\"some-string\".to_string()),\n            error_name: Some(\"some-string\".to_string()),\n            message: \"some-string\".to_string(),\n            release: \"some-string\".to_string(),\n            route: Some(\"some-string\".to_string()),\n            stack: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn report_client_error<'a>(
