@@ -34704,6 +34704,39 @@
           "dimensions"
         ]
       },
+      "CadDesignWorkflow": {
+        "description": "Strict design-workflow enum for onboarding/CRM form submissions.",
+        "oneOf": [
+          {
+            "description": "Sketch-first workflow.",
+            "type": "string",
+            "enum": [
+              "sketching"
+            ]
+          },
+          {
+            "description": "Code-first workflow.",
+            "type": "string",
+            "enum": [
+              "coding"
+            ]
+          },
+          {
+            "description": "AI-first workflow.",
+            "type": "string",
+            "enum": [
+              "ai"
+            ]
+          },
+          {
+            "description": "Hybrid workflow spanning multiple approaches.",
+            "type": "string",
+            "enum": [
+              "hybrid_approach"
+            ]
+          }
+        ]
+      },
       "CadDiscoverySource": {
         "description": "Strict acquisition-source enum used by the website CAD user info form.",
         "oneOf": [
@@ -34775,6 +34808,32 @@
             "type": "string",
             "enum": [
               "other"
+            ]
+          }
+        ]
+      },
+      "CadExperienceLevel": {
+        "description": "Strict CAD/API experience-level enum for onboarding/CRM form submissions.",
+        "oneOf": [
+          {
+            "description": "Beginner experience level.",
+            "type": "string",
+            "enum": [
+              "beginner"
+            ]
+          },
+          {
+            "description": "Intermediate experience level.",
+            "type": "string",
+            "enum": [
+              "intermediate"
+            ]
+          },
+          {
+            "description": "Advanced experience level.",
+            "type": "string",
+            "enum": [
+              "advanced"
             ]
           }
         ]
@@ -58006,6 +58065,15 @@
         "description": "CAD user info details for admin surfaces.",
         "type": "object",
         "properties": {
+          "cad_experience_level": {
+            "nullable": true,
+            "description": "CAD/API experience level.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CadExperienceLevel"
+              }
+            ]
+          },
           "cad_industry": {
             "nullable": true,
             "description": "CAD industry selection.",
@@ -58033,6 +58101,20 @@
               }
             ]
           },
+          "design_workflow": {
+            "nullable": true,
+            "description": "Preferred design workflow.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CadDesignWorkflow"
+              }
+            ]
+          },
+          "has_used_zoo_design_studio_or_api_before": {
+            "nullable": true,
+            "description": "Whether the user has used Zoo Design Studio or the API before.",
+            "type": "boolean"
+          },
           "how_did_you_find_us": {
             "nullable": true,
             "description": "Acquisition source selection.",
@@ -58047,9 +58129,29 @@
             "description": "Free-text acquisition source when `other` was selected.",
             "type": "string"
           },
+          "location_city": {
+            "nullable": true,
+            "description": "Free-text city for the user's location.",
+            "type": "string"
+          },
+          "location_country": {
+            "nullable": true,
+            "description": "Free-text country for the user's location.",
+            "type": "string"
+          },
+          "location_state": {
+            "nullable": true,
+            "description": "Free-text state or region for the user's location.",
+            "type": "string"
+          },
           "number_of_cad_users": {
             "nullable": true,
             "description": "Number of CAD users.",
+            "type": "string"
+          },
+          "what_are_you_building": {
+            "nullable": true,
+            "description": "Free-text description of what the user wants to build.",
             "type": "string"
           }
         }
@@ -58673,6 +58775,15 @@
         "description": "Request body for authenticated website CAD user info form submissions.",
         "type": "object",
         "properties": {
+          "cad_experience_level": {
+            "nullable": true,
+            "description": "Experience level with CAD software or APIs.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CadExperienceLevel"
+              }
+            ]
+          },
           "cad_industry": {
             "nullable": true,
             "description": "The industry of the user.",
@@ -58700,6 +58811,20 @@
               }
             ]
           },
+          "design_workflow": {
+            "nullable": true,
+            "description": "Which design workflow the user is most excited about.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CadDesignWorkflow"
+              }
+            ]
+          },
+          "has_used_zoo_design_studio_or_api_before": {
+            "nullable": true,
+            "description": "Whether the user has used Zoo Design Studio or the API before.",
+            "type": "boolean"
+          },
           "how_did_you_find_us": {
             "nullable": true,
             "description": "How the user found Zoo.",
@@ -58714,9 +58839,29 @@
             "description": "Optional free-text value when \"Other\" is selected.",
             "type": "string"
           },
+          "location_city": {
+            "nullable": true,
+            "description": "Optional city for the user's location.",
+            "type": "string"
+          },
+          "location_country": {
+            "nullable": true,
+            "description": "Optional country for the user's location.",
+            "type": "string"
+          },
+          "location_state": {
+            "nullable": true,
+            "description": "Optional state or region for the user's location.",
+            "type": "string"
+          },
           "number_of_cad_users": {
             "nullable": true,
             "description": "The number of CAD users.",
+            "type": "string"
+          },
+          "what_are_you_building": {
+            "nullable": true,
+            "description": "Optional free-text description of what the user wants to build.",
             "type": "string"
           }
         }
