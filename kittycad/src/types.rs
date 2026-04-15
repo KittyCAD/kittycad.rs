@@ -4209,6 +4209,39 @@ impl tabled::Tabled for BoundingBox {
     }
 }
 
+#[doc = "Strict design-workflow enum for onboarding/CRM form submissions."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CadDesignWorkflow {
+    #[doc = "Sketch-first workflow."]
+    #[serde(rename = "sketching")]
+    #[display("sketching")]
+    Sketching,
+    #[doc = "Code-first workflow."]
+    #[serde(rename = "coding")]
+    #[display("coding")]
+    Coding,
+    #[doc = "AI-first workflow."]
+    #[serde(rename = "ai")]
+    #[display("ai")]
+    Ai,
+    #[doc = "Hybrid workflow spanning multiple approaches."]
+    #[serde(rename = "hybrid_approach")]
+    #[display("hybrid_approach")]
+    HybridApproach,
+}
+
 #[doc = "Strict acquisition-source enum used by the website CAD user info form."]
 #[derive(
     serde :: Serialize,
@@ -4264,6 +4297,35 @@ pub enum CadDiscoverySource {
     #[serde(rename = "other")]
     #[display("other")]
     Other,
+}
+
+#[doc = "Strict CAD/API experience-level enum for onboarding/CRM form submissions."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CadExperienceLevel {
+    #[doc = "Beginner experience level."]
+    #[serde(rename = "beginner")]
+    #[display("beginner")]
+    Beginner,
+    #[doc = "Intermediate experience level."]
+    #[serde(rename = "intermediate")]
+    #[display("intermediate")]
+    Intermediate,
+    #[doc = "Advanced experience level."]
+    #[serde(rename = "advanced")]
+    #[display("advanced")]
+    Advanced,
 }
 
 #[doc = "Strict CAD industry enum for onboarding/CRM form submissions."]
@@ -26869,6 +26931,9 @@ impl tabled::Tabled for UserAdminDetails {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UserCadInfoAdminDetails {
+    #[doc = "CAD/API experience level."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cad_experience_level: Option<CadExperienceLevel>,
     #[doc = "CAD industry selection."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cad_industry: Option<CadIndustry>,
@@ -26878,15 +26943,33 @@ pub struct UserCadInfoAdminDetails {
     #[doc = "Company size selection."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub company_size: Option<CompanySize>,
+    #[doc = "Preferred design workflow."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub design_workflow: Option<CadDesignWorkflow>,
+    #[doc = "Whether the user has used Zoo Design Studio or the API before."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub has_used_zoo_design_studio_or_api_before: Option<bool>,
     #[doc = "Acquisition source selection."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub how_did_you_find_us: Option<CadDiscoverySource>,
     #[doc = "Free-text acquisition source when `other` was selected."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub how_did_you_find_us_other: Option<String>,
+    #[doc = "Free-text city for the user's location."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_city: Option<String>,
+    #[doc = "Free-text country for the user's location."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_country: Option<String>,
+    #[doc = "Free-text state or region for the user's location."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_state: Option<String>,
     #[doc = "Number of CAD users."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub number_of_cad_users: Option<String>,
+    #[doc = "Free-text description of what the user wants to build."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub what_are_you_building: Option<String>,
 }
 
 impl std::fmt::Display for UserCadInfoAdminDetails {
@@ -26901,9 +26984,14 @@ impl std::fmt::Display for UserCadInfoAdminDetails {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UserCadInfoAdminDetails {
-    const LENGTH: usize = 6;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(cad_experience_level) = &self.cad_experience_level {
+                format!("{:?}", cad_experience_level).into()
+            } else {
+                String::new().into()
+            },
             if let Some(cad_industry) = &self.cad_industry {
                 format!("{:?}", cad_industry).into()
             } else {
@@ -26919,6 +27007,18 @@ impl tabled::Tabled for UserCadInfoAdminDetails {
             } else {
                 String::new().into()
             },
+            if let Some(design_workflow) = &self.design_workflow {
+                format!("{:?}", design_workflow).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(has_used_zoo_design_studio_or_api_before) =
+                &self.has_used_zoo_design_studio_or_api_before
+            {
+                format!("{:?}", has_used_zoo_design_studio_or_api_before).into()
+            } else {
+                String::new().into()
+            },
             if let Some(how_did_you_find_us) = &self.how_did_you_find_us {
                 format!("{:?}", how_did_you_find_us).into()
             } else {
@@ -26929,8 +27029,28 @@ impl tabled::Tabled for UserCadInfoAdminDetails {
             } else {
                 String::new().into()
             },
+            if let Some(location_city) = &self.location_city {
+                format!("{:?}", location_city).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(location_country) = &self.location_country {
+                format!("{:?}", location_country).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(location_state) = &self.location_state {
+                format!("{:?}", location_state).into()
+            } else {
+                String::new().into()
+            },
             if let Some(number_of_cad_users) = &self.number_of_cad_users {
                 format!("{:?}", number_of_cad_users).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(what_are_you_building) = &self.what_are_you_building {
+                format!("{:?}", what_are_you_building).into()
             } else {
                 String::new().into()
             },
@@ -26939,12 +27059,19 @@ impl tabled::Tabled for UserCadInfoAdminDetails {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "cad_experience_level".into(),
             "cad_industry".into(),
             "cad_user_type".into(),
             "company_size".into(),
+            "design_workflow".into(),
+            "has_used_zoo_design_studio_or_api_before".into(),
             "how_did_you_find_us".into(),
             "how_did_you_find_us_other".into(),
+            "location_city".into(),
+            "location_country".into(),
+            "location_state".into(),
             "number_of_cad_users".into(),
+            "what_are_you_building".into(),
         ]
     }
 }
@@ -27710,6 +27837,9 @@ impl tabled::Tabled for WebSocketResponse {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct WebsiteCadUserInfoForm {
+    #[doc = "Experience level with CAD software or APIs."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cad_experience_level: Option<CadExperienceLevel>,
     #[doc = "The industry of the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cad_industry: Option<CadIndustry>,
@@ -27719,15 +27849,33 @@ pub struct WebsiteCadUserInfoForm {
     #[doc = "Optional company size metadata."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub company_size: Option<CompanySize>,
+    #[doc = "Which design workflow the user is most excited about."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub design_workflow: Option<CadDesignWorkflow>,
+    #[doc = "Whether the user has used Zoo Design Studio or the API before."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub has_used_zoo_design_studio_or_api_before: Option<bool>,
     #[doc = "How the user found Zoo."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub how_did_you_find_us: Option<CadDiscoverySource>,
     #[doc = "Optional free-text value when \"Other\" is selected."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub how_did_you_find_us_other: Option<String>,
+    #[doc = "Optional city for the user's location."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_city: Option<String>,
+    #[doc = "Optional country for the user's location."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_country: Option<String>,
+    #[doc = "Optional state or region for the user's location."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_state: Option<String>,
     #[doc = "The number of CAD users."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub number_of_cad_users: Option<String>,
+    #[doc = "Optional free-text description of what the user wants to build."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub what_are_you_building: Option<String>,
 }
 
 impl std::fmt::Display for WebsiteCadUserInfoForm {
@@ -27742,9 +27890,14 @@ impl std::fmt::Display for WebsiteCadUserInfoForm {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for WebsiteCadUserInfoForm {
-    const LENGTH: usize = 6;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(cad_experience_level) = &self.cad_experience_level {
+                format!("{:?}", cad_experience_level).into()
+            } else {
+                String::new().into()
+            },
             if let Some(cad_industry) = &self.cad_industry {
                 format!("{:?}", cad_industry).into()
             } else {
@@ -27760,6 +27913,18 @@ impl tabled::Tabled for WebsiteCadUserInfoForm {
             } else {
                 String::new().into()
             },
+            if let Some(design_workflow) = &self.design_workflow {
+                format!("{:?}", design_workflow).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(has_used_zoo_design_studio_or_api_before) =
+                &self.has_used_zoo_design_studio_or_api_before
+            {
+                format!("{:?}", has_used_zoo_design_studio_or_api_before).into()
+            } else {
+                String::new().into()
+            },
             if let Some(how_did_you_find_us) = &self.how_did_you_find_us {
                 format!("{:?}", how_did_you_find_us).into()
             } else {
@@ -27770,8 +27935,28 @@ impl tabled::Tabled for WebsiteCadUserInfoForm {
             } else {
                 String::new().into()
             },
+            if let Some(location_city) = &self.location_city {
+                format!("{:?}", location_city).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(location_country) = &self.location_country {
+                format!("{:?}", location_country).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(location_state) = &self.location_state {
+                format!("{:?}", location_state).into()
+            } else {
+                String::new().into()
+            },
             if let Some(number_of_cad_users) = &self.number_of_cad_users {
                 format!("{:?}", number_of_cad_users).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(what_are_you_building) = &self.what_are_you_building {
+                format!("{:?}", what_are_you_building).into()
             } else {
                 String::new().into()
             },
@@ -27780,12 +27965,19 @@ impl tabled::Tabled for WebsiteCadUserInfoForm {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "cad_experience_level".into(),
             "cad_industry".into(),
             "cad_user_type".into(),
             "company_size".into(),
+            "design_workflow".into(),
+            "has_used_zoo_design_studio_or_api_before".into(),
             "how_did_you_find_us".into(),
             "how_did_you_find_us_other".into(),
+            "location_city".into(),
+            "location_country".into(),
+            "location_state".into(),
             "number_of_cad_users".into(),
+            "what_are_you_building".into(),
         ]
     }
 }
