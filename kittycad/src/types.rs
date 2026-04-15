@@ -26972,6 +26972,9 @@ pub enum UserFeature {
     #[serde(rename = "classic_sketch_mode")]
     #[display("classic_sketch_mode")]
     ClassicSketchMode,
+    #[serde(rename = "web_app_file_browser")]
+    #[display("web_app_file_browser")]
+    WebAppFileBrowser,
 }
 
 #[doc = "Enabled features surfaced to end users."]
