@@ -5756,13 +5756,19 @@ impl tabled::Tabled for CreateCustomModel {
     }
 }
 
-#[doc = "Request body for creating a public device-flow app."]
+#[doc = "Request body for creating a public OAuth app."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CreateOAuth2AppRequest {
+    #[doc = "The OAuth grant types this app can use."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub grant_types: Option<Vec<Oauth2AppGrantType>>,
     #[doc = "The display name of the app."]
     pub name: String,
+    #[doc = "The redirect URIs registered for this app."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub redirect_uris: Option<Vec<String>>,
 }
 
 impl std::fmt::Display for CreateOAuth2AppRequest {
@@ -5777,13 +5783,25 @@ impl std::fmt::Display for CreateOAuth2AppRequest {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CreateOAuth2AppRequest {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![self.name.clone().into()]
+        vec![
+            if let Some(grant_types) = &self.grant_types {
+                format!("{:?}", grant_types).into()
+            } else {
+                String::new().into()
+            },
+            self.name.clone().into(),
+            if let Some(redirect_uris) = &self.redirect_uris {
+                format!("{:?}", redirect_uris).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["name".into()]
+        vec!["grant_types".into(), "name".into(), "redirect_uris".into()]
     }
 }
 
@@ -14853,6 +14871,8 @@ pub struct Oauth2AppResponse {
     pub is_active: bool,
     #[doc = "The display name of the app."]
     pub name: String,
+    #[doc = "The registered redirect URIs for this app."]
+    pub redirect_uris: Vec<String>,
     #[doc = "When the app record was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
@@ -14869,7 +14889,7 @@ impl std::fmt::Display for Oauth2AppResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Oauth2AppResponse {
-    const LENGTH: usize = 8;
+    const LENGTH: usize = 9;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.client_id).into(),
@@ -14879,6 +14899,7 @@ impl tabled::Tabled for Oauth2AppResponse {
             format!("{:?}", self.grant_types).into(),
             format!("{:?}", self.is_active).into(),
             self.name.clone().into(),
+            format!("{:?}", self.redirect_uris).into(),
             format!("{:?}", self.updated_at).into(),
         ]
     }
@@ -14892,6 +14913,7 @@ impl tabled::Tabled for Oauth2AppResponse {
             "grant_types".into(),
             "is_active".into(),
             "name".into(),
+            "redirect_uris".into(),
             "updated_at".into(),
         ]
     }
@@ -14970,6 +14992,33 @@ impl tabled::Tabled for Oauth2AppResponseResultsPage {
     }
 }
 
+#[doc = "The OAuth 2.0 authorization response type."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Oauth2AuthorizationResponseType {
+    #[doc = "The authorization code response type."]
+    #[serde(rename = "code")]
+    #[display("code")]
+    Code,
+}
+
+impl std::default::Default for Oauth2AuthorizationResponseType {
+    fn default() -> Self {
+        Oauth2AuthorizationResponseType::Code
+    }
+}
+
 #[doc = "Information about an OAuth 2.0 client."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -15037,6 +15086,29 @@ impl tabled::Tabled for Oauth2ClientInfo {
     }
 }
 
+#[doc = "The PKCE code challenge method."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Oauth2CodeChallengeMethod {
+    #[doc = "Plain code challenge comparison."]
+    #[serde(rename = "PLAIN")]
+    #[display("PLAIN")]
+    Plain,
+    #[doc = "SHA-256 based PKCE challenge."]
+    S256,
+}
+
 #[doc = "An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>."]
 #[derive(
     serde :: Serialize,
@@ -15061,6 +15133,106 @@ pub enum Oauth2GrantType {
 impl std::default::Default for Oauth2GrantType {
     fn default() -> Self {
         Oauth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode
+    }
+}
+
+#[doc = "The OAuth 2.0 token endpoint grant types supported by the general token endpoint."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Oauth2TokenGrantType {
+    #[doc = "The authorization code grant."]
+    #[serde(rename = "authorization_code")]
+    #[display("authorization_code")]
+    AuthorizationCode,
+    #[doc = "The refresh token grant."]
+    #[serde(rename = "refresh_token")]
+    #[display("refresh_token")]
+    RefreshToken,
+}
+
+#[doc = "Form body for `/oauth2/token`."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Oauth2TokenRequestForm {
+    #[doc = "The OAuth app client ID."]
+    pub client_id: uuid::Uuid,
+    #[doc = "The authorization code, for `authorization_code`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
+    #[doc = "The PKCE verifier, for `authorization_code`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub code_verifier: Option<String>,
+    #[doc = "The OAuth token grant type."]
+    pub grant_type: Oauth2TokenGrantType,
+    #[doc = "The redirect URI, for `authorization_code`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub redirect_uri: Option<String>,
+    #[doc = "The refresh token, for `refresh_token`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub refresh_token: Option<String>,
+}
+
+impl std::fmt::Display for Oauth2TokenRequestForm {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Oauth2TokenRequestForm {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.client_id).into(),
+            if let Some(code) = &self.code {
+                format!("{:?}", code).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(code_verifier) = &self.code_verifier {
+                format!("{:?}", code_verifier).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.grant_type).into(),
+            if let Some(redirect_uri) = &self.redirect_uri {
+                format!("{:?}", redirect_uri).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(refresh_token) = &self.refresh_token {
+                format!("{:?}", refresh_token).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "client_id".into(),
+            "code".into(),
+            "code_verifier".into(),
+            "grant_type".into(),
+            "redirect_uri".into(),
+            "refresh_token".into(),
+        ]
     }
 }
 
@@ -25942,13 +26114,20 @@ impl tabled::Tabled for UpdateMemberToOrgBody {
     }
 }
 
-#[doc = "Request body for updating a public device-flow app."]
+#[doc = "Request body for updating a public OAuth app."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UpdateOAuth2AppRequest {
+    #[doc = "The OAuth grant types this app can use."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub grant_types: Option<Vec<Oauth2AppGrantType>>,
     #[doc = "The new display name of the app."]
-    pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[doc = "The redirect URIs registered for this app."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub redirect_uris: Option<Vec<String>>,
 }
 
 impl std::fmt::Display for UpdateOAuth2AppRequest {
@@ -25963,13 +26142,29 @@ impl std::fmt::Display for UpdateOAuth2AppRequest {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UpdateOAuth2AppRequest {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![self.name.clone().into()]
+        vec![
+            if let Some(grant_types) = &self.grant_types {
+                format!("{:?}", grant_types).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(name) = &self.name {
+                format!("{:?}", name).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(redirect_uris) = &self.redirect_uris {
+                format!("{:?}", redirect_uris).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["name".into()]
+        vec!["grant_types".into(), "name".into(), "redirect_uris".into()]
     }
 }
 

@@ -6484,6 +6484,244 @@
         }
       }
     },
+    "/oauth2/authorize": {
+      "get": {
+        "tags": [
+          "oauth2",
+          "hidden"
+        ],
+        "summary": "Start an OAuth 2.0 authorization code flow with PKCE.",
+        "operationId": "oauth2_authorize",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "response_type",
+            "description": "The OAuth response type.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/OAuth2AuthorizationResponseType"
+            }
+          },
+          {
+            "in": "query",
+            "name": "client_id",
+            "description": "The OAuth app client ID.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "redirect_uri",
+            "description": "The redirect URI for the client.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "description": "Opaque client state to round-trip back to the client.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "scope",
+            "description": "The requested OAuth scopes.",
+            "schema": {
+              "$ref": "#/components/schemas/OAuth2Scopes"
+            }
+          },
+          {
+            "in": "query",
+            "name": "code_challenge",
+            "description": "The PKCE code challenge.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "code_challenge_method",
+            "description": "The PKCE challenge method.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/OAuth2CodeChallengeMethod"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Temporary Redirect",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_oauth2_authorize",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/oauth2/device/auth": {
       "post": {
         "tags": [
@@ -7443,6 +7681,121 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OAuth2ClientInfo"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/oauth2/token": {
+      "post": {
+        "tags": [
+          "oauth2",
+          "hidden"
+        ],
+        "summary": "Exchange an authorization code or refresh token for an OAuth 2.0 access token.",
+        "operationId": "oauth2_token",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/OAuth2TokenRequestForm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "*/*": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_oauth2_token",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -11694,7 +12047,7 @@
           "orgs"
         ],
         "summary": "Create an org OAuth app.",
-        "description": "This endpoint requires authentication by an org admin. It creates an active public device-flow app owned by the authenticated organization.",
+        "description": "This endpoint requires authentication by an org admin. It creates an active public OAuth app owned by the authenticated organization.",
         "operationId": "create_org_oauth2_app",
         "requestBody": {
           "content": {
@@ -11988,7 +12341,7 @@
           "orgs"
         ],
         "summary": "Update an org OAuth app.",
-        "description": "This endpoint requires authentication by an org admin. It updates the name of the organization's active public OAuth app.",
+        "description": "This endpoint requires authentication by an org admin. It updates the configuration of the organization's active public OAuth app.",
         "operationId": "update_org_oauth2_app",
         "parameters": [
           {
@@ -22490,7 +22843,7 @@
           "users"
         ],
         "summary": "Create a personal OAuth app.",
-        "description": "This endpoint requires authentication by any Zoo user. It creates an active public device-flow app owned by the authenticated user.",
+        "description": "This endpoint requires authentication by any Zoo user. It creates an active public OAuth app owned by the authenticated user.",
         "operationId": "create_user_oauth2_app",
         "requestBody": {
           "content": {
@@ -22784,7 +23137,7 @@
           "users"
         ],
         "summary": "Update a personal OAuth app.",
-        "description": "This endpoint requires authentication by any Zoo user. It updates the name of the authenticated user's active public OAuth app.",
+        "description": "This endpoint requires authentication by any Zoo user. It updates the configuration of the authenticated user's active public OAuth app.",
         "operationId": "update_user_oauth2_app",
         "parameters": [
           {
@@ -35809,12 +36162,27 @@
         ]
       },
       "CreateOAuth2AppRequest": {
-        "description": "Request body for creating a public device-flow app.",
+        "description": "Request body for creating a public OAuth app.",
         "type": "object",
         "properties": {
+          "grant_types": {
+            "description": "The OAuth grant types this app can use.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OAuth2AppGrantType"
+            }
+          },
           "name": {
             "description": "The display name of the app.",
             "type": "string"
+          },
+          "redirect_uris": {
+            "description": "The redirect URIs registered for this app.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
           }
         },
         "required": [
@@ -36556,10 +36924,6 @@
           "device_code",
           "grant_type"
         ]
-      },
-      "DeviceAccessTokenUuid": {
-        "description": "An auth token. A uuid with a prefix of dev-",
-        "type": "string"
       },
       "DeviceAuthConfirmParams": {
         "description": "The request parameters to confirm the `user_code` for the OAuth 2.0 Device Authorization Grant.",
@@ -46523,6 +46887,15 @@
             "description": "The display name of the app.",
             "type": "string"
           },
+          "redirect_uris": {
+            "description": "The registered redirect URIs for this app.",
+            "type": "array",
+            "items": {
+              "title": "String",
+              "type": "string",
+              "format": "uri"
+            }
+          },
           "updated_at": {
             "title": "DateTime",
             "description": "When the app record was last updated.",
@@ -46538,6 +46911,7 @@
           "grant_types",
           "is_active",
           "name",
+          "redirect_uris",
           "updated_at"
         ]
       },
@@ -46560,6 +46934,22 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "OAuth2AuthorizationCodeUuid": {
+        "description": "An auth token. A uuid with a prefix of zoo-oac-",
+        "type": "string"
+      },
+      "OAuth2AuthorizationResponseType": {
+        "description": "The OAuth 2.0 authorization response type.",
+        "oneOf": [
+          {
+            "description": "The authorization code response type.",
+            "type": "string",
+            "enum": [
+              "code"
+            ]
+          }
         ]
       },
       "OAuth2ClientInfo": {
@@ -46586,6 +46976,25 @@
           }
         }
       },
+      "OAuth2CodeChallengeMethod": {
+        "description": "The PKCE code challenge method.",
+        "oneOf": [
+          {
+            "description": "Plain code challenge comparison.",
+            "type": "string",
+            "enum": [
+              "PLAIN"
+            ]
+          },
+          {
+            "description": "SHA-256 based PKCE challenge.",
+            "type": "string",
+            "enum": [
+              "S256"
+            ]
+          }
+        ]
+      },
       "OAuth2GrantType": {
         "description": "An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>.",
         "oneOf": [
@@ -46596,6 +47005,85 @@
               "urn:ietf:params:oauth:grant-type:device_code"
             ]
           }
+        ]
+      },
+      "OAuth2RefreshTokenUuid": {
+        "description": "An auth token. A uuid with a prefix of zoo-rfr-",
+        "type": "string"
+      },
+      "OAuth2Scopes": {
+        "description": "OAuth 2.0 scopes encoded as a space-delimited string.",
+        "type": "string"
+      },
+      "OAuth2TokenGrantType": {
+        "description": "The OAuth 2.0 token endpoint grant types supported by the general token endpoint.",
+        "oneOf": [
+          {
+            "description": "The authorization code grant.",
+            "type": "string",
+            "enum": [
+              "authorization_code"
+            ]
+          },
+          {
+            "description": "The refresh token grant.",
+            "type": "string",
+            "enum": [
+              "refresh_token"
+            ]
+          }
+        ]
+      },
+      "OAuth2TokenRequestForm": {
+        "description": "Form body for `/oauth2/token`.",
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "description": "The OAuth app client ID.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "nullable": true,
+            "description": "The authorization code, for `authorization_code`.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OAuth2AuthorizationCodeUuid"
+              }
+            ]
+          },
+          "code_verifier": {
+            "nullable": true,
+            "description": "The PKCE verifier, for `authorization_code`.",
+            "type": "string"
+          },
+          "grant_type": {
+            "description": "The OAuth token grant type.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OAuth2TokenGrantType"
+              }
+            ]
+          },
+          "redirect_uri": {
+            "nullable": true,
+            "description": "The redirect URI, for `authorization_code`.",
+            "type": "string",
+            "format": "uri"
+          },
+          "refresh_token": {
+            "nullable": true,
+            "description": "The refresh token, for `refresh_token`.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OAuth2RefreshTokenUuid"
+              }
+            ]
+          }
+        },
+        "required": [
+          "client_id",
+          "grant_type"
         ]
       },
       "ObjectBringToFront": {
@@ -55756,11 +56244,7 @@
           },
           "token": {
             "description": "The token to revoke.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DeviceAccessTokenUuid"
-              }
-            ]
+            "type": "string"
           }
         },
         "required": [
@@ -57804,17 +58288,32 @@
         ]
       },
       "UpdateOAuth2AppRequest": {
-        "description": "Request body for updating a public device-flow app.",
+        "description": "Request body for updating a public OAuth app.",
         "type": "object",
         "properties": {
+          "grant_types": {
+            "nullable": true,
+            "description": "The OAuth grant types this app can use.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OAuth2AppGrantType"
+            }
+          },
           "name": {
+            "nullable": true,
             "description": "The new display name of the app.",
             "type": "string"
+          },
+          "redirect_uris": {
+            "nullable": true,
+            "description": "The redirect URIs registered for this app.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
           }
-        },
-        "required": [
-          "name"
-        ]
+        }
       },
       "UpdateOrgDataset": {
         "description": "Payload for updating an org dataset.",
