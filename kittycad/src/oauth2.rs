@@ -2,6 +2,38 @@ use anyhow::Result;
 
 use crate::Client;
 #[derive(Clone, Debug)]
+pub struct Oauth2AuthorizeParams<'a> {
+    pub client_id: uuid::Uuid,
+    pub code_challenge: &'a str,
+    pub code_challenge_method: crate::types::Oauth2CodeChallengeMethod,
+    pub redirect_uri: &'a str,
+    pub response_type: crate::types::Oauth2AuthorizationResponseType,
+    pub scope: Option<String>,
+    pub state: &'a str,
+}
+
+impl<'a> Oauth2AuthorizeParams<'a> {
+    pub fn new(
+        client_id: uuid::Uuid,
+        code_challenge: &'a str,
+        code_challenge_method: crate::types::Oauth2CodeChallengeMethod,
+        redirect_uri: &'a str,
+        response_type: crate::types::Oauth2AuthorizationResponseType,
+        state: &'a str,
+    ) -> Self {
+        Self {
+            client_id,
+            code_challenge,
+            code_challenge_method,
+            redirect_uri,
+            response_type,
+            scope: Default::default(),
+            state,
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct Oauth2 {
     pub client: Client,
 }
@@ -10,6 +42,55 @@ impl Oauth2 {
     #[doc(hidden)]
     pub fn new(client: Client) -> Self {
         Self { client }
+    }
+
+    #[doc = "Start an OAuth 2.0 authorization code flow with PKCE.\n\n**Parameters:**\n\n- `client_id: uuid::Uuid`: The OAuth app client ID. (required)\n- `code_challenge: &'astr`: The PKCE code challenge. (required)\n- `code_challenge_method: crate::types::Oauth2CodeChallengeMethod`: The PKCE challenge method. (required)\n- `redirect_uri: &'astr`: The redirect URI for the client. (required)\n- `response_type: crate::types::Oauth2AuthorizationResponseType`: The OAuth response type. (required)\n- `scope: Option<String>`: The requested OAuth scopes.\n- `state: &'astr`: Opaque client state to round-trip back to the client. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_oauth_2_authorize() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .oauth_2_authorize(kittycad::oauth2::Oauth2AuthorizeParams {\n            client_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            code_challenge: \"some-string\",\n            code_challenge_method: kittycad::types::Oauth2CodeChallengeMethod::S256,\n            redirect_uri: \"https://example.com/foo/bar\",\n            response_type: kittycad::types::Oauth2AuthorizationResponseType::Code,\n            scope: Some(\"some-string\".to_string()),\n            state: \"some-string\",\n        })\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn oauth_2_authorize<'a>(
+        &'a self,
+        params: Oauth2AuthorizeParams<'a>,
+    ) -> Result<(), crate::types::error::Error> {
+        let Oauth2AuthorizeParams {
+            client_id,
+            code_challenge,
+            code_challenge_method,
+            redirect_uri,
+            response_type,
+            scope,
+            state,
+        } = params;
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "oauth2/authorize"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![
+            ("client_id", format!("{}", client_id)),
+            ("code_challenge", code_challenge.to_string()),
+            (
+                "code_challenge_method",
+                format!("{}", code_challenge_method),
+            ),
+            ("redirect_uri", redirect_uri.to_string()),
+            ("response_type", format!("{}", response_type)),
+            ("state", state.to_string()),
+        ];
+        if let Some(p) = scope {
+            query_params.push(("scope", p));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
     }
 
     #[doc = "Start an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint is designed to be \
@@ -289,6 +370,31 @@ impl Oauth2 {
         }
     }
 
+    #[doc = "Exchange an authorization code or refresh token for an OAuth 2.0 access token.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_oauth_2_token() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .oauth_2_token(&kittycad::types::Oauth2TokenRequestForm {\n            client_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            code: Some(\"some-string\".to_string()),\n            code_verifier: Some(\"some-string\".to_string()),\n            grant_type: kittycad::types::Oauth2TokenGrantType::RefreshToken,\n            redirect_uri: Some(\"https://example.com/foo/bar\".to_string()),\n            refresh_token: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn oauth_2_token<'a>(
+        &'a self,
+        body: &crate::types::Oauth2TokenRequestForm,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!("{}/{}", self.client.base_url, "oauth2/token"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.form(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Revoke an OAuth2 token.\n\nThis endpoint is designed to be accessed from an *unauthenticated* API client.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_oauth_2_token_revoke() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .oauth_2_token_revoke(&kittycad::types::TokenRevokeRequestForm {\n            client_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            client_secret: Some(\"some-string\".to_string()),\n            token: \"some-string\".to_string(),\n        })\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn oauth_2_token_revoke<'a>(
@@ -466,14 +572,7 @@ impl Oauth2 {
             .boxed()
     }
 
-    #[doc = "Create an org OAuth app.\n\nThis endpoint requires authentication by an org admin. It \
-             creates an active public device-flow app owned by the authenticated \
-             organization.\n\n```rust,no_run\nasync fn example_oauth2_create_org_oauth_2_app() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        \
-             .create_org_oauth_2_app(&kittycad::types::CreateOAuth2AppRequest {\n            name: \
-             \"some-string\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", \
-             result);\n    Ok(())\n}\n```"]
+    #[doc = "Create an org OAuth app.\n\nThis endpoint requires authentication by an org admin. It creates an active public OAuth app owned by the authenticated organization.\n\n```rust,no_run\nasync fn example_oauth2_create_org_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .create_org_oauth_2_app(&kittycad::types::CreateOAuth2AppRequest {\n            grant_types: Some(vec![kittycad::types::Oauth2AppGrantType::RefreshToken]),\n            name: \"some-string\".to_string(),\n            redirect_uris: Some(vec![\"https://example.com/foo/bar\".to_string()]),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_org_oauth_2_app<'a>(
         &'a self,
@@ -538,17 +637,7 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Update an org OAuth app.\n\nThis endpoint requires authentication by an org admin. It \
-             updates the name of the organization's active public OAuth \
-             app.\n\n**Parameters:**\n\n- `client_id: uuid::Uuid`: The OAuth client identifier. \
-             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
-             example_oauth2_update_org_oauth_2_app() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse \
-             = client\n        .oauth2()\n        .update_org_oauth_2_app(\n            \
-             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
-             &kittycad::types::UpdateOAuth2AppRequest {\n                name: \
-             \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update an org OAuth app.\n\nThis endpoint requires authentication by an org admin. It updates the configuration of the organization's active public OAuth app.\n\n**Parameters:**\n\n- `client_id: uuid::Uuid`: The OAuth client identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_update_org_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .update_org_oauth_2_app(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateOAuth2AppRequest {\n                grant_types: Some(vec![kittycad::types::Oauth2AppGrantType::RefreshToken]),\n                name: Some(\"some-string\".to_string()),\n                redirect_uris: Some(vec![\"https://example.com/foo/bar\".to_string()]),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_org_oauth_2_app<'a>(
         &'a self,
@@ -866,14 +955,7 @@ impl Oauth2 {
             .boxed()
     }
 
-    #[doc = "Create a personal OAuth app.\n\nThis endpoint requires authentication by any Zoo \
-             user. It creates an active public device-flow app owned by the authenticated \
-             user.\n\n```rust,no_run\nasync fn example_oauth2_create_user_oauth_2_app() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        \
-             .create_user_oauth_2_app(&kittycad::types::CreateOAuth2AppRequest {\n            \
-             name: \"some-string\".to_string(),\n        })\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create a personal OAuth app.\n\nThis endpoint requires authentication by any Zoo user. It creates an active public OAuth app owned by the authenticated user.\n\n```rust,no_run\nasync fn example_oauth2_create_user_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .create_user_oauth_2_app(&kittycad::types::CreateOAuth2AppRequest {\n            grant_types: Some(vec![kittycad::types::Oauth2AppGrantType::RefreshToken]),\n            name: \"some-string\".to_string(),\n            redirect_uris: Some(vec![\"https://example.com/foo/bar\".to_string()]),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_user_oauth_2_app<'a>(
         &'a self,
@@ -938,17 +1020,7 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Update a personal OAuth app.\n\nThis endpoint requires authentication by any Zoo \
-             user. It updates the name of the authenticated user's active public OAuth \
-             app.\n\n**Parameters:**\n\n- `client_id: uuid::Uuid`: The OAuth client identifier. \
-             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
-             example_oauth2_update_user_oauth_2_app() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse \
-             = client\n        .oauth2()\n        .update_user_oauth_2_app(\n            \
-             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
-             &kittycad::types::UpdateOAuth2AppRequest {\n                name: \
-             \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update a personal OAuth app.\n\nThis endpoint requires authentication by any Zoo user. It updates the configuration of the authenticated user's active public OAuth app.\n\n**Parameters:**\n\n- `client_id: uuid::Uuid`: The OAuth client identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_update_user_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .update_user_oauth_2_app(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateOAuth2AppRequest {\n                grant_types: Some(vec![kittycad::types::Oauth2AppGrantType::RefreshToken]),\n                name: Some(\"some-string\".to_string()),\n                redirect_uris: Some(vec![\"https://example.com/foo/bar\".to_string()]),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_user_oauth_2_app<'a>(
         &'a self,
