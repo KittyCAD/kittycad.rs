@@ -37221,6 +37221,13 @@
             ]
           },
           {
+            "description": "Recipient later unsubscribed through an email unsubscribe flow.",
+            "type": "string",
+            "enum": [
+              "unsubscribed"
+            ]
+          },
+          {
             "description": "User explicitly declined.",
             "type": "string",
             "enum": [
