@@ -7474,6 +7474,10 @@ pub enum EmailMarketingConsentStatus {
     #[serde(rename = "confirmed")]
     #[display("confirmed")]
     Confirmed,
+    #[doc = "Recipient later unsubscribed through an email unsubscribe flow."]
+    #[serde(rename = "unsubscribed")]
+    #[display("unsubscribed")]
+    Unsubscribed,
     #[doc = "User explicitly declined."]
     #[serde(rename = "declined")]
     #[display("declined")]
