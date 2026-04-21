@@ -242,16 +242,28 @@ impl Payments {
         }
     }
 
-    #[doc = "List invoices for your org.\n\nThis endpoint requires authentication by an org admin. It lists invoices for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_list_invoices_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::Invoice> = client.payments().list_invoices_for_org().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "List invoices for your org.\n\nThis endpoint requires authentication by an org admin. It lists invoices for the authenticated user's org.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_payments_list_invoices_for_org_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut payments = client.payments();\n    let mut stream = payments.list_invoices_for_org_stream(Some(4 as u32));\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list_invoices_for_org<'a>(
         &'a self,
-    ) -> Result<Vec<crate::types::Invoice>, crate::types::error::Error> {
+        limit: Option<u32>,
+        page_token: Option<String>,
+    ) -> Result<crate::types::InvoiceResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!("{}/{}", self.client.base_url, "org/payment/invoices"),
         );
         req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
@@ -269,6 +281,76 @@ impl Payments {
                 status,
             })
         }
+    }
+
+    #[doc = "List invoices for your org.\n\nThis endpoint requires authentication by an org admin. It lists invoices for the authenticated user's org.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_payments_list_invoices_for_org_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut payments = client.payments();\n    let mut stream = payments.list_invoices_for_org_stream(Some(4 as u32));\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    #[cfg(not(feature = "js"))]
+    pub fn list_invoices_for_org_stream<'a>(
+        &'a self,
+        limit: Option<u32>,
+    ) -> impl futures::Stream<Item = Result<crate::types::Invoice, crate::types::error::Error>>
+           + Unpin
+           + '_ {
+        use futures::{StreamExt, TryFutureExt, TryStreamExt};
+
+        use crate::types::paginate::Pagination;
+        self.list_invoices_for_org(limit, None)
+            .map_ok(move |result| {
+                let items = futures::stream::iter(result.items().into_iter().map(Ok));
+                let next_pages = futures::stream::try_unfold(
+                    (None, result),
+                    move |(prev_page_token, new_result)| async move {
+                        if new_result.has_more_pages()
+                            && !new_result.items().is_empty()
+                            && prev_page_token != new_result.next_page_token()
+                        {
+                            async {
+                                let mut req = self.client.client.request(
+                                    http::Method::GET,
+                                    format!("{}/{}", self.client.base_url, "org/payment/invoices"),
+                                );
+                                req = req.bearer_auth(&self.client.token);
+                                let mut request = req.build()?;
+                                request = new_result.next_page(request)?;
+                                let resp = self.client.client.execute(request).await?;
+                                let status = resp.status();
+                                if status.is_success() {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    serde_json::from_str(&text).map_err(|err| {
+                                        crate::types::error::Error::from_serde_error(
+                                            format_serde_error::SerdeError::new(
+                                                text.to_string(),
+                                                err,
+                                            ),
+                                            status,
+                                        )
+                                    })
+                                } else {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    Err(crate::types::error::Error::Server {
+                                        body: text.to_string(),
+                                        status,
+                                    })
+                                }
+                            }
+                            .map_ok(|result: crate::types::InvoiceResultsPage| {
+                                Some((
+                                    futures::stream::iter(result.items().into_iter().map(Ok)),
+                                    (new_result.next_page_token(), result),
+                                ))
+                            })
+                            .await
+                        } else {
+                            Ok(None)
+                        }
+                    },
+                )
+                .try_flatten();
+                items.chain(next_pages)
+            })
+            .try_flatten_stream()
+            .boxed()
     }
 
     #[doc = "List payment methods for your org.\n\nThis endpoint requires authentication by an org admin. It lists payment methods for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_list_methods_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::PaymentMethod> = client.payments().list_methods_for_org().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
@@ -855,16 +937,40 @@ impl Payments {
         }
     }
 
-    #[doc = "List invoices for your user.\n\nThis endpoint requires authentication by any Zoo user. It lists invoices for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_list_invoices_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::Invoice> = client.payments().list_invoices_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "List invoices for your user.\n\nThis endpoint requires authentication by any Zoo \
+             user. It lists invoices for the authenticated user.\n\n**Parameters:**\n\n- `limit: \
+             Option<u32>`: Maximum number of items returned by a single call\n- `page_token: \
+             Option<String>`: Token returned by previous call to retrieve the subsequent \
+             page\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn \
+             example_payments_list_invoices_for_user_stream() -> anyhow::Result<()> {\n    let \
+             client = kittycad::Client::new_from_env();\n    let mut payments = \
+             client.payments();\n    let mut stream = \
+             payments.list_invoices_for_user_stream(Some(4 as u32));\n    loop {\n        match \
+             stream.try_next().await {\n            Ok(Some(item)) => {\n                \
+             println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                \
+             break;\n            }\n            Err(err) => {\n                return \
+             Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list_invoices_for_user<'a>(
         &'a self,
-    ) -> Result<Vec<crate::types::Invoice>, crate::types::error::Error> {
+        limit: Option<u32>,
+        page_token: Option<String>,
+    ) -> Result<crate::types::InvoiceResultsPage, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!("{}/{}", self.client.base_url, "user/payment/invoices"),
         );
         req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
@@ -882,6 +988,88 @@ impl Payments {
                 status,
             })
         }
+    }
+
+    #[doc = "List invoices for your user.\n\nThis endpoint requires authentication by any Zoo \
+             user. It lists invoices for the authenticated user.\n\n**Parameters:**\n\n- `limit: \
+             Option<u32>`: Maximum number of items returned by a single call\n- `page_token: \
+             Option<String>`: Token returned by previous call to retrieve the subsequent \
+             page\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn \
+             example_payments_list_invoices_for_user_stream() -> anyhow::Result<()> {\n    let \
+             client = kittycad::Client::new_from_env();\n    let mut payments = \
+             client.payments();\n    let mut stream = \
+             payments.list_invoices_for_user_stream(Some(4 as u32));\n    loop {\n        match \
+             stream.try_next().await {\n            Ok(Some(item)) => {\n                \
+             println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                \
+             break;\n            }\n            Err(err) => {\n                return \
+             Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    #[cfg(not(feature = "js"))]
+    pub fn list_invoices_for_user_stream<'a>(
+        &'a self,
+        limit: Option<u32>,
+    ) -> impl futures::Stream<Item = Result<crate::types::Invoice, crate::types::error::Error>>
+           + Unpin
+           + '_ {
+        use futures::{StreamExt, TryFutureExt, TryStreamExt};
+
+        use crate::types::paginate::Pagination;
+        self.list_invoices_for_user(limit, None)
+            .map_ok(move |result| {
+                let items = futures::stream::iter(result.items().into_iter().map(Ok));
+                let next_pages = futures::stream::try_unfold(
+                    (None, result),
+                    move |(prev_page_token, new_result)| async move {
+                        if new_result.has_more_pages()
+                            && !new_result.items().is_empty()
+                            && prev_page_token != new_result.next_page_token()
+                        {
+                            async {
+                                let mut req = self.client.client.request(
+                                    http::Method::GET,
+                                    format!("{}/{}", self.client.base_url, "user/payment/invoices"),
+                                );
+                                req = req.bearer_auth(&self.client.token);
+                                let mut request = req.build()?;
+                                request = new_result.next_page(request)?;
+                                let resp = self.client.client.execute(request).await?;
+                                let status = resp.status();
+                                if status.is_success() {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    serde_json::from_str(&text).map_err(|err| {
+                                        crate::types::error::Error::from_serde_error(
+                                            format_serde_error::SerdeError::new(
+                                                text.to_string(),
+                                                err,
+                                            ),
+                                            status,
+                                        )
+                                    })
+                                } else {
+                                    let text = resp.text().await.unwrap_or_default();
+                                    Err(crate::types::error::Error::Server {
+                                        body: text.to_string(),
+                                        status,
+                                    })
+                                }
+                            }
+                            .map_ok(|result: crate::types::InvoiceResultsPage| {
+                                Some((
+                                    futures::stream::iter(result.items().into_iter().map(Ok)),
+                                    (new_result.next_page_token(), result),
+                                ))
+                            })
+                            .await
+                        } else {
+                            Ok(None)
+                        }
+                    },
+                )
+                .try_flatten();
+                items.chain(next_pages)
+            })
+            .try_flatten_stream()
+            .boxed()
     }
 
     #[doc = "List payment methods for your user.\n\nThis endpoint requires authentication by any Zoo user. It lists payment methods for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_list_methods_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::PaymentMethod> =\n        client.payments().list_methods_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]

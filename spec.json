@@ -12613,6 +12613,28 @@
         "summary": "List invoices for your org.",
         "description": "This endpoint requires authentication by an org admin. It lists invoices for the authenticated user's org.",
         "operationId": "list_invoices_for_org",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -12685,11 +12707,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_Invoice",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Invoice"
-                  }
+                  "$ref": "#/components/schemas/InvoiceResultsPage"
                 }
               }
             }
@@ -12700,6 +12718,9 @@
           "5XX": {
             "$ref": "#/components/responses/Error"
           }
+        },
+        "x-dropshot-pagination": {
+          "required": []
         }
       }
     },
@@ -23369,6 +23390,28 @@
         "summary": "List invoices for your user.",
         "description": "This endpoint requires authentication by any Zoo user. It lists invoices for the authenticated user.",
         "operationId": "list_invoices_for_user",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -23441,11 +23484,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_Invoice",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Invoice"
-                  }
+                  "$ref": "#/components/schemas/InvoiceResultsPage"
                 }
               }
             }
@@ -23456,6 +23495,9 @@
           "5XX": {
             "$ref": "#/components/responses/Error"
           }
+        },
+        "x-dropshot-pagination": {
+          "required": []
         }
       }
     },
@@ -38208,6 +38250,27 @@
               "refunded"
             ]
           }
+        ]
+      },
+      "InvoiceResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Invoice"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "InvoiceStatus": {
