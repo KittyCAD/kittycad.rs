@@ -33,22 +33,6 @@
   },
   {
     "op": "add",
-    "path": "/paths/~1api-call-metrics/get/x-rust",
-    "value": {
-      "example": "/// Get API call metrics.\n/// \n/// This endpoint requires authentication by a Zoo employee. The API calls are grouped by the parameter passed.\n/// \n/// **Parameters:**\n/// \n/// - `group_by: crate::types::ApiCallQueryGroupBy`: What field to group the metrics by. (required)\nasync fn example_api_calls_get_metrics() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::ApiCallQueryGroup> = client\n        .api_calls()\n        .get_metrics(kittycad::types::ApiCallQueryGroupBy::UserId)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.get_metrics"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1api-calls/get/x-rust",
-    "value": {
-      "example": "/// List API calls.\n/// \n/// This endpoint requires authentication by a Zoo employee. The API calls are returned in order of creation, with the most recently created API calls first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_api_calls_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPriceResultsPage = client\n        .api_calls()\n        .list(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_calls_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_calls = client.api_calls();\n    let mut stream = api_calls.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.list"
-    }
-  },
-  {
-    "op": "add",
     "path": "/paths/~1api-calls~1{id}/get/x-rust",
     "value": {
       "example": "/// Get details of an API call.\n/// \n/// This endpoint requires authentication by any Zoo user. It returns details of the requested API call for the user.\n/// \n/// If the user is not authenticated to view the specified API call, then it is not returned.\n/// \n/// Only Zoo employees can view API calls for other users.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The ID of the API call. (required)\nuse std::str::FromStr;\nasync fn example_api_calls_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPrice = client\n        .api_calls()\n        .get(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
@@ -77,14 +61,6 @@
     "value": {
       "example": "/// Listen for GitHub webhooks.\n/// \n/// These come from the GitHub app.\nasync fn example_apps_github_webhook() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .apps()\n        .github_webhook(&bytes::Bytes::from(\"some-string\"))\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/apps/struct.Apps.html#method.github_webhook"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1async~1operations/get/x-rust",
-    "value": {
-      "example": "/// List async operations.\n/// \n/// For async file conversion operations, this endpoint does not return the contents of converted files (`output`). To get the contents use the `/async/operations/{id}` endpoint.\n/// \n/// This endpoint requires authentication by a Zoo employee.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\n/// - `status: Option<crate::types::ApiCallStatus>`: The status to filter by.\nasync fn example_api_calls_list_async_operations() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AsyncApiCallResultsPage = client\n        .api_calls()\n        .list_async_operations(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n            Some(kittycad::types::ApiCallStatus::Completed),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_api_calls_list_async_operations_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut api_calls = client.api_calls();\n    let mut stream = api_calls.list_async_operations_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        Some(kittycad::types::ApiCallStatus::Completed),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_calls/struct.ApiCalls.html#method.list_async_operations"
     }
   },
   {
@@ -157,14 +133,6 @@
     "value": {
       "example": "/// Authorize an inbound auth request from our Community page.\n/// \n/// **Parameters:**\n/// \n/// - `sig: &'astr`: The signature for the given payload (required)\n/// - `sso: &'astr`: The nonce and redirect URL sent to us by Discourse (required)\nasync fn example_meta_community_sso() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .meta()\n        .community_sso(\"some-string\", \"some-string\")\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.community_sso"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1events/post/x-rust",
-    "value": {
-      "example": "/// Creates an internal telemetry event.\n/// \n/// We collect anonymous telemetry data for improving our product.\nuse std::str::FromStr;\nasync fn example_meta_create_event() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .meta()\n        .create_event(\n            vec![kittycad::types::multipart::Attachment {\n                name: \"thing\".to_string(),\n                filepath: Some(\"myfile.json\".into()),\n                content_type: Some(\"application/json\".to_string()),\n                data: std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            &kittycad::types::Event {\n                attachment_uri: Some(\"some-string\".to_string()),\n                created_at: chrono::Utc::now(),\n                event_type: kittycad::types::ModelingAppEventType::SuccessfulCompileBeforeClose,\n                last_compiled_at: Some(chrono::Utc::now()),\n                project_description: Some(\"some-string\".to_string()),\n                project_name: \"some-string\".to_string(),\n                source_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n                type_: kittycad::types::Type::ModelingAppEvent,\n                user_id: \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.create_event"
     }
   },
   {
@@ -245,22 +213,6 @@
     "value": {
       "example": "/// This endpoint removes the session cookie for a user.\n/// \n/// This is used in logout scenarios.\nasync fn example_hidden_logout() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.hidden().logout().await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/hidden/struct.Hidden.html#method.logout"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1ml-prompts/get/x-rust",
-    "value": {
-      "example": "/// List all ML prompts.\n/// \n/// For text-to-cad prompts, this will always return the STEP file contents as well as the format the user originally requested.\n/// \n/// This endpoint requires authentication by a Zoo employee.\n/// \n/// The ML prompts are returned in order of creation, with the most recently created ML prompts first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_ml_list_prompts() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::MlPromptResponseResultsPage = client\n        .ml()\n        .list_prompts(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_ml_list_prompts_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ml = client.ml();\n    let mut stream = ml.list_prompts_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ml/struct.Ml.html#method.list_prompts"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1ml-prompts~1{id}/get/x-rust",
-    "value": {
-      "example": "/// Get a ML prompt.\n/// \n/// This endpoint requires authentication by a Zoo employee.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The id of the model to give feedback to. (required)\nuse std::str::FromStr;\nasync fn example_ml_get_prompt() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::MlPromptResponse = client\n        .ml()\n        .get_prompt(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ml/struct.Ml.html#method.get_prompt"
     }
   },
   {
@@ -869,22 +821,6 @@
     "value": {
       "example": "/// Get the shortlinks for an org.\n/// \n/// This endpoint requires authentication by an org admin. It gets the shortlinks for the authenticated user's org.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_orgs_get_shortlinks() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ShortlinkResultsPage = client\n        .orgs()\n        .get_shortlinks(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_get_shortlinks_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.get_shortlinks_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.get_shortlinks"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1orgs/get/x-rust",
-    "value": {
-      "example": "/// List orgs.\n/// \n/// This endpoint requires authentication by a Zoo employee. The orgs are returned in order of creation, with the most recently created orgs first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_orgs_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgResultsPage = client\n        .orgs()\n        .list(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.list"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1orgs~1{id}/get/x-rust",
-    "value": {
-      "example": "/// Get an org.\n/// \n/// This endpoint requires authentication by a Zoo employee. It gets the information for the specified org.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_orgs_get_any() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Org = client\n        .orgs()\n        .get_any(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.get_any"
     }
   },
   {
@@ -1621,22 +1557,6 @@
     "value": {
       "example": "/// Give feedback to a specific ML response.\n/// \n/// This can be a text-to-CAD creation or iteration.\n/// \n/// This endpoint requires authentication by any Zoo user. The user must be the owner of the ML response, in order to give feedback.\n/// \n/// **Parameters:**\n/// \n/// - `feedback: crate::types::MlFeedback`: The feedback. (required)\n/// - `id: uuid::Uuid`: The id of the model to give feedback to. (required)\nuse std::str::FromStr;\nasync fn example_ml_create_text_to_cad_part_feedback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .ml()\n        .create_text_to_cad_part_feedback(\n            kittycad::types::MlFeedback::Accepted,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ml/struct.Ml.html#method.create_text_to_cad_part_feedback"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1users/get/x-rust",
-    "value": {
-      "example": "/// List users.\n/// \n/// This endpoint requires authentication by a Zoo employee. The users are returned in order of creation, with the most recently created users first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_users_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserResponseResultsPage = client\n        .users()\n        .list(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_users_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.list"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1users-extended/get/x-rust",
-    "value": {
-      "example": "/// List users with extended information.\n/// \n/// This endpoint requires authentication by a Zoo employee. The users are returned in order of creation, with the most recently created users first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_users_list_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUserResultsPage = client\n        .users()\n        .list_extended(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_users_list_extended_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut users = client.users();\n    let mut stream = users.list_extended_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.list_extended"
     }
   },
   {
