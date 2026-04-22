@@ -33474,6 +33474,60 @@
           }
         ]
       },
+      "BodiesCreated": {
+        "description": "List of bodies that were created by an operation.",
+        "type": "object",
+        "properties": {
+          "bodies": {
+            "description": "All bodies created by this operation.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BodyCreated"
+            }
+          }
+        },
+        "required": [
+          "bodies"
+        ]
+      },
+      "BodiesUpdated": {
+        "description": "List of bodies that were updated by an operation.",
+        "type": "object",
+        "properties": {
+          "bodies": {
+            "description": "All bodies created by this operation.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BodyUpdated"
+            }
+          }
+        },
+        "required": [
+          "bodies"
+        ]
+      },
+      "BodyCreated": {
+        "description": "Details of a body that was created.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The body's ID.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "surfaces": {
+            "description": "Surfaces this body contains.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SurfaceCreated"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "surfaces"
+        ]
+      },
       "BodyType": {
         "description": "Body type determining if the operation will create a manifold (solid) body or a non-manifold collection of surfaces.",
         "oneOf": [
@@ -33491,6 +33545,28 @@
               "surface"
             ]
           }
+        ]
+      },
+      "BodyUpdated": {
+        "description": "Details of a body that was updated.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The body's ID.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "surfaces": {
+            "description": "Surfaces added to this body.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SurfaceCreated"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "surfaces"
         ]
       },
       "BooleanImprint": {
@@ -36334,7 +36410,25 @@
       },
       "Extrude": {
         "description": "The response from the `Extrude` endpoint.",
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "bodies_created": {
+            "description": "Any new bodies created by the request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BodiesCreated"
+              }
+            ]
+          },
+          "bodies_updated": {
+            "description": "Any existing bodies updated by the request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BodiesUpdated"
+              }
+            ]
+          }
+        }
       },
       "ExtrudeMethod": {
         "description": "Extrusion method determining if the extrusion will be part of the existing object or an entirely new object.",
@@ -36450,7 +36544,25 @@
       },
       "ExtrudeToReference": {
         "description": "The response from the `ExtrudeToReference` endpoint.",
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "bodies_created": {
+            "description": "Any new bodies created by the request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BodiesCreated"
+              }
+            ]
+          },
+          "bodies_updated": {
+            "description": "Any existing bodies updated by the request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BodiesUpdated"
+              }
+            ]
+          }
+        }
       },
       "ExtrudedFaceInfo": {
         "description": "IDs for the extruded faces.",
@@ -51794,11 +51906,47 @@
       },
       "Revolve": {
         "description": "The response from the `Revolve` endpoint.",
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "bodies_created": {
+            "description": "Any new bodies created by the request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BodiesCreated"
+              }
+            ]
+          },
+          "bodies_updated": {
+            "description": "Any existing bodies updated by the request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BodiesUpdated"
+              }
+            ]
+          }
+        }
       },
       "RevolveAboutEdge": {
         "description": "The response from the `RevolveAboutEdge` endpoint.",
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "bodies_created": {
+            "description": "Any new bodies created by the request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BodiesCreated"
+              }
+            ]
+          },
+          "bodies_updated": {
+            "description": "Any existing bodies updated by the request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BodiesUpdated"
+              }
+            ]
+          }
+        }
       },
       "Rotation": {
         "description": "A rotation defined by an axis, origin of rotation, and an angle.",
@@ -53421,6 +53569,36 @@
         "description": "The response from the `SurfaceBlend` endpoint.",
         "type": "object"
       },
+      "SurfaceCreated": {
+        "description": "Details of a surface that was created under some body.",
+        "type": "object",
+        "properties": {
+          "from_segments": {
+            "description": "Which segment IDs was this surface swept from?",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "id": {
+            "description": "The surface's ID.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "primitive_face_index": {
+            "description": "Which number face of the parent body is this?",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "from_segments",
+          "id",
+          "primitive_face_index"
+        ]
+      },
       "SurfaceEdgeReference": {
         "description": "An object id, that corresponds to a surface body, and a list of edges of the surface.",
         "type": "object",
@@ -53445,7 +53623,25 @@
       },
       "Sweep": {
         "description": "The response from the `Sweep` endpoint.",
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "bodies_created": {
+            "description": "Any new bodies created by the request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BodiesCreated"
+              }
+            ]
+          },
+          "bodies_updated": {
+            "description": "Any existing bodies updated by the request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BodiesUpdated"
+              }
+            ]
+          }
+        }
       },
       "System": {
         "description": "Co-ordinate system definition.\n\nThe `up` axis must be orthogonal to the `forward` axis.\n\nSee [cglearn.eu] for background reading.\n\n[cglearn.eu](https://cglearn.eu/pub/computer-graphics/introduction-to-geometry#material-coordinate-systems-1)",
@@ -54585,7 +54781,25 @@
       },
       "TwistExtrude": {
         "description": "The response from the `TwistExtrude` endpoint.",
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "bodies_created": {
+            "description": "Any new bodies created by the request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BodiesCreated"
+              }
+            ]
+          },
+          "bodies_updated": {
+            "description": "Any existing bodies updated by the request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BodiesUpdated"
+              }
+            ]
+          }
+        }
       },
       "UnitAngle": {
         "description": "The valid types of angle formats.",
