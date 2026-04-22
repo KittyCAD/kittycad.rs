@@ -3675,6 +3675,104 @@ pub enum BlockReason {
     UpgradeDowngradeAbuse,
 }
 
+#[doc = "List of bodies that were created by an operation."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BodiesCreated {
+    #[doc = "All bodies created by this operation."]
+    pub bodies: Vec<BodyCreated>,
+}
+
+impl std::fmt::Display for BodiesCreated {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BodiesCreated {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.bodies).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["bodies".into()]
+    }
+}
+
+#[doc = "List of bodies that were updated by an operation."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BodiesUpdated {
+    #[doc = "All bodies created by this operation."]
+    pub bodies: Vec<BodyUpdated>,
+}
+
+impl std::fmt::Display for BodiesUpdated {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BodiesUpdated {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.bodies).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["bodies".into()]
+    }
+}
+
+#[doc = "Details of a body that was created."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BodyCreated {
+    #[doc = "The body's ID."]
+    pub id: uuid::Uuid,
+    #[doc = "Surfaces this body contains."]
+    pub surfaces: Vec<SurfaceCreated>,
+}
+
+impl std::fmt::Display for BodyCreated {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BodyCreated {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.surfaces).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["id".into(), "surfaces".into()]
+    }
+}
+
 #[doc = "Body type determining if the operation will create a manifold (solid) body or a \
          non-manifold collection of surfaces."]
 #[derive(
@@ -3699,6 +3797,42 @@ pub enum BodyType {
     #[serde(rename = "surface")]
     #[display("surface")]
     Surface,
+}
+
+#[doc = "Details of a body that was updated."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BodyUpdated {
+    #[doc = "The body's ID."]
+    pub id: uuid::Uuid,
+    #[doc = "Surfaces added to this body."]
+    pub surfaces: Vec<SurfaceCreated>,
+}
+
+impl std::fmt::Display for BodyUpdated {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BodyUpdated {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.surfaces).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["id".into(), "surfaces".into()]
+    }
 }
 
 #[doc = "The response from the 'BooleanImprint'."]
@@ -8496,7 +8630,14 @@ impl tabled::Tabled for ExtendedUser {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct Extrude {}
+pub struct Extrude {
+    #[doc = "Any new bodies created by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_created: Option<BodiesCreated>,
+    #[doc = "Any existing bodies updated by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_updated: Option<BodiesUpdated>,
+}
 
 impl std::fmt::Display for Extrude {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -8510,13 +8651,24 @@ impl std::fmt::Display for Extrude {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Extrude {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![
+            if let Some(bodies_created) = &self.bodies_created {
+                format!("{:?}", bodies_created).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(bodies_updated) = &self.bodies_updated {
+                format!("{:?}", bodies_updated).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["bodies_created".into(), "bodies_updated".into()]
     }
 }
 
@@ -8581,7 +8733,14 @@ pub enum ExtrudeReference {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct ExtrudeToReference {}
+pub struct ExtrudeToReference {
+    #[doc = "Any new bodies created by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_created: Option<BodiesCreated>,
+    #[doc = "Any existing bodies updated by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_updated: Option<BodiesUpdated>,
+}
 
 impl std::fmt::Display for ExtrudeToReference {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -8595,13 +8754,24 @@ impl std::fmt::Display for ExtrudeToReference {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ExtrudeToReference {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![
+            if let Some(bodies_created) = &self.bodies_created {
+                format!("{:?}", bodies_created).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(bodies_updated) = &self.bodies_updated {
+                format!("{:?}", bodies_updated).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["bodies_created".into(), "bodies_updated".into()]
     }
 }
 
@@ -19613,7 +19783,14 @@ impl tabled::Tabled for RemoveSceneObjects {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct Revolve {}
+pub struct Revolve {
+    #[doc = "Any new bodies created by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_created: Option<BodiesCreated>,
+    #[doc = "Any existing bodies updated by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_updated: Option<BodiesUpdated>,
+}
 
 impl std::fmt::Display for Revolve {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -19627,13 +19804,24 @@ impl std::fmt::Display for Revolve {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Revolve {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![
+            if let Some(bodies_created) = &self.bodies_created {
+                format!("{:?}", bodies_created).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(bodies_updated) = &self.bodies_updated {
+                format!("{:?}", bodies_updated).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["bodies_created".into(), "bodies_updated".into()]
     }
 }
 
@@ -19641,7 +19829,14 @@ impl tabled::Tabled for Revolve {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct RevolveAboutEdge {}
+pub struct RevolveAboutEdge {
+    #[doc = "Any new bodies created by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_created: Option<BodiesCreated>,
+    #[doc = "Any existing bodies updated by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_updated: Option<BodiesUpdated>,
+}
 
 impl std::fmt::Display for RevolveAboutEdge {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -19655,13 +19850,24 @@ impl std::fmt::Display for RevolveAboutEdge {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for RevolveAboutEdge {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![
+            if let Some(bodies_created) = &self.bodies_created {
+                format!("{:?}", bodies_created).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(bodies_updated) = &self.bodies_updated {
+                format!("{:?}", bodies_updated).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["bodies_created".into(), "bodies_updated".into()]
     }
 }
 
@@ -22541,6 +22747,49 @@ impl tabled::Tabled for SurfaceBlend {
     }
 }
 
+#[doc = "Details of a surface that was created under some body."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SurfaceCreated {
+    #[doc = "Which segment IDs was this surface swept from?"]
+    pub from_segments: Vec<uuid::Uuid>,
+    #[doc = "The surface's ID."]
+    pub id: uuid::Uuid,
+    #[doc = "Which number face of the parent body is this?"]
+    pub primitive_face_index: u32,
+}
+
+impl std::fmt::Display for SurfaceCreated {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SurfaceCreated {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.from_segments).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.primitive_face_index).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "from_segments".into(),
+            "id".into(),
+            "primitive_face_index".into(),
+        ]
+    }
+}
+
 #[doc = "An object id, that corresponds to a surface body, and a list of edges of the surface."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -22581,7 +22830,14 @@ impl tabled::Tabled for SurfaceEdgeReference {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct Sweep {}
+pub struct Sweep {
+    #[doc = "Any new bodies created by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_created: Option<BodiesCreated>,
+    #[doc = "Any existing bodies updated by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_updated: Option<BodiesUpdated>,
+}
 
 impl std::fmt::Display for Sweep {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -22595,13 +22851,24 @@ impl std::fmt::Display for Sweep {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Sweep {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![
+            if let Some(bodies_created) = &self.bodies_created {
+                format!("{:?}", bodies_created).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(bodies_updated) = &self.bodies_updated {
+                format!("{:?}", bodies_updated).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["bodies_created".into(), "bodies_updated".into()]
     }
 }
 
@@ -23741,7 +24008,14 @@ impl tabled::Tabled for TransformByForPoint4D {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct TwistExtrude {}
+pub struct TwistExtrude {
+    #[doc = "Any new bodies created by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_created: Option<BodiesCreated>,
+    #[doc = "Any existing bodies updated by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_updated: Option<BodiesUpdated>,
+}
 
 impl std::fmt::Display for TwistExtrude {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -23755,13 +24029,24 @@ impl std::fmt::Display for TwistExtrude {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TwistExtrude {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![
+            if let Some(bodies_created) = &self.bodies_created {
+                format!("{:?}", bodies_created).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(bodies_updated) = &self.bodies_updated {
+                format!("{:?}", bodies_updated).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["bodies_created".into(), "bodies_updated".into()]
     }
 }
 
