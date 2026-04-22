@@ -48741,6 +48741,10 @@
             "description": "Human-friendly block reason message.",
             "type": "string"
           },
+          "never_block": {
+            "description": "Whether this organization is permanently exempt from blocking.",
+            "type": "boolean"
+          },
           "payment_methods": {
             "description": "Known payment methods on file.",
             "type": "array",
@@ -48767,6 +48771,7 @@
           }
         },
         "required": [
+          "never_block",
           "payment_methods",
           "payment_methods_summary"
         ]
@@ -56728,6 +56733,10 @@
               }
             ]
           },
+          "never_block": {
+            "description": "Whether this user is permanently exempt from blocking.",
+            "type": "boolean"
+          },
           "payment_methods": {
             "description": "Known payment methods on file.",
             "type": "array",
@@ -56757,6 +56766,7 @@
           "active_api_tokens_count",
           "active_device_tokens_count",
           "active_sessions_count",
+          "never_block",
           "payment_methods",
           "payment_methods_summary"
         ]

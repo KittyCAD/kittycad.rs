@@ -16083,6 +16083,8 @@ pub struct OrgAdminDetails {
     #[doc = "Human-friendly block reason message."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub block_message: Option<String>,
+    #[doc = "Whether this organization is permanently exempt from blocking."]
+    pub never_block: bool,
     #[doc = "Known payment methods on file."]
     pub payment_methods: Vec<PaymentMethod>,
     #[doc = "Summaries of the known payment methods."]
@@ -16107,7 +16109,7 @@ impl std::fmt::Display for OrgAdminDetails {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgAdminDetails {
-    const LENGTH: usize = 8;
+    const LENGTH: usize = 9;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(address) = &self.address {
@@ -16130,6 +16132,7 @@ impl tabled::Tabled for OrgAdminDetails {
             } else {
                 String::new().into()
             },
+            format!("{:?}", self.never_block).into(),
             format!("{:?}", self.payment_methods).into(),
             format!("{:?}", self.payment_methods_summary).into(),
             if let Some(stripe_customer_id) = &self.stripe_customer_id {
@@ -16151,6 +16154,7 @@ impl tabled::Tabled for OrgAdminDetails {
             "address_summary".into(),
             "block".into(),
             "block_message".into(),
+            "never_block".into(),
             "payment_methods".into(),
             "payment_methods_summary".into(),
             "stripe_customer_id".into(),
@@ -26180,6 +26184,8 @@ pub struct UserAdminDetails {
     #[doc = "CAD user info collected from website onboarding/CRM form."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cad_user_info: Option<UserCadInfoAdminDetails>,
+    #[doc = "Whether this user is permanently exempt from blocking."]
+    pub never_block: bool,
     #[doc = "Known payment methods on file."]
     pub payment_methods: Vec<PaymentMethod>,
     #[doc = "Summaries of the known payment methods."]
@@ -26204,7 +26210,7 @@ impl std::fmt::Display for UserAdminDetails {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UserAdminDetails {
-    const LENGTH: usize = 12;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.active_api_tokens_count).into(),
@@ -26235,6 +26241,7 @@ impl tabled::Tabled for UserAdminDetails {
             } else {
                 String::new().into()
             },
+            format!("{:?}", self.never_block).into(),
             format!("{:?}", self.payment_methods).into(),
             format!("{:?}", self.payment_methods_summary).into(),
             if let Some(stripe_customer_id) = &self.stripe_customer_id {
@@ -26260,6 +26267,7 @@ impl tabled::Tabled for UserAdminDetails {
             "block".into(),
             "block_message".into(),
             "cad_user_info".into(),
+            "never_block".into(),
             "payment_methods".into(),
             "payment_methods_summary".into(),
             "stripe_customer_id".into(),
