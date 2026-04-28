@@ -16121,11 +16121,17 @@ pub struct OrgDatasetFileConversionDetails {
     #[doc = "Plain-text contents of the raw KCL artifact, when available."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub raw_kcl_output: Option<String>,
+    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the raw KCL model matches the original model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub raw_kcl_similarity_score: Option<f64>,
     #[doc = "Snapshot images for the raw KCL model."]
     pub raw_kcl_snapshot_images: Vec<OrgDatasetSnapshotImage>,
     #[doc = "Plain-text contents of the salon/refactored KCL artifact, when available."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub salon_kcl_output: Option<String>,
+    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the salon KCL model matches the raw KCL model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub salon_kcl_similarity_score: Option<f64>,
     #[doc = "Snapshot images for the salon/refactored KCL model."]
     pub salon_kcl_snapshot_images: Vec<OrgDatasetSnapshotImage>,
     #[doc = "The date and time the conversion started."]
@@ -16152,7 +16158,7 @@ impl std::fmt::Display for OrgDatasetFileConversionDetails {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgDatasetFileConversionDetails {
-    const LENGTH: usize = 23;
+    const LENGTH: usize = 25;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -16199,9 +16205,19 @@ impl tabled::Tabled for OrgDatasetFileConversionDetails {
             } else {
                 String::new().into()
             },
+            if let Some(raw_kcl_similarity_score) = &self.raw_kcl_similarity_score {
+                format!("{:?}", raw_kcl_similarity_score).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.raw_kcl_snapshot_images).into(),
             if let Some(salon_kcl_output) = &self.salon_kcl_output {
                 format!("{:?}", salon_kcl_output).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(salon_kcl_similarity_score) = &self.salon_kcl_similarity_score {
+                format!("{:?}", salon_kcl_similarity_score).into()
             } else {
                 String::new().into()
             },
@@ -16239,8 +16255,10 @@ impl tabled::Tabled for OrgDatasetFileConversionDetails {
             "output".into(),
             "phase".into(),
             "raw_kcl_output".into(),
+            "raw_kcl_similarity_score".into(),
             "raw_kcl_snapshot_images".into(),
             "salon_kcl_output".into(),
+            "salon_kcl_similarity_score".into(),
             "salon_kcl_snapshot_images".into(),
             "started_at".into(),
             "status".into(),
@@ -16350,6 +16368,10 @@ pub enum OrgDatasetFileConversionStatus {
     #[serde(rename = "error_user")]
     #[display("error_user")]
     ErrorUser,
+    #[doc = "Conversion produced a raw KCL result whose geometry diverged from the source model beyond the accepted threshold."]
+    #[serde(rename = "error_geometry_mismatch")]
+    #[display("error_geometry_mismatch")]
+    ErrorGeometryMismatch,
     #[doc = "Conversion failed because we didn't know how to handle the file. The conversion should be retried with a new converter version."]
     #[serde(rename = "error_unsupported")]
     #[display("error_unsupported")]
@@ -16393,6 +16415,12 @@ pub struct OrgDatasetFileConversionSummary {
     pub metadata: Option<serde_json::Value>,
     #[doc = "Current step in the conversion pipeline."]
     pub phase: OrgDatasetFileConversionPhase,
+    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the raw KCL model matches the original model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub raw_kcl_similarity_score: Option<f64>,
+    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the salon KCL model matches the raw KCL model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub salon_kcl_similarity_score: Option<f64>,
     #[doc = "The date and time the conversion started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -16417,7 +16445,7 @@ impl std::fmt::Display for OrgDatasetFileConversionSummary {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgDatasetFileConversionSummary {
-    const LENGTH: usize = 16;
+    const LENGTH: usize = 18;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -16448,6 +16476,16 @@ impl tabled::Tabled for OrgDatasetFileConversionSummary {
                 String::new().into()
             },
             format!("{:?}", self.phase).into(),
+            if let Some(raw_kcl_similarity_score) = &self.raw_kcl_similarity_score {
+                format!("{:?}", raw_kcl_similarity_score).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(salon_kcl_similarity_score) = &self.salon_kcl_similarity_score {
+                format!("{:?}", salon_kcl_similarity_score).into()
+            } else {
+                String::new().into()
+            },
             if let Some(started_at) = &self.started_at {
                 format!("{:?}", started_at).into()
             } else {
@@ -16477,6 +16515,8 @@ impl tabled::Tabled for OrgDatasetFileConversionSummary {
             "manual_kcl_override_updated_at".into(),
             "metadata".into(),
             "phase".into(),
+            "raw_kcl_similarity_score".into(),
+            "salon_kcl_similarity_score".into(),
             "started_at".into(),
             "status".into(),
             "status_message".into(),
