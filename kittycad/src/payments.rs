@@ -353,6 +353,39 @@ impl Payments {
             .boxed()
     }
 
+    #[doc = "Redirect to a fresh Stripe-hosted payment-method update link for your org.\n\nIf the request is not authenticated, this redirects to website login with a callback back to this endpoint. If authenticated as an org admin, it creates a fresh hosted Stripe portal session and redirects the browser to it.\n\n**Parameters:**\n\n- `return_url: Option<String>`: The URL Stripe should offer after the hosted flow completes.\n\nIf omitted, this defaults to the account page.\n\n```rust,no_run\nasync fn example_payments_redirect_method_portal_link_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .redirect_method_portal_link_for_org(Some(\"https://example.com/foo/bar\".to_string()))\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn redirect_method_portal_link_for_org<'a>(
+        &'a self,
+        return_url: Option<String>,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url, "org/payment/method-portal-link"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = return_url {
+            query_params.push(("return_url", p));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "List payment methods for your org.\n\nThis endpoint requires authentication by an org admin. It lists payment methods for the authenticated user's org.\n\n```rust,no_run\nasync fn example_payments_list_methods_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::PaymentMethod> = client.payments().list_methods_for_org().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list_methods_for_org<'a>(
@@ -1070,6 +1103,39 @@ impl Payments {
             })
             .try_flatten_stream()
             .boxed()
+    }
+
+    #[doc = "Redirect to a fresh Stripe-hosted payment-method update link for your user.\n\nIf the request is not authenticated, this redirects to website login with a callback back to this endpoint. If authenticated, it creates a fresh hosted Stripe portal session and redirects the browser to it.\n\n**Parameters:**\n\n- `return_url: Option<String>`: The URL Stripe should offer after the hosted flow completes.\n\nIf omitted, this defaults to the account page.\n\n```rust,no_run\nasync fn example_payments_redirect_method_portal_link_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .redirect_method_portal_link_for_user(Some(\"https://example.com/foo/bar\".to_string()))\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn redirect_method_portal_link_for_user<'a>(
+        &'a self,
+        return_url: Option<String>,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url, "user/payment/method-portal-link"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = return_url {
+            query_params.push(("return_url", p));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
     }
 
     #[doc = "List payment methods for your user.\n\nThis endpoint requires authentication by any Zoo user. It lists payment methods for the authenticated user.\n\n```rust,no_run\nasync fn example_payments_list_methods_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::PaymentMethod> =\n        client.payments().list_methods_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]

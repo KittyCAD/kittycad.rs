@@ -689,6 +689,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1org~1payment~1method-portal-link/get/x-rust",
+    "value": {
+      "example": "/// Redirect to a fresh Stripe-hosted payment-method update link for your org.\n/// \n/// If the request is not authenticated, this redirects to website login with a callback back to this endpoint. If authenticated as an org admin, it creates a fresh hosted Stripe portal session and redirects the browser to it.\n/// \n/// **Parameters:**\n/// \n/// - `return_url: Option<String>`: The URL Stripe should offer after the hosted flow completes.\n/// \n/// If omitted, this defaults to the account page.\nasync fn example_payments_redirect_method_portal_link_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .redirect_method_portal_link_for_org(Some(\"https://example.com/foo/bar\".to_string()))\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.redirect_method_portal_link_for_org"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1org~1payment~1methods/get/x-rust",
     "value": {
       "example": "/// List payment methods for your org.\n/// \n/// This endpoint requires authentication by an org admin. It lists payment methods for the authenticated user's org.\nasync fn example_payments_list_methods_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::PaymentMethod> = client.payments().list_methods_for_org().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
@@ -1325,6 +1333,14 @@
     "value": {
       "example": "/// List invoices for your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It lists invoices for the authenticated user.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\nasync fn example_payments_list_invoices_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::InvoiceResultsPage = client\n        .payments()\n        .list_invoices_for_user(Some(4 as u32), Some(\"some-string\".to_string()))\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_payments_list_invoices_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut payments = client.payments();\n    let mut stream = payments.list_invoices_for_user_stream(Some(4 as u32));\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.list_invoices_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1payment~1method-portal-link/get/x-rust",
+    "value": {
+      "example": "/// Redirect to a fresh Stripe-hosted payment-method update link for your user.\n/// \n/// If the request is not authenticated, this redirects to website login with a callback back to this endpoint. If authenticated, it creates a fresh hosted Stripe portal session and redirects the browser to it.\n/// \n/// **Parameters:**\n/// \n/// - `return_url: Option<String>`: The URL Stripe should offer after the hosted flow completes.\n/// \n/// If omitted, this defaults to the account page.\nasync fn example_payments_redirect_method_portal_link_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .redirect_method_portal_link_for_user(Some(\"https://example.com/foo/bar\".to_string()))\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.redirect_method_portal_link_for_user"
     }
   },
   {
