@@ -26264,9 +26264,6 @@ pub enum UserFeature {
     #[serde(rename = "proprietary_to_kcl_conversion_beta")]
     #[display("proprietary_to_kcl_conversion_beta")]
     ProprietaryToKclConversionBeta,
-    #[serde(rename = "classic_sketch_mode")]
-    #[display("classic_sketch_mode")]
-    ClassicSketchMode,
     #[serde(rename = "web_app_file_browser")]
     #[display("web_app_file_browser")]
     WebAppFileBrowser,
