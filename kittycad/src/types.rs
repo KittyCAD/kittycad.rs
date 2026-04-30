@@ -5639,6 +5639,9 @@ pub struct CreateOAuth2AppRequest {
     #[doc = "The OAuth grant types this app can use."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub grant_types: Option<Vec<Oauth2AppGrantType>>,
+    #[doc = "The deployment mode for this app."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mode: Option<Oauth2AppMode>,
     #[doc = "The display name of the app."]
     pub name: String,
     #[doc = "The redirect URIs registered for this app."]
@@ -5658,11 +5661,16 @@ impl std::fmt::Display for CreateOAuth2AppRequest {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CreateOAuth2AppRequest {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(grant_types) = &self.grant_types {
                 format!("{:?}", grant_types).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(mode) = &self.mode {
+                format!("{:?}", mode).into()
             } else {
                 String::new().into()
             },
@@ -5676,7 +5684,12 @@ impl tabled::Tabled for CreateOAuth2AppRequest {
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["grant_types".into(), "name".into(), "redirect_uris".into()]
+        vec![
+            "grant_types".into(),
+            "mode".into(),
+            "name".into(),
+            "redirect_uris".into(),
+        ]
     }
 }
 
@@ -14620,6 +14633,32 @@ pub enum Oauth2AppGrantType {
     ClientCredentials,
 }
 
+#[doc = "The deployment mode for an OAuth 2.0 app."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Oauth2AppMode {
+    #[doc = "Development mode permits HTTPS redirect URIs and local HTTP redirect URIs. Only the \
+             app owner, or an org admin for organization apps, can authorize development apps."]
+    #[serde(rename = "development")]
+    #[display("development")]
+    Development,
+    #[doc = "Production mode only permits secure non-local redirect URIs."]
+    #[serde(rename = "production")]
+    #[display("production")]
+    Production,
+}
+
 #[doc = "API response for a managed OAuth app."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -14637,6 +14676,8 @@ pub struct Oauth2AppResponse {
     pub grant_types: Vec<Oauth2AppGrantType>,
     #[doc = "Whether this app is active."]
     pub is_active: bool,
+    #[doc = "The deployment mode for this app."]
+    pub mode: Oauth2AppMode,
     #[doc = "The display name of the app."]
     pub name: String,
     #[doc = "The registered redirect URIs for this app."]
@@ -14657,7 +14698,7 @@ impl std::fmt::Display for Oauth2AppResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Oauth2AppResponse {
-    const LENGTH: usize = 9;
+    const LENGTH: usize = 10;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.client_id).into(),
@@ -14666,6 +14707,7 @@ impl tabled::Tabled for Oauth2AppResponse {
             format!("{:?}", self.first_party).into(),
             format!("{:?}", self.grant_types).into(),
             format!("{:?}", self.is_active).into(),
+            format!("{:?}", self.mode).into(),
             self.name.clone().into(),
             format!("{:?}", self.redirect_uris).into(),
             format!("{:?}", self.updated_at).into(),
@@ -14680,6 +14722,7 @@ impl tabled::Tabled for Oauth2AppResponse {
             "first_party".into(),
             "grant_types".into(),
             "is_active".into(),
+            "mode".into(),
             "name".into(),
             "redirect_uris".into(),
             "updated_at".into(),
@@ -14757,6 +14800,97 @@ impl tabled::Tabled for Oauth2AppResponseResultsPage {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "Result of approving or denying an OAuth authorization request."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Oauth2AuthorizationDecisionResponse {
+    #[doc = "The URL the user agent should navigate to after the decision."]
+    pub redirect_url: String,
+}
+
+impl std::fmt::Display for Oauth2AuthorizationDecisionResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Oauth2AuthorizationDecisionResponse {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.redirect_url.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["redirect_url".into()]
+    }
+}
+
+#[doc = "Details rendered by the OAuth consent page."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Oauth2AuthorizationRequestResponse {
+    #[doc = "The OAuth app display name."]
+    pub app_name: String,
+    #[doc = "When this authorization request expires."]
+    pub expires_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The OAuth app owner display name, if available."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub owner_name: Option<String>,
+    #[doc = "The redirect URI that will receive the authorization result."]
+    pub redirect_uri: String,
+    #[doc = "The pending authorization request ID."]
+    pub request_id: uuid::Uuid,
+    #[doc = "The scopes requested by the app."]
+    pub scopes: Vec<Oauth2Scope>,
+}
+
+impl std::fmt::Display for Oauth2AuthorizationRequestResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Oauth2AuthorizationRequestResponse {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.app_name.clone().into(),
+            format!("{:?}", self.expires_at).into(),
+            if let Some(owner_name) = &self.owner_name {
+                format!("{:?}", owner_name).into()
+            } else {
+                String::new().into()
+            },
+            self.redirect_uri.clone().into(),
+            format!("{:?}", self.request_id).into(),
+            format!("{:?}", self.scopes).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "app_name".into(),
+            "expires_at".into(),
+            "owner_name".into(),
+            "redirect_uri".into(),
+            "request_id".into(),
+            "scopes".into(),
+        ]
     }
 }
 
@@ -14901,6 +15035,31 @@ pub enum Oauth2GrantType {
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
 
+
+#[doc = "Supported OAuth 2.0 scopes."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Oauth2Scope {
+    #[doc = "Grants access to modeling APIs."]
+    #[serde(rename = "modeling")]
+    #[display("modeling")]
+    Modeling,
+    #[doc = "Grants write access to admin APIs."]
+    #[serde(rename = "admin:write")]
+    #[display("admin:write")]
+    AdminWrite,
+}
 
 #[doc = "The OAuth 2.0 token endpoint grant types supported by the general token endpoint."]
 #[derive(
@@ -26101,6 +26260,9 @@ pub struct UpdateOAuth2AppRequest {
     #[doc = "The OAuth grant types this app can use."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub grant_types: Option<Vec<Oauth2AppGrantType>>,
+    #[doc = "The deployment mode for this app."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mode: Option<Oauth2AppMode>,
     #[doc = "The new display name of the app."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -26121,11 +26283,16 @@ impl std::fmt::Display for UpdateOAuth2AppRequest {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UpdateOAuth2AppRequest {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(grant_types) = &self.grant_types {
                 format!("{:?}", grant_types).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(mode) = &self.mode {
+                format!("{:?}", mode).into()
             } else {
                 String::new().into()
             },
@@ -26143,7 +26310,12 @@ impl tabled::Tabled for UpdateOAuth2AppRequest {
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["grant_types".into(), "name".into(), "redirect_uris".into()]
+        vec![
+            "grant_types".into(),
+            "mode".into(),
+            "name".into(),
+            "redirect_uris".into(),
+        ]
     }
 }
 
