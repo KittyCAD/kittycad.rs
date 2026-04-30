@@ -52563,8 +52563,9 @@
           },
           "private_key": {
             "nullable": true,
+            "writeOnly": true,
             "title": "String",
-            "description": "The private key for the SAML identity provider. This is the PEM corresponding to the X509 pair.",
+            "description": "The private key for the SAML identity provider. This is the PEM corresponding to the X509 pair.\n\nNever serialized in API responses: the SP signing key is a secret used internally to sign AuthnRequests, and would otherwise leak to admin GETs, audit logs, support tooling, and browser history. Input is accepted via the dedicated `SamlIdentityProviderCreate` body type, not by deserializing this struct.",
             "type": "string",
             "format": "byte"
           },
