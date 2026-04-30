@@ -20167,7 +20167,10 @@ pub struct SamlIdentityProvider {
     #[doc = "The organization ID the SAML identity provider belongs to."]
     pub org_id: uuid::Uuid,
     #[doc = "The private key for the SAML identity provider. This is the PEM corresponding to the \
-             X509 pair."]
+             X509 pair.\n\nNever serialized in API responses: the SP signing key is a secret used \
+             internally to sign AuthnRequests, and would otherwise leak to admin GETs, audit \
+             logs, support tooling, and browser history. Input is accepted via the dedicated \
+             `SamlIdentityProviderCreate` body type, not by deserializing this struct."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub private_key: Option<base64::Base64Data>,
     #[doc = "The public certificate for the SAML identity provider. This is the PEM corresponding \
