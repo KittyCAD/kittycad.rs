@@ -26432,6 +26432,9 @@ pub enum UserFeature {
     #[serde(rename = "aquarium")]
     #[display("aquarium")]
     Aquarium,
+    #[serde(rename = "bodies_pane")]
+    #[display("bodies_pane")]
+    BodiesPane,
     #[serde(rename = "proprietary_to_kcl_conversion_beta")]
     #[display("proprietary_to_kcl_conversion_beta")]
     ProprietaryToKclConversionBeta,
