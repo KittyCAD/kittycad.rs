@@ -12160,10 +12160,6 @@ pub enum MlCopilotClientMessage {
         #[doc = "Change the default or mode reasoning effort."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         reasoning_effort: Option<MlReasoningEffort>,
-        #[doc = "To handle the transition period between sketch 1 and sketch_solve, set a flag \
-                 for sketch_solve, True for sketch_solve, false for sketch 1. Defaults to false"]
-        #[serde(default)]
-        sketch_solve: bool,
         #[doc = "The source ranges the user suggested to change. If empty, the content (prompt) \
                  will be used and is required."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
