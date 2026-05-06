@@ -31104,6 +31104,13 @@
             ]
           },
           {
+            "description": "The ZooCorp account provider (aka https://auth.corp.zoo.dev).",
+            "type": "string",
+            "enum": [
+              "zoo_corp"
+            ]
+          },
+          {
             "description": "The GitHub account provider.",
             "type": "string",
             "enum": [
@@ -31122,13 +31129,6 @@
             "type": "string",
             "enum": [
               "saml"
-            ]
-          },
-          {
-            "description": "The Tencent QQ account provider.",
-            "type": "string",
-            "enum": [
-              "tencent"
             ]
           },
           {

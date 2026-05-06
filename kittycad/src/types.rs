@@ -512,6 +512,10 @@ pub enum AccountProvider {
     #[serde(rename = "google")]
     #[display("google")]
     Google,
+    #[doc = "The ZooCorp account provider (aka https://auth.corp.zoo.dev)."]
+    #[serde(rename = "zoo_corp")]
+    #[display("zoo_corp")]
+    ZooCorp,
     #[doc = "The GitHub account provider."]
     #[serde(rename = "github")]
     #[display("github")]
@@ -524,10 +528,6 @@ pub enum AccountProvider {
     #[serde(rename = "saml")]
     #[display("saml")]
     Saml,
-    #[doc = "The Tencent QQ account provider."]
-    #[serde(rename = "tencent")]
-    #[display("tencent")]
-    Tencent,
     #[doc = "Test provider for integration tests (only available during testing)."]
     #[serde(rename = "test_provider")]
     #[display("test_provider")]
