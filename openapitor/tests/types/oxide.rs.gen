@@ -194,6 +194,15 @@ pub mod paginate {
             &self,
             req: reqwest::Request,
         ) -> Result<reqwest::Request, crate::types::error::Error>;
+        #[doc = " Modify a request to get the next page using the operation's page parameter."]
+        fn next_page_with_param(
+            &self,
+            req: reqwest::Request,
+            _page_param: &str,
+        ) -> Result<reqwest::Request, crate::types::error::Error> {
+            self.next_page(req)
+        }
+
         #[doc = " Get the items from a page."]
         fn items(&self) -> Vec<Self::Item>;
     }
@@ -914,6 +923,14 @@ impl crate::types::paginate::Pagination for DiskResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -922,7 +939,7 @@ impl crate::types::paginate::Pagination for DiskResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -1440,6 +1457,14 @@ impl crate::types::paginate::Pagination for GlobalImageResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -1448,7 +1473,7 @@ impl crate::types::paginate::Pagination for GlobalImageResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -1568,6 +1593,14 @@ impl crate::types::paginate::Pagination for IdentityProviderResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -1576,7 +1609,7 @@ impl crate::types::paginate::Pagination for IdentityProviderResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -1840,6 +1873,14 @@ impl crate::types::paginate::Pagination for ImageResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -1848,7 +1889,7 @@ impl crate::types::paginate::Pagination for ImageResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -2149,6 +2190,14 @@ impl crate::types::paginate::Pagination for InstanceResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -2157,7 +2206,7 @@ impl crate::types::paginate::Pagination for InstanceResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -2436,6 +2485,14 @@ impl crate::types::paginate::Pagination for IpPoolRangeResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -2444,7 +2501,7 @@ impl crate::types::paginate::Pagination for IpPoolRangeResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -2509,6 +2566,14 @@ impl crate::types::paginate::Pagination for IpPoolResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -2517,7 +2582,7 @@ impl crate::types::paginate::Pagination for IpPoolResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -2833,6 +2898,14 @@ impl crate::types::paginate::Pagination for NetworkInterfaceResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -2841,7 +2914,7 @@ impl crate::types::paginate::Pagination for NetworkInterfaceResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -3037,6 +3110,14 @@ impl crate::types::paginate::Pagination for OrganizationResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -3045,7 +3126,7 @@ impl crate::types::paginate::Pagination for OrganizationResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -3337,6 +3418,14 @@ impl crate::types::paginate::Pagination for ProjectResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -3345,7 +3434,7 @@ impl crate::types::paginate::Pagination for ProjectResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -3590,6 +3679,14 @@ impl crate::types::paginate::Pagination for RackResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -3598,7 +3695,7 @@ impl crate::types::paginate::Pagination for RackResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -3695,6 +3792,14 @@ impl crate::types::paginate::Pagination for RoleResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -3703,7 +3808,7 @@ impl crate::types::paginate::Pagination for RoleResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -3955,6 +4060,14 @@ impl crate::types::paginate::Pagination for RouterRouteResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -3963,7 +4076,7 @@ impl crate::types::paginate::Pagination for RouterRouteResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -4134,6 +4247,14 @@ impl crate::types::paginate::Pagination for SagaResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -4142,7 +4263,7 @@ impl crate::types::paginate::Pagination for SagaResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -4479,6 +4600,14 @@ impl crate::types::paginate::Pagination for SiloResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -4487,7 +4616,7 @@ impl crate::types::paginate::Pagination for SiloResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -4695,6 +4824,14 @@ impl crate::types::paginate::Pagination for SledResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -4703,7 +4840,7 @@ impl crate::types::paginate::Pagination for SledResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -4867,6 +5004,14 @@ impl crate::types::paginate::Pagination for SnapshotResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -4875,7 +5020,7 @@ impl crate::types::paginate::Pagination for SnapshotResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -5066,6 +5211,14 @@ impl crate::types::paginate::Pagination for SshKeyResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -5074,7 +5227,7 @@ impl crate::types::paginate::Pagination for SshKeyResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -5184,6 +5337,14 @@ impl crate::types::paginate::Pagination for TimeseriesSchemaResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -5192,7 +5353,7 @@ impl crate::types::paginate::Pagination for TimeseriesSchemaResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -5343,6 +5504,14 @@ impl crate::types::paginate::Pagination for UserBuiltinResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -5351,7 +5520,7 @@ impl crate::types::paginate::Pagination for UserBuiltinResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -5439,6 +5608,14 @@ impl crate::types::paginate::Pagination for UserResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -5447,7 +5624,7 @@ impl crate::types::paginate::Pagination for UserResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -6031,6 +6208,14 @@ impl crate::types::paginate::Pagination for VpcResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -6039,7 +6224,7 @@ impl crate::types::paginate::Pagination for VpcResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -6216,6 +6401,14 @@ impl crate::types::paginate::Pagination for VpcRouterResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -6224,7 +6417,7 @@ impl crate::types::paginate::Pagination for VpcRouterResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -6454,6 +6647,14 @@ impl crate::types::paginate::Pagination for VpcSubnetResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -6462,7 +6663,7 @@ impl crate::types::paginate::Pagination for VpcSubnetResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 

@@ -73,9 +73,10 @@ fn internal_generate(spec: &openapiv3::OpenAPI, opts: &Opts) -> Result<String> {
     /*
      * Deal with any dependencies we require to produce this client.
      */
-    a("#![allow(elided_named_lifetimes)]");
+    a("#![allow(mismatched_lifetime_syntaxes)]");
     a("#![allow(missing_docs)]"); // TODO: Make this a deny.
     a("#![allow(unused_imports)]");
+    a("#![allow(clippy::large_enum_variant)]"); // Generated schemas can have wildly uneven enum variants.
     a("#![allow(clippy::needless_lifetimes)]"); // TODO: Fix this.
     a("#![allow(clippy::too_many_arguments)]"); // TODO: Fix this.
 
