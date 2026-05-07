@@ -333,6 +333,157 @@ async fn test_stream() {
     }
 }
 
+#[tokio::test]
+#[cfg(not(feature = "js"))]
+async fn test_list_dataset_conversions_stream_preserves_query_params() {
+    let dataset_id = uuid::Uuid::new_v4();
+    let conversion_id_1 = uuid::Uuid::new_v4();
+    let conversion_id_2 = uuid::Uuid::new_v4();
+    let (base_url, requests, server) =
+        dataset_conversions_test_server(dataset_id, conversion_id_1, conversion_id_2);
+
+    let mut client = crate::Client::new("test-token");
+    client.set_base_url(base_url);
+
+    let orgs = client.orgs();
+    let mut stream = orgs.list_dataset_conversions_stream(
+        Some("status=success".to_string()),
+        dataset_id,
+        Some(1),
+        Some(crate::types::ConversionSortMode::StatusDescending),
+    );
+
+    let mut ids = Vec::new();
+    while let Some(item) = stream.try_next().await.unwrap() {
+        ids.push(item.id);
+    }
+
+    assert_eq!(ids, vec![conversion_id_1, conversion_id_2]);
+
+    let first = requests
+        .recv_timeout(std::time::Duration::from_secs(5))
+        .unwrap();
+    let second = requests
+        .recv_timeout(std::time::Duration::from_secs(5))
+        .unwrap();
+    server.join().unwrap();
+
+    let first_url = request_url(&first);
+    let second_url = request_url(&second);
+    let expected_path = format!("/org/datasets/{dataset_id}/conversions");
+    assert_eq!(first_url.path(), expected_path);
+    assert_eq!(second_url.path(), expected_path);
+
+    assert_query_pair(&first_url, "filter", "status=success");
+    assert_query_pair(&first_url, "limit", "1");
+    assert_query_pair(&first_url, "sort_by", "status_descending");
+    assert_no_query_pair(&first_url, "page_token");
+    assert_no_query_pair(&first_url, "next_page");
+
+    assert_query_pair(&second_url, "filter", "status=success");
+    assert_query_pair(&second_url, "limit", "1");
+    assert_query_pair(&second_url, "sort_by", "status_descending");
+    assert_query_pair(&second_url, "page_token", "token-1");
+    assert_no_query_pair(&second_url, "next_page");
+}
+
+#[cfg(not(feature = "js"))]
+fn dataset_conversions_test_server(
+    dataset_id: uuid::Uuid,
+    conversion_id_1: uuid::Uuid,
+    conversion_id_2: uuid::Uuid,
+) -> (
+    String,
+    std::sync::mpsc::Receiver<String>,
+    std::thread::JoinHandle<()>,
+) {
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let base_url = format!("http://{}", listener.local_addr().unwrap());
+    let (requests_tx, requests_rx) = std::sync::mpsc::channel();
+
+    let server = std::thread::spawn(move || {
+        let pages = [
+            dataset_conversion_page(dataset_id, conversion_id_1, Some("token-1")),
+            dataset_conversion_page(dataset_id, conversion_id_2, None),
+        ];
+
+        for body in pages {
+            let (mut stream, _) = listener.accept().unwrap();
+            stream
+                .set_read_timeout(Some(std::time::Duration::from_secs(5)))
+                .unwrap();
+
+            let mut buffer = [0; 4096];
+            let bytes_read = std::io::Read::read(&mut stream, &mut buffer).unwrap();
+            let request = String::from_utf8_lossy(&buffer[..bytes_read]);
+            let path = request
+                .lines()
+                .next()
+                .and_then(|line| line.split_whitespace().nth(1))
+                .unwrap()
+                .to_string();
+            requests_tx.send(path).unwrap();
+
+            let response = format!(
+                "HTTP/1.1 200 OK\r\ncontent-type: application/json\r\ncontent-length: \
+                 {}\r\nconnection: close\r\n\r\n{}",
+                body.len(),
+                body
+            );
+            std::io::Write::write_all(&mut stream, response.as_bytes()).unwrap();
+        }
+    });
+
+    (base_url, requests_rx, server)
+}
+
+#[cfg(not(feature = "js"))]
+fn dataset_conversion_page(
+    dataset_id: uuid::Uuid,
+    conversion_id: uuid::Uuid,
+    next_page: Option<&str>,
+) -> String {
+    serde_json::json!({
+        "items": [{
+            "created_at": "2026-05-07T00:00:00Z",
+            "dataset_id": dataset_id,
+            "file_etag": "etag",
+            "file_path": "parts/bracket.step",
+            "file_size": 42,
+            "id": conversion_id,
+            "manual_kcl_override_active": false,
+            "phase": "completed",
+            "status": "success",
+            "updated_at": "2026-05-07T00:00:00Z"
+        }],
+        "next_page": next_page
+    })
+    .to_string()
+}
+
+#[cfg(not(feature = "js"))]
+fn request_url(path: &str) -> url::Url {
+    url::Url::parse(&format!("http://localhost{path}")).unwrap()
+}
+
+#[cfg(not(feature = "js"))]
+fn assert_query_pair(url: &url::Url, name: &str, value: &str) {
+    let pairs = url.query_pairs().collect::<Vec<_>>();
+    assert!(
+        pairs.iter().any(|(k, v)| k == name && v == value),
+        "missing query pair {name}={value}, got {pairs:?}"
+    );
+}
+
+#[cfg(not(feature = "js"))]
+fn assert_no_query_pair(url: &url::Url, name: &str) {
+    let pairs = url.query_pairs().collect::<Vec<_>>();
+    assert!(
+        pairs.iter().all(|(k, _)| k != name),
+        "unexpected query pair {name}, got {pairs:?}"
+    );
+}
+
 #[test]
 fn test_empty_phone_number() {
     let user_info = crate::types::UpdateUser {

@@ -67,7 +67,7 @@ fn generate_websocket_fn(
 
     // Let's get the query parameters.
     let query_params = get_query_params(type_space, op, global_params)?;
-    let query_params_code = gen_query_params_code(&query_params, false)?;
+    let query_params_code = gen_query_params_code(&query_params)?;
 
     let auth_code = generate_auth_code(opts)?;
 
@@ -315,6 +315,13 @@ pub(crate) fn generate_files(
                         quote!(,body)
                     };
 
+                    let pagination_setup = gen_pagination_request_setup_code(
+                        type_space,
+                        name,
+                        method,
+                        op,
+                        global_params,
+                    )?;
                     let paginated_function_body =
                         get_function_body(type_space, name, method, op, true, opts, global_params)?;
 
@@ -325,18 +332,18 @@ pub(crate) fn generate_files(
                         let params_ident = params_struct.ident.clone();
                         let page_param_ident =
                             format_ident!("{}", crate::types::clean_property_name(&page_param_str));
-                        let path_params = get_path_params(type_space, op, global_params)?;
-                        let path_param_idents: Vec<proc_macro2::Ident> = path_params
+                        let pagination_param_idents: Vec<proc_macro2::Ident> = raw_args
                             .keys()
+                            .filter(|name| name.as_str() != page_param_str)
                             .map(|name| {
                                 format_ident!("{}", crate::types::clean_property_name(name))
                             })
                             .collect();
-                        let params_unpack = if path_param_idents.is_empty() {
+                        let params_unpack = if pagination_param_idents.is_empty() {
                             quote!()
                         } else {
                             quote! {
-                                let #params_ident { #(#path_param_idents),*, .. } = params;
+                                let #params_ident { #(#pagination_param_idents),*, .. } = params;
                             }
                         };
 
@@ -352,6 +359,7 @@ pub(crate) fn generate_files(
                                 params.#page_param_ident = Default::default();
                                 let params_for_call = params.clone();
                                 #params_unpack
+                                #pagination_setup
 
                                 // Get the result from our main function.
                                 self.#fn_name_ident(params_for_call #body_arg)
@@ -361,7 +369,10 @@ pub(crate) fn generate_files(
                                         // Get the next pages.
                                         let next_pages = futures::stream::try_unfold(
                                             (None, result),
-                                            move |(prev_page_token, new_result)| async move {
+                                            move |(prev_page_token, new_result)| {
+                                                let pagination_url_path = pagination_url_path.clone();
+                                                let pagination_query_params = pagination_query_params.clone();
+                                                async move {
                                                 if new_result.has_more_pages() && !new_result.items().is_empty() && prev_page_token != new_result.next_page_token() {
                                                     // Get the next page, we modify the request directly,
                                                     // so that if we want to generate an API that uses
@@ -379,6 +390,7 @@ pub(crate) fn generate_files(
                                                 } else {
                                                     // We have no more pages.
                                                     Ok(None)
+                                                }
                                                 }
                                             }
                                         )
@@ -432,6 +444,8 @@ pub(crate) fn generate_files(
                                 use futures::{StreamExt, TryFutureExt, TryStreamExt};
                                 use crate::types::paginate::Pagination;
 
+                                #pagination_setup
+
                                 // Get the result from our main function.
                                 self.#fn_name_ident(#inner_args #body_arg)
                                     .map_ok(move |result| {
@@ -440,7 +454,10 @@ pub(crate) fn generate_files(
                                         // Get the next pages.
                                         let next_pages = futures::stream::try_unfold(
                                             (None, result),
-                                            move |(prev_page_token, new_result)| async move {
+                                            move |(prev_page_token, new_result)| {
+                                                let pagination_url_path = pagination_url_path.clone();
+                                                let pagination_query_params = pagination_query_params.clone();
+                                                async move {
                                                 if new_result.has_more_pages() && !new_result.items().is_empty() && prev_page_token != new_result.next_page_token() {
                                                     // Get the next page, we modify the request directly,
                                                     // so that if we want to generate an API that uses
@@ -458,6 +475,7 @@ pub(crate) fn generate_files(
                                                 } else {
                                                     // We have no more pages.
                                                     Ok(None)
+                                                }
                                                 }
                                             }
                                         )
@@ -1197,11 +1215,8 @@ fn clean_url_from(path_params: &BTreeMap<String, TokenStream>) -> Result<TokenSt
     Ok(clean_string)
 }
 
-fn gen_query_params_code(
-    query_params: &BTreeMap<String, TokenStream>,
-    paginated: bool,
-) -> Result<TokenStream> {
-    if query_params.is_empty() || paginated {
+fn gen_query_params_code(query_params: &BTreeMap<String, TokenStream>) -> Result<TokenStream> {
+    if query_params.is_empty() {
         return Ok(quote!());
     }
 
@@ -1266,6 +1281,88 @@ fn gen_query_params_code(
     })
 }
 
+fn gen_pagination_query_params_setup_code(
+    query_params: &BTreeMap<String, TokenStream>,
+    page_param: &str,
+) -> Result<TokenStream> {
+    let mut push_params = Vec::new();
+    for (name, t) in query_params {
+        if name == page_param {
+            continue;
+        }
+
+        let cleaned_name = crate::types::clean_property_name(name);
+        let name_ident = format_ident!("{}", cleaned_name);
+        let type_text = crate::types::get_text(t)?;
+
+        if t.is_vec()? {
+            push_params.push(quote! {
+                pagination_query_params.push((#name, itertools::join(#name_ident.iter(), ",")));
+            })
+        } else if !t.is_option()? {
+            if type_text == "String" {
+                push_params.push(quote! {
+                    pagination_query_params.push((#name, #name_ident.clone()));
+                })
+            } else {
+                push_params.push(quote! {
+                    pagination_query_params.push((#name, format!("{}", #name_ident)));
+                })
+            }
+        } else if type_text == "Option<String>" {
+            push_params.push(quote! {
+                if let Some(p) = #name_ident.as_ref() {
+                    pagination_query_params.push((#name, p.clone()));
+                }
+            })
+        } else if type_text == "Option<crate::types::phone_number::PhoneNumber>" {
+            push_params.push(quote! {
+                if let Some(p) = #name_ident.as_ref().and_then(|p| p.0.as_ref()) {
+                    pagination_query_params.push((#name, format!("{p}")));
+                }
+            })
+        } else if t.is_option_vec()? {
+            push_params.push(quote! {
+                if let Some(p) = #name_ident.as_ref() {
+                    pagination_query_params.push((#name, itertools::join(p.iter(), ",")));
+                }
+            })
+        } else {
+            push_params.push(quote! {
+                if let Some(p) = #name_ident.as_ref() {
+                    pagination_query_params.push((#name, format!("{}", p)));
+                }
+            })
+        }
+    }
+
+    Ok(quote! {
+        let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        #(#push_params)*
+    })
+}
+
+fn gen_pagination_request_setup_code(
+    type_space: &mut crate::types::TypeSpace,
+    name: &str,
+    method: &http::Method,
+    op: &openapiv3::Operation,
+    global_params: &[openapiv3::ReferenceOr<openapiv3::Parameter>],
+) -> Result<TokenStream> {
+    let path = name.trim_start_matches('/');
+    let path_params = get_path_params(type_space, op, global_params)?;
+    let clean_url = clean_url_from(&path_params)?;
+    let query_params = get_query_params(type_space, op, global_params)?;
+    let page_param =
+        get_pagination_properties(name, method, op, &type_space.spec)?.page_param_str()?;
+    let query_params_setup = gen_pagination_query_params_setup_code(&query_params, &page_param)?;
+
+    Ok(quote! {
+        let pagination_url_path = (#path #clean_url).to_string();
+        #query_params_setup
+    })
+}
+
 fn generate_auth_code(opts: &crate::Opts) -> Result<TokenStream> {
     let out = if opts.token_endpoint.is_some() {
         quote!(req = req.bearer_auth(&self.client.token.read().await.access_token);)
@@ -1296,7 +1393,14 @@ fn get_function_body(
 
     // Let's get the query parameters.
     let query_params = get_query_params(type_space, op, global_params)?;
-    let query_params_code = gen_query_params_code(&query_params, paginated)?;
+    let query_params_code = if paginated {
+        quote! {
+            let query_params = pagination_query_params.clone();
+            req = req.query(&query_params);
+        }
+    } else {
+        gen_query_params_code(&query_params)?
+    };
 
     // Get if there is a request body.
     let request_body = if let Some(request_body) = get_request_body(type_space, name, method, op)? {
@@ -1435,11 +1539,13 @@ fn get_function_body(
     };
 
     let send_request = if paginated {
+        let page_param =
+            get_pagination_properties(name, method, op, &type_space.spec)?.page_param_str()?;
         quote!(
             // Build the request.
             let mut request = req.build()?;
             // Now we will modify the request to add the pagination.
-            request = new_result.next_page(request)?;
+            request = new_result.next_page_with_param(request, #page_param)?;
             // Now we will execute the request.
             let resp = self.client.client.execute(request).await?;
         )
@@ -1453,10 +1559,16 @@ fn get_function_body(
 
     let auth_code = generate_auth_code(opts)?;
 
+    let url_path = if paginated {
+        quote!(pagination_url_path.clone())
+    } else {
+        quote!(#path #clean_url)
+    };
+
     Ok(quote! {
         let mut req = self.client.client.request(
             http::Method::#method_ident,
-            format!("{}/{}", self.client.base_url, #path #clean_url),
+            format!("{}/{}", self.client.base_url, #url_path),
         );
 
         // Add in our authentication.

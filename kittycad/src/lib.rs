@@ -29,7 +29,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! kittycad = "0.4.10"
+//! kittycad = "0.4.11"
 //! ```
 //!
 //! ## Basic example
@@ -59,6 +59,7 @@
 #![allow(mismatched_lifetime_syntaxes)]
 #![allow(missing_docs)]
 #![allow(unused_imports)]
+#![allow(clippy::large_enum_variant)]
 #![allow(clippy::needless_lifetimes)]
 #![allow(clippy::too_many_arguments)]
 #![cfg_attr(docsrs, feature(doc_cfg))]

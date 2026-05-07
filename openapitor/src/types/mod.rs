@@ -768,6 +768,10 @@ impl TypeSpace {
                             Ok(req)
                         }
 
+                        fn next_page_with_param(&self, req: reqwest::Request, _page_param: &str) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+                            self.next_page(req)
+                        }
+
                         fn items(&self) -> Vec<Self::Item> {
                             self.#item_ident.clone()
                         }
@@ -788,9 +792,13 @@ impl TypeSpace {
                         }
 
                         fn next_page(&self, req: reqwest::Request) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+                            self.next_page_with_param(req, #next_page_str)
+                        }
+
+                        fn next_page_with_param(&self, req: reqwest::Request, page_param: &str) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
                             let mut req = req.try_clone().ok_or_else(|| crate::types::error::Error::InvalidRequest(format!("failed to clone request: {:?}", req)))?;
                             req.url_mut().query_pairs_mut()
-                                .append_pair(#next_page_str, self.#next_page_ident.as_deref().unwrap_or(""));
+                                .append_pair(page_param, self.#next_page_ident.as_deref().unwrap_or(""));
 
                             Ok(req)
                         }
